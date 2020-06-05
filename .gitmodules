@@ -1,0 +1,3 @@
+[submodule "libs/nod"]
+	path = libs/nod
+	url = https://github.com/fr00b0/nod.git

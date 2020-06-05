@@ -1,0 +1,239 @@
+// PieJam - An audio mixer for Raspberry Pi.
+//
+// Copyright (C) 2020  Dimitrij Kotrev
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#include <piejam/range/stride_iterator.h>
+
+#include <gtest/gtest.h>
+
+#include <array>
+
+namespace piejam::range::test
+{
+
+TEST(stride_iterator, pre_increment)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it(arr.begin(), 2);
+
+    EXPECT_EQ(1, *it);
+    ++it;
+    EXPECT_EQ(3, *it);
+    ++it;
+    EXPECT_EQ(5, *it);
+    ++it;
+    EXPECT_EQ(7, *it);
+}
+
+TEST(stride_iterator, post_increment)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it(arr.begin(), 2);
+
+    EXPECT_EQ(1, *it++);
+    EXPECT_EQ(3, *it);
+    EXPECT_EQ(3, *it++);
+    EXPECT_EQ(5, *it);
+    EXPECT_EQ(5, *it++);
+    EXPECT_EQ(7, *it);
+    EXPECT_EQ(7, *it++);
+}
+
+TEST(stride_iterator, add_assign)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it(arr.begin(), 2);
+
+    it += 2;
+
+    EXPECT_EQ(5, *it);
+}
+
+TEST(stride_iterator, pre_decrement)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it(
+            std::next(arr.begin(), 6),
+            2);
+
+    EXPECT_EQ(7, *it);
+    --it;
+    EXPECT_EQ(5, *it);
+    --it;
+    EXPECT_EQ(3, *it);
+    --it;
+    EXPECT_EQ(1, *it);
+}
+
+TEST(stride_iterator, post_decrement)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it(
+            std::next(arr.begin(), 6),
+            2);
+
+    EXPECT_EQ(7, *it--);
+    EXPECT_EQ(5, *it);
+    EXPECT_EQ(5, *it--);
+    EXPECT_EQ(3, *it);
+    EXPECT_EQ(3, *it--);
+    EXPECT_EQ(1, *it);
+    EXPECT_EQ(1, *it--);
+}
+
+TEST(stride_iterator, subtract_assign)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it(
+            std::next(arr.begin(), 6),
+            2);
+
+    it -= 2;
+
+    EXPECT_EQ(3, *it);
+}
+
+TEST(stride_iterator, equal)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it1(arr.begin(), 2);
+    stride_iterator<decltype(arr)::const_iterator> it2(
+            std::next(arr.begin(), 2),
+            2);
+
+    EXPECT_TRUE(it1 == it1);
+    EXPECT_FALSE(it1 == it2);
+}
+
+TEST(stride_iterator, not_equal)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it1(arr.begin(), 2);
+    stride_iterator<decltype(arr)::const_iterator> it2(
+            std::next(arr.begin(), 2),
+            2);
+
+    EXPECT_FALSE(it1 != it1);
+    EXPECT_TRUE(it1 != it2);
+}
+
+TEST(stride_iterator, less)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it1(arr.begin(), 2);
+    stride_iterator<decltype(arr)::const_iterator> it2(
+            std::next(arr.begin(), 2),
+            2);
+
+    EXPECT_FALSE(it1 < it1);
+    EXPECT_FALSE(it2 < it1);
+    EXPECT_TRUE(it1 < it2);
+}
+
+TEST(stride_iterator, less_equal)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it1(arr.begin(), 2);
+    stride_iterator<decltype(arr)::const_iterator> it2(
+            std::next(arr.begin(), 2),
+            2);
+
+    EXPECT_TRUE(it1 <= it1);
+    EXPECT_FALSE(it2 <= it1);
+    EXPECT_TRUE(it1 <= it2);
+}
+
+TEST(stride_iterator, greater)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it1(arr.begin(), 2);
+    stride_iterator<decltype(arr)::const_iterator> it2(
+            std::next(arr.begin(), 2),
+            2);
+
+    EXPECT_FALSE(it1 > it1);
+    EXPECT_TRUE(it2 > it1);
+    EXPECT_FALSE(it1 > it2);
+}
+
+TEST(stride_iterator, greater_equal)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it1(arr.begin(), 2);
+    stride_iterator<decltype(arr)::const_iterator> it2(
+            std::next(arr.begin(), 2),
+            2);
+
+    EXPECT_TRUE(it1 >= it1);
+    EXPECT_TRUE(it2 >= it1);
+    EXPECT_FALSE(it1 >= it2);
+}
+
+TEST(stride_iterator, add_step)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it(arr.begin(), 2);
+
+    auto it1 = it + 2;
+    auto it2 = 2 + it;
+
+    EXPECT_EQ(1, *it);
+    EXPECT_EQ(5, *it1);
+    EXPECT_EQ(5, *it2);
+}
+
+TEST(stride_iterator, subtract_step)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it(
+            std::next(arr.begin(), 6),
+            2);
+
+    auto it1 = it - 2;
+
+    EXPECT_EQ(7, *it);
+    EXPECT_EQ(3, *it1);
+}
+
+TEST(stride_iterator, diff)
+{
+    std::array arr{1, 2, 3, 4, 5, 6, 7};
+
+    stride_iterator<decltype(arr)::const_iterator> it1(arr.begin(), 2);
+    stride_iterator<decltype(arr)::const_iterator> it2(
+            std::next(arr.begin(), 4),
+            2);
+
+    EXPECT_EQ(2, it2 - it1);
+    EXPECT_EQ(-2, it1 - it2);
+    EXPECT_EQ(2, std::distance(it1, it2));
+}
+
+} // namespace piejam::range::test

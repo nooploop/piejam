@@ -1,0 +1,36 @@
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+find_package(Qt5Quick REQUIRED)
+find_package(Qt5QuickControls2 REQUIRED)
+
+set(RESOUCE_FILES "resources/piejam_gui_resources.qrc")
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    find_package(Qt5QuickCompiler)
+    qtquick_compiler_add_resources(RESOURCES ${RESOUCE_FILES})
+else()
+    qt5_add_resources(RESOURCES ${RESOUCE_FILES})
+endif()
+
+list(APPEND PIEJAM_QML_IMPORT_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/resources)
+set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)
+
+add_library(piejam_gui STATIC
+    ${RESOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioSettings.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Info.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Mixer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/qt_log.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Info.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Mixer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StringList.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
+)
+qt5_use_modules(piejam_gui Quick QuickControls2)
+target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(piejam_gui fmt spdlog::spdlog)
+target_compile_options(piejam_gui PRIVATE -Wall -Wextra -Werror -pedantic-errors)

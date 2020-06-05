@@ -1,0 +1,10 @@
+add_library(piejam_thread STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/affinity.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/priority.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/affinity.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/priority.cpp
+)
+
+target_include_directories(piejam_thread PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_link_libraries(piejam_thread PRIVATE pthread)

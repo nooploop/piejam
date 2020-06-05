@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file>PieJam/MixerControls/DbConvert.js</file>
+        <file>PieJam/MixerControls/DbScale.qml</file>
+        <file>PieJam/MixerControls/DbScaleData.qml</file>
+        <file>PieJam/MixerControls/DbScaleTick.qml</file>
+        <file>PieJam/MixerControls/LevelFader.qml</file>
+        <file>PieJam/MixerControls/LevelIndicator.qml</file>
+        <file>PieJam/MixerControls/LevelMeter.qml</file>
+        <file>PieJam/MixerControls/LevelMeterFader.qml</file>
+        <file>PieJam/Views/AudioSettings.qml</file>
+        <file>PieJam/Views/Mixer.qml</file>
+        <file>PieJam/Views/Power.qml</file>
+        <file>PieJam/Views/TopPane.qml</file>
+        <file>PieJam/Controls/ComboBoxSetting.qml</file>
+        <file>images/icons/mixer.png</file>
+        <file>images/icons/settings.png</file>
+        <file>images/icons/power.png</file>
+        <file>PieJam/Controls/Color.js</file>
+        <file>images/icons/ic_refresh_white_48dp.png</file>
+        <file>PieJam/Views/Info.qml</file>
+        <file>images/icons/ic_info_outline_white_18dp.png</file>
+        <file>PieJam/Views/MainWindow.qml</file>
+        <file>PieJam/Views/qmldir</file>
+    </qresource>
+</RCC>
