@@ -17,16 +17,54 @@
 
 #pragma once
 
+#include <variant>
 #include <vector>
 
 namespace piejam::audio::mixer
 {
 
+struct mono_level
+{
+    float value{};
+};
+
+inline constexpr bool
+operator==(mono_level const& l, mono_level const& r) noexcept
+{
+    return l.value == r.value;
+}
+
+inline constexpr bool
+operator!=(mono_level const& l, mono_level const& r) noexcept
+{
+    return l.value != r.value;
+}
+
+struct stereo_level
+{
+    float left{};
+    float right{};
+};
+
+inline constexpr bool
+operator==(stereo_level const& l, stereo_level const& r) noexcept
+{
+    return l.left == r.left && l.right == r.right;
+}
+
+inline constexpr bool
+operator!=(stereo_level const& l, stereo_level const& r) noexcept
+{
+    return !(l == r);
+}
+
+using channel_level = std::variant<mono_level, stereo_level>;
+
 struct channel
 {
     bool enabled{true};
     float gain{1.f};
-    float level{0.f};
+    channel_level level{};
 };
 
 using input_channels = std::vector<channel>;

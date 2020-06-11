@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/mixer.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
@@ -51,11 +52,12 @@ extern const selector<output_devices> select_output_devices;
 extern const selector<std::size_t> select_num_input_devices;
 
 auto make_input_gain_selector(std::size_t index) -> selector<float>;
-auto make_input_level_selector(std::size_t index) -> selector<float>;
+auto make_input_level_selector(std::size_t index)
+        -> selector<audio::mixer::channel_level>;
 auto make_input_enabled_selector(std::size_t index) -> selector<bool>;
 
 extern const selector<float> select_output_gain;
-extern const selector<float> select_output_level;
+extern const selector<audio::mixer::channel_level> select_output_level;
 extern const selector<bool> select_output_enabled;
 
 extern const selector<std::size_t> select_xruns;

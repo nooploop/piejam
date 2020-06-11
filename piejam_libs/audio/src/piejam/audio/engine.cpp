@@ -79,16 +79,19 @@ engine::set_output_channel_gain(float const gain)
 }
 
 auto
-engine::get_input_level(std::size_t const index) const noexcept -> float
+engine::get_input_level(std::size_t const index) const noexcept
+        -> mixer::channel_level
 {
     assert(index < m_mixer_state.inputs.size());
-    return m_mixer_state.inputs[index].level.load(std::memory_order_relaxed);
+    return mixer::mono_level{
+            m_mixer_state.inputs[index].level.load(std::memory_order_relaxed)};
 }
 
 auto
-engine::get_output_level() const noexcept -> float
+engine::get_output_level() const noexcept -> mixer::channel_level
 {
-    return m_mixer_state.output.level.load(std::memory_order_relaxed);
+    auto level = m_mixer_state.output.level.load(std::memory_order_relaxed);
+    return mixer::stereo_level{level, level};
 }
 
 template <class InputIterator, class OutputIterator>

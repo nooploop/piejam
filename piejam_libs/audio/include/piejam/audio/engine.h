@@ -38,8 +38,9 @@ public:
     void set_input_channel_gain(std::size_t index, float gain);
     void set_output_channel_gain(float gain);
 
-    auto get_input_level(std::size_t index) const noexcept -> float;
-    auto get_output_level() const noexcept -> float;
+    auto get_input_level(std::size_t index) const noexcept
+            -> mixer::channel_level;
+    auto get_output_level() const noexcept -> mixer::channel_level;
 
     void operator()(
             range::table_view<float const> const& in_audio,

@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/Mixer.h>
 
+#include <piejam/functional/overload.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/engine_actions.h>
@@ -26,10 +27,42 @@
 namespace piejam::app::gui::model
 {
 
+static void
+set_input_channel_level(
+        Mixer& m,
+        std::size_t ch,
+        audio::mixer::channel_level const& level)
+{
+    std::visit(
+            overload{
+                    [&m, ch](audio::mixer::mono_level const& ml) {
+                        m.inputChannel(ch).setLevel(ml.value);
+                    },
+                    [&m, ch](audio::mixer::stereo_level const& sl) {
+                        m.inputChannel(ch).setLevel(sl.left);
+                    }},
+            level);
+}
+
+static void
+set_output_channel_level(Mixer& m, audio::mixer::channel_level const& level)
+{
+    std::visit(
+            overload{
+                    [&m](audio::mixer::mono_level const& ml) {
+                        m.outputChannel()->setLevel(ml.value);
+                    },
+                    [&m](audio::mixer::stereo_level const& sl) {
+                        m.outputChannel()->setLevel(sl.left);
+                    }},
+            level);
+}
+
 Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
     : m_store(app_store)
 {
     namespace selectors = runtime::audio_state_selectors;
+    using namespace audio::mixer;
 
     auto const subs_id = get_next_sub_id();
 
@@ -55,8 +88,8 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
                             subs_id,
                             state_change_subscriber,
                             selectors::make_input_level_selector(i),
-                            [this, i](float x) {
-                                inputChannel(i).setLevel(x);
+                            [this, i](channel_level const& x) {
+                                set_input_channel_level(*this, i, x);
                             });
 
                     m_subs.observe(
@@ -79,7 +112,9 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
             subs_id,
             state_change_subscriber,
             runtime::audio_state_selectors::select_output_level,
-            [this](float x) { outputChannel()->setLevel(x); });
+            [this](channel_level const& x) {
+                set_output_channel_level(*this, x);
+            });
 }
 
 void
