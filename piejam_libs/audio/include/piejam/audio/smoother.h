@@ -65,7 +65,7 @@ public:
     constexpr void advance(std::size_t const frames) noexcept
     {
         std::size_t const framesToProcess = std::min(frames, m_framesToSmooth);
-        if (m_framesToSmooth)
+        if (framesToProcess)
         {
             m_current += m_inc * framesToProcess;
             m_framesToSmooth -= framesToProcess;

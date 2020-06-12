@@ -100,7 +100,6 @@ static void
 apply_gain(
         smoother<>& gain_smoother,
         float const gain,
-        std::size_t const smoother_advance,
         InputIterator&& in_begin,
         InputIterator&& in_end,
         OutputIterator&& out)
@@ -117,8 +116,6 @@ apply_gain(
                 gain_smoother,
                 std::forward<OutputIterator>(out),
                 std::multiplies<float>{});
-
-        gain_smoother.advance(smoother_advance);
     }
     else if (gain_smoother.current() == 1.f)
     {
@@ -162,10 +159,10 @@ engine::operator()(
                 apply_gain(
                         m_in_gain_smoothers[ch],
                         in_channel.gain,
-                        ins[ch].size(),
                         ins[ch].begin(),
                         ins[ch].end(),
                         std::back_inserter(gain_buffer));
+                m_in_gain_smoothers[ch].advance(ins[ch].size());
 
                 // calculate level
                 algorithm::copy(
@@ -201,10 +198,10 @@ engine::operator()(
         apply_gain(
                 m_out_gain_smoother,
                 m_mixer_state.output.gain,
-                outs[0].size(),
                 outs[0].begin(),
                 outs[0].end(),
                 outs[0].begin());
+        m_out_gain_smoother.advance(outs[0].size());
 
         algorithm::copy(outs[0], std::back_inserter(m_out_level_meter));
         auto const out_level = m_out_level_meter.get();
