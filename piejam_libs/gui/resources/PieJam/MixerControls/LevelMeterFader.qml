@@ -22,7 +22,9 @@ import QtQuick.Controls.Material 2.12
 Frame {
     id: root
 
+    property alias mono: meter.mono
     property alias level: meter.level
+    property alias levelRight: meter.levelRight
     property alias name: title.text
     property alias gain: fader.gain
 

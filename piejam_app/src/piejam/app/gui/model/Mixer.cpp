@@ -28,41 +28,40 @@ namespace piejam::app::gui::model
 {
 
 static void
-set_input_channel_level(
-        Mixer& m,
-        std::size_t ch,
+set_channel_level(
+        piejam::gui::model::MixerChannel& mixerChannel,
         audio::mixer::channel_level const& level)
 {
     std::visit(
             overload{
-                    [&m, ch](audio::mixer::mono_level const& ml) {
-                        m.inputChannel(ch).setLevel(ml.value);
+                    [&](audio::mixer::mono_level const& ml) {
+                        mixerChannel.setLevel(ml.value);
                     },
-                    [&m, ch](audio::mixer::stereo_level const& sl) {
-                        m.inputChannel(ch).setLevel(sl.left);
+                    [&](audio::mixer::stereo_level const& sl) {
+                        mixerChannel.setLevel(sl.left, sl.right);
                     }},
             level);
 }
 
 static void
+set_input_channel_level(
+        Mixer& m,
+        std::size_t ch,
+        audio::mixer::channel_level const& level)
+{
+    set_channel_level(m.inputChannel(ch), level);
+}
+
+static void
 set_output_channel_level(Mixer& m, audio::mixer::channel_level const& level)
 {
-    std::visit(
-            overload{
-                    [&m](audio::mixer::mono_level const& ml) {
-                        m.outputChannel()->setLevel(ml.value);
-                    },
-                    [&m](audio::mixer::stereo_level const& sl) {
-                        m.outputChannel()->setLevel(sl.left);
-                    }},
-            level);
+    set_channel_level(*m.outputChannel(), level);
 }
 
 Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
     : m_store(app_store)
 {
     namespace selectors = runtime::audio_state_selectors;
-    using namespace audio::mixer;
 
     auto const subs_id = get_next_sub_id();
 
@@ -88,7 +87,7 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
                             subs_id,
                             state_change_subscriber,
                             selectors::make_input_level_selector(i),
-                            [this, i](channel_level const& x) {
+                            [this, i](audio::mixer::channel_level const& x) {
                                 set_input_channel_level(*this, i, x);
                             });
 
@@ -112,7 +111,7 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
             subs_id,
             state_change_subscriber,
             runtime::audio_state_selectors::select_output_level,
-            [this](channel_level const& x) {
+            [this](audio::mixer::channel_level const& x) {
                 set_output_channel_level(*this, x);
             });
 }

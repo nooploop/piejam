@@ -24,7 +24,9 @@ import "DbConvert.js" as DbConvert
 Rectangle {
     id: root
 
+    property bool mono: true
     property real level
+    property real levelRight
 
     width: 64
     height: 300
@@ -50,25 +52,46 @@ Rectangle {
         scaleData: meterScaleData
     }
 
+    Gradient {
+        id: levelGradient
+
+        GradientStop { position: 0; color: "#ff0000" }
+        GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-3), privates.minPos, privates.maxPos, 0, 1); color: "#ffa500" }
+        GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-12), privates.minPos, privates.maxPos, 0, 1); color: "#ffff00" }
+        GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-20), privates.minPos, privates.maxPos, 0, 1); color: "#7ee00d" }
+        GradientStop { position: 0.95; color: "#7ee00d" }
+        GradientStop { position: 1; color: "#008000" }
+    }
+
     LevelIndicator {
         id: indicator
-        width: 12
+        width: mono ? 12 : 5
+        anchors.bottomMargin: 6
+        anchors.topMargin: 6
+        anchors.right: mono ? dbScaleRight.left : indicatorRight.left
+        anchors.bottom: parent.bottom
+        anchors.top: parent.top
+
+        level: DbConvert.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.level)), privates.minPos, privates.maxPos, 0, 1)
+
+        gradient: levelGradient
+
+        fillColor: Material.backgroundColor
+    }
+
+    LevelIndicator {
+        id: indicatorRight
+        visible: !mono
+        width: mono ? 12 : 5
         anchors.bottomMargin: 6
         anchors.topMargin: 6
         anchors.right: dbScaleRight.left
         anchors.bottom: parent.bottom
         anchors.top: parent.top
 
-        level: DbConvert.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.level)), privates.minPos, privates.maxPos, 0, 1)
+        level: DbConvert.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelRight)), privates.minPos, privates.maxPos, 0, 1)
 
-        gradient: Gradient {
-            GradientStop { position: 0; color: "#ff0000" }
-            GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-3), privates.minPos, privates.maxPos, 0, 1); color: "#ffa500" }
-            GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-12), privates.minPos, privates.maxPos, 0, 1); color: "#ffff00" }
-            GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-20), privates.minPos, privates.maxPos, 0, 1); color: "#7ee00d" }
-            GradientStop { position: 0.95; color: "#7ee00d" }
-            GradientStop { position: 1; color: "#008000" }
-        }
+        gradient: levelGradient
 
         fillColor: Material.backgroundColor
     }

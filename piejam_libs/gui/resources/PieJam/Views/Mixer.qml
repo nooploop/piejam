@@ -38,18 +38,20 @@ TopPane {
         model: root.model.inputChannels
 
         delegate: CheckDelegate {
+            property bool modelEnabled: model.enabled
+
+            id: checkDelegate
+
             text: index + 1
             checkState: model.enabled ? Qt.Checked : Qt.Unchecked
             height: 40
             width: 90
 
-            onClicked: {
-                root.model.toggleInputChannel(index)
-            }
+            onClicked: root.model.toggleInputChannel(index)
 
             Connections {
-                target: model
-                onEnabledChanged: { inputFadersVisualModel.items.get(index).inDisplayed = model.enabled }
+                target: checkDelegate
+                function onModelEnabledChanged() { inputFadersVisualModel.items.get(index).inDisplayed = model.enabled }
             }
         }
     }
@@ -85,7 +87,9 @@ TopPane {
             asynchronous: root.visible
             sourceComponent: LevelMeterFader {
                 height: 384
+                mono: model.mono
                 level: model.level
+                levelRight: model.levelRight
                 gain: model.gain
                 name: "In " + (index + 1)
 
@@ -125,7 +129,9 @@ TopPane {
         anchors.right: parent.right
 
         name: "Master"
+        mono: root.model.outputChannel.mono
         level: root.model.outputChannel.level
+        levelRight: root.model.outputChannel.levelRight
         gain: root.model.outputChannel.gain
 
         onFaderMoved: root.model.setOutputChannelGain(newGain)
@@ -140,7 +146,7 @@ TopPane {
 
     Connections {
         target: root.model
-        onInputChannelsChanged: {
+        function onInputChannelsChanged() {
             inputFadersVisualModel.model = root.model.inputChannels
             inputFadersVisualModel.updateDisplayedChannels()
         }

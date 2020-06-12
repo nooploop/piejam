@@ -90,8 +90,9 @@ engine::get_input_level(std::size_t const index) const noexcept
 auto
 engine::get_output_level() const noexcept -> mixer::channel_level
 {
-    auto level = m_mixer_state.output.level.load(std::memory_order_relaxed);
-    return mixer::stereo_level{level, level};
+    return mixer::stereo_level{
+            m_mixer_state.output.level.load(std::memory_order_relaxed),
+            m_mixer_state.output.levelRight.load(std::memory_order_relaxed)};
 }
 
 template <class InputIterator, class OutputIterator>
@@ -205,13 +206,23 @@ engine::operator()(
                 outs[0].end(),
                 outs[0].begin());
 
-        if (num_out_channels > 1)
-            algorithm::copy(outs[0], outs[1].begin());
-
         algorithm::copy(outs[0], std::back_inserter(m_out_level_meter));
-        m_mixer_state.output.level.store(
-                m_out_level_meter.get(),
-                std::memory_order_relaxed);
+        auto const out_level = m_out_level_meter.get();
+        m_mixer_state.output.level.store(out_level, std::memory_order_relaxed);
+
+        if (num_out_channels > 1)
+        {
+            algorithm::copy(outs[0], outs[1].begin());
+            m_mixer_state.output.levelRight.store(
+                    out_level,
+                    std::memory_order_relaxed);
+        }
+        else
+        {
+            m_mixer_state.output.levelRight.store(
+                    0.f,
+                    std::memory_order_relaxed);
+        }
     }
 }
 

@@ -52,6 +52,7 @@ private:
         std::atomic_bool enabled{true};
         std::atomic<float> gain{1.f};
         std::atomic<float> level{0.f};
+        std::atomic<float> levelRight{0.f};
     };
 
     struct mixer_state

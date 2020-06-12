@@ -45,8 +45,30 @@ MixerChannel::setGain(double x)
 void
 MixerChannel::setLevel(double x)
 {
+    if (!m_mono)
+    {
+        m_mono = true;
+        emit monoChanged();
+        m_levelRight = 0.;
+    }
+
     m_level = x;
     emit levelChanged();
+}
+
+void
+MixerChannel::setLevel(double left, double right)
+{
+    if (m_mono)
+    {
+        m_mono = false;
+        emit monoChanged();
+    }
+
+    m_level = left;
+    emit levelChanged();
+    m_levelRight = right;
+    emit levelRightChanged();
 }
 
 } // namespace piejam::gui::model
