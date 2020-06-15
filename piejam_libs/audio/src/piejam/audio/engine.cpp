@@ -124,6 +124,15 @@ apply_gain(
                 std::forward<InputIterator>(in_end),
                 std::forward<OutputIterator>(out));
     }
+    else if (gain_smoother.current() == 0.f)
+    {
+        std::fill_n(
+                std::forward<OutputIterator>(out),
+                std::distance(
+                        std::forward<InputIterator>(in_begin),
+                        std::forward<InputIterator>(in_end)),
+                0.f);
+    }
     else
     {
         std::transform(
