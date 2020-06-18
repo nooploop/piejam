@@ -11,6 +11,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/mixer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_convert.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_descriptor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_format.h

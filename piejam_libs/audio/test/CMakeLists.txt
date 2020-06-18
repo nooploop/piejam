@@ -5,6 +5,7 @@ endif()
 find_package(GTest REQUIRED)
 add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/level_meter_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/pan_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pcm_convert_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/smoother_test.cpp
 )
