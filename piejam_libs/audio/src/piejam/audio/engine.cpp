@@ -85,16 +85,16 @@ engine::get_input_level(std::size_t const index) const noexcept
     assert(index < m_mixer_state.inputs.size());
     auto const& in_ch = m_mixer_state.inputs[index];
     return mixer::stereo_level{
-            in_ch.level_l.load(std::memory_order_relaxed),
-            in_ch.level_r.load(std::memory_order_relaxed)};
+            in_ch.level.left().load(std::memory_order_relaxed),
+            in_ch.level.right().load(std::memory_order_relaxed)};
 }
 
 auto
 engine::get_output_level() const noexcept -> mixer::channel_level
 {
     return mixer::stereo_level{
-            m_mixer_state.output.level_l.load(std::memory_order_relaxed),
-            m_mixer_state.output.level_r.load(std::memory_order_relaxed)};
+            m_mixer_state.output.level.left().load(std::memory_order_relaxed),
+            m_mixer_state.output.level.right().load(std::memory_order_relaxed)};
 }
 
 template <class InputIterator, class OutputIterator>
@@ -181,8 +181,12 @@ engine::operator()(
                         std::back_inserter(m_in_level_meters[ch]));
 
                 auto const in_level = m_in_level_meters[ch].get();
-                in_channel.level_l.store(in_level, std::memory_order_relaxed);
-                in_channel.level_r.store(in_level, std::memory_order_relaxed);
+                in_channel.level.left().store(
+                        in_level,
+                        std::memory_order_relaxed);
+                in_channel.level.right().store(
+                        in_level,
+                        std::memory_order_relaxed);
 
                 // mix
                 if (num_out_channels > 0)
@@ -198,8 +202,8 @@ engine::operator()(
             else
             {
                 m_in_level_meters[ch].clear();
-                in_channel.level_l.store(0.f, std::memory_order_relaxed);
-                in_channel.level_r.store(0.f, std::memory_order_relaxed);
+                in_channel.level.left().store(0.f, std::memory_order_relaxed);
+                in_channel.level.right().store(0.f, std::memory_order_relaxed);
             }
         }
     }
@@ -217,20 +221,22 @@ engine::operator()(
 
         algorithm::copy(outs[0], std::back_inserter(m_out_level_meter));
         auto const out_level = m_out_level_meter.get();
-        m_mixer_state.output.level_l.store(
+        m_mixer_state.output.level.left().store(
                 out_level,
                 std::memory_order_relaxed);
 
         if (num_out_channels > 1)
         {
             algorithm::copy(outs[0], outs[1].begin());
-            m_mixer_state.output.level_r.store(
+            m_mixer_state.output.level.right().store(
                     out_level,
                     std::memory_order_relaxed);
         }
         else
         {
-            m_mixer_state.output.level_r.store(0.f, std::memory_order_relaxed);
+            m_mixer_state.output.level.right().store(
+                    0.f,
+                    std::memory_order_relaxed);
         }
     }
 }

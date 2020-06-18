@@ -19,6 +19,7 @@
 
 #include <piejam/audio/level_meter.h>
 #include <piejam/audio/mixer.h>
+#include <piejam/audio/pair.h>
 #include <piejam/audio/smoother.h>
 
 #include <piejam/range/fwd.h>
@@ -51,8 +52,7 @@ private:
     {
         std::atomic_bool enabled{true};
         std::atomic<float> gain{1.f};
-        std::atomic<float> level_l{0.f};
-        std::atomic<float> level_r{0.f};
+        pair<std::atomic<float>> level;
     };
 
     struct mixer_state
