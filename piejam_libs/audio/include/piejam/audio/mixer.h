@@ -64,7 +64,8 @@ struct channel
 {
     bool enabled{true};
     float gain{1.f};
-    channel_level level{};
+    float pan{0.f};
+    channel_level level{mono_level{}};
 };
 
 using input_channels = std::vector<channel>;

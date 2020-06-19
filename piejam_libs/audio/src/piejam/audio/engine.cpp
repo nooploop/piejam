@@ -20,6 +20,7 @@
 #include <piejam/algorithm/copy.h>
 #include <piejam/algorithm/transform.h>
 #include <piejam/audio/mixer.h>
+#include <piejam/audio/pan.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/range/table_view.h>
 
@@ -71,6 +72,13 @@ engine::set_input_channel_gain(std::size_t const index, float const gain)
 {
     assert(index < m_mixer_state.inputs.size());
     m_mixer_state.inputs[index].gain.store(gain, std::memory_order_relaxed);
+}
+
+void
+engine::set_input_channel_pan(std::size_t const index, float const pan)
+{
+    assert(index < m_mixer_state.inputs.size());
+    m_mixer_state.inputs[index].pan.store(pan, std::memory_order_relaxed);
 }
 
 void
@@ -205,11 +213,14 @@ engine::operator()(
         {
             pair<gain_buffer_t> gain_buffer;
 
+            auto in_pan = sinusoidal_constant_power_pan(
+                    in_channel.pan.load(std::memory_order_relaxed));
+
             if (num_out_channels > 0)
             {
                 apply_gain(
                         m_in_gain_smoothers[ch].left(),
-                        in_channel.gain,
+                        in_channel.gain * in_pan.left(),
                         ins[ch],
                         std::back_inserter(gain_buffer.left()));
 
@@ -225,7 +236,7 @@ engine::operator()(
             {
                 apply_gain(
                         m_in_gain_smoothers[ch].right(),
-                        in_channel.gain,
+                        in_channel.gain * in_pan.right(),
                         ins[ch],
                         std::back_inserter(gain_buffer.right()));
 

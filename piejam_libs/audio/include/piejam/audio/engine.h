@@ -37,6 +37,7 @@ public:
 
     void set_input_channel_enabled(std::size_t index, bool enabled);
     void set_input_channel_gain(std::size_t index, float gain);
+    void set_input_channel_pan(std::size_t index, float pan);
     void set_output_channel_gain(float gain);
 
     auto get_input_level(std::size_t index) const noexcept
@@ -52,6 +53,7 @@ private:
     {
         std::atomic_bool enabled{true};
         std::atomic<float> gain{1.f};
+        std::atomic<float> pan{0.f};
         pair<std::atomic<float>> level;
     };
 

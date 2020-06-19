@@ -17,16 +17,14 @@
 
 #pragma once
 
+#include <piejam/audio/pair.h>
+
 #include <boost/math/constants/constants.hpp>
 
 namespace piejam::audio
 {
 
-struct stereo_pan
-{
-    float left_gain{};
-    float right_gain{};
-};
+using stereo_pan = pair<float>;
 
 // left = 1/sqrt(2) (cos(x×π/4) - sin(x×π/4))
 //     ~= 1/sqrt(2) -
