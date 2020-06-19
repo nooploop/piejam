@@ -68,11 +68,11 @@ private:
 
     mixer_state m_mixer_state;
 
-    std::vector<level_meter> m_in_level_meters;
-    level_meter m_out_level_meter;
+    std::vector<pair<level_meter>> m_in_level_meters;
+    pair<level_meter> m_out_level_meter;
 
-    std::vector<smoother<>> m_in_gain_smoothers;
-    smoother<> m_out_gain_smoother;
+    std::vector<pair<smoother<>>> m_in_gain_smoothers;
+    pair<smoother<>> m_out_gain_smoother;
 };
 
 } // namespace piejam::audio
