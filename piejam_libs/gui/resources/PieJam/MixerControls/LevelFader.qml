@@ -21,6 +21,7 @@ import QtQuick.Controls.Material 2.12
 
 import "DbConvert.js" as DbConvert
 import "../Controls/Color.js" as ColorUtil
+import "../Util/MathExt.js" as MathExt
 
 Item {
     id: root
@@ -38,7 +39,7 @@ Item {
         anchors.fill: parent
         padding: 6
 
-        value: DbConvert.mapTo(dbScale.scaleData.dbToPosition(DbConvert.linToDb(root.gain)), privates.minPos, privates.maxPos, 0, 1)
+        value: MathExt.mapTo(dbScale.scaleData.dbToPosition(DbConvert.linToDb(root.gain)), privates.minPos, privates.maxPos, 0, 1)
 
         orientation: Qt.Vertical
 
@@ -66,7 +67,7 @@ Item {
         }
 
         onMoved: {
-            var newGain = dbScale.scaleData.dbAt(DbConvert.mapTo(slider.value, 0, 1, privates.minPos, privates.maxPos))
+            var newGain = dbScale.scaleData.dbAt(MathExt.mapTo(slider.value, 0, 1, privates.minPos, privates.maxPos))
             root.moved(DbConvert.dbToLin(newGain))
         }
 

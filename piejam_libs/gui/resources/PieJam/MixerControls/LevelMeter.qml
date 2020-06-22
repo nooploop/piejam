@@ -20,6 +20,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 
 import "DbConvert.js" as DbConvert
+import "../Util/MathExt.js" as MathExt
 
 Rectangle {
     id: root
@@ -56,9 +57,9 @@ Rectangle {
         id: levelGradient
 
         GradientStop { position: 0; color: "#ff0000" }
-        GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-3), privates.minPos, privates.maxPos, 0, 1); color: "#ffa500" }
-        GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-12), privates.minPos, privates.maxPos, 0, 1); color: "#ffff00" }
-        GradientStop { position: DbConvert.mapTo(1 - meterScaleData.dbToPosition(-20), privates.minPos, privates.maxPos, 0, 1); color: "#7ee00d" }
+        GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-3), privates.minPos, privates.maxPos, 0, 1); color: "#ffa500" }
+        GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-12), privates.minPos, privates.maxPos, 0, 1); color: "#ffff00" }
+        GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-20), privates.minPos, privates.maxPos, 0, 1); color: "#7ee00d" }
         GradientStop { position: 0.95; color: "#7ee00d" }
         GradientStop { position: 1; color: "#008000" }
     }
@@ -72,7 +73,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.top: parent.top
 
-        level: DbConvert.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.level)), privates.minPos, privates.maxPos, 0, 1)
+        level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.level)), privates.minPos, privates.maxPos, 0, 1)
 
         gradient: levelGradient
 
@@ -89,7 +90,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.top: parent.top
 
-        level: DbConvert.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelRight)), privates.minPos, privates.maxPos, 0, 1)
+        level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelRight)), privates.minPos, privates.maxPos, 0, 1)
 
         gradient: levelGradient
 

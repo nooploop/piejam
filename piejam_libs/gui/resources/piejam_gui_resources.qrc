@@ -22,5 +22,6 @@
         <file>images/icons/ic_info_outline_white_18dp.png</file>
         <file>PieJam/Views/MainWindow.qml</file>
         <file>PieJam/Views/qmldir</file>
+        <file>PieJam/Util/MathExt.js</file>
     </qresource>
 </RCC>

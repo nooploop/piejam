@@ -18,6 +18,7 @@
 import QtQuick 2.12
 
 import "DbConvert.js" as DbConvert
+import "../Util/MathExt.js" as MathExt
 
 QtObject {
     id: root
@@ -60,7 +61,7 @@ QtObject {
                         else if (hi.db === Number.POSITIVE_INFINITY)
                             return Number.POSITIVE_INFINITY
                         else
-                            return DbConvert.mapTo(position, lo.position, hi.position, lo.db, hi.db)
+                            return MathExt.mapTo(position, lo.position, hi.position, lo.db, hi.db)
                     }
                 }
             }
@@ -102,7 +103,7 @@ QtObject {
                         } else if (hi.db === Number.POSITIVE_INFINITY) {
                             return hi.position
                         } else {
-                            return DbConvert.mapTo(db, lo.db, hi.db, lo.position, hi.position)
+                            return MathExt.mapTo(db, lo.db, hi.db, lo.position, hi.position)
                         }
                     }
                 }
