@@ -18,3 +18,15 @@
 function mapTo(x, srcLo, srcHi, dstLo, dstHi) {
     return ((x - srcLo) / (srcHi - srcLo)) * (dstHi - dstLo) + dstLo
 }
+
+function clamp(x, min, max) {
+    return Math.min(Math.max(x, min), max)
+}
+
+function toRad(deg) {
+    return (deg / 180) * Math.PI
+}
+
+function toDeg(rad) {
+    return (rad / Math.PI) * 180
+}
