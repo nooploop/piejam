@@ -12,3 +12,5 @@ add_subdirectory(redux)
 add_subdirectory(reselect)
 add_subdirectory(runtime)
 add_subdirectory(thread)
+
+set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)
