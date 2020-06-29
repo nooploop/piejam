@@ -18,6 +18,8 @@
         <file>images/icons/settings.png</file>
         <file>images/icons/power.png</file>
         <file>PieJam/Controls/Color.js</file>
+        <file>PieJam/Controls/Knob.qml</file>
+        <file>PieJam/Controls/LabeledKnob.qml</file>
         <file>images/icons/ic_refresh_white_48dp.png</file>
         <file>PieJam/Views/Info.qml</file>
         <file>images/icons/ic_info_outline_white_18dp.png</file>
