@@ -67,15 +67,24 @@ make_input_gain_selector(std::size_t const index) -> selector<float>
 }
 
 auto
-make_input_level_selector(std::size_t const index)
-        -> selector<audio::mixer::channel_level>
+make_input_pan_selector(std::size_t const index) -> selector<float>
 {
-    return selector<audio::mixer::channel_level>(
-            [index](audio_state const& st) -> audio::mixer::channel_level {
+    return selector<float>([index](audio_state const& st) -> float {
+        return index < st.mixer_state.inputs.size()
+                       ? st.mixer_state.inputs[index].pan
+                       : 0.f;
+    });
+}
+
+auto
+make_input_level_selector(std::size_t const index)
+        -> selector<audio::mixer::stereo_level>
+{
+    return selector<audio::mixer::stereo_level>(
+            [index](audio_state const& st) -> audio::mixer::stereo_level {
                 return index < st.mixer_state.inputs.size()
                                ? st.mixer_state.inputs[index].level
-                               : audio::mixer::channel_level(
-                                         audio::mixer::mono_level{});
+                               : audio::mixer::stereo_level{};
             });
 }
 
@@ -92,8 +101,14 @@ make_input_enabled_selector(std::size_t const index) -> selector<bool>
 const selector<float> select_output_gain([](audio_state const& st) {
     return st.mixer_state.output.gain;
 });
-const selector<audio::mixer::channel_level> select_output_level(
+
+const selector<float> select_output_balance([](audio_state const& st) {
+    return st.mixer_state.output.balance;
+});
+
+const selector<audio::mixer::stereo_level> select_output_level(
         [](audio_state const& st) { return st.mixer_state.output.level; });
+
 const selector<bool> select_output_enabled([](audio_state const& st) {
     return st.mixer_state.output.enabled;
 });

@@ -22,10 +22,8 @@ import QtQuick.Controls.Material 2.12
 Frame {
     id: root
 
-    property alias mono: meter.mono
-    property alias level: meter.level
+    property alias levelLeft: meter.levelLeft
     property alias levelRight: meter.levelRight
-    property alias name: title.text
     property alias gain: fader.gain
 
     signal faderMoved(real newGain)
@@ -36,37 +34,19 @@ Frame {
 
     LevelMeter {
         id: meter
-        anchors.topMargin: 8
         anchors.rightMargin: 4
         anchors.right: fader.left
         anchors.left: parent.left
-        anchors.top: title.bottom
+        anchors.top: parent.top
         anchors.bottom: parent.bottom
     }
 
     LevelFader {
         id: fader
-        anchors.topMargin: 8
-        anchors.top: title.bottom
+        anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.right: parent.right
 
         onMoved: root.faderMoved(newGain)
-    }
-
-    Label {
-        id: title
-        y: 0
-        height: 18
-        padding: 2
-        verticalAlignment: Text.AlignVCenter
-        background: Rectangle {
-            color: Material.primaryColor
-            radius: 2
-        }
-        font.bold: true
-        anchors.right: parent.right
-        anchors.left: parent.left
-        font.pixelSize: 12
     }
 }

@@ -26,24 +26,43 @@ namespace piejam::audio
 // Utility class like std::pair. Just to make it easier to define and use
 // a pair in audio context.
 template <class T>
-struct pair : private std::pair<T, T>
+struct pair
 {
     using type = T;
 
-    pair(T const& t)
-        : std::pair<T, T>(t, t)
+    T left{};
+    T right{};
+
+    constexpr pair() noexcept(std::is_nothrow_default_constructible_v<T>) =
+            default;
+
+    explicit constexpr pair(T const& t) noexcept(
+            std::is_nothrow_copy_constructible_v<T>)
+        : left(t)
+        , right(t)
     {
     }
 
-    using std::pair<T, T>::pair;
-    using std::pair<T, T>::operator=;
-    using std::pair<T, T>::swap;
-
-    constexpr auto left() const noexcept -> T const& { return this->first; }
-    constexpr auto left() noexcept -> T& { return this->first; }
-
-    constexpr auto right() const noexcept -> T const& { return this->second; }
-    constexpr auto right() noexcept -> T& { return this->second; }
+    constexpr pair(T const& l, T const& r) noexcept(
+            std::is_nothrow_copy_constructible_v<T>)
+        : left(l)
+        , right(r)
+    {
+    }
 };
+
+template <class T>
+constexpr bool
+operator==(pair<T> const& l, pair<T> const& r)
+{
+    return l.left == r.left && l.right == r.right;
+}
+
+template <class T>
+constexpr bool
+operator!=(pair<T> const& l, pair<T> const& r)
+{
+    return !(l == r);
+}
 
 } // namespace piejam::audio

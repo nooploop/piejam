@@ -27,5 +27,6 @@
         <file>PieJam/Views/MainWindow.qml</file>
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/Util/MathExt.js</file>
+        <file>PieJam/MixerControls/ChannelStrip.qml</file>
     </qresource>
 </RCC>

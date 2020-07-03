@@ -39,10 +39,11 @@ public:
     void set_input_channel_gain(std::size_t index, float gain);
     void set_input_channel_pan(std::size_t index, float pan);
     void set_output_channel_gain(float gain);
+    void set_output_channel_balance(float balance);
 
     auto get_input_level(std::size_t index) const noexcept
-            -> mixer::channel_level;
-    auto get_output_level() const noexcept -> mixer::channel_level;
+            -> mixer::stereo_level;
+    auto get_output_level() const noexcept -> mixer::stereo_level;
 
     void operator()(
             range::table_view<float const> const& in_audio,
@@ -53,8 +54,17 @@ private:
     {
         std::atomic_bool enabled{true};
         std::atomic<float> gain{1.f};
-        std::atomic<float> pan{0.f};
         pair<std::atomic<float>> level;
+    };
+
+    struct input_mixer_channel : mixer_channel
+    {
+        std::atomic<float> pan{};
+    };
+
+    struct output_mixer_channel : mixer_channel
+    {
+        std::atomic<float> balance;
     };
 
     struct mixer_state
@@ -64,8 +74,8 @@ private:
         {
         }
 
-        std::vector<mixer_channel> inputs;
-        mixer_channel output;
+        std::vector<input_mixer_channel> inputs;
+        output_mixer_channel output;
     };
 
     mixer_state m_mixer_state;

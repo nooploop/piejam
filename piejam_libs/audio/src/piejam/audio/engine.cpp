@@ -48,7 +48,7 @@ engine::engine(unsigned const samplerate, std::size_t const num_inputs)
     : m_mixer_state(num_inputs)
     , m_in_level_meters(
               num_inputs,
-              {level_meter{
+              pair<level_meter>{level_meter{
                       level_meter_decay_time(samplerate),
                       level_meter_rms_window_size(samplerate)}})
     , m_out_level_meter(
@@ -87,23 +87,29 @@ engine::set_output_channel_gain(float const gain)
     m_mixer_state.output.gain.store(gain, std::memory_order_relaxed);
 }
 
+void
+engine::set_output_channel_balance(float const balance)
+{
+    m_mixer_state.output.balance.store(balance, std::memory_order_relaxed);
+}
+
 auto
 engine::get_input_level(std::size_t const index) const noexcept
-        -> mixer::channel_level
+        -> mixer::stereo_level
 {
     assert(index < m_mixer_state.inputs.size());
     auto const& in_ch = m_mixer_state.inputs[index];
     return mixer::stereo_level{
-            in_ch.level.left().load(std::memory_order_relaxed),
-            in_ch.level.right().load(std::memory_order_relaxed)};
+            in_ch.level.left.load(std::memory_order_relaxed),
+            in_ch.level.right.load(std::memory_order_relaxed)};
 }
 
 auto
-engine::get_output_level() const noexcept -> mixer::channel_level
+engine::get_output_level() const noexcept -> mixer::stereo_level
 {
     return mixer::stereo_level{
-            m_mixer_state.output.level.left().load(std::memory_order_relaxed),
-            m_mixer_state.output.level.right().load(std::memory_order_relaxed)};
+            m_mixer_state.output.level.left.load(std::memory_order_relaxed),
+            m_mixer_state.output.level.right.load(std::memory_order_relaxed)};
 }
 
 template <class InputIterator, class OutputIterator>
@@ -196,8 +202,9 @@ engine::operator()(
         range::table_view<float const> const& ins,
         range::table_view<float> const& outs) noexcept
 {
-    using gain_buffer_t =
+    using audio_buffer_t =
             boost::container::static_vector<float, max_period_size>;
+    using stereo_audio_buffer_t = pair<audio_buffer_t>;
 
     // clear output
     for (auto ch : outs)
@@ -208,10 +215,10 @@ engine::operator()(
 
     for (std::size_t ch = 0; ch < num_in_channels; ++ch)
     {
-        mixer_channel& in_channel = m_mixer_state.inputs[ch];
+        input_mixer_channel& in_channel = m_mixer_state.inputs[ch];
         if (in_channel.enabled)
         {
-            pair<gain_buffer_t> gain_buffer;
+            stereo_audio_buffer_t gain_buffer;
 
             auto in_pan = sinusoidal_constant_power_pan(
                     in_channel.pan.load(std::memory_order_relaxed));
@@ -219,83 +226,85 @@ engine::operator()(
             if (num_out_channels > 0)
             {
                 apply_gain(
-                        m_in_gain_smoothers[ch].left(),
-                        in_channel.gain * in_pan.left(),
+                        m_in_gain_smoothers[ch].left,
+                        in_channel.gain * in_pan.left,
                         ins[ch],
-                        std::back_inserter(gain_buffer.left()));
+                        std::back_inserter(gain_buffer.left));
 
                 calculate_level(
-                        gain_buffer.left(),
-                        m_in_level_meters[ch].left(),
-                        in_channel.level.left());
+                        gain_buffer.left,
+                        m_in_level_meters[ch].left,
+                        in_channel.level.left);
 
-                mix(gain_buffer.left(), outs[0].begin());
+                mix(gain_buffer.left, outs[0].begin());
             }
 
             if (num_out_channels > 1)
             {
                 apply_gain(
-                        m_in_gain_smoothers[ch].right(),
-                        in_channel.gain * in_pan.right(),
+                        m_in_gain_smoothers[ch].right,
+                        in_channel.gain * in_pan.right,
                         ins[ch],
-                        std::back_inserter(gain_buffer.right()));
+                        std::back_inserter(gain_buffer.right));
 
                 calculate_level(
-                        gain_buffer.right(),
-                        m_in_level_meters[ch].right(),
-                        in_channel.level.right());
+                        gain_buffer.right,
+                        m_in_level_meters[ch].right,
+                        in_channel.level.right);
 
-                mix(gain_buffer.right(), outs[1].begin());
+                mix(gain_buffer.right, outs[1].begin());
             }
         }
         else
         {
-            reset_level(m_in_level_meters[ch].left(), in_channel.level.left());
-            reset_level(
-                    m_in_level_meters[ch].right(),
-                    in_channel.level.right());
+            reset_level(m_in_level_meters[ch].left, in_channel.level.left);
+            reset_level(m_in_level_meters[ch].right, in_channel.level.right);
         }
     }
+
+    auto pow3 = [](auto x) { return x * x * x; };
 
     // apply output gain
     if (num_out_channels > 0)
     {
+        float const balance = m_mixer_state.output.balance <= 0.f
+                                      ? 1.f
+                                      : pow3(1 - m_mixer_state.output.balance);
         apply_gain(
-                m_out_gain_smoother.left(),
-                m_mixer_state.output.gain,
+                m_out_gain_smoother.left,
+                m_mixer_state.output.gain * balance,
                 outs[0],
                 outs[0].begin());
 
         calculate_level(
                 outs[0],
-                m_out_level_meter.left(),
-                m_mixer_state.output.level.left());
+                m_out_level_meter.left,
+                m_mixer_state.output.level.left);
     }
     else
     {
-        reset_level(
-                m_out_level_meter.left(),
-                m_mixer_state.output.level.left());
+        reset_level(m_out_level_meter.left, m_mixer_state.output.level.left);
     }
 
     if (num_out_channels > 1)
     {
+        float const balance = m_mixer_state.output.balance >= 0.f
+                                      ? 1.f
+                                      : pow3(1 + m_mixer_state.output.balance);
         apply_gain(
-                m_out_gain_smoother.right(),
-                m_mixer_state.output.gain,
+                m_out_gain_smoother.right,
+                m_mixer_state.output.gain * balance,
                 outs[1],
                 outs[1].begin());
 
         calculate_level(
                 outs[1],
-                m_out_level_meter.right(),
-                m_mixer_state.output.level.right());
+                m_out_level_meter.right,
+                m_mixer_state.output.level.right);
     }
     else
     {
-        reset_level(
-                m_out_level_meter.right(),
-                m_mixer_state.output.level.right());
+        reset_level(m_out_level_meter.right, m_mixer_state.output.level.right);
     }
 }
 

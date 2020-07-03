@@ -28,8 +28,10 @@ class MixerChannel final : public QObject
 
     Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged FINAL)
     Q_PROPERTY(double gain READ gain NOTIFY gainChanged FINAL)
-    Q_PROPERTY(double level READ level NOTIFY levelChanged FINAL)
+    Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
+    Q_PROPERTY(double pan READ pan NOTIFY panChanged FINAL)
+    Q_PROPERTY(double balance READ balance NOTIFY balanceChanged FINAL)
     Q_PROPERTY(double mono READ mono NOTIFY monoChanged FINAL)
 
 public:
@@ -41,11 +43,15 @@ public:
     auto gain() const noexcept -> double { return m_gain; }
     void setGain(double);
 
-    auto level() const noexcept -> double { return m_level; }
-    void setLevel(double);
-
+    auto levelLeft() const noexcept -> double { return m_levelLeft; }
     auto levelRight() const noexcept -> double { return m_levelRight; }
     void setLevel(double left, double right);
+
+    auto pan() const noexcept -> double { return m_pan; }
+    void setPan(double pan);
+
+    auto balance() const noexcept -> double { return m_balance; }
+    void setBalance(double balance);
 
     bool mono() const noexcept { return m_mono; }
 
@@ -53,14 +59,18 @@ signals:
 
     void enabledChanged();
     void gainChanged();
-    void levelChanged();
+    void levelLeftChanged();
     void levelRightChanged();
+    void panChanged();
+    void balanceChanged();
     void monoChanged();
 
 private:
     double m_gain{1.};
-    double m_level{};
+    double m_levelLeft{};
     double m_levelRight{};
+    double m_pan{};
+    double m_balance{};
     bool m_enabled{true};
     bool m_mono{true};
 };

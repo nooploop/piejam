@@ -32,7 +32,9 @@ public:
 
     void toggleInputChannel(unsigned index) override;
     void setInputChannelGain(unsigned index, double gain) override;
+    void setInputChannelPan(unsigned index, double pan) override;
     void setOutputChannelGain(double gain) override;
+    void setOutputChannelBalance(double balance) override;
     void requestLevelsUpdate() override;
 
 private:

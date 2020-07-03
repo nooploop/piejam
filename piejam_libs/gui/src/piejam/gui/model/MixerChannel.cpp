@@ -36,28 +36,49 @@ MixerChannel::setEnabled(bool x)
 }
 
 void
-MixerChannel::setGain(double x)
+MixerChannel::setGain(double const x)
 {
-    m_gain = x;
-    emit gainChanged();
+    if (m_gain != x)
+    {
+        m_gain = x;
+        emit gainChanged();
+    }
 }
 
 void
-MixerChannel::setLevel(double x)
+MixerChannel::setLevel(double const left, double const right)
+{
+    if (m_levelLeft != left)
+    {
+        m_levelLeft = left;
+        emit levelLeftChanged();
+    }
+
+    if (m_levelRight != right)
+    {
+        m_levelRight = right;
+        emit levelRightChanged();
+    }
+}
+
+void
+MixerChannel::setPan(double const pan)
 {
     if (!m_mono)
     {
         m_mono = true;
         emit monoChanged();
-        m_levelRight = 0.;
     }
 
-    m_level = x;
-    emit levelChanged();
+    if (m_pan != pan)
+    {
+        m_pan = pan;
+        emit panChanged();
+    }
 }
 
 void
-MixerChannel::setLevel(double left, double right)
+MixerChannel::setBalance(double const balance)
 {
     if (m_mono)
     {
@@ -65,10 +86,11 @@ MixerChannel::setLevel(double left, double right)
         emit monoChanged();
     }
 
-    m_level = left;
-    emit levelChanged();
-    m_levelRight = right;
-    emit levelRightChanged();
+    if (m_balance != balance)
+    {
+        m_balance = balance;
+        emit balanceChanged();
+    }
 }
 
 } // namespace piejam::gui::model

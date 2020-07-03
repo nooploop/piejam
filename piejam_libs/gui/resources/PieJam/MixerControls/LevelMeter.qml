@@ -25,8 +25,7 @@ import "../Util/MathExt.js" as MathExt
 Rectangle {
     id: root
 
-    property bool mono: true
-    property real level
+    property real levelLeft
     property real levelRight
 
     width: 64
@@ -66,14 +65,14 @@ Rectangle {
 
     LevelIndicator {
         id: indicator
-        width: mono ? 12 : 5
+        width: 5
         anchors.bottomMargin: 6
         anchors.topMargin: 6
-        anchors.right: mono ? dbScaleRight.left : indicatorRight.left
+        anchors.right: indicatorRight.left
         anchors.bottom: parent.bottom
         anchors.top: parent.top
 
-        level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.level)), privates.minPos, privates.maxPos, 0, 1)
+        level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelLeft)), privates.minPos, privates.maxPos, 0, 1)
 
         gradient: levelGradient
 
@@ -82,8 +81,7 @@ Rectangle {
 
     LevelIndicator {
         id: indicatorRight
-        visible: !mono
-        width: mono ? 12 : 5
+        width: 5
         anchors.bottomMargin: 6
         anchors.topMargin: 6
         anchors.right: dbScaleRight.left

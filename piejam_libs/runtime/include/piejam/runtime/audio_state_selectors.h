@@ -52,12 +52,14 @@ extern const selector<output_devices> select_output_devices;
 extern const selector<std::size_t> select_num_input_devices;
 
 auto make_input_gain_selector(std::size_t index) -> selector<float>;
+auto make_input_pan_selector(std::size_t index) -> selector<float>;
 auto make_input_level_selector(std::size_t index)
-        -> selector<audio::mixer::channel_level>;
+        -> selector<audio::mixer::stereo_level>;
 auto make_input_enabled_selector(std::size_t index) -> selector<bool>;
 
 extern const selector<float> select_output_gain;
-extern const selector<audio::mixer::channel_level> select_output_level;
+extern const selector<float> select_output_balance;
+extern const selector<audio::mixer::stereo_level> select_output_level;
 extern const selector<bool> select_output_enabled;
 
 extern const selector<std::size_t> select_xruns;

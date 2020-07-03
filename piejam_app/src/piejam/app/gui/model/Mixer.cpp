@@ -30,30 +30,22 @@ namespace piejam::app::gui::model
 static void
 set_channel_level(
         piejam::gui::model::MixerChannel& mixerChannel,
-        audio::mixer::channel_level const& level)
+        audio::mixer::stereo_level const& level)
 {
-    std::visit(
-            overload{
-                    [&](audio::mixer::mono_level const& ml) {
-                        mixerChannel.setLevel(ml.value);
-                    },
-                    [&](audio::mixer::stereo_level const& sl) {
-                        mixerChannel.setLevel(sl.left, sl.right);
-                    }},
-            level);
+    mixerChannel.setLevel(level.left, level.right);
 }
 
 static void
 set_input_channel_level(
         Mixer& m,
         std::size_t ch,
-        audio::mixer::channel_level const& level)
+        audio::mixer::stereo_level const& level)
 {
     set_channel_level(m.inputChannel(ch), level);
 }
 
 static void
-set_output_channel_level(Mixer& m, audio::mixer::channel_level const& level)
+set_output_channel_level(Mixer& m, audio::mixer::stereo_level const& level)
 {
     set_channel_level(*m.outputChannel(), level);
 }
@@ -86,8 +78,14 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
                     m_subs.observe(
                             subs_id,
                             state_change_subscriber,
+                            selectors::make_input_pan_selector(i),
+                            [this, i](float x) { inputChannel(i).setPan(x); });
+
+                    m_subs.observe(
+                            subs_id,
+                            state_change_subscriber,
                             selectors::make_input_level_selector(i),
-                            [this, i](audio::mixer::channel_level const& x) {
+                            [this, i](audio::mixer::stereo_level const& x) {
                                 set_input_channel_level(*this, i, x);
                             });
 
@@ -110,8 +108,14 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
     m_subs.observe(
             subs_id,
             state_change_subscriber,
+            runtime::audio_state_selectors::select_output_balance,
+            [this](float const x) { outputChannel()->setBalance(x); });
+
+    m_subs.observe(
+            subs_id,
+            state_change_subscriber,
             runtime::audio_state_selectors::select_output_level,
-            [this](audio::mixer::channel_level const& x) {
+            [this](audio::mixer::stereo_level const& x) {
                 set_output_channel_level(*this, x);
             });
 }
@@ -134,11 +138,28 @@ Mixer::setInputChannelGain(unsigned const index, double const gain)
 }
 
 void
+Mixer::setInputChannelPan(unsigned const index, double const pan)
+{
+    runtime::actions::set_input_channel_pan action;
+    action.index = index;
+    action.pan = static_cast<float>(pan);
+    m_store.dispatch<runtime::actions::set_input_channel_pan>(action);
+}
+
+void
 Mixer::setOutputChannelGain(double const gain)
 {
     runtime::actions::set_output_channel_gain action;
     action.gain = static_cast<float>(gain);
     m_store.dispatch<runtime::actions::set_output_channel_gain>(action);
+}
+
+void
+Mixer::setOutputChannelBalance(double const balance)
+{
+    runtime::actions::set_output_channel_balance action;
+    action.balance = static_cast<float>(balance);
+    m_store.dispatch<runtime::actions::set_output_channel_balance>(action);
 }
 
 void

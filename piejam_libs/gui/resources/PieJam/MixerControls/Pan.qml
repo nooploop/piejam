@@ -23,7 +23,12 @@ import "../Controls"
 
 Item {
     property bool mono: false
-    property alias labelVisible: leftPan.labelVisible
+    property bool labelVisible: true
+    property alias pan: panKnob.value
+    property alias balance: balanceKnob.value
+
+    signal panMoved()
+    signal balanceMoved()
 
     id: root
 
@@ -33,26 +38,33 @@ Item {
         spacing: 8
 
         LabeledKnob {
-            id: leftPan
+            id: panKnob
 
             width: Math.min(root.width, root.height)
-            height: leftPan.width
+            height: panKnob.width
 
             bipolar: true
-            text: (leftPan.value * 100).toFixed(0) + "%"
+            text: (panKnob.value * 100).toFixed(0) + "%"
+            labelVisible: root.labelVisible
+
+            visible: root.mono
+
+            onMoved: root.panMoved()
         }
 
         LabeledKnob {
-            id: rightPan
+            id: balanceKnob
 
-            width: leftPan.width
-            height: leftPan.height
+            width: Math.min(root.width, root.height)
+            height: balanceKnob.width
 
             bipolar: true
-            text: (rightPan.value * 100).toFixed(0) + "%"
+            text: (balanceKnob.value * 100).toFixed(0) + "%"
             labelVisible: root.labelVisible
 
             visible: !root.mono
+
+            onMoved: root.balanceMoved()
         }
     }
 }

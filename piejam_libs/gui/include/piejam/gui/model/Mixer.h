@@ -56,7 +56,9 @@ public:
     virtual Q_INVOKABLE void toggleInputChannel(unsigned index) = 0;
     virtual Q_INVOKABLE void
     setInputChannelGain(unsigned index, double gain) = 0;
+    virtual Q_INVOKABLE void setInputChannelPan(unsigned index, double pan) = 0;
     virtual Q_INVOKABLE void setOutputChannelGain(double gain) = 0;
+    virtual Q_INVOKABLE void setOutputChannelBalance(double balance) = 0;
     virtual Q_INVOKABLE void requestLevelsUpdate() = 0;
 
 signals:

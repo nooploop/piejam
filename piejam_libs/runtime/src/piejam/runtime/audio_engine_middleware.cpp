@@ -283,12 +283,28 @@ audio_engine_middleware::process_engine_action(
                     m_engine->set_input_channel_gain(a.index, a.gain);
                 }
             },
+            [this](actions::set_input_channel_pan const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->set_input_channel_pan(a.index, a.pan);
+                }
+            },
             [this](actions::set_output_channel_gain const& a) {
                 m_next(a);
 
                 if (m_engine)
                 {
                     m_engine->set_output_channel_gain(a.gain);
+                }
+            },
+            [this](actions::set_output_channel_balance const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->set_output_channel_balance(a.balance);
                 }
             },
             [this](actions::request_levels_update const&) {
@@ -387,9 +403,11 @@ audio_engine_middleware::start_engine()
         for (std::size_t i = 0, num_inputs = inputs.size(); i < num_inputs; ++i)
         {
             m_engine->set_input_channel_gain(i, inputs[i].gain);
+            m_engine->set_input_channel_pan(i, inputs[i].pan);
             m_engine->set_input_channel_enabled(i, inputs[i].enabled);
         }
         m_engine->set_output_channel_gain(state.mixer_state.output.gain);
+        m_engine->set_output_channel_balance(state.mixer_state.output.balance);
 
         m_device->start(
                 m_audio_thread_cpu_affinity,

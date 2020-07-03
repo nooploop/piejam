@@ -63,7 +63,7 @@ Item {
             y: slider.visualPosition * slider.availableHeight + height
             implicitWidth: root.width
             implicitHeight: 4
-            color: ColorUtil.setAlpha(Material.primaryColor, 0.6)
+            color: ColorUtil.setAlpha(Material.accentColor, 0.6)
         }
 
         onMoved: {

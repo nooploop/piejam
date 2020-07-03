@@ -44,11 +44,30 @@ struct set_input_channel_gain final
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
+struct set_input_channel_pan final
+    : ui::action<audio_state>
+    , visitable_engine_action<set_input_channel_pan>
+{
+    std::size_t index{};
+    float pan{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
 struct set_output_channel_gain final
     : ui::action<audio_state>
     , visitable_engine_action<set_output_channel_gain>
 {
     float gain{1.f};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
+struct set_output_channel_balance final
+    : ui::action<audio_state>
+    , visitable_engine_action<set_output_channel_balance>
+{
+    float balance{};
 
     auto operator()(audio_state const&) const -> audio_state override;
 };
@@ -64,8 +83,8 @@ struct update_levels final
     : ui::action<audio_state>
     , visitable_engine_action<update_levels>
 {
-    std::vector<audio::mixer::channel_level> in_levels;
-    audio::mixer::channel_level out_level{};
+    std::vector<audio::mixer::stereo_level> in_levels;
+    audio::mixer::stereo_level out_level{};
 
     auto operator()(audio_state const&) const -> audio_state override;
 };

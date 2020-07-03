@@ -85,15 +85,21 @@ TopPane {
 
         delegate: Loader {
             asynchronous: root.visible
-            sourceComponent: LevelMeterFader {
+            sourceComponent: ChannelStrip {
+                id: inputChannelStrip
+
                 height: 384
-                mono: model.mono
-                level: model.level
+                monoSource: model.mono
+                levelLeft: model.levelLeft
                 levelRight: model.levelRight
+                pan: model.pan
+                balance: model.balance
                 gain: model.gain
                 name: "In " + (index + 1)
 
                 onFaderMoved: root.model.setInputChannelGain(index, newGain)
+                onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
+                onBalanceMoved: console.log("Input has no balance yet.")
             }
         }
 
@@ -122,19 +128,23 @@ TopPane {
         model: inputFadersVisualModel
     }
 
-    LevelMeterFader {
+    ChannelStrip {
         id: outputLevelMeterFader
         y: 48
         height: 384
         anchors.right: parent.right
 
-        name: "Master"
-        mono: root.model.outputChannel.mono
-        level: root.model.outputChannel.level
+        name: "Main"
+        monoSource: root.model.outputChannel.mono
+        levelLeft: root.model.outputChannel.levelLeft
         levelRight: root.model.outputChannel.levelRight
+        pan: root.model.outputChannel.pan
+        balance: root.model.outputChannel.balance
         gain: root.model.outputChannel.gain
 
         onFaderMoved: root.model.setOutputChannelGain(newGain)
+        onPanMoved: console.log("Output has no pan yet.")
+        onBalanceMoved: root.model.setOutputChannelBalance(outputLevelMeterFader.balance)
     }
 
     Timer {

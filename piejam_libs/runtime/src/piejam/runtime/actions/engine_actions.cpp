@@ -47,11 +47,34 @@ set_input_channel_gain::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
+set_input_channel_pan::operator()(audio_state const& st) const -> audio_state
+{
+    auto new_st = st;
+
+    assert(index < new_st.mixer_state.inputs.size());
+    auto& channel = new_st.mixer_state.inputs[index];
+    channel.pan = pan;
+
+    return new_st;
+}
+
+auto
 set_output_channel_gain::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
     new_st.mixer_state.output.gain = gain;
+
+    return new_st;
+}
+
+auto
+set_output_channel_balance::operator()(audio_state const& st) const
+        -> audio_state
+{
+    auto new_st = st;
+
+    new_st.mixer_state.output.balance = balance;
 
     return new_st;
 }
