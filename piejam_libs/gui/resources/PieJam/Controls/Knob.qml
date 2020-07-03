@@ -23,7 +23,9 @@ import "../Util/MathExt.js" as MathExt
 
 Item {
     property bool bipolar: true
-    readonly property alias value: dial.value
+    property alias value: dial.value
+
+    signal moved()
 
     id: root
 
@@ -72,7 +74,10 @@ Item {
 
         handle: Item {}
 
-        onMoved: knobRing.requestPaint()
+        onMoved: {
+            root.moved()
+            knobRing.requestPaint()
+        }
     }
 
 }

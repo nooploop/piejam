@@ -22,8 +22,10 @@ import QtQuick.Controls.Material 2.12
 Item {
     property alias bipolar: knob.bipolar
     property alias text: label.text
-    readonly property alias value: knob.value
+    property alias value: knob.value
     property alias labelVisible: label.visible
+
+    signal moved()
 
     id: root
 
@@ -35,6 +37,8 @@ Item {
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.top: parent.top
+
+        onMoved: root.moved()
     }
 
     Label {
