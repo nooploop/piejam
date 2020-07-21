@@ -9,7 +9,6 @@
         <file>PieJam/MixerControls/LevelIndicator.qml</file>
         <file>PieJam/MixerControls/LevelMeter.qml</file>
         <file>PieJam/MixerControls/LevelMeterFader.qml</file>
-        <file>PieJam/MixerControls/Pan.qml</file>
         <file>PieJam/Views/AudioSettings.qml</file>
         <file>PieJam/Views/Mixer.qml</file>
         <file>PieJam/Views/Power.qml</file>

@@ -20,6 +20,8 @@ import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
 
+import "../Controls"
+
 Item {
     property alias name: title.text
     property alias levelLeft: levelMeterFader.levelLeft
@@ -54,15 +56,15 @@ Item {
         font.pixelSize: 12
     }
 
-    Pan {
+    BipolarSlider {
         id: panControls
 
-        labelVisible: false
-        height: panControls.labelVisible ? 48 : 32
+        height: 40
+        anchors.rightMargin: 6
+        anchors.leftMargin: 6
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.top: title.bottom
-        anchors.topMargin: 4
 
         onMoved: root.panMoved()
     }
@@ -74,7 +76,6 @@ Item {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.top: panControls.bottom
-        anchors.topMargin: 2
 
         onFaderMoved: root.faderMoved(newGain)
     }
