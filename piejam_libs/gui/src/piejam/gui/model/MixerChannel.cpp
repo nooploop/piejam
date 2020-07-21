@@ -62,34 +62,12 @@ MixerChannel::setLevel(double const left, double const right)
 }
 
 void
-MixerChannel::setPan(double const pan)
+MixerChannel::setPanBalance(double const x)
 {
-    if (!m_mono)
+    if (m_panBalance != x)
     {
-        m_mono = true;
-        emit monoChanged();
-    }
-
-    if (m_pan != pan)
-    {
-        m_pan = pan;
-        emit panChanged();
-    }
-}
-
-void
-MixerChannel::setBalance(double const balance)
-{
-    if (m_mono)
-    {
-        m_mono = false;
-        emit monoChanged();
-    }
-
-    if (m_balance != balance)
-    {
-        m_balance = balance;
-        emit balanceChanged();
+        m_panBalance = x;
+        emit panBalanceChanged();
     }
 }
 

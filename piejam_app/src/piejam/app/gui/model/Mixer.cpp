@@ -79,7 +79,9 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
                             subs_id,
                             state_change_subscriber,
                             selectors::make_input_pan_selector(i),
-                            [this, i](float x) { inputChannel(i).setPan(x); });
+                            [this, i](float x) {
+                                inputChannel(i).setPanBalance(x);
+                            });
 
                     m_subs.observe(
                             subs_id,
@@ -109,7 +111,7 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
             subs_id,
             state_change_subscriber,
             runtime::audio_state_selectors::select_output_balance,
-            [this](float const x) { outputChannel()->setBalance(x); });
+            [this](float const x) { outputChannel()->setPanBalance(x); });
 
     m_subs.observe(
             subs_id,

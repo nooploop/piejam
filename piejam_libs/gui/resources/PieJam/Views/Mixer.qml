@@ -91,7 +91,7 @@ TopPane {
                 height: 384
                 levelLeft: model.levelLeft
                 levelRight: model.levelRight
-                pan: model.pan
+                pan: model.panBalance
                 gain: model.gain
                 name: "In " + (index + 1)
 
@@ -134,7 +134,7 @@ TopPane {
         name: "Main"
         levelLeft: root.model.outputChannel.levelLeft
         levelRight: root.model.outputChannel.levelRight
-        pan: root.model.outputChannel.pan
+        pan: root.model.outputChannel.panBalance
         gain: root.model.outputChannel.gain
 
         onFaderMoved: root.model.setOutputChannelGain(newGain)

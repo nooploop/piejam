@@ -30,9 +30,7 @@ class MixerChannel final : public QObject
     Q_PROPERTY(double gain READ gain NOTIFY gainChanged FINAL)
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
-    Q_PROPERTY(double pan READ pan NOTIFY panChanged FINAL)
-    Q_PROPERTY(double balance READ balance NOTIFY balanceChanged FINAL)
-    Q_PROPERTY(double mono READ mono NOTIFY monoChanged FINAL)
+    Q_PROPERTY(double panBalance READ panBalance NOTIFY panBalanceChanged FINAL)
 
 public:
     MixerChannel(QObject* parent = nullptr);
@@ -47,13 +45,8 @@ public:
     auto levelRight() const noexcept -> double { return m_levelRight; }
     void setLevel(double left, double right);
 
-    auto pan() const noexcept -> double { return m_pan; }
-    void setPan(double pan);
-
-    auto balance() const noexcept -> double { return m_balance; }
-    void setBalance(double balance);
-
-    bool mono() const noexcept { return m_mono; }
+    auto panBalance() const noexcept -> double { return m_panBalance; }
+    void setPanBalance(double);
 
 signals:
 
@@ -61,18 +54,14 @@ signals:
     void gainChanged();
     void levelLeftChanged();
     void levelRightChanged();
-    void panChanged();
-    void balanceChanged();
-    void monoChanged();
+    void panBalanceChanged();
 
 private:
     double m_gain{1.};
     double m_levelLeft{};
     double m_levelRight{};
-    double m_pan{};
-    double m_balance{};
+    double m_panBalance{};
     bool m_enabled{true};
-    bool m_mono{true};
 };
 
 } // namespace piejam::gui::model
