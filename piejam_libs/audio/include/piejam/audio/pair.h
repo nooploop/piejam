@@ -30,11 +30,14 @@ struct pair
 {
     using type = T;
 
-    T left{};
-    T right{};
+    T left;
+    T right;
 
-    constexpr pair() noexcept(std::is_nothrow_default_constructible_v<T>) =
-            default;
+    constexpr pair() noexcept(std::is_nothrow_default_constructible_v<T>)
+        : left()
+        , right()
+    {
+    }
 
     explicit constexpr pair(T const& t) noexcept(
             std::is_nothrow_copy_constructible_v<T>)
