@@ -24,14 +24,11 @@ Item {
     property alias name: title.text
     property alias levelLeft: levelMeterFader.levelLeft
     property alias levelRight: levelMeterFader.levelRight
-    property alias pan: panControls.pan
-    property alias balance: panControls.balance
+    property alias pan: panControls.value
     property alias gain: levelMeterFader.gain
-    property alias monoSource: panControls.mono
 
     signal faderMoved(real newGain)
     signal panMoved()
-    signal balanceMoved()
 
     id: root
 
@@ -60,15 +57,14 @@ Item {
     Pan {
         id: panControls
 
-        labelVisible: true
-        height: panControls.labelVisible ? 48 : 24
+        labelVisible: false
+        height: panControls.labelVisible ? 48 : 32
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.top: title.bottom
         anchors.topMargin: 4
 
-        onPanMoved: root.panMoved()
-        onBalanceMoved: root.balanceMoved()
+        onMoved: root.panMoved()
     }
 
     LevelMeterFader {

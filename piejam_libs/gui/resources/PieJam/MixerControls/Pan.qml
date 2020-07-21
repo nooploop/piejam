@@ -22,49 +22,21 @@ import QtQuick.Controls.Material 2.12
 import "../Controls"
 
 Item {
-    property bool mono: false
     property bool labelVisible: true
-    property alias pan: panKnob.value
-    property alias balance: balanceKnob.value
+    property alias value: panSlider.value
 
-    signal panMoved()
-    signal balanceMoved()
+    signal moved()
 
     id: root
 
-    Row {
-        id: row
+    BipolarSlider {
+        id: panSlider
+
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 8
 
-        LabeledKnob {
-            id: panKnob
+        width: root.width - 16
+        height: 32
 
-            width: Math.min(root.width, root.height)
-            height: panKnob.width
-
-            bipolar: true
-            text: (panKnob.value * 100).toFixed(0) + "%"
-            labelVisible: root.labelVisible
-
-            visible: root.mono
-
-            onMoved: root.panMoved()
-        }
-
-        LabeledKnob {
-            id: balanceKnob
-
-            width: Math.min(root.width, root.height)
-            height: balanceKnob.width
-
-            bipolar: true
-            text: (balanceKnob.value * 100).toFixed(0) + "%"
-            labelVisible: root.labelVisible
-
-            visible: !root.mono
-
-            onMoved: root.balanceMoved()
-        }
+        onMoved: root.moved()
     }
 }

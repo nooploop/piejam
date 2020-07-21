@@ -28,5 +28,6 @@
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/Util/MathExt.js</file>
         <file>PieJam/MixerControls/ChannelStrip.qml</file>
+        <file>PieJam/Controls/BipolarSlider.qml</file>
     </qresource>
 </RCC>
