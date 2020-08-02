@@ -31,23 +31,27 @@ template <class... Args>
 static void
 log_fn(QtMsgType type, char const* const pattern, Args const&... args)
 {
-    [type]() -> decltype(&spdlog::debug<Args...>) {
-        switch (type)
-        {
-            case QtDebugMsg:
-                return &spdlog::debug<Args...>;
-            case QtInfoMsg:
-                return &spdlog::info<Args...>;
-            case QtWarningMsg:
-                return &spdlog::warn<Args...>;
-            case QtCriticalMsg:
-                return &spdlog::critical<Args...>;
-            case QtFatalMsg:
-                return &spdlog::error<Args...>;
-        }
-        BOOST_ASSERT_MSG(false, "unhandled QtMsgType");
-        return nullptr;
-    }()(pattern, std::forward<Args const>(args)...);
+    switch (type)
+    {
+        case QtDebugMsg:
+            spdlog::debug(pattern, std::forward<Args const>(args)...);
+            break;
+        case QtInfoMsg:
+            spdlog::info(pattern, std::forward<Args const>(args)...);
+            break;
+        case QtWarningMsg:
+            spdlog::warn(pattern, std::forward<Args const>(args)...);
+            break;
+        case QtCriticalMsg:
+            spdlog::critical(pattern, std::forward<Args const>(args)...);
+            break;
+        case QtFatalMsg:
+            spdlog::error(pattern, std::forward<Args const>(args)...);
+            break;
+        default:
+            BOOST_ASSERT_MSG(false, "unhandled QtMsgType");
+            break;
+    }
 }
 
 void
