@@ -29,13 +29,13 @@ using stereo_level = pair<float>;
 
 struct channel
 {
-    bool enabled{true};
     float gain{1.f};
     stereo_level level;
 };
 
 struct mono_channel : channel
 {
+    std::size_t device_channel{};
     float pan{};
 };
 

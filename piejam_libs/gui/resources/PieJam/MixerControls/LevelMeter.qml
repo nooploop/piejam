@@ -110,7 +110,7 @@ Rectangle {
     QtObject {
         id: privates
 
-        property real minPos: 6 / root.height
-        property real maxPos: (root.height - 6) / root.height
+        property real minPos: root.height < 6 ? 0 : 6 / root.height
+        property real maxPos: root.height < 6 ? 1 : (root.height - 6) / root.height
     }
 }

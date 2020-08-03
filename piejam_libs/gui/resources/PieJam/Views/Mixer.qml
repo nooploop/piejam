@@ -28,108 +28,49 @@ TopPane {
     property var model
 
     ListView {
-        id: inputToggles
+        id: inputs
 
-        anchors.top: parent.top
-        anchors.left: inputsLabel.right
-        anchors.right: parent.right
-        orientation: ListView.Horizontal
-
-        model: root.model.inputChannels
-
-        delegate: CheckDelegate {
-            property bool modelEnabled: model.enabled
-
-            id: checkDelegate
-
-            text: index + 1
-            checkState: model.enabled ? Qt.Checked : Qt.Unchecked
-            height: 40
-            width: 90
-
-            onClicked: root.model.toggleInputChannel(index)
-
-            Connections {
-                target: checkDelegate
-                function onModelEnabledChanged() { inputFadersVisualModel.items.get(index).inDisplayed = model.enabled }
-            }
-        }
-    }
-
-    Label {
-        id: inputsLabel
-        width: 120
-        height: 40
-        text: qsTr("Inputs:")
-        font.bold: true
-        anchors.top: parent.top
+        anchors.right: outputLevelMeterFader.left
+        anchors.rightMargin: 8
         anchors.left: parent.left
         anchors.leftMargin: 8
-        verticalAlignment: Text.AlignVCenter
-        visible: root.model.inputChannels.length !== 0
-    }
-
-    DelegateModel {
-        id: inputFadersVisualModel
-
-        model: root.model.inputChannels
-
-        groups: [
-            DelegateModelGroup {
-                name: "displayed"
-                includeByDefault: false
-            }
-        ]
-
-        filterOnGroup: "displayed"
-
-        delegate: Loader {
-            asynchronous: root.visible
-            sourceComponent: ChannelStrip {
-                id: inputChannelStrip
-
-                height: 384
-                levelLeft: model.levelLeft
-                levelRight: model.levelRight
-                pan: model.panBalance
-                gain: model.gain
-                name: "In " + (index + 1)
-
-                onFaderMoved: root.model.setInputChannelGain(index, newGain)
-                onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
-            }
-        }
-
-        Component.onCompleted: updateDisplayedChannels()
-
-        function updateDisplayedChannels() {
-            for (var i = 0; i < items.count; ++i) {
-                var entry = items.get(i)
-                entry.inDisplayed = entry.model.enabled
-            }
-        }
-    }
-
-    ListView {
-        id: inputs
-        x: 0
-        y: 48
-        width: 640
-        height: 384
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
+        anchors.top: parent.top
+        anchors.topMargin: 8
         spacing: 2
         clip: true
         orientation: ListView.Horizontal
 
         boundsBehavior: Flickable.StopAtBounds
 
-        model: inputFadersVisualModel
+        model: root.model.inputChannels
+
+        delegate: ChannelStrip {
+            id: inputChannelStrip
+
+            height: outputLevelMeterFader.height
+
+            levelLeft: model.levelLeft
+            levelRight: model.levelRight
+            pan: model.panBalance
+            gain: model.gain
+            name: "In " + (index + 1)
+
+            onFaderMoved: root.model.setInputChannelGain(index, newGain)
+            onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
+        }
     }
 
     ChannelStrip {
         id: outputLevelMeterFader
-        y: 48
-        height: 384
+
         anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
+        anchors.top: parent.top
+        anchors.topMargin: 8
 
         name: "Main"
         levelLeft: root.model.outputChannel.levelLeft
@@ -146,13 +87,5 @@ TopPane {
         running: root.visible
         repeat: true
         onTriggered: root.model.requestLevelsUpdate()
-    }
-
-    Connections {
-        target: root.model
-        function onInputChannelsChanged() {
-            inputFadersVisualModel.model = root.model.inputChannels
-            inputFadersVisualModel.updateDisplayedChannels()
-        }
     }
 }

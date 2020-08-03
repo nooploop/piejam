@@ -30,7 +30,6 @@ class Mixer final : public piejam::gui::model::Mixer
 public:
     Mixer(store&, subscriber&);
 
-    void toggleInputChannel(unsigned index) override;
     void setInputChannelGain(unsigned index, double gain) override;
     void setInputChannelPan(unsigned index, double pan) override;
     void setOutputChannelGain(double gain) override;

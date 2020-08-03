@@ -44,27 +44,21 @@ level_meter_rms_window_size(unsigned const samplerate) -> std::size_t
     return static_cast<std::size_t>((ws_in_ms / 1000.) * samplerate);
 }
 
-engine::engine(unsigned const samplerate, std::size_t const num_inputs)
-    : m_mixer_state(num_inputs)
+engine::engine(unsigned const samplerate, std::vector<std::size_t> const& input_bus_config)
+    : m_mixer_state(input_bus_config.size())
     , m_in_level_meters(
-              num_inputs,
+              input_bus_config.size(),
               pair<level_meter>{level_meter{
                       level_meter_decay_time(samplerate),
                       level_meter_rms_window_size(samplerate)}})
     , m_out_level_meter(
               {level_meter_decay_time(samplerate),
                level_meter_rms_window_size(samplerate)})
-    , m_in_gain_smoothers(num_inputs)
+    , m_in_gain_smoothers(input_bus_config.size())
 {
-}
-
-void
-engine::set_input_channel_enabled(std::size_t const index, bool const enabled)
-{
-    assert(index < m_mixer_state.inputs.size());
-    m_mixer_state.inputs[index].enabled.store(
-            enabled,
-            std::memory_order_relaxed);
+    std::size_t input_bus_index{};
+    for (std::size_t in_channel : input_bus_config)
+        m_mixer_state.inputs[input_bus_index++].device_channel = in_channel;
 }
 
 void
@@ -213,27 +207,31 @@ engine::operator()(
     std::size_t const num_in_channels = ins.major_size();
     std::size_t const num_out_channels = outs.major_size();
 
-    for (std::size_t ch = 0; ch < num_in_channels; ++ch)
+    std::size_t const num_in_busses = m_mixer_state.inputs.size();
+
+    for (std::size_t bus = 0; bus < num_in_busses; ++bus)
     {
-        input_mixer_channel& in_channel = m_mixer_state.inputs[ch];
-        if (in_channel.enabled)
+        input_mixer_channel& in_channel = m_mixer_state.inputs[bus];
+        if (in_channel.device_channel < num_in_channels)
         {
             stereo_audio_buffer_t gain_buffer;
 
             auto in_pan = sinusoidal_constant_power_pan(
                     in_channel.pan.load(std::memory_order_relaxed));
 
+            std::size_t ch = in_channel.device_channel;
+
             if (num_out_channels > 0)
             {
                 apply_gain(
-                        m_in_gain_smoothers[ch].left,
+                        m_in_gain_smoothers[bus].left,
                         in_channel.gain * in_pan.left,
                         ins[ch],
                         std::back_inserter(gain_buffer.left));
 
                 calculate_level(
                         gain_buffer.left,
-                        m_in_level_meters[ch].left,
+                        m_in_level_meters[bus].left,
                         in_channel.level.left);
 
                 mix(gain_buffer.left, outs[0].begin());
@@ -242,14 +240,14 @@ engine::operator()(
             if (num_out_channels > 1)
             {
                 apply_gain(
-                        m_in_gain_smoothers[ch].right,
+                        m_in_gain_smoothers[bus].right,
                         in_channel.gain * in_pan.right,
                         ins[ch],
                         std::back_inserter(gain_buffer.right));
 
                 calculate_level(
                         gain_buffer.right,
-                        m_in_level_meters[ch].right,
+                        m_in_level_meters[bus].right,
                         in_channel.level.right);
 
                 mix(gain_buffer.right, outs[1].begin());
@@ -257,8 +255,8 @@ engine::operator()(
         }
         else
         {
-            reset_level(m_in_level_meters[ch].left, in_channel.level.left);
-            reset_level(m_in_level_meters[ch].right, in_channel.level.right);
+            reset_level(m_in_level_meters[bus].left, in_channel.level.left);
+            reset_level(m_in_level_meters[bus].right, in_channel.level.right);
         }
     }
 

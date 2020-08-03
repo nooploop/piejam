@@ -25,15 +25,6 @@
 namespace piejam::runtime::actions
 {
 
-struct toggle_input_channel final
-    : ui::action<audio_state>
-    , visitable_engine_action<toggle_input_channel>
-{
-    std::size_t index{};
-
-    auto operator()(audio_state const&) const -> audio_state override;
-};
-
 struct set_input_channel_gain final
     : ui::action<audio_state>
     , visitable_engine_action<set_input_channel_gain>

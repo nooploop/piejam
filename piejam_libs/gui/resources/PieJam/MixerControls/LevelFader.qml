@@ -74,8 +74,8 @@ Item {
         QtObject {
             id: privates
 
-            property real minPos: slider.topPadding / root.height
-            property real maxPos: (root.height - slider.bottomPadding) / root.height
+            property real minPos: slider.topPadding > root.height ? 0 : slider.topPadding / root.height
+            property real maxPos: slider.bottomPadding > root.height ? 1 : (root.height - slider.bottomPadding) / root.height
         }
     }
 }

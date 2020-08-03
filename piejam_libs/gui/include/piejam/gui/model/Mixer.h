@@ -53,7 +53,6 @@ public:
 
     auto outputChannel() -> MixerChannel* { return &m_outputChannel; }
 
-    virtual Q_INVOKABLE void toggleInputChannel(unsigned index) = 0;
     virtual Q_INVOKABLE void
     setInputChannelGain(unsigned index, double gain) = 0;
     virtual Q_INVOKABLE void setInputChannelPan(unsigned index, double pan) = 0;

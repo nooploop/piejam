@@ -23,18 +23,6 @@ namespace piejam::runtime::actions
 {
 
 auto
-toggle_input_channel::operator()(audio_state const& st) const -> audio_state
-{
-    auto new_st = st;
-
-    assert(index < new_st.mixer_state.inputs.size());
-    auto& channel = new_st.mixer_state.inputs[index];
-    channel.enabled = !channel.enabled;
-
-    return new_st;
-}
-
-auto
 set_input_channel_gain::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
