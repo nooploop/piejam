@@ -26,16 +26,6 @@ MixerChannel::MixerChannel(QObject* parent)
 }
 
 void
-MixerChannel::setEnabled(bool x)
-{
-    if (m_enabled != x)
-    {
-        m_enabled = x;
-        emit enabledChanged();
-    }
-}
-
-void
 MixerChannel::setGain(double const x)
 {
     if (m_gain != x)

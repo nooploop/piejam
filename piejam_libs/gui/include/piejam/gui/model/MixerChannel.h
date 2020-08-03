@@ -26,7 +26,6 @@ class MixerChannel final : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged FINAL)
     Q_PROPERTY(double gain READ gain NOTIFY gainChanged FINAL)
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
@@ -34,9 +33,6 @@ class MixerChannel final : public QObject
 
 public:
     MixerChannel(QObject* parent = nullptr);
-
-    bool enabled() const noexcept { return m_enabled; }
-    void setEnabled(bool);
 
     auto gain() const noexcept -> double { return m_gain; }
     void setGain(double);
@@ -50,7 +46,6 @@ public:
 
 signals:
 
-    void enabledChanged();
     void gainChanged();
     void levelLeftChanged();
     void levelRightChanged();
@@ -61,7 +56,6 @@ private:
     double m_levelLeft{};
     double m_levelRight{};
     double m_panBalance{};
-    bool m_enabled{true};
 };
 
 } // namespace piejam::gui::model
