@@ -64,6 +64,10 @@ select_device::operator()(audio_state const& st) const -> audio_state
     {
         new_st.mixer_state.inputs = piejam::audio::mixer::input_channels{
                 new_st.input.hw_params->num_channels};
+
+        std::size_t channel_index{};
+        for (auto& in : new_st.mixer_state.inputs)
+            in.device_channel = channel_index++;
     }
 
     return new_st;

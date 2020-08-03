@@ -34,7 +34,6 @@ struct select_device;
 struct select_samplerate;
 struct select_period_size;
 
-struct toggle_input_channel;
 struct set_input_channel_gain;
 struct set_input_channel_pan;
 struct set_output_channel_gain;

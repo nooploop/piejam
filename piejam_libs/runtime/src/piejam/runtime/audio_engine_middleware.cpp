@@ -19,6 +19,7 @@
 
 #include <piejam/algorithm/find_or_get_first.h>
 #include <piejam/algorithm/index_of.h>
+#include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
@@ -262,19 +263,6 @@ audio_engine_middleware::process_engine_action(
         actions::engine_action const& action)
 {
     auto v = ui::make_action_visitor<actions::engine_action_visitor>(
-            [this](actions::toggle_input_channel const& a) {
-                m_next(a);
-
-                if (m_engine)
-                {
-                    audio_state const& current_state = m_get_state();
-                    auto const& inputs = current_state.mixer_state.inputs;
-                    BOOST_ASSERT(a.index < inputs.size());
-                    m_engine->set_input_channel_enabled(
-                            a.index,
-                            inputs[a.index].enabled);
-                }
-            },
             [this](actions::set_input_channel_gain const& a) {
                 m_next(a);
 
@@ -397,14 +385,15 @@ audio_engine_middleware::start_engine()
 
         m_engine = std::make_unique<audio::engine>(
                 state.samplerate,
-                state.mixer_state.inputs.size());
+                algorithm::transform_to_vector(
+                        state.mixer_state.inputs,
+                        [](auto const& in) { return in.device_channel; }));
 
         auto const& inputs = state.mixer_state.inputs;
         for (std::size_t i = 0, num_inputs = inputs.size(); i < num_inputs; ++i)
         {
             m_engine->set_input_channel_gain(i, inputs[i].gain);
             m_engine->set_input_channel_pan(i, inputs[i].pan);
-            m_engine->set_input_channel_enabled(i, inputs[i].enabled);
         }
         m_engine->set_output_channel_gain(state.mixer_state.output.gain);
         m_engine->set_output_channel_balance(state.mixer_state.output.balance);

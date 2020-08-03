@@ -90,14 +90,6 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
                             [this, i](audio::mixer::stereo_level const& x) {
                                 set_input_channel_level(*this, i, x);
                             });
-
-                    m_subs.observe(
-                            subs_id,
-                            state_change_subscriber,
-                            selectors::make_input_enabled_selector(i),
-                            [this, i](bool x) {
-                                inputChannel(i).setEnabled(x);
-                            });
                 }
             });
 
@@ -120,14 +112,6 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
             [this](audio::mixer::stereo_level const& x) {
                 set_output_channel_level(*this, x);
             });
-}
-
-void
-Mixer::toggleInputChannel(unsigned const index)
-{
-    runtime::actions::toggle_input_channel action;
-    action.index = index;
-    m_store.dispatch<runtime::actions::toggle_input_channel>(action);
 }
 
 void
