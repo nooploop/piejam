@@ -18,7 +18,9 @@
 #pragma once
 
 #include <piejam/audio/pair.h>
+#include <piejam/container/boxed_string.h>
 
+#include <string>
 #include <variant>
 #include <vector>
 
@@ -29,6 +31,7 @@ using stereo_level = pair<float>;
 
 struct channel
 {
+    container::boxed_string name;
     float gain{1.f};
     stereo_level level;
 };

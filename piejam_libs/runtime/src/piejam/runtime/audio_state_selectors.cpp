@@ -17,10 +17,13 @@
 
 #include <piejam/runtime/audio_state_selectors.h>
 
+#include <piejam/algorithm/npos.h>
 #include <piejam/container/boxify_result.h>
 #include <piejam/functional/memo.h>
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/audio_state.h>
+
+#include <cassert>
 
 namespace piejam::runtime::audio_state_selectors
 {
@@ -52,9 +55,35 @@ const selector<output_devices>
         });
 
 const selector<std::size_t>
-        select_num_input_devices([](audio_state const& st) -> std::size_t {
+        select_num_input_channels([](audio_state const& st) -> std::size_t {
             return st.input.hw_params->num_channels;
         });
+
+const selector<std::size_t>
+        select_num_input_busses([](audio_state const& st) -> std::size_t {
+            return st.mixer_state.inputs.size();
+        });
+
+auto
+make_input_name_selector(std::size_t const bus)
+        -> selector<container::boxed_string>
+{
+    return selector<container::boxed_string>(
+            [bus](audio_state const& st) -> container::boxed_string {
+                assert(bus < st.mixer_state.inputs.size());
+                return st.mixer_state.inputs[bus].name;
+            });
+}
+
+auto
+make_input_channel_selector(std::size_t const index) -> selector<std::size_t>
+{
+    return selector<std::size_t>([index](audio_state const& st) -> std::size_t {
+        return index < st.mixer_state.inputs.size()
+                       ? st.mixer_state.inputs[index].device_channel
+                       : algorithm::npos;
+    });
+}
 
 auto
 make_input_gain_selector(std::size_t const index) -> selector<float>

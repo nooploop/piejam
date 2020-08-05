@@ -33,6 +33,9 @@ struct initiate_device_selection;
 struct select_device;
 struct select_samplerate;
 struct select_period_size;
+struct select_input_bus_mono_channel;
+struct add_device_bus;
+struct delete_device_bus;
 
 struct set_input_channel_gain;
 struct set_input_channel_pan;
@@ -42,6 +45,8 @@ struct request_levels_update;
 struct update_levels;
 struct request_info_update;
 struct update_info;
+
+struct set_bus_name;
 
 // visitors
 

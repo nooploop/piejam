@@ -17,6 +17,7 @@
 
 #include <piejam/runtime/actions/device_actions.h>
 
+#include <piejam/algorithm/npos.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
@@ -38,8 +39,12 @@ update_devices::operator()(audio_state const& st) const -> audio_state
     new_st.output = output;
     new_st.samplerate = samplerate;
     new_st.period_size = period_size;
-    new_st.mixer_state.inputs = piejam::audio::mixer::input_channels{
-            new_st.input.hw_params->num_channels};
+
+    for (auto& in : new_st.mixer_state.inputs)
+    {
+        if (in.device_channel >= new_st.input.hw_params->num_channels)
+            in.device_channel = algorithm::npos;
+    }
 
     return new_st;
 }
@@ -67,7 +72,10 @@ select_device::operator()(audio_state const& st) const -> audio_state
 
         std::size_t channel_index{};
         for (auto& in : new_st.mixer_state.inputs)
+        {
             in.device_channel = channel_index++;
+            in.name = "In " + std::to_string(in.device_channel + 1);
+        }
     }
 
     return new_st;
@@ -93,6 +101,43 @@ select_period_size::operator()(audio_state const& st) const -> audio_state
     auto const pszs = period_sizes_from_state(new_st);
     assert(index < pszs.size());
     new_st.period_size = pszs[index];
+
+    return new_st;
+}
+
+auto
+select_input_bus_mono_channel::operator()(audio_state const& st) const
+        -> audio_state
+{
+    auto new_st = st;
+
+    assert(bus < new_st.mixer_state.inputs.size());
+    assert(channel == algorithm::npos ||
+           channel < new_st.input.hw_params->num_channels);
+    new_st.mixer_state.inputs[bus].device_channel = channel;
+
+    return new_st;
+}
+
+auto
+add_device_bus::operator()(audio_state const& st) const -> audio_state
+{
+    auto new_st = st;
+
+    auto& bus = new_st.mixer_state.inputs.emplace_back();
+    bus.name = "In " + std::to_string(new_st.mixer_state.inputs.size());
+    bus.device_channel = algorithm::npos;
+
+    return new_st;
+}
+
+auto
+delete_device_bus::operator()(audio_state const& st) const -> audio_state
+{
+    auto new_st = st;
+
+    assert(bus < new_st.mixer_state.inputs.size());
+    new_st.mixer_state.inputs.erase(new_st.mixer_state.inputs.begin() + bus);
 
     return new_st;
 }

@@ -15,16 +15,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import QtQuick 2.12
-import QtQuick.Controls 2.12
+#pragma once
 
-import PieJam.Views 1.0
+#include <piejam/app/store.h>
+#include <piejam/app/subscriber.h>
+#include <piejam/gui/model/AudioInputOutputSettings.h>
+#include <piejam/reselect/subscriptions_manager.h>
 
-MainWindow {
-    id: root
+namespace piejam::app::gui::model
+{
 
-    audioSettingsPage.deviceModel: g_audioSettings
-    audioSettingsPage.inputsModel: g_audioInputSettings
-    mixerPage.model: g_mixer
-    infoPage.model: g_info
-}
+class AudioInputSettings final
+    : public piejam::gui::model::AudioInputOutputSettings
+{
+public:
+    AudioInputSettings(store&, subscriber&);
+
+    void setBusName(unsigned bus, QString const& name) override;
+    void selectMonoChannel(unsigned bus, unsigned ch) override;
+    void addMonoBus() override;
+    void deleteBus(unsigned bus) override;
+
+private:
+    store& m_store;
+    subscriptions_manager m_subs;
+};
+
+} // namespace piejam::app::gui::model
