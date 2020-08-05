@@ -18,7 +18,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 
-import "../Controls"
+import "../SettingsControls"
 
 Item {
     id: root
