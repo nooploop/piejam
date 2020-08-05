@@ -26,6 +26,16 @@ MixerChannel::MixerChannel(QObject* parent)
 }
 
 void
+MixerChannel::setName(QString const& x)
+{
+    if (m_name != x)
+    {
+        m_name = x;
+        emit nameChanged();
+    }
+}
+
+void
 MixerChannel::setGain(double const x)
 {
     if (m_gain != x)

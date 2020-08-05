@@ -51,11 +51,11 @@ TopPane {
 
             height: outputLevelMeterFader.height
 
-            levelLeft: model.levelLeft
-            levelRight: model.levelRight
-            pan: model.panBalance
-            gain: model.gain
-            name: "In " + (index + 1)
+            levelLeft: modelData.levelLeft
+            levelRight: modelData.levelRight
+            pan: modelData.panBalance
+            gain: modelData.gain
+            name: modelData.name
 
             onFaderMoved: root.model.setInputChannelGain(index, newGain)
             onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)

@@ -26,6 +26,7 @@ class MixerChannel final : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(double gain READ gain NOTIFY gainChanged FINAL)
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
@@ -33,6 +34,9 @@ class MixerChannel final : public QObject
 
 public:
     MixerChannel(QObject* parent = nullptr);
+
+    auto name() const noexcept -> QString const& { return m_name; }
+    void setName(QString const&);
 
     auto gain() const noexcept -> double { return m_gain; }
     void setGain(double);
@@ -46,12 +50,14 @@ public:
 
 signals:
 
+    void nameChanged();
     void gainChanged();
     void levelLeftChanged();
     void levelRightChanged();
     void panBalanceChanged();
 
 private:
+    QString m_name;
     double m_gain{1.};
     double m_levelLeft{};
     double m_levelRight{};
