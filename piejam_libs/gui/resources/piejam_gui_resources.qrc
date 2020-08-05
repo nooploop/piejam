@@ -9,7 +9,6 @@
         <file>PieJam/MixerControls/LevelIndicator.qml</file>
         <file>PieJam/MixerControls/LevelMeter.qml</file>
         <file>PieJam/MixerControls/LevelMeterFader.qml</file>
-        <file>PieJam/Views/AudioSettings.qml</file>
         <file>PieJam/Views/Mixer.qml</file>
         <file>PieJam/Views/Power.qml</file>
         <file>PieJam/Views/TopPane.qml</file>
@@ -28,5 +27,9 @@
         <file>PieJam/Util/MathExt.js</file>
         <file>PieJam/MixerControls/ChannelStrip.qml</file>
         <file>PieJam/Controls/BipolarSlider.qml</file>
+        <file>PieJam/Views/AudioSettings.qml</file>
+        <file>PieJam/SettingsControls/BusConfig.qml</file>
+        <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
+        <file>PieJam/SettingsControls/AudioInputSettings.qml</file>
     </qresource>
 </RCC>

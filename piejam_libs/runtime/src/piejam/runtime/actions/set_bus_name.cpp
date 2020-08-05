@@ -15,16 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import QtQuick 2.12
-import QtQuick.Controls 2.12
+#include <piejam/runtime/actions/set_bus_name.h>
 
-import PieJam.Views 1.0
+#include <piejam/runtime/audio_state.h>
 
-MainWindow {
-    id: root
+namespace piejam::runtime::actions
+{
 
-    audioSettingsPage.deviceModel: g_audioSettings
-    audioSettingsPage.inputsModel: g_audioInputSettings
-    mixerPage.model: g_mixer
-    infoPage.model: g_info
+auto
+set_bus_name::operator()(audio_state const& st) const -> audio_state
+{
+    auto new_st = st;
+
+    assert(bus < new_st.mixer_state.inputs.size());
+    new_st.mixer_state.inputs[bus].name = name;
+
+    return new_st;
 }
+
+} // namespace piejam::runtime::actions

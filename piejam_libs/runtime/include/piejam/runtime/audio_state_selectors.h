@@ -22,6 +22,7 @@
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
 #include <piejam/container/box.h>
+#include <piejam/container/boxed_string.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
 
@@ -49,7 +50,12 @@ using output_devices =
         std::pair<container::box<audio::pcm_io_descriptors>, std::size_t>;
 extern const selector<output_devices> select_output_devices;
 
-extern const selector<std::size_t> select_num_input_devices;
+extern const selector<std::size_t> select_num_input_channels;
+extern const selector<std::size_t> select_num_input_busses;
+
+auto make_input_name_selector(std::size_t bus)
+        -> selector<container::boxed_string>;
+auto make_input_channel_selector(std::size_t index) -> selector<std::size_t>;
 
 auto make_input_gain_selector(std::size_t index) -> selector<float>;
 auto make_input_pan_selector(std::size_t index) -> selector<float>;

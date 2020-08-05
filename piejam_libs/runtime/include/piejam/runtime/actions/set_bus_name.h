@@ -15,16 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import QtQuick 2.12
-import QtQuick.Controls 2.12
+#pragma once
 
-import PieJam.Views 1.0
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/action.h>
 
-MainWindow {
-    id: root
+#include <string>
 
-    audioSettingsPage.deviceModel: g_audioSettings
-    audioSettingsPage.inputsModel: g_audioInputSettings
-    mixerPage.model: g_mixer
-    infoPage.model: g_info
-}
+namespace piejam::runtime::actions
+{
+
+struct set_bus_name : action
+{
+    std::size_t bus{};
+    std::string name;
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
+} // namespace piejam::runtime::actions

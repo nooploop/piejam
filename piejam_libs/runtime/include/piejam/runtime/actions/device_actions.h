@@ -95,4 +95,30 @@ struct select_period_size final
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
+struct select_input_bus_mono_channel final
+    : action
+    , visitable_device_action<select_input_bus_mono_channel>
+{
+    std::size_t bus{};
+    std::size_t channel{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
+struct add_device_bus final
+    : action
+    , visitable_device_action<add_device_bus>
+{
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
+struct delete_device_bus final
+    : action
+    , visitable_device_action<delete_device_bus>
+{
+    std::size_t bus{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
 } // namespace piejam::runtime::actions

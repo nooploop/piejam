@@ -102,7 +102,12 @@ audio_engine_middleware::process_device_action(
                 BOOST_ASSERT_MSG(false, "should not be sent by user");
             },
             [this](actions::select_samplerate const& a) { m_next(a); },
-            [this](actions::select_period_size const& a) { m_next(a); });
+            [this](actions::select_period_size const& a) { m_next(a); },
+            [this](actions::select_input_bus_mono_channel const& a) {
+                m_next(a);
+            },
+            [this](actions::add_device_bus const& a) { m_next(a); },
+            [this](actions::delete_device_bus const& a) { m_next(a); });
 
     action.visit(v);
 

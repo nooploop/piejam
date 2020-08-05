@@ -16,6 +16,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <piejam/app/config_access.h>
+#include <piejam/app/gui/model/AudioInputSettings.h>
 #include <piejam/app/gui/model/AudioSettings.h>
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/Mixer.h>
@@ -94,9 +95,13 @@ main(int argc, char* argv[]) -> int
         state_change_subscriber.notify(state);
     });
 
+    qmlRegisterInterface<gui::model::BusConfig>("BusConfig");
     qmlRegisterInterface<gui::model::MixerChannel>("MixerChannel");
 
     app::gui::model::AudioSettings audio_settings(
+            store,
+            state_change_subscriber);
+    app::gui::model::AudioInputSettings audio_input_settings(
             store,
             state_change_subscriber);
     app::gui::model::Mixer mixer(store, state_change_subscriber);
@@ -118,6 +123,9 @@ main(int argc, char* argv[]) -> int
     engine.rootContext()->setContextProperty(
             "g_audioSettings",
             &audio_settings);
+    engine.rootContext()->setContextProperty(
+            "g_audioInputSettings",
+            &audio_input_settings);
     engine.rootContext()->setContextProperty("g_mixer", &mixer);
     engine.rootContext()->setContextProperty("g_info", &info_model);
 
