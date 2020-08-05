@@ -18,7 +18,9 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 
-Frame {
+
+Item {
+
     id: root
 
     property alias nameLabelWidth: nameLabel.width
@@ -28,30 +30,33 @@ Frame {
 
     signal optionSelected(int index)
 
-    width: 784
-    height: 64
+    Frame {
+        id: frame
 
-    Label {
-        id: nameLabel
+        anchors.fill: parent
 
-        width: 128
+        Label {
+            id: nameLabel
 
-        anchors.bottom: parent.bottom
-        anchors.top: parent.top
-        anchors.left: parent.left
+            width: 128
+            anchors.verticalCenter: parent.verticalCenter
 
-        verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 18
+            anchors.left: parent.left
+
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: 18
+        }
+
+        ComboBox {
+            id: comboBox
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: 8
+
+            anchors.right: parent.right
+            anchors.left: nameLabel.right
+
+            onActivated: optionSelected(index)
+        }
     }
 
-    ComboBox {
-        id: comboBox
-
-        anchors.bottom: parent.bottom
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.left: nameLabel.right
-
-        onActivated: optionSelected(index)
-    }
 }
