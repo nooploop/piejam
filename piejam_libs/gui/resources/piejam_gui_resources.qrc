@@ -12,7 +12,6 @@
         <file>PieJam/Views/Mixer.qml</file>
         <file>PieJam/Views/Power.qml</file>
         <file>PieJam/Views/TopPane.qml</file>
-        <file>PieJam/Controls/ComboBoxSetting.qml</file>
         <file>images/icons/mixer.png</file>
         <file>images/icons/settings.png</file>
         <file>images/icons/power.png</file>
@@ -31,5 +30,6 @@
         <file>PieJam/SettingsControls/BusConfig.qml</file>
         <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
         <file>PieJam/SettingsControls/AudioInputSettings.qml</file>
+        <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
     </qresource>
 </RCC>
