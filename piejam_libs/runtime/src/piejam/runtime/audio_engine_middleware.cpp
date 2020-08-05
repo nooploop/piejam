@@ -137,12 +137,10 @@ void
 audio_engine_middleware::process_apply_app_config_action(
         actions::apply_app_config const& a)
 {
-    m_next(a);
-
     audio_state const& current_state = m_get_state();
 
-    actions::update_devices next_action;
-    next_action.pcm_devices = current_state.pcm_devices;
+    actions::update_devices prep_action;
+    prep_action.pcm_devices = current_state.pcm_devices;
 
     if (auto index = algorithm::index_of_if(
                 current_state.pcm_devices->inputs,
@@ -151,13 +149,13 @@ audio_engine_middleware::process_apply_app_config_action(
                 });
         index != algorithm::npos)
     {
-        next_action.input = {
+        prep_action.input = {
                 index,
-                m_get_hw_params(next_action.pcm_devices->inputs[index])};
+                m_get_hw_params(prep_action.pcm_devices->inputs[index])};
     }
     else
     {
-        next_action.input = current_state.input;
+        prep_action.input = current_state.input;
     }
 
     if (auto index = algorithm::index_of_if(
@@ -167,23 +165,25 @@ audio_engine_middleware::process_apply_app_config_action(
                 });
         index != algorithm::npos)
     {
-        next_action.output = {
+        prep_action.output = {
                 index,
-                m_get_hw_params(next_action.pcm_devices->outputs[index])};
+                m_get_hw_params(prep_action.pcm_devices->outputs[index])};
     }
     else
     {
-        next_action.output = current_state.output;
+        prep_action.output = current_state.output;
     }
 
-    std::tie(next_action.samplerate, next_action.period_size) =
+    std::tie(prep_action.samplerate, prep_action.period_size) =
             next_samplerate_and_period_size(
-                    next_action.input.hw_params,
-                    next_action.output.hw_params,
+                    prep_action.input.hw_params,
+                    prep_action.output.hw_params,
                     a.conf.samplerate,
                     a.conf.period_size);
 
-    m_next(next_action);
+    m_next(prep_action);
+
+    m_next(a);
 }
 
 void
