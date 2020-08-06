@@ -287,7 +287,7 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->set_output_channel_gain(a.gain);
+                    m_engine->set_output_channel_gain(0, a.gain); //! \todo bus
                 }
             },
             [this](actions::set_output_channel_balance const& a) {
@@ -295,7 +295,9 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->set_output_channel_balance(a.balance);
+                    m_engine->set_output_channel_balance(
+                            0,
+                            a.balance); //! \todo bus
                 }
             },
             [this](actions::request_levels_update const&) {
@@ -313,7 +315,8 @@ audio_engine_middleware::process_engine_action(
                         next_action.in_levels[index] =
                                 m_engine->get_input_level(index);
 
-                    next_action.out_level = m_engine->get_output_level();
+                    next_action.out_level =
+                            m_engine->get_output_level(0); //! \todo bus
                 }
 
                 m_next(next_action);
@@ -391,7 +394,7 @@ audio_engine_middleware::start_engine()
                 algorithm::transform_to_vector(
                         state.mixer_state.inputs,
                         [](auto const& in) { return in.device_channel; }),
-                state.mixer_state.output.device_channels);
+                std::vector{state.mixer_state.output.device_channels});
 
         auto const& inputs = state.mixer_state.inputs;
         for (std::size_t i = 0, num_inputs = inputs.size(); i < num_inputs; ++i)
@@ -399,8 +402,12 @@ audio_engine_middleware::start_engine()
             m_engine->set_input_channel_gain(i, inputs[i].gain);
             m_engine->set_input_channel_pan(i, inputs[i].pan);
         }
-        m_engine->set_output_channel_gain(state.mixer_state.output.gain);
-        m_engine->set_output_channel_balance(state.mixer_state.output.balance);
+        m_engine->set_output_channel_gain(
+                0,
+                state.mixer_state.output.gain); //! \todo bus
+        m_engine->set_output_channel_balance(
+                0,
+                state.mixer_state.output.balance); //! \todo bus
 
         m_device->start(
                 m_audio_thread_cpu_affinity,

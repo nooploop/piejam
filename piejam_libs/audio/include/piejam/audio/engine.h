@@ -36,16 +36,17 @@ class engine
 public:
     engine(unsigned samplerate,
            std::vector<std::size_t> const& input_bus_config,
-           pair<std::size_t> const& output_config);
+           std::vector<pair<std::size_t>> const& output_config);
 
     void set_input_channel_gain(std::size_t index, float gain);
     void set_input_channel_pan(std::size_t index, float pan);
-    void set_output_channel_gain(float gain);
-    void set_output_channel_balance(float balance);
+    void set_output_channel_gain(std::size_t index, float gain);
+    void set_output_channel_balance(std::size_t index, float balance);
 
     auto get_input_level(std::size_t index) const noexcept
             -> mixer::stereo_level;
-    auto get_output_level() const noexcept -> mixer::stereo_level;
+    auto get_output_level(std::size_t index) const noexcept
+            -> mixer::stereo_level;
 
     void operator()(
             range::table_view<float const> const& in_audio,
@@ -76,9 +77,11 @@ private:
     {
         mixer_state(
                 std::size_t num_inputs,
+                std::size_t num_outputs,
                 std::size_t level_meter_decay_time,
                 std::size_t level_meter_rms_window_size)
             : inputs(num_inputs)
+            , outputs(num_outputs)
         {
             for (auto& in : inputs)
             {
@@ -87,13 +90,16 @@ private:
                         level_meter_rms_window_size));
             }
 
-            output.stereo_level_meter = pair<level_meter>(level_meter(
-                    level_meter_decay_time,
-                    level_meter_rms_window_size));
+            for (auto& out : outputs)
+            {
+                out.stereo_level_meter = pair<level_meter>(level_meter(
+                        level_meter_decay_time,
+                        level_meter_rms_window_size));
+            }
         }
 
         std::vector<input_mixer_channel> inputs;
-        output_mixer_channel output;
+        std::vector<output_mixer_channel> outputs;
     };
 
     mixer_state m_mixer_state;
