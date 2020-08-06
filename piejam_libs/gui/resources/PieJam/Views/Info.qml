@@ -104,6 +104,4 @@ TopPane {
         repeat: true
         onTriggered: root.model.requestUpdate()
     }
-
-    onVisibleChanged: root.model.requestUpdate()
 }

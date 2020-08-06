@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/bus_defs.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/container/box.h>
@@ -95,12 +96,14 @@ struct select_period_size final
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
-struct select_input_bus_mono_channel final
+struct select_bus_channel final
     : action
-    , visitable_device_action<select_input_bus_mono_channel>
+    , visitable_device_action<select_bus_channel>
 {
+    audio::bus_direction direction{};
     std::size_t bus{};
-    std::size_t channel{};
+    audio::bus_channel channel_selector{};
+    std::size_t channel_index{};
 
     auto operator()(audio_state const&) const -> audio_state override;
 };

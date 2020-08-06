@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/bus_defs.h>
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/period_sizes.h>
@@ -53,14 +54,24 @@ extern const selector<output_devices> select_output_devices;
 extern const selector<std::size_t> select_num_input_channels;
 extern const selector<std::size_t> select_num_input_busses;
 
-auto make_input_name_selector(std::size_t bus)
+auto make_bus_name_selector(audio::bus_direction, std::size_t bus)
         -> selector<container::boxed_string>;
-auto make_input_channel_selector(std::size_t index) -> selector<std::size_t>;
+
+auto make_bus_type_selector(audio::bus_direction, std::size_t bus)
+        -> selector<audio::bus_type>;
+
+auto make_bus_channel_selector(
+        audio::bus_direction,
+        std::size_t bus,
+        audio::bus_channel) -> selector<std::size_t>;
 
 auto make_input_gain_selector(std::size_t index) -> selector<float>;
 auto make_input_pan_selector(std::size_t index) -> selector<float>;
 auto make_input_level_selector(std::size_t index)
         -> selector<audio::mixer::stereo_level>;
+
+extern const selector<std::size_t> select_num_output_channels;
+extern const selector<std::size_t> select_num_output_busses;
 
 extern const selector<float> select_output_gain;
 extern const selector<float> select_output_balance;

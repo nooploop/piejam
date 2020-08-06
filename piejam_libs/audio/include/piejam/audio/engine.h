@@ -33,7 +33,9 @@ namespace piejam::audio
 class engine
 {
 public:
-    engine(unsigned samplerate, std::vector<std::size_t> const& input_bus_config);
+    engine(unsigned samplerate,
+           std::vector<std::size_t> const& input_bus_config,
+           pair<std::size_t> const& output_config);
 
     void set_input_channel_gain(std::size_t index, float gain);
     void set_input_channel_pan(std::size_t index, float pan);
@@ -63,6 +65,7 @@ private:
 
     struct output_mixer_channel : mixer_channel
     {
+        pair<std::size_t> device_channels;
         std::atomic<float> balance;
     };
 

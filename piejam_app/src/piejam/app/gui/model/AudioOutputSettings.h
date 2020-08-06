@@ -25,11 +25,11 @@
 namespace piejam::app::gui::model
 {
 
-class AudioInputSettings final
+class AudioOutputSettings final
     : public piejam::gui::model::AudioInputOutputSettings
 {
 public:
-    AudioInputSettings(store&, subscriber&);
+    AudioOutputSettings(store&, subscriber&);
 
     void setBusName(unsigned bus, QString const& name) override;
     void selectMonoChannel(unsigned bus, unsigned ch) override;

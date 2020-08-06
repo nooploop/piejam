@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/bus_defs.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 
@@ -27,6 +28,7 @@ namespace piejam::runtime::actions
 
 struct set_bus_name : action
 {
+    audio::bus_direction bus_direction{};
     std::size_t bus{};
     std::string name;
 

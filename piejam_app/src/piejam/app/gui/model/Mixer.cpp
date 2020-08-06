@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/Mixer.h>
 
+#include <piejam/audio/bus_defs.h>
 #include <piejam/functional/overload.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
@@ -72,7 +73,9 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
                     m_subs.observe(
                             subs_id,
                             state_change_subscriber,
-                            selectors::make_input_name_selector(bus),
+                            selectors::make_bus_name_selector(
+                                    audio::bus_direction::input,
+                                    bus),
                             [this, bus](container::boxed_string name) {
                                 inputChannel(bus).setName(
                                         QString::fromStdString(*name));
@@ -107,19 +110,27 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
     m_subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::select_output_gain,
+            selectors::make_bus_name_selector(audio::bus_direction::output, 0),
+            [this](container::boxed_string name) {
+                outputChannel()->setName(QString::fromStdString(*name));
+            });
+
+    m_subs.observe(
+            subs_id,
+            state_change_subscriber,
+            selectors::select_output_gain,
             [this](float x) { outputChannel()->setGain(x); });
 
     m_subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::select_output_balance,
+            selectors::select_output_balance,
             [this](float const x) { outputChannel()->setPanBalance(x); });
 
     m_subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::select_output_level,
+            selectors::select_output_level,
             [this](audio::mixer::stereo_level const& x) {
                 set_output_channel_level(*this, x);
             });

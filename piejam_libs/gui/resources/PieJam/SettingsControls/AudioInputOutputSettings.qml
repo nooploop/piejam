@@ -17,33 +17,26 @@
 
 import QtQuick 2.12
 import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.12
 
 Item {
 
-    property variant model: {
-        "channels": [ "-", 1, 2, 3, 4, 5 ],
-        "busConfigs": [
-            { "name": "In 1 (M)", "mono": true, "monoChannel": 1 },
-            { "name": "In 2 (S)", "mono": false, "stereoLeftChannel": 2, "stereoRightChannel": 3 }
-        ],
-        "selectMonoChannel": function (idx, ch) { console.log("selectMonoChannel", idx, ch) },
-        "selectStereoLeftChannel": function (idx, ch) { console.log("selectStereoLeftChannel", idx, ch) },
-        "selectStereoRightChannel": function (idx, ch) { console.log("selectStereoRightChannel", idx, ch) },
-        "deleteBus": function (idx) { console.log("deleteBus", idx) },
-        "addMonoBus": function () { console.log("addMonoBus") }
-    }
+    property variant model
+
+    property bool showAddMono: true
+    property bool showAddStereo: true
 
     id: root
 
     ListView {
-        id: inputs
+        id: busConfigsList
 
         model: root.model.busConfigs
 
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.bottom: addMono.top
+        anchors.bottom: addButtons.top
         anchors.margins: 8
 
         spacing: 8
@@ -55,9 +48,9 @@ Item {
             name: modelData.name
             mono: modelData.mono
             channels: root.model.channels
-            monoChannelIndex: modelData.mono ? modelData.monoChannel : 0
-            stereoLeftChannelIndex: modelData.mono ? 0 : modelData.stereoLeftChannel
-            stereoRightChannelIndex: modelData.mono ? 0 : modelData.stereoRightChannel
+            monoChannelIndex: modelData.monoChannel
+            stereoLeftChannelIndex: modelData.stereoLeftChannel
+            stereoRightChannelIndex: modelData.stereoRightChannel
 
             anchors.left: parent.left
             anchors.right: parent.right
@@ -70,17 +63,41 @@ Item {
         }
     }
 
-    Button {
-        id: addMono
-        text: "Add Mono"
+    RowLayout {
+        id: addButtons
+
+        spacing: 8
         anchors.rightMargin: 8
         anchors.leftMargin: 8
-        anchors.bottomMargin: 16
+        anchors.bottomMargin: 8
+
+        anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        font.capitalization: Font.MixedCase
 
-        onClicked: root.model.addMonoBus()
+        Button {
+            id: addMono
+
+            text: "Add Mono"
+            Layout.fillWidth: true
+            Layout.minimumWidth: addButtons.width / 2
+            font.capitalization: Font.MixedCase
+            visible: root.showAddMono
+
+            onClicked: root.model.addMonoBus()
+        }
+
+        Button {
+            id: addStereo
+
+            text: "Add Stereo"
+            Layout.fillWidth: true
+            Layout.minimumWidth: addButtons.width / 2
+            font.capitalization: Font.MixedCase
+            visible: root.showAddStereo
+
+            onClicked: root.model.addStereo()
+        }
+
     }
 }

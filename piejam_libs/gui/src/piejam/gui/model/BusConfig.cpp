@@ -46,7 +46,7 @@ BusConfig::setMono(bool x)
 }
 
 void
-BusConfig::setMonoChannel(int x)
+BusConfig::setMonoChannel(unsigned x)
 {
     if (m_monoChannel != x)
     {
@@ -56,7 +56,7 @@ BusConfig::setMonoChannel(int x)
 }
 
 void
-BusConfig::setStereoLeftChannel(int x)
+BusConfig::setStereoLeftChannel(unsigned x)
 {
     if (m_stereoLeftChannel != x)
     {
@@ -66,7 +66,7 @@ BusConfig::setStereoLeftChannel(int x)
 }
 
 void
-BusConfig::setStereoRightChannel(int x)
+BusConfig::setStereoRightChannel(unsigned x)
 {
     if (m_stereoRightChannel != x)
     {

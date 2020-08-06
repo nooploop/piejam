@@ -19,6 +19,8 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/config_access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioInputSettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioInputSettings.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioOutputSettings.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioSettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.cpp

@@ -44,6 +44,7 @@ struct mono_channel : channel
 
 struct stereo_channel : channel
 {
+    pair<std::size_t> device_channels;
     float balance{};
 };
 

@@ -65,24 +65,92 @@ const selector<std::size_t>
         });
 
 auto
-make_input_name_selector(std::size_t const bus)
+make_bus_name_selector(audio::bus_direction const bd, std::size_t const bus)
         -> selector<container::boxed_string>
 {
-    return selector<container::boxed_string>(
-            [bus](audio_state const& st) -> container::boxed_string {
-                assert(bus < st.mixer_state.inputs.size());
-                return st.mixer_state.inputs[bus].name;
-            });
+    switch (bd)
+    {
+        case audio::bus_direction::input:
+            return selector<container::boxed_string>(
+                    [bus](audio_state const& st) -> container::boxed_string {
+                        assert(bus < st.mixer_state.inputs.size());
+                        return st.mixer_state.inputs[bus].name;
+                    });
+
+        case audio::bus_direction::output:
+            assert(bus == 0);
+            return selector<container::boxed_string>(
+                    [](audio_state const& st) -> container::boxed_string {
+                        return st.mixer_state.output.name;
+                    });
+    }
+
+    throw;
 }
 
 auto
-make_input_channel_selector(std::size_t const index) -> selector<std::size_t>
+make_bus_type_selector(audio::bus_direction const bd, std::size_t const bus)
+        -> selector<audio::bus_type>
 {
-    return selector<std::size_t>([index](audio_state const& st) -> std::size_t {
-        return index < st.mixer_state.inputs.size()
-                       ? st.mixer_state.inputs[index].device_channel
-                       : algorithm::npos;
-    });
+    switch (bd)
+    {
+        case audio::bus_direction::input:
+            return selector<audio::bus_type>(
+                    [](audio_state const & /*st*/) -> audio::bus_type {
+                        return audio::bus_type::mono;
+                    });
+
+        case audio::bus_direction::output:
+            assert(bus == 0);
+            return selector<audio::bus_type>(
+                    [](audio_state const & /*st*/) -> audio::bus_type {
+                        return audio::bus_type::stereo;
+                    });
+    }
+
+    throw;
+}
+
+auto
+make_bus_channel_selector(
+        audio::bus_direction const bd,
+        std::size_t const bus,
+        audio::bus_channel const bc) -> selector<std::size_t>
+{
+    switch (bd)
+    {
+        case audio::bus_direction::input:
+            return selector<std::size_t>(
+                    [bus](audio_state const& st) -> std::size_t {
+                        assert(bus < st.mixer_state.inputs.size());
+                        return st.mixer_state.inputs[bus].device_channel;
+                    });
+
+        case audio::bus_direction::output:
+            assert(bus == 0);
+            switch (bc)
+            {
+                case audio::bus_channel::left:
+                    return selector<std::size_t>(
+                            [](audio_state const& st) -> std::size_t {
+                                return st.mixer_state.output.device_channels
+                                        .left;
+                            });
+
+                case audio::bus_channel::right:
+                    return selector<std::size_t>(
+                            [](audio_state const& st) -> std::size_t {
+                                return st.mixer_state.output.device_channels
+                                        .right;
+                            });
+
+                default:
+                    assert(false);
+                    break;
+            }
+    }
+
+    throw;
 }
 
 auto
@@ -116,6 +184,16 @@ make_input_level_selector(std::size_t const index)
                                : audio::mixer::stereo_level{};
             });
 }
+
+const selector<std::size_t>
+        select_num_output_channels([](audio_state const& st) -> std::size_t {
+            return st.output.hw_params->num_channels;
+        });
+
+const selector<std::size_t>
+        select_num_output_busses([](audio_state const& st) -> std::size_t {
+            return st.output.index == 0 ? 0 : 1;
+        });
 
 const selector<float> select_output_gain([](audio_state const& st) {
     return st.mixer_state.output.gain;

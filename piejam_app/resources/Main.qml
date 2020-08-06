@@ -24,7 +24,8 @@ MainWindow {
     id: root
 
     audioSettingsPage.deviceModel: g_audioSettings
-    audioSettingsPage.inputsModel: g_audioInputSettings
+    audioSettingsPage.inputModel: g_audioInputSettings
+    audioSettingsPage.outputModel: g_audioOutputSettings
     mixerPage.model: g_mixer
     infoPage.model: g_info
 }
