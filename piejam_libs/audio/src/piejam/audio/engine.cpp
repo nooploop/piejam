@@ -52,7 +52,6 @@ engine::engine(
               input_bus_config.size(),
               level_meter_decay_time(samplerate),
               level_meter_rms_window_size(samplerate))
-    , m_in_gain_smoothers(input_bus_config.size())
 {
     std::size_t input_bus_index{};
     for (std::size_t in_channel : input_bus_config)
@@ -222,10 +221,10 @@ engine::operator()(
 
             std::size_t ch = in_channel.device_channel;
 
-            if (num_out_channels > 0)
+            // left channel
             {
                 apply_gain(
-                        m_in_gain_smoothers[bus].left,
+                        in_channel.gain_smoother.left,
                         in_channel.gain * in_pan.left,
                         ins[ch],
                         std::back_inserter(gain_buffer.left));
@@ -238,10 +237,10 @@ engine::operator()(
                 mix(gain_buffer.left, mix_buffer.left.begin());
             }
 
-            if (num_out_channels > 1)
+            // right channel
             {
                 apply_gain(
-                        m_in_gain_smoothers[bus].right,
+                        in_channel.gain_smoother.right,
                         in_channel.gain * in_pan.right,
                         ins[ch],
                         std::back_inserter(gain_buffer.right));
@@ -267,46 +266,47 @@ engine::operator()(
 
     auto pow3 = [](auto x) { return x * x * x; };
 
-    // apply output gain
+    auto& out_ch = m_mixer_state.output;
+
+    // left channel
     {
-        float const balance = m_mixer_state.output.balance <= 0.f
-                                      ? 1.f
-                                      : pow3(1 - m_mixer_state.output.balance);
+        float const balance =
+                out_ch.balance <= 0.f ? 1.f : pow3(1 - out_ch.balance);
         apply_gain(
-                m_out_gain_smoother.left,
-                m_mixer_state.output.gain * balance,
+                out_ch.gain_smoother.left,
+                out_ch.gain * balance,
                 mix_buffer.left,
                 mix_buffer.left.begin());
 
         calculate_level(
                 mix_buffer.left,
-                m_mixer_state.output.stereo_level_meter->left,
-                m_mixer_state.output.level.left);
+                out_ch.stereo_level_meter->left,
+                out_ch.level.left);
     }
 
-    auto const left_channel = m_mixer_state.output.device_channels.left;
+    auto const left_channel = out_ch.device_channels.left;
     if (num_out_channels > left_channel)
     {
         algorithm::copy(mix_buffer.left, outs[left_channel].begin());
     }
 
+    // right channel
     {
-        float const balance = m_mixer_state.output.balance >= 0.f
-                                      ? 1.f
-                                      : pow3(1 + m_mixer_state.output.balance);
+        float const balance =
+                out_ch.balance >= 0.f ? 1.f : pow3(1 + out_ch.balance);
         apply_gain(
-                m_out_gain_smoother.right,
-                m_mixer_state.output.gain * balance,
+                out_ch.gain_smoother.right,
+                out_ch.gain * balance,
                 mix_buffer.right,
                 mix_buffer.right.begin());
 
         calculate_level(
                 mix_buffer.right,
-                m_mixer_state.output.stereo_level_meter->right,
-                m_mixer_state.output.level.right);
+                out_ch.stereo_level_meter->right,
+                out_ch.level.right);
     }
 
-    auto const right_channel = m_mixer_state.output.device_channels.right;
+    auto const right_channel = out_ch.device_channels.right;
     if (num_out_channels > right_channel)
     {
         algorithm::copy(mix_buffer.right, outs[right_channel].begin());

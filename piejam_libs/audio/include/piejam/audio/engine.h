@@ -55,8 +55,9 @@ private:
     struct mixer_channel
     {
         std::optional<pair<level_meter>> stereo_level_meter;
-        std::atomic<float> gain{1.f};
         pair<std::atomic<float>> level;
+        std::atomic<float> gain{1.f};
+        pair<smoother<>> gain_smoother;
     };
 
     struct input_mixer_channel : mixer_channel
@@ -96,9 +97,6 @@ private:
     };
 
     mixer_state m_mixer_state;
-
-    std::vector<pair<smoother<>>> m_in_gain_smoothers;
-    pair<smoother<>> m_out_gain_smoother;
 };
 
 } // namespace piejam::audio
