@@ -48,15 +48,10 @@ engine::engine(
         unsigned const samplerate,
         std::vector<std::size_t> const& input_bus_config,
         pair<std::size_t> const& output_config)
-    : m_mixer_state(input_bus_config.size())
-    , m_in_level_meters(
+    : m_mixer_state(
               input_bus_config.size(),
-              pair<level_meter>{level_meter{
-                      level_meter_decay_time(samplerate),
-                      level_meter_rms_window_size(samplerate)}})
-    , m_out_level_meter(
-              {level_meter_decay_time(samplerate),
-               level_meter_rms_window_size(samplerate)})
+              level_meter_decay_time(samplerate),
+              level_meter_rms_window_size(samplerate))
     , m_in_gain_smoothers(input_bus_config.size())
 {
     std::size_t input_bus_index{};
@@ -237,7 +232,7 @@ engine::operator()(
 
                 calculate_level(
                         gain_buffer.left,
-                        m_in_level_meters[bus].left,
+                        in_channel.stereo_level_meter->left,
                         in_channel.level.left);
 
                 mix(gain_buffer.left, mix_buffer.left.begin());
@@ -253,7 +248,7 @@ engine::operator()(
 
                 calculate_level(
                         gain_buffer.right,
-                        m_in_level_meters[bus].right,
+                        in_channel.stereo_level_meter->right,
                         in_channel.level.right);
 
                 mix(gain_buffer.right, mix_buffer.right.begin());
@@ -261,8 +256,12 @@ engine::operator()(
         }
         else
         {
-            reset_level(m_in_level_meters[bus].left, in_channel.level.left);
-            reset_level(m_in_level_meters[bus].right, in_channel.level.right);
+            reset_level(
+                    in_channel.stereo_level_meter->left,
+                    in_channel.level.left);
+            reset_level(
+                    in_channel.stereo_level_meter->right,
+                    in_channel.level.right);
         }
     }
 
@@ -281,7 +280,7 @@ engine::operator()(
 
         calculate_level(
                 mix_buffer.left,
-                m_out_level_meter.left,
+                m_mixer_state.output.stereo_level_meter->left,
                 m_mixer_state.output.level.left);
     }
 
@@ -303,7 +302,7 @@ engine::operator()(
 
         calculate_level(
                 mix_buffer.right,
-                m_out_level_meter.right,
+                m_mixer_state.output.stereo_level_meter->right,
                 m_mixer_state.output.level.right);
     }
 
