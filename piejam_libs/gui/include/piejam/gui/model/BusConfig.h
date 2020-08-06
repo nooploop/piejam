@@ -43,20 +43,20 @@ public:
     auto mono() const noexcept -> bool { return m_mono; }
     void setMono(bool);
 
-    auto monoChannel() const noexcept -> int { return m_monoChannel; }
-    void setMonoChannel(int);
+    auto monoChannel() const noexcept -> unsigned { return m_monoChannel; }
+    void setMonoChannel(unsigned);
 
-    auto stereoLeftChannel() const noexcept -> int
+    auto stereoLeftChannel() const noexcept -> unsigned
     {
         return m_stereoLeftChannel;
     }
-    void setStereoLeftChannel(int);
+    void setStereoLeftChannel(unsigned);
 
-    auto stereoRightChannel() const noexcept -> int
+    auto stereoRightChannel() const noexcept -> unsigned
     {
         return m_stereoRightChannel;
     }
-    void setStereoRightChannel(int);
+    void setStereoRightChannel(unsigned);
 
 signals:
 
@@ -69,9 +69,9 @@ signals:
 private:
     QString m_name;
     bool m_mono{true};
-    int m_monoChannel{};
-    int m_stereoLeftChannel{};
-    int m_stereoRightChannel{};
+    unsigned m_monoChannel{};
+    unsigned m_stereoLeftChannel{};
+    unsigned m_stereoRightChannel{};
 };
 
 } // namespace piejam::gui::model

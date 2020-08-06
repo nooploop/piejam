@@ -44,7 +44,10 @@ level_meter_rms_window_size(unsigned const samplerate) -> std::size_t
     return static_cast<std::size_t>((ws_in_ms / 1000.) * samplerate);
 }
 
-engine::engine(unsigned const samplerate, std::vector<std::size_t> const& input_bus_config)
+engine::engine(
+        unsigned const samplerate,
+        std::vector<std::size_t> const& input_bus_config,
+        pair<std::size_t> const& output_config)
     : m_mixer_state(input_bus_config.size())
     , m_in_level_meters(
               input_bus_config.size(),
@@ -59,6 +62,7 @@ engine::engine(unsigned const samplerate, std::vector<std::size_t> const& input_
     std::size_t input_bus_index{};
     for (std::size_t in_channel : input_bus_config)
         m_mixer_state.inputs[input_bus_index++].device_channel = in_channel;
+    m_mixer_state.output.device_channels = output_config;
 }
 
 void
@@ -209,6 +213,8 @@ engine::operator()(
 
     std::size_t const num_in_busses = m_mixer_state.inputs.size();
 
+    stereo_audio_buffer_t mix_buffer(audio_buffer_t(outs.minor_size(), 0.f));
+
     for (std::size_t bus = 0; bus < num_in_busses; ++bus)
     {
         input_mixer_channel& in_channel = m_mixer_state.inputs[bus];
@@ -234,7 +240,7 @@ engine::operator()(
                         m_in_level_meters[bus].left,
                         in_channel.level.left);
 
-                mix(gain_buffer.left, outs[0].begin());
+                mix(gain_buffer.left, mix_buffer.left.begin());
             }
 
             if (num_out_channels > 1)
@@ -250,7 +256,7 @@ engine::operator()(
                         m_in_level_meters[bus].right,
                         in_channel.level.right);
 
-                mix(gain_buffer.right, outs[1].begin());
+                mix(gain_buffer.right, mix_buffer.right.begin());
             }
         }
         else
@@ -263,7 +269,6 @@ engine::operator()(
     auto pow3 = [](auto x) { return x * x * x; };
 
     // apply output gain
-    if (num_out_channels > 0)
     {
         float const balance = m_mixer_state.output.balance <= 0.f
                                       ? 1.f
@@ -271,20 +276,21 @@ engine::operator()(
         apply_gain(
                 m_out_gain_smoother.left,
                 m_mixer_state.output.gain * balance,
-                outs[0],
-                outs[0].begin());
+                mix_buffer.left,
+                mix_buffer.left.begin());
 
         calculate_level(
-                outs[0],
+                mix_buffer.left,
                 m_out_level_meter.left,
                 m_mixer_state.output.level.left);
     }
-    else
+
+    auto const left_channel = m_mixer_state.output.device_channels.left;
+    if (num_out_channels > left_channel)
     {
-        reset_level(m_out_level_meter.left, m_mixer_state.output.level.left);
+        algorithm::copy(mix_buffer.left, outs[left_channel].begin());
     }
 
-    if (num_out_channels > 1)
     {
         float const balance = m_mixer_state.output.balance >= 0.f
                                       ? 1.f
@@ -292,17 +298,19 @@ engine::operator()(
         apply_gain(
                 m_out_gain_smoother.right,
                 m_mixer_state.output.gain * balance,
-                outs[1],
-                outs[1].begin());
+                mix_buffer.right,
+                mix_buffer.right.begin());
 
         calculate_level(
-                outs[1],
+                mix_buffer.right,
                 m_out_level_meter.right,
                 m_mixer_state.output.level.right);
     }
-    else
+
+    auto const right_channel = m_mixer_state.output.device_channels.right;
+    if (num_out_channels > right_channel)
     {
-        reset_level(m_out_level_meter.right, m_mixer_state.output.level.right);
+        algorithm::copy(mix_buffer.right, outs[right_channel].begin());
     }
 }
 

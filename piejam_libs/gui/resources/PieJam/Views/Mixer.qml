@@ -72,7 +72,7 @@ TopPane {
         anchors.top: parent.top
         anchors.topMargin: 8
 
-        name: "Main"
+        name: root.model.outputChannel.name
         levelLeft: root.model.outputChannel.levelLeft
         levelRight: root.model.outputChannel.levelRight
         pan: root.model.outputChannel.panBalance

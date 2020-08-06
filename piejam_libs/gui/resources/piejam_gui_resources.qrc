@@ -29,7 +29,7 @@
         <file>PieJam/Views/AudioSettings.qml</file>
         <file>PieJam/SettingsControls/BusConfig.qml</file>
         <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
-        <file>PieJam/SettingsControls/AudioInputSettings.qml</file>
+        <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
         <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
     </qresource>
 </RCC>

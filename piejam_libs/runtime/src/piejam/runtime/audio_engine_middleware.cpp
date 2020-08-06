@@ -103,9 +103,7 @@ audio_engine_middleware::process_device_action(
             },
             [this](actions::select_samplerate const& a) { m_next(a); },
             [this](actions::select_period_size const& a) { m_next(a); },
-            [this](actions::select_input_bus_mono_channel const& a) {
-                m_next(a);
-            },
+            [this](actions::select_bus_channel const& a) { m_next(a); },
             [this](actions::add_device_bus const& a) { m_next(a); },
             [this](actions::delete_device_bus const& a) { m_next(a); });
 
@@ -392,7 +390,8 @@ audio_engine_middleware::start_engine()
                 state.samplerate,
                 algorithm::transform_to_vector(
                         state.mixer_state.inputs,
-                        [](auto const& in) { return in.device_channel; }));
+                        [](auto const& in) { return in.device_channel; }),
+                state.mixer_state.output.device_channels);
 
         auto const& inputs = state.mixer_state.inputs;
         for (std::size_t i = 0, num_inputs = inputs.size(); i < num_inputs; ++i)

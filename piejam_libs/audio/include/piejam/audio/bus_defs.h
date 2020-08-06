@@ -15,36 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/set_bus_name.h>
+#pragma once
 
-#include <piejam/runtime/audio_state.h>
-
-namespace piejam::runtime::actions
+namespace piejam::audio
 {
 
-auto
-set_bus_name::operator()(audio_state const& st) const -> audio_state
+enum class bus_direction
 {
-    auto new_st = st;
+    input,
+    output
+};
 
-    switch (bus_direction)
-    {
-        case audio::bus_direction::input:
-            assert(bus < new_st.mixer_state.inputs.size());
-            new_st.mixer_state.inputs[bus].name = name;
-            break;
+enum class bus_type
+{
+    mono,
+    stereo
+};
 
-        case audio::bus_direction::output:
-            assert(bus == 0);
-            new_st.mixer_state.output.name = name;
-            break;
+enum class bus_channel
+{
+    mono,
+    left,
+    right
+};
 
-        default:
-            assert(false);
-            break;
-    }
-
-    return new_st;
-}
-
-} // namespace piejam::runtime::actions
+} // namespace piejam::audio

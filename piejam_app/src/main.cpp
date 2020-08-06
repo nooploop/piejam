@@ -17,6 +17,7 @@
 
 #include <piejam/app/config_access.h>
 #include <piejam/app/gui/model/AudioInputSettings.h>
+#include <piejam/app/gui/model/AudioOutputSettings.h>
 #include <piejam/app/gui/model/AudioSettings.h>
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/Mixer.h>
@@ -104,6 +105,9 @@ main(int argc, char* argv[]) -> int
     app::gui::model::AudioInputSettings audio_input_settings(
             store,
             state_change_subscriber);
+    app::gui::model::AudioOutputSettings audio_output_settings(
+            store,
+            state_change_subscriber);
     app::gui::model::Mixer mixer(store, state_change_subscriber);
     app::gui::model::Info info_model(store, state_change_subscriber);
 
@@ -126,6 +130,9 @@ main(int argc, char* argv[]) -> int
     engine.rootContext()->setContextProperty(
             "g_audioInputSettings",
             &audio_input_settings);
+    engine.rootContext()->setContextProperty(
+            "g_audioOutputSettings",
+            &audio_output_settings);
     engine.rootContext()->setContextProperty("g_mixer", &mixer);
     engine.rootContext()->setContextProperty("g_info", &info_model);
 

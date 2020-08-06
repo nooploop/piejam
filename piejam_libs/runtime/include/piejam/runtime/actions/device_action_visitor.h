@@ -32,7 +32,7 @@ struct device_action_visitor
               select_device,
               select_samplerate,
               select_period_size,
-              select_input_bus_mono_channel,
+              select_bus_channel,
               add_device_bus,
               delete_device_bus>
 {

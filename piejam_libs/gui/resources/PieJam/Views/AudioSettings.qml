@@ -24,7 +24,8 @@ import "../SettingsControls"
 TopPane {
 
     property alias deviceModel: deviceSettings.model
-    property alias inputsModel: audioInputSettings.model
+    property alias inputModel: audioInputSettings.model
+    property alias outputModel: audioOutputSettings.model
 
     id: root
 
@@ -42,6 +43,10 @@ TopPane {
         TabButton {
             text: "Input"
         }
+
+        TabButton {
+            text: "Output"
+        }
     }
 
     SwipeView {
@@ -57,8 +62,18 @@ TopPane {
             id: deviceSettings
         }
 
-        AudioInputSettings {
+        AudioInputOutputSettings {
             id: audioInputSettings
+
+            showAddMono: true
+            showAddStereo: false
+        }
+
+        AudioInputOutputSettings {
+            id: audioOutputSettings
+
+            showAddMono: false
+            showAddStereo: false
         }
     }
 }
