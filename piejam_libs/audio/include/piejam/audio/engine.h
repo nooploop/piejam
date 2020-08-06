@@ -25,6 +25,7 @@
 #include <piejam/range/fwd.h>
 
 #include <atomic>
+#include <optional>
 #include <vector>
 
 namespace piejam::audio
@@ -53,6 +54,7 @@ public:
 private:
     struct mixer_channel
     {
+        std::optional<pair<level_meter>> stereo_level_meter;
         std::atomic<float> gain{1.f};
         pair<std::atomic<float>> level;
     };
@@ -71,9 +73,22 @@ private:
 
     struct mixer_state
     {
-        mixer_state(std::size_t num_inputs)
+        mixer_state(
+                std::size_t num_inputs,
+                std::size_t level_meter_decay_time,
+                std::size_t level_meter_rms_window_size)
             : inputs(num_inputs)
         {
+            for (auto& in : inputs)
+            {
+                in.stereo_level_meter = pair<level_meter>(level_meter(
+                        level_meter_decay_time,
+                        level_meter_rms_window_size));
+            }
+
+            output.stereo_level_meter = pair<level_meter>(level_meter(
+                    level_meter_decay_time,
+                    level_meter_rms_window_size));
         }
 
         std::vector<input_mixer_channel> inputs;
@@ -81,9 +96,6 @@ private:
     };
 
     mixer_state m_mixer_state;
-
-    std::vector<pair<level_meter>> m_in_level_meters;
-    pair<level_meter> m_out_level_meter;
 
     std::vector<pair<smoother<>>> m_in_gain_smoothers;
     pair<smoother<>> m_out_gain_smoother;
