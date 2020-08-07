@@ -172,8 +172,12 @@ AudioOutputSettings::addStereoBus()
 }
 
 void
-AudioOutputSettings::deleteBus(unsigned const /*bus*/)
+AudioOutputSettings::deleteBus(unsigned const bus)
 {
+    runtime::actions::delete_device_bus action;
+    action.direction = audio::bus_direction::output;
+    action.bus = bus;
+    m_store.dispatch<runtime::actions::delete_device_bus>(action);
 }
 
 } // namespace piejam::app::gui::model
