@@ -165,7 +165,7 @@ make_input_pan_selector(std::size_t const index) -> selector<float>
 {
     return selector<float>([index](audio_state const& st) -> float {
         assert(index < st.mixer_state.inputs.size());
-        return st.mixer_state.inputs[index].pan;
+        return st.mixer_state.inputs[index].pan_balance;
     });
 }
 
@@ -204,7 +204,7 @@ make_output_balance_selector(std::size_t const index) -> selector<float>
 {
     return selector<float>([index](audio_state const& st) -> float {
         assert(index < st.mixer_state.outputs.size());
-        return st.mixer_state.outputs[index].balance;
+        return st.mixer_state.outputs[index].pan_balance;
     });
 }
 

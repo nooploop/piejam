@@ -41,7 +41,7 @@ set_input_channel_pan::operator()(audio_state const& st) const -> audio_state
 
     assert(index < new_st.mixer_state.inputs.size());
     auto& channel = new_st.mixer_state.inputs[index];
-    channel.pan = pan;
+    channel.pan_balance = pan;
 
     return new_st;
 }
@@ -64,7 +64,7 @@ set_output_channel_balance::operator()(audio_state const& st) const
     auto new_st = st;
 
     assert(index < new_st.mixer_state.outputs.size());
-    new_st.mixer_state.outputs[index].balance = balance;
+    new_st.mixer_state.outputs[index].pan_balance = balance;
 
     return new_st;
 }

@@ -33,19 +33,18 @@ struct channel
 {
     container::boxed_string name;
     float gain{1.f};
+    float pan_balance{};
     stereo_level level;
 };
 
 struct mono_channel : channel
 {
     std::size_t device_channel{};
-    float pan{};
 };
 
 struct stereo_channel : channel
 {
     pair<std::size_t> device_channels;
-    float balance{};
 };
 
 using input_channels = std::vector<mono_channel>;
