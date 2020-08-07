@@ -397,7 +397,7 @@ audio_engine_middleware::start_engine()
                 state.samplerate,
                 algorithm::transform_to_vector(
                         inputs,
-                        [](auto const& in) { return in.device_channel; }),
+                        [](auto const& in) { return in.device_channels.left; }),
                 algorithm::transform_to_vector(outputs, [](auto const& out) {
                     return out.device_channels;
                 }));

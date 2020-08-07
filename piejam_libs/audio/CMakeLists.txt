@@ -34,7 +34,7 @@ add_library(piejam_audio STATIC
 
 target_include_directories(piejam_audio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_audio
-    PUBLIC piejam_io piejam_numeric piejam_thread
-    PRIVATE fmt spdlog::spdlog piejam_algorithm piejam_container piejam_range)
+    PUBLIC piejam_algorithm piejam_container piejam_io piejam_numeric piejam_thread
+    PRIVATE fmt spdlog::spdlog piejam_range)
 
 add_subdirectory(test)

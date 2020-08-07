@@ -120,7 +120,7 @@ make_bus_channel_selector(
         return selector<std::size_t>(
                 [bus](audio_state const& st) -> std::size_t {
                     assert(bus < st.mixer_state.inputs.size());
-                    return st.mixer_state.inputs[bus].device_channel;
+                    return st.mixer_state.inputs[bus].device_channels.left;
                 });
     }
     else

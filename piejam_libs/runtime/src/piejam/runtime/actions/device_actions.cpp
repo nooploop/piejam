@@ -29,6 +29,13 @@ refresh_devices::operator()(audio_state const& st) const -> audio_state
     return st;
 }
 
+static void
+update_channel(std::size_t& cur_ch, std::size_t const num_chs)
+{
+    if (cur_ch >= num_chs)
+        cur_ch = algorithm::npos;
+}
+
 auto
 update_devices::operator()(audio_state const& st) const -> audio_state
 {
@@ -40,10 +47,18 @@ update_devices::operator()(audio_state const& st) const -> audio_state
     new_st.samplerate = samplerate;
     new_st.period_size = period_size;
 
+    std::size_t const num_in_channels = new_st.input.hw_params->num_channels;
     for (auto& in : new_st.mixer_state.inputs)
     {
-        if (in.device_channel >= new_st.input.hw_params->num_channels)
-            in.device_channel = algorithm::npos;
+        update_channel(in.device_channels.left, num_in_channels);
+        update_channel(in.device_channels.right, num_in_channels);
+    }
+
+    std::size_t const num_out_channels = new_st.output.hw_params->num_channels;
+    for (auto& out : new_st.mixer_state.outputs)
+    {
+        update_channel(out.device_channels.left, num_out_channels);
+        update_channel(out.device_channels.right, num_out_channels);
     }
 
     return new_st;
@@ -67,14 +82,14 @@ select_device::operator()(audio_state const& st) const -> audio_state
 
     if (input)
     {
-        new_st.mixer_state.inputs = piejam::audio::mixer::input_channels{
+        new_st.mixer_state.inputs = piejam::audio::mixer::channels{
                 new_st.input.hw_params->num_channels};
 
         std::size_t channel_index{};
         for (auto& in : new_st.mixer_state.inputs)
         {
-            in.device_channel = channel_index++;
-            in.name = "In " + std::to_string(in.device_channel + 1);
+            in.device_channels.left = channel_index++;
+            in.name = "In " + std::to_string(channel_index);
         }
     }
     else
@@ -129,7 +144,7 @@ select_bus_channel::operator()(audio_state const& st) const -> audio_state
         assert(channel_selector == audio::bus_channel::mono);
         assert(channel_index == algorithm::npos ||
                channel_index < new_st.input.hw_params->num_channels);
-        new_st.mixer_state.inputs[bus].device_channel = channel_index;
+        new_st.mixer_state.inputs[bus].device_channels.left = channel_index;
     }
     else
     {
@@ -162,7 +177,6 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
     {
         auto& bus = new_st.mixer_state.inputs.emplace_back();
         bus.name = "In " + std::to_string(new_st.mixer_state.inputs.size());
-        bus.device_channel = algorithm::npos;
     }
     else
     {
@@ -171,8 +185,6 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
         auto const new_size = new_st.mixer_state.outputs.size();
         bus.name = new_size == 1 ? std::string("Main")
                                  : "Aux " + std::to_string(new_size - 1);
-        bus.device_channels.left = algorithm::npos;
-        bus.device_channels.right = algorithm::npos;
     }
 
     return new_st;
