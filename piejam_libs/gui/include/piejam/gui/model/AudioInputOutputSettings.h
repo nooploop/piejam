@@ -55,6 +55,7 @@ public:
     Q_INVOKABLE virtual void
     selectStereoRightChannel(unsigned bus, unsigned ch) = 0;
     Q_INVOKABLE virtual void addMonoBus() = 0;
+    Q_INVOKABLE virtual void addStereoBus() = 0;
     Q_INVOKABLE virtual void deleteBus(unsigned bus) = 0;
 
 signals:

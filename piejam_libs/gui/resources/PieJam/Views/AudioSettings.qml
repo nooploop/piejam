@@ -73,7 +73,7 @@ TopPane {
             id: audioOutputSettings
 
             showAddMono: false
-            showAddStereo: false
+            showAddStereo: true
         }
     }
 }

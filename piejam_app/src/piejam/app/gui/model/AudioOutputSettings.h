@@ -36,6 +36,7 @@ public:
     void selectStereoLeftChannel(unsigned bus, unsigned ch) override;
     void selectStereoRightChannel(unsigned bus, unsigned ch) override;
     void addMonoBus() override;
+    void addStereoBus() override;
     void deleteBus(unsigned bus) override;
 
 private:

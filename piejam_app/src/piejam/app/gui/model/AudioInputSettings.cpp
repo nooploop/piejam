@@ -142,7 +142,14 @@ void
 AudioInputSettings::addMonoBus()
 {
     runtime::actions::add_device_bus action;
+    action.direction = audio::bus_direction::input;
+    action.type = audio::bus_type::mono;
     m_store.dispatch<runtime::actions::add_device_bus>(action);
+}
+
+void
+AudioInputSettings::addStereoBus()
+{
 }
 
 void

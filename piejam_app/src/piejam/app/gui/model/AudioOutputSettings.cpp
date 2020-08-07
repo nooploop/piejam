@@ -163,6 +163,15 @@ AudioOutputSettings::addMonoBus()
 }
 
 void
+AudioOutputSettings::addStereoBus()
+{
+    runtime::actions::add_device_bus action;
+    action.direction = audio::bus_direction::output;
+    action.type = audio::bus_type::stereo;
+    m_store.dispatch<runtime::actions::add_device_bus>(action);
+}
+
+void
 AudioOutputSettings::deleteBus(unsigned const /*bus*/)
 {
 }
