@@ -405,14 +405,14 @@ audio_engine_middleware::start_engine()
         for (std::size_t n = 0, num_inputs = inputs.size(); n < num_inputs; ++n)
         {
             m_engine->set_input_channel_gain(n, inputs[n].gain);
-            m_engine->set_input_channel_pan(n, inputs[n].pan);
+            m_engine->set_input_channel_pan(n, inputs[n].pan_balance);
         }
 
         for (std::size_t n = 0, num_outputs = outputs.size(); n < num_outputs;
              ++n)
         {
             m_engine->set_output_channel_gain(n, outputs[n].gain);
-            m_engine->set_output_channel_balance(n, outputs[n].balance);
+            m_engine->set_output_channel_balance(n, outputs[n].pan_balance);
         }
 
         m_device->start(
