@@ -96,7 +96,7 @@ Item {
             font.capitalization: Font.MixedCase
             visible: root.showAddStereo
 
-            onClicked: root.model.addStereo()
+            onClicked: root.model.addStereoBus()
         }
 
     }

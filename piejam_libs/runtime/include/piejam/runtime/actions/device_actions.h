@@ -112,6 +112,9 @@ struct add_device_bus final
     : action
     , visitable_device_action<add_device_bus>
 {
+    audio::bus_direction direction{};
+    audio::bus_type type{};
+
     auto operator()(audio_state const&) const -> audio_state override;
 };
 

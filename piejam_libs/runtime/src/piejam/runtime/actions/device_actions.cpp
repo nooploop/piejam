@@ -123,27 +123,31 @@ select_bus_channel::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    switch (direction)
+    if (direction == audio::bus_direction::input)
     {
-        case audio::bus_direction::input:
-            assert(bus < new_st.mixer_state.inputs.size());
-            assert(channel_selector == audio::bus_channel::mono);
-            assert(channel_index == algorithm::npos ||
-                   channel_index < new_st.input.hw_params->num_channels);
-            new_st.mixer_state.inputs[bus].device_channel = channel_index;
-            break;
-
-        case audio::bus_direction::output:
-            assert(bus == 0);
-            assert(channel_selector == audio::bus_channel::left ||
-                   channel_selector == audio::bus_channel::right);
-            assert(channel_index == algorithm::npos ||
-                   channel_index < new_st.output.hw_params->num_channels);
-            break;
-
-        default:
-            assert(false);
-            break;
+        assert(bus < new_st.mixer_state.inputs.size());
+        assert(channel_selector == audio::bus_channel::mono);
+        assert(channel_index == algorithm::npos ||
+               channel_index < new_st.input.hw_params->num_channels);
+        new_st.mixer_state.inputs[bus].device_channel = channel_index;
+    }
+    else
+    {
+        assert(direction == audio::bus_direction::output);
+        assert(bus < new_st.mixer_state.outputs.size());
+        assert(channel_index == algorithm::npos ||
+               channel_index < new_st.output.hw_params->num_channels);
+        if (channel_selector == audio::bus_channel::left)
+        {
+            new_st.mixer_state.outputs[bus].device_channels.left =
+                    channel_index;
+        }
+        else
+        {
+            assert(channel_selector == audio::bus_channel::right);
+            new_st.mixer_state.outputs[bus].device_channels.right =
+                    channel_index;
+        }
     }
 
     return new_st;
@@ -154,9 +158,22 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    auto& bus = new_st.mixer_state.inputs.emplace_back();
-    bus.name = "In " + std::to_string(new_st.mixer_state.inputs.size());
-    bus.device_channel = algorithm::npos;
+    if (direction == audio::bus_direction::input)
+    {
+        auto& bus = new_st.mixer_state.inputs.emplace_back();
+        bus.name = "In " + std::to_string(new_st.mixer_state.inputs.size());
+        bus.device_channel = algorithm::npos;
+    }
+    else
+    {
+        assert(direction == audio::bus_direction::output);
+        auto& bus = new_st.mixer_state.outputs.emplace_back();
+        auto const new_size = new_st.mixer_state.outputs.size();
+        bus.name = new_size == 1 ? std::string("Main")
+                                 : "Aux " + std::to_string(new_size - 1);
+        bus.device_channels.left = algorithm::npos;
+        bus.device_channels.right = algorithm::npos;
+    }
 
     return new_st;
 }
