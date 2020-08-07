@@ -73,9 +73,10 @@ auto make_input_level_selector(std::size_t index)
 extern const selector<std::size_t> select_num_output_channels;
 extern const selector<std::size_t> select_num_output_busses;
 
-extern const selector<float> select_output_gain;
-extern const selector<float> select_output_balance;
-extern const selector<audio::mixer::stereo_level> select_output_level;
+auto make_output_gain_selector(std::size_t index) -> selector<float>;
+auto make_output_balance_selector(std::size_t index) -> selector<float>;
+auto make_output_level_selector(std::size_t index)
+        -> selector<audio::mixer::stereo_level>;
 
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;

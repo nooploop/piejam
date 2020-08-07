@@ -287,7 +287,7 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->set_output_channel_gain(0, a.gain); //! \todo bus
+                    m_engine->set_output_channel_gain(a.index, a.gain);
                 }
             },
             [this](actions::set_output_channel_balance const& a) {
@@ -295,9 +295,7 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->set_output_channel_balance(
-                            0,
-                            a.balance); //! \todo bus
+                    m_engine->set_output_channel_balance(a.index, a.balance);
                 }
             },
             [this](actions::request_levels_update const&) {
@@ -305,18 +303,22 @@ audio_engine_middleware::process_engine_action(
 
                 std::size_t const num_inputs =
                         current_state.mixer_state.inputs.size();
+                std::size_t const num_outputs =
+                        current_state.mixer_state.outputs.size();
 
                 actions::update_levels next_action;
-                next_action.in_levels.resize(num_inputs);
+                next_action.in_levels.reserve(num_inputs);
+                next_action.out_levels.reserve(num_outputs);
 
                 if (m_engine)
                 {
                     for (std::size_t index = 0; index < num_inputs; ++index)
-                        next_action.in_levels[index] =
-                                m_engine->get_input_level(index);
+                        next_action.in_levels.push_back(
+                                m_engine->get_input_level(index));
 
-                    next_action.out_level =
-                            m_engine->get_output_level(0); //! \todo bus
+                    for (std::size_t index = 0; index < num_outputs; ++index)
+                        next_action.out_levels.push_back(
+                                m_engine->get_output_level(index));
                 }
 
                 m_next(next_action);
@@ -388,26 +390,30 @@ audio_engine_middleware::start_engine()
     if (m_device->is_open())
     {
         auto const& state = m_get_state();
+        auto const& inputs = state.mixer_state.inputs;
+        auto const& outputs = state.mixer_state.outputs;
 
         m_engine = std::make_unique<audio::engine>(
                 state.samplerate,
                 algorithm::transform_to_vector(
-                        state.mixer_state.inputs,
+                        inputs,
                         [](auto const& in) { return in.device_channel; }),
-                std::vector{state.mixer_state.output.device_channels});
+                algorithm::transform_to_vector(outputs, [](auto const& out) {
+                    return out.device_channels;
+                }));
 
-        auto const& inputs = state.mixer_state.inputs;
-        for (std::size_t i = 0, num_inputs = inputs.size(); i < num_inputs; ++i)
+        for (std::size_t n = 0, num_inputs = inputs.size(); n < num_inputs; ++n)
         {
-            m_engine->set_input_channel_gain(i, inputs[i].gain);
-            m_engine->set_input_channel_pan(i, inputs[i].pan);
+            m_engine->set_input_channel_gain(n, inputs[n].gain);
+            m_engine->set_input_channel_pan(n, inputs[n].pan);
         }
-        m_engine->set_output_channel_gain(
-                0,
-                state.mixer_state.output.gain); //! \todo bus
-        m_engine->set_output_channel_balance(
-                0,
-                state.mixer_state.output.balance); //! \todo bus
+
+        for (std::size_t n = 0, num_outputs = outputs.size(); n < num_outputs;
+             ++n)
+        {
+            m_engine->set_output_channel_gain(n, outputs[n].gain);
+            m_engine->set_output_channel_balance(n, outputs[n].balance);
+        }
 
         m_device->start(
                 m_audio_thread_cpu_affinity,

@@ -34,40 +34,43 @@ class Mixer : public QObject
     Q_OBJECT
     Q_PROPERTY(QQmlListProperty<MixerChannel> inputChannels READ inputChannels
                        NOTIFY inputChannelsChanged FINAL)
-    Q_PROPERTY(MixerChannel* outputChannel READ outputChannel NOTIFY
-                       outputChannelChanged FINAL)
+    Q_PROPERTY(QQmlListProperty<MixerChannel> outputChannels READ outputChannels
+                       NOTIFY outputChannelsChanged FINAL)
 
 public:
-    auto inputChannels() -> QQmlListProperty<MixerChannel>;
     void setNumInputChannels(std::size_t);
-
-    auto numInputChannels() const noexcept -> std::size_t
-    {
-        return m_inputChannels.size();
-    }
-
+    auto inputChannels() -> QQmlListProperty<MixerChannel>;
     auto inputChannel(std::size_t index) noexcept -> MixerChannel&
     {
+        assert(index < m_inputChannels.size());
         return m_inputChannels[index];
     }
 
-    auto outputChannel() -> MixerChannel* { return &m_outputChannel; }
+    void setNumOutputChannels(std::size_t);
+    auto outputChannels() -> QQmlListProperty<MixerChannel>;
+    auto outputChannel(std::size_t index) noexcept -> MixerChannel&
+    {
+        assert(index < m_outputChannels.size());
+        return m_outputChannels[index];
+    }
 
     virtual Q_INVOKABLE void
     setInputChannelGain(unsigned index, double gain) = 0;
     virtual Q_INVOKABLE void setInputChannelPan(unsigned index, double pan) = 0;
-    virtual Q_INVOKABLE void setOutputChannelGain(double gain) = 0;
-    virtual Q_INVOKABLE void setOutputChannelBalance(double balance) = 0;
+    virtual Q_INVOKABLE void
+    setOutputChannelGain(unsigned index, double gain) = 0;
+    virtual Q_INVOKABLE void
+    setOutputChannelBalance(unsigned index, double balance) = 0;
     virtual Q_INVOKABLE void requestLevelsUpdate() = 0;
 
 signals:
 
     void inputChannelsChanged();
-    void outputChannelChanged();
+    void outputChannelsChanged();
 
 private:
     std::vector<MixerChannel> m_inputChannels;
-    MixerChannel m_outputChannel;
+    std::vector<MixerChannel> m_outputChannels;
 };
 
 } // namespace piejam::gui::model

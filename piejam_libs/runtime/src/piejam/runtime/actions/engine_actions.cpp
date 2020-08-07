@@ -51,7 +51,8 @@ set_output_channel_gain::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    new_st.mixer_state.output.gain = gain;
+    assert(index < new_st.mixer_state.outputs.size());
+    new_st.mixer_state.outputs[index].gain = gain;
 
     return new_st;
 }
@@ -62,7 +63,8 @@ set_output_channel_balance::operator()(audio_state const& st) const
 {
     auto new_st = st;
 
-    new_st.mixer_state.output.balance = balance;
+    assert(index < new_st.mixer_state.outputs.size());
+    new_st.mixer_state.outputs[index].balance = balance;
 
     return new_st;
 }
@@ -78,13 +80,15 @@ update_levels::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    std::size_t const num_in_levels = in_levels.size();
-    assert(num_in_levels == new_st.mixer_state.inputs.size());
-    auto& inputs = new_st.mixer_state.inputs;
-    for (std::size_t index = 0; index < num_in_levels; ++index)
-        inputs[index].level = in_levels[index];
+    auto const update = [](auto& channels, auto const& levels) {
+        std::size_t const num_levels = levels.size();
+        assert(num_levels == channels.size());
+        for (std::size_t index = 0; index < num_levels; ++index)
+            channels[index].level = levels[index];
+    };
 
-    new_st.mixer_state.output.level = out_level;
+    update(new_st.mixer_state.inputs, in_levels);
+    update(new_st.mixer_state.outputs, out_levels);
 
     return new_st;
 }
