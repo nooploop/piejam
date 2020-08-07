@@ -156,6 +156,7 @@ void
 AudioInputSettings::deleteBus(unsigned const bus)
 {
     runtime::actions::delete_device_bus action;
+    action.direction = audio::bus_direction::input;
     action.bus = bus;
     m_store.dispatch<runtime::actions::delete_device_bus>(action);
 }

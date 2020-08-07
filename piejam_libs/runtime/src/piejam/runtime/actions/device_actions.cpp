@@ -183,8 +183,19 @@ delete_device_bus::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    assert(bus < new_st.mixer_state.inputs.size());
-    new_st.mixer_state.inputs.erase(new_st.mixer_state.inputs.begin() + bus);
+    if (direction == audio::bus_direction::input)
+    {
+        auto& inputs = new_st.mixer_state.inputs;
+        assert(bus < inputs.size());
+        inputs.erase(inputs.begin() + bus);
+    }
+    else
+    {
+        auto& outputs = new_st.mixer_state.outputs;
+        assert(direction == audio::bus_direction::output);
+        assert(bus < outputs.size());
+        outputs.erase(outputs.begin() + bus);
+    }
 
     return new_st;
 }
