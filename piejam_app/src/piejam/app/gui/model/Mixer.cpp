@@ -28,29 +28,6 @@
 namespace piejam::app::gui::model
 {
 
-static void
-set_channel_level(
-        piejam::gui::model::MixerChannel& mixerChannel,
-        audio::mixer::stereo_level const& level)
-{
-    mixerChannel.setLevel(level.left, level.right);
-}
-
-static void
-set_input_channel_level(
-        Mixer& m,
-        std::size_t ch,
-        audio::mixer::stereo_level const& level)
-{
-    set_channel_level(m.inputChannel(ch), level);
-}
-
-static void
-set_output_channel_level(Mixer& m, audio::mixer::stereo_level const& level)
-{
-    set_channel_level(*m.outputChannel(), level);
-}
-
 Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
     : m_store(app_store)
 {
@@ -63,12 +40,12 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
             state_change_subscriber,
             selectors::select_num_input_busses,
             [this, &state_change_subscriber, subs_id = get_next_sub_id()](
-                    std::size_t const num_input_busses) mutable {
+                    std::size_t const num_busses) mutable {
                 m_subs.erase(subs_id);
 
-                setNumInputChannels(num_input_busses);
+                setNumInputChannels(num_busses);
 
-                for (std::size_t bus = 0; bus < num_input_busses; ++bus)
+                for (std::size_t bus = 0; bus < num_busses; ++bus)
                 {
                     m_subs.observe(
                             subs_id,
@@ -102,7 +79,7 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
                             state_change_subscriber,
                             selectors::make_input_level_selector(bus),
                             [this, bus](audio::mixer::stereo_level const& x) {
-                                set_input_channel_level(*this, bus, x);
+                                inputChannel(bus).setLevel(x.left, x.right);
                             });
                 }
             });
@@ -110,29 +87,50 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
     m_subs.observe(
             subs_id,
             state_change_subscriber,
-            selectors::make_bus_name_selector(audio::bus_direction::output, 0),
-            [this](container::boxed_string name) {
-                outputChannel()->setName(QString::fromStdString(*name));
-            });
+            selectors::select_num_output_busses,
+            [this, &state_change_subscriber, subs_id = get_next_sub_id()](
+                    std::size_t const num_busses) mutable {
+                m_subs.erase(subs_id);
 
-    m_subs.observe(
-            subs_id,
-            state_change_subscriber,
-            selectors::select_output_gain,
-            [this](float x) { outputChannel()->setGain(x); });
+                setNumOutputChannels(num_busses);
 
-    m_subs.observe(
-            subs_id,
-            state_change_subscriber,
-            selectors::select_output_balance,
-            [this](float const x) { outputChannel()->setPanBalance(x); });
+                for (std::size_t bus = 0; bus < num_busses; ++bus)
+                {
+                    m_subs.observe(
+                            subs_id,
+                            state_change_subscriber,
+                            selectors::make_bus_name_selector(
+                                    audio::bus_direction::output,
+                                    bus),
+                            [this, bus](container::boxed_string name) {
+                                outputChannel(bus).setName(
+                                        QString::fromStdString(*name));
+                            });
 
-    m_subs.observe(
-            subs_id,
-            state_change_subscriber,
-            selectors::select_output_level,
-            [this](audio::mixer::stereo_level const& x) {
-                set_output_channel_level(*this, x);
+                    m_subs.observe(
+                            subs_id,
+                            state_change_subscriber,
+                            selectors::make_output_gain_selector(bus),
+                            [this, bus](float x) {
+                                outputChannel(bus).setGain(x);
+                            });
+
+                    m_subs.observe(
+                            subs_id,
+                            state_change_subscriber,
+                            selectors::make_output_balance_selector(bus),
+                            [this, bus](float const x) {
+                                outputChannel(bus).setPanBalance(x);
+                            });
+
+                    m_subs.observe(
+                            subs_id,
+                            state_change_subscriber,
+                            selectors::make_output_level_selector(bus),
+                            [this, bus](audio::mixer::stereo_level const& x) {
+                                outputChannel(bus).setLevel(x.left, x.right);
+                            });
+                }
             });
 }
 
@@ -155,17 +153,19 @@ Mixer::setInputChannelPan(unsigned const index, double const pan)
 }
 
 void
-Mixer::setOutputChannelGain(double const gain)
+Mixer::setOutputChannelGain(unsigned const index, double const gain)
 {
     runtime::actions::set_output_channel_gain action;
+    action.index = index;
     action.gain = static_cast<float>(gain);
     m_store.dispatch<runtime::actions::set_output_channel_gain>(action);
 }
 
 void
-Mixer::setOutputChannelBalance(double const balance)
+Mixer::setOutputChannelBalance(unsigned const index, double const balance)
 {
     runtime::actions::set_output_channel_balance action;
+    action.index = index;
     action.balance = static_cast<float>(balance);
     m_store.dispatch<runtime::actions::set_output_channel_balance>(action);
 }

@@ -49,11 +49,12 @@ struct stereo_channel : channel
 };
 
 using input_channels = std::vector<mono_channel>;
+using output_channels = std::vector<stereo_channel>;
 
 struct state
 {
     input_channels inputs;
-    stereo_channel output;
+    output_channels outputs;
 };
 
 } // namespace piejam::audio::mixer

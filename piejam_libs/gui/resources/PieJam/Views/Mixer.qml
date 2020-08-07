@@ -15,10 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import QtQuick 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Controls.Material 2.12
-import QtQml.Models 2.12
+import QtQuick 2.13
+import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.13
 
 import "../MixerControls"
 
@@ -27,59 +26,70 @@ TopPane {
 
     property var model
 
-    ListView {
-        id: inputs
+    SplitView {
+        anchors.fill: parent
+        anchors.margins: 8
 
-        anchors.right: outputLevelMeterFader.left
-        anchors.rightMargin: 8
-        anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 8
-        anchors.top: parent.top
-        anchors.topMargin: 8
-        spacing: 2
-        clip: true
-        orientation: ListView.Horizontal
+        ListView {
+            id: inputs
 
-        boundsBehavior: Flickable.StopAtBounds
+            SplitView.fillWidth: true
+            SplitView.minimumWidth: 142
 
-        model: root.model.inputChannels
+            spacing: 2
+            clip: true
+            orientation: ListView.Horizontal
 
-        delegate: ChannelStrip {
-            id: inputChannelStrip
+            boundsBehavior: Flickable.StopAtBounds
 
-            height: outputLevelMeterFader.height
+            model: root.model.inputChannels
 
-            levelLeft: modelData.levelLeft
-            levelRight: modelData.levelRight
-            pan: modelData.panBalance
-            gain: modelData.gain
-            name: modelData.name
+            delegate: ChannelStrip {
+                id: inputChannelStrip
 
-            onFaderMoved: root.model.setInputChannelGain(index, newGain)
-            onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+
+                levelLeft: modelData.levelLeft
+                levelRight: modelData.levelRight
+                pan: modelData.panBalance
+                gain: modelData.gain
+                name: modelData.name
+
+                onFaderMoved: root.model.setInputChannelGain(index, newGain)
+                onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
+            }
         }
-    }
 
-    ChannelStrip {
-        id: outputLevelMeterFader
+        ListView {
+            id: outputs
 
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 8
-        anchors.top: parent.top
-        anchors.topMargin: 8
+            SplitView.minimumWidth: 142
 
-        name: root.model.outputChannel.name
-        levelLeft: root.model.outputChannel.levelLeft
-        levelRight: root.model.outputChannel.levelRight
-        pan: root.model.outputChannel.panBalance
-        gain: root.model.outputChannel.gain
+            spacing: 2
+            clip: true
+            orientation: ListView.Horizontal
 
-        onFaderMoved: root.model.setOutputChannelGain(newGain)
-        onPanMoved: root.model.setOutputChannelBalance(outputLevelMeterFader.pan)
+            boundsBehavior: Flickable.StopAtBounds
+
+            model: root.model.outputChannels
+
+            delegate: ChannelStrip {
+                id: outputChannelStrip
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+
+                levelLeft: modelData.levelLeft
+                levelRight: modelData.levelRight
+                pan: modelData.panBalance
+                gain: modelData.gain
+                name: modelData.name
+
+                onFaderMoved: root.model.setOutputChannelGain(index, newGain)
+                onPanMoved: root.model.setOutputChannelPan(index, outputChannelStrip.pan)
+            }
+        }
     }
 
     Timer {

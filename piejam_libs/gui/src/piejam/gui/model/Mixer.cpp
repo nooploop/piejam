@@ -23,6 +23,14 @@
 namespace piejam::gui::model
 {
 
+void
+Mixer::setNumInputChannels(std::size_t const size)
+{
+    std::vector<MixerChannel> newChannels(size);
+    std::swap(m_inputChannels, newChannels);
+    emit inputChannelsChanged();
+}
+
 auto
 Mixer::inputChannels() -> QQmlListProperty<MixerChannel>
 {
@@ -43,11 +51,31 @@ Mixer::inputChannels() -> QQmlListProperty<MixerChannel>
 }
 
 void
-Mixer::setNumInputChannels(std::size_t const size)
+Mixer::setNumOutputChannels(std::size_t const size)
 {
-    std::vector<MixerChannel> newInputChannels(size);
-    std::swap(m_inputChannels, newInputChannels);
-    emit inputChannelsChanged();
+    std::vector<MixerChannel> newChannels(size);
+    std::swap(m_outputChannels, newChannels);
+    emit outputChannelsChanged();
+}
+
+auto
+Mixer::outputChannels() -> QQmlListProperty<MixerChannel>
+{
+    return QQmlListProperty<MixerChannel>(
+            this,
+            nullptr,
+            [](QQmlListProperty<MixerChannel>* property) -> int {
+                Mixer* const mixer = qobject_cast<Mixer*>(property->object);
+                assert(mixer);
+                return static_cast<int>(mixer->m_outputChannels.size());
+            },
+            [](QQmlListProperty<MixerChannel>* property,
+               int index) -> MixerChannel* {
+                Mixer* const mixer = qobject_cast<Mixer*>(property->object);
+                assert(mixer);
+                return &mixer->m_outputChannels[static_cast<std::size_t>(
+                        index)];
+            });
 }
 
 } // namespace piejam::gui::model

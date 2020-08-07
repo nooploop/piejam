@@ -27,21 +27,16 @@ set_bus_name::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    switch (bus_direction)
+    if (bus_direction == audio::bus_direction::input)
     {
-        case audio::bus_direction::input:
-            assert(bus < new_st.mixer_state.inputs.size());
-            new_st.mixer_state.inputs[bus].name = name;
-            break;
-
-        case audio::bus_direction::output:
-            assert(bus == 0);
-            new_st.mixer_state.output.name = name;
-            break;
-
-        default:
-            assert(false);
-            break;
+        assert(bus < new_st.mixer_state.inputs.size());
+        new_st.mixer_state.inputs[bus].name = name;
+    }
+    else
+    {
+        assert(bus_direction == audio::bus_direction::output);
+        assert(bus < new_st.mixer_state.outputs.size());
+        new_st.mixer_state.outputs[bus].name = name;
     }
 
     return new_st;

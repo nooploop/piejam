@@ -80,10 +80,15 @@ select_device::operator()(audio_state const& st) const -> audio_state
     else
     {
         auto const num_channels = new_st.output.hw_params->num_channels;
-        auto& out = new_st.mixer_state.output;
-        out.name = std::string("Main");
-        out.device_channels.left = num_channels > 0 ? 0 : algorithm::npos;
-        out.device_channels.right = num_channels > 1 ? 1 : algorithm::npos;
+        new_st.mixer_state.outputs.clear();
+
+        if (num_channels)
+        {
+            auto& out = new_st.mixer_state.outputs.emplace_back();
+            out.name = std::string("Main");
+            out.device_channels.left = num_channels > 0 ? 0 : algorithm::npos;
+            out.device_channels.right = num_channels > 1 ? 1 : algorithm::npos;
+        }
     }
 
     return new_st;
