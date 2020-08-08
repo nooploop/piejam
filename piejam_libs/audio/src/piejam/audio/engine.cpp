@@ -273,15 +273,10 @@ engine::operator()(
     std::size_t const num_in_channels = ins.major_size();
     std::size_t const num_out_channels = outs.major_size();
 
-    std::size_t const num_in_busses = m_mixer_state.inputs.size();
-
     stereo_audio_buffer_t mix_buffer(audio_buffer_t(ins.minor_size(), 0.f));
 
-    for (std::size_t bus = 0; bus < num_in_busses; ++bus)
+    for (auto& in_channel : m_mixer_state.inputs)
     {
-        auto& in_channel = m_mixer_state.inputs[bus];
-        assert(in_channel.type == bus_type::mono);
-
         stereo_audio_buffer_t gain_buffer;
 
         float const in_pan_balance_pos =

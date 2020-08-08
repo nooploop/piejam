@@ -66,7 +66,7 @@ TopPane {
             id: audioInputSettings
 
             showAddMono: true
-            showAddStereo: false
+            showAddStereo: true
         }
 
         AudioInputOutputSettings {

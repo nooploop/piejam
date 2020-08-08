@@ -101,8 +101,8 @@ select_device::operator()(audio_state const& st) const -> audio_state
         if (num_channels)
         {
             auto& out = new_st.mixer_state.outputs.emplace_back();
-            out.name = std::string("Main");
             out.type = audio::bus_type::stereo;
+            out.name = std::string("Main");
             out.device_channels.left = num_channels > 0 ? 0 : algorithm::npos;
             out.device_channels.right = num_channels > 1 ? 1 : algorithm::npos;
         }

@@ -114,28 +114,39 @@ AudioInputSettings::setBusName(unsigned const bus, QString const& name)
 }
 
 void
-AudioInputSettings::selectMonoChannel(unsigned const bus, unsigned const ch)
+AudioInputSettings::selectChannel(
+        audio::bus_channel const bc,
+        unsigned const bus,
+        unsigned const ch)
 {
     runtime::actions::select_bus_channel action;
     action.direction = audio::bus_direction::input;
     action.bus = bus;
-    action.channel_selector = audio::bus_channel::mono;
+    action.channel_selector = bc;
     action.channel_index = static_cast<std::size_t>(ch) - 1;
     m_store.dispatch<runtime::actions::select_bus_channel>(action);
 }
 
 void
-AudioInputSettings::selectStereoLeftChannel(
-        unsigned const /*bus*/,
-        unsigned const /*ch*/)
+AudioInputSettings::selectMonoChannel(unsigned const bus, unsigned const ch)
 {
+    selectChannel(audio::bus_channel::mono, bus, ch);
+}
+
+void
+AudioInputSettings::selectStereoLeftChannel(
+        unsigned const bus,
+        unsigned const ch)
+{
+    selectChannel(audio::bus_channel::left, bus, ch);
 }
 
 void
 AudioInputSettings::selectStereoRightChannel(
-        unsigned const /*bus*/,
-        unsigned const /*ch*/)
+        unsigned const bus,
+        unsigned const ch)
 {
+    selectChannel(audio::bus_channel::right, bus, ch);
 }
 
 void
@@ -150,6 +161,10 @@ AudioInputSettings::addMonoBus()
 void
 AudioInputSettings::addStereoBus()
 {
+    runtime::actions::add_device_bus action;
+    action.direction = audio::bus_direction::input;
+    action.type = audio::bus_type::stereo;
+    m_store.dispatch<runtime::actions::add_device_bus>(action);
 }
 
 void
