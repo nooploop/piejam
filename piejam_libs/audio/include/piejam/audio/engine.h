@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <piejam/algorithm/npos.h>
+#include <piejam/audio/bus_defs.h>
 #include <piejam/audio/level_meter.h>
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pair.h>
@@ -55,21 +57,13 @@ public:
 private:
     struct mixer_channel
     {
+        bus_type type{};
         std::optional<pair<level_meter>> stereo_level_meter;
         pair<std::atomic<float>> level;
         std::atomic<float> gain{1.f};
         std::atomic<float> pan_balance{};
         pair<smoother<>> gain_smoother;
-    };
-
-    struct input_mixer_channel : mixer_channel
-    {
-        std::size_t device_channel;
-    };
-
-    struct output_mixer_channel : mixer_channel
-    {
-        pair<std::size_t> device_channels;
+        pair<std::size_t> device_channels{algorithm::npos};
     };
 
     struct mixer_state
@@ -97,8 +91,8 @@ private:
             }
         }
 
-        std::vector<input_mixer_channel> inputs;
-        std::vector<output_mixer_channel> outputs;
+        std::vector<mixer_channel> inputs;
+        std::vector<mixer_channel> outputs;
     };
 
     mixer_state m_mixer_state;
