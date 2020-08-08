@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/audio/bus_defs.h>
+#include <piejam/audio/types.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 

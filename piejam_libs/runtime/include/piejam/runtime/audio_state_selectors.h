@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <piejam/audio/bus_defs.h>
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
+#include <piejam/audio/types.h>
 #include <piejam/container/box.h>
 #include <piejam/container/boxed_string.h>
 #include <piejam/reselect/fwd.h>

@@ -17,7 +17,7 @@
 
 #include <piejam/app/gui/model/Mixer.h>
 
-#include <piejam/audio/bus_defs.h>
+#include <piejam/audio/types.h>
 #include <piejam/functional/overload.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
