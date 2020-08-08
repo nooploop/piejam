@@ -22,6 +22,7 @@
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pan.h>
 #include <piejam/audio/period_sizes.h>
+#include <piejam/range/span.h>
 #include <piejam/range/table_view.h>
 
 #include <boost/container/static_vector.hpp>
@@ -30,6 +31,9 @@
 
 namespace piejam::audio
 {
+
+using audio_buffer_t = boost::container::static_vector<float, max_period_size>;
+using stereo_audio_buffer_t = pair<audio_buffer_t>;
 
 static constexpr auto
 level_meter_decay_time(unsigned const samplerate) -> std::size_t
@@ -46,28 +50,29 @@ level_meter_rms_window_size(unsigned const samplerate) -> std::size_t
 
 engine::engine(
         unsigned const samplerate,
-        std::vector<std::size_t> const& input_bus_config,
+        std::vector<std::pair<bus_type, channel_index_pair>> const&
+                input_config,
         std::vector<channel_index_pair> const& output_config)
     : m_mixer_state(
-              input_bus_config.size(),
+              input_config.size(),
               output_config.size(),
               level_meter_decay_time(samplerate),
               level_meter_rms_window_size(samplerate))
 {
     std::size_t input_bus_index{};
-    for (std::size_t in_channel : input_bus_config)
+    for (auto const& in_conf : input_config)
     {
         auto& in_ch = m_mixer_state.inputs[input_bus_index++];
-        in_ch.type = bus_type::mono;
-        in_ch.device_channels.left = in_channel;
+        in_ch.type = in_conf.first;
+        in_ch.device_channels = in_conf.second;
     }
 
     std::size_t output_bus_index{};
-    for (auto const& out_channels : output_config)
+    for (auto const& out_conf : output_config)
     {
         auto& out_ch = m_mixer_state.outputs[output_bus_index++];
         out_ch.type = bus_type::stereo;
-        out_ch.device_channels = out_channels;
+        out_ch.device_channels = out_conf;
     }
 }
 
@@ -203,6 +208,52 @@ reset_level(level_meter& lm, std::atomic<float>& level)
     level.store(0.f, std::memory_order_relaxed);
 }
 
+template <class MixerChannel>
+static void
+apply_gain_and_calculate_level(
+        MixerChannel& mc,
+        range::span<float const> source_left_buffer,
+        range::span<float const> source_right_buffer,
+        stereo_gain const gain,
+        stereo_audio_buffer_t& gain_buffer)
+{
+    if (!source_left_buffer.empty())
+    {
+        apply_gain(
+                mc.gain_smoother.left,
+                mc.gain * gain.left,
+                source_left_buffer,
+                std::back_inserter(gain_buffer.left));
+
+        calculate_level(
+                gain_buffer.left,
+                mc.stereo_level_meter->left,
+                mc.level.left);
+    }
+    else
+    {
+        reset_level(mc.stereo_level_meter->left, mc.level.left);
+    }
+
+    if (!source_right_buffer.empty())
+    {
+        apply_gain(
+                mc.gain_smoother.right,
+                mc.gain * gain.right,
+                source_right_buffer,
+                std::back_inserter(gain_buffer.right));
+
+        calculate_level(
+                gain_buffer.right,
+                mc.stereo_level_meter->right,
+                mc.level.right);
+    }
+    else
+    {
+        reset_level(mc.stereo_level_meter->right, mc.level.right);
+    }
+}
+
 template <class ChannelBuffer, class InOutIterator>
 static void
 mix(ChannelBuffer const& buf, InOutIterator dst)
@@ -215,10 +266,6 @@ engine::operator()(
         range::table_view<float const> const& ins,
         range::table_view<float> const& outs) noexcept
 {
-    using audio_buffer_t =
-            boost::container::static_vector<float, max_period_size>;
-    using stereo_audio_buffer_t = pair<audio_buffer_t>;
-
     // clear output
     for (auto ch : outs)
         std::fill(ch.begin(), ch.end(), 0.f);
@@ -228,114 +275,64 @@ engine::operator()(
 
     std::size_t const num_in_busses = m_mixer_state.inputs.size();
 
-    stereo_audio_buffer_t mix_buffer(audio_buffer_t(outs.minor_size(), 0.f));
+    stereo_audio_buffer_t mix_buffer(audio_buffer_t(ins.minor_size(), 0.f));
 
     for (std::size_t bus = 0; bus < num_in_busses; ++bus)
     {
         auto& in_channel = m_mixer_state.inputs[bus];
         assert(in_channel.type == bus_type::mono);
-        if (in_channel.device_channels.left < num_in_channels)
-        {
-            stereo_audio_buffer_t gain_buffer;
 
-            auto in_pan = sinusoidal_constant_power_pan(
-                    in_channel.pan_balance.load(std::memory_order_relaxed));
+        stereo_audio_buffer_t gain_buffer;
 
-            std::size_t const ch = in_channel.device_channels.left;
+        float const in_pan_balance_pos =
+                in_channel.pan_balance.load(std::memory_order_relaxed);
+        auto const in_pan_balance =
+                in_channel.type == bus_type::mono
+                        ? sinusoidal_constant_power_pan(in_pan_balance_pos)
+                        : stereo_balance(in_pan_balance_pos);
 
-            // left channel
-            {
-                apply_gain(
-                        in_channel.gain_smoother.left,
-                        in_channel.gain * in_pan.left,
-                        ins[ch],
-                        std::back_inserter(gain_buffer.left));
+        range::span<float const> in_left_buffer;
+        if (auto ch = in_channel.device_channels.left; ch < num_in_channels)
+            in_left_buffer = {ins[ch].data(), ins[ch].size()};
+        range::span<float const> in_right_buffer;
+        if (auto ch = in_channel.device_channels.right; ch < num_in_channels)
+            in_right_buffer = {ins[ch].data(), ins[ch].size()};
 
-                calculate_level(
-                        gain_buffer.left,
-                        in_channel.stereo_level_meter->left,
-                        in_channel.level.left);
+        apply_gain_and_calculate_level(
+                in_channel,
+                in_left_buffer,
+                in_right_buffer,
+                in_pan_balance,
+                gain_buffer);
 
-                mix(gain_buffer.left, mix_buffer.left.begin());
-            }
-
-            // right channel
-            {
-                apply_gain(
-                        in_channel.gain_smoother.right,
-                        in_channel.gain * in_pan.right,
-                        ins[ch],
-                        std::back_inserter(gain_buffer.right));
-
-                calculate_level(
-                        gain_buffer.right,
-                        in_channel.stereo_level_meter->right,
-                        in_channel.level.right);
-
-                mix(gain_buffer.right, mix_buffer.right.begin());
-            }
-        }
-        else
-        {
-            reset_level(
-                    in_channel.stereo_level_meter->left,
-                    in_channel.level.left);
-            reset_level(
-                    in_channel.stereo_level_meter->right,
-                    in_channel.level.right);
-        }
+        mix(gain_buffer.left, mix_buffer.left.begin());
+        mix(gain_buffer.right, mix_buffer.right.begin());
     }
-
-    auto const pow3 = [](auto x) { return x * x * x; };
 
     for (auto& out_ch : m_mixer_state.outputs)
     {
         stereo_audio_buffer_t gain_buffer;
 
-        // left channel
+        assert(out_ch.type == bus_type::stereo);
+        auto const out_balance = stereo_balance(out_ch.pan_balance);
+
+        apply_gain_and_calculate_level(
+                out_ch,
+                {mix_buffer.left.data(), mix_buffer.left.size()},
+                {mix_buffer.right.data(), mix_buffer.right.size()},
+                out_balance,
+                gain_buffer);
+
+        auto const left_channel = out_ch.device_channels.left;
+        if (num_out_channels > left_channel)
         {
-            float const balance = out_ch.pan_balance <= 0.f
-                                          ? 1.f
-                                          : pow3(1 - out_ch.pan_balance);
-            apply_gain(
-                    out_ch.gain_smoother.left,
-                    out_ch.gain * balance,
-                    mix_buffer.left,
-                    std::back_inserter(gain_buffer.left));
-
-            calculate_level(
-                    gain_buffer.left,
-                    out_ch.stereo_level_meter->left,
-                    out_ch.level.left);
-
-            auto const left_channel = out_ch.device_channels.left;
-            if (num_out_channels > left_channel)
-            {
-                algorithm::copy(gain_buffer.left, outs[left_channel].begin());
-            }
+            algorithm::copy(gain_buffer.left, outs[left_channel].begin());
         }
 
-        // right channel
+        auto const right_channel = out_ch.device_channels.right;
+        if (num_out_channels > right_channel)
         {
-            float const balance = out_ch.pan_balance >= 0.f
-                                          ? 1.f
-                                          : pow3(1 + out_ch.pan_balance);
-            apply_gain(
-                    out_ch.gain_smoother.right,
-                    out_ch.gain * balance,
-                    mix_buffer.right,
-                    std::back_inserter(gain_buffer.right));
-
-            calculate_level(
-                    gain_buffer.right,
-                    out_ch.stereo_level_meter->right,
-                    out_ch.level.right);
-
-            auto const right_channel = out_ch.device_channels.right;
-            if (num_out_channels > right_channel)
-            {
-                algorithm::copy(gain_buffer.right, outs[right_channel].begin());
-            }
+            algorithm::copy(gain_buffer.right, outs[right_channel].begin());
         }
     }
 }

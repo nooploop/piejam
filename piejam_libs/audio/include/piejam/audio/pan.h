@@ -24,7 +24,7 @@
 namespace piejam::audio
 {
 
-using mono_pan_factors = pair<float>;
+using stereo_gain = pair<float>;
 
 // left = 1/sqrt(2) (cos(x×π/4) - sin(x×π/4))
 //     ~= 1/sqrt(2) -
@@ -39,7 +39,7 @@ using mono_pan_factors = pair<float>;
 //           (π^3 x^3)/(384 sqrt(2)) +
 //           (π^4 x^4)/(6144 sqrt(2))
 inline constexpr auto
-sinusoidal_constant_power_pan(float pan_pos) -> mono_pan_factors
+sinusoidal_constant_power_pan(float pan_pos) -> stereo_gain
 {
     using namespace boost::math::float_constants;
     constexpr float pi_div_4root2 = pi / (4.f * root_two);
@@ -59,6 +59,25 @@ sinusoidal_constant_power_pan(float pan_pos) -> mono_pan_factors
     float const left = axs - axt;
     float const right = axs + axt;
     return {left, right};
+}
+
+inline constexpr auto
+stereo_balance(float balance_pos) -> stereo_gain
+{
+    constexpr auto pow3 = [](auto x) { return x * x * x; };
+
+    if (balance_pos < 0.f)
+    {
+        return stereo_gain{1.f, pow3(1 + balance_pos)};
+    }
+    else if (balance_pos > 0.f)
+    {
+        return stereo_gain{pow3(1 - balance_pos), 1.f};
+    }
+    else
+    {
+        return stereo_gain{1.f};
+    }
 }
 
 } // namespace piejam::audio

@@ -88,7 +88,8 @@ select_device::operator()(audio_state const& st) const -> audio_state
         std::size_t channel_index{};
         for (auto& in : new_st.mixer_state.inputs)
         {
-            in.device_channels.left = channel_index++;
+            in.type = audio::bus_type::mono;
+            in.device_channels = audio::channel_index_pair{channel_index++};
             in.name = "In " + std::to_string(channel_index);
         }
     }
@@ -101,6 +102,7 @@ select_device::operator()(audio_state const& st) const -> audio_state
         {
             auto& out = new_st.mixer_state.outputs.emplace_back();
             out.name = std::string("Main");
+            out.type = audio::bus_type::stereo;
             out.device_channels.left = num_channels > 0 ? 0 : algorithm::npos;
             out.device_channels.right = num_channels > 1 ? 1 : algorithm::npos;
         }
@@ -138,31 +140,35 @@ select_bus_channel::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    if (direction == audio::bus_direction::input)
+    auto& channels = direction == audio::bus_direction::input
+                             ? new_st.mixer_state.inputs
+                             : new_st.mixer_state.outputs;
+
+    assert(bus < channels.size());
+    assert(channel_index == algorithm::npos ||
+           channel_index < (direction == audio::bus_direction::input
+                                    ? new_st.input.hw_params->num_channels
+                                    : new_st.output.hw_params->num_channels));
+
+    switch (channel_selector)
     {
-        assert(bus < new_st.mixer_state.inputs.size());
-        assert(channel_selector == audio::bus_channel::mono);
-        assert(channel_index == algorithm::npos ||
-               channel_index < new_st.input.hw_params->num_channels);
-        new_st.mixer_state.inputs[bus].device_channels.left = channel_index;
-    }
-    else
-    {
-        assert(direction == audio::bus_direction::output);
-        assert(bus < new_st.mixer_state.outputs.size());
-        assert(channel_index == algorithm::npos ||
-               channel_index < new_st.output.hw_params->num_channels);
-        if (channel_selector == audio::bus_channel::left)
-        {
-            new_st.mixer_state.outputs[bus].device_channels.left =
-                    channel_index;
-        }
-        else
-        {
-            assert(channel_selector == audio::bus_channel::right);
-            new_st.mixer_state.outputs[bus].device_channels.right =
-                    channel_index;
-        }
+        case audio::bus_channel::mono:
+            assert(direction == audio::bus_direction::input);
+            channels[bus].device_channels =
+                    audio::channel_index_pair{channel_index};
+            break;
+
+        case audio::bus_channel::left:
+            assert(direction == audio::bus_direction::input ||
+                   direction == audio::bus_direction::output);
+            channels[bus].device_channels.left = channel_index;
+            break;
+
+        case audio::bus_channel::right:
+            assert(direction == audio::bus_direction::input ||
+                   direction == audio::bus_direction::output);
+            channels[bus].device_channels.right = channel_index;
+            break;
     }
 
     return new_st;
@@ -176,6 +182,7 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
     if (direction == audio::bus_direction::input)
     {
         auto& bus = new_st.mixer_state.inputs.emplace_back();
+        bus.type = type;
         bus.name = "In " + std::to_string(new_st.mixer_state.inputs.size());
     }
     else
@@ -183,6 +190,8 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
         assert(direction == audio::bus_direction::output);
         auto& bus = new_st.mixer_state.outputs.emplace_back();
         auto const new_size = new_st.mixer_state.outputs.size();
+        assert(type == audio::bus_type::stereo);
+        bus.type = type;
         bus.name = new_size == 1 ? std::string("Main")
                                  : "Aux " + std::to_string(new_size - 1);
     }
