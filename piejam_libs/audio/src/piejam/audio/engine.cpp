@@ -56,12 +56,19 @@ engine::engine(
 {
     std::size_t input_bus_index{};
     for (std::size_t in_channel : input_bus_config)
-        m_mixer_state.inputs[input_bus_index++].device_channel = in_channel;
+    {
+        auto& in_ch = m_mixer_state.inputs[input_bus_index++];
+        in_ch.type = bus_type::mono;
+        in_ch.device_channels.left = in_channel;
+    }
 
     std::size_t output_bus_index{};
     for (auto const& out_channels : output_config)
-        m_mixer_state.outputs[output_bus_index++].device_channels =
-                out_channels;
+    {
+        auto& out_ch = m_mixer_state.outputs[output_bus_index++];
+        out_ch.type = bus_type::stereo;
+        out_ch.device_channels = out_channels;
+    }
 }
 
 void
@@ -225,15 +232,16 @@ engine::operator()(
 
     for (std::size_t bus = 0; bus < num_in_busses; ++bus)
     {
-        input_mixer_channel& in_channel = m_mixer_state.inputs[bus];
-        if (in_channel.device_channel < num_in_channels)
+        auto& in_channel = m_mixer_state.inputs[bus];
+        assert(in_channel.type == bus_type::mono);
+        if (in_channel.device_channels.left < num_in_channels)
         {
             stereo_audio_buffer_t gain_buffer;
 
             auto in_pan = sinusoidal_constant_power_pan(
                     in_channel.pan_balance.load(std::memory_order_relaxed));
 
-            std::size_t ch = in_channel.device_channel;
+            std::size_t const ch = in_channel.device_channels.left;
 
             // left channel
             {
