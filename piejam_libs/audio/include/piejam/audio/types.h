@@ -17,41 +17,11 @@
 
 #pragma once
 
-#include <piejam/algorithm/npos.h>
-#include <piejam/audio/bus_defs.h>
 #include <piejam/audio/pair.h>
-#include <piejam/audio/types.h>
-#include <piejam/container/boxed_string.h>
 
-#include <string>
-#include <variant>
-#include <vector>
-
-namespace piejam::audio::mixer
+namespace piejam::audio
 {
 
-using stereo_level = pair<float>;
-using channel_type = bus_type;
+using channel_index_pair = pair<std::size_t>;
 
-struct channel
-{
-    container::boxed_string name;
-    float gain{1.f};
-    float pan_balance{};
-    stereo_level level;
-    channel_type type{};
-
-    //! for mono channels we just use left part of the pair to store the device
-    //! channel
-    channel_index_pair device_channels{algorithm::npos};
-};
-
-using channels = std::vector<channel>;
-
-struct state
-{
-    channels inputs;
-    channels outputs;
-};
-
-} // namespace piejam::audio::mixer
+} // namespace piejam::audio

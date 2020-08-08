@@ -47,7 +47,7 @@ level_meter_rms_window_size(unsigned const samplerate) -> std::size_t
 engine::engine(
         unsigned const samplerate,
         std::vector<std::size_t> const& input_bus_config,
-        std::vector<pair<std::size_t>> const& output_config)
+        std::vector<channel_index_pair> const& output_config)
     : m_mixer_state(
               input_bus_config.size(),
               output_config.size(),
