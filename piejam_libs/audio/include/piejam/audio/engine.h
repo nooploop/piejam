@@ -37,7 +37,8 @@ class engine
 {
 public:
     engine(unsigned samplerate,
-           std::vector<std::size_t> const& input_bus_config,
+           std::vector<std::pair<bus_type, channel_index_pair>> const&
+                   input_config,
            std::vector<channel_index_pair> const& output_config);
 
     void set_input_channel_gain(std::size_t index, float gain);

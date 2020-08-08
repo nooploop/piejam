@@ -40,8 +40,7 @@ struct channel
     stereo_level level;
     channel_type type{};
 
-    //! for mono channels we just use left part of the pair to store the device
-    //! channel
+    //! mono channels hold same device channel in the pair
     channel_index_pair device_channels{algorithm::npos};
 };
 
