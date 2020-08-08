@@ -38,7 +38,7 @@ class engine
 public:
     engine(unsigned samplerate,
            std::vector<std::size_t> const& input_bus_config,
-           std::vector<pair<std::size_t>> const& output_config);
+           std::vector<channel_index_pair> const& output_config);
 
     void set_input_channel_gain(std::size_t index, float gain);
     void set_input_channel_pan(std::size_t index, float pan);
@@ -63,7 +63,7 @@ private:
         std::atomic<float> gain{1.f};
         std::atomic<float> pan_balance{};
         pair<smoother<>> gain_smoother;
-        pair<std::size_t> device_channels{algorithm::npos};
+        channel_index_pair device_channels{algorithm::npos};
     };
 
     struct mixer_state
