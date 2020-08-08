@@ -30,7 +30,7 @@ Item {
     property alias gain: levelMeterFader.gain
 
     signal faderMoved(real newGain)
-    signal panMoved()
+    signal panMoved(real newPan)
 
     id: root
 
@@ -66,7 +66,7 @@ Item {
         anchors.left: parent.left
         anchors.top: title.bottom
 
-        onMoved: root.panMoved()
+        onMoved: root.panMoved(panControls.value)
     }
 
     LevelMeterFader {

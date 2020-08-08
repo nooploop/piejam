@@ -75,7 +75,9 @@ void
 engine::set_input_channel_pan(std::size_t const index, float const pan)
 {
     assert(index < m_mixer_state.inputs.size());
-    m_mixer_state.inputs[index].pan.store(pan, std::memory_order_relaxed);
+    m_mixer_state.inputs[index].pan_balance.store(
+            pan,
+            std::memory_order_relaxed);
 }
 
 void
@@ -89,7 +91,7 @@ void
 engine::set_output_channel_balance(std::size_t const index, float const balance)
 {
     assert(index < m_mixer_state.outputs.size());
-    m_mixer_state.outputs[index].balance.store(
+    m_mixer_state.outputs[index].pan_balance.store(
             balance,
             std::memory_order_relaxed);
 }
@@ -229,7 +231,7 @@ engine::operator()(
             stereo_audio_buffer_t gain_buffer;
 
             auto in_pan = sinusoidal_constant_power_pan(
-                    in_channel.pan.load(std::memory_order_relaxed));
+                    in_channel.pan_balance.load(std::memory_order_relaxed));
 
             std::size_t ch = in_channel.device_channel;
 
@@ -284,8 +286,9 @@ engine::operator()(
 
         // left channel
         {
-            float const balance =
-                    out_ch.balance <= 0.f ? 1.f : pow3(1 - out_ch.balance);
+            float const balance = out_ch.pan_balance <= 0.f
+                                          ? 1.f
+                                          : pow3(1 - out_ch.pan_balance);
             apply_gain(
                     out_ch.gain_smoother.left,
                     out_ch.gain * balance,
@@ -306,8 +309,9 @@ engine::operator()(
 
         // right channel
         {
-            float const balance =
-                    out_ch.balance >= 0.f ? 1.f : pow3(1 + out_ch.balance);
+            float const balance = out_ch.pan_balance >= 0.f
+                                          ? 1.f
+                                          : pow3(1 + out_ch.pan_balance);
             apply_gain(
                     out_ch.gain_smoother.right,
                     out_ch.gain * balance,

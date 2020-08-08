@@ -87,7 +87,7 @@ TopPane {
                 name: modelData.name
 
                 onFaderMoved: root.model.setOutputChannelGain(index, newGain)
-                onPanMoved: root.model.setOutputChannelPan(index, outputChannelStrip.pan)
+                onPanMoved: root.model.setOutputChannelBalance(index, newPan)
             }
         }
     }
