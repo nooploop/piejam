@@ -18,11 +18,11 @@
 #pragma once
 
 #include <piejam/algorithm/npos.h>
-#include <piejam/audio/bus_defs.h>
 #include <piejam/audio/level_meter.h>
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/smoother.h>
+#include <piejam/audio/types.h>
 
 #include <piejam/range/fwd.h>
 

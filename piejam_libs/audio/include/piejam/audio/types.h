@@ -24,4 +24,23 @@ namespace piejam::audio
 
 using channel_index_pair = pair<std::size_t>;
 
+enum class bus_direction : bool
+{
+    input,
+    output
+};
+
+enum class bus_type : bool
+{
+    mono,
+    stereo
+};
+
+enum class bus_channel
+{
+    mono,
+    left,
+    right
+};
+
 } // namespace piejam::audio

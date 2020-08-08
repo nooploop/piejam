@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/algorithm/npos.h>
-#include <piejam/audio/bus_defs.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/boxed_string.h>
