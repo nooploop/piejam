@@ -146,8 +146,7 @@ make_bus_channel_selector(
                         });
 
             default:
-                assert(false);
-                break;
+                throw;
         }
     }
 }

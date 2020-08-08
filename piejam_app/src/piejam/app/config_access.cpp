@@ -18,6 +18,7 @@
 #include <piejam/app/config_access.h>
 
 #include <piejam/algorithm/index_of.h>
+#include <piejam/algorithm/transform.h>
 #include <piejam/redux/store.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/app_config.h>
@@ -77,6 +78,20 @@ save(runtime::audio_state const& state)
                 state.pcm_devices->outputs[state.output.index].name;
         conf.samplerate = state.samplerate;
         conf.period_size = state.period_size;
+
+        algorithm::transform(
+                state.mixer_state.inputs,
+                std::back_inserter(conf.input_bus_config),
+                [](audio::mixer::channel const& ch) -> runtime::bus_config {
+                    return {ch.name, ch.type, ch.device_channels};
+                });
+
+        algorithm::transform(
+                state.mixer_state.outputs,
+                std::back_inserter(conf.output_bus_config),
+                [](audio::mixer::channel const& ch) -> runtime::bus_config {
+                    return {ch.name, ch.type, ch.device_channels};
+                });
 
         runtime::save_app_config(conf, config_file_path());
     }
