@@ -88,15 +88,16 @@ make_bus_name_selector(audio::bus_direction const bd, std::size_t const bus)
 }
 
 auto
-make_bus_type_selector(audio::bus_direction const bd, std::size_t const /*bus*/)
+make_bus_type_selector(audio::bus_direction const bd, std::size_t const bus)
         -> selector<audio::bus_type>
 {
     switch (bd)
     {
         case audio::bus_direction::input:
             return selector<audio::bus_type>(
-                    [](audio_state const & /*st*/) -> audio::bus_type {
-                        return audio::bus_type::mono;
+                    [bus](audio_state const& st) -> audio::bus_type {
+                        assert(bus < st.mixer_state.inputs.size());
+                        return st.mixer_state.inputs[bus].type;
                     });
 
         case audio::bus_direction::output:

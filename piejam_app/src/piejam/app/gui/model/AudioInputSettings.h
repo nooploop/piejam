@@ -19,6 +19,7 @@
 
 #include <piejam/app/store.h>
 #include <piejam/app/subscriber.h>
+#include <piejam/audio/types.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
 #include <piejam/reselect/subscriptions_manager.h>
 
@@ -40,6 +41,8 @@ public:
     void deleteBus(unsigned bus) override;
 
 private:
+    void selectChannel(audio::bus_channel, unsigned bus, unsigned ch);
+
     store& m_store;
     subscriptions_manager m_subs;
 };
