@@ -58,19 +58,18 @@ private:
         std::optional<pair<level_meter>> stereo_level_meter;
         pair<std::atomic<float>> level;
         std::atomic<float> gain{1.f};
+        std::atomic<float> pan_balance{};
         pair<smoother<>> gain_smoother;
     };
 
     struct input_mixer_channel : mixer_channel
     {
         std::size_t device_channel;
-        std::atomic<float> pan{};
     };
 
     struct output_mixer_channel : mixer_channel
     {
         pair<std::size_t> device_channels;
-        std::atomic<float> balance;
     };
 
     struct mixer_state
