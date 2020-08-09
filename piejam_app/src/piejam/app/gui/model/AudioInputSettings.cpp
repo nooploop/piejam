@@ -97,6 +97,28 @@ AudioInputSettings::AudioInputSettings(
                             [this, bus](std::size_t const ch) {
                                 busConfig(bus).setMonoChannel(ch + 1);
                             });
+
+                    m_subs.observe(
+                            subs_id,
+                            state_change_subscriber,
+                            selectors::make_bus_channel_selector(
+                                    audio::bus_direction::input,
+                                    bus,
+                                    audio::bus_channel::left),
+                            [this, bus](std::size_t const ch) {
+                                busConfig(bus).setStereoLeftChannel(ch + 1);
+                            });
+
+                    m_subs.observe(
+                            subs_id,
+                            state_change_subscriber,
+                            selectors::make_bus_channel_selector(
+                                    audio::bus_direction::input,
+                                    bus,
+                                    audio::bus_channel::right),
+                            [this, bus](std::size_t const ch) {
+                                busConfig(bus).setStereoRightChannel(ch + 1);
+                            });
                 }
 
                 setBusConfigs(std::move(busConfigs));
@@ -150,21 +172,24 @@ AudioInputSettings::selectStereoRightChannel(
 }
 
 void
-AudioInputSettings::addMonoBus()
+AudioInputSettings::addBus(audio::bus_type bus_type)
 {
     runtime::actions::add_device_bus action;
     action.direction = audio::bus_direction::input;
-    action.type = audio::bus_type::mono;
+    action.type = bus_type;
     m_store.dispatch<runtime::actions::add_device_bus>(action);
+}
+
+void
+AudioInputSettings::addMonoBus()
+{
+    addBus(audio::bus_type::mono);
 }
 
 void
 AudioInputSettings::addStereoBus()
 {
-    runtime::actions::add_device_bus action;
-    action.direction = audio::bus_direction::input;
-    action.type = audio::bus_type::stereo;
-    m_store.dispatch<runtime::actions::add_device_bus>(action);
+    addBus(audio::bus_type::stereo);
 }
 
 void

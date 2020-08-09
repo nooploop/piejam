@@ -79,19 +79,24 @@ save(runtime::audio_state const& state)
         conf.samplerate = state.samplerate;
         conf.period_size = state.period_size;
 
-        algorithm::transform(
-                state.mixer_state.inputs,
-                std::back_inserter(conf.input_bus_config),
-                [](audio::mixer::channel const& ch) -> runtime::bus_config {
-                    return {ch.name, ch.type, ch.device_channels};
-                });
+        auto const channels_to_bus_configs = [](auto const& channels,
+                                                auto& configs) {
+            configs.reserve(channels.size());
+            algorithm::transform(
+                    channels,
+                    std::back_inserter(configs),
+                    [](audio::mixer::channel const& ch) -> runtime::bus_config {
+                        return {ch.name, ch.type, ch.device_channels};
+                    });
+        };
 
-        algorithm::transform(
+        channels_to_bus_configs(
+                state.mixer_state.inputs,
+                conf.input_bus_config);
+
+        channels_to_bus_configs(
                 state.mixer_state.outputs,
-                std::back_inserter(conf.output_bus_config),
-                [](audio::mixer::channel const& ch) -> runtime::bus_config {
-                    return {ch.name, ch.type, ch.device_channels};
-                });
+                conf.output_bus_config);
 
         runtime::save_app_config(conf, config_file_path());
     }

@@ -42,6 +42,7 @@ public:
 
 private:
     void selectChannel(audio::bus_channel, unsigned bus, unsigned ch);
+    void addBus(audio::bus_type);
 
     store& m_store;
     subscriptions_manager m_subs;
