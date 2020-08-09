@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/app/gui/model/AudioSettings.h>
+#include <piejam/app/gui/model/AudioDeviceSettings.h>
 
 #include <piejam/algorithm/index_of.h>
 #include <piejam/algorithm/transform.h>
@@ -57,7 +57,7 @@ to_QStringList(Vector const& l) -> QStringList
     return result;
 }
 
-AudioSettings::AudioSettings(
+AudioDeviceSettings::AudioDeviceSettings(
         store& app_store,
         subscriber& state_change_subscriber)
     : m_store(app_store)
@@ -116,13 +116,13 @@ AudioSettings::AudioSettings(
 }
 
 void
-AudioSettings::refreshDeviceLists()
+AudioDeviceSettings::refreshDeviceLists()
 {
     m_store.dispatch<runtime::actions::refresh_devices>();
 }
 
 void
-AudioSettings::selectInputDevice(unsigned const index)
+AudioDeviceSettings::selectInputDevice(unsigned const index)
 {
     runtime::actions::initiate_device_selection action;
     action.input = true;
@@ -131,7 +131,7 @@ AudioSettings::selectInputDevice(unsigned const index)
 }
 
 void
-AudioSettings::selectOutputDevice(unsigned const index)
+AudioDeviceSettings::selectOutputDevice(unsigned const index)
 {
     runtime::actions::initiate_device_selection action;
     action.input = false;
@@ -140,7 +140,7 @@ AudioSettings::selectOutputDevice(unsigned const index)
 }
 
 void
-AudioSettings::selectSamplerate(unsigned index)
+AudioDeviceSettings::selectSamplerate(unsigned index)
 {
     runtime::actions::select_samplerate action;
     action.index = index;
@@ -148,7 +148,7 @@ AudioSettings::selectSamplerate(unsigned index)
 }
 
 void
-AudioSettings::selectPeriodSize(unsigned index)
+AudioDeviceSettings::selectPeriodSize(unsigned index)
 {
     runtime::actions::select_period_size action;
     action.index = index;

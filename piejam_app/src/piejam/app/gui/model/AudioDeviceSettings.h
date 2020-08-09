@@ -19,16 +19,16 @@
 
 #include <piejam/app/store.h>
 #include <piejam/app/subscriber.h>
-#include <piejam/gui/model/AudioSettings.h>
+#include <piejam/gui/model/AudioDeviceSettings.h>
 #include <piejam/reselect/subscriptions_manager.h>
 
 namespace piejam::app::gui::model
 {
 
-class AudioSettings : public piejam::gui::model::AudioSettings
+class AudioDeviceSettings final : public piejam::gui::model::AudioSettings
 {
 public:
-    AudioSettings(store&, subscriber&);
+    AudioDeviceSettings(store&, subscriber&);
 
     virtual void refreshDeviceLists() override;
     virtual void selectInputDevice(unsigned index) override;

@@ -17,7 +17,7 @@
 
 #include <piejam/app/config_access.h>
 #include <piejam/app/gui/model/AudioInputOutputSettings.h>
-#include <piejam/app/gui/model/AudioSettings.h>
+#include <piejam/app/gui/model/AudioDeviceSettings.h>
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/Mixer.h>
 #include <piejam/app/store.h>
@@ -98,7 +98,7 @@ main(int argc, char* argv[]) -> int
     qmlRegisterInterface<gui::model::BusConfig>("BusConfig");
     qmlRegisterInterface<gui::model::MixerChannel>("MixerChannel");
 
-    app::gui::model::AudioSettings audio_settings(
+    app::gui::model::AudioDeviceSettings audio_settings(
             store,
             state_change_subscriber);
     app::gui::model::AudioInputSettings audio_input_settings(
