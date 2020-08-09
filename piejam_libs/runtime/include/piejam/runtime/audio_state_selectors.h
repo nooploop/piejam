@@ -51,8 +51,10 @@ using output_devices =
         std::pair<container::box<audio::pcm_io_descriptors>, std::size_t>;
 extern const selector<output_devices> select_output_devices;
 
-extern const selector<std::size_t> select_num_input_channels;
-extern const selector<std::size_t> select_num_input_busses;
+auto make_num_device_channels_selector(audio::bus_direction)
+        -> selector<std::size_t>;
+
+auto make_num_busses_selector(audio::bus_direction) -> selector<std::size_t>;
 
 auto make_bus_name_selector(audio::bus_direction, std::size_t bus)
         -> selector<container::boxed_string>;
@@ -69,9 +71,6 @@ auto make_input_gain_selector(std::size_t index) -> selector<float>;
 auto make_input_pan_selector(std::size_t index) -> selector<float>;
 auto make_input_level_selector(std::size_t index)
         -> selector<audio::mixer::stereo_level>;
-
-extern const selector<std::size_t> select_num_output_channels;
-extern const selector<std::size_t> select_num_output_busses;
 
 auto make_output_gain_selector(std::size_t index) -> selector<float>;
 auto make_output_balance_selector(std::size_t index) -> selector<float>;

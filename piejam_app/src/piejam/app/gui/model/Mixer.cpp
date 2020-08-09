@@ -38,7 +38,7 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
     m_subs.observe(
             subs_id,
             state_change_subscriber,
-            selectors::select_num_input_busses,
+            selectors::make_num_busses_selector(audio::bus_direction::input),
             [this, &state_change_subscriber, subs_id = get_next_sub_id()](
                     std::size_t const num_busses) mutable {
                 m_subs.erase(subs_id);
@@ -87,7 +87,7 @@ Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
     m_subs.observe(
             subs_id,
             state_change_subscriber,
-            selectors::select_num_output_busses,
+            selectors::make_num_busses_selector(audio::bus_direction::output),
             [this, &state_change_subscriber, subs_id = get_next_sub_id()](
                     std::size_t const num_busses) mutable {
                 m_subs.erase(subs_id);
