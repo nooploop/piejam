@@ -3,6 +3,7 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt5Quick REQUIRED)
 find_package(Qt5QuickControls2 REQUIRED)
+find_package(Qt5VirtualKeyboard REQUIRED)
 
 set(RESOUCE_FILES "resources/piejam_gui_resources.qrc")
 
@@ -35,5 +36,5 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
 )
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(piejam_gui Qt5::Quick Qt5::QuickControls2 fmt spdlog::spdlog)
+target_link_libraries(piejam_gui Qt5::Quick Qt5::QuickControls2 Qt5::VirtualKeyboard fmt spdlog::spdlog)
 target_compile_options(piejam_gui PRIVATE -Wall -Wextra -Werror -pedantic-errors)
