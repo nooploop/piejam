@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <piejam/algorithm/npos.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/boxed_string.h>
+#include <piejam/npos.h>
 
 #include <string>
 #include <variant>
@@ -41,7 +41,7 @@ struct channel
     channel_type type{};
 
     //! mono channels hold same device channel in the pair
-    channel_index_pair device_channels{algorithm::npos};
+    channel_index_pair device_channels{npos};
 };
 
 using channels = std::vector<channel>;

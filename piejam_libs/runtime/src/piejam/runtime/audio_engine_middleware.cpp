@@ -145,7 +145,7 @@ audio_engine_middleware::process_apply_app_config_action(
                 [&](auto const& d) {
                     return d.name == a.conf.input_device_name;
                 });
-        index != algorithm::npos)
+        index != npos)
     {
         prep_action.input = {
                 index,
@@ -161,7 +161,7 @@ audio_engine_middleware::process_apply_app_config_action(
                 [&](auto const& d) {
                     return d.name == a.conf.output_device_name;
                 });
-        index != algorithm::npos)
+        index != npos)
     {
         prep_action.output = {
                 index,
@@ -199,8 +199,7 @@ audio_engine_middleware::process_refresh_devices_action(
         auto const found_index = algorithm::index_of(
                 new_devices,
                 current_devices[current_index]);
-        auto const next_index =
-                found_index == algorithm::npos ? 0 : found_index;
+        auto const next_index = found_index == npos ? 0 : found_index;
         return {next_index, m_get_hw_params(new_devices[next_index])};
     };
 

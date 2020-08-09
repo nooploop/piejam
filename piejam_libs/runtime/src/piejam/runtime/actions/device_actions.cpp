@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/device_actions.h>
 
-#include <piejam/algorithm/npos.h>
+#include <piejam/npos.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
@@ -33,7 +33,7 @@ static void
 update_channel(std::size_t& cur_ch, std::size_t const num_chs)
 {
     if (cur_ch >= num_chs)
-        cur_ch = algorithm::npos;
+        cur_ch = npos;
 }
 
 auto
@@ -103,8 +103,8 @@ select_device::operator()(audio_state const& st) const -> audio_state
             auto& out = new_st.mixer_state.outputs.emplace_back();
             out.type = audio::bus_type::stereo;
             out.name = std::string("Main");
-            out.device_channels.left = num_channels > 0 ? 0 : algorithm::npos;
-            out.device_channels.right = num_channels > 1 ? 1 : algorithm::npos;
+            out.device_channels.left = num_channels > 0 ? 0 : npos;
+            out.device_channels.right = num_channels > 1 ? 1 : npos;
         }
     }
 
@@ -145,7 +145,7 @@ select_bus_channel::operator()(audio_state const& st) const -> audio_state
                              : new_st.mixer_state.outputs;
 
     assert(bus < channels.size());
-    assert(channel_index == algorithm::npos ||
+    assert(channel_index == npos ||
            channel_index < (direction == audio::bus_direction::input
                                     ? new_st.input.hw_params->num_channels
                                     : new_st.output.hw_params->num_channels));
