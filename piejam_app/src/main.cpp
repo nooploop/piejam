@@ -16,8 +16,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <piejam/app/config_access.h>
-#include <piejam/app/gui/model/AudioInputSettings.h>
-#include <piejam/app/gui/model/AudioOutputSettings.h>
+#include <piejam/app/gui/model/AudioInputOutputSettings.h>
 #include <piejam/app/gui/model/AudioSettings.h>
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/Mixer.h>

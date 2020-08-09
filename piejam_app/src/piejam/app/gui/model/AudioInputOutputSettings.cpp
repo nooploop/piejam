@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/app/gui/model/AudioInputSettings.h>
+#include <piejam/app/gui/model/AudioInputOutputSettings.h>
 
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/redux/store.h>
@@ -30,10 +30,12 @@
 namespace piejam::app::gui::model
 {
 
-AudioInputSettings::AudioInputSettings(
+AudioInputOutputSettings::AudioInputOutputSettings(
         store& app_store,
-        subscriber& state_change_subscriber)
+        subscriber& state_change_subscriber,
+        audio::bus_direction const settings_type)
     : m_store(app_store)
+    , m_settings_type(settings_type)
 {
     namespace selectors = runtime::audio_state_selectors;
 
@@ -43,7 +45,7 @@ AudioInputSettings::AudioInputSettings(
             subs_id,
             state_change_subscriber,
             selectors::make_num_device_channels_selector(
-                    audio::bus_direction::input),
+                    m_settings_type),
             [this](std::size_t const num_input_channels) {
                 QStringList channels;
                 channels.push_back("-");
@@ -56,7 +58,7 @@ AudioInputSettings::AudioInputSettings(
     m_subs.observe(
             subs_id,
             state_change_subscriber,
-            selectors::make_num_busses_selector(audio::bus_direction::input),
+            selectors::make_num_busses_selector(m_settings_type),
             [this, &state_change_subscriber, subs_id = get_next_sub_id()](
                     std::size_t const num_busses) {
                 m_subs.erase(subs_id);
@@ -70,7 +72,7 @@ AudioInputSettings::AudioInputSettings(
                             subs_id,
                             state_change_subscriber,
                             selectors::make_bus_name_selector(
-                                    audio::bus_direction::input,
+                                    m_settings_type,
                                     bus),
                             [this, bus](container::boxed_string name) {
                                 busConfig(bus).setName(
@@ -81,7 +83,7 @@ AudioInputSettings::AudioInputSettings(
                             subs_id,
                             state_change_subscriber,
                             selectors::make_bus_type_selector(
-                                    audio::bus_direction::input,
+                                    m_settings_type,
                                     bus),
                             [this, bus](audio::bus_type const t) {
                                 busConfig(bus).setMono(
@@ -92,7 +94,7 @@ AudioInputSettings::AudioInputSettings(
                             subs_id,
                             state_change_subscriber,
                             selectors::make_bus_channel_selector(
-                                    audio::bus_direction::input,
+                                    m_settings_type,
                                     bus,
                                     audio::bus_channel::mono),
                             [this, bus](std::size_t const ch) {
@@ -103,7 +105,7 @@ AudioInputSettings::AudioInputSettings(
                             subs_id,
                             state_change_subscriber,
                             selectors::make_bus_channel_selector(
-                                    audio::bus_direction::input,
+                                    m_settings_type,
                                     bus,
                                     audio::bus_channel::left),
                             [this, bus](std::size_t const ch) {
@@ -114,7 +116,7 @@ AudioInputSettings::AudioInputSettings(
                             subs_id,
                             state_change_subscriber,
                             selectors::make_bus_channel_selector(
-                                    audio::bus_direction::input,
+                                    m_settings_type,
                                     bus,
                                     audio::bus_channel::right),
                             [this, bus](std::size_t const ch) {
@@ -127,23 +129,23 @@ AudioInputSettings::AudioInputSettings(
 }
 
 void
-AudioInputSettings::setBusName(unsigned const bus, QString const& name)
+AudioInputOutputSettings::setBusName(unsigned const bus, QString const& name)
 {
     runtime::actions::set_bus_name action;
-    action.bus_direction = audio::bus_direction::input;
+    action.bus_direction = m_settings_type;
     action.bus = bus;
     action.name = name.toStdString();
     m_store.dispatch<runtime::actions::set_bus_name>(action);
 }
 
 void
-AudioInputSettings::selectChannel(
+AudioInputOutputSettings::selectChannel(
         audio::bus_channel const bc,
         unsigned const bus,
         unsigned const ch)
 {
     runtime::actions::select_bus_channel action;
-    action.direction = audio::bus_direction::input;
+    action.direction = m_settings_type;
     action.bus = bus;
     action.channel_selector = bc;
     action.channel_index = static_cast<std::size_t>(ch) - 1;
@@ -151,13 +153,13 @@ AudioInputSettings::selectChannel(
 }
 
 void
-AudioInputSettings::selectMonoChannel(unsigned const bus, unsigned const ch)
+AudioInputOutputSettings::selectMonoChannel(unsigned const bus, unsigned const ch)
 {
     selectChannel(audio::bus_channel::mono, bus, ch);
 }
 
 void
-AudioInputSettings::selectStereoLeftChannel(
+AudioInputOutputSettings::selectStereoLeftChannel(
         unsigned const bus,
         unsigned const ch)
 {
@@ -165,7 +167,7 @@ AudioInputSettings::selectStereoLeftChannel(
 }
 
 void
-AudioInputSettings::selectStereoRightChannel(
+AudioInputOutputSettings::selectStereoRightChannel(
         unsigned const bus,
         unsigned const ch)
 {
@@ -173,31 +175,31 @@ AudioInputSettings::selectStereoRightChannel(
 }
 
 void
-AudioInputSettings::addBus(audio::bus_type bus_type)
+AudioInputOutputSettings::addBus(audio::bus_type bus_type)
 {
     runtime::actions::add_device_bus action;
-    action.direction = audio::bus_direction::input;
+    action.direction = m_settings_type;
     action.type = bus_type;
     m_store.dispatch<runtime::actions::add_device_bus>(action);
 }
 
 void
-AudioInputSettings::addMonoBus()
+AudioInputOutputSettings::addMonoBus()
 {
     addBus(audio::bus_type::mono);
 }
 
 void
-AudioInputSettings::addStereoBus()
+AudioInputOutputSettings::addStereoBus()
 {
     addBus(audio::bus_type::stereo);
 }
 
 void
-AudioInputSettings::deleteBus(unsigned const bus)
+AudioInputOutputSettings::deleteBus(unsigned const bus)
 {
     runtime::actions::delete_device_bus action;
-    action.direction = audio::bus_direction::input;
+    action.direction = m_settings_type;
     action.bus = bus;
     m_store.dispatch<runtime::actions::delete_device_bus>(action);
 }

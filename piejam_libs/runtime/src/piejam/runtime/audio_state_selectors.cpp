@@ -196,7 +196,10 @@ make_bus_channel_selector(
                             });
 
                 case audio::bus_channel::mono:
-                    break;
+                    return selector<std::size_t>(
+                            [](audio_state const&) -> std::size_t {
+                                return npos;
+                            });
             }
     }
 
