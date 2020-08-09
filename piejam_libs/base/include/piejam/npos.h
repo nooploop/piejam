@@ -19,9 +19,9 @@
 
 #include <cstddef>
 
-namespace piejam::algorithm
+namespace piejam
 {
 
 inline constexpr std::size_t npos{static_cast<std::size_t>(-1)};
 
-} // namespace piejam::algorithm
+} // namespace piejam

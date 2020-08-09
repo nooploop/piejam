@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <piejam/algorithm/npos.h>
 #include <piejam/audio/level_meter.h>
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/smoother.h>
 #include <piejam/audio/types.h>
+#include <piejam/npos.h>
 
 #include <piejam/range/fwd.h>
 
@@ -64,7 +64,7 @@ private:
         std::atomic<float> gain{1.f};
         std::atomic<float> pan_balance{};
         pair<smoother<>> gain_smoother;
-        channel_index_pair device_channels{algorithm::npos};
+        channel_index_pair device_channels{npos};
     };
 
     struct mixer_state

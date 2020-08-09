@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/algorithm/npos.h>
+#include <piejam/npos.h>
 
 #include <cassert>
 #include <iterator>

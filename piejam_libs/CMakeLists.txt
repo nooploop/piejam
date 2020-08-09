@@ -1,5 +1,6 @@
 add_subdirectory(algorithm)
 add_subdirectory(audio)
+add_subdirectory(base)
 add_subdirectory(container)
 add_subdirectory(functional)
 add_subdirectory(gui)

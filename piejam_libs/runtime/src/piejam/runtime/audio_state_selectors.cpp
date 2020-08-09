@@ -17,9 +17,9 @@
 
 #include <piejam/runtime/audio_state_selectors.h>
 
-#include <piejam/algorithm/npos.h>
 #include <piejam/container/boxify_result.h>
 #include <piejam/functional/memo.h>
+#include <piejam/npos.h>
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/audio_state.h>
 
