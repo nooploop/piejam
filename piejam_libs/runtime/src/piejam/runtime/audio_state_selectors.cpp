@@ -116,13 +116,35 @@ make_bus_channel_selector(
         std::size_t const bus,
         audio::bus_channel const bc) -> selector<std::size_t>
 {
+
     if (bd == audio::bus_direction::input)
     {
-        return selector<std::size_t>(
-                [bus](audio_state const& st) -> std::size_t {
-                    assert(bus < st.mixer_state.inputs.size());
-                    return st.mixer_state.inputs[bus].device_channels.left;
-                });
+        switch (bc)
+        {
+            case audio::bus_channel::mono:
+                return selector<std::size_t>(
+                        [bus](audio_state const& st) -> std::size_t {
+                            assert(bus < st.mixer_state.inputs.size());
+                            return st.mixer_state.inputs[bus]
+                                    .device_channels.left;
+                        });
+
+            case audio::bus_channel::left:
+                return selector<std::size_t>(
+                        [bus](audio_state const& st) -> std::size_t {
+                            assert(bus < st.mixer_state.inputs.size());
+                            return st.mixer_state.inputs[bus]
+                                    .device_channels.left;
+                        });
+
+            case audio::bus_channel::right:
+                return selector<std::size_t>(
+                        [bus](audio_state const& st) -> std::size_t {
+                            assert(bus < st.mixer_state.inputs.size());
+                            return st.mixer_state.inputs[bus]
+                                    .device_channels.right;
+                        });
+        }
     }
     else
     {
@@ -145,10 +167,12 @@ make_bus_channel_selector(
                                     .device_channels.right;
                         });
 
-            default:
-                throw;
+            case audio::bus_channel::mono:
+                break;
         }
     }
+
+    throw;
 }
 
 auto

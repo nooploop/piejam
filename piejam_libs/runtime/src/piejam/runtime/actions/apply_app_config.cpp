@@ -44,6 +44,7 @@ apply_app_config::operator()(audio_state const& st) const -> audio_state
                     bus.type = bus_conf.bus_type;
                     bus.device_channels = bus_conf.channels;
                     update_channel(bus.device_channels.left, num_ch);
+                    update_channel(bus.device_channels.right, num_ch);
                 }
             };
 
