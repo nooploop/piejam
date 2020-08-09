@@ -77,6 +77,8 @@ TopPane {
             width: 760
             height: 318
 
+            clip: true
+
             model: root.model.logData
 
             delegate: Label {
