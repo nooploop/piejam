@@ -37,47 +37,48 @@ Item {
     width: 142
     height: 400
 
-    Label {
-        id: title
+    Frame {
 
-        height: 18
-        anchors.rightMargin: 4
-        anchors.leftMargin: 4
-        anchors.top: parent.top
-        padding: 2
-        verticalAlignment: Text.AlignVCenter
-        background: Rectangle {
-            color: Material.primaryColor
-            radius: 2
+        anchors.fill: parent
+
+        Label {
+            id: title
+
+            height: 18
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.left: parent.left
+            padding: 2
+            verticalAlignment: Text.AlignVCenter
+            background: Rectangle {
+                color: Material.primaryColor
+                radius: 2
+            }
+            font.bold: true
+            font.pixelSize: 12
         }
-        font.bold: true
-        anchors.right: parent.right
-        anchors.left: parent.left
-        font.pixelSize: 12
+
+        BipolarSlider {
+            id: panControls
+
+            height: 40
+            anchors.right: parent.right
+            anchors.left: parent.left
+            anchors.top: title.bottom
+
+            onMoved: root.panMoved(panControls.value)
+        }
+
+        LevelMeterFader {
+            id: levelMeterFader
+
+            anchors.right: parent.right
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.top: panControls.bottom
+
+            onFaderMoved: root.faderMoved(newGain)
+        }
+
     }
-
-    BipolarSlider {
-        id: panControls
-
-        height: 40
-        anchors.rightMargin: 6
-        anchors.leftMargin: 6
-        anchors.right: parent.right
-        anchors.left: parent.left
-        anchors.top: title.bottom
-
-        onMoved: root.panMoved(panControls.value)
-    }
-
-    LevelMeterFader {
-        id: levelMeterFader
-
-        anchors.right: parent.right
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        anchors.top: panControls.bottom
-
-        onFaderMoved: root.faderMoved(newGain)
-    }
-
 }
