@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/audio/pair.h>
+#include <piejam/math.h>
 
 #include <boost/math/constants/constants.hpp>
 
@@ -64,15 +65,13 @@ sinusoidal_constant_power_pan(float pan_pos) -> stereo_gain
 inline constexpr auto
 stereo_balance(float balance_pos) -> stereo_gain
 {
-    constexpr auto pow3 = [](auto x) { return x * x * x; };
-
     if (balance_pos < 0.f)
     {
-        return stereo_gain{1.f, pow3(1 + balance_pos)};
+        return stereo_gain{1.f, math::pow3(1 + balance_pos)};
     }
     else if (balance_pos > 0.f)
     {
-        return stereo_gain{pow3(1 - balance_pos), 1.f};
+        return stereo_gain{math::pow3(1 - balance_pos), 1.f};
     }
     else
     {
