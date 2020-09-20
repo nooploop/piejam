@@ -38,15 +38,26 @@ class AudioInputOutputSettings : public QObject
                        busConfigsChanged FINAL)
 
 public:
+    Q_INVOKABLE virtual void subscribe() = 0;
+    Q_INVOKABLE virtual void unsubscribe() = 0;
+
     auto channels() -> QStringList { return m_channels; }
     void setChannels(QStringList const& channels);
 
     auto busConfigs() -> QQmlListProperty<BusConfig>;
+
+    auto numBusConfigs() const noexcept -> std::size_t
+    {
+        return m_busConfigs.size();
+    }
+
     auto busConfig(std::size_t index) noexcept -> BusConfig&
     {
-        return m_busConfigs[index];
+        return *m_busConfigs[index];
     }
-    void setBusConfigs(std::vector<BusConfig>);
+
+    void addBusConfig(std::unique_ptr<BusConfig>);
+    void removeBusConfig();
 
     Q_INVOKABLE virtual void setBusName(unsigned name, QString const&) = 0;
     Q_INVOKABLE virtual void selectMonoChannel(unsigned bus, unsigned ch) = 0;
@@ -65,7 +76,7 @@ signals:
 
 private:
     QStringList m_channels;
-    std::vector<BusConfig> m_busConfigs;
+    std::vector<std::unique_ptr<BusConfig>> m_busConfigs;
 };
 
 } // namespace piejam::gui::model

@@ -17,10 +17,11 @@
 
 #include <piejam/app/gui/model/AudioInputOutputSettings.h>
 
-#include <piejam/gui/model/BusConfig.h>
+#include <piejam/app/gui/model/BusConfig.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/device_actions.h>
+#include <piejam/runtime/actions/renotify.h>
 #include <piejam/runtime/actions/set_bus_name.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/audio_state_selectors.h>
@@ -35,17 +36,23 @@ AudioInputOutputSettings::AudioInputOutputSettings(
         subscriber& state_change_subscriber,
         audio::bus_direction const settings_type)
     : m_store(app_store)
+    , m_state_change_subscriber(state_change_subscriber)
     , m_settings_type(settings_type)
 {
+}
+
+void
+AudioInputOutputSettings::subscribe()
+{
+    if (m_subscribed)
+        return;
+
     namespace selectors = runtime::audio_state_selectors;
 
-    auto const subs_id = get_next_sub_id();
-
     m_subs.observe(
-            subs_id,
-            state_change_subscriber,
-            selectors::make_num_device_channels_selector(
-                    m_settings_type),
+            m_subs_id,
+            m_state_change_subscriber,
+            selectors::make_num_device_channels_selector(m_settings_type),
             [this](std::size_t const num_input_channels) {
                 QStringList channels;
                 channels.push_back("-");
@@ -56,76 +63,69 @@ AudioInputOutputSettings::AudioInputOutputSettings(
             });
 
     m_subs.observe(
-            subs_id,
-            state_change_subscriber,
+            m_subs_id,
+            m_state_change_subscriber,
             selectors::make_num_busses_selector(m_settings_type),
-            [this, &state_change_subscriber, subs_id = get_next_sub_id()](
-                    std::size_t const num_busses) {
-                m_subs.erase(subs_id);
+            [this](std::size_t const num_busses) {
+                bool const emitSignal = num_busses != numBusConfigs();
 
-                std::vector<piejam::gui::model::BusConfig> busConfigs(
-                        num_busses);
-
-                for (std::size_t bus = 0; bus < num_busses; ++bus)
+                while (num_busses > numBusConfigs())
                 {
-                    m_subs.observe(
-                            subs_id,
-                            state_change_subscriber,
-                            selectors::make_bus_name_selector(
-                                    m_settings_type,
-                                    bus),
-                            [this, bus](container::boxed_string name) {
-                                busConfig(bus).setName(
-                                        QString::fromStdString(*name));
-                            });
+                    auto const bus = numBusConfigs();
+                    addBusConfig(std::make_unique<BusConfig>(
+                            m_state_change_subscriber,
+                            BusConfigSelectors{
+                                    selectors::make_bus_name_selector(
+                                            m_settings_type,
+                                            bus),
+                                    selectors::make_bus_type_selector(
+                                            m_settings_type,
+                                            bus),
+                                    selectors::make_bus_channel_selector(
+                                            m_settings_type,
+                                            bus,
+                                            audio::bus_channel::mono),
+                                    selectors::make_bus_channel_selector(
+                                            m_settings_type,
+                                            bus,
+                                            audio::bus_channel::left),
+                                    selectors::make_bus_channel_selector(
+                                            m_settings_type,
+                                            bus,
+                                            audio::bus_channel::right)}));
 
-                    m_subs.observe(
-                            subs_id,
-                            state_change_subscriber,
-                            selectors::make_bus_type_selector(
-                                    m_settings_type,
-                                    bus),
-                            [this, bus](audio::bus_type const t) {
-                                busConfig(bus).setMono(
-                                        t == audio::bus_type::mono);
-                            });
-
-                    m_subs.observe(
-                            subs_id,
-                            state_change_subscriber,
-                            selectors::make_bus_channel_selector(
-                                    m_settings_type,
-                                    bus,
-                                    audio::bus_channel::mono),
-                            [this, bus](std::size_t const ch) {
-                                busConfig(bus).setMonoChannel(ch + 1);
-                            });
-
-                    m_subs.observe(
-                            subs_id,
-                            state_change_subscriber,
-                            selectors::make_bus_channel_selector(
-                                    m_settings_type,
-                                    bus,
-                                    audio::bus_channel::left),
-                            [this, bus](std::size_t const ch) {
-                                busConfig(bus).setStereoLeftChannel(ch + 1);
-                            });
-
-                    m_subs.observe(
-                            subs_id,
-                            state_change_subscriber,
-                            selectors::make_bus_channel_selector(
-                                    m_settings_type,
-                                    bus,
-                                    audio::bus_channel::right),
-                            [this, bus](std::size_t const ch) {
-                                busConfig(bus).setStereoRightChannel(ch + 1);
-                            });
+                    busConfig(bus).subscribe();
                 }
 
-                setBusConfigs(std::move(busConfigs));
+                while (num_busses < numBusConfigs())
+                {
+                    removeBusConfig();
+                }
+
+                if (emitSignal)
+                {
+                    emit busConfigsChanged();
+                    m_store.dispatch<runtime::actions::renotify>();
+                }
             });
+
+    for (std::size_t bus = 0; bus < numBusConfigs(); ++bus)
+        busConfig(bus).subscribe();
+
+    m_subscribed = true;
+}
+
+void
+AudioInputOutputSettings::unsubscribe()
+{
+    if (!m_subscribed)
+        return;
+
+    m_subs.erase(m_subs_id);
+    for (std::size_t bus = 0; bus < numBusConfigs(); ++bus)
+        busConfig(bus).unsubscribe();
+
+    m_subscribed = false;
 }
 
 void
@@ -153,7 +153,9 @@ AudioInputOutputSettings::selectChannel(
 }
 
 void
-AudioInputOutputSettings::selectMonoChannel(unsigned const bus, unsigned const ch)
+AudioInputOutputSettings::selectMonoChannel(
+        unsigned const bus,
+        unsigned const ch)
 {
     selectChannel(audio::bus_channel::mono, bus, ch);
 }

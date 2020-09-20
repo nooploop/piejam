@@ -33,6 +33,9 @@ protected:
     AudioInputOutputSettings(store&, subscriber&, audio::bus_direction);
 
 public:
+    void subscribe() override;
+    void unsubscribe() override;
+
     void setBusName(unsigned bus, QString const& name) override;
     void selectMonoChannel(unsigned bus, unsigned ch) override;
     void selectStereoLeftChannel(unsigned bus, unsigned ch) override;
@@ -46,7 +49,10 @@ private:
     void addBus(audio::bus_type);
 
     store& m_store;
+    subscriber& m_state_change_subscriber;
     subscriptions_manager m_subs;
+    bool m_subscribed{};
+    subscription_id const m_subs_id{get_next_sub_id()};
     audio::bus_direction m_settings_type;
 };
 
@@ -55,7 +61,8 @@ class AudioInputSettings final : public AudioInputOutputSettings
 public:
     AudioInputSettings(store& st, subscriber& subs)
         : AudioInputOutputSettings(st, subs, audio::bus_direction::input)
-    {}
+    {
+    }
 };
 
 class AudioOutputSettings final : public AudioInputOutputSettings
@@ -63,7 +70,8 @@ class AudioOutputSettings final : public AudioInputOutputSettings
 public:
     AudioOutputSettings(store& st, subscriber& subs)
         : AudioInputOutputSettings(st, subs, audio::bus_direction::output)
-    {}
+    {
+    }
 };
 
 } // namespace piejam::app::gui::model

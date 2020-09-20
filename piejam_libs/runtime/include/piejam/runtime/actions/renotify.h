@@ -17,26 +17,15 @@
 
 #pragma once
 
-#include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/action.h>
 
-#include <functional>
-
-namespace piejam::app
+namespace piejam::runtime::actions
 {
 
-using subscriber = reselect::subscriber<runtime::audio_state>;
-
-using subscription_id = std::size_t;
-using subscriptions_manager = reselect::subscriptions_manager<subscription_id>;
-
-inline auto
-get_next_sub_id() -> subscription_id
+struct renotify : action
 {
-    static subscription_id s_id{};
-    return s_id++;
-}
+    auto operator()(audio_state const&) const -> audio_state override;
+};
 
-using renotify_action = std::function<void()>;
-
-} // namespace piejam::app
+} // namespace piejam::runtime::actions

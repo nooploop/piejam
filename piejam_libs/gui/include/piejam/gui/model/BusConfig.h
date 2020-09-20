@@ -22,7 +22,7 @@
 namespace piejam::gui::model
 {
 
-class BusConfig final : public QObject
+class BusConfig : public QObject
 {
     Q_OBJECT
 
@@ -36,6 +36,9 @@ class BusConfig final : public QObject
 
 public:
     BusConfig(QObject* parent = nullptr);
+
+    virtual void subscribe() = 0;
+    virtual void unsubscribe() = 0;
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const&);

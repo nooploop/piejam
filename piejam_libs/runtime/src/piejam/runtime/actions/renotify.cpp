@@ -15,28 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/renotify.h>
 
-#include <piejam/reselect/fwd.h>
-#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/audio_state.h>
 
-#include <functional>
-
-namespace piejam::app
+namespace piejam::runtime::actions
 {
 
-using subscriber = reselect::subscriber<runtime::audio_state>;
-
-using subscription_id = std::size_t;
-using subscriptions_manager = reselect::subscriptions_manager<subscription_id>;
-
-inline auto
-get_next_sub_id() -> subscription_id
+auto
+renotify::operator()(audio_state const& st) const -> audio_state
 {
-    static subscription_id s_id{};
-    return s_id++;
+    return st;
 }
 
-using renotify_action = std::function<void()>;
-
-} // namespace piejam::app
+} // namespace piejam::runtime::actions
