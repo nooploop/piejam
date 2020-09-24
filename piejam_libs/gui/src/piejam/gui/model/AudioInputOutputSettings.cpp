@@ -33,41 +33,4 @@ AudioInputOutputSettings::setChannels(QStringList const& channels)
     }
 }
 
-auto
-AudioInputOutputSettings::busConfigs() -> QQmlListProperty<BusConfig>
-{
-    return QQmlListProperty<BusConfig>(
-            this,
-            nullptr,
-            [](QQmlListProperty<BusConfig>* property) -> int {
-                AudioInputOutputSettings* const settings =
-                        qobject_cast<AudioInputOutputSettings*>(
-                                property->object);
-                assert(settings);
-                return static_cast<int>(settings->m_busConfigs.size());
-            },
-            [](QQmlListProperty<BusConfig>* property, int index) -> BusConfig* {
-                AudioInputOutputSettings* const settings =
-                        qobject_cast<AudioInputOutputSettings*>(
-                                property->object);
-                assert(settings);
-                return settings->m_busConfigs[static_cast<std::size_t>(index)]
-                        .get();
-            });
-}
-
-void
-AudioInputOutputSettings::addBusConfig(std::unique_ptr<BusConfig> busConfig)
-{
-    m_busConfigs.push_back(std::move(busConfig));
-}
-
-void
-AudioInputOutputSettings::removeBusConfig()
-{
-    assert(!m_busConfigs.empty());
-    m_busConfigs.erase(
-            std::next(m_busConfigs.begin(), m_busConfigs.size() - 1));
-}
-
 } // namespace piejam::gui::model

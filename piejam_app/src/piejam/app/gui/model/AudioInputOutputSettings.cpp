@@ -69,37 +69,38 @@ AudioInputOutputSettings::subscribe()
             [this](std::size_t const num_busses) {
                 bool const emitSignal = num_busses != numBusConfigs();
 
-                while (num_busses > numBusConfigs())
+                if (num_busses > numBusConfigs())
                 {
-                    auto const bus = numBusConfigs();
-                    addBusConfig(std::make_unique<BusConfig>(
-                            m_state_change_subscriber,
-                            BusConfigSelectors{
-                                    selectors::make_bus_name_selector(
-                                            m_settings_type,
-                                            bus),
-                                    selectors::make_bus_type_selector(
-                                            m_settings_type,
-                                            bus),
-                                    selectors::make_bus_channel_selector(
-                                            m_settings_type,
-                                            bus,
-                                            audio::bus_channel::mono),
-                                    selectors::make_bus_channel_selector(
-                                            m_settings_type,
-                                            bus,
-                                            audio::bus_channel::left),
-                                    selectors::make_bus_channel_selector(
-                                            m_settings_type,
-                                            bus,
-                                            audio::bus_channel::right)}));
-
-                    busConfig(bus).subscribe();
+                    while (num_busses > numBusConfigs())
+                    {
+                        auto const bus = numBusConfigs();
+                        busConfigs()->addBusConfig(std::make_unique<BusConfig>(
+                                m_state_change_subscriber,
+                                BusConfigSelectors{
+                                        selectors::make_bus_name_selector(
+                                                m_settings_type,
+                                                bus),
+                                        selectors::make_bus_type_selector(
+                                                m_settings_type,
+                                                bus),
+                                        selectors::make_bus_channel_selector(
+                                                m_settings_type,
+                                                bus,
+                                                audio::bus_channel::mono),
+                                        selectors::make_bus_channel_selector(
+                                                m_settings_type,
+                                                bus,
+                                                audio::bus_channel::left),
+                                        selectors::make_bus_channel_selector(
+                                                m_settings_type,
+                                                bus,
+                                                audio::bus_channel::right)}));
+                    }
                 }
 
                 while (num_busses < numBusConfigs())
                 {
-                    removeBusConfig();
+                    busConfigs()->removeBusConfig();
                 }
 
                 if (emitSignal)

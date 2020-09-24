@@ -45,12 +45,12 @@ Item {
 
         delegate: BusConfig {
             height: 64
-            name: modelData.name
-            mono: modelData.mono
+            name: model.item.name
+            mono: model.item.mono
             channels: root.model.channels
-            monoChannelIndex: modelData.monoChannel
-            stereoLeftChannelIndex: modelData.stereoLeftChannel
-            stereoRightChannelIndex: modelData.stereoRightChannel
+            monoChannelIndex: model.item.monoChannel
+            stereoLeftChannelIndex: model.item.stereoLeftChannel
+            stereoRightChannelIndex: model.item.stereoRightChannel
 
             anchors.left: parent.left
             anchors.right: parent.right
@@ -60,9 +60,6 @@ Item {
             onStereoRightChannelSelected: root.model.selectStereoRightChannel(index, ch)
             onDeleteConfigClicked: root.model.deleteBus(index)
             onNameEdited: root.model.setBusName(index, name)
-
-            onVisibleChanged: modelData.subscribed = visible
-            Component.onCompleted: modelData.subscribed = visible
         }
     }
 
