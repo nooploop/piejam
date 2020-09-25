@@ -17,21 +17,20 @@
 
 #pragma once
 
+#include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/app/store.h>
-#include <piejam/app/subscriber.h>
 #include <piejam/gui/model/AudioDeviceSettings.h>
-#include <piejam/reselect/subscriptions_manager.h>
 
 namespace piejam::app::gui::model
 {
 
-class AudioDeviceSettings final : public piejam::gui::model::AudioSettings
+class AudioDeviceSettings final
+    : public Subscribable<piejam::gui::model::AudioSettings>
 {
 public:
-    AudioDeviceSettings(store&, subscriber&);
+    using base_t = Subscribable<piejam::gui::model::AudioSettings>;
 
-    void subscribe() override;
-    void unsubscribe() override;
+    AudioDeviceSettings(store&, subscriber&);
 
     virtual void refreshDeviceLists() override;
     virtual void selectInputDevice(unsigned index) override;
@@ -40,11 +39,9 @@ public:
     virtual void selectPeriodSize(unsigned index) override;
 
 private:
+    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
+            override;
     store& m_store;
-    subscriber& m_state_change_subscriber;
-    subscriptions_manager m_subs;
-    bool m_subscribed{};
-    subscription_id const m_subs_id{get_next_sub_id()};
 };
 
 } // namespace piejam::app::gui::model
