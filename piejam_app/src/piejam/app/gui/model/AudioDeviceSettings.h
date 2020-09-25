@@ -30,6 +30,9 @@ class AudioDeviceSettings final : public piejam::gui::model::AudioSettings
 public:
     AudioDeviceSettings(store&, subscriber&);
 
+    void subscribe() override;
+    void unsubscribe() override;
+
     virtual void refreshDeviceLists() override;
     virtual void selectInputDevice(unsigned index) override;
     virtual void selectOutputDevice(unsigned index) override;
@@ -38,7 +41,10 @@ public:
 
 private:
     store& m_store;
+    subscriber& m_state_change_subscriber;
     subscriptions_manager m_subs;
+    bool m_subscribed{};
+    subscription_id const m_subs_id{get_next_sub_id()};
 };
 
 } // namespace piejam::app::gui::model

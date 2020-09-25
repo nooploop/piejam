@@ -52,8 +52,8 @@ Item {
             stereoLeftChannelIndex: model.item.stereoLeftChannel
             stereoRightChannelIndex: model.item.stereoRightChannel
 
-            anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.left: if (parent) parent.left
+            anchors.right: if (parent) parent.right
 
             onMonoChannelSelected: root.model.selectMonoChannel(index, ch)
             onStereoLeftChannelSelected: root.model.selectStereoLeftChannel(index, ch)

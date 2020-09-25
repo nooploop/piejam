@@ -61,14 +61,21 @@ AudioDeviceSettings::AudioDeviceSettings(
         store& app_store,
         subscriber& state_change_subscriber)
     : m_store(app_store)
+    , m_state_change_subscriber(state_change_subscriber)
 {
+}
+
+void
+AudioDeviceSettings::subscribe()
+{
+    if (m_subscribed)
+        return;
+
     namespace selectors = runtime::audio_state_selectors;
 
-    auto const subs_id = get_next_sub_id();
-
     m_subs.observe(
-            subs_id,
-            state_change_subscriber,
+            m_subs_id,
+            m_state_change_subscriber,
             selectors::select_input_devices,
             [this](selectors::input_devices const& input_devices) {
                 inputDevices()->setElements(
@@ -78,8 +85,8 @@ AudioDeviceSettings::AudioDeviceSettings(
             });
 
     m_subs.observe(
-            subs_id,
-            state_change_subscriber,
+            m_subs_id,
+            m_state_change_subscriber,
             selectors::select_output_devices,
             [this](selectors::output_devices const& output_devices) {
                 outputDevices()->setElements(
@@ -89,8 +96,8 @@ AudioDeviceSettings::AudioDeviceSettings(
             });
 
     m_subs.observe(
-            subs_id,
-            state_change_subscriber,
+            m_subs_id,
+            m_state_change_subscriber,
             selectors::select_samplerate,
             [this](selectors::samplerate const& samplerate) {
                 auto const index = algorithm::index_of(
@@ -102,8 +109,8 @@ AudioDeviceSettings::AudioDeviceSettings(
             });
 
     m_subs.observe(
-            subs_id,
-            state_change_subscriber,
+            m_subs_id,
+            m_state_change_subscriber,
             selectors::select_period_size,
             [this](selectors::period_size const& period_size) {
                 auto const index = algorithm::index_of(
@@ -113,6 +120,19 @@ AudioDeviceSettings::AudioDeviceSettings(
                 periodSizes()->setElements(to_QStringList(*period_size.first));
                 periodSizes()->setFocused(static_cast<int>(index));
             });
+
+    m_subscribed = true;
+}
+
+void
+AudioDeviceSettings::unsubscribe()
+{
+    if (!m_subscribed)
+        return;
+
+    m_subs.erase(m_subs_id);
+
+    m_subscribed = false;
 }
 
 void
