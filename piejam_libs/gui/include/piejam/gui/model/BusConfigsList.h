@@ -35,12 +35,6 @@ public:
     BusConfigsList(QObject* parent = nullptr);
     ~BusConfigsList();
 
-    auto at(std::size_t index) -> BusConfig& { return *m_list[index]; }
-    auto at(std::size_t index) const -> BusConfig const&
-    {
-        return *m_list[index];
-    }
-
     auto rowCount(const QModelIndex& parent = QModelIndex()) const
             -> int override;
     auto data(const QModelIndex& index, int role = Qt::DisplayRole) const

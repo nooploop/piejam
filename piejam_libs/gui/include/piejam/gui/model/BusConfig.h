@@ -37,8 +37,8 @@ class BusConfig : public QObject
 public:
     BusConfig(QObject* parent = nullptr);
 
-    virtual void subscribe() = 0;
-    virtual void unsubscribe() = 0;
+    Q_INVOKABLE virtual void subscribe() = 0;
+    Q_INVOKABLE virtual void unsubscribe() = 0;
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const&);

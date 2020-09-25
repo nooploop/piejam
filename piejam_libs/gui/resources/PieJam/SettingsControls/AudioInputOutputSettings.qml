@@ -60,6 +60,9 @@ Item {
             onStereoRightChannelSelected: root.model.selectStereoRightChannel(index, ch)
             onDeleteConfigClicked: root.model.deleteBus(index)
             onNameEdited: root.model.setBusName(index, name)
+
+            Component.onCompleted: visible ? model.item.subscribe() : model.item.unsubscribe()
+            onVisibleChanged: visible ? model.item.subscribe() : model.item.unsubscribe()
         }
     }
 

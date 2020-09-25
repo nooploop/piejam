@@ -52,11 +52,6 @@ public:
         return m_busConfigs.rowCount();
     }
 
-    auto busConfig(std::size_t index) noexcept -> BusConfig&
-    {
-        return m_busConfigs.at(index);
-    }
-
     Q_INVOKABLE virtual void setBusName(unsigned name, QString const&) = 0;
     Q_INVOKABLE virtual void selectMonoChannel(unsigned bus, unsigned ch) = 0;
     Q_INVOKABLE virtual void
