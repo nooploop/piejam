@@ -35,23 +35,23 @@ AudioInputOutputSettings::AudioInputOutputSettings(
         store& app_store,
         subscriber& state_change_subscriber,
         audio::bus_direction const settings_type)
-    : m_store(app_store)
-    , m_state_change_subscriber(state_change_subscriber)
+    : base_t(state_change_subscriber)
+    , m_store(app_store)
     , m_settings_type(settings_type)
 {
 }
 
 void
-AudioInputOutputSettings::subscribe()
+AudioInputOutputSettings::subscribeStep(
+        subscriber& state_change_subscriber,
+        subscriptions_manager& subs,
+        subscription_id subs_id)
 {
-    if (m_subscribed)
-        return;
-
     namespace selectors = runtime::audio_state_selectors;
 
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             selectors::make_num_device_channels_selector(m_settings_type),
             [this](std::size_t const num_input_channels) {
                 QStringList channels;
@@ -62,18 +62,18 @@ AudioInputOutputSettings::subscribe()
                 setChannels(channels);
             });
 
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             selectors::make_num_busses_selector(m_settings_type),
-            [this](std::size_t const num_busses) {
+            [this, &state_change_subscriber](std::size_t const num_busses) {
                 if (num_busses > numBusConfigs())
                 {
                     while (num_busses > numBusConfigs())
                     {
                         auto const bus = numBusConfigs();
                         busConfigs()->addBusConfig(std::make_unique<BusConfig>(
-                                m_state_change_subscriber,
+                                state_change_subscriber,
                                 BusConfigSelectors{
                                         selectors::make_bus_name_selector(
                                                 m_settings_type,
@@ -101,24 +101,6 @@ AudioInputOutputSettings::subscribe()
                     busConfigs()->removeBusConfig();
                 }
             });
-
-    for (std::size_t bus = 0; bus < numBusConfigs(); ++bus)
-        busConfig(bus).subscribe();
-
-    m_subscribed = true;
-}
-
-void
-AudioInputOutputSettings::unsubscribe()
-{
-    if (!m_subscribed)
-        return;
-
-    m_subs.erase(m_subs_id);
-    for (std::size_t bus = 0; bus < numBusConfigs(); ++bus)
-        busConfig(bus).unsubscribe();
-
-    m_subscribed = false;
 }
 
 void

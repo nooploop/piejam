@@ -17,25 +17,24 @@
 
 #pragma once
 
+#include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/app/store.h>
 #include <piejam/app/subscriber.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
-#include <piejam/reselect/subscriptions_manager.h>
 
 namespace piejam::app::gui::model
 {
 
 class AudioInputOutputSettings
-    : public piejam::gui::model::AudioInputOutputSettings
+    : public Subscribable<piejam::gui::model::AudioInputOutputSettings>
 {
+    using base_t = Subscribable<piejam::gui::model::AudioInputOutputSettings>;
+
 protected:
     AudioInputOutputSettings(store&, subscriber&, audio::bus_direction);
 
 public:
-    void subscribe() override;
-    void unsubscribe() override;
-
     void setBusName(unsigned bus, QString const& name) override;
     void selectMonoChannel(unsigned bus, unsigned ch) override;
     void selectStereoLeftChannel(unsigned bus, unsigned ch) override;
@@ -45,14 +44,13 @@ public:
     void deleteBus(unsigned bus) override;
 
 private:
+    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
+            override;
+
     void selectChannel(audio::bus_channel, unsigned bus, unsigned ch);
     void addBus(audio::bus_type);
 
     store& m_store;
-    subscriber& m_state_change_subscriber;
-    subscriptions_manager m_subs;
-    bool m_subscribed{};
-    subscription_id const m_subs_id{get_next_sub_id()};
     audio::bus_direction m_settings_type;
 };
 
