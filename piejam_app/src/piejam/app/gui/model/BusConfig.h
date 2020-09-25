@@ -17,39 +17,37 @@
 
 #pragma once
 
+#include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/app/store.h>
 #include <piejam/app/subscriber.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/boxed_string.h>
 #include <piejam/gui/model/BusConfig.h>
-#include <piejam/reselect/subscriptions_manager.h>
 
 namespace piejam::app::gui::model
 {
 
 struct BusConfigSelectors
 {
-    reselect::selector<container::boxed_string, runtime::audio_state> name;
-    reselect::selector<audio::bus_type, runtime::audio_state> bus_type;
-    reselect::selector<std::size_t, runtime::audio_state> mono_channel;
-    reselect::selector<std::size_t, runtime::audio_state> stereo_left_channel;
-    reselect::selector<std::size_t, runtime::audio_state> stereo_right_channel;
+    selector<container::boxed_string> name;
+    selector<audio::bus_type> bus_type;
+    selector<std::size_t> mono_channel;
+    selector<std::size_t> stereo_left_channel;
+    selector<std::size_t> stereo_right_channel;
 };
 
-class BusConfig final : public piejam::gui::model::BusConfig
+class BusConfig final : public Subscribable<piejam::gui::model::BusConfig>
 {
+    using base_t = Subscribable<piejam::gui::model::BusConfig>;
+
 public:
     BusConfig(subscriber&, BusConfigSelectors);
 
-    void subscribe() override;
-    void unsubscribe() override;
-
 private:
-    subscriber& m_state_change_subscriber;
+    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
+            override;
+
     BusConfigSelectors m_selectors;
-    bool m_subscribed{};
-    subscription_id const m_subs_id{get_next_sub_id()};
-    subscriptions_manager m_subs;
 };
 
 } // namespace piejam::app::gui::model

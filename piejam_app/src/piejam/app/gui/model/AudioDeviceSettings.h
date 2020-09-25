@@ -27,9 +27,9 @@ namespace piejam::app::gui::model
 class AudioDeviceSettings final
     : public Subscribable<piejam::gui::model::AudioSettings>
 {
-public:
     using base_t = Subscribable<piejam::gui::model::AudioSettings>;
 
+public:
     AudioDeviceSettings(store&, subscriber&);
 
     virtual void refreshDeviceLists() override;

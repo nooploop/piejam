@@ -23,62 +23,50 @@ namespace piejam::app::gui::model
 BusConfig::BusConfig(
         subscriber& state_change_subscriber,
         BusConfigSelectors selectors)
-    : m_state_change_subscriber(state_change_subscriber)
+    : base_t(state_change_subscriber)
     , m_selectors(std::move(selectors))
 {
 }
 
 void
-BusConfig::subscribe()
+BusConfig::subscribeStep(
+        subscriber& state_change_subscriber,
+        subscriptions_manager& subs,
+        subscription_id subs_id)
 {
-    if (m_subscribed)
-        return;
-
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             m_selectors.name,
             [this](container::boxed_string name) {
                 setName(QString::fromStdString(*name));
             });
 
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             m_selectors.bus_type,
             [this](audio::bus_type const t) {
                 setMono(t == audio::bus_type::mono);
             });
 
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             m_selectors.mono_channel,
             [this](std::size_t const ch) { setMonoChannel(ch + 1); });
 
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             m_selectors.stereo_left_channel,
             [this](std::size_t const ch) { setStereoLeftChannel(ch + 1); });
 
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             m_selectors.stereo_right_channel,
             [this](std::size_t const ch) { setStereoRightChannel(ch + 1); });
-
-    m_subscribed = true;
-}
-
-void
-BusConfig::unsubscribe()
-{
-    if (!m_subscribed)
-        return;
-
-    m_subs.erase(m_subs_id);
-    m_subscribed = false;
 }
 
 } // namespace piejam::app::gui::model

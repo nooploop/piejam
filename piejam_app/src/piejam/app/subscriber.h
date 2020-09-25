@@ -27,6 +27,9 @@ namespace piejam::app
 
 using subscriber = reselect::subscriber<runtime::audio_state>;
 
+template <class Value>
+using selector = reselect::selector<Value, runtime::audio_state>;
+
 using subscription_id = std::size_t;
 using subscriptions_manager = reselect::subscriptions_manager<subscription_id>;
 
