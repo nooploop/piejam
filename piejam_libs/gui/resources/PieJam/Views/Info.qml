@@ -106,4 +106,7 @@ TopPane {
         repeat: true
         onTriggered: root.model.requestUpdate()
     }
+
+    Component.onCompleted: root.visible ? root.model.subscribe() : root.model.unsubscribe()
+    onVisibleChanged: root.visible ? root.model.subscribe() : root.model.unsubscribe()
 }

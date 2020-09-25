@@ -36,6 +36,9 @@ class Info : public QObject
     Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
 
 public:
+    Q_INVOKABLE virtual void subscribe() = 0;
+    Q_INVOKABLE virtual void unsubscribe() = 0;
+
     auto audioLoad() const noexcept -> double { return m_audioLoad; }
     void setAudioLoad(double);
 
