@@ -67,8 +67,6 @@ AudioInputOutputSettings::subscribe()
             m_state_change_subscriber,
             selectors::make_num_busses_selector(m_settings_type),
             [this](std::size_t const num_busses) {
-                bool const emitSignal = num_busses != numBusConfigs();
-
                 if (num_busses > numBusConfigs())
                 {
                     while (num_busses > numBusConfigs())
@@ -101,12 +99,6 @@ AudioInputOutputSettings::subscribe()
                 while (num_busses < numBusConfigs())
                 {
                     busConfigs()->removeBusConfig();
-                }
-
-                if (emitSignal)
-                {
-                    emit busConfigsChanged();
-                    m_store.dispatch<runtime::actions::renotify>();
                 }
             });
 
