@@ -20,29 +20,33 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/app/store.h>
 #include <piejam/app/subscriber.h>
-#include <piejam/gui/model/Mixer.h>
+#include <piejam/audio/mixer.h>
+#include <piejam/container/boxed_string.h>
+#include <piejam/gui/model/MixerChannel.h>
 
 namespace piejam::app::gui::model
 {
 
-class Mixer final : public Subscribable<piejam::gui::model::Mixer>
+struct MixerChannelSelectors
 {
-    using base_t = Subscribable<piejam::gui::model::Mixer>;
+    selector<container::boxed_string> name;
+    selector<float> gain;
+    selector<float> pan;
+    selector<audio::mixer::stereo_level> level;
+};
+
+class MixerChannel final : public Subscribable<piejam::gui::model::MixerChannel>
+{
+    using base_t = Subscribable<piejam::gui::model::MixerChannel>;
 
 public:
-    Mixer(store&, subscriber&);
-
-    void setInputChannelGain(unsigned index, double gain) override;
-    void setInputChannelPan(unsigned index, double pan) override;
-    void setOutputChannelGain(unsigned index, double gain) override;
-    void setOutputChannelBalance(unsigned index, double balance) override;
-    void requestLevelsUpdate() override;
+    MixerChannel(subscriber&, MixerChannelSelectors);
 
 private:
     void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
             override;
 
-    store& m_store;
+    MixerChannelSelectors m_selectors;
 };
 
 } // namespace piejam::app::gui::model

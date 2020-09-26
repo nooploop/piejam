@@ -15,12 +15,43 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/gui/model/Mixer.h>
+#pragma once
 
-#include <algorithm>
-#include <cassert>
+#include <QAbstractListModel>
+
+#include <memory>
+#include <vector>
 
 namespace piejam::gui::model
 {
+
+class MixerChannel;
+
+class MixerChannelsList : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    MixerChannelsList(QObject* parent = nullptr);
+    ~MixerChannelsList();
+
+    auto rowCount(const QModelIndex& parent = QModelIndex()) const
+            -> int override;
+    auto data(const QModelIndex& index, int role = Qt::DisplayRole) const
+            -> QVariant override;
+
+    auto roleNames() const -> QHash<int, QByteArray> override;
+
+    void addMixerChannel(std::unique_ptr<MixerChannel>);
+    void removeMixerChannel();
+
+private:
+    enum Roles : int
+    {
+        ItemRole = Qt::UserRole
+    };
+
+    std::vector<std::unique_ptr<MixerChannel>> m_list;
+};
 
 } // namespace piejam::gui::model

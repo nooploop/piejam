@@ -61,8 +61,7 @@ Item {
             onDeleteConfigClicked: root.model.deleteBus(index)
             onNameEdited: root.model.setBusName(index, name)
 
-            Component.onCompleted: visible ? model.item.subscribe() : model.item.unsubscribe()
-            onVisibleChanged: visible ? model.item.subscribe() : model.item.unsubscribe()
+            Component.onCompleted: model.item.subscribe()
         }
     }
 
@@ -104,6 +103,5 @@ Item {
 
     }
 
-    Component.onCompleted: root.visible ? root.model.subscribe() : root.model.unsubscribe()
-    onVisibleChanged: root.visible ? root.model.subscribe() : root.model.unsubscribe()
+    Component.onCompleted: root.model.subscribe()
 }

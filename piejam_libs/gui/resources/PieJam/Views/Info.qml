@@ -107,6 +107,5 @@ TopPane {
         onTriggered: root.model.requestUpdate()
     }
 
-    Component.onCompleted: root.visible ? root.model.subscribe() : root.model.unsubscribe()
-    onVisibleChanged: if (root.model) { root.visible ? root.model.subscribe() : root.model.unsubscribe() }
+    Component.onCompleted: root.model.subscribe()
 }

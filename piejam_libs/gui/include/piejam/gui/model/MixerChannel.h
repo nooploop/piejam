@@ -22,7 +22,7 @@
 namespace piejam::gui::model
 {
 
-class MixerChannel final : public QObject
+class MixerChannel : public QObject
 {
     Q_OBJECT
 
@@ -34,6 +34,9 @@ class MixerChannel final : public QObject
 
 public:
     MixerChannel(QObject* parent = nullptr);
+
+    Q_INVOKABLE virtual void subscribe() = 0;
+    Q_INVOKABLE virtual void unsubscribe() = 0;
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const&);

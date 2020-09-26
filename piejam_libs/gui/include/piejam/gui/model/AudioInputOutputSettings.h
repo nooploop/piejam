@@ -35,8 +35,7 @@ class AudioInputOutputSettings : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QStringList channels READ channels NOTIFY channelsChanged FINAL)
-    Q_PROPERTY(BusConfigsList* busConfigs READ busConfigs NOTIFY
-                       busConfigsChanged FINAL)
+    Q_PROPERTY(BusConfigsList* busConfigs READ busConfigs CONSTANT)
 
 public:
     Q_INVOKABLE virtual void subscribe() = 0;
@@ -65,7 +64,6 @@ public:
 signals:
 
     void channelsChanged();
-    void busConfigsChanged();
 
 private:
     QStringList m_channels;

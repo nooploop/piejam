@@ -18,9 +18,9 @@
 #pragma once
 
 #include <piejam/gui/model/MixerChannel.h>
+#include <piejam/gui/model/MixerChannelsList.h>
 
 #include <QObject>
-#include <QQmlListProperty>
 
 #include <memory>
 #include <vector>
@@ -30,28 +30,25 @@ namespace piejam::gui::model
 
 class Mixer : public QObject
 {
-
     Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<MixerChannel> inputChannels READ inputChannels
-                       NOTIFY inputChannelsChanged FINAL)
-    Q_PROPERTY(QQmlListProperty<MixerChannel> outputChannels READ outputChannels
-                       NOTIFY outputChannelsChanged FINAL)
+
+    Q_PROPERTY(MixerChannelsList* inputChannels READ inputChannels CONSTANT)
+    Q_PROPERTY(MixerChannelsList* outputChannels READ outputChannels CONSTANT)
 
 public:
-    void setNumInputChannels(std::size_t);
-    auto inputChannels() -> QQmlListProperty<MixerChannel>;
-    auto inputChannel(std::size_t index) noexcept -> MixerChannel&
+    Q_INVOKABLE virtual void subscribe() = 0;
+    Q_INVOKABLE virtual void unsubscribe() = 0;
+
+    auto inputChannels() -> MixerChannelsList* { return &m_inputChannels; }
+    auto numInputChannels() const noexcept -> std::size_t
     {
-        assert(index < m_inputChannels.size());
-        return m_inputChannels[index];
+        return m_inputChannels.rowCount();
     }
 
-    void setNumOutputChannels(std::size_t);
-    auto outputChannels() -> QQmlListProperty<MixerChannel>;
-    auto outputChannel(std::size_t index) noexcept -> MixerChannel&
+    auto outputChannels() -> MixerChannelsList* { return &m_outputChannels; }
+    auto numOutputChannels() const noexcept -> std::size_t
     {
-        assert(index < m_outputChannels.size());
-        return m_outputChannels[index];
+        return m_outputChannels.rowCount();
     }
 
     virtual Q_INVOKABLE void
@@ -63,14 +60,9 @@ public:
     setOutputChannelBalance(unsigned index, double balance) = 0;
     virtual Q_INVOKABLE void requestLevelsUpdate() = 0;
 
-signals:
-
-    void inputChannelsChanged();
-    void outputChannelsChanged();
-
 private:
-    std::vector<MixerChannel> m_inputChannels;
-    std::vector<MixerChannel> m_outputChannels;
+    MixerChannelsList m_inputChannels;
+    MixerChannelsList m_outputChannels;
 };
 
 } // namespace piejam::gui::model

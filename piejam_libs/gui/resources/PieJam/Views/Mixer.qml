@@ -47,17 +47,19 @@ TopPane {
             delegate: ChannelStrip {
                 id: inputChannelStrip
 
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
+                anchors.top: if (parent) parent.top
+                anchors.bottom: if (parent) parent.bottom
 
-                levelLeft: modelData.levelLeft
-                levelRight: modelData.levelRight
-                pan: modelData.panBalance
-                gain: modelData.gain
-                name: modelData.name
+                levelLeft: model.item.levelLeft
+                levelRight: model.item.levelRight
+                pan: model.item.panBalance
+                gain: model.item.gain
+                name: model.item.name
 
                 onFaderMoved: root.model.setInputChannelGain(index, newGain)
                 onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
+
+                Component.onCompleted: model.item.subscribe()
             }
         }
 
@@ -77,17 +79,19 @@ TopPane {
             delegate: ChannelStrip {
                 id: outputChannelStrip
 
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
+                anchors.top: if (parent) parent.top
+                anchors.bottom: if (parent) parent.bottom
 
-                levelLeft: modelData.levelLeft
-                levelRight: modelData.levelRight
-                pan: modelData.panBalance
-                gain: modelData.gain
-                name: modelData.name
+                levelLeft: model.item.levelLeft
+                levelRight: model.item.levelRight
+                pan: model.item.panBalance
+                gain: model.item.gain
+                name: model.item.name
 
                 onFaderMoved: root.model.setOutputChannelGain(index, newGain)
                 onPanMoved: root.model.setOutputChannelBalance(index, newPan)
+
+                Component.onCompleted: model.item.subscribe()
             }
         }
     }
@@ -98,4 +102,6 @@ TopPane {
         repeat: true
         onTriggered: root.model.requestLevelsUpdate()
     }
+
+    Component.onCompleted: root.model.subscribe()
 }

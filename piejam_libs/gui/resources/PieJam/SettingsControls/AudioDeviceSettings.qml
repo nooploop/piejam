@@ -171,6 +171,5 @@ Item {
         }
     }
 
-    Component.onCompleted: root.visible ? root.model.subscribe() : root.model.unsubscribe()
-    onVisibleChanged: root.visible ? root.model.subscribe() : root.model.unsubscribe()
+    Component.onCompleted: root.model.subscribe()
 }
