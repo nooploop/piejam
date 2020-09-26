@@ -28,21 +28,21 @@ class smoother
     static_assert(std::is_scalar_v<T>);
 
 public:
-    constexpr void set(T target, std::size_t framesToSmooth) noexcept
+    constexpr void set(T target, std::size_t frames_to_smooth) noexcept
     {
         if (target != m_target)
         {
             m_target = target;
-            m_framesToSmooth = framesToSmooth;
+            m_frames_to_smooth = frames_to_smooth;
 
-            if (!m_framesToSmooth)
+            if (!m_frames_to_smooth)
             {
                 m_current = m_target;
                 m_inc = T{};
             }
             else
             {
-                m_inc = (m_target - m_current) / m_framesToSmooth;
+                m_inc = (m_target - m_current) / m_frames_to_smooth;
             }
         }
     }
@@ -64,25 +64,29 @@ public:
 
     constexpr void advance(std::size_t const frames) noexcept
     {
-        std::size_t const framesToProcess = std::min(frames, m_framesToSmooth);
-        if (framesToProcess)
+        std::size_t const frames_to_process =
+                std::min(frames, m_frames_to_smooth);
+        if (frames_to_process)
         {
-            m_current += m_inc * framesToProcess;
-            m_framesToSmooth -= framesToProcess;
+            m_current += m_inc * frames_to_process;
+            m_frames_to_smooth -= frames_to_process;
 
-            if (!m_framesToSmooth)
+            if (!m_frames_to_smooth)
             {
                 m_current = m_target;
             }
         }
     }
 
-    constexpr bool is_running() const noexcept { return m_framesToSmooth != 0; }
+    constexpr bool is_running() const noexcept
+    {
+        return m_frames_to_smooth != 0;
+    }
 
     constexpr auto current() const noexcept -> T { return m_current; }
 
 private:
-    std::size_t m_framesToSmooth{};
+    std::size_t m_frames_to_smooth{};
     T m_inc{};
     T m_current{};
     T m_target{};
