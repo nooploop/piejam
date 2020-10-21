@@ -178,4 +178,26 @@ TEST(table_view, fill)
             std::array{23, 23, 23, 0, 23, 23, 23, 0}.begin()));
 }
 
+TEST(table_view_as_const, data_stays_same)
+{
+    std::array arr{1.f, 2.f, 3.f, 4.f};
+    table_view<float> tv(arr.data(), 2, 2, 1, 1);
+    auto ctv = as_const(tv);
+    EXPECT_EQ(tv.data(), ctv.data());
+    EXPECT_EQ(tv.major_size(), ctv.major_size());
+    EXPECT_EQ(tv.major_step(), ctv.major_step());
+    EXPECT_EQ(tv.minor_size(), ctv.minor_size());
+    EXPECT_EQ(tv.minor_step(), ctv.minor_step());
+}
+
+TEST(table_view_as_const, types_converts_to_const)
+{
+    table_view<float> tv;
+    auto ctv = as_const(tv);
+    static_assert(std::is_same_v<table_view<float const>, decltype(ctv)>);
+
+    auto ctv2 = as_const(tv);
+    static_assert(std::is_same_v<table_view<float const>, decltype(ctv2)>);
+}
+
 } // namespace piejam::range::test

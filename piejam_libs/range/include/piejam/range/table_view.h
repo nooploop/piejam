@@ -326,4 +326,15 @@ fill(table_view<T> const& tv, T value)
         std::fill(row.begin(), row.end(), value);
 }
 
+template <class T>
+auto
+as_const(table_view<T> const& tv) -> table_view<std::add_const_t<T>>
+{
+    return {tv.data(),
+            tv.major_size(),
+            tv.minor_size(),
+            tv.major_step(),
+            tv.minor_step()};
+}
+
 } // namespace piejam::range
