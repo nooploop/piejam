@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/audio_state.h>
 
-#include <piejam/algorithm/set_intersection.h>
+#include <algorithm>
 
 namespace piejam::runtime
 {
@@ -27,7 +27,7 @@ static auto
 set_intersection(Vector const& in, Vector const& out)
 {
     Vector result;
-    algorithm::set_intersection(in, out, std::back_inserter(result));
+    std::ranges::set_intersection(in, out, std::back_inserter(result));
     return result;
 }
 
