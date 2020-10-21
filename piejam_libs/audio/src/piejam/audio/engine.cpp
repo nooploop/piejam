@@ -17,7 +17,6 @@
 
 #include <piejam/audio/engine.h>
 
-#include <piejam/algorithm/copy.h>
 #include <piejam/algorithm/transform.h>
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pan.h>
@@ -197,7 +196,7 @@ calculate_level(
         level_meter& lm,
         std::atomic<float>& level)
 {
-    algorithm::copy(buf, std::back_inserter(lm));
+    std::ranges::copy(buf, std::back_inserter(lm));
     level.store(lm.get(), std::memory_order_relaxed);
 }
 
@@ -321,13 +320,13 @@ engine::operator()(
         auto const left_channel = out_ch.device_channels.left;
         if (num_out_channels > left_channel)
         {
-            algorithm::copy(gain_buffer.left, outs[left_channel].begin());
+            std::ranges::copy(gain_buffer.left, outs[left_channel].begin());
         }
 
         auto const right_channel = out_ch.device_channels.right;
         if (num_out_channels > right_channel)
         {
-            algorithm::copy(gain_buffer.right, outs[right_channel].begin());
+            std::ranges::copy(gain_buffer.right, outs[right_channel].begin());
         }
     }
 }

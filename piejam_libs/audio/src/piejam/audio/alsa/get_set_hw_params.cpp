@@ -17,7 +17,6 @@
 
 #include <piejam/audio/alsa/get_set_hw_params.h>
 
-#include <piejam/algorithm/copy.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_format.h>
 #include <piejam/audio/pcm_hw_params.h>
@@ -243,10 +242,10 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
 
     if (pcm.path.empty())
     {
-        algorithm::copy(
+        std::ranges::copy(
                 preferred_samplerates,
                 std::back_inserter(result.samplerates));
-        algorithm::copy(
+        std::ranges::copy(
                 preferred_period_sizes,
                 std::back_inserter(result.period_sizes));
         return result;
