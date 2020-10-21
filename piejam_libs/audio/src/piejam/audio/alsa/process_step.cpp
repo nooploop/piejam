@@ -338,7 +338,7 @@ process_step::operator()()
         if (m_output_fd)
         {
             for (auto const& row : m_writer->buffer())
-                std::fill(row.begin(), row.end(), 0.f);
+                std::ranges::fill(row, 0.f);
 
             for (unsigned i = 0; i < m_io_config.process_config.period_count;
                  ++i)

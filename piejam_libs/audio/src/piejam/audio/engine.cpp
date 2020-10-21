@@ -265,8 +265,7 @@ engine::operator()(
         range::table_view<float> const& outs) noexcept
 {
     // clear output
-    for (auto ch : outs)
-        std::fill(ch.begin(), ch.end(), 0.f);
+    fill(outs, 0.f);
 
     std::size_t const num_in_channels = ins.major_size();
     std::size_t const num_out_channels = outs.major_size();

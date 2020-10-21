@@ -323,7 +323,7 @@ void
 fill(table_view<T> const& tv, T value)
 {
     for (auto row : tv)
-        std::fill(row.begin(), row.end(), value);
+        std::ranges::fill(row, value);
 }
 
 template <class T>

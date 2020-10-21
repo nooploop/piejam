@@ -145,9 +145,7 @@ make_snd_pcm_hw_params_for_refine_any() -> snd_pcm_hw_params
     std::for_each(
             std::begin(hw_params.masks),
             std::end(hw_params.masks),
-            [](snd_mask& m) {
-                std::fill(std::begin(m.bits), std::end(m.bits), ~0u);
-            });
+            [](snd_mask& m) { std::ranges::fill(m.bits, ~0u); });
     std::for_each(
             std::begin(hw_params.intervals),
             std::end(hw_params.intervals),
