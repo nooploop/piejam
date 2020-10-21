@@ -1,7 +1,6 @@
 add_library(piejam_algorithm INTERFACE)
 
 target_sources(piejam_algorithm INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/find.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/find_if.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/find_or_get_first.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/index_of.h
