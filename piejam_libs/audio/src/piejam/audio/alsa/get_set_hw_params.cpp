@@ -297,16 +297,14 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
             get_interval(hw_params, SNDRV_PCM_HW_PARAM_CHANNELS).max;
 
     assert(result.samplerates.empty());
-    std::copy_if(
-            preferred_samplerates.begin(),
-            preferred_samplerates.end(),
+    std::ranges::copy_if(
+            preferred_samplerates,
             std::back_inserter(result.samplerates),
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_RATE));
 
     assert(result.period_sizes.empty());
-    std::copy_if(
-            preferred_period_sizes.begin(),
-            preferred_period_sizes.end(),
+    std::ranges::copy_if(
+            preferred_period_sizes,
             std::back_inserter(result.period_sizes),
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIOD_SIZE));
 
