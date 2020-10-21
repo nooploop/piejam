@@ -10,3 +10,5 @@ target_sources(piejam_algorithm INTERFACE
 
 target_include_directories(piejam_algorithm INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_algorithm INTERFACE piejam_base)
+
+add_subdirectory(tests)

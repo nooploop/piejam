@@ -26,7 +26,7 @@ namespace piejam::algorithm
 {
 
 template <class Range, class Predicate>
-auto
+constexpr auto
 index_of_if(Range const& rng, Predicate&& p)
 {
     std::size_t pos{};
@@ -41,7 +41,7 @@ index_of_if(Range const& rng, Predicate&& p)
 }
 
 template <class Range, class T>
-auto
+constexpr auto
 index_of(Range const& rng, T&& value) -> std::size_t
 {
     return index_of_if(rng, [v = std::forward<T>(value)](auto&& x) {
