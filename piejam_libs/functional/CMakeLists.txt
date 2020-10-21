@@ -9,4 +9,4 @@ target_include_directories(piejam_functional INTERFACE ${CMAKE_CURRENT_SOURCE_DI
 
 target_link_libraries(piejam_functional INTERFACE piejam_meta)
 
-add_subdirectory(test)
+add_subdirectory(tests)

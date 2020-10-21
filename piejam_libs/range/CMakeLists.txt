@@ -9,4 +9,4 @@ target_sources(piejam_range INTERFACE
 
 target_include_directories(piejam_range INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_subdirectory(test)
+add_subdirectory(tests)

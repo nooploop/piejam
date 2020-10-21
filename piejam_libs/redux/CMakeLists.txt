@@ -8,4 +8,4 @@ target_sources(piejam_redux INTERFACE
 
 target_include_directories(piejam_redux INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_subdirectory(test)
+add_subdirectory(tests)
