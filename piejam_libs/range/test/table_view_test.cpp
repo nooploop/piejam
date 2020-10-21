@@ -145,4 +145,37 @@ TEST(column_major_table_view, transpose)
     EXPECT_TRUE(std::equal(row2.begin(), row2.end(), expected_row2.begin()));
 }
 
+TEST(table_view, fill)
+{
+    // 1 2 3
+    // 4 5 6
+    std::array arr{1, 2, 3, 0, 4, 5, 6, 0};
+
+    table_view<int> sut(arr.data(), 2, 3, 4, 1);
+
+    ASSERT_TRUE(std::equal(
+            sut[0].begin(),
+            sut[0].end(),
+            std::array{1, 2, 3}.begin()));
+    ASSERT_TRUE(std::equal(
+            sut[1].begin(),
+            sut[1].end(),
+            std::array{4, 5, 6}.begin()));
+
+    fill(sut, 23);
+
+    EXPECT_TRUE(std::equal(
+            sut[0].begin(),
+            sut[0].end(),
+            std::array{23, 23, 23}.begin()));
+    EXPECT_TRUE(std::equal(
+            sut[1].begin(),
+            sut[1].end(),
+            std::array{23, 23, 23}.begin()));
+    EXPECT_TRUE(std::equal(
+            arr.begin(),
+            arr.end(),
+            std::array{23, 23, 23, 0, 23, 23, 23, 0}.begin()));
+}
+
 } // namespace piejam::range::test

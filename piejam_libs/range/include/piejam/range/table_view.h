@@ -318,4 +318,12 @@ transform(
         std::transform(src_it->begin(), src_it->end(), dst_it->begin(), op);
 }
 
+template <class T>
+void
+fill(table_view<T> const& tv, T value)
+{
+    for (auto row : tv)
+        std::fill(row.begin(), row.end(), value);
+}
+
 } // namespace piejam::range
