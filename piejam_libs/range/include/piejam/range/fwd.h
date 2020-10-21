@@ -20,9 +20,6 @@
 namespace piejam::range
 {
 
-template <class T>
-class span;
-
 template <class Iterator>
 class stride_iterator;
 

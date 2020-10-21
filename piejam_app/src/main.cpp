@@ -16,8 +16,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <piejam/app/config_access.h>
-#include <piejam/app/gui/model/AudioInputOutputSettings.h>
 #include <piejam/app/gui/model/AudioDeviceSettings.h>
+#include <piejam/app/gui/model/AudioInputOutputSettings.h>
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/Mixer.h>
 #include <piejam/app/store.h>
@@ -95,8 +95,8 @@ main(int argc, char* argv[]) -> int
         state_change_subscriber.notify(state);
     });
 
-    qmlRegisterInterface<gui::model::BusConfig>("BusConfig");
-    qmlRegisterInterface<gui::model::MixerChannel>("MixerChannel");
+    qmlRegisterInterface<gui::model::BusConfig>("BusConfig", 1);
+    qmlRegisterInterface<gui::model::MixerChannel>("MixerChannel", 1);
 
     app::gui::model::AudioDeviceSettings audio_settings(
             store,

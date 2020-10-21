@@ -22,12 +22,12 @@
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pan.h>
 #include <piejam/audio/period_sizes.h>
-#include <piejam/range/span.h>
 #include <piejam/range/table_view.h>
 
 #include <boost/container/static_vector.hpp>
 
 #include <algorithm>
+#include <span>
 
 namespace piejam::audio
 {
@@ -212,8 +212,8 @@ template <class MixerChannel>
 static void
 apply_gain_and_calculate_level(
         MixerChannel& mc,
-        range::span<float const> source_left_buffer,
-        range::span<float const> source_right_buffer,
+        std::span<float const> source_left_buffer,
+        std::span<float const> source_right_buffer,
         stereo_gain const gain,
         stereo_audio_buffer_t& gain_buffer)
 {
@@ -286,10 +286,10 @@ engine::operator()(
                         ? sinusoidal_constant_power_pan(in_pan_balance_pos)
                         : stereo_balance(in_pan_balance_pos);
 
-        range::span<float const> in_left_buffer;
+        std::span<float const> in_left_buffer;
         if (auto ch = in_channel.device_channels.left; ch < num_in_channels)
             in_left_buffer = {ins[ch].data(), ins[ch].size()};
-        range::span<float const> in_right_buffer;
+        std::span<float const> in_right_buffer;
         if (auto ch = in_channel.device_channels.right; ch < num_in_channels)
             in_right_buffer = {ins[ch].data(), ins[ch].size()};
 

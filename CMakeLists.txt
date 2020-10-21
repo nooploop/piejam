@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 project(piejam VERSION 0.1.0)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 option(PIEJAM_BUILD_AUDIO_TEST "Build pjaudiotest" OFF)
 option(PIEJAM_TESTS "Build tests" OFF)
