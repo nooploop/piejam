@@ -315,7 +315,7 @@ transform(
     for (auto src_it = src.begin(), src_end = src.end(), dst_it = dst.begin();
          src_it != src_end;
          ++src_it, ++dst_it)
-        std::transform(src_it->begin(), src_it->end(), dst_it->begin(), op);
+        std::ranges::transform(*src_it, dst_it->begin(), op);
 }
 
 template <class T>
