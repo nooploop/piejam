@@ -17,7 +17,6 @@
 
 #include <piejam/audio/engine.h>
 
-#include <piejam/algorithm/transform.h>
 #include <piejam/audio/mixer.h>
 #include <piejam/audio/pan.h>
 #include <piejam/audio/period_sizes.h>

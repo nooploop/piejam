@@ -18,7 +18,6 @@
 #include <piejam/app/gui/model/AudioDeviceSettings.h>
 
 #include <piejam/algorithm/index_of.h>
-#include <piejam/algorithm/transform.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
@@ -28,6 +27,8 @@
 
 #include <boost/hof/compose.hpp>
 
+#include <algorithm>
+
 namespace piejam::app::gui::model
 {
 
@@ -36,7 +37,7 @@ device_names(std::vector<piejam::audio::pcm_descriptor> const& devices)
         -> QStringList
 {
     QStringList result;
-    algorithm::transform(
+    std::ranges::transform(
             devices,
             std::back_inserter(result),
             boost::hof::compose(
@@ -50,7 +51,7 @@ static auto
 to_QStringList(Vector const& l) -> QStringList
 {
     QStringList result;
-    algorithm::transform(
+    std::ranges::transform(
             l,
             std::back_inserter(result),
             [](auto const x) -> QString { return QString::number(x); });

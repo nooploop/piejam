@@ -18,7 +18,6 @@
 #include <piejam/app/config_access.h>
 
 #include <piejam/algorithm/index_of.h>
-#include <piejam/algorithm/transform.h>
 #include <piejam/redux/store.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/app_config.h>
@@ -28,6 +27,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <algorithm>
 #include <filesystem>
 
 namespace piejam::app::config_access
@@ -82,7 +82,7 @@ save(runtime::audio_state const& state)
         auto const channels_to_bus_configs = [](auto const& channels,
                                                 auto& configs) {
             configs.reserve(channels.size());
-            algorithm::transform(
+            std::ranges::transform(
                     channels,
                     std::back_inserter(configs),
                     [](audio::mixer::channel const& ch) -> runtime::bus_config {

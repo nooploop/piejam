@@ -17,13 +17,14 @@
 
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 
-#include <piejam/algorithm/transform.h>
 #include <piejam/io/ioctl_device.h>
 
 #include <fmt/format.h>
 
 #include <sound/asound.h>
 #include <sys/ioctl.h>
+
+#include <algorithm>
 
 namespace piejam::audio::alsa
 {
@@ -140,11 +141,11 @@ get_pcm_io_descriptors() -> pcm_io_descriptors
 
     for (soundcard const& sc : soundcards())
     {
-        algorithm::transform(
+        std::ranges::transform(
                 input_devices(sc),
                 std::back_inserter(result.inputs),
                 to_pcm_descriptor(sc, 'c'));
-        algorithm::transform(
+        std::ranges::transform(
                 output_devices(sc),
                 std::back_inserter(result.outputs),
                 to_pcm_descriptor(sc, 'p'));

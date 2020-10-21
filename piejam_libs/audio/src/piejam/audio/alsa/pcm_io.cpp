@@ -17,7 +17,6 @@
 
 #include <piejam/audio/alsa/pcm_io.h>
 
-#include <piejam/algorithm/transform.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
 #include <piejam/audio/alsa/process_step.h>
 #include <piejam/audio/pcm_descriptor.h>
