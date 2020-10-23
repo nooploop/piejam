@@ -29,23 +29,13 @@ output_processor::output_processor(std::size_t const num_inputs)
     assert(m_num_inputs > 0);
 }
 
-auto
-output_processor::num_inputs() const -> std::size_t
-{
-    return m_num_inputs;
-}
-
-auto
-output_processor::num_outputs() const -> std::size_t
-{
-    return 0;
-}
-
 void
 output_processor::process(
         input_buffers_t const& in_bufs,
         output_buffers_t const& /*out_bufs*/,
-        result_buffers_t const& /*result_bufs*/)
+        result_buffers_t const& /*result_bufs*/,
+        event_input_buffers const&,
+        event_output_buffers const&)
 {
     assert(in_bufs.size() == m_num_inputs);
     assert(m_engine_output.major_size() == m_num_inputs);

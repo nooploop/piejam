@@ -19,6 +19,7 @@
 
 #include <boost/assert.hpp>
 
+#include <algorithm>
 #include <stdexcept>
 
 namespace piejam::audio::engine
@@ -76,16 +77,15 @@ dag::is_descendent(node const& parent, node const& descendent)
     if (&parent == &descendent)
         return true;
 
-    return std::any_of(
-            parent.children.begin(),
-            parent.children.end(),
+    return std::ranges::any_of(
+            parent.children,
             [&descendent](node const& child) {
                 return is_descendent(child, descendent);
             });
 }
 
 void
-dag::operator()()
+dag::operator()(thread_context const& ctx)
 {
     BOOST_ASSERT(m_run_queue.empty());
 
@@ -104,7 +104,7 @@ dag::operator()()
         m_run_queue.pop_back();
         BOOST_ASSERT(n->parents_to_process == 0);
 
-        n->task();
+        n->task(ctx);
 
         for (node& child : n->children)
         {

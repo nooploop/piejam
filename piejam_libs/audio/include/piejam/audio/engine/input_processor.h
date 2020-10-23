@@ -35,13 +35,23 @@ public:
         m_engine_input = engine_input;
     }
 
-    auto num_inputs() const -> std::size_t override;
-    auto num_outputs() const -> std::size_t override;
+    auto num_inputs() const -> std::size_t override { return 0; }
+    auto num_outputs() const -> std::size_t override { return m_num_outputs; }
+
+    auto num_event_inputs() const -> std::size_t override { return 0; }
+    auto num_event_outputs() const -> std::size_t override { return 0; }
+
+    void create_event_output_buffers(
+            event_output_buffer_factory const&) const override
+    {
+    }
 
     void
     process(input_buffers_t const&,
             output_buffers_t const&,
-            result_buffers_t const&) override;
+            result_buffers_t const&,
+            event_input_buffers const&,
+            event_output_buffers const&) override;
 
 private:
     std::size_t const m_num_outputs{};

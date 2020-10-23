@@ -8,13 +8,19 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/amplify_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_buffer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_buffer_memory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_to_dag.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/mix_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/output_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_job.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/thread_context.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/mixer.h
@@ -38,12 +44,14 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/process_step.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/amplify_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/dag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph_to_dag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/input_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/mix_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/output_processor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
 )
 
 target_include_directories(piejam_audio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -25,29 +25,33 @@ namespace piejam::audio::engine
 {
 
 void
-graph::add_wire(
-        processor& src_proc,
-        std::size_t src_port,
-        processor& dst_proc,
-        std::size_t dst_port)
+graph::add_wire(endpoint const& src, endpoint const& dst)
 {
-    BOOST_ASSERT(src_port < src_proc.num_outputs());
-    BOOST_ASSERT(dst_port < dst_proc.num_inputs());
+    BOOST_ASSERT(src.port < src.proc.get().num_outputs());
+    BOOST_ASSERT(dst.port < dst.proc.get().num_inputs());
 
     BOOST_ASSERT_MSG(
-            m_wires.count({src_proc, src_port}) == 0,
-            "source endpoint already added, missing a spreader?");
-
-    BOOST_ASSERT_MSG(
-            std::none_of(
-                    m_wires.begin(),
-                    m_wires.end(),
-                    [dst = endpoint{dst_proc, dst_port}](auto const& wire) {
-                        return wire.second == dst;
-                    }),
+            std::ranges::none_of(
+                    m_wires,
+                    [&dst](auto const& wire) { return wire.second == dst; }),
             "destination endpoint already added, missing a mixer?");
 
-    m_wires.emplace(endpoint{src_proc, src_port}, endpoint{dst_proc, dst_port});
+    m_wires.emplace(src, dst);
+}
+
+void
+graph::add_event_wire(const endpoint& src, const endpoint& dst)
+{
+    BOOST_ASSERT(src.port < src.proc.get().num_event_outputs());
+    BOOST_ASSERT(dst.port < dst.proc.get().num_event_inputs());
+
+    BOOST_ASSERT_MSG(
+            std::ranges::none_of(
+                    m_event_wires,
+                    [&dst](auto const& wire) { return wire.second == dst; }),
+            "destination endpoint already added, missing an event mixer?");
+
+    m_event_wires.emplace(src, dst);
 }
 
 } // namespace piejam::audio::engine

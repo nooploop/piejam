@@ -17,6 +17,8 @@
 
 #include <piejam/audio/engine/mix_processor.h>
 
+#include <piejam/audio/engine/event_input_buffers.h>
+#include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/processor.h>
 
 #include <gtest/gtest.h>
@@ -43,7 +45,7 @@ TEST(mix_processor, mix_two_silence_channels)
 
     ASSERT_FALSE(result[0].empty());
 
-    sut->process(in, out, result);
+    sut->process(in, out, result, {0}, {});
 
     EXPECT_TRUE(result[0].empty());
 }
@@ -65,7 +67,7 @@ TEST(mix_processor, mix_one_silence_one_non_silence_channel)
 
     ASSERT_FLOAT_EQ(0.f, result[0][0]);
 
-    sut->process(in, out, result);
+    sut->process(in, out, result, {0}, {});
 
     ASSERT_EQ(1u, result[0].size());
     EXPECT_FLOAT_EQ(0.23f, result[0][0]);
@@ -88,7 +90,7 @@ TEST(mix_processor, mix_two_non_silence_channels)
 
     ASSERT_FLOAT_EQ(0.f, result[0][0]);
 
-    sut->process(in, out, result);
+    sut->process(in, out, result, {0}, {});
 
     ASSERT_EQ(1u, result[0].size());
     EXPECT_FLOAT_EQ(0.81f, result[0][0]);
@@ -111,7 +113,7 @@ TEST(mix_processor, mix_two_silence_one_non_silence_channel)
 
     ASSERT_FLOAT_EQ(0.f, result[0][0]);
 
-    sut->process(in, out, result);
+    sut->process(in, out, result, {0}, {});
 
     ASSERT_EQ(1u, result[0].size());
     EXPECT_FLOAT_EQ(0.23f, result[0][0]);
@@ -136,7 +138,7 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
 
     ASSERT_FLOAT_EQ(0.f, result[0][0]);
 
-    sut->process(in, out, result);
+    sut->process(in, out, result, {0}, {});
 
     ASSERT_EQ(1u, result[0].size());
     EXPECT_FLOAT_EQ(0.81f, result[0][0]);

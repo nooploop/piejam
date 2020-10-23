@@ -32,7 +32,7 @@ public:
     struct endpoint
     {
         std::reference_wrapper<processor> proc;
-        std::size_t port;
+        std::size_t port{};
 
         bool operator<(endpoint const& other) const noexcept
         {
@@ -49,18 +49,20 @@ public:
         }
     };
 
-    using wires_t = std::map<endpoint, endpoint>;
+    using wires_t = std::multimap<endpoint, endpoint>;
 
-    void add_wire(
-            processor& src_proc,
-            std::size_t src_port,
-            processor& dst_proc,
-            std::size_t dst_port);
+    void add_wire(endpoint const& src, endpoint const& dst);
+    void add_event_wire(endpoint const& src, endpoint const& dst);
 
     auto wires() const noexcept -> wires_t const& { return m_wires; }
+    auto event_wires() const noexcept -> wires_t const&
+    {
+        return m_event_wires;
+    }
 
 private:
     wires_t m_wires;
+    wires_t m_event_wires;
 };
 
 } // namespace piejam::audio::engine

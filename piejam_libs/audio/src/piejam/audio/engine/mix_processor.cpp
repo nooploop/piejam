@@ -33,13 +33,23 @@ class mix_processor final : public processor
 public:
     mix_processor(std::size_t num_inputs);
 
-    auto num_inputs() const -> std::size_t override;
-    auto num_outputs() const -> std::size_t override;
+    auto num_inputs() const -> std::size_t override { return m_num_inputs; }
+    auto num_outputs() const -> std::size_t override { return 1; }
+
+    auto num_event_inputs() const -> std::size_t override { return 0; }
+    auto num_event_outputs() const -> std::size_t override { return 0; }
+
+    void create_event_output_buffers(
+            event_output_buffer_factory const&) const override
+    {
+    }
 
     void
     process(input_buffers_t const&,
             output_buffers_t const&,
-            result_buffers_t const&) override;
+            result_buffers_t const&,
+            event_input_buffers const&,
+            event_output_buffers const&) override;
 
 private:
     std::size_t const m_num_inputs{};
@@ -51,23 +61,13 @@ mix_processor::mix_processor(std::size_t num_inputs)
     assert(m_num_inputs > 1);
 }
 
-auto
-mix_processor::num_inputs() const -> std::size_t
-{
-    return m_num_inputs;
-}
-
-auto
-mix_processor::num_outputs() const -> std::size_t
-{
-    return 1;
-}
-
 void
 mix_processor::process(
         input_buffers_t const& in_bufs,
         output_buffers_t const& out_bufs,
-        result_buffers_t const& result_bufs)
+        result_buffers_t const& result_bufs,
+        event_input_buffers const&,
+        event_output_buffers const&)
 {
     assert(in_bufs.size() == m_num_inputs);
     assert(out_bufs.size() == 1 && !out_bufs[0].empty());

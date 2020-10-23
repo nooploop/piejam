@@ -24,27 +24,16 @@
 namespace piejam::audio::engine
 {
 
-//! Simple dependency graph executor. No multi-threading support yet.
+class thread_context;
+
+//! Simple dependency graph executor. Execution runs from parents to children.
+//! No multi-threading support yet.
 class dag
 {
 public:
     using task_id_t = std::size_t;
-    using task_t = std::function<void()>;
+    using task_t = std::function<void(thread_context const&)>;
 
-    dag(std::size_t run_queue_size);
-    dag(dag const&) = delete;
-    dag(dag&&) = default;
-
-    auto operator=(dag const&) -> dag& = delete;
-    auto operator=(dag &&) -> dag& = default;
-
-    auto add_task(task_t) -> task_id_t;
-    auto add_child_task(task_id_t parent, task_t) -> task_id_t;
-    void add_child(task_id_t parent, task_id_t child);
-
-    void operator()();
-
-private:
     struct node;
     using node_ref = std::reference_wrapper<node>;
 
@@ -56,6 +45,24 @@ private:
         std::vector<node_ref> children;
     };
 
+    using nodes_t = std::unordered_map<task_id_t, node>;
+
+    dag(std::size_t run_queue_size);
+    dag(dag const&) = delete;
+    dag(dag&&) = default;
+
+    auto operator=(dag const&) -> dag& = delete;
+    auto operator=(dag &&) -> dag& = default;
+
+    auto nodes() const noexcept -> nodes_t const& { return m_nodes; }
+
+    auto add_task(task_t) -> task_id_t;
+    auto add_child_task(task_id_t parent, task_t) -> task_id_t;
+    void add_child(task_id_t parent, task_id_t child);
+
+    void operator()(thread_context const&);
+
+private:
     static bool is_descendent(node const& parent, node const& descendent);
 
     std::size_t m_free_id{};

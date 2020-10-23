@@ -28,6 +28,43 @@ class smoother
     static_assert(std::is_scalar_v<T>);
 
 public:
+    struct iterator
+    {
+        constexpr iterator() noexcept = default;
+        constexpr iterator(smoother<T>& smoother)
+            : m_smoother(std::addressof(smoother))
+        {
+        }
+
+        constexpr auto operator*() const noexcept -> T
+        {
+            return m_smoother->current();
+        }
+
+        constexpr auto operator++() noexcept -> iterator&
+        {
+            m_smoother->advance(1);
+            return *this;
+        }
+
+        constexpr auto operator++(int) noexcept -> iterator
+        {
+            auto copy = *this;
+            m_smoother->advance(1);
+            return copy;
+        }
+
+    private:
+        smoother<T>* m_smoother{};
+    };
+
+    constexpr smoother() noexcept = default;
+    constexpr smoother(T const current) noexcept
+        : m_current(current)
+        , m_target(current)
+    {
+    }
+
     constexpr void set(T target, std::size_t frames_to_smooth) noexcept
     {
         if (target != m_target)
@@ -77,6 +114,8 @@ public:
             }
         }
     }
+
+    constexpr auto advance_iterator() noexcept -> iterator { return {*this}; }
 
     constexpr bool is_running() const noexcept
     {
