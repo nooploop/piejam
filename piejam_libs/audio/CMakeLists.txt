@@ -5,6 +5,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_reader.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_writer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/process_step.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/channel_strip_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine.h
@@ -42,6 +43,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_set_hw_params.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/pcm_io.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/process_step.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/channel_strip_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/amplify_processor.cpp

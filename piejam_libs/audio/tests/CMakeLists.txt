@@ -5,6 +5,7 @@ endif()
 find_package(GTest REQUIRED)
 add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/amplify_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/channel_strip_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dag_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_buffer_memory_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_buffer_test.cpp

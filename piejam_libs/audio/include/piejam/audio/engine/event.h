@@ -48,4 +48,18 @@ private:
     T m_value{};
 };
 
+template <class T>
+bool
+operator==(event<T> const& l, event<T> const& r)
+{
+    return l.offset() == r.offset() && l.value() == r.value();
+}
+
+template <class T>
+bool
+operator!=(event<T> const& l, event<T> const& r)
+{
+    return !(l == r);
+}
+
 } // namespace piejam::audio::engine
