@@ -17,6 +17,7 @@
 
 #include <piejam/audio/engine/mix_processor.h>
 
+#include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 
 #include <algorithm>
@@ -44,12 +45,7 @@ public:
     {
     }
 
-    void
-    process(input_buffers_t const&,
-            output_buffers_t const&,
-            result_buffers_t const&,
-            event_input_buffers const&,
-            event_output_buffers const&) override;
+    void process(process_context const&) override;
 
 private:
     std::size_t const m_num_inputs{};
@@ -62,24 +58,15 @@ mix_processor::mix_processor(std::size_t num_inputs)
 }
 
 void
-mix_processor::process(
-        input_buffers_t const& in_bufs,
-        output_buffers_t const& out_bufs,
-        result_buffers_t const& result_bufs,
-        event_input_buffers const&,
-        event_output_buffers const&)
+mix_processor::process(process_context const& ctx)
 {
-    assert(in_bufs.size() == m_num_inputs);
-    assert(out_bufs.size() == 1 && !out_bufs[0].empty());
-    assert(result_bufs.size() == 1);
-
     std::size_t mixed = 0;
-    for (std::span<float const> const& in : in_bufs)
+    for (std::span<float const> const& in : ctx.inputs)
     {
         if (in.empty())
             continue;
 
-        assert(in.size() == out_bufs[0].size());
+        assert(in.size() == ctx.outputs[0].size());
 
         if (mixed > 1)
         {
@@ -88,8 +75,8 @@ mix_processor::process(
             std::transform(
                     in.begin(),
                     in.end(),
-                    out_bufs[0].begin(),
-                    out_bufs[0].begin(),
+                    ctx.outputs[0].begin(),
+                    ctx.outputs[0].begin(),
                     std::plus<float>{});
         }
         else if (mixed == 1)
@@ -99,22 +86,22 @@ mix_processor::process(
             std::transform(
                     in.begin(),
                     in.end(),
-                    result_bufs[0].begin(),
-                    out_bufs[0].begin(),
+                    ctx.results[0].begin(),
+                    ctx.outputs[0].begin(),
                     std::plus<float>{});
-            result_bufs[0] = out_bufs[0];
+            ctx.results[0] = ctx.outputs[0];
             ++mixed;
         }
         else
         {
             // we didn't mixed anything yet, so we pass this input as result
-            result_bufs[0] = in;
+            ctx.results[0] = in;
             ++mixed;
         }
     }
 
     if (mixed == 0)
-        result_bufs[0] = {};
+        ctx.results[0] = {};
 }
 
 } // namespace

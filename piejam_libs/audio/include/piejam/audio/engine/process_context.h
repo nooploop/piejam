@@ -17,28 +17,28 @@
 
 #pragma once
 
-#include <piejam/audio/engine/processor.h>
+#include <functional>
+#include <span>
 
-#include <gmock/gmock.h>
-
-namespace piejam::audio::engine::test
+namespace piejam::audio::engine
 {
 
-struct processor_mock : public processor
+class event_input_buffers;
+class event_output_buffers;
+
+struct process_context
 {
-    MOCK_METHOD(std::size_t, num_inputs, (), (const, override));
-    MOCK_METHOD(std::size_t, num_outputs, (), (const, override));
+    using input_buffers_t = std::span<
+            std::reference_wrapper<std::span<float const> const> const>;
+    using output_buffers_t = std::span<std::span<float> const>;
+    using result_buffers_t = std::span<std::span<float const>>;
 
-    MOCK_METHOD(std::size_t, num_event_inputs, (), (const, override));
-    MOCK_METHOD(std::size_t, num_event_outputs, (), (const, override));
-
-    MOCK_METHOD(
-            void,
-            create_event_output_buffers,
-            (event_output_buffer_factory const&),
-            (const, override));
-
-    MOCK_METHOD(void, process, (process_context const&), (override));
+    input_buffers_t inputs{};
+    output_buffers_t outputs{};
+    result_buffers_t results{};
+    event_input_buffers const& event_inputs;
+    event_output_buffers const& event_outputs;
+    std::size_t buffer_size{};
 };
 
-} // namespace piejam::audio::engine::test
+} // namespace piejam::audio::engine

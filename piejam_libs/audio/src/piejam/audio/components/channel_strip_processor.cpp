@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/pan.h>
 
@@ -89,26 +90,23 @@ public:
         m_last_volume = ev.value();
     }
 
-    void
-    process(input_buffers_t const&,
-            output_buffers_t const&,
-            result_buffers_t const&,
-            engine::event_input_buffers const& ev_ins,
-            engine::event_output_buffers const& ev_outs) override
+    void process(engine::process_context const& ctx) override
     {
         engine::event_buffer<float> const* const ev_buf_pan =
-                ev_ins.get<float>(0);
+                ctx.event_inputs.get<float>(0);
         BOOST_ASSERT(ev_buf_pan);
 
         engine::event_buffer<float> const* const ev_buf_vol =
-                ev_ins.get<float>(1);
+                ctx.event_inputs.get<float>(1);
         BOOST_ASSERT(ev_buf_vol);
 
         if (ev_buf_pan->empty() && ev_buf_vol->empty())
             return;
 
-        engine::event_buffer<float>& ev_buf_left = ev_outs.get<float>(0);
-        engine::event_buffer<float>& ev_buf_right = ev_outs.get<float>(1);
+        engine::event_buffer<float>& ev_buf_left =
+                ctx.event_outputs.get<float>(0);
+        engine::event_buffer<float>& ev_buf_right =
+                ctx.event_outputs.get<float>(1);
 
         auto pan_it = ev_buf_pan->begin();
         auto const pan_last = ev_buf_pan->end();

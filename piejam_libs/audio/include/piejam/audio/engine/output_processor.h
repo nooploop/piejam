@@ -46,12 +46,7 @@ public:
     {
     }
 
-    void
-    process(input_buffers_t const&,
-            output_buffers_t const&,
-            result_buffers_t const&,
-            event_input_buffers const&,
-            event_output_buffers const&) override;
+    void process(process_context const&) override;
 
 private:
     std::size_t const m_num_inputs{};

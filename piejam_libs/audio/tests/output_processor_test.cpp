@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/process_context.h>
 
 #include <piejam/container/table.h>
 
@@ -40,7 +41,7 @@ TEST(output_processor, input_table_is_propagated_to_outputs)
             in_spans.begin(),
             in_spans.end()};
 
-    sut.process(inputs, {}, {}, {0}, {});
+    sut.process({inputs, {}, {}, {0}, {}, 2});
 
     EXPECT_FLOAT_EQ(23.f, data.rows()[0][0]);
     EXPECT_FLOAT_EQ(58.f, data.rows()[0][1]);

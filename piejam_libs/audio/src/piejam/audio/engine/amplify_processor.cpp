@@ -18,6 +18,7 @@
 #include <piejam/audio/engine/amplify_processor.h>
 
 #include <piejam/audio/engine/event_input_buffers.h>
+#include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/smoother.h>
 
@@ -42,17 +43,13 @@ public:
     {
     }
 
-    void
-    process(input_buffers_t const& in_bufs,
-            output_buffers_t const& out_bufs,
-            result_buffers_t const& res_bufs,
-            event_input_buffers const& ev_in_bufs,
-            event_output_buffers const&) override
+    void process(process_context const& ctx) override
     {
-        event_buffer<float> const* const amp_ev_buf = ev_in_bufs.get<float>(0);
-        std::span<float const> const in_buf = in_bufs[0];
-        std::span<float> const out_buf = out_bufs[0];
-        std::span<float const>& res_buf = res_bufs[0];
+        event_buffer<float> const* const amp_ev_buf =
+                ctx.event_inputs.get<float>(0);
+        std::span<float const> const in_buf = ctx.inputs[0];
+        std::span<float> const out_buf = ctx.outputs[0];
+        std::span<float const>& res_buf = ctx.results[0];
 
         if (!amp_ev_buf || amp_ev_buf->empty())
         {
@@ -84,13 +81,13 @@ public:
             if (in_buf.empty())
             {
                 res_buf = {};
-                for (event<float> const& ev : *ev_in_bufs.get<float>(0))
+                for (event<float> const& ev : *amp_ev_buf)
                     m_factor.set(ev.value(), 0);
             }
             else
             {
                 std::size_t offset{};
-                for (event<float> const& ev : *ev_in_bufs.get<float>(0))
+                for (event<float> const& ev : *amp_ev_buf)
                 {
                     BOOST_ASSERT(offset < in_buf.size());
                     std::transform(

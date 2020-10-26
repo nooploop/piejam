@@ -17,6 +17,8 @@
 
 #include <piejam/audio/engine/output_processor.h>
 
+#include <piejam/audio/engine/process_context.h>
+
 #include <algorithm>
 #include <cassert>
 
@@ -30,27 +32,21 @@ output_processor::output_processor(std::size_t const num_inputs)
 }
 
 void
-output_processor::process(
-        input_buffers_t const& in_bufs,
-        output_buffers_t const& /*out_bufs*/,
-        result_buffers_t const& /*result_bufs*/,
-        event_input_buffers const&,
-        event_output_buffers const&)
+output_processor::process(process_context const& ctx)
 {
-    assert(in_bufs.size() == m_num_inputs);
     assert(m_engine_output.major_size() == m_num_inputs);
 
     for (std::size_t ch = 0; ch < m_num_inputs; ++ch)
     {
         auto const out = m_engine_output[ch];
-        if (in_bufs[ch].get().empty())
+        if (ctx.inputs[ch].get().empty())
         {
             std::ranges::fill(out, 0.f);
         }
         else
         {
-            assert(in_bufs[ch].get().size() == out.size());
-            std::ranges::copy(in_bufs[ch].get(), out.begin());
+            assert(ctx.inputs[ch].get().size() == out.size());
+            std::ranges::copy(ctx.inputs[ch].get(), out.begin());
         }
     }
 }

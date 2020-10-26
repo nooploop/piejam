@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 
 #include <gtest/gtest.h>
@@ -57,7 +58,7 @@ TEST_F(amplify_processor_test,
        result_is_input_when_factor_is_one_and_event_is_not_connected)
 {
     auto sut = make_amplify_processor();
-    sut->process(in_bufs, out_bufs, res_bufs, {1}, {});
+    sut->process({in_bufs, out_bufs, res_bufs, {1}, {}, 128});
 
     EXPECT_EQ(res_bufs[0].data(), in_bufs[0].get().data());
     EXPECT_EQ(res_bufs[0].size(), in_bufs[0].get().size());
@@ -68,7 +69,7 @@ TEST_F(amplify_processor_test,
 {
     auto sut = make_amplify_processor();
 
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
 
     EXPECT_EQ(res_bufs[0].data(), in_bufs[0].get().data());
     EXPECT_EQ(res_bufs[0].size(), in_bufs[0].get().size());
@@ -79,7 +80,7 @@ TEST_F(amplify_processor_test, buffer_is_smoothly_amplified_after_event)
     ev_in_buf.insert(0, 2.f);
 
     auto sut = make_amplify_processor();
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
 
     ASSERT_NE(nullptr, res_bufs[0].data());
     ASSERT_EQ(128u, res_bufs[0].size());
@@ -97,7 +98,7 @@ TEST_F(amplify_processor_test, buffer_is_not_amplified_before_event)
     ev_in_buf.insert(2, 2.f);
 
     auto sut = make_amplify_processor();
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
 
     ASSERT_NE(nullptr, res_bufs[0].data());
     ASSERT_EQ(128u, res_bufs[0].size());
@@ -121,7 +122,7 @@ TEST_F(amplify_processor_test, buffer_is_processed_sliced_with_multiple_events)
     ev_in_buf.insert(4, 1.f);
 
     auto sut = make_amplify_processor();
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
 
     ASSERT_NE(nullptr, res_bufs[0].data());
     ASSERT_EQ(128u, res_bufs[0].size());
@@ -139,14 +140,14 @@ TEST_F(amplify_processor_test, result_is_silence_when_factor_is_zero)
     ev_in_buf.insert(0, 0.f);
 
     auto sut = make_amplify_processor();
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
     ev_in_buf.clear();
 
     ASSERT_EQ(out_bufs[0].data(), res_bufs[0].data());
     ASSERT_EQ(128u, res_bufs[0].size());
 
     // smoothing is finished in the previous process, now we should have silence
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
 
     EXPECT_EQ(nullptr, res_bufs[0].data());
     EXPECT_EQ(0, res_bufs[0].size());
@@ -157,7 +158,7 @@ TEST_F(amplify_processor_test, factor_stays_after_smoothing)
     ev_in_buf.insert(0, 2.f);
 
     auto sut = make_amplify_processor();
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
     ev_in_buf.clear();
 
     ASSERT_EQ(out_bufs[0].data(), res_bufs[0].data());
@@ -165,7 +166,7 @@ TEST_F(amplify_processor_test, factor_stays_after_smoothing)
 
     // smoothing is finished in the previous process,
     // now factor should be applied to all samples in next process
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
 
     EXPECT_EQ(out_bufs[0].data(), res_bufs[0].data());
     EXPECT_EQ(128u, res_bufs[0].size());
@@ -180,7 +181,7 @@ TEST_F(amplify_processor_test,
     ev_in_buf.insert(10, 2.f);
 
     auto sut = make_amplify_processor();
-    sut->process(in_bufs, out_bufs, res_bufs, ev_in_bufs, {});
+    sut->process({in_bufs, out_bufs, res_bufs, ev_in_bufs, {}, 128});
 
     EXPECT_EQ(nullptr, res_bufs[0].data());
     EXPECT_EQ(0, res_bufs[0].size());

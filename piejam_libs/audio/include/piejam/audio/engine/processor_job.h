@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/period_sizes.h>
 
 #include <array>
@@ -62,6 +63,8 @@ private:
 
     event_input_buffers m_event_inputs;
     event_output_buffers m_event_outputs;
+
+    process_context m_process_context;
 };
 
 } // namespace piejam::audio::engine

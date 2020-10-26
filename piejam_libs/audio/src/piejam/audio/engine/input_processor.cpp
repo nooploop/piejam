@@ -17,6 +17,8 @@
 
 #include <piejam/audio/engine/input_processor.h>
 
+#include <piejam/audio/engine/process_context.h>
+
 #include <boost/core/ignore_unused.hpp>
 
 #include <algorithm>
@@ -32,27 +34,18 @@ input_processor::input_processor(std::size_t const num_outputs)
 }
 
 void
-input_processor::process(
-        input_buffers_t const& /*in_bufs*/,
-        output_buffers_t const& out_bufs,
-        result_buffers_t const& result_bufs,
-        event_input_buffers const&,
-        event_output_buffers const&)
+input_processor::process(process_context const& ctx)
 {
-    assert(out_bufs.size() == m_num_outputs);
-    assert(result_bufs.size() == m_num_outputs);
     assert(m_engine_input.major_size() == m_num_outputs);
 
     for (std::size_t ch = 0; ch < m_num_outputs; ++ch)
     {
-        assert(m_engine_input.minor_size() == out_bufs[ch].size());
+        assert(m_engine_input.minor_size() == ctx.outputs[ch].size());
         assert(m_engine_input.minor_step() == 1);
-        result_bufs[ch] = {
+        ctx.results[ch] = {
                 m_engine_input[ch].data(),
                 m_engine_input.minor_size()};
     }
-
-    boost::ignore_unused(out_bufs);
 }
 
 } // namespace piejam::audio::engine

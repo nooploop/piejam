@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/pan.h>
 
@@ -35,6 +36,7 @@ namespace piejam::audio::components::test
 
 struct channel_strip_processor_test : ::testing::Test
 {
+    std::size_t const buffer_size{16};
     engine::event_buffer_memory ev_buf_mem{1024};
     std::pmr::memory_resource* ev_mem{&ev_buf_mem.memory_resource()};
     engine::event_buffer<float> ev_in_pan_buf{ev_mem};
@@ -54,7 +56,7 @@ struct channel_strip_processor_test : ::testing::Test
 
 TEST_F(channel_strip_processor_test, empty_inputs_to_empty_outputs)
 {
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     EXPECT_TRUE(ev_out_bufs.get<float>(0).empty());
     EXPECT_TRUE(ev_out_bufs.get<float>(1).empty());
@@ -63,7 +65,7 @@ TEST_F(channel_strip_processor_test, empty_inputs_to_empty_outputs)
 TEST_F(channel_strip_processor_test, one_pan_event)
 {
     ev_in_pan_buf.insert(1, 1.f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -81,7 +83,7 @@ TEST_F(channel_strip_processor_test, two_pan_events_at_different_offsets)
 {
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_pan_buf.insert(3, -1.f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -101,7 +103,7 @@ TEST_F(channel_strip_processor_test, two_pan_events_at_same_offset)
 {
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_pan_buf.insert(1, -1.f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -120,7 +122,7 @@ TEST_F(channel_strip_processor_test, two_pan_events_at_same_offset)
 TEST_F(channel_strip_processor_test, one_vol_event)
 {
     ev_in_vol_buf.insert(1, .5f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -138,7 +140,7 @@ TEST_F(channel_strip_processor_test, two_vol_events_at_different_offsets)
 {
     ev_in_vol_buf.insert(1, .5f);
     ev_in_vol_buf.insert(3, .7f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -158,7 +160,7 @@ TEST_F(channel_strip_processor_test, two_vol_events_at_same_offset)
 {
     ev_in_vol_buf.insert(1, .5f);
     ev_in_vol_buf.insert(1, .7f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -178,7 +180,7 @@ TEST_F(channel_strip_processor_test, first_pan_then_vol)
 {
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_vol_buf.insert(3, .7f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -198,7 +200,7 @@ TEST_F(channel_strip_processor_test, first_vol_then_pan)
 {
     ev_in_vol_buf.insert(1, .7f);
     ev_in_pan_buf.insert(3, 1.f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -218,7 +220,7 @@ TEST_F(channel_strip_processor_test, pan_and_vol_at_same_offset)
 {
     ev_in_vol_buf.insert(1, .7f);
     ev_in_pan_buf.insert(1, 1.f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -239,7 +241,7 @@ TEST_F(channel_strip_processor_test,
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_vol_buf.insert(3, .5f);
     ev_in_pan_buf.insert(3, -1.f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -262,7 +264,7 @@ TEST_F(channel_strip_processor_test,
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_vol_buf.insert(1, .5f);
     ev_in_pan_buf.insert(1, -1.f);
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);
@@ -284,7 +286,7 @@ TEST_F(channel_strip_processor_test, stereo_balance)
     ev_in_pan_buf.insert(3, -1.f);
     ev_in_pan_buf.insert(5, 0.f);
     sut = make_stereo_channel_strip_processor();
-    sut->process({}, {}, {}, ev_in_bufs, ev_out_bufs);
+    sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);
     auto const& ev_out_right = ev_out_bufs.get<float>(1);

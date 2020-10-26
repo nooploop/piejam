@@ -23,9 +23,8 @@
 namespace piejam::audio::engine
 {
 
-class event_input_buffers;
-class event_output_buffers;
 class event_output_buffer_factory;
+struct process_context;
 
 class processor
 {
@@ -41,17 +40,7 @@ public:
     virtual void
     create_event_output_buffers(event_output_buffer_factory const&) const = 0;
 
-    using input_buffers_t = std::span<
-            std::reference_wrapper<std::span<float const> const> const>;
-    using output_buffers_t = std::span<std::span<float> const>;
-    using result_buffers_t = std::span<std::span<float const>>;
-
-    virtual void
-    process(input_buffers_t const&,
-            output_buffers_t const&,
-            result_buffers_t const&,
-            event_input_buffers const&,
-            event_output_buffers const&) = 0;
+    virtual void process(process_context const&) = 0;
 };
 
 } // namespace piejam::audio::engine

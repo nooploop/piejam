@@ -44,6 +44,8 @@ processor_job::processor_job(
     , m_outputs(m_output_buffers.begin(), m_output_buffers.end())
     , m_results(m_proc.num_outputs())
     , m_event_inputs(m_proc.num_event_inputs())
+    , m_process_context(
+              {m_inputs, m_outputs, m_results, m_event_inputs, m_event_outputs})
 {
     m_proc.create_event_output_buffers(m_event_outputs);
     BOOST_ASSERT(m_proc.num_event_outputs() == m_event_outputs.size());
@@ -99,12 +101,8 @@ processor_job::operator()(thread_context const& ctx)
     BOOST_ASSERT(ctx.event_memory);
     m_event_outputs.set_event_memory(ctx.event_memory);
 
-    m_proc.process(
-            m_inputs,
-            m_outputs,
-            m_results,
-            m_event_inputs,
-            m_event_outputs);
+    m_process_context.buffer_size = m_buffer_size;
+    m_proc.process(m_process_context);
 }
 
 } // namespace piejam::audio::engine
