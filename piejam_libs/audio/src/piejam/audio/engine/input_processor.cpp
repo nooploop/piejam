@@ -18,6 +18,7 @@
 #include <piejam/audio/engine/input_processor.h>
 
 #include <piejam/audio/engine/process_context.h>
+#include <piejam/audio/engine/verify_process_context.h>
 
 #include <boost/core/ignore_unused.hpp>
 
@@ -36,7 +37,7 @@ input_processor::input_processor(std::size_t const num_outputs)
 void
 input_processor::process(process_context const& ctx)
 {
-    assert(m_engine_input.major_size() == m_num_outputs);
+    verify_process_context(*this, ctx);
 
     for (std::size_t ch = 0; ch < m_num_outputs; ++ch)
     {

@@ -21,6 +21,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/pan.h>
 
 #include <boost/assert.hpp>
@@ -92,6 +93,8 @@ public:
 
     void process(engine::process_context const& ctx) override
     {
+        engine::verify_process_context(*this, ctx);
+
         engine::event_buffer<float> const* const ev_buf_pan =
                 ctx.event_inputs.get<float>(0);
         BOOST_ASSERT(ev_buf_pan);

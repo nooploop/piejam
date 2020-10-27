@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/smoother.h>
 
 #include <algorithm>
@@ -45,6 +46,8 @@ public:
 
     void process(process_context const& ctx) override
     {
+        verify_process_context(*this, ctx);
+
         event_buffer<float> const* const amp_ev_buf =
                 ctx.event_inputs.get<float>(0);
         std::span<float const> const in_buf = ctx.inputs[0];

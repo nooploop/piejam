@@ -18,6 +18,7 @@
 #include <piejam/audio/components/level_meter_processor.h>
 
 #include <piejam/audio/engine/process_context.h>
+#include <piejam/audio/engine/verify_process_context.h>
 
 #include <algorithm>
 #include <span>
@@ -39,6 +40,8 @@ level_meter_processor::level_meter_processor(unsigned const samplerate)
 void
 level_meter_processor::process(engine::process_context const& ctx)
 {
+    verify_process_context(*this, ctx);
+
     std::span<float const> const& in_buf = ctx.inputs[0];
     if (!in_buf.empty())
         std::ranges::copy(in_buf, std::back_inserter(m_lm));

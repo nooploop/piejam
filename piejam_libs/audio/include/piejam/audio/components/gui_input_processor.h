@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/verify_process_context.h>
 
 #include <atomic>
 #include <functional>
@@ -56,6 +57,7 @@ public:
 
     void process(engine::process_context const& ctx) override
     {
+        engine::verify_process_context(*this, ctx);
         std::invoke(m_process_fn, this, ctx);
     }
 

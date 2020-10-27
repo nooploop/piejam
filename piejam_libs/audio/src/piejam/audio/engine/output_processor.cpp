@@ -18,6 +18,7 @@
 #include <piejam/audio/engine/output_processor.h>
 
 #include <piejam/audio/engine/process_context.h>
+#include <piejam/audio/engine/verify_process_context.h>
 
 #include <algorithm>
 #include <cassert>
@@ -34,7 +35,7 @@ output_processor::output_processor(std::size_t const num_inputs)
 void
 output_processor::process(process_context const& ctx)
 {
-    assert(m_engine_output.major_size() == m_num_inputs);
+    verify_process_context(*this, ctx);
 
     for (std::size_t ch = 0; ch < m_num_inputs; ++ch)
     {

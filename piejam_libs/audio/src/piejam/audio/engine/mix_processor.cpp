@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/verify_process_context.h>
 
 #include <algorithm>
 #include <cassert>
@@ -60,6 +61,8 @@ mix_processor::mix_processor(std::size_t num_inputs)
 void
 mix_processor::process(process_context const& ctx)
 {
+    verify_process_context(*this, ctx);
+
     std::size_t mixed = 0;
     for (std::span<float const> const& in : ctx.inputs)
     {
