@@ -65,4 +65,5 @@ target_link_libraries(piejam_audio
     PUBLIC piejam_algorithm piejam_container piejam_io piejam_numeric piejam_thread
     PRIVATE fmt spdlog::spdlog piejam_functional piejam_range)
 
+add_subdirectory(benchmarks)
 add_subdirectory(tests)

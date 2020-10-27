@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
 
 option(PIEJAM_BUILD_AUDIO_TEST "Build pjaudiotest" OFF)
+option(PIEJAM_BENCHMARKS "Build benchmarks" OFF)
 option(PIEJAM_TESTS "Build tests" OFF)
 
 if(PIEJAM_TESTS)
