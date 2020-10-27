@@ -34,7 +34,7 @@ Item {
 
     id: root
 
-    width: 142
+    width: 150
     height: 400
 
     Frame {

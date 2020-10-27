@@ -33,7 +33,6 @@ Item {
 
     LevelMeter {
         id: meter
-        anchors.rightMargin: 4
         anchors.right: fader.left
         anchors.left: parent.left
         anchors.top: parent.top

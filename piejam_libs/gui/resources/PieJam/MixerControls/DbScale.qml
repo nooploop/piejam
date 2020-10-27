@@ -43,7 +43,7 @@ Canvas {
         privates.drawLines(ctx)
 
         if (root.enableText) {
-            ctx.font = "8px sans-serif"
+            ctx.font = "10px sans-serif"
             ctx.textAlign = horizontalOrientation === DbScale.Orientation.Left ? "left" : "right"
             privates.drawText(ctx)
         }
