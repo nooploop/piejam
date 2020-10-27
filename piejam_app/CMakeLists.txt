@@ -39,4 +39,4 @@ target_compile_options(piejam_app PRIVATE -Wall -Wextra -Werror -Wno-error=depre
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     target_compile_definitions(piejam_app PRIVATE QT_QML_DEBUG=1)
 endif()
-install(TARGETS piejam_app RUNTIME DESTINATION bin RENAME piejam)
+install(TARGETS piejam_app RUNTIME DESTINATION bin)
