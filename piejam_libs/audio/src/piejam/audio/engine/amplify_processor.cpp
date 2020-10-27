@@ -55,12 +55,20 @@ public:
         {
             if (m_factor.is_running())
             {
-                std::transform(
-                        in_buf.begin(),
-                        in_buf.end(),
-                        m_factor.advance_iterator(),
-                        out_buf.begin(),
-                        std::multiplies<float>{});
+                if (!in_buf.empty())
+                {
+                    std::transform(
+                            in_buf.begin(),
+                            in_buf.end(),
+                            m_factor.advance_iterator(),
+                            out_buf.begin(),
+                            std::multiplies<float>{});
+                }
+                else
+                {
+                    res_buf = in_buf;
+                    m_factor.advance(ctx.buffer_size);
+                }
             }
             else if (m_factor.current() == 1.f || in_buf.empty())
                 res_buf = in_buf;

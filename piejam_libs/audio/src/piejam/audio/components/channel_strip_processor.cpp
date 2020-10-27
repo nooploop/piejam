@@ -130,17 +130,14 @@ public:
                 }
                 else
                 {
-                    auto pbg = pan_balance_gain(pan_it->value());
-                    ev_buf_left.insert(
-                            pan_it->offset(),
-                            pbg.left * vol_it->value());
-                    ev_buf_right.insert(
-                            pan_it->offset(),
-                            pbg.right * vol_it->value());
-                    m_last_pan_balance = pan_it->value();
-                    ++pan_it;
-                    m_last_volume = vol_it->value();
-                    ++vol_it;
+                    auto const offset = pan_it->offset();
+                    auto const pan_value = (*pan_it++).value();
+                    auto const vol_value = (*vol_it++).value();
+                    auto pbg = pan_balance_gain(pan_value);
+                    ev_buf_left.insert(offset, pbg.left * vol_value);
+                    ev_buf_right.insert(offset, pbg.right * vol_value);
+                    m_last_pan_balance = pan_value;
+                    m_last_volume = vol_value;
                 }
             }
             else if (pan_it != pan_last)

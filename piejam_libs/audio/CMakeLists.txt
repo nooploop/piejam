@@ -6,6 +6,8 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_writer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/process_step.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/channel_strip_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/gui_input_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/level_meter_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine.h
@@ -24,6 +26,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/thread_context.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_meter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_peak_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pair.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pan.h
@@ -44,6 +47,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/pcm_io.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/process_step.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/channel_strip_processor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/level_meter_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/amplify_processor.cpp
