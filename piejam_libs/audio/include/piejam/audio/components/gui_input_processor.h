@@ -83,9 +83,7 @@ private:
     std::atomic<T> m_value{};
     T m_last_sent_value{};
 
-    using process_fn_t =
-            void (gui_input_processor<T>::*)(engine::process_context const&);
-
+    using process_fn_t = decltype(&gui_input_processor<T>::process);
     process_fn_t m_process_fn{&gui_input_processor<T>::initial_process};
 };
 

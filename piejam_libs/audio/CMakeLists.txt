@@ -19,6 +19,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_to_dag.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/input_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/lockstep_events.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/mix_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/output_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor.h

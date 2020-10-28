@@ -17,6 +17,7 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/input_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/level_meter_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/level_meter_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/lockstep_events_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mix_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/output_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pan_test.cpp
