@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/meta/type_traits.h>
 #include <piejam/thread/affinity.h>
 #include <piejam/thread/priority.h>
 
@@ -33,12 +34,11 @@ namespace piejam::audio
 
 class process_thread
 {
-    inline static constexpr bool is_nothrow_default_constructible =
-            std::is_nothrow_default_constructible_v<std::atomic_bool> &&
-            std::is_nothrow_default_constructible_v<std::thread>;
 
 public:
-    process_thread() noexcept(is_nothrow_default_constructible) = default;
+    process_thread() noexcept(meta::is_nothrow_default_constructible_v<
+                              std::atomic_bool,
+                              std::thread>) = default;
 
     ~process_thread() { stop(); }
 
