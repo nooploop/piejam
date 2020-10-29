@@ -58,7 +58,7 @@ MixerChannel::subscribeStep(
             subs_id,
             state_change_subscriber,
             m_selectors.level,
-            [this](audio::mixer::stereo_level const& x) {
+            [this](runtime::mixer::stereo_level const& x) {
                 setLevel(x.left, x.right);
             });
 }

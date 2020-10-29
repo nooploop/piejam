@@ -76,8 +76,8 @@ struct update_levels final
     : ui::action<audio_state>
     , visitable_engine_action<update_levels>
 {
-    std::vector<audio::mixer::stereo_level> in_levels;
-    std::vector<audio::mixer::stereo_level> out_levels;
+    std::vector<mixer::stereo_level> in_levels;
+    std::vector<mixer::stereo_level> out_levels;
 
     auto operator()(audio_state const&) const -> audio_state override;
 };

@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <piejam/audio/mixer.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/container/box.h>
+#include <piejam/runtime/mixer.h>
 #include <piejam/runtime/selected_device.h>
 
 #include <functional>
@@ -39,7 +39,7 @@ struct audio_state
     unsigned samplerate{};
     unsigned period_size{};
 
-    audio::mixer::state mixer_state{};
+    mixer::state mixer_state{};
 
     std::size_t xruns{};
     float cpu_load{};

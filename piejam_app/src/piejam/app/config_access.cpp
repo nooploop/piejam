@@ -85,7 +85,8 @@ save(runtime::audio_state const& state)
             std::ranges::transform(
                     channels,
                     std::back_inserter(configs),
-                    [](audio::mixer::channel const& ch) -> runtime::bus_config {
+                    [](runtime::mixer::channel const& ch)
+                            -> runtime::bus_config {
                         return {ch.name, ch.type, ch.device_channels};
                     });
         };

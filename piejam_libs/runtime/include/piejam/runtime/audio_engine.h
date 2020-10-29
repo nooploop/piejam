@@ -23,10 +23,10 @@
 #include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/thread_context.h>
-#include <piejam/audio/mixer.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
 #include <piejam/range/table_view.h>
+#include <piejam/runtime/mixer.h>
 
 #include <memory>
 #include <vector>
@@ -43,7 +43,7 @@ public:
             unsigned samplerate,
             unsigned num_device_input_channels,
             unsigned num_device_output_channels,
-            audio::mixer::state const&);
+            mixer::state const&);
     ~audio_engine();
 
     void set_input_channel_volume(std::size_t index, float volume);
@@ -52,9 +52,9 @@ public:
     void set_output_channel_balance(std::size_t index, float balance);
 
     auto get_input_level(std::size_t index) const noexcept
-            -> audio::mixer::stereo_level;
+            -> mixer::stereo_level;
     auto get_output_level(std::size_t index) const noexcept
-            -> audio::mixer::stereo_level;
+            -> mixer::stereo_level;
 
     void operator()(
             range::table_view<float const> const& in_audio,

@@ -19,10 +19,10 @@
 
 #include <piejam/audio/device.h>
 #include <piejam/audio/fwd.h>
-#include <piejam/audio/mixer.h>
 #include <piejam/redux/functors.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/mixer.h>
 
 #include <functional>
 #include <memory>

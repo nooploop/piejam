@@ -39,7 +39,7 @@ using processor_ptr = std::unique_ptr<audio::engine::processor>;
 class audio_engine::mixer_bus final
 {
 public:
-    mixer_bus(unsigned const samplerate, audio::mixer::channel const& channel)
+    mixer_bus(unsigned const samplerate, mixer::channel const& channel)
         : m_device_channels(channel.device_channels)
         , m_volume_proc(std::make_unique<aucomp::gui_input_processor<float>>(
                   channel.volume))
@@ -67,7 +67,7 @@ public:
     void set_volume(float vol) noexcept { m_volume_proc->set(vol); }
     void set_pan_balance(float pan) noexcept { m_pan_balance_proc->set(pan); }
 
-    auto get_level() const noexcept -> audio::mixer::stereo_level
+    auto get_level() const noexcept -> mixer::stereo_level
     {
         return {m_level_meter_procs.left->peak_level(),
                 m_level_meter_procs.right->peak_level()};
@@ -123,8 +123,7 @@ private:
 static auto
 make_mixer_bus_vector(
         unsigned const samplerate,
-        audio::mixer::channels const& channels)
-        -> std::vector<audio_engine::mixer_bus>
+        mixer::channels const& channels) -> std::vector<audio_engine::mixer_bus>
 {
     std::vector<audio_engine::mixer_bus> result;
     result.reserve(channels.size());
@@ -175,7 +174,7 @@ connect_mixer_bus(audio::engine::graph& g, audio_engine::mixer_bus const& mb)
 
 static auto
 make_graph(
-        audio::mixer::state const& mixer_state,
+        mixer::state const& mixer_state,
         audio::engine::processor& input_proc,
         audio::engine::processor& output_proc,
         std::vector<audio_engine::mixer_bus> const& input_buses,
@@ -272,7 +271,7 @@ audio_engine::audio_engine(
         unsigned const samplerate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels,
-        audio::mixer::state const& mixer_state)
+        mixer::state const& mixer_state)
     : m_input_proc(std::make_unique<audio::engine::input_processor>(
               num_device_input_channels))
     , m_output_proc(std::make_unique<audio::engine::output_processor>(
@@ -323,14 +322,14 @@ audio_engine::set_output_channel_balance(std::size_t index, float balance)
 
 auto
 audio_engine::get_input_level(std::size_t index) const noexcept
-        -> audio::mixer::stereo_level
+        -> mixer::stereo_level
 {
     return m_input_buses[index].get_level();
 }
 
 auto
 audio_engine::get_output_level(std::size_t index) const noexcept
-        -> audio::mixer::stereo_level
+        -> mixer::stereo_level
 {
     return m_output_buses[index].get_level();
 }

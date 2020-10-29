@@ -26,11 +26,11 @@
 #include <variant>
 #include <vector>
 
-namespace piejam::audio::mixer
+namespace piejam::runtime::mixer
 {
 
-using stereo_level = pair<float>;
-using channel_type = bus_type;
+using stereo_level = audio::pair<float>;
+using channel_type = audio::bus_type;
 
 struct channel
 {
@@ -41,7 +41,7 @@ struct channel
     channel_type type{};
 
     //! mono channels hold same device channel in the pair
-    channel_index_pair device_channels{npos};
+    audio::channel_index_pair device_channels{npos};
 };
 
 using channels = std::vector<channel>;

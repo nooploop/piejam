@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <piejam/audio/mixer.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
@@ -26,6 +25,7 @@
 #include <piejam/container/boxed_string.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/mixer.h>
 
 #include <cstddef>
 
@@ -70,12 +70,12 @@ auto make_bus_channel_selector(
 auto make_input_volume_selector(std::size_t index) -> selector<float>;
 auto make_input_pan_selector(std::size_t index) -> selector<float>;
 auto make_input_level_selector(std::size_t index)
-        -> selector<audio::mixer::stereo_level>;
+        -> selector<mixer::stereo_level>;
 
 auto make_output_volume_selector(std::size_t index) -> selector<float>;
 auto make_output_balance_selector(std::size_t index) -> selector<float>;
 auto make_output_level_selector(std::size_t index)
-        -> selector<audio::mixer::stereo_level>;
+        -> selector<mixer::stereo_level>;
 
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;
