@@ -8,7 +8,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/gui_input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/level_meter_processor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/mixer_bus_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/amplify_processor.h
@@ -50,7 +49,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/pcm_io.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/process_step.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/level_meter_processor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/mixer_bus_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/amplify_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/dag.cpp

@@ -17,18 +17,16 @@
 
 #pragma once
 
+#include <piejam/audio/engine/fwd.h>
+
 #include <memory>
 
-namespace piejam::audio::engine
-{
-class processor;
-}
-
-namespace piejam::audio::components
+namespace piejam::runtime::audio_components
 {
 
-auto make_mono_mixer_bus_processor() -> std::unique_ptr<engine::processor>;
+auto make_mono_mixer_bus_processor()
+        -> std::unique_ptr<audio::engine::processor>;
 auto make_stereo_mixer_bus_processor()
-        -> std::unique_ptr<engine::processor>;
+        -> std::unique_ptr<audio::engine::processor>;
 
-} // namespace piejam::audio::components
+} // namespace piejam::runtime::audio_components

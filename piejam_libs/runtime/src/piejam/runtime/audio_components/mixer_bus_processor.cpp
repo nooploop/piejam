@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/audio/components/mixer_bus_processor.h>
+#include <piejam/runtime/audio_components/mixer_bus_processor.h>
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
@@ -28,14 +28,14 @@
 
 #include <boost/assert.hpp>
 
-namespace piejam::audio::components
+namespace piejam::runtime::audio_components
 {
 
 namespace
 {
 
-template <bus_type C>
-class mixer_bus_processor final : public engine::processor
+template <audio::bus_type C>
+class mixer_bus_processor final : public audio::engine::processor
 {
 public:
     auto type_name() const -> std::string_view override { return "mixer_bus"; }
@@ -54,51 +54,53 @@ public:
     auto num_event_outputs() const -> std::size_t override { return 2; }
 
     void create_event_output_buffers(
-            engine::event_output_buffer_factory const& f) const override
+            audio::engine::event_output_buffer_factory const& f) const override
     {
         f.add<float>();
         f.add<float>();
     }
 
     static constexpr auto pan_balance_factors(float const pan_balance)
-            -> stereo_gain
+            -> audio::stereo_gain
     {
-        return C == bus_type::mono ? sinusoidal_constant_power_pan(pan_balance)
-                                   : stereo_balance(pan_balance);
+        return C == audio::bus_type::mono
+                       ? audio::sinusoidal_constant_power_pan(pan_balance)
+                       : audio::stereo_balance(pan_balance);
     }
 
-    void process(engine::process_context const& ctx) override
+    void process(audio::engine::process_context const& ctx) override
     {
-        engine::verify_process_context(*this, ctx);
+        audio::engine::verify_process_context(*this, ctx);
 
-        engine::event_buffer<float> const* const ev_buf_pan =
+        audio::engine::event_buffer<float> const* const ev_buf_pan =
                 ctx.event_inputs.get<float>(0);
         BOOST_ASSERT(ev_buf_pan);
 
-        engine::event_buffer<float> const* const ev_buf_vol =
+        audio::engine::event_buffer<float> const* const ev_buf_vol =
                 ctx.event_inputs.get<float>(1);
         BOOST_ASSERT(ev_buf_vol);
 
         if (ev_buf_pan->empty() && ev_buf_vol->empty())
             return;
 
-        engine::event_buffer<float>& ev_buf_left =
+        audio::engine::event_buffer<float>& ev_buf_left =
                 ctx.event_outputs.get<float>(0);
-        engine::event_buffer<float>& ev_buf_right =
+        audio::engine::event_buffer<float>& ev_buf_right =
                 ctx.event_outputs.get<float>(1);
 
-        std::tie(m_last_pan_balance, m_last_volume) = engine::lockstep_events(
-                [&ev_buf_left, &ev_buf_right](
-                        std::size_t const offset,
-                        float const pan,
-                        float const vol) {
-                    auto const pbf = pan_balance_factors(pan);
-                    ev_buf_left.insert(offset, pbf.left * vol);
-                    ev_buf_right.insert(offset, pbf.right * vol);
-                },
-                std::tuple(m_last_pan_balance, m_last_volume),
-                *ev_buf_pan,
-                *ev_buf_vol);
+        std::tie(m_last_pan_balance, m_last_volume) =
+                audio::engine::lockstep_events(
+                        [&ev_buf_left, &ev_buf_right](
+                                std::size_t const offset,
+                                float const pan,
+                                float const vol) {
+                            auto const pbf = pan_balance_factors(pan);
+                            ev_buf_left.insert(offset, pbf.left * vol);
+                            ev_buf_right.insert(offset, pbf.right * vol);
+                        },
+                        std::tuple(m_last_pan_balance, m_last_volume),
+                        *ev_buf_pan,
+                        *ev_buf_vol);
     }
 
 private:
@@ -109,15 +111,15 @@ private:
 } // namespace
 
 auto
-make_mono_mixer_bus_processor() -> std::unique_ptr<engine::processor>
+make_mono_mixer_bus_processor() -> std::unique_ptr<audio::engine::processor>
 {
-    return std::make_unique<mixer_bus_processor<bus_type::mono>>();
+    return std::make_unique<mixer_bus_processor<audio::bus_type::mono>>();
 }
 
 auto
-make_stereo_mixer_bus_processor() -> std::unique_ptr<engine::processor>
+make_stereo_mixer_bus_processor() -> std::unique_ptr<audio::engine::processor>
 {
-    return std::make_unique<mixer_bus_processor<bus_type::stereo>>();
+    return std::make_unique<mixer_bus_processor<audio::bus_type::stereo>>();
 }
 
-} // namespace piejam::audio::components
+} // namespace piejam::runtime::audio_components
