@@ -52,6 +52,19 @@ struct pair
         , right(r)
     {
     }
+
+    constexpr pair(T&& l, T&& r) noexcept(
+            std::is_nothrow_move_constructible_v<T>)
+        : left(std::move(l))
+        , right(std::move(r))
+    {
+    }
+
+    constexpr pair(pair const&) = default;
+    constexpr pair(pair&&) = default;
+
+    constexpr auto operator=(pair const&) -> pair<T>& = default;
+    constexpr auto operator=(pair &&) -> pair<T>& = default;
 };
 
 template <class T>

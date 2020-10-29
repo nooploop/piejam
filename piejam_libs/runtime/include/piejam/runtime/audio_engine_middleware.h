@@ -77,7 +77,7 @@ private:
     get_state_f m_get_state;
     next_f m_next;
 
-    std::unique_ptr<piejam::audio::engine> m_engine;
+    std::unique_ptr<audio_engine> m_engine;
     std::unique_ptr<piejam::audio::device> m_device{
             std::make_unique<piejam::audio::dummy_device>()};
 };

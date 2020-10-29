@@ -20,7 +20,6 @@
 #include <piejam/algorithm/find_or_get_first.h>
 #include <piejam/algorithm/index_of.h>
 #include <piejam/algorithm/transform_to_vector.h>
-#include <piejam/audio/engine.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/runtime/actions/apply_app_config.h>
@@ -28,6 +27,7 @@
 #include <piejam/runtime/actions/device_actions.h>
 #include <piejam/runtime/actions/engine_action_visitor.h>
 #include <piejam/runtime/actions/engine_actions.h>
+#include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/audio_state.h>
 
 #include <spdlog/spdlog.h>
@@ -270,7 +270,7 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->set_input_channel_gain(a.index, a.gain);
+                    m_engine->set_input_channel_volume(a.index, a.gain);
                 }
             },
             [this](actions::set_input_channel_pan const& a) {
@@ -278,7 +278,7 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->set_input_channel_pan(a.index, a.pan);
+                    m_engine->set_input_channel_pan_balance(a.index, a.pan);
                 }
             },
             [this](actions::set_output_channel_gain const& a) {
@@ -286,7 +286,7 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->set_output_channel_gain(a.index, a.gain);
+                    m_engine->set_output_channel_volume(a.index, a.gain);
                 }
             },
             [this](actions::set_output_channel_balance const& a) {
@@ -389,32 +389,12 @@ audio_engine_middleware::start_engine()
     if (m_device->is_open())
     {
         auto const& state = m_get_state();
-        auto const& inputs = state.mixer_state.inputs;
-        auto const& outputs = state.mixer_state.outputs;
 
-        m_engine = std::make_unique<audio::engine>(
+        m_engine = std::make_unique<audio_engine>(
                 state.samplerate,
-                algorithm::transform_to_vector(
-                        inputs,
-                        [](auto const& in) {
-                            return std::pair(in.type, in.device_channels);
-                        }),
-                algorithm::transform_to_vector(outputs, [](auto const& out) {
-                    return out.device_channels;
-                }));
-
-        for (std::size_t n = 0, num_inputs = inputs.size(); n < num_inputs; ++n)
-        {
-            m_engine->set_input_channel_gain(n, inputs[n].gain);
-            m_engine->set_input_channel_pan(n, inputs[n].pan_balance);
-        }
-
-        for (std::size_t n = 0, num_outputs = outputs.size(); n < num_outputs;
-             ++n)
-        {
-            m_engine->set_output_channel_gain(n, outputs[n].gain);
-            m_engine->set_output_channel_balance(n, outputs[n].pan_balance);
-        }
+                state.input.hw_params->num_channels,
+                state.output.hw_params->num_channels,
+                state.mixer_state);
 
         m_device->start(
                 m_audio_thread_cpu_affinity,

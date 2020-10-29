@@ -23,7 +23,6 @@ namespace piejam::audio
 enum class pcm_format : unsigned;
 
 class device;
-class engine;
 class process_thread;
 
 struct pcm_descriptor;

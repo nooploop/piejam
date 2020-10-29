@@ -17,23 +17,11 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/fwd.h>
-
-namespace piejam::runtime
+namespace piejam::audio::components
 {
 
-class audio_engine;
-struct audio_state;
-struct selected_device;
+template <class T>
+class gui_input_processor;
+class level_meter_processor;
 
-namespace ui
-{
-
-template <class State>
-struct action;
-
-} // namespace ui
-
-using action = ui::action<audio_state>;
-
-} // namespace piejam::runtime
+} // namespace piejam::audio::components
