@@ -23,6 +23,7 @@
 #include <piejam/audio/engine/processor.h>
 
 #include <boost/assert.hpp>
+#include <boost/core/ignore_unused.hpp>
 
 #include <algorithm>
 
@@ -46,6 +47,8 @@ verify_process_context(processor const& proc, process_context const& ctx)
             std::ranges::all_of(ctx.outputs, [&](std::span<float> const& b) {
                 return b.size() == ctx.buffer_size;
             }));
+
+    boost::ignore_unused(proc, ctx);
 }
 
 } // namespace piejam::audio::engine

@@ -45,6 +45,8 @@ public:
         m_value.store(std::move(x), std::memory_order_release);
     }
 
+    auto type_name() const -> std::string_view override { return "gui_input"; }
+
     auto num_inputs() const -> std::size_t override { return 0; }
     auto num_outputs() const -> std::size_t override { return 0; }
     auto num_event_inputs() const -> std::size_t override { return 0; }

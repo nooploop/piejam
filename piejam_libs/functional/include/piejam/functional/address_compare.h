@@ -23,27 +23,47 @@
 namespace piejam
 {
 
+namespace detail
+{
+
+template <class T>
+struct unwrap_const_addressof
+{
+    constexpr auto operator()(T const& t) const noexcept -> T const*
+    {
+        return std::addressof(t);
+    }
+
+    constexpr auto operator()(T const* const t) const noexcept -> T const*
+    {
+        return t;
+    }
+
+    constexpr auto operator()(std::reference_wrapper<T> const& t) const noexcept
+            -> T const*
+    {
+        return std::addressof(t.get());
+    }
+
+    constexpr auto
+    operator()(std::reference_wrapper<T const> const& t) const noexcept
+            -> T const*
+    {
+        return std::addressof(t.get());
+    }
+};
+
+} // namespace detail
+
 template <class T, class Compare>
 struct address_compare
 {
-    constexpr auto operator()(T const& l, T const& r) const noexcept -> bool
+    template <class U, class V>
+    constexpr auto operator()(U const& l, V const& r) const noexcept -> bool
     {
-        return Compare{}(std::addressof(l), std::addressof(r));
-    }
-
-    constexpr auto operator()(T const& l, T const* const r) const noexcept -> bool
-    {
-        return Compare{}(std::addressof(l), r);
-    }
-
-    constexpr auto operator()(T const* const l, T const& r) const noexcept -> bool
-    {
-        return Compare{}(l, std::addressof(r));
-    }
-
-    constexpr auto operator()(T const* const l, T const* const r) const noexcept -> bool
-    {
-        return Compare{}(l, r);
+        return Compare{}(
+                detail::unwrap_const_addressof<T>{}(l),
+                detail::unwrap_const_addressof<T>{}(r));
     }
 };
 

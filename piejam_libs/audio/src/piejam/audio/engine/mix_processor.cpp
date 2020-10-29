@@ -35,6 +35,8 @@ class mix_processor final : public processor
 public:
     mix_processor(std::size_t num_inputs);
 
+    auto type_name() const -> std::string_view override { return "mix"; }
+
     auto num_inputs() const -> std::size_t override { return m_num_inputs; }
     auto num_outputs() const -> std::size_t override { return 1; }
 

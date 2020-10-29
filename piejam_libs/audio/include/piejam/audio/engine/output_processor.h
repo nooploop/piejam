@@ -35,6 +35,8 @@ public:
         m_engine_output = engine_output;
     }
 
+    auto type_name() const -> std::string_view override { return "output"; }
+
     auto num_inputs() const -> std::size_t override { return m_num_inputs; }
     auto num_outputs() const -> std::size_t override { return 0; }
 

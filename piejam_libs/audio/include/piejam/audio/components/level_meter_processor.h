@@ -35,6 +35,11 @@ public:
         return m_peak_level.load(std::memory_order_consume);
     }
 
+    auto type_name() const -> std::string_view override
+    {
+        return "level_meter";
+    }
+
     auto num_inputs() const -> std::size_t override { return 1; }
     auto num_outputs() const -> std::size_t override { return 0; }
     auto num_event_inputs() const -> std::size_t override { return 0; }

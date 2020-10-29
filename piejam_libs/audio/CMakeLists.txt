@@ -54,6 +54,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/amplify_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/dag.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/export_graph_as_dot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph_to_dag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/input_processor.cpp

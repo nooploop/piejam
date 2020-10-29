@@ -38,6 +38,11 @@ template <bus_type C>
 class channel_strip_processor final : public engine::processor
 {
 public:
+    auto type_name() const -> std::string_view override
+    {
+        return "channel_strip";
+    }
+
     auto num_inputs() const -> std::size_t override { return 0; }
     auto num_outputs() const -> std::size_t override { return 0; }
 

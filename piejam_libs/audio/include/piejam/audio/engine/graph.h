@@ -21,6 +21,7 @@
 
 #include <functional>
 #include <map>
+#include <string>
 #include <vector>
 
 namespace piejam::audio::engine
@@ -64,5 +65,7 @@ private:
     wires_t m_wires;
     wires_t m_event_wires;
 };
+
+auto export_graph_as_dot(graph const&) -> std::string;
 
 } // namespace piejam::audio::engine
