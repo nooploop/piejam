@@ -35,7 +35,7 @@ using channel_type = bus_type;
 struct channel
 {
     container::boxed_string name;
-    float gain{1.f};
+    float volume{1.f};
     float pan_balance{};
     stereo_level level;
     channel_type type{};

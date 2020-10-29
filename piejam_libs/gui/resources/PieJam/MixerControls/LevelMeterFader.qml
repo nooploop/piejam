@@ -24,9 +24,9 @@ Item {
 
     property alias levelLeft: meter.levelLeft
     property alias levelRight: meter.levelRight
-    property alias gain: fader.gain
+    property alias volume: fader.volume
 
-    signal faderMoved(real newGain)
+    signal faderMoved(real newVolume)
 
     width: 142
     height: 400
@@ -45,6 +45,6 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
 
-        onMoved: root.faderMoved(newGain)
+        onMoved: root.faderMoved(newVolume)
     }
 }

@@ -265,12 +265,12 @@ audio_engine_middleware::process_engine_action(
         actions::engine_action const& action)
 {
     auto v = ui::make_action_visitor<actions::engine_action_visitor>(
-            [this](actions::set_input_channel_gain const& a) {
+            [this](actions::set_input_channel_volume const& a) {
                 m_next(a);
 
                 if (m_engine)
                 {
-                    m_engine->set_input_channel_volume(a.index, a.gain);
+                    m_engine->set_input_channel_volume(a.index, a.volume);
                 }
             },
             [this](actions::set_input_channel_pan const& a) {
@@ -281,12 +281,12 @@ audio_engine_middleware::process_engine_action(
                     m_engine->set_input_channel_pan_balance(a.index, a.pan);
                 }
             },
-            [this](actions::set_output_channel_gain const& a) {
+            [this](actions::set_output_channel_volume const& a) {
                 m_next(a);
 
                 if (m_engine)
                 {
-                    m_engine->set_output_channel_volume(a.index, a.gain);
+                    m_engine->set_output_channel_volume(a.index, a.volume);
                 }
             },
             [this](actions::set_output_channel_balance const& a) {

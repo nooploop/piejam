@@ -39,9 +39,9 @@ struct select_bus_channel;
 struct add_device_bus;
 struct delete_device_bus;
 
-struct set_input_channel_gain;
+struct set_input_channel_volume;
 struct set_input_channel_pan;
-struct set_output_channel_gain;
+struct set_output_channel_volume;
 struct set_output_channel_balance;
 struct request_levels_update;
 struct update_levels;

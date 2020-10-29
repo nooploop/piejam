@@ -45,8 +45,8 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.gain,
-            [this](float x) { setGain(x); });
+            m_selectors.volume,
+            [this](float x) { setVolume(x); });
 
     subs.observe(
             subs_id,

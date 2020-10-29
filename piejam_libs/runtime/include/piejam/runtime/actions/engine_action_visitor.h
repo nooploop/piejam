@@ -25,9 +25,9 @@ namespace piejam::runtime::actions
 
 struct engine_action_visitor
     : ui::action_visitor_interface<
-              set_input_channel_gain,
+              set_input_channel_volume,
               set_input_channel_pan,
-              set_output_channel_gain,
+              set_output_channel_volume,
               set_output_channel_balance,
               request_levels_update,
               update_levels,

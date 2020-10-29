@@ -27,9 +27,9 @@ Item {
     property alias levelLeft: levelMeterFader.levelLeft
     property alias levelRight: levelMeterFader.levelRight
     property alias pan: panControls.value
-    property alias gain: levelMeterFader.gain
+    property alias volume: levelMeterFader.volume
 
-    signal faderMoved(real newGain)
+    signal faderMoved(real newVolume)
     signal panMoved(real newPan)
 
     id: root
@@ -77,7 +77,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.top: panControls.bottom
 
-            onFaderMoved: root.faderMoved(newGain)
+            onFaderMoved: root.faderMoved(newVolume)
         }
 
     }

@@ -215,11 +215,11 @@ make_bus_channel_selector(
 }
 
 auto
-make_input_gain_selector(std::size_t const index) -> selector<float>
+make_input_volume_selector(std::size_t const index) -> selector<float>
 {
     return selector<float>([index](audio_state const& st) -> float {
         return index < st.mixer_state.inputs.size()
-                       ? st.mixer_state.inputs[index].gain
+                       ? st.mixer_state.inputs[index].volume
                        : 1.f;
     });
 }
@@ -247,11 +247,11 @@ make_input_level_selector(std::size_t const index)
 }
 
 auto
-make_output_gain_selector(std::size_t const index) -> selector<float>
+make_output_volume_selector(std::size_t const index) -> selector<float>
 {
     return selector<float>([index](audio_state const& st) -> float {
         return index < st.mixer_state.outputs.size()
-                       ? st.mixer_state.outputs[index].gain
+                       ? st.mixer_state.outputs[index].volume
                        : 1.f;
     });
 }

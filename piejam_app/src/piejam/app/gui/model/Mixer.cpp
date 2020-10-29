@@ -58,7 +58,7 @@ Mixer::subscribeStep(
                                     selectors::make_bus_name_selector(
                                             piejam::audio::bus_direction::input,
                                             bus),
-                                    selectors::make_input_gain_selector(bus),
+                                    selectors::make_input_volume_selector(bus),
                                     selectors::make_input_pan_selector(bus),
                                     selectors::make_input_level_selector(
                                             bus)}));
@@ -86,7 +86,7 @@ Mixer::subscribeStep(
                                             piejam::audio::bus_direction::
                                                     output,
                                             bus),
-                                    selectors::make_output_gain_selector(bus),
+                                    selectors::make_output_volume_selector(bus),
                                     selectors::make_output_balance_selector(
                                             bus),
                                     selectors::make_output_level_selector(
@@ -101,12 +101,12 @@ Mixer::subscribeStep(
 }
 
 void
-Mixer::setInputChannelGain(unsigned const index, double const gain)
+Mixer::setInputChannelVolume(unsigned const index, double const volume)
 {
-    runtime::actions::set_input_channel_gain action;
+    runtime::actions::set_input_channel_volume action;
     action.index = index;
-    action.gain = static_cast<float>(gain);
-    m_store.dispatch<runtime::actions::set_input_channel_gain>(action);
+    action.volume = static_cast<float>(volume);
+    m_store.dispatch<runtime::actions::set_input_channel_volume>(action);
 }
 
 void
@@ -119,12 +119,12 @@ Mixer::setInputChannelPan(unsigned const index, double const pan)
 }
 
 void
-Mixer::setOutputChannelGain(unsigned const index, double const gain)
+Mixer::setOutputChannelVolume(unsigned const index, double const volume)
 {
-    runtime::actions::set_output_channel_gain action;
+    runtime::actions::set_output_channel_volume action;
     action.index = index;
-    action.gain = static_cast<float>(gain);
-    m_store.dispatch<runtime::actions::set_output_channel_gain>(action);
+    action.volume = static_cast<float>(volume);
+    m_store.dispatch<runtime::actions::set_output_channel_volume>(action);
 }
 
 void

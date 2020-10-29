@@ -26,9 +26,9 @@ import "../Util/MathExt.js" as MathExt
 Item {
     id: root
 
-    property real gain
+    property real volume
 
-    signal moved(real newGain)
+    signal moved(real newVolume)
 
     width: 58
     height: 280
@@ -39,7 +39,7 @@ Item {
         anchors.fill: parent
         padding: 6
 
-        value: MathExt.mapTo(dbScale.scaleData.dbToPosition(DbConvert.linToDb(root.gain)), privates.minPos, privates.maxPos, 0, 1)
+        value: MathExt.mapTo(dbScale.scaleData.dbToPosition(DbConvert.linToDb(root.volume)), privates.minPos, privates.maxPos, 0, 1)
 
         orientation: Qt.Vertical
 
@@ -67,8 +67,8 @@ Item {
         }
 
         onMoved: {
-            var newGain = dbScale.scaleData.dbAt(MathExt.mapTo(slider.value, 0, 1, privates.minPos, privates.maxPos))
-            root.moved(DbConvert.dbToLin(newGain))
+            var newVolume = dbScale.scaleData.dbAt(MathExt.mapTo(slider.value, 0, 1, privates.minPos, privates.maxPos))
+            root.moved(DbConvert.dbToLin(newVolume))
         }
 
         QtObject {

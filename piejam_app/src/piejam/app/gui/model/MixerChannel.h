@@ -30,7 +30,7 @@ namespace piejam::app::gui::model
 struct MixerChannelSelectors
 {
     selector<container::boxed_string> name;
-    selector<float> gain;
+    selector<float> volume;
     selector<float> pan;
     selector<audio::mixer::stereo_level> level;
 };

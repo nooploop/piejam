@@ -42,7 +42,7 @@ public:
     mixer_bus(unsigned const samplerate, audio::mixer::channel const& channel)
         : m_device_channels(channel.device_channels)
         , m_volume_proc(std::make_unique<aucomp::gui_input_processor<float>>(
-                  channel.gain))
+                  channel.volume))
         , m_pan_balance_proc(
                   std::make_unique<aucomp::gui_input_processor<float>>(
                           channel.pan_balance))

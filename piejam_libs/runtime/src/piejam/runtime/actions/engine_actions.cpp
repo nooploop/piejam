@@ -23,13 +23,13 @@ namespace piejam::runtime::actions
 {
 
 auto
-set_input_channel_gain::operator()(audio_state const& st) const -> audio_state
+set_input_channel_volume::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
     assert(index < new_st.mixer_state.inputs.size());
     auto& channel = new_st.mixer_state.inputs[index];
-    channel.gain = gain;
+    channel.volume = volume;
 
     return new_st;
 }
@@ -47,12 +47,12 @@ set_input_channel_pan::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-set_output_channel_gain::operator()(audio_state const& st) const -> audio_state
+set_output_channel_volume::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
     assert(index < new_st.mixer_state.outputs.size());
-    new_st.mixer_state.outputs[index].gain = gain;
+    new_st.mixer_state.outputs[index].volume = volume;
 
     return new_st;
 }

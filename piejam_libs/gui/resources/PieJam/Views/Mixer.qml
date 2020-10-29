@@ -53,10 +53,10 @@ TopPane {
                 levelLeft: model.item.levelLeft
                 levelRight: model.item.levelRight
                 pan: model.item.panBalance
-                gain: model.item.gain
+                volume: model.item.volume
                 name: model.item.name
 
-                onFaderMoved: root.model.setInputChannelGain(index, newGain)
+                onFaderMoved: root.model.setInputChannelVolume(index, newVolume)
                 onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
 
                 Component.onCompleted: model.item.subscribe()
@@ -85,10 +85,10 @@ TopPane {
                 levelLeft: model.item.levelLeft
                 levelRight: model.item.levelRight
                 pan: model.item.panBalance
-                gain: model.item.gain
+                volume: model.item.volume
                 name: model.item.name
 
-                onFaderMoved: root.model.setOutputChannelGain(index, newGain)
+                onFaderMoved: root.model.setOutputChannelVolume(index, newVolume)
                 onPanMoved: root.model.setOutputChannelBalance(index, newPan)
 
                 Component.onCompleted: model.item.subscribe()

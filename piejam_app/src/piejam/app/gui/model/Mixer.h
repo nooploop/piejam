@@ -32,9 +32,9 @@ class Mixer final : public Subscribable<piejam::gui::model::Mixer>
 public:
     Mixer(store&, subscriber&);
 
-    void setInputChannelGain(unsigned index, double gain) override;
+    void setInputChannelVolume(unsigned index, double volume) override;
     void setInputChannelPan(unsigned index, double pan) override;
-    void setOutputChannelGain(unsigned index, double gain) override;
+    void setOutputChannelVolume(unsigned index, double volume) override;
     void setOutputChannelBalance(unsigned index, double balance) override;
     void requestLevelsUpdate() override;
 

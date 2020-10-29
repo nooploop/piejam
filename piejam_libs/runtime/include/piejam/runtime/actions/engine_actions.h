@@ -25,12 +25,12 @@
 namespace piejam::runtime::actions
 {
 
-struct set_input_channel_gain final
+struct set_input_channel_volume final
     : ui::action<audio_state>
-    , visitable_engine_action<set_input_channel_gain>
+    , visitable_engine_action<set_input_channel_volume>
 {
     std::size_t index{};
-    float gain{1.f};
+    float volume{1.f};
 
     auto operator()(audio_state const&) const -> audio_state override;
 };
@@ -45,12 +45,12 @@ struct set_input_channel_pan final
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
-struct set_output_channel_gain final
+struct set_output_channel_volume final
     : ui::action<audio_state>
-    , visitable_engine_action<set_output_channel_gain>
+    , visitable_engine_action<set_output_channel_volume>
 {
     std::size_t index{};
-    float gain{1.f};
+    float volume{1.f};
 
     auto operator()(audio_state const&) const -> audio_state override;
 };

@@ -36,12 +36,12 @@ MixerChannel::setName(QString const& x)
 }
 
 void
-MixerChannel::setGain(double const x)
+MixerChannel::setVolume(double const x)
 {
-    if (m_gain != x)
+    if (m_volume != x)
     {
-        m_gain = x;
-        emit gainChanged();
+        m_volume = x;
+        emit volumeChanged();
     }
 }
 
