@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/audio/components/channel_strip_processor.h>
+#include <piejam/audio/components/mixer_bus_processor.h>
 
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -34,7 +34,7 @@
 namespace piejam::audio::components::test
 {
 
-struct channel_strip_processor_test : ::testing::Test
+struct mixer_bus_processor_test : ::testing::Test
 {
     std::size_t const buffer_size{16};
     engine::event_buffer_memory ev_buf_mem{1024};
@@ -43,9 +43,9 @@ struct channel_strip_processor_test : ::testing::Test
     engine::event_buffer<float> ev_in_vol_buf{ev_mem};
     engine::event_input_buffers ev_in_bufs{2};
     engine::event_output_buffers ev_out_bufs;
-    std::unique_ptr<engine::processor> sut{make_mono_channel_strip_processor()};
+    std::unique_ptr<engine::processor> sut{make_mono_mixer_bus_processor()};
 
-    channel_strip_processor_test()
+    mixer_bus_processor_test()
     {
         ev_in_bufs.set(0, ev_in_pan_buf);
         ev_in_bufs.set(1, ev_in_vol_buf);
@@ -54,7 +54,7 @@ struct channel_strip_processor_test : ::testing::Test
     }
 };
 
-TEST_F(channel_strip_processor_test, empty_inputs_to_empty_outputs)
+TEST_F(mixer_bus_processor_test, empty_inputs_to_empty_outputs)
 {
     sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
@@ -62,7 +62,7 @@ TEST_F(channel_strip_processor_test, empty_inputs_to_empty_outputs)
     EXPECT_TRUE(ev_out_bufs.get<float>(1).empty());
 }
 
-TEST_F(channel_strip_processor_test, one_pan_event)
+TEST_F(mixer_bus_processor_test, one_pan_event)
 {
     ev_in_pan_buf.insert(1, 1.f);
     sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
@@ -79,7 +79,7 @@ TEST_F(channel_strip_processor_test, one_pan_event)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, two_pan_events_at_different_offsets)
+TEST_F(mixer_bus_processor_test, two_pan_events_at_different_offsets)
 {
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_pan_buf.insert(3, -1.f);
@@ -99,7 +99,7 @@ TEST_F(channel_strip_processor_test, two_pan_events_at_different_offsets)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, two_pan_events_at_same_offset)
+TEST_F(mixer_bus_processor_test, two_pan_events_at_same_offset)
 {
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_pan_buf.insert(1, -1.f);
@@ -119,7 +119,7 @@ TEST_F(channel_strip_processor_test, two_pan_events_at_same_offset)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, one_vol_event)
+TEST_F(mixer_bus_processor_test, one_vol_event)
 {
     ev_in_vol_buf.insert(1, .5f);
     sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
@@ -136,7 +136,7 @@ TEST_F(channel_strip_processor_test, one_vol_event)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, two_vol_events_at_different_offsets)
+TEST_F(mixer_bus_processor_test, two_vol_events_at_different_offsets)
 {
     ev_in_vol_buf.insert(1, .5f);
     ev_in_vol_buf.insert(3, .7f);
@@ -156,7 +156,7 @@ TEST_F(channel_strip_processor_test, two_vol_events_at_different_offsets)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, two_vol_events_at_same_offset)
+TEST_F(mixer_bus_processor_test, two_vol_events_at_same_offset)
 {
     ev_in_vol_buf.insert(1, .5f);
     ev_in_vol_buf.insert(1, .7f);
@@ -176,7 +176,7 @@ TEST_F(channel_strip_processor_test, two_vol_events_at_same_offset)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, first_pan_then_vol)
+TEST_F(mixer_bus_processor_test, first_pan_then_vol)
 {
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_vol_buf.insert(3, .7f);
@@ -196,7 +196,7 @@ TEST_F(channel_strip_processor_test, first_pan_then_vol)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, first_vol_then_pan)
+TEST_F(mixer_bus_processor_test, first_vol_then_pan)
 {
     ev_in_vol_buf.insert(1, .7f);
     ev_in_pan_buf.insert(3, 1.f);
@@ -216,7 +216,7 @@ TEST_F(channel_strip_processor_test, first_vol_then_pan)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, pan_and_vol_at_same_offset)
+TEST_F(mixer_bus_processor_test, pan_and_vol_at_same_offset)
 {
     ev_in_vol_buf.insert(1, .7f);
     ev_in_pan_buf.insert(1, 1.f);
@@ -234,7 +234,7 @@ TEST_F(channel_strip_processor_test, pan_and_vol_at_same_offset)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test,
+TEST_F(mixer_bus_processor_test,
        pan_and_vol_at_same_offset_twice_consecutive)
 {
     ev_in_vol_buf.insert(1, .7f);
@@ -257,7 +257,7 @@ TEST_F(channel_strip_processor_test,
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test,
+TEST_F(mixer_bus_processor_test,
        pan_and_vol_at_same_offset_twice_at_same_offset)
 {
     ev_in_vol_buf.insert(1, .7f);
@@ -280,12 +280,12 @@ TEST_F(channel_strip_processor_test,
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-TEST_F(channel_strip_processor_test, stereo_balance)
+TEST_F(mixer_bus_processor_test, stereo_balance)
 {
     ev_in_pan_buf.insert(1, 1.f);
     ev_in_pan_buf.insert(3, -1.f);
     ev_in_pan_buf.insert(5, 0.f);
-    sut = make_stereo_channel_strip_processor();
+    sut = make_stereo_mixer_bus_processor();
     sut->process({{}, {}, {}, ev_in_bufs, ev_out_bufs, buffer_size});
 
     auto const& ev_out_left = ev_out_bufs.get<float>(0);

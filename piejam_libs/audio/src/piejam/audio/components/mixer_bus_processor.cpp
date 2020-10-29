@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/audio/components/channel_strip_processor.h>
+#include <piejam/audio/components/mixer_bus_processor.h>
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
@@ -35,13 +35,10 @@ namespace
 {
 
 template <bus_type C>
-class channel_strip_processor final : public engine::processor
+class mixer_bus_processor final : public engine::processor
 {
 public:
-    auto type_name() const -> std::string_view override
-    {
-        return "channel_strip";
-    }
+    auto type_name() const -> std::string_view override { return "mixer_bus"; }
 
     auto num_inputs() const -> std::size_t override { return 0; }
     auto num_outputs() const -> std::size_t override { return 0; }
@@ -112,15 +109,15 @@ private:
 } // namespace
 
 auto
-make_mono_channel_strip_processor() -> std::unique_ptr<engine::processor>
+make_mono_mixer_bus_processor() -> std::unique_ptr<engine::processor>
 {
-    return std::make_unique<channel_strip_processor<bus_type::mono>>();
+    return std::make_unique<mixer_bus_processor<bus_type::mono>>();
 }
 
 auto
-make_stereo_channel_strip_processor() -> std::unique_ptr<engine::processor>
+make_stereo_mixer_bus_processor() -> std::unique_ptr<engine::processor>
 {
-    return std::make_unique<channel_strip_processor<bus_type::stereo>>();
+    return std::make_unique<mixer_bus_processor<bus_type::stereo>>();
 }
 
 } // namespace piejam::audio::components

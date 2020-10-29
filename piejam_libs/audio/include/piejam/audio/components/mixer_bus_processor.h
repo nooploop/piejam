@@ -27,8 +27,8 @@ class processor;
 namespace piejam::audio::components
 {
 
-auto make_mono_channel_strip_processor() -> std::unique_ptr<engine::processor>;
-auto make_stereo_channel_strip_processor()
+auto make_mono_mixer_bus_processor() -> std::unique_ptr<engine::processor>;
+auto make_stereo_mixer_bus_processor()
         -> std::unique_ptr<engine::processor>;
 
 } // namespace piejam::audio::components

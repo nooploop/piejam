@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/audio_engine.h>
 
-#include <piejam/audio/components/channel_strip_processor.h>
+#include <piejam/audio/components/mixer_bus_processor.h>
 #include <piejam/audio/components/gui_input_processor.h>
 #include <piejam/audio/components/level_meter_processor.h>
 #include <piejam/audio/engine/amplify_processor.h>
@@ -48,8 +48,8 @@ public:
                           channel.pan_balance))
         , m_channel_proc(
                   channel.type == audio::bus_type::mono
-                          ? aucomp::make_mono_channel_strip_processor()
-                          : aucomp::make_stereo_channel_strip_processor())
+                          ? aucomp::make_mono_mixer_bus_processor()
+                          : aucomp::make_stereo_mixer_bus_processor())
         , m_amplifier_procs(
                   audio::engine::make_amplify_processor(),
                   audio::engine::make_amplify_processor())
