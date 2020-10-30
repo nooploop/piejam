@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_to_dag.h>
 #include <piejam/audio/engine/process_context.h>
@@ -160,12 +161,15 @@ TEST(graph_to_dag, event_is_transferred)
 
     using namespace testing;
 
-    ON_CALL(in_proc, num_event_outputs()).WillByDefault(Return(1));
+    std::array event_in_ports{event_port{}};
+    std::array event_out_ports{event_port{}};
+
+    ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_in_ports));
     ON_CALL(in_proc, create_event_output_buffers(_))
             .WillByDefault(Invoke([](event_output_buffer_factory const& fac) {
                 fac.add<float>();
             }));
-    ON_CALL(out_proc, num_event_inputs()).WillByDefault(Return(1));
+    ON_CALL(out_proc, event_inputs()).WillByDefault(Return(event_out_ports));
 
     g.add_event_wire({in_proc, 0}, {out_proc, 0});
 
@@ -201,8 +205,10 @@ TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
 
     using namespace testing;
 
+    std::array event_out_ports{event_port{}};
+
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(1));
-    ON_CALL(in_proc, num_event_outputs()).WillByDefault(Return(1));
+    ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_out_ports));
     ON_CALL(in_proc, create_event_output_buffers(_))
             .WillByDefault(Invoke([](event_output_buffer_factory const& fac) {
                 fac.add<float>();

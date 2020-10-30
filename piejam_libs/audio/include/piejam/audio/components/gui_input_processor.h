@@ -18,10 +18,12 @@
 #pragma once
 
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
 
+#include <array>
 #include <atomic>
 #include <functional>
 
@@ -39,6 +41,7 @@ public:
             T const initial,
             std::string_view const& name = {}) noexcept
         : named_processor(name)
+        , m_event_output_ports{engine::event_port{std::string(name)}}
         , m_value{initial}
     {
     }
@@ -52,8 +55,11 @@ public:
 
     auto num_inputs() const -> std::size_t override { return 0; }
     auto num_outputs() const -> std::size_t override { return 0; }
-    auto num_event_inputs() const -> std::size_t override { return 0; }
-    auto num_event_outputs() const -> std::size_t override { return 1; }
+    auto event_inputs() const -> event_ports override { return {}; }
+    auto event_outputs() const -> event_ports override
+    {
+        return m_event_output_ports;
+    }
     void create_event_output_buffers(
             engine::event_output_buffer_factory const& f) const override
     {
@@ -84,6 +90,8 @@ private:
         ctx.event_outputs.get<T>(0).insert(0, value);
         m_last_sent_value = value;
     }
+
+    std::array<engine::event_port, 1> const m_event_output_ports{};
 
     std::atomic<T> m_value{};
     T m_last_sent_value{};

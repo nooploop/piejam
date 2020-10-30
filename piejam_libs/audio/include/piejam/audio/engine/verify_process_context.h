@@ -36,8 +36,8 @@ verify_process_context(processor const& proc, process_context const& ctx)
     BOOST_ASSERT(proc.num_inputs() == ctx.inputs.size());
     BOOST_ASSERT(proc.num_outputs() == ctx.outputs.size());
     BOOST_ASSERT(proc.num_outputs() == ctx.results.size());
-    BOOST_ASSERT(proc.num_event_inputs() == ctx.event_inputs.size());
-    BOOST_ASSERT(proc.num_event_outputs() == ctx.event_outputs.size());
+    BOOST_ASSERT(proc.event_inputs().size() == ctx.event_inputs.size());
+    BOOST_ASSERT(proc.event_outputs().size() == ctx.event_outputs.size());
     BOOST_ASSERT(std::ranges::all_of(
             ctx.inputs,
             [&](std::span<float const> const& b) {

@@ -42,8 +42,8 @@ graph::add_wire(endpoint const& src, endpoint const& dst)
 void
 graph::add_event_wire(const endpoint& src, const endpoint& dst)
 {
-    BOOST_ASSERT(src.port < src.proc.get().num_event_outputs());
-    BOOST_ASSERT(dst.port < dst.proc.get().num_event_inputs());
+    BOOST_ASSERT(src.port < src.proc.get().event_outputs().size());
+    BOOST_ASSERT(dst.port < dst.proc.get().event_inputs().size());
 
     BOOST_ASSERT_MSG(
             std::ranges::none_of(

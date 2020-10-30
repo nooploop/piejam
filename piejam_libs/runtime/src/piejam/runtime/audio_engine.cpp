@@ -30,6 +30,7 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <fstream>
 #include <ranges>
 
 namespace piejam::runtime
@@ -299,6 +300,8 @@ audio_engine::audio_engine(
               m_mixer_procs))
     , m_dag(audio::engine::graph_to_dag(m_graph, 256, m_buffer_size))
 {
+    std::ofstream("graph.dot")
+            << audio::engine::export_graph_as_dot(m_graph) << std::endl;
 }
 
 audio_engine::~audio_engine() = default;

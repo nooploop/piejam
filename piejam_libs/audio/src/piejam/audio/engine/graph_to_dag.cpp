@@ -73,7 +73,7 @@ graph_to_dag(
         auto id = result.add_task(
                 [j = std::move(job)](thread_context const& ctx) { (*j)(ctx); });
         processor_job_mapping.emplace(e.proc, std::pair(id, job_ptr));
-        if (e.proc.get().num_event_outputs())
+        if (!e.proc.get().event_outputs().empty())
             clear_event_buffer_jobs.push_back(job_ptr);
     };
 

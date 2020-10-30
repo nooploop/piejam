@@ -17,29 +17,14 @@
 
 #pragma once
 
+#include <string>
+
 namespace piejam::audio::engine
 {
 
-template <class T>
-class event;
-class abstract_event_buffer;
-template <class T>
-class event_buffer;
-class event_buffer_memory;
-class event_input_buffers;
-class event_output_buffer_factory;
-class event_output_buffers;
-
-class event_port;
-class processor;
-class named_processor;
-class input_processor;
-class output_processor;
-
-class dag;
-class graph;
-struct process_context;
-class processor_job;
-class thread_context;
+struct event_port
+{
+    std::string name;
+};
 
 } // namespace piejam::audio::engine

@@ -46,8 +46,8 @@ public:
     auto num_inputs() const -> std::size_t override { return m_num_inputs; }
     auto num_outputs() const -> std::size_t override { return 1; }
 
-    auto num_event_inputs() const -> std::size_t override { return 0; }
-    auto num_event_outputs() const -> std::size_t override { return 0; }
+    auto event_inputs() const -> event_ports override { return {}; }
+    auto event_outputs() const -> event_ports override { return {}; }
 
     void create_event_output_buffers(
             event_output_buffer_factory const&) const override

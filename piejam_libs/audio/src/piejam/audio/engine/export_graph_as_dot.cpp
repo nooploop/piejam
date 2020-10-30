@@ -18,6 +18,7 @@
 #include <piejam/audio/engine/graph.h>
 
 #include <piejam/algorithm/unique_erase.h>
+#include <piejam/audio/engine/event_port.h>
 #include <piejam/functional/address_compare.h>
 
 #include <fmt/format.h>
@@ -69,10 +70,13 @@ export_graph_as_dot(graph const& g) -> std::string
 
     for (processor const& p : all_procs)
     {
+        auto const num_event_inputs = p.event_inputs().size();
+        auto const num_event_outputs = p.event_outputs().size();
+
         ss << p.type_name() << '_' << std::addressof(p) << " [label=<<table>"
            << std::endl;
 
-        if (p.num_inputs() || p.num_event_inputs())
+        if (p.num_inputs() || num_event_inputs)
         {
             ss << "<tr>" << std::endl;
             for (std::size_t i = 0; i < p.num_inputs(); ++i)
@@ -84,13 +88,13 @@ export_graph_as_dot(graph const& g) -> std::string
                               i)
                    << std::endl;
             }
-            for (std::size_t i = 0; i < p.num_event_inputs(); ++i)
+            for (std::size_t i = 0; i < num_event_inputs; ++i)
             {
                 ss << fmt::format(
-                              "<td port=\"ei{}\" bgcolor=\"{}\">e{}</td>",
+                              "<td port=\"ei{}\" bgcolor=\"{}\">{}</td>",
                               i,
                               event_color,
-                              i)
+                              p.event_inputs()[i].name)
                    << std::endl;
             }
             ss << "</tr>" << std::endl;
@@ -100,13 +104,13 @@ export_graph_as_dot(graph const& g) -> std::string
         ss << fmt::format(
                 "<td colspan=\"{}\">{}:{}</td>",
                 std::max(
-                        p.num_inputs() + p.num_event_inputs(),
-                        p.num_outputs() + p.num_event_outputs()),
+                        p.num_inputs() + num_event_inputs,
+                        p.num_outputs() + p.event_outputs().size()),
                 p.type_name(),
                 p.name());
         ss << "</tr>" << std::endl;
 
-        if (p.num_outputs() || p.num_event_outputs())
+        if (p.num_outputs() || num_event_outputs)
         {
             ss << "<tr>" << std::endl;
             for (std::size_t i = 0; i < p.num_outputs(); ++i)
@@ -118,13 +122,13 @@ export_graph_as_dot(graph const& g) -> std::string
                               i)
                    << std::endl;
             }
-            for (std::size_t i = 0; i < p.num_event_outputs(); ++i)
+            for (std::size_t i = 0; i < num_event_outputs; ++i)
             {
                 ss << fmt::format(
-                              "<td port=\"eo{}\" bgcolor=\"{}\">e{}</td>",
+                              "<td port=\"eo{}\" bgcolor=\"{}\">{}</td>",
                               i,
                               event_color,
-                              i)
+                              p.event_outputs()[i].name)
                    << std::endl;
             }
             ss << "</tr>" << std::endl;

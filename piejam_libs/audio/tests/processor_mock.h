@@ -32,8 +32,8 @@ struct processor_mock : public processor
     MOCK_METHOD(std::size_t, num_inputs, (), (const, override));
     MOCK_METHOD(std::size_t, num_outputs, (), (const, override));
 
-    MOCK_METHOD(std::size_t, num_event_inputs, (), (const, override));
-    MOCK_METHOD(std::size_t, num_event_outputs, (), (const, override));
+    MOCK_METHOD(event_ports, event_inputs, (), (const, override));
+    MOCK_METHOD(event_ports, event_outputs, (), (const, override));
 
     MOCK_METHOD(
             void,

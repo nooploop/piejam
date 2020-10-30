@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/lockstep_events.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
@@ -27,6 +28,8 @@
 #include <piejam/audio/types.h>
 
 #include <boost/assert.hpp>
+
+#include <array>
 
 namespace piejam::runtime::audio_components
 {
@@ -48,15 +51,22 @@ public:
     auto num_inputs() const -> std::size_t override { return 0; }
     auto num_outputs() const -> std::size_t override { return 0; }
 
-    // event-ins:
-    //   0: pan / balance
-    //   1: volume
-    auto num_event_inputs() const -> std::size_t override { return 2; }
+    auto event_inputs() const -> event_ports override
+    {
+        static std::array s_ports{
+                audio::engine::event_port{
+                        C == audio::bus_type::mono ? "pan" : "balance"},
+                audio::engine::event_port{"volume"}};
+        return s_ports;
+    }
 
-    // event-outs:
-    //   0: left channel amplify factor
-    //   1: right channel amplify factor
-    auto num_event_outputs() const -> std::size_t override { return 2; }
+    auto event_outputs() const -> event_ports override
+    {
+        static std::array s_ports{
+                audio::engine::event_port{"gain L"},
+                audio::engine::event_port{"gain R"}};
+        return s_ports;
+    }
 
     void create_event_output_buffers(
             audio::engine::event_output_buffer_factory const& f) const override

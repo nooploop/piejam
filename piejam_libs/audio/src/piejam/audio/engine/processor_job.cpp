@@ -43,12 +43,12 @@ processor_job::processor_job(
     , m_inputs(m_proc.num_inputs(), empty_result_ref())
     , m_outputs(m_output_buffers.begin(), m_output_buffers.end())
     , m_results(m_proc.num_outputs())
-    , m_event_inputs(m_proc.num_event_inputs())
+    , m_event_inputs(m_proc.event_inputs().size())
     , m_process_context(
               {m_inputs, m_outputs, m_results, m_event_inputs, m_event_outputs})
 {
     m_proc.create_event_output_buffers(m_event_outputs);
-    BOOST_ASSERT(m_proc.num_event_outputs() == m_event_outputs.size());
+    BOOST_ASSERT(m_proc.event_outputs().size() == m_event_outputs.size());
 }
 
 auto

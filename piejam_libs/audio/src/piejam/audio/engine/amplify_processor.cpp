@@ -18,12 +18,14 @@
 #include <piejam/audio/engine/amplify_processor.h>
 
 #include <piejam/audio/engine/event_input_buffers.h>
+#include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/smoother.h>
 
 #include <algorithm>
+#include <array>
 
 namespace piejam::audio::engine
 {
@@ -43,8 +45,12 @@ public:
 
     auto num_inputs() const -> std::size_t override { return 1; }
     auto num_outputs() const -> std::size_t override { return 1; }
-    auto num_event_inputs() const -> std::size_t override { return 1; }
-    auto num_event_outputs() const -> std::size_t override { return 0; }
+    auto event_inputs() const -> event_ports override
+    {
+        static std::array s_ports{event_port{"gain"}};
+        return s_ports;
+    }
+    auto event_outputs() const -> event_ports override { return {}; }
 
     void create_event_output_buffers(
             event_output_buffer_factory const&) const override
