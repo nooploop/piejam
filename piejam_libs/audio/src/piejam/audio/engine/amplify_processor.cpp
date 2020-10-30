@@ -82,7 +82,7 @@ public:
                 }
                 else
                 {
-                    res_buf = in_buf;
+                    res_buf = {};
                     m_factor.advance(ctx.buffer_size);
                 }
             }
@@ -102,34 +102,39 @@ public:
         {
             constexpr float frames_to_smooth = 128;
 
+            auto process_sliced =
+                    [amp_ev_buf, this, bs = ctx.buffer_size](auto&& fp) {
+                        std::size_t offset{};
+                        for (event<float> const& ev : *amp_ev_buf)
+                        {
+                            BOOST_ASSERT(ev.offset() < bs);
+                            fp(offset, ev.offset());
+                            offset = ev.offset();
+                            m_factor.set(ev.value(), frames_to_smooth);
+                        }
+
+                        fp(offset, bs);
+                    };
+
             if (in_buf.empty())
             {
                 res_buf = {};
-                for (event<float> const& ev : *amp_ev_buf)
-                    m_factor.set(ev.value(), 0);
+                process_sliced([this](auto offset, auto next_offset) {
+                    m_factor.advance(next_offset - offset);
+                });
             }
             else
             {
-                std::size_t offset{};
-                for (event<float> const& ev : *amp_ev_buf)
-                {
-                    BOOST_ASSERT(offset < in_buf.size());
+                process_sliced([this,
+                                &in_buf,
+                                &out_buf](auto offset, auto next_offset) {
                     std::transform(
                             std::next(in_buf.begin(), offset),
-                            std::next(in_buf.begin(), ev.offset()),
+                            std::next(in_buf.begin(), next_offset),
                             m_factor.advance_iterator(),
                             std::next(out_buf.begin(), offset),
                             std::multiplies<float>{});
-                    offset = ev.offset();
-                    m_factor.set(ev.value(), frames_to_smooth);
-                }
-
-                std::transform(
-                        std::next(in_buf.begin(), offset),
-                        in_buf.end(),
-                        m_factor.advance_iterator(),
-                        std::next(out_buf.begin(), offset),
-                        std::multiplies<float>{});
+                });
             }
         }
     }
