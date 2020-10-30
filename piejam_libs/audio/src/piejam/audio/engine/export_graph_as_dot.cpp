@@ -37,9 +37,9 @@ graph_processors(graph const& g)
     std::vector<std::reference_wrapper<processor>> procs;
     procs.reserve((g.wires().size() + g.event_wires().size()) * 2);
 
-    auto add_procs = [](auto& pc, auto&& w) {
-        pc.push_back(w.first.proc);
-        pc.push_back(w.second.proc);
+    auto add_procs = [](auto& vec, auto&& w) {
+        vec.push_back(w.first.proc);
+        vec.push_back(w.second.proc);
     };
 
     for (auto const& w : g.wires())
@@ -96,11 +96,15 @@ export_graph_as_dot(graph const& g) -> std::string
             ss << "</tr>" << std::endl;
         }
 
-        ss << "<tr><td colspan=\""
-           << std::max(
-                      p.num_inputs() + p.num_event_inputs(),
-                      p.num_outputs() + p.num_event_outputs())
-           << "\">" << p.type_name() << "</td></tr>" << std::endl;
+        ss << "<tr>" << std::endl;
+        ss << fmt::format(
+                "<td colspan=\"{}\">{}:{}</td>",
+                std::max(
+                        p.num_inputs() + p.num_event_inputs(),
+                        p.num_outputs() + p.num_event_outputs()),
+                p.type_name(),
+                p.name());
+        ss << "</tr>" << std::endl;
 
         if (p.num_outputs() || p.num_event_outputs())
         {

@@ -18,8 +18,8 @@
 #include <piejam/audio/engine/amplify_processor.h>
 
 #include <piejam/audio/engine/event_input_buffers.h>
+#include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/smoother.h>
 
@@ -31,9 +31,14 @@ namespace piejam::audio::engine
 namespace
 {
 
-class amplify_processor final : public processor
+class amplify_processor final : public named_processor
 {
 public:
+    amplify_processor(std::string_view const& name)
+        : named_processor(name)
+    {
+    }
+
     auto type_name() const -> std::string_view override { return "amplify"; }
 
     auto num_inputs() const -> std::size_t override { return 1; }
@@ -75,9 +80,9 @@ public:
                     m_factor.advance(ctx.buffer_size);
                 }
             }
-            else if (m_factor.current() == 1.f || in_buf.empty())
+            else if (m_factor.current() == 1.f)
                 res_buf = in_buf;
-            else if (m_factor.current() == 0.f)
+            else if (in_buf.empty() || m_factor.current() == 0.f)
                 res_buf = {};
             else
                 std::ranges::transform(
@@ -130,9 +135,10 @@ private:
 } // namespace
 
 auto
-make_amplify_processor() -> std::unique_ptr<processor>
+make_amplify_processor(std::string_view const& name)
+        -> std::unique_ptr<processor>
 {
-    return std::make_unique<amplify_processor>();
+    return std::make_unique<amplify_processor>(name);
 }
 
 } // namespace piejam::audio::engine

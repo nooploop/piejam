@@ -27,6 +27,7 @@ namespace piejam::audio::engine::test
 struct processor_mock : public processor
 {
     MOCK_METHOD(std::string_view, type_name, (), (const, override));
+    MOCK_METHOD(std::string_view, name, (), (const, override));
 
     MOCK_METHOD(std::size_t, num_inputs, (), (const, override));
     MOCK_METHOD(std::size_t, num_outputs, (), (const, override));

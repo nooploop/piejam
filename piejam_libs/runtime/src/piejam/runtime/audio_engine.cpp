@@ -27,6 +27,8 @@
 #include <piejam/audio/engine/output_processor.h>
 #include <piejam/runtime/audio_components/mixer_bus_processor.h>
 
+#include <fmt/format.h>
+
 #include <algorithm>
 #include <ranges>
 
@@ -42,20 +44,27 @@ public:
     mixer_bus(unsigned const samplerate, mixer::channel const& channel)
         : m_device_channels(channel.device_channels)
         , m_volume_proc(std::make_unique<aucomp::gui_input_processor<float>>(
-                  channel.volume))
+                  channel.volume,
+                  "volume"))
         , m_pan_balance_proc(
                   std::make_unique<aucomp::gui_input_processor<float>>(
-                          channel.pan_balance))
+                          channel.pan_balance,
+                          channel.type == audio::bus_type::mono ? "pan"
+                                                                : "balance"))
         , m_channel_proc(
                   channel.type == audio::bus_type::mono
                           ? audio_components::make_mono_mixer_bus_processor()
                           : audio_components::make_stereo_mixer_bus_processor())
         , m_amplifier_procs(
-                  audio::engine::make_amplify_processor(),
-                  audio::engine::make_amplify_processor())
+                  audio::engine::make_amplify_processor("L"),
+                  audio::engine::make_amplify_processor("R"))
         , m_level_meter_procs(
-                  std::make_unique<aucomp::level_meter_processor>(samplerate),
-                  std::make_unique<aucomp::level_meter_processor>(samplerate))
+                  std::make_unique<aucomp::level_meter_processor>(
+                          samplerate,
+                          "L"),
+                  std::make_unique<aucomp::level_meter_processor>(
+                          samplerate,
+                          "R"))
     {
     }
 
@@ -145,8 +154,8 @@ make_mixer_processors(std::size_t const num_inputs, std::size_t num_outputs)
         result.reserve(num_outputs);
         while (num_outputs--)
             result.emplace_back(
-                    audio::engine::make_mix_processor(num_inputs),
-                    audio::engine::make_mix_processor(num_inputs));
+                    audio::engine::make_mix_processor(num_inputs, "L"),
+                    audio::engine::make_mix_processor(num_inputs, "R"));
     }
     return result;
 }

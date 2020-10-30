@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/named_processor.h>
 #include <piejam/range/table_view.h>
 
 #include <vector>
@@ -25,10 +25,10 @@
 namespace piejam::audio::engine
 {
 
-class output_processor final : public processor
+class output_processor final : public named_processor
 {
 public:
-    output_processor(std::size_t num_inputs);
+    output_processor(std::size_t num_inputs, std::string_view const& name = {});
 
     void set_output(range::table_view<float> const& engine_output)
     {

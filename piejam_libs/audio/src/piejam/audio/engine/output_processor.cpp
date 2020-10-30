@@ -20,16 +20,20 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
 
+#include <boost/assert.hpp>
+
 #include <algorithm>
-#include <cassert>
 
 namespace piejam::audio::engine
 {
 
-output_processor::output_processor(std::size_t const num_inputs)
-    : m_num_inputs(num_inputs)
+output_processor::output_processor(
+        std::size_t const num_inputs,
+        std::string_view const& name)
+    : named_processor(name)
+    , m_num_inputs(num_inputs)
 {
-    assert(m_num_inputs > 0);
+    BOOST_ASSERT(m_num_inputs > 0);
 }
 
 void
@@ -46,7 +50,7 @@ output_processor::process(process_context const& ctx)
         }
         else
         {
-            assert(ctx.inputs[ch].get().size() == out.size());
+            BOOST_ASSERT(ctx.inputs[ch].get().size() == out.size());
             std::ranges::copy(ctx.inputs[ch].get(), out.begin());
         }
     }

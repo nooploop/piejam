@@ -17,13 +17,16 @@
 
 #pragma once
 
+#include <piejam/audio/engine/fwd.h>
+
 #include <memory>
+#include <string_view>
 
 namespace piejam::audio::engine
 {
 
-class processor;
-
-auto make_mix_processor(std::size_t num_inputs) -> std::unique_ptr<processor>;
+auto
+make_mix_processor(std::size_t num_inputs, std::string_view const& name = {})
+        -> std::unique_ptr<processor>;
 
 } // namespace piejam::audio::engine

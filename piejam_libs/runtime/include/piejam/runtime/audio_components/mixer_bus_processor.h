@@ -20,13 +20,14 @@
 #include <piejam/audio/engine/fwd.h>
 
 #include <memory>
+#include <string_view>
 
 namespace piejam::runtime::audio_components
 {
 
-auto make_mono_mixer_bus_processor()
+auto make_mono_mixer_bus_processor(std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::processor>;
-auto make_stereo_mixer_bus_processor()
+auto make_stereo_mixer_bus_processor(std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::processor>;
 
 } // namespace piejam::runtime::audio_components

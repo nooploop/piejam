@@ -17,34 +17,25 @@
 
 #pragma once
 
-#include <functional>
-#include <span>
-#include <string_view>
+#include <piejam/audio/engine/processor.h>
+
+#include <string>
 
 namespace piejam::audio::engine
 {
 
-class event_output_buffer_factory;
-struct process_context;
-
-class processor
+class named_processor : public processor
 {
 public:
-    virtual ~processor() = default;
+    named_processor(std::string_view const& name = {})
+        : m_name(name)
+    {
+    }
 
-    virtual auto type_name() const -> std::string_view = 0;
-    virtual auto name() const -> std::string_view = 0;
+    auto name() const -> std::string_view override { return m_name; }
 
-    virtual auto num_inputs() const -> std::size_t = 0;
-    virtual auto num_outputs() const -> std::size_t = 0;
-
-    virtual auto num_event_inputs() const -> std::size_t = 0;
-    virtual auto num_event_outputs() const -> std::size_t = 0;
-
-    virtual void
-    create_event_output_buffers(event_output_buffer_factory const&) const = 0;
-
-    virtual void process(process_context const&) = 0;
+private:
+    std::string const m_name;
 };
 
 } // namespace piejam::audio::engine

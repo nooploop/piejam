@@ -18,8 +18,8 @@
 #pragma once
 
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 
 #include <atomic>
@@ -29,14 +29,17 @@ namespace piejam::audio::components
 {
 
 template <class T>
-class gui_input_processor final : public engine::processor
+class gui_input_processor final : public engine::named_processor
 {
     static_assert(std::atomic<T>::is_always_lock_free);
 
 public:
-    gui_input_processor() noexcept = default;
-    gui_input_processor(T const initial) noexcept
-        : m_value{initial}
+    gui_input_processor() = default;
+    gui_input_processor(
+            T const initial,
+            std::string_view const& name = {}) noexcept
+        : named_processor(name)
+        , m_value{initial}
     {
     }
 

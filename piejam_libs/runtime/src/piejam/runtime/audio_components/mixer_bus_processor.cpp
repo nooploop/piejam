@@ -20,8 +20,8 @@
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/lockstep_events.h>
+#include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/pan.h>
 #include <piejam/audio/types.h>
@@ -35,9 +35,14 @@ namespace
 {
 
 template <audio::bus_type C>
-class mixer_bus_processor final : public audio::engine::processor
+class mixer_bus_processor final : public audio::engine::named_processor
 {
 public:
+    mixer_bus_processor(std::string_view const& name)
+        : audio::engine::named_processor(name)
+    {
+    }
+
     auto type_name() const -> std::string_view override { return "mixer_bus"; }
 
     auto num_inputs() const -> std::size_t override { return 0; }
@@ -111,15 +116,17 @@ private:
 } // namespace
 
 auto
-make_mono_mixer_bus_processor() -> std::unique_ptr<audio::engine::processor>
+make_mono_mixer_bus_processor(std::string_view const& name)
+        -> std::unique_ptr<audio::engine::processor>
 {
-    return std::make_unique<mixer_bus_processor<audio::bus_type::mono>>();
+    return std::make_unique<mixer_bus_processor<audio::bus_type::mono>>(name);
 }
 
 auto
-make_stereo_mixer_bus_processor() -> std::unique_ptr<audio::engine::processor>
+make_stereo_mixer_bus_processor(std::string_view const& name)
+        -> std::unique_ptr<audio::engine::processor>
 {
-    return std::make_unique<mixer_bus_processor<audio::bus_type::stereo>>();
+    return std::make_unique<mixer_bus_processor<audio::bus_type::stereo>>(name);
 }
 
 } // namespace piejam::runtime::audio_components

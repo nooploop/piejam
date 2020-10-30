@@ -17,12 +17,13 @@
 
 #include <piejam/audio/engine/mix_processor.h>
 
+#include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 
+#include <boost/assert.hpp>
+
 #include <algorithm>
-#include <cassert>
 
 namespace piejam::audio::engine
 {
@@ -30,10 +31,15 @@ namespace piejam::audio::engine
 namespace
 {
 
-class mix_processor final : public processor
+class mix_processor final : public named_processor
 {
 public:
-    mix_processor(std::size_t num_inputs);
+    mix_processor(std::size_t num_inputs, std::string_view const& name)
+        : named_processor(name)
+        , m_num_inputs(num_inputs)
+    {
+        BOOST_ASSERT(m_num_inputs > 1);
+    }
 
     auto type_name() const -> std::string_view override { return "mix"; }
 
@@ -48,73 +54,63 @@ public:
     {
     }
 
-    void process(process_context const&) override;
+    void process(process_context const& ctx) override
+    {
+        verify_process_context(*this, ctx);
+
+        std::size_t mixed = 0;
+        for (std::span<float const> const& in : ctx.inputs)
+        {
+            if (in.empty())
+                continue;
+
+            if (mixed > 1)
+            {
+                // we already mixed atleast two channels,
+                // so additionally mix this input.
+                std::transform(
+                        in.begin(),
+                        in.end(),
+                        ctx.outputs[0].begin(),
+                        ctx.outputs[0].begin(),
+                        std::plus<float>{});
+            }
+            else if (mixed == 1)
+            {
+                // we already mixed one channel, which is set as result.
+                // we mix this input and current result into the output.
+                std::transform(
+                        in.begin(),
+                        in.end(),
+                        ctx.results[0].begin(),
+                        ctx.outputs[0].begin(),
+                        std::plus<float>{});
+                ctx.results[0] = ctx.outputs[0];
+                ++mixed;
+            }
+            else
+            {
+                // we didn't mixed anything yet, so we pass this input as result
+                ctx.results[0] = in;
+                ++mixed;
+            }
+        }
+
+        if (mixed == 0)
+            ctx.results[0] = {};
+    }
 
 private:
     std::size_t const m_num_inputs{};
 };
 
-mix_processor::mix_processor(std::size_t num_inputs)
-    : m_num_inputs(num_inputs)
-{
-    assert(m_num_inputs > 1);
-}
-
-void
-mix_processor::process(process_context const& ctx)
-{
-    verify_process_context(*this, ctx);
-
-    std::size_t mixed = 0;
-    for (std::span<float const> const& in : ctx.inputs)
-    {
-        if (in.empty())
-            continue;
-
-        assert(in.size() == ctx.outputs[0].size());
-
-        if (mixed > 1)
-        {
-            // we already mixed atleast two channels,
-            // so additionally mix this input.
-            std::transform(
-                    in.begin(),
-                    in.end(),
-                    ctx.outputs[0].begin(),
-                    ctx.outputs[0].begin(),
-                    std::plus<float>{});
-        }
-        else if (mixed == 1)
-        {
-            // we already mixed one channel, which is set as result.
-            // we mix this input and current result into the output.
-            std::transform(
-                    in.begin(),
-                    in.end(),
-                    ctx.results[0].begin(),
-                    ctx.outputs[0].begin(),
-                    std::plus<float>{});
-            ctx.results[0] = ctx.outputs[0];
-            ++mixed;
-        }
-        else
-        {
-            // we didn't mixed anything yet, so we pass this input as result
-            ctx.results[0] = in;
-            ++mixed;
-        }
-    }
-
-    if (mixed == 0)
-        ctx.results[0] = {};
-}
-
 } // namespace
 
 auto
-make_mix_processor(std::size_t const num_inputs) -> std::unique_ptr<processor>
+make_mix_processor(std::size_t const num_inputs, std::string_view const& name)
+        -> std::unique_ptr<processor>
 {
-    return std::make_unique<mix_processor>(num_inputs);
+    return std::make_unique<mix_processor>(num_inputs, name);
 }
 
 } // namespace piejam::audio::engine

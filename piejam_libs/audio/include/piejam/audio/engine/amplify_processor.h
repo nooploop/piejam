@@ -17,13 +17,15 @@
 
 #pragma once
 
+#include <piejam/audio/engine/fwd.h>
+
 #include <memory>
+#include <string_view>
 
 namespace piejam::audio::engine
 {
 
-class processor;
-
-auto make_amplify_processor() -> std::unique_ptr<processor>;
+auto make_amplify_processor(std::string_view const& name = {})
+        -> std::unique_ptr<processor>;
 
 } // namespace piejam::audio::engine

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/level_peak_meter.h>
 
 #include <atomic>
@@ -25,10 +25,12 @@
 namespace piejam::audio::components
 {
 
-class level_meter_processor final : public engine::processor
+class level_meter_processor final : public engine::named_processor
 {
 public:
-    level_meter_processor(unsigned samplerate);
+    level_meter_processor(
+            unsigned samplerate,
+            std::string_view const& name = {});
 
     auto peak_level() const noexcept -> float
     {
