@@ -23,6 +23,7 @@
 #include <boost/intrusive/set.hpp>
 
 #include <memory_resource>
+#include <typeindex>
 
 namespace piejam::audio::engine
 {
@@ -32,6 +33,7 @@ class abstract_event_buffer
 public:
     virtual ~abstract_event_buffer() = default;
 
+    virtual auto type() const -> std::type_index const& = 0;
     virtual void clear() = 0;
 };
 
@@ -42,6 +44,12 @@ public:
     event_buffer(std::pmr::memory_resource*& event_memory)
         : m_event_memory(event_memory)
     {
+    }
+
+    auto type() const -> std::type_index const& override
+    {
+        static std::type_index const s_type(typeid(T));
+        return s_type;
     }
 
     bool empty() const noexcept { return m_event_container.empty(); }

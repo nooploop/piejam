@@ -161,8 +161,8 @@ TEST(graph_to_dag, event_is_transferred)
 
     using namespace testing;
 
-    std::array event_in_ports{event_port{}};
-    std::array event_out_ports{event_port{}};
+    std::array event_in_ports{event_port{typeid(float), {}}};
+    std::array event_out_ports{event_port{typeid(float), {}}};
 
     ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_in_ports));
     ON_CALL(in_proc, create_event_output_buffers(_))
@@ -205,7 +205,7 @@ TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
 
     using namespace testing;
 
-    std::array event_out_ports{event_port{}};
+    std::array event_out_ports{event_port{typeid(float), {}}};
 
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(1));
     ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_out_ports));

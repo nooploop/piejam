@@ -47,7 +47,7 @@ public:
     auto num_outputs() const -> std::size_t override { return 1; }
     auto event_inputs() const -> event_ports override
     {
-        static std::array s_ports{event_port{"gain"}};
+        static std::array s_ports{event_port{typeid(float), "gain"}};
         return s_ports;
     }
     auto event_outputs() const -> event_ports override { return {}; }

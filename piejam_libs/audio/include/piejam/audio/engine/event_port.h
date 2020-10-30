@@ -18,12 +18,14 @@
 #pragma once
 
 #include <string>
+#include <typeindex>
 
 namespace piejam::audio::engine
 {
 
 struct event_port
 {
+    std::type_index type;
     std::string name;
 };
 

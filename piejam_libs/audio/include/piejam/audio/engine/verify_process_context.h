@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 
@@ -46,6 +47,18 @@ verify_process_context(processor const& proc, process_context const& ctx)
     BOOST_ASSERT(
             std::ranges::all_of(ctx.outputs, [&](std::span<float> const& b) {
                 return b.size() == ctx.buffer_size;
+            }));
+    BOOST_ASSERT(std::ranges::equal(
+            proc.event_inputs(),
+            ctx.event_inputs,
+            [](event_port const& p, abstract_event_buffer const* b) {
+                return !b || p.type == b->type();
+            }));
+    BOOST_ASSERT(std::ranges::equal(
+            proc.event_outputs(),
+            ctx.event_outputs,
+            [](event_port const& p, auto const& b) {
+                return p.type == b->type();
             }));
 
     boost::ignore_unused(proc, ctx);

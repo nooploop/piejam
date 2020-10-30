@@ -17,6 +17,8 @@
 
 #include <piejam/audio/engine/graph.h>
 
+#include <piejam/audio/engine/event_port.h>
+
 #include <boost/assert.hpp>
 
 #include <algorithm>
@@ -44,6 +46,9 @@ graph::add_event_wire(const endpoint& src, const endpoint& dst)
 {
     BOOST_ASSERT(src.port < src.proc.get().event_outputs().size());
     BOOST_ASSERT(dst.port < dst.proc.get().event_inputs().size());
+    BOOST_ASSERT(
+            src.proc.get().event_outputs()[src.port].type ==
+            dst.proc.get().event_inputs()[dst.port].type);
 
     BOOST_ASSERT_MSG(
             std::ranges::none_of(

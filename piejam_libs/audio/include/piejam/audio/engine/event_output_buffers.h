@@ -35,6 +35,9 @@ public:
     auto empty() const noexcept -> bool { return m_event_buffers.empty(); }
     auto size() const noexcept -> std::size_t { return m_event_buffers.size(); }
 
+    auto begin() const { return m_event_buffers.begin(); }
+    auto end() const { return m_event_buffers.end(); }
+
     void set_event_memory(std::pmr::memory_resource* const event_memory)
     {
         m_event_memory = event_memory;

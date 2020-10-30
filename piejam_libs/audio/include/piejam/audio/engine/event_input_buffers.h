@@ -37,6 +37,9 @@ public:
 
     auto size() const noexcept -> std::size_t { return m_event_buffers.size(); }
 
+    auto begin() const { return m_event_buffers.begin(); }
+    auto end() const { return m_event_buffers.end(); }
+
     auto
     set(std::size_t const buffer_index, abstract_event_buffer const& ev_buf)
     {

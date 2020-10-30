@@ -41,7 +41,7 @@ public:
             T const initial,
             std::string_view const& name = {}) noexcept
         : named_processor(name)
-        , m_event_output_ports{engine::event_port{std::string(name)}}
+        , m_event_output_ports{engine::event_port{typeid(T), std::string(name)}}
         , m_value{initial}
     {
     }
