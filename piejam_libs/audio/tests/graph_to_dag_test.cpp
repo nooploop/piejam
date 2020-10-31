@@ -17,6 +17,7 @@
 
 #include "processor_mock.h"
 
+#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
@@ -56,8 +57,9 @@ TEST(graph_to_dag, audio_is_transferred_to_connected_proc)
     }));
 
     auto input_has_sample = [](process_context const& ctx) {
-        return ctx.inputs.size() == 1 && ctx.inputs[0].get().size() == 1 &&
-               ctx.inputs[0].get()[0] == 23.f;
+        return ctx.inputs.size() == 1 &&
+               ctx.inputs[0].get().buffer().size() == 1 &&
+               ctx.inputs[0].get().buffer()[0] == 23.f;
     };
 
     EXPECT_CALL(out_proc, process(Truly(input_has_sample))).Times(1);
@@ -90,10 +92,11 @@ TEST(graph_to_dag, audio_can_spread_to_multiple_ins)
     }));
 
     auto input_has_sample = [](process_context const& ctx) {
-        return ctx.inputs.size() == 2 && ctx.inputs[0].get().size() == 1 &&
-               ctx.inputs[0].get()[0] == 23.f &&
-               ctx.inputs[1].get().size() == 1 &&
-               ctx.inputs[1].get()[0] == 23.f;
+        return ctx.inputs.size() == 2 &&
+               ctx.inputs[0].get().buffer().size() == 1 &&
+               ctx.inputs[0].get().buffer()[0] == 23.f &&
+               ctx.inputs[1].get().buffer().size() == 1 &&
+               ctx.inputs[1].get().buffer()[0] == 23.f;
     };
 
     EXPECT_CALL(out_proc, process(Truly(input_has_sample))).Times(1);
@@ -143,8 +146,9 @@ TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
     EXPECT_CALL(in_proc, process(_)).Times(1);
 
     auto valid_ins = [](process_context const& ctx) {
-        return ctx.inputs.size() == 2 && ctx.inputs[0].get().size() == 1 &&
-               ctx.inputs[1].get().empty();
+        return ctx.inputs.size() == 2 &&
+               ctx.inputs[0].get().buffer().size() == 1 &&
+               is_silence(ctx.inputs[1]);
     };
 
     EXPECT_CALL(out_proc, process(Truly(valid_ins))).Times(1);

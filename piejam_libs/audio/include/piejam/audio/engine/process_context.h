@@ -17,21 +17,21 @@
 
 #pragma once
 
+#include <piejam/audio/engine/audio_slice.h>
+#include <piejam/audio/engine/fwd.h>
+
 #include <functional>
 #include <span>
 
 namespace piejam::audio::engine
 {
 
-class event_input_buffers;
-class event_output_buffers;
-
 struct process_context
 {
-    using input_buffers_t = std::span<
-            std::reference_wrapper<std::span<float const> const> const>;
+    using input_buffers_t =
+            std::span<std::reference_wrapper<audio_slice const> const>;
     using output_buffers_t = std::span<std::span<float> const>;
-    using result_buffers_t = std::span<std::span<float const>>;
+    using result_buffers_t = std::span<audio_slice>;
 
     input_buffers_t inputs{};
     output_buffers_t outputs{};

@@ -17,8 +17,10 @@
 
 #include <piejam/audio/components/level_meter_processor.h>
 
+#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
+#include <piejam/functional/overload.h>
 
 #include <algorithm>
 #include <span>
@@ -45,11 +47,15 @@ level_meter_processor::process(engine::process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
-    std::span<float const> const& in_buf = ctx.inputs[0];
-    if (!in_buf.empty())
-        std::ranges::copy(in_buf, std::back_inserter(m_lm));
-    else
-        std::fill_n(std::back_inserter(m_lm), ctx.buffer_size, 0.f);
+    std::visit(
+            overload{
+                    [this, bs = ctx.buffer_size](float const c) {
+                        std::fill_n(std::back_inserter(m_lm), bs, c);
+                    },
+                    [this](std::span<float const> const& buffer) {
+                        std::ranges::copy(buffer, std::back_inserter(m_lm));
+                    }},
+            ctx.inputs[0].get().as_variant());
 
     m_peak_level.store(m_lm.get(), std::memory_order_release);
 }

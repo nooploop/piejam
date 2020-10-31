@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/event_port.h>
@@ -39,14 +40,12 @@ verify_process_context(processor const& proc, process_context const& ctx)
     BOOST_ASSERT(proc.num_outputs() == ctx.results.size());
     BOOST_ASSERT(proc.event_inputs().size() == ctx.event_inputs.size());
     BOOST_ASSERT(proc.event_outputs().size() == ctx.event_outputs.size());
-    BOOST_ASSERT(std::ranges::all_of(
-            ctx.inputs,
-            [&](std::span<float const> const& b) {
-                return b.empty() || b.size() == ctx.buffer_size;
-            }));
+    BOOST_ASSERT(std::ranges::all_of(ctx.inputs, [&](audio_slice const& b) {
+        return b.is_constant() || b.buffer().size() == ctx.buffer_size;
+    }));
     BOOST_ASSERT(
             std::ranges::all_of(ctx.outputs, [&](std::span<float> const& b) {
-                return b.size() == ctx.buffer_size;
+                return b.data() && b.size() == ctx.buffer_size;
             }));
     BOOST_ASSERT(std::ranges::equal(
             proc.event_inputs(),

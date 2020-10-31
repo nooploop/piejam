@@ -17,6 +17,7 @@
 
 #include <piejam/audio/engine/output_processor.h>
 
+#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
@@ -36,8 +37,8 @@ TEST(output_processor, input_table_is_propagated_to_outputs)
     sut.set_output(data.rows());
 
     std::array<float, 2> in_buf{23.f, 58.f};
-    std::vector<std::span<float const>> in_spans{in_buf, {}};
-    std::vector<std::reference_wrapper<std::span<float const> const>> inputs{
+    std::vector<audio_slice> in_spans{in_buf, {}};
+    std::vector<std::reference_wrapper<audio_slice const>> inputs{
             in_spans.begin(),
             in_spans.end()};
 

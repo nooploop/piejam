@@ -28,9 +28,9 @@ namespace piejam::audio::engine
 {
 
 static auto
-empty_result_ref() -> std::reference_wrapper<std::span<float const> const>
+empty_result_ref() -> std::reference_wrapper<audio_slice const>
 {
-    static std::span<float const> res;
+    static audio_slice res;
     return std::cref(res);
 }
 
@@ -52,8 +52,7 @@ processor_job::processor_job(
 }
 
 auto
-processor_job::result_ref(std::size_t const index) const
-        -> std::span<float const> const&
+processor_job::result_ref(std::size_t const index) const -> audio_slice const&
 {
     return m_results[index];
 }
@@ -66,9 +65,7 @@ processor_job::event_result_ref(std::size_t const index)
 }
 
 void
-processor_job::connect_result(
-        std::size_t const index,
-        std::span<float const> const& res)
+processor_job::connect_result(std::size_t const index, audio_slice const& res)
 {
     BOOST_ASSERT(index < m_inputs.size());
     m_inputs[index] = std::ref(res);

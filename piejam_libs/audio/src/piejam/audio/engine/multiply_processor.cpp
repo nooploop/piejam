@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/audio/engine/mix_processor.h>
+#include <piejam/audio/engine/multiply_processor.h>
 
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/named_processor.h>
@@ -33,17 +33,17 @@ namespace piejam::audio::engine
 namespace
 {
 
-class mix_processor final : public named_processor
+class multiply_processor final : public named_processor
 {
 public:
-    mix_processor(std::size_t num_inputs, std::string_view const& name)
+    multiply_processor(std::size_t num_inputs, std::string_view const& name)
         : named_processor(name)
         , m_num_inputs(num_inputs)
     {
         BOOST_ASSERT(m_num_inputs > 1);
     }
 
-    auto type_name() const -> std::string_view override { return "mix"; }
+    auto type_name() const -> std::string_view override { return "multiply"; }
 
     auto num_inputs() const -> std::size_t override { return m_num_inputs; }
     auto num_outputs() const -> std::size_t override { return 1; }
@@ -61,16 +61,13 @@ public:
         verify_process_context(*this, ctx);
 
         auto& res = ctx.results[0];
-        res = {};
+        res = {1.f};
 
         auto const out = ctx.outputs[0];
 
         for (audio_slice const& in : ctx.inputs)
         {
-            if (is_silence(in))
-                continue;
-
-            res = add(in, res, out);
+            res = multiply(in, res, out);
         }
     }
 
@@ -81,10 +78,11 @@ private:
 } // namespace
 
 auto
-make_mix_processor(std::size_t const num_inputs, std::string_view const& name)
-        -> std::unique_ptr<processor>
+make_multiply_processor(
+        std::size_t const num_inputs,
+        std::string_view const& name) -> std::unique_ptr<processor>
 {
-    return std::make_unique<mix_processor>(num_inputs, name);
+    return std::make_unique<multiply_processor>(num_inputs, name);
 }
 
 } // namespace piejam::audio::engine

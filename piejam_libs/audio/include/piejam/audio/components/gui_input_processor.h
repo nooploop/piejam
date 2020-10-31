@@ -91,7 +91,7 @@ private:
         m_last_sent_value = value;
     }
 
-    std::array<engine::event_port, 1> const m_event_output_ports{};
+    std::array<engine::event_port, 1> const m_event_output_ports;
 
     std::atomic<T> m_value{};
     T m_last_sent_value{};

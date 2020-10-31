@@ -15,31 +15,40 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/audio/engine/audio_slice.h>
+
+#include <piejam/audio/engine/slice_algorithms.h>
 
 namespace piejam::audio::engine
 {
 
-template <class T>
-class event;
-class abstract_event_buffer;
-template <class T>
-class event_buffer;
-class event_buffer_memory;
-class event_input_buffers;
-class event_output_buffer_factory;
-class event_output_buffers;
-class event_port;
+namespace
+{
 
-class processor;
-class named_processor;
-class input_processor;
-class output_processor;
+struct is_silence_visitor
+{
+    constexpr bool operator()(float const x) const noexcept { return x == 0.f; }
+    constexpr bool operator()(slice<float>::span_t const& b) const noexcept
+    {
+        return b.empty();
+    }
+};
 
-class dag;
-class graph;
-struct process_context;
-class processor_job;
-class thread_context;
+} // namespace
+
+auto
+is_silence(audio_slice const& sl) noexcept -> bool
+{
+    return std::visit(is_silence_visitor{}, sl.as_variant());
+}
+
+template auto
+add(audio_slice const& l, audio_slice const& r, std::span<float> const& out)
+        -> audio_slice;
+
+template auto multiply(
+        audio_slice const& l,
+        audio_slice const& r,
+        std::span<float> const& out) -> audio_slice;
 
 } // namespace piejam::audio::engine

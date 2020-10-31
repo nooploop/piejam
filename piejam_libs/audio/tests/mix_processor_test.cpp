@@ -17,6 +17,7 @@
 
 #include <piejam/audio/engine/mix_processor.h>
 
+#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
@@ -35,43 +36,41 @@ TEST(mix_processor, mix_two_silence_channels)
 {
     auto sut = make_mix_processor(2);
 
-    std::span<float const> const silence;
+    audio_slice const silence;
 
-    std::vector<std::reference_wrapper<std::span<float const> const>> in(
-            2,
-            silence);
+    std::vector<std::reference_wrapper<audio_slice const>> in(2, silence);
     std::array out_buf{0.f};
     std::vector<std::span<float>> out = {out_buf};
-    std::vector<std::span<float const>> result{out[0]};
+    std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FALSE(result[0].empty());
+    ASSERT_FALSE(is_silence(result[0]));
 
     sut->process({in, out, result, {0}, {}, 1});
 
-    EXPECT_TRUE(result[0].empty());
+    EXPECT_TRUE(is_silence(result[0]));
 }
 
 TEST(mix_processor, mix_one_silence_one_non_silence_channel)
 {
     auto sut = make_mix_processor(2);
 
-    std::span<float const> const silence;
+    audio_slice const silence;
     std::array in_buf{0.23f};
-    std::span<float const> in_buf_span(in_buf);
+    audio_slice in_buf_span(in_buf);
 
-    std::vector<std::reference_wrapper<std::span<float const> const>> in{
+    std::vector<std::reference_wrapper<audio_slice const>> in{
             silence,
             in_buf_span};
     std::array out_buf{0.f};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<std::span<float const>> result{out[0]};
+    std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0][0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
     sut->process({in, out, result, {0}, {}, 1});
 
-    ASSERT_EQ(1u, result[0].size());
-    EXPECT_FLOAT_EQ(0.23f, result[0][0]);
+    ASSERT_EQ(1u, result[0].buffer().size());
+    EXPECT_FLOAT_EQ(0.23f, result[0].buffer()[0]);
 }
 
 TEST(mix_processor, mix_two_non_silence_channels)
@@ -79,70 +78,70 @@ TEST(mix_processor, mix_two_non_silence_channels)
     auto sut = make_mix_processor(2);
 
     std::array in_buf1{0.23f};
-    std::span<float const> in_buf1_span(in_buf1);
+    audio_slice in_buf1_span(in_buf1);
     std::array in_buf2{0.58f};
-    std::span<float const> in_buf2_span(in_buf2);
-    std::vector<std::reference_wrapper<std::span<float const> const>> in{
+    audio_slice in_buf2_span(in_buf2);
+    std::vector<std::reference_wrapper<audio_slice const>> in{
             in_buf1_span,
             in_buf2_span};
     std::array out_buf{0.f};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<std::span<float const>> result{out[0]};
+    std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0][0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
     sut->process({in, out, result, {0}, {}, 1});
 
-    ASSERT_EQ(1u, result[0].size());
-    EXPECT_FLOAT_EQ(0.81f, result[0][0]);
+    ASSERT_EQ(1u, result[0].buffer().size());
+    EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[0]);
 }
 
 TEST(mix_processor, mix_two_silence_one_non_silence_channel)
 {
     auto sut = make_mix_processor(3);
 
-    std::span<float const> const silence;
+    audio_slice const silence;
     std::array in_buf{0.23f};
-    std::span<float const> in_buf_span(in_buf);
-    std::vector<std::reference_wrapper<std::span<float const> const>> in{
+    audio_slice in_buf_span(in_buf);
+    std::vector<std::reference_wrapper<audio_slice const>> in{
             silence,
             silence,
             in_buf_span};
     std::array out_buf{0.f};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<std::span<float const>> result{out[0]};
+    std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0][0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
     sut->process({in, out, result, {0}, {}, 1});
 
-    ASSERT_EQ(1u, result[0].size());
-    EXPECT_FLOAT_EQ(0.23f, result[0][0]);
+    ASSERT_EQ(1u, result[0].buffer().size());
+    EXPECT_FLOAT_EQ(0.23f, result[0].buffer()[0]);
 }
 
 TEST(mix_processor, mix_one_silence_two_non_silence_channels)
 {
     auto sut = make_mix_processor(3);
 
-    std::span<float const> const silence;
+    audio_slice const silence;
     std::array in_buf1{0.23f};
-    std::span<float const> in_buf1_span(in_buf1);
+    audio_slice in_buf1_span(in_buf1);
     std::array in_buf2{0.58f};
-    std::span<float const> in_buf2_span(in_buf2);
-    std::vector<std::reference_wrapper<std::span<float const> const>> in{
+    audio_slice in_buf2_span(in_buf2);
+    std::vector<std::reference_wrapper<audio_slice const>> in{
             in_buf1_span,
             silence,
             in_buf2_span};
     std::array out_buf{0.f};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<std::span<float const>> result{out[0]};
+    std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0][0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
     sut->process({in, out, result, {0}, {}, 1});
 
-    ASSERT_EQ(1u, result[0].size());
-    EXPECT_FLOAT_EQ(0.81f, result[0][0]);
+    ASSERT_EQ(1u, result[0].buffer().size());
+    EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[0]);
 }
 
 } // namespace piejam::audio::engine::test

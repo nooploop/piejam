@@ -17,29 +17,22 @@
 
 #pragma once
 
+#include <piejam/audio/engine/slice.h>
+
 namespace piejam::audio::engine
 {
 
-template <class T>
-class event;
-class abstract_event_buffer;
-template <class T>
-class event_buffer;
-class event_buffer_memory;
-class event_input_buffers;
-class event_output_buffer_factory;
-class event_output_buffers;
-class event_port;
+using audio_slice = slice<float>;
 
-class processor;
-class named_processor;
-class input_processor;
-class output_processor;
+auto is_silence(audio_slice const& l) noexcept -> bool;
 
-class dag;
-class graph;
-struct process_context;
-class processor_job;
-class thread_context;
+extern template auto
+add(audio_slice const& l, audio_slice const& r, std::span<float> const& out)
+        -> audio_slice;
+
+extern template auto multiply(
+        audio_slice const& l,
+        audio_slice const& r,
+        std::span<float> const& out) -> audio_slice;
 
 } // namespace piejam::audio::engine

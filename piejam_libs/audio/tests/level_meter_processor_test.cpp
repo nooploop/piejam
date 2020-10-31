@@ -17,6 +17,7 @@
 
 #include <piejam/audio/components/level_meter_processor.h>
 
+#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
@@ -34,8 +35,8 @@ struct level_meter_processor_test : ::testing::Test
 {
     level_meter_processor sut{4800};
     std::array<float, 2> in_buf{};
-    std::vector<std::span<float const>> in_buf_spans{in_buf};
-    std::vector<std::reference_wrapper<std::span<float const> const>> in_bufs{
+    std::vector<engine::audio_slice> in_buf_spans{in_buf};
+    std::vector<std::reference_wrapper<engine::audio_slice const>> in_bufs{
             in_buf_spans.begin(),
             in_buf_spans.end()};
 };
@@ -43,7 +44,7 @@ struct level_meter_processor_test : ::testing::Test
 TEST_F(level_meter_processor_test, new_peak_is_meassured_from_input_buffer)
 {
     in_buf[0] = .7f;
-    in_buf_spans[0] = {in_buf.data(), 1};
+    in_buf_spans[0] = std::span{in_buf.data(), 1};
 
     sut.process({in_bufs, {}, {}, {}, {}, 1});
 

@@ -25,7 +25,8 @@
 namespace piejam::audio::engine
 {
 
-auto make_amplify_processor(std::string_view const& name = {})
+auto
+make_multiply_processor(std::size_t num_inputs, std::string_view const& name = {})
         -> std::unique_ptr<processor>;
 
 } // namespace piejam::audio::engine

@@ -17,6 +17,7 @@
 
 #include <piejam/audio/engine/input_processor.h>
 
+#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
@@ -36,13 +37,15 @@ TEST(input_processor, input_table_is_propagated_to_outputs)
 
     std::array<float, 16> out_buf{};
     std::vector<std::span<float>> outputs{out_buf, out_buf};
-    std::vector<std::span<float const>> results(2);
+    std::vector<audio_slice> results(2);
     sut.process({{}, outputs, results, {0}, {}, 16});
 
-    EXPECT_EQ(results[0].data(), data.rows()[0].data());
-    EXPECT_EQ(results[0].size(), data.rows()[0].size());
-    EXPECT_EQ(results[1].data(), data.rows()[1].data());
-    EXPECT_EQ(results[1].size(), data.rows()[1].size());
+    ASSERT_TRUE(results[0].is_buffer());
+    EXPECT_EQ(results[0].buffer().data(), data.rows()[0].data());
+    EXPECT_EQ(results[0].buffer().size(), data.rows()[0].size());
+    ASSERT_TRUE(results[1].is_buffer());
+    EXPECT_EQ(results[1].buffer().data(), data.rows()[1].data());
+    EXPECT_EQ(results[1].buffer().size(), data.rows()[1].size());
 }
 
 } // namespace piejam::audio::engine::test

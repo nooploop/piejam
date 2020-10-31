@@ -18,6 +18,7 @@
 #pragma once
 
 #include <algorithm>
+#include <iterator>
 
 namespace piejam::audio
 {
@@ -25,11 +26,15 @@ namespace piejam::audio
 template <class T = float>
 class smoother
 {
-    static_assert(std::is_scalar_v<T>);
+    static_assert(std::is_floating_point_v<T>);
 
 public:
     struct iterator
     {
+        using iterator_category = std::input_iterator_tag;
+        using value_type = T;
+        using difference_type = int;
+
         constexpr iterator() noexcept = default;
         constexpr iterator(smoother<T>& smoother)
             : m_smoother(std::addressof(smoother))
@@ -52,6 +57,11 @@ public:
             auto copy = *this;
             m_smoother->advance(1);
             return copy;
+        }
+
+        constexpr bool operator==(iterator const& other) const noexcept
+        {
+            return this == &other;
         }
 
     private:

@@ -46,7 +46,7 @@ input_processor::process(process_context const& ctx)
     {
         BOOST_ASSERT(m_engine_input.minor_size() == ctx.outputs[ch].size());
         BOOST_ASSERT(m_engine_input.minor_step() == 1);
-        ctx.results[ch] = {
+        ctx.results[ch] = std::span{
                 m_engine_input[ch].data(),
                 m_engine_input.minor_size()};
     }

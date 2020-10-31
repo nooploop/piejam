@@ -44,14 +44,14 @@ output_processor::process(process_context const& ctx)
     for (std::size_t ch = 0; ch < m_num_inputs; ++ch)
     {
         auto const out = m_engine_output[ch];
-        if (ctx.inputs[ch].get().empty())
+        if (ctx.inputs[ch].get().is_constant())
         {
-            std::ranges::fill(out, 0.f);
+            std::ranges::fill(out, ctx.inputs[ch].get().constant());
         }
         else
         {
-            BOOST_ASSERT(ctx.inputs[ch].get().size() == out.size());
-            std::ranges::copy(ctx.inputs[ch].get(), out.begin());
+            BOOST_ASSERT(ctx.inputs[ch].get().buffer().size() == out.size());
+            std::ranges::copy(ctx.inputs[ch].get().buffer(), out.begin());
         }
     }
 }
