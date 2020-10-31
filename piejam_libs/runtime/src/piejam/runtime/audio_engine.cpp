@@ -37,7 +37,9 @@ namespace piejam::runtime
 {
 
 namespace aucomp = audio::components;
-using processor_ptr = std::unique_ptr<audio::engine::processor>;
+namespace ns_ae = audio::engine;
+
+using processor_ptr = std::unique_ptr<ns_ae::processor>;
 
 class audio_engine::mixer_bus final
 {
@@ -57,15 +59,11 @@ public:
                           ? audio_components::make_mono_mixer_bus_processor()
                           : audio_components::make_stereo_mixer_bus_processor())
         , m_amp_smoother_procs(
-                  std::make_unique<audio::engine::smoother_processor<float>>(
-                          128,
-                          "L"),
-                  std::make_unique<audio::engine::smoother_processor<float>>(
-                          128,
-                          "R"))
+                  std::make_unique<ns_ae::smoother_processor<float>>("L"),
+                  std::make_unique<ns_ae::smoother_processor<float>>("R"))
         , m_amp_multiply_procs(
-                  audio::engine::make_multiply_processor(2, "L"),
-                  audio::engine::make_multiply_processor(2, "R"))
+                  ns_ae::make_multiply_processor(2, "L"),
+                  ns_ae::make_multiply_processor(2, "R"))
         , m_level_meter_procs(
                   std::make_unique<aucomp::level_meter_processor>(
                           samplerate,
@@ -90,53 +88,47 @@ public:
                 m_level_meter_procs.right->peak_level()};
     }
 
-    auto volume_processor() const noexcept -> audio::engine::processor&
+    auto volume_processor() const noexcept -> ns_ae::processor&
     {
         return *m_volume_proc;
     }
 
-    auto pan_balance_processor() const noexcept -> audio::engine::processor&
+    auto pan_balance_processor() const noexcept -> ns_ae::processor&
     {
         return *m_pan_balance_proc;
     }
 
-    auto channel_processor() const noexcept -> audio::engine::processor&
+    auto channel_processor() const noexcept -> ns_ae::processor&
     {
         return *m_channel_proc;
     }
 
-    auto left_amp_smoother_processor() const noexcept
-            -> audio::engine::processor&
+    auto left_amp_smoother_processor() const noexcept -> ns_ae::processor&
     {
         return *m_amp_smoother_procs.left;
     }
 
-    auto right_amp_smoother_processor() const noexcept
-            -> audio::engine::processor&
+    auto right_amp_smoother_processor() const noexcept -> ns_ae::processor&
     {
         return *m_amp_smoother_procs.right;
     }
 
-    auto left_amp_multiply_processor() const noexcept
-            -> audio::engine::processor&
+    auto left_amp_multiply_processor() const noexcept -> ns_ae::processor&
     {
         return *m_amp_multiply_procs.left;
     }
 
-    auto right_amp_multiply_processor() const noexcept
-            -> audio::engine::processor&
+    auto right_amp_multiply_processor() const noexcept -> ns_ae::processor&
     {
         return *m_amp_multiply_procs.right;
     }
 
-    auto left_level_meter_processor() const noexcept
-            -> audio::engine::processor&
+    auto left_level_meter_processor() const noexcept -> ns_ae::processor&
     {
         return *m_level_meter_procs.left;
     }
 
-    auto right_level_meter_processor() const noexcept
-            -> audio::engine::processor&
+    auto right_level_meter_processor() const noexcept -> ns_ae::processor&
     {
         return *m_level_meter_procs.right;
     }
@@ -177,14 +169,14 @@ make_mixer_processors(std::size_t const num_inputs, std::size_t num_outputs)
         result.reserve(num_outputs);
         while (num_outputs--)
             result.emplace_back(
-                    audio::engine::make_mix_processor(num_inputs, "L"),
-                    audio::engine::make_mix_processor(num_inputs, "R"));
+                    ns_ae::make_mix_processor(num_inputs, "L"),
+                    ns_ae::make_mix_processor(num_inputs, "R"));
     }
     return result;
 }
 
 static void
-connect_mixer_bus(audio::engine::graph& g, audio_engine::mixer_bus const& mb)
+connect_mixer_bus(ns_ae::graph& g, audio_engine::mixer_bus const& mb)
 {
     g.add_event_wire(
             {mb.pan_balance_processor(), 0},
@@ -213,13 +205,13 @@ connect_mixer_bus(audio::engine::graph& g, audio_engine::mixer_bus const& mb)
 static auto
 make_graph(
         mixer::state const& mixer_state,
-        audio::engine::processor& input_proc,
-        audio::engine::processor& output_proc,
+        ns_ae::processor& input_proc,
+        ns_ae::processor& output_proc,
         std::vector<audio_engine::mixer_bus> const& input_buses,
         std::vector<audio_engine::mixer_bus> const& output_buses,
         std::vector<audio::pair<processor_ptr>> const& mixer_procs)
 {
-    audio::engine::graph g;
+    ns_ae::graph g;
 
     for (auto& mb : input_buses)
     {
@@ -310,9 +302,9 @@ audio_engine::audio_engine(
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels,
         mixer::state const& mixer_state)
-    : m_input_proc(std::make_unique<audio::engine::input_processor>(
+    : m_input_proc(std::make_unique<ns_ae::input_processor>(
               num_device_input_channels))
-    , m_output_proc(std::make_unique<audio::engine::output_processor>(
+    , m_output_proc(std::make_unique<ns_ae::output_processor>(
               num_device_output_channels))
     , m_input_buses(make_mixer_bus_vector(samplerate, mixer_state.inputs))
     , m_output_buses(make_mixer_bus_vector(samplerate, mixer_state.outputs))
@@ -326,7 +318,7 @@ audio_engine::audio_engine(
               m_input_buses,
               m_output_buses,
               m_mixer_procs))
-    , m_dag(audio::engine::graph_to_dag(m_graph, 256, m_buffer_size))
+    , m_dag(ns_ae::graph_to_dag(m_graph, 256, m_buffer_size))
 {
 }
 

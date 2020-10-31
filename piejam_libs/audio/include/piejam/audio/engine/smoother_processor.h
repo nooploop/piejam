@@ -35,10 +35,13 @@ class smoother_processor : public named_processor
     static_assert(std::is_convertible_v<T, float>);
 
 public:
+    static constexpr std::size_t default_smooth_length = 128;
+
     smoother_processor(
-            std::size_t smooth_length,
-            std::string_view const& name = {})
+            std::string_view const& name = {},
+            std::size_t smooth_length = default_smooth_length)
         : named_processor(name)
+        , m_input_events_ports{event_port{typeid(T), std::string(name)}}
         , m_smooth_length(smooth_length)
     {
     }
@@ -50,9 +53,7 @@ public:
 
     auto event_inputs() const -> event_ports override
     {
-        static std::array const s_ep{
-                event_port{typeid(T), std::string(name())}};
-        return s_ep;
+        return m_input_events_ports;
     }
     auto event_outputs() const -> event_ports override { return {}; }
 
@@ -105,6 +106,7 @@ public:
     }
 
 private:
+    std::array<event_port, 1> const m_input_events_ports;
     std::size_t const m_smooth_length{};
     smoother<T> m_smoother;
 };
