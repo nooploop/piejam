@@ -43,12 +43,15 @@ is_silence(audio_slice const& sl) noexcept -> bool
 }
 
 template auto
-add(audio_slice const& l, audio_slice const& r, std::span<float> const& out)
-        -> audio_slice;
+add(audio_slice const& l,
+    audio_slice const& r,
+    std::span<float> const& out) noexcept -> audio_slice;
 
 template auto multiply(
         audio_slice const& l,
         audio_slice const& r,
-        std::span<float> const& out) -> audio_slice;
+        std::span<float> const& out) noexcept -> audio_slice;
+
+template void copy(audio_slice const&, std::span<float> const&) noexcept;
 
 } // namespace piejam::audio::engine

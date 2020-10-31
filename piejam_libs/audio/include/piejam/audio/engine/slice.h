@@ -77,11 +77,15 @@ private:
 };
 
 template <class T>
-auto add(slice<T> const& l, slice<T> const& r, std::span<T> const& out)
+auto add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
         -> slice<T>;
 
 template <class T>
-auto multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out)
+auto
+multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
         -> slice<T>;
+
+template <class T>
+void copy(slice<T> const& src, std::span<T> const& out) noexcept;
 
 } // namespace piejam::audio::engine

@@ -42,10 +42,10 @@ input_processor::process(process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
+    BOOST_ASSERT(m_engine_input.minor_step() == 1);
     for (std::size_t ch = 0; ch < m_num_outputs; ++ch)
     {
         BOOST_ASSERT(m_engine_input.minor_size() == ctx.outputs[ch].size());
-        BOOST_ASSERT(m_engine_input.minor_step() == 1);
         ctx.results[ch] = std::span{
                 m_engine_input[ch].data(),
                 m_engine_input.minor_size()};

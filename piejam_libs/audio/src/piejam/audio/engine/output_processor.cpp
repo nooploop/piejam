@@ -41,18 +41,12 @@ output_processor::process(process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
+    BOOST_ASSERT(m_engine_output.minor_step() == 1);
+    BOOST_ASSERT(m_engine_output.minor_size() == ctx.buffer_size);
     for (std::size_t ch = 0; ch < m_num_inputs; ++ch)
     {
-        auto const out = m_engine_output[ch];
-        if (ctx.inputs[ch].get().is_constant())
-        {
-            std::ranges::fill(out, ctx.inputs[ch].get().constant());
-        }
-        else
-        {
-            BOOST_ASSERT(ctx.inputs[ch].get().buffer().size() == out.size());
-            std::ranges::copy(ctx.inputs[ch].get().buffer(), out.begin());
-        }
+        copy(ctx.inputs[ch].get(),
+             {m_engine_output[ch].data(), m_engine_output.minor_size()});
     }
 }
 

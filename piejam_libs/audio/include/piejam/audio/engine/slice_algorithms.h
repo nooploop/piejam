@@ -30,7 +30,7 @@ namespace detail
 template <class T>
 struct add_visitor
 {
-    constexpr add_visitor(std::span<T> const& out)
+    constexpr add_visitor(std::span<T> const& out) noexcept
         : m_out(out)
     {
     }
@@ -86,7 +86,7 @@ private:
 template <class T>
 struct multiply_visitor
 {
-    constexpr multiply_visitor(std::span<T> const& out)
+    constexpr multiply_visitor(std::span<T> const& out) noexcept
         : m_out(out)
     {
     }
@@ -141,11 +141,35 @@ private:
     std::span<T> const m_out;
 };
 
+template <class T>
+struct copy_visitor
+{
+    constexpr copy_visitor(std::span<T> const& out) noexcept
+        : m_out(out)
+    {
+    }
+
+    constexpr void operator()(T const c) const noexcept
+    {
+        std::ranges::fill(m_out, c);
+    }
+
+    constexpr void operator()(std::span<T const> const& buf) const noexcept
+    {
+        BOOST_ASSERT(buf.size() == m_out.size());
+        std::ranges::copy(buf, m_out.begin());
+    }
+
+private:
+    std::span<T> const m_out;
+};
+
 } // namespace detail
 
 template <class T>
 auto
-add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) -> slice<T>
+add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
+        -> slice<T>
 {
     return std::visit(
             detail::add_visitor<T>(out),
@@ -155,13 +179,20 @@ add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) -> slice<T>
 
 template <class T>
 auto
-multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out)
+multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
         -> slice<T>
 {
     return std::visit(
             detail::multiply_visitor<T>(out),
             l.as_variant(),
             r.as_variant());
+}
+
+template <class T>
+void
+copy(slice<T> const& s, std::span<T> const& out) noexcept
+{
+    std::visit(detail::copy_visitor(out), s.as_variant());
 }
 
 } // namespace piejam::audio::engine
