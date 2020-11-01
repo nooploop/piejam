@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/audio/engine/mix_processor.h>
+#include <piejam/audio/engine/multiply_processor.h>
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
@@ -33,11 +33,11 @@ namespace piejam::audio::engine
 {
 
 static void
-BM_mix_processor_2_inputs(benchmark::State& state)
+BM_multiply_processor_2_inputs(benchmark::State& state)
 {
     std::srand(std::time(nullptr));
 
-    auto sut = make_mix_processor(2);
+    auto sut = make_multiply_processor(2);
 
     std::size_t const buffer_size = state.range(0);
 
@@ -64,11 +64,11 @@ BM_mix_processor_2_inputs(benchmark::State& state)
 }
 
 static void
-BM_mix_processor_3_inputs(benchmark::State& state)
+BM_multiply_processor_3_inputs(benchmark::State& state)
 {
     std::srand(std::time(nullptr));
 
-    auto sut = make_mix_processor(3);
+    auto sut = make_multiply_processor(3);
 
     std::size_t const buffer_size = state.range(0);
 
@@ -98,11 +98,11 @@ BM_mix_processor_3_inputs(benchmark::State& state)
 }
 
 static void
-BM_mix_processor_4_inputs(benchmark::State& state)
+BM_multiply_processor_4_inputs(benchmark::State& state)
 {
     std::srand(std::time(nullptr));
 
-    auto sut = make_mix_processor(4);
+    auto sut = make_multiply_processor(4);
 
     std::size_t const buffer_size = state.range(0);
 
@@ -134,8 +134,8 @@ BM_mix_processor_4_inputs(benchmark::State& state)
         sut->process(ctx);
 }
 
-BENCHMARK(BM_mix_processor_2_inputs)->RangeMultiplier(2)->Range(1, 1024);
-BENCHMARK(BM_mix_processor_3_inputs)->RangeMultiplier(2)->Range(1, 1024);
-BENCHMARK(BM_mix_processor_4_inputs)->RangeMultiplier(2)->Range(1, 1024);
+BENCHMARK(BM_multiply_processor_2_inputs)->RangeMultiplier(2)->Range(1, 1024);
+BENCHMARK(BM_multiply_processor_3_inputs)->RangeMultiplier(2)->Range(1, 1024);
+BENCHMARK(BM_multiply_processor_4_inputs)->RangeMultiplier(2)->Range(1, 1024);
 
 } // namespace piejam::audio::engine

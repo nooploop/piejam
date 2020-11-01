@@ -72,17 +72,22 @@ private:
     void process_3_inputs(process_context const& ctx)
     {
         ctx.results[0] = add(
-                ctx.inputs[2].get(),
-                add(ctx.inputs[0].get(), ctx.inputs[1].get(), ctx.outputs[0]),
+                ctx.inputs[0].get(),
+                add(ctx.inputs[1].get(), ctx.inputs[2].get(), ctx.outputs[0]),
                 ctx.outputs[0]);
     }
 
     void process_4_inputs(process_context const& ctx)
     {
-        ctx.results[0] = add(
-                add(ctx.inputs[0].get(), ctx.inputs[1].get(), ctx.outputs[0]),
-                add(ctx.inputs[2].get(), ctx.inputs[3].get(), ctx.outputs[0]),
-                ctx.outputs[0]);
+        ctx.results[0] =
+                add(ctx.inputs[0].get(),
+                    add(ctx.inputs[1].get(),
+                        add(ctx.inputs[2].get(),
+                            ctx.inputs[3].get(),
+                            ctx.outputs[0]),
+                        ctx.outputs[0]),
+                    ctx.outputs[0]);
+        ;
     }
 
     void process_multiple_inputs(process_context const& ctx)

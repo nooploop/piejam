@@ -115,6 +115,7 @@ TEST(mix_processor, mix_two_silence_one_non_silence_channel)
 
     sut->process({in, out, result, {0}, {}, 1});
 
+    ASSERT_TRUE(result[0].is_buffer());
     ASSERT_EQ(1u, result[0].buffer().size());
     EXPECT_FLOAT_EQ(0.23f, result[0].buffer()[0]);
 }

@@ -59,6 +59,46 @@ public:
     void process(process_context const& ctx) override
     {
         verify_process_context(*this, ctx);
+        std::invoke(m_process_fn, this, ctx);
+    }
+
+private:
+    void process_2_inputs(process_context const& ctx)
+    {
+        ctx.results[0] = multiply(
+                ctx.inputs[0].get(),
+                ctx.inputs[1].get(),
+                ctx.outputs[0]);
+    }
+
+    void process_3_inputs(process_context const& ctx)
+    {
+        ctx.results[0] = multiply(
+                ctx.inputs[0].get(),
+                multiply(
+                        ctx.inputs[1].get(),
+                        ctx.inputs[2].get(),
+                        ctx.outputs[0]),
+                ctx.outputs[0]);
+    }
+
+    void process_4_inputs(process_context const& ctx)
+    {
+        ctx.results[0] = multiply(
+                ctx.inputs[0].get(),
+                multiply(
+                        ctx.inputs[1].get(),
+                        multiply(
+                                ctx.inputs[2].get(),
+                                ctx.inputs[3].get(),
+                                ctx.outputs[0]),
+                        ctx.outputs[0]),
+                ctx.outputs[0]);
+    }
+
+    void process_multiple_inputs(process_context const& ctx)
+    {
+        verify_process_context(*this, ctx);
 
         auto& res = ctx.results[0];
         res = {1.f};
@@ -71,8 +111,25 @@ public:
         }
     }
 
-private:
+    using process_fn_t = decltype(&multiply_processor::process);
+    constexpr auto get_process_fn(std::size_t const num_inputs) noexcept
+            -> process_fn_t
+    {
+        switch (num_inputs)
+        {
+            case 2:
+                return &multiply_processor::process_2_inputs;
+            case 3:
+                return &multiply_processor::process_3_inputs;
+            case 4:
+                return &multiply_processor::process_4_inputs;
+            default:
+                return &multiply_processor::process_multiple_inputs;
+        }
+    }
+
     std::size_t const m_num_inputs{};
+    process_fn_t const m_process_fn{get_process_fn(m_num_inputs)};
 };
 
 } // namespace
