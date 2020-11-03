@@ -46,7 +46,7 @@ TEST(row_major_table_view, transpose)
 {
     // 1 2 3
     // 4 5 6
-    std::array arr{1, 2, 3, 0, 4, 5, 6, 0};
+    std::vector arr{1, 2, 3, 0, 4, 5, 6, 0};
 
     table_view<int> tv(arr.data(), 2, 3, 4, 1);
 
@@ -69,7 +69,7 @@ TEST(row_major_table_view, stepped_columns)
 {
     // 1 2 3
     // 4 5 6
-    std::array arr{1, 0, 2, 0, 3, 4, 0, 5, 0, 6};
+    std::vector arr{1, 0, 2, 0, 3, 4, 0, 5, 0, 6};
 
     table_view<int> sut(arr.data(), 2, 3, 5, 2);
 
@@ -86,7 +86,7 @@ TEST(row_major_table_view, stepped_columns_transpose)
 {
     // 1 2 3
     // 4 5 6
-    std::array arr{1, 0, 2, 0, 3, 4, 0, 5, 0, 6};
+    std::vector arr{1, 0, 2, 0, 3, 4, 0, 5, 0, 6};
 
     table_view<int> tv(arr.data(), 2, 3, 5, 2);
 
@@ -109,7 +109,7 @@ TEST(column_major_table_view, iterate_and_compare)
 {
     // 1 2 3
     // 4 5 6
-    std::array arr{1, 2, 3, 0, 4, 5, 6, 0};
+    std::vector arr{1, 2, 3, 0, 4, 5, 6, 0};
 
     table_view<int> sut(arr.data(), 3, 2, 1, 4);
 
