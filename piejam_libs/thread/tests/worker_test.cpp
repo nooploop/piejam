@@ -15,12 +15,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/thread/worker.h>
 
-namespace piejam::thread
+#include <gtest/gtest.h>
+
+namespace piejam::thread::test
 {
 
-struct configuration;
-class worker;
+TEST(worker, doesnt_execute_if_not_woken_up)
+{
+    std::atomic_bool worked{false};
 
-} // namespace piejam::thread
+    worker wt([&]() { worked.store(true, std::memory_order_release); });
+    std::this_thread::sleep_for(std::chrono::microseconds{100});
+
+    EXPECT_FALSE(worked);
+}
+
+TEST(worker, executes_after_wakeup)
+{
+    std::atomic_bool worked{false};
+
+    worker wt([&]() { worked.store(true, std::memory_order_release); });
+    wt.wakeup();
+    std::this_thread::sleep_for(std::chrono::microseconds{100});
+
+    EXPECT_TRUE(worked);
+}
+
+} // namespace piejam::thread::test
