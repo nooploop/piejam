@@ -22,6 +22,7 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/functional/overload.h>
+#include <piejam/npos.h>
 
 #include <boost/assert.hpp>
 
@@ -33,19 +34,63 @@ namespace piejam::audio::engine
 namespace
 {
 
+template <std::size_t N>
+auto
+multiply(process_context const& ctx)
+{
+    return multiply(
+            ctx.inputs[N - 1].get(),
+            multiply<N - 1>(ctx),
+            ctx.outputs[0]);
+}
+
+template <>
+auto
+multiply<2>(process_context const& ctx)
+{
+    return multiply(ctx.inputs[1].get(), ctx.inputs[0].get(), ctx.outputs[0]);
+}
+
+template <>
+auto
+multiply<npos>(process_context const& ctx)
+{
+    audio_slice res{1.f};
+
+    auto const out = ctx.outputs[0];
+
+    for (audio_slice const& in : ctx.inputs)
+    {
+        res = multiply(in, res, out);
+    }
+
+    return res;
+}
+
+template <std::size_t NumInputs>
 class multiply_processor final : public named_processor
 {
 public:
-    multiply_processor(std::size_t num_inputs, std::string_view const& name)
+    multiply_processor(std::string_view const& name) requires(NumInputs != npos)
+        : named_processor(name)
+        , m_num_inputs(NumInputs)
+    {
+    }
+
+    multiply_processor(
+            std::size_t num_inputs,
+            std::string_view const& name) requires(NumInputs == npos)
         : named_processor(name)
         , m_num_inputs(num_inputs)
     {
-        BOOST_ASSERT(m_num_inputs > 1);
     }
 
     auto type_name() const -> std::string_view override { return "multiply"; }
 
-    auto num_inputs() const -> std::size_t override { return m_num_inputs; }
+    auto num_inputs() const -> std::size_t override
+    {
+        return NumInputs != npos ? NumInputs : m_num_inputs;
+    }
     auto num_outputs() const -> std::size_t override { return 1; }
 
     auto event_inputs() const -> event_ports override { return {}; }
@@ -59,77 +104,12 @@ public:
     void process(process_context const& ctx) override
     {
         verify_process_context(*this, ctx);
-        std::invoke(m_process_fn, this, ctx);
+
+        ctx.results[0] = multiply<NumInputs>(ctx);
     }
 
 private:
-    void process_2_inputs(process_context const& ctx)
-    {
-        ctx.results[0] = multiply(
-                ctx.inputs[0].get(),
-                ctx.inputs[1].get(),
-                ctx.outputs[0]);
-    }
-
-    void process_3_inputs(process_context const& ctx)
-    {
-        ctx.results[0] = multiply(
-                ctx.inputs[0].get(),
-                multiply(
-                        ctx.inputs[1].get(),
-                        ctx.inputs[2].get(),
-                        ctx.outputs[0]),
-                ctx.outputs[0]);
-    }
-
-    void process_4_inputs(process_context const& ctx)
-    {
-        ctx.results[0] = multiply(
-                ctx.inputs[0].get(),
-                multiply(
-                        ctx.inputs[1].get(),
-                        multiply(
-                                ctx.inputs[2].get(),
-                                ctx.inputs[3].get(),
-                                ctx.outputs[0]),
-                        ctx.outputs[0]),
-                ctx.outputs[0]);
-    }
-
-    void process_multiple_inputs(process_context const& ctx)
-    {
-        verify_process_context(*this, ctx);
-
-        auto& res = ctx.results[0];
-        res = {1.f};
-
-        auto const out = ctx.outputs[0];
-
-        for (audio_slice const& in : ctx.inputs)
-        {
-            res = multiply(in, res, out);
-        }
-    }
-
-    using process_fn_t = decltype(&multiply_processor::process);
-    constexpr auto get_process_fn(std::size_t const num_inputs) noexcept
-            -> process_fn_t
-    {
-        switch (num_inputs)
-        {
-            case 2:
-                return &multiply_processor::process_2_inputs;
-            case 3:
-                return &multiply_processor::process_3_inputs;
-            case 4:
-                return &multiply_processor::process_4_inputs;
-            default:
-                return &multiply_processor::process_multiple_inputs;
-        }
-    }
-
     std::size_t const m_num_inputs{};
-    process_fn_t const m_process_fn{get_process_fn(m_num_inputs)};
 };
 
 } // namespace
@@ -139,7 +119,18 @@ make_multiply_processor(
         std::size_t const num_inputs,
         std::string_view const& name) -> std::unique_ptr<processor>
 {
-    return std::make_unique<multiply_processor>(num_inputs, name);
+    switch (num_inputs)
+    {
+        case 2:
+            return std::make_unique<multiply_processor<2>>(name);
+        case 3:
+            return std::make_unique<multiply_processor<3>>(name);
+        case 4:
+            return std::make_unique<multiply_processor<4>>(name);
+        default:
+            BOOST_ASSERT(num_inputs > 1);
+            return std::make_unique<multiply_processor<npos>>(num_inputs, name);
+    }
 }
 
 } // namespace piejam::audio::engine
