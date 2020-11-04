@@ -37,6 +37,7 @@ class input_processor;
 class output_processor;
 
 class dag;
+class dag_executor;
 class graph;
 struct process_context;
 class processor_job;

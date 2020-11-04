@@ -19,6 +19,7 @@
 
 #include <piejam/audio/components/gui_input_processor.h>
 #include <piejam/audio/components/level_meter_processor.h>
+#include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_to_dag.h>
 #include <piejam/audio/engine/input_processor.h>
@@ -298,6 +299,7 @@ make_graph(
 }
 
 audio_engine::audio_engine(
+        std::span<thread::configuration const> const& wt_configs,
         unsigned const samplerate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels,
@@ -318,7 +320,8 @@ audio_engine::audio_engine(
               m_input_buses,
               m_output_buses,
               m_mixer_procs))
-    , m_dag(ns_ae::graph_to_dag(m_graph, 256, m_buffer_size))
+    , m_dag(ns_ae::graph_to_dag(m_graph, m_buffer_size)
+                    .make_runnable(wt_configs))
 {
 }
 
@@ -373,9 +376,7 @@ audio_engine::operator()(
     m_output_proc->set_output(out_audio);
     m_buffer_size = in_audio.minor_size();
 
-    m_dag(m_thread_context);
-
-    m_event_memory.release();
+    (*m_dag)();
 }
 
 } // namespace piejam::runtime

@@ -27,6 +27,8 @@
 
 #include <functional>
 #include <memory>
+#include <span>
+#include <vector>
 
 namespace piejam::runtime
 {
@@ -47,6 +49,7 @@ public:
 
     audio_engine_middleware(
             thread::configuration const& audio_thread_config,
+            std::span<thread::configuration const> const& wt_configs,
             get_pcm_io_descriptors_f,
             get_hw_params_f,
             device_factory_f,
@@ -71,6 +74,7 @@ private:
     void start_engine();
 
     thread::configuration m_audio_thread_config;
+    std::vector<thread::configuration> m_wt_configs;
 
     get_pcm_io_descriptors_f m_get_pcm_io_descriptors;
     get_hw_params_f m_get_hw_params;

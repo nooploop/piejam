@@ -17,57 +17,55 @@
 
 #pragma once
 
+#include <piejam/audio/engine/fwd.h>
+#include <piejam/thread/fwd.h>
+
 #include <functional>
+#include <memory>
+#include <span>
 #include <unordered_map>
 #include <vector>
 
 namespace piejam::audio::engine
 {
 
-class thread_context;
+class dag_executor
+{
+public:
+    virtual ~dag_executor() = default;
 
-//! Simple dependency graph executor. Execution runs from parents to children.
-//! No multi-threading support yet.
+    virtual void operator()() = 0;
+};
+
+//! Directed acyclic graph of tasks.
 class dag
 {
 public:
     using task_id_t = std::size_t;
     using task_t = std::function<void(thread_context const&)>;
+    using tasks_t = std::vector<std::pair<task_id_t, task_t>>;
+    using graph_t = std::unordered_map<task_id_t, std::vector<task_id_t>>;
 
-    struct node;
-    using node_ref = std::reference_wrapper<node>;
-
-    struct node
-    {
-        std::size_t parents_to_process{};
-        std::size_t num_parents{};
-        task_t task;
-        std::vector<node_ref> children;
-    };
-
-    using nodes_t = std::unordered_map<task_id_t, node>;
-
-    dag(std::size_t run_queue_size);
+    dag();
     dag(dag const&) = delete;
     dag(dag&&) = default;
 
     auto operator=(dag const&) -> dag& = delete;
     auto operator=(dag &&) -> dag& = default;
 
-    auto nodes() const noexcept -> nodes_t const& { return m_nodes; }
+    auto graph() const noexcept -> graph_t const& { return m_graph; }
 
     auto add_task(task_t) -> task_id_t;
     auto add_child_task(task_id_t parent, task_t) -> task_id_t;
     void add_child(task_id_t parent, task_id_t child);
 
-    void operator()(thread_context const&);
+    auto make_runnable(std::span<thread::configuration const> const& = {})
+            -> std::unique_ptr<dag_executor>;
 
 private:
-    static bool is_descendent(node const& parent, node const& descendent);
-
     std::size_t m_free_id{};
-    std::unordered_map<task_id_t, node> m_nodes;
-    std::vector<node*> m_run_queue;
+    graph_t m_graph;
+    tasks_t m_tasks;
 };
 
 } // namespace piejam::audio::engine

@@ -27,10 +27,10 @@ namespace piejam::audio::engine::test
 TEST(dag, add_task_and_run)
 {
     int x{};
-    dag sut(20);
+    dag sut;
 
     sut.add_task([&x](auto const&) { x = 1; });
-    sut({});
+    (*sut.make_runnable())();
 
     EXPECT_EQ(1, x);
 }
@@ -38,11 +38,11 @@ TEST(dag, add_task_and_run)
 TEST(dag, add_child_task_and_run)
 {
     int x{};
-    dag sut(20);
+    dag sut;
 
     auto parent_id = sut.add_task([&x](auto const&) { x = 5; });
     sut.add_child_task(parent_id, [&x](auto const&) { x -= 3; });
-    sut({});
+    (*sut.make_runnable())();
 
     EXPECT_EQ(2, x);
 }
@@ -50,12 +50,12 @@ TEST(dag, add_child_task_and_run)
 TEST(dag, add_child_and_run)
 {
     int x{};
-    dag sut(20);
+    dag sut;
 
     auto parent_id = sut.add_task([&x](auto const&) { x = 5; });
     auto child_id = sut.add_task([&x](auto const&) { x += 3; });
     sut.add_child(parent_id, child_id);
-    sut({});
+    (*sut.make_runnable())();
 
     EXPECT_EQ(8, x);
 }
@@ -63,7 +63,7 @@ TEST(dag, add_child_and_run)
 TEST(dag, split_and_merge_graph)
 {
     int x{}, y{}, z{};
-    dag sut(20);
+    dag sut;
 
     auto parent_id = sut.add_task([&x](auto const&) { x = 5; });
     auto child1_id =
@@ -74,7 +74,7 @@ TEST(dag, split_and_merge_graph)
         x += y + z;
     });
     sut.add_child(child2_id, result_id);
-    sut({});
+    (*sut.make_runnable())();
 
     EXPECT_EQ(10, x);
 }

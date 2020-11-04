@@ -18,17 +18,16 @@
 #pragma once
 
 #include <piejam/audio/components/fwd.h>
-#include <piejam/audio/engine/dag.h>
-#include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/engine/graph.h>
-#include <piejam/audio/engine/thread_context.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
 #include <piejam/range/table_view.h>
 #include <piejam/runtime/mixer.h>
+#include <piejam/thread/fwd.h>
 
 #include <memory>
+#include <span>
 #include <vector>
 
 namespace piejam::runtime
@@ -40,6 +39,7 @@ public:
     class mixer_bus;
 
     audio_engine(
+            std::span<thread::configuration const> const& wt_configs,
             unsigned samplerate,
             unsigned num_device_input_channels,
             unsigned num_device_output_channels,
@@ -63,10 +63,6 @@ public:
 private:
     using processor_ptr = std::unique_ptr<audio::engine::processor>;
 
-    audio::engine::event_buffer_memory m_event_memory{1u << 20};
-    audio::engine::thread_context m_thread_context{
-            &m_event_memory.memory_resource()};
-
     std::unique_ptr<audio::engine::input_processor> m_input_proc;
     std::unique_ptr<audio::engine::output_processor> m_output_proc;
 
@@ -76,7 +72,7 @@ private:
 
     std::size_t m_buffer_size{};
     audio::engine::graph m_graph;
-    audio::engine::dag m_dag;
+    std::unique_ptr<audio::engine::dag_executor> m_dag;
 };
 
 } // namespace piejam::runtime

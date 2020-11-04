@@ -28,10 +28,12 @@
 
 #include <boost/assert.hpp>
 
+#include <algorithm>
 #include <array>
 #include <initializer_list>
 #include <map>
 #include <memory>
+#include <ranges>
 #include <set>
 #include <span>
 #include <vector>
@@ -39,25 +41,10 @@
 namespace piejam::audio::engine
 {
 
-static auto
-jobs_without_children(dag const& dag_) -> std::vector<dag::task_id_t>
-{
-    std::vector<dag::task_id_t> result;
-    for (auto const& [id, node] : dag_.nodes())
-    {
-        if (node.children.empty())
-            result.push_back(id);
-    }
-    return result;
-}
-
 auto
-graph_to_dag(
-        graph const& g,
-        std::size_t const run_queue_size,
-        std::size_t const& buffer_size_ref) -> dag
+graph_to_dag(graph const& g, std::size_t const& buffer_size_ref) -> dag
 {
-    dag result(run_queue_size);
+    dag result;
 
     std::map<
             std::reference_wrapper<processor>,
@@ -134,7 +121,15 @@ graph_to_dag(
     if (!clear_event_buffer_jobs.empty())
     {
         // get final jobs first, before inserting the clear job
-        auto const final_jobs = jobs_without_children(result);
+        auto const final_jobs = [&]() {
+            std::vector<dag::task_id_t> jobs_without_children;
+            for (auto const& [id, children] : result.graph())
+            {
+                if (children.empty())
+                    jobs_without_children.push_back(id);
+            }
+            return jobs_without_children;
+        }();
 
         auto clear_job_id =
                 result.add_task([jobs = std::move(clear_event_buffer_jobs)](

@@ -47,6 +47,7 @@ struct audio_engine_middleware_test : ::testing::Test
     {
         return audio_engine_middleware(
                 {},
+                {},
                 [this]() -> audio::pcm_io_descriptors {
                     return m_ctrl.get_pcm_io_descriptors();
                 },

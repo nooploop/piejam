@@ -80,8 +80,10 @@ main(int argc, char* argv[]) -> int
 
     store.apply_middleware([](auto get_state, auto /*dispatch*/, auto next) {
         thread::configuration const audio_thread_config{2, 96};
+        std::array const worker_thread_configs{thread::configuration{3, 96}};
         auto m = std::make_shared<runtime::audio_engine_middleware>(
                 audio_thread_config,
+                worker_thread_configs,
                 &audio::alsa::get_pcm_io_descriptors,
                 &audio::alsa::get_hw_params,
                 &runtime::open_alsa_device,

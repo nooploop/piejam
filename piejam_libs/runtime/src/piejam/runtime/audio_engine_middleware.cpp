@@ -39,12 +39,14 @@ namespace piejam::runtime
 
 audio_engine_middleware::audio_engine_middleware(
         thread::configuration const& audio_thread_config,
+        std::span<thread::configuration const> const& wt_configs,
         get_pcm_io_descriptors_f get_pcm_io_descriptors,
         get_hw_params_f get_hw_params,
         device_factory_f device_factory,
         get_state_f get_state,
         next_f next)
     : m_audio_thread_config(audio_thread_config)
+    , m_wt_configs(wt_configs.begin(), wt_configs.end())
     , m_get_pcm_io_descriptors(std::move(get_pcm_io_descriptors))
     , m_get_hw_params(std::move(get_hw_params))
     , m_device_factory(std::move(device_factory))
@@ -391,6 +393,7 @@ audio_engine_middleware::start_engine()
         auto const& state = m_get_state();
 
         m_engine = std::make_unique<audio_engine>(
+                m_wt_configs,
                 state.samplerate,
                 state.input.hw_params->num_channels,
                 state.output.hw_params->num_channels,
