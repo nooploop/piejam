@@ -41,7 +41,7 @@ public:
     void close() override;
 
     bool is_running() const noexcept override;
-    void start(int affinity, process_function) override;
+    void start(thread::configuration const&, process_function) override;
     void stop() override;
 
     auto cpu_load() const noexcept -> float override

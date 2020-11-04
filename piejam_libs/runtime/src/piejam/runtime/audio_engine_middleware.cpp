@@ -38,13 +38,13 @@ namespace piejam::runtime
 {
 
 audio_engine_middleware::audio_engine_middleware(
-        int const audio_thread_cpu_affinity,
+        thread::configuration const& audio_thread_config,
         get_pcm_io_descriptors_f get_pcm_io_descriptors,
         get_hw_params_f get_hw_params,
         device_factory_f device_factory,
         get_state_f get_state,
         next_f next)
-    : m_audio_thread_cpu_affinity(audio_thread_cpu_affinity)
+    : m_audio_thread_config(audio_thread_config)
     , m_get_pcm_io_descriptors(std::move(get_pcm_io_descriptors))
     , m_get_hw_params(std::move(get_hw_params))
     , m_device_factory(std::move(device_factory))
@@ -397,7 +397,7 @@ audio_engine_middleware::start_engine()
                 state.mixer_state);
 
         m_device->start(
-                m_audio_thread_cpu_affinity,
+                m_audio_thread_config,
                 [engine = m_engine.get()](auto const& in, auto const& out) {
                     engine->operator()(in, out);
                 });

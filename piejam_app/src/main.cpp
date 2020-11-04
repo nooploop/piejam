@@ -53,7 +53,7 @@ main(int argc, char* argv[]) -> int
 {
     using namespace piejam;
 
-    // run app on the second cpu
+    // run app on the second cpu, first one is for the system
     this_thread::set_affinity(1);
 
     gui::qt_log::install_handler();
@@ -79,8 +79,9 @@ main(int argc, char* argv[]) -> int
     app::store store([](auto const& st, auto const& a) { return a(st); }, {});
 
     store.apply_middleware([](auto get_state, auto /*dispatch*/, auto next) {
+        thread::configuration const audio_thread_config{2, 96};
         auto m = std::make_shared<runtime::audio_engine_middleware>(
-                3, /* audio_thread_cpu_affinity */
+                audio_thread_config,
                 &audio::alsa::get_pcm_io_descriptors,
                 &audio::alsa::get_hw_params,
                 &runtime::open_alsa_device,

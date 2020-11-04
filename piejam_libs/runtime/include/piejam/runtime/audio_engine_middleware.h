@@ -23,6 +23,7 @@
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/mixer.h>
+#include <piejam/thread/configuration.h>
 
 #include <functional>
 #include <memory>
@@ -45,7 +46,7 @@ public:
                     audio_state const&)>;
 
     audio_engine_middleware(
-            int audio_thread_cpu_affinity,
+            thread::configuration const& audio_thread_config,
             get_pcm_io_descriptors_f,
             get_hw_params_f,
             device_factory_f,
@@ -69,7 +70,7 @@ private:
     void open_device();
     void start_engine();
 
-    int m_audio_thread_cpu_affinity{};
+    thread::configuration m_audio_thread_config;
 
     get_pcm_io_descriptors_f m_get_pcm_io_descriptors;
     get_hw_params_f m_get_hw_params;

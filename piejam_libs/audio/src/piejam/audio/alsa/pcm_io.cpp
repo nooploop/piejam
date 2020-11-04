@@ -123,7 +123,9 @@ pcm_io::is_running() const noexcept
 }
 
 void
-pcm_io::start(int const affinity, process_function process_function)
+pcm_io::start(
+        thread::configuration const& thread_config,
+        process_function process_function)
 {
     assert(is_open());
     assert(!m_process_thread);
@@ -132,7 +134,7 @@ pcm_io::start(int const affinity, process_function process_function)
 
     m_process_thread = std::make_unique<process_thread>();
     m_process_thread->start(
-            affinity,
+            thread_config,
             process_step(
                     m_input_fd,
                     m_output_fd,

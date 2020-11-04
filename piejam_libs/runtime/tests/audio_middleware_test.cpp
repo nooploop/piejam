@@ -18,6 +18,7 @@
 #include <piejam/runtime/actions/device_actions.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/thread/configuration.h>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -45,7 +46,7 @@ struct audio_engine_middleware_test : ::testing::Test
     auto make_sut()
     {
         return audio_engine_middleware(
-                0,
+                {},
                 [this]() -> audio::pcm_io_descriptors {
                     return m_ctrl.get_pcm_io_descriptors();
                 },

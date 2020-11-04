@@ -19,6 +19,7 @@
 
 #include <piejam/meta/type_traits.h>
 #include <piejam/thread/affinity.h>
+#include <piejam/thread/configuration.h>
 #include <piejam/thread/priority.h>
 
 #include <spdlog/spdlog.h>
@@ -48,17 +49,19 @@ public:
     }
 
     template <class Process>
-    void start(int affinity, Process&& process)
+    void start(thread::configuration const& conf, Process&& process)
     {
         assert(!m_running);
 
         m_running = true;
         m_thread = std::thread(
                 [this,
-                 affinity,
+                 conf,
                  fprocess = std::forward<Process>(process)]() mutable {
-                    this_thread::set_affinity(affinity);
-                    this_thread::set_priority(96);
+                    if (conf.affinity)
+                        this_thread::set_affinity(*conf.affinity);
+                    if (conf.priority)
+                        this_thread::set_priority(*conf.priority);
 
                     try
                     {
