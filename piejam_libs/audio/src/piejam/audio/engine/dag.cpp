@@ -91,35 +91,40 @@ private:
 class dag_executor_st final : public dag_executor_base
 {
 public:
-    dag_executor_st(dag::tasks_t const& tasks, dag::graph_t const& graph)
+    dag_executor_st(
+            dag::tasks_t const& tasks,
+            dag::graph_t const& graph,
+            std::size_t const event_memory_size)
         : dag_executor_base(tasks, graph)
+        , m_event_memory(event_memory_size)
     {
         m_run_queue.reserve(m_nodes.size());
     }
 
     void operator()() override
     {
-        for (auto& id_node : m_nodes)
+        for (auto& [id, nd] : m_nodes)
         {
-            id_node.second.parents_to_process = id_node.second.num_parents;
+            nd.parents_to_process = nd.num_parents;
 
-            if (id_node.second.num_parents == 0)
+            if (nd.num_parents == 0)
             {
                 BOOST_ASSERT(m_run_queue.size() < m_run_queue.capacity());
-                m_run_queue.push_back(std::addressof(id_node.second));
+                m_run_queue.emplace_back(std::addressof(nd));
             }
         }
 
         while (!m_run_queue.empty())
         {
-            node* const n = m_run_queue.back();
+            node* const nd = m_run_queue.back();
             m_run_queue.pop_back();
 
             BOOST_ASSERT(
-                    n->parents_to_process.load(std::memory_order_relaxed) == 0);
-            n->task(m_thread_context);
+                    nd->parents_to_process.load(std::memory_order_relaxed) ==
+                    0);
+            nd->task(m_thread_context);
 
-            for (node& child : n->children)
+            for (node& child : nd->children)
             {
                 if (1 == child.parents_to_process.fetch_sub(
                                  1,
@@ -135,7 +140,7 @@ public:
     }
 
 private:
-    audio::engine::event_buffer_memory m_event_memory{1u << 20};
+    audio::engine::event_buffer_memory m_event_memory;
     audio::engine::thread_context m_thread_context{
             &m_event_memory.memory_resource()};
     std::vector<node*> m_run_queue;
@@ -147,11 +152,16 @@ public:
     dag_executor_mt(
             dag::tasks_t const& tasks,
             dag::graph_t const& graph,
+            std::size_t const event_memory_size,
             std::span<thread::configuration const> const& wt_configs)
         : dag_executor_base(tasks, graph)
         , m_run_queues(1 + wt_configs.size())
-        , m_main_worker(0, m_nodes_to_process, m_run_queues)
-        , m_workers(make_workers(wt_configs, m_nodes_to_process, m_run_queues))
+        , m_main_worker(0, event_memory_size, m_nodes_to_process, m_run_queues)
+        , m_workers(make_workers(
+                  event_memory_size,
+                  wt_configs,
+                  m_nodes_to_process,
+                  m_run_queues))
     {
     }
 
@@ -197,9 +207,11 @@ private:
     {
         dag_worker(
                 std::size_t const worker_index,
+                std::size_t const event_memory_size,
                 std::atomic_size_t& nodes_to_process,
                 std::span<thread::job_deque<node>> run_queues)
             : m_worker_index(worker_index)
+            , m_event_memory(event_memory_size)
             , m_nodes_to_process(nodes_to_process)
             , m_run_queues(std::move(run_queues))
         {
@@ -268,7 +280,7 @@ private:
         }
 
         std::size_t m_worker_index;
-        audio::engine::event_buffer_memory m_event_memory{1u << 20};
+        audio::engine::event_buffer_memory m_event_memory;
         audio::engine::thread_context m_thread_context{
                 &m_event_memory.memory_resource()};
         std::atomic_size_t& m_nodes_to_process;
@@ -276,6 +288,7 @@ private:
     };
 
     static auto make_workers(
+            std::size_t const event_memory_size,
             std::span<thread::configuration const> const& wt_configs,
             std::atomic_size_t& nodes_to_process,
             std::span<thread::job_deque<node>> run_queues) -> workers_t
@@ -286,7 +299,11 @@ private:
         for (std::size_t i = 0; i < wt_configs.size(); ++i)
         {
             workers.emplace_back(std::make_unique<thread::worker>(
-                    dag_worker(i + 1, nodes_to_process, run_queues),
+                    dag_worker(
+                            i + 1,
+                            event_memory_size,
+                            nodes_to_process,
+                            run_queues),
                     wt_configs[i]));
         }
 
@@ -359,13 +376,21 @@ dag::add_child(task_id_t const parent, task_id_t const child)
 }
 
 auto
-dag::make_runnable(std::span<thread::configuration const> const& wt_configs)
-        -> std::unique_ptr<dag_executor>
+dag::make_runnable(
+        std::span<thread::configuration const> const& wt_configs,
+        std::size_t const event_memory_size) -> std::unique_ptr<dag_executor>
 {
     if (wt_configs.empty())
-        return std::make_unique<dag_executor_st>(m_tasks, m_graph);
+        return std::make_unique<dag_executor_st>(
+                m_tasks,
+                m_graph,
+                event_memory_size);
     else
-        return std::make_unique<dag_executor_mt>(m_tasks, m_graph, wt_configs);
+        return std::make_unique<dag_executor_mt>(
+                m_tasks,
+                m_graph,
+                event_memory_size,
+                wt_configs);
 }
 
 } // namespace piejam::audio::engine
