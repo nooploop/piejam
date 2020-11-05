@@ -32,6 +32,75 @@
 namespace piejam::audio::engine::test
 {
 
+struct mix_processor_2_inputs : public ::testing::Test
+{
+    audio_slice in1;
+    audio_slice in2;
+    std::array<std::reference_wrapper<audio_slice const>, 2> inputs{in1, in2};
+    std::array<float, 2> out_buf{0.f, 0.f};
+    std::array<std::span<float>, 1> outputs{out_buf};
+    std::array<audio_slice, 1> results{outputs[0]};
+    event_input_buffers ev_ins{0};
+    event_output_buffers ev_outs{};
+    process_context ctx{inputs, outputs, results, ev_ins, ev_outs, 2};
+
+    std::unique_ptr<processor> sut{make_mix_processor(2)};
+};
+
+TEST_F(mix_processor_2_inputs, mixing_constants_will_result_in_constant)
+{
+    in1 = {.23f};
+    in2 = {.58f};
+
+    sut->process(ctx);
+
+    ASSERT_TRUE(results[0].is_constant());
+    EXPECT_FLOAT_EQ(.23f + .58f, results[0].constant());
+}
+
+TEST_F(mix_processor_2_inputs,
+       mix_buffer_and_constant_result_will_be_written_into_output_buffer)
+{
+    std::array in1_buf{.23f, .58f};
+    in1 = {in1_buf};
+    in2 = {.77f};
+
+    sut->process(ctx);
+
+    ASSERT_TRUE(results[0].is_buffer());
+    ASSERT_EQ(2u, results[0].buffer().size());
+    EXPECT_FLOAT_EQ(.23f + .77f, results[0].buffer()[0]);
+    EXPECT_FLOAT_EQ(.58f + .77f, results[0].buffer()[1]);
+}
+
+TEST_F(mix_processor_2_inputs,
+       mix_buffer_and_silence_result_will_point_to_the_input_buffer)
+{
+    std::array in1_buf{.23f, .58f};
+    in1 = {in1_buf};
+
+    sut->process(ctx);
+
+    ASSERT_TRUE(results[0].is_buffer());
+    EXPECT_EQ(in1_buf.data(), results[0].buffer().data());
+    EXPECT_EQ(in1_buf.size(), results[0].buffer().size());
+}
+
+TEST_F(mix_processor_2_inputs, mix_two_buffers_result_will_be_in_the_output)
+{
+    std::array in1_buf{.23f, .58f};
+    in1 = {in1_buf};
+    std::array in2_buf{.99f, .77f};
+    in2 = {in2_buf};
+
+    sut->process(ctx);
+
+    ASSERT_TRUE(results[0].is_buffer());
+    ASSERT_EQ(2u, results[0].buffer().size());
+    EXPECT_FLOAT_EQ(.23f + .99f, results[0].buffer()[0]);
+    EXPECT_FLOAT_EQ(.58f + .77f, results[0].buffer()[1]);
+}
+
 TEST(mix_processor, mix_two_silence_channels)
 {
     auto sut = make_mix_processor(2);

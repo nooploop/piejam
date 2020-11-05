@@ -125,6 +125,14 @@ make_mix_processor(std::size_t const num_inputs, std::string_view const& name)
             return std::make_unique<mix_processor<3>>(name);
         case 4:
             return std::make_unique<mix_processor<4>>(name);
+        case 5:
+            return std::make_unique<mix_processor<5>>(name);
+        case 6:
+            return std::make_unique<mix_processor<6>>(name);
+        case 7:
+            return std::make_unique<mix_processor<7>>(name);
+        case 8:
+            return std::make_unique<mix_processor<8>>(name);
         default:
             BOOST_ASSERT(num_inputs > 1);
             return std::make_unique<mix_processor<npos>>(num_inputs, name);
