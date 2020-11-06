@@ -50,7 +50,7 @@ single_event_input_processor<Processor, T>::process_sliced_on_events(
     else
     {
         std::size_t offset{};
-        for (event<std::size_t> const& ev : *ev_in_buf)
+        for (event<T> const& ev : *ev_in_buf)
         {
             BOOST_ASSERT(ev.offset() < ctx.buffer_size);
             this_proc.process_event_slice(ctx, offset, ev.offset(), ev.value());
