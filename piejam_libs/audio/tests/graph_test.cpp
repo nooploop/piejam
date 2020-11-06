@@ -127,4 +127,47 @@ TEST(graph_endpoint_equal_compare, different_proc_different_ports)
     EXPECT_NE(sut_r, sut_l);
 }
 
+TEST(graph, is_empty_on_default_construction)
+{
+    graph sut;
+    EXPECT_TRUE(sut.wires().empty());
+    EXPECT_TRUE(sut.event_wires().empty());
+}
+
+TEST(graph, add_wire)
+{
+    processor_mock proc_src;
+    processor_mock proc_dst;
+    ON_CALL(proc_src, num_outputs()).WillByDefault(::testing::Return(1));
+    ON_CALL(proc_dst, num_inputs()).WillByDefault(::testing::Return(1));
+    graph::endpoint src{proc_src, 0};
+    graph::endpoint dst{proc_dst, 0};
+    graph sut;
+    sut.add_wire(src, dst);
+    EXPECT_FALSE(sut.wires().empty());
+    ASSERT_EQ(1u, sut.wires().size());
+    EXPECT_EQ(src, sut.wires().begin()->first);
+    EXPECT_EQ(dst, sut.wires().begin()->second);
+}
+
+TEST(graph, add_event_wire)
+{
+    processor_mock proc_src;
+    processor_mock proc_dst;
+    std::array src_outs{event_port{typeid(float), "src_out"}};
+    std::array dst_ins{event_port{typeid(float), "dst_in"}};
+    ON_CALL(proc_src, event_outputs())
+            .WillByDefault(::testing::Return(processor::event_ports{src_outs}));
+    ON_CALL(proc_dst, event_inputs())
+            .WillByDefault(::testing::Return(processor::event_ports{dst_ins}));
+    graph::endpoint src{proc_src, 0};
+    graph::endpoint dst{proc_dst, 0};
+    graph sut;
+    sut.add_event_wire(src, dst);
+    EXPECT_FALSE(sut.event_wires().empty());
+    ASSERT_EQ(1u, sut.event_wires().size());
+    EXPECT_EQ(src, sut.event_wires().begin()->first);
+    EXPECT_EQ(dst, sut.event_wires().begin()->second);
+}
+
 } // namespace piejam::audio::engine::test
