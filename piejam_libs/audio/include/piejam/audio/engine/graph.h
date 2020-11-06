@@ -37,29 +37,29 @@ public:
 
         bool operator<(endpoint const& other) const noexcept
         {
-            return std::addressof(proc.get()) <
-                           std::addressof(other.proc.get()) ||
-                   port < other.port;
+            auto const proc_l = std::addressof(proc.get());
+            auto const proc_r = std::addressof(other.proc.get());
+            return proc_l < proc_r || (proc_l == proc_r && port < other.port);
         }
 
         bool operator==(endpoint const& other) const noexcept
         {
-            return std::addressof(proc.get()) ==
-                           std::addressof(other.proc.get()) &&
-                   port == other.port;
+            auto const proc_l = std::addressof(proc.get());
+            auto const proc_r = std::addressof(other.proc.get());
+            return proc_l == proc_r && port == other.port;
         }
     };
 
     using wires_t = std::multimap<endpoint, endpoint>;
 
-    void add_wire(endpoint const& src, endpoint const& dst);
-    void add_event_wire(endpoint const& src, endpoint const& dst);
-
     auto wires() const noexcept -> wires_t const& { return m_wires; }
+    void add_wire(endpoint const& src, endpoint const& dst);
+
     auto event_wires() const noexcept -> wires_t const&
     {
         return m_event_wires;
     }
+    void add_event_wire(endpoint const& src, endpoint const& dst);
 
 private:
     wires_t m_wires;

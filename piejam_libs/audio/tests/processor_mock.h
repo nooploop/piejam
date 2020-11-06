@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <piejam/audio/engine/event_output_buffers.h>
+#include <piejam/audio/engine/event_port.h>
+#include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 
 #include <gmock/gmock.h>
