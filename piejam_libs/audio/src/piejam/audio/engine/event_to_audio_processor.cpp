@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/audio/engine/event_to_audio_processor.h>
 
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -29,31 +29,29 @@
 namespace piejam::audio::engine
 {
 
-template <class T>
-class smoother_processor : public named_processor
+namespace
 {
-    static_assert(std::is_convertible_v<T, float>);
 
+class event_to_audio_processor final : public named_processor
+{
 public:
-    static constexpr std::size_t default_smooth_length = 128;
-
-    smoother_processor(
-            std::string_view const& name = {},
-            std::size_t smooth_length = default_smooth_length)
+    event_to_audio_processor(
+            std::string_view const& name,
+            std::size_t smooth_length)
         : named_processor(name)
-        , m_input_events_ports{event_port{typeid(T), std::string(name)}}
         , m_smooth_length(smooth_length)
     {
     }
 
-    auto type_name() const -> std::string_view override { return "smoother"; }
+    auto type_name() const -> std::string_view override { return "e_to_a"; }
 
     auto num_inputs() const -> std::size_t override { return 0; }
     auto num_outputs() const -> std::size_t override { return 1; }
 
     auto event_inputs() const -> event_ports override
     {
-        return m_input_events_ports;
+        static std::array s_ports{event_port{typeid(float), "e"}};
+        return s_ports;
     }
     auto event_outputs() const -> event_ports override { return {}; }
 
@@ -66,7 +64,8 @@ public:
     {
         verify_process_context(*this, ctx);
 
-        event_buffer<T> const* const ev_buf = ctx.event_inputs.get<T>(0);
+        event_buffer<float> const* const ev_buf =
+                ctx.event_inputs.get<float>(0);
         std::span<float> const out = ctx.outputs[0];
         audio_slice& res = ctx.results[0];
 
@@ -74,7 +73,7 @@ public:
         {
             std::size_t offset{};
             auto it_out = out.begin();
-            for (event<T> const& ev : *ev_buf)
+            for (event<float> const& ev : *ev_buf)
             {
                 BOOST_ASSERT(ev.offset() < ctx.buffer_size);
                 it_out = std::copy_n(
@@ -107,9 +106,18 @@ public:
     }
 
 private:
-    std::array<event_port, 1> const m_input_events_ports;
     std::size_t const m_smooth_length{};
-    smoother<T> m_smoother;
+    smoother<float> m_smoother;
 };
+
+} // namespace
+
+auto
+make_event_to_audio_processor(
+        std::string_view const& name,
+        std::size_t const smooth_length) -> std::unique_ptr<processor>
+{
+    return std::make_unique<event_to_audio_processor>(name, smooth_length);
+}
 
 } // namespace piejam::audio::engine

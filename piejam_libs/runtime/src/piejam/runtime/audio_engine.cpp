@@ -20,6 +20,7 @@
 #include <piejam/audio/components/gui_input_processor.h>
 #include <piejam/audio/components/level_meter_processor.h>
 #include <piejam/audio/engine/dag.h>
+#include <piejam/audio/engine/event_to_audio_processor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_algorithms.h>
 #include <piejam/audio/engine/graph_to_dag.h>
@@ -27,7 +28,6 @@
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/multiply_processor.h>
 #include <piejam/audio/engine/output_processor.h>
-#include <piejam/audio/engine/smoother_processor.h>
 #include <piejam/runtime/audio_components/mixer_bus_processor.h>
 
 #include <fmt/format.h>
@@ -61,8 +61,8 @@ public:
                           ? audio_components::make_mono_mixer_bus_processor()
                           : audio_components::make_stereo_mixer_bus_processor())
         , m_amp_smoother_procs(
-                  std::make_unique<ns_ae::smoother_processor<float>>("L"),
-                  std::make_unique<ns_ae::smoother_processor<float>>("R"))
+                  ns_ae::make_event_to_audio_processor("L"),
+                  ns_ae::make_event_to_audio_processor("R"))
         , m_amp_multiply_procs(
                   ns_ae::make_multiply_processor(2, "L"),
                   ns_ae::make_multiply_processor(2, "R"))
