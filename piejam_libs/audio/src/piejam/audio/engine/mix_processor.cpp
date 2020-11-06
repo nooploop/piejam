@@ -139,4 +139,23 @@ make_mix_processor(std::size_t const num_inputs, std::string_view const& name)
     }
 }
 
+bool
+is_mix_processor(processor const& proc) noexcept
+{
+    static std::array mix_processor_typeids{
+            std::type_index(typeid(mix_processor<2>)),
+            std::type_index(typeid(mix_processor<3>)),
+            std::type_index(typeid(mix_processor<4>)),
+            std::type_index(typeid(mix_processor<5>)),
+            std::type_index(typeid(mix_processor<6>)),
+            std::type_index(typeid(mix_processor<7>)),
+            std::type_index(typeid(mix_processor<8>)),
+            std::type_index(typeid(mix_processor<npos>))};
+    return std::ranges::any_of(
+            mix_processor_typeids,
+            [ti = std::type_index(typeid(proc))](std::type_index const& mti) {
+                return ti == mti;
+            });
+}
+
 } // namespace piejam::audio::engine

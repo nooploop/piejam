@@ -214,4 +214,18 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
     EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[0]);
 }
 
+struct is_mix_processor_test : ::testing::TestWithParam<std::size_t>
+{
+};
+
+TEST_P(is_mix_processor_test, verify)
+{
+    EXPECT_TRUE(is_mix_processor(*make_mix_processor(GetParam())));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+        verify,
+        is_mix_processor_test,
+        testing::Range<std::size_t>(2u, 10u));
+
 } // namespace piejam::audio::engine::test

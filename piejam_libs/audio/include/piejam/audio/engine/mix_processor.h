@@ -29,4 +29,6 @@ auto
 make_mix_processor(std::size_t num_inputs, std::string_view const& name = {})
         -> std::unique_ptr<processor>;
 
+bool is_mix_processor(processor const&) noexcept;
+
 } // namespace piejam::audio::engine
