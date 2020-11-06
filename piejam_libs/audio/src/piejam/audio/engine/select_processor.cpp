@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
+#include <piejam/audio/engine/single_event_input_processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 
 #include <boost/assert.hpp>
@@ -32,7 +33,9 @@ namespace piejam::audio::engine
 namespace
 {
 
-class select_processor final : public named_processor
+class select_processor final
+    : public named_processor
+    , public single_event_input_processor<select_processor, std::size_t>
 {
 public:
     select_processor(std::size_t const num_inputs, std::string_view const& name)
@@ -63,42 +66,56 @@ public:
     {
         verify_process_context(*this, ctx);
 
-        event_buffer<std::size_t> const* const select_in_buf =
-                ctx.event_inputs.get<std::size_t>(0);
+        process_sliced_on_events(ctx);
+    }
 
-        if (!select_in_buf || select_in_buf->empty())
-        {
-            ctx.results[0] = m_selected < m_num_inputs ? ctx.inputs[m_selected]
-                                                       : audio_slice{};
-        }
-        else
-        {
-            auto out = ctx.outputs[0];
-            std::size_t offset{};
-            for (event<std::size_t> const& ev : *select_in_buf)
-            {
-                BOOST_ASSERT(ev.offset() < ctx.buffer_size);
-                auto const subslice_size = ev.offset() - offset;
-                copy(m_selected < m_num_inputs
-                             ? subslice(
-                                       ctx.inputs[m_selected].get(),
-                                       offset,
-                                       subslice_size)
-                             : audio_slice(),
-                     std::span<float>(out.data() + offset, subslice_size));
-                m_selected = ev.value();
-                offset = ev.offset();
-            }
+    void process_without_events(process_context const& ctx)
+    {
+        ctx.results[0] = m_selected < m_num_inputs ? ctx.inputs[m_selected]
+                                                   : audio_slice{};
+    }
 
-            auto const subslice_size = ctx.buffer_size - offset;
-            copy(m_selected < m_num_inputs
-                         ? subslice(
-                                   ctx.inputs[m_selected].get(),
-                                   offset,
-                                   subslice_size)
-                         : audio_slice(),
-                 std::span<float>(out.data() + offset, subslice_size));
-        }
+    void process_with_starting_event(
+            process_context const& ctx,
+            std::size_t const index)
+    {
+        m_selected = index;
+
+        ctx.results[0] = m_selected < m_num_inputs ? ctx.inputs[m_selected]
+                                                   : audio_slice{};
+    }
+
+    void process_event_slice(
+            process_context const& ctx,
+            std::size_t const from_offset,
+            std::size_t const to_offset,
+            std::size_t const next_index)
+    {
+        auto const subslice_size = to_offset - from_offset;
+        copy(m_selected < m_num_inputs ? subslice(
+                                                 ctx.inputs[m_selected].get(),
+                                                 from_offset,
+                                                 subslice_size)
+                                       : audio_slice(),
+             std::span<float>(
+                     ctx.outputs[0].data() + from_offset,
+                     subslice_size));
+        m_selected = next_index;
+    }
+
+    void process_final_slice(
+            process_context const& ctx,
+            std::size_t const from_offset)
+    {
+        auto const subslice_size = ctx.buffer_size - from_offset;
+        copy(m_selected < m_num_inputs ? subslice(
+                                                 ctx.inputs[m_selected].get(),
+                                                 from_offset,
+                                                 subslice_size)
+                                       : audio_slice(),
+             std::span<float>(
+                     ctx.outputs[0].data() + from_offset,
+                     subslice_size));
     }
 
 private:

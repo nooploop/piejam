@@ -67,12 +67,6 @@ TEST_F(select_processor_test, select_second_input_at_begin)
     index_event_buffer.insert(0, 1);
 
     sut->process(ctx);
-    ASSERT_TRUE(results[0].is_buffer()); //! \todo should be ideally constant
-    EXPECT_TRUE(std::ranges::all_of(results[0].buffer(), equal_to(.58f)));
-
-    index_event_buffer.clear();
-
-    sut->process(ctx);
     ASSERT_TRUE(results[0].is_constant());
     EXPECT_FLOAT_EQ(.58f, results[0].constant());
 }
@@ -109,12 +103,6 @@ TEST_F(select_processor_test,
        select_out_of_bounds_at_begin_will_result_in_silence)
 {
     index_event_buffer.insert(0, 10);
-
-    sut->process(ctx);
-    ASSERT_TRUE(results[0].is_buffer()); //! \todo should be ideally constant
-    EXPECT_TRUE(std::ranges::all_of(results[0].buffer(), equal_to(0.f)));
-
-    index_event_buffer.clear();
 
     sut->process(ctx);
     ASSERT_TRUE(results[0].is_constant());
