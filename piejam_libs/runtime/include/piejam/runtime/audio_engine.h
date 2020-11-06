@@ -68,7 +68,7 @@ private:
 
     std::vector<mixer_bus> m_input_buses;
     std::vector<mixer_bus> m_output_buses;
-    std::vector<audio::pair<processor_ptr>> m_mixer_procs;
+    std::vector<processor_ptr> m_mixer_procs;
 
     std::size_t m_buffer_size{};
     audio::engine::graph m_graph;

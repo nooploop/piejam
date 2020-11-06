@@ -21,6 +21,7 @@
 #include <piejam/audio/components/level_meter_processor.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/graph.h>
+#include <piejam/audio/engine/graph_algorithms.h>
 #include <piejam/audio/engine/graph_to_dag.h>
 #include <piejam/audio/engine/input_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
@@ -161,21 +162,6 @@ make_mixer_bus_vector(
     return result;
 }
 
-static auto
-make_mixer_processors(std::size_t const num_inputs, std::size_t num_outputs)
-{
-    std::vector<audio::pair<processor_ptr>> result;
-    if (num_inputs > 1)
-    {
-        result.reserve(num_outputs);
-        while (num_outputs--)
-            result.emplace_back(
-                    ns_ae::make_mix_processor(num_inputs, "L"),
-                    ns_ae::make_mix_processor(num_inputs, "R"));
-    }
-    return result;
-}
-
 static void
 connect_mixer_bus(ns_ae::graph& g, audio_engine::mixer_bus const& mb)
 {
@@ -210,7 +196,7 @@ make_graph(
         ns_ae::processor& output_proc,
         std::vector<audio_engine::mixer_bus> const& input_buses,
         std::vector<audio_engine::mixer_bus> const& output_buses,
-        std::vector<audio::pair<processor_ptr>> const& mixer_procs)
+        std::vector<processor_ptr>& mixer_procs)
 {
     ns_ae::graph g;
 
@@ -229,69 +215,40 @@ make_graph(
                     {mb.right_amp_multiply_processor(), 0});
     }
 
-    if (mixer_state.inputs.size() > 1)
-    {
-        for (std::size_t in = 0, num_inputs = mixer_state.inputs.size();
-             in < num_inputs;
-             ++in)
-        {
-            for (std::size_t out = 0, num_outputs = mixer_state.outputs.size();
-                 out < num_outputs;
-                 ++out)
-            {
-                g.add_wire(
-                        {input_buses[in].left_amp_multiply_processor(), 0},
-                        {*mixer_procs[out].left, in});
-                g.add_wire(
-                        {input_buses[in].right_amp_multiply_processor(), 0},
-                        {*mixer_procs[out].right, in});
-            }
-        }
-    }
-
     for (auto& mb : output_buses)
     {
         connect_mixer_bus(g, mb);
 
         if (mb.device_channels().left != npos)
-            g.add_wire(
+            connect(g,
                     {mb.left_amp_multiply_processor(), 0},
-                    {output_proc, mb.device_channels().left});
+                    {output_proc, mb.device_channels().left},
+                    mixer_procs);
 
         if (mb.device_channels().right != npos)
-            g.add_wire(
+            connect(g,
                     {mb.right_amp_multiply_processor(), 0},
-                    {output_proc, mb.device_channels().right});
+                    {output_proc, mb.device_channels().right},
+                    mixer_procs);
     }
 
-    if (mixer_state.inputs.size() > 1)
+    for (std::size_t out = 0, num_outputs = mixer_state.outputs.size();
+         out < num_outputs;
+         ++out)
     {
-        for (std::size_t out = 0, num_outputs = mixer_state.outputs.size();
-             out < num_outputs;
-             ++out)
+        for (std::size_t in = 0, num_inputs = mixer_state.inputs.size();
+             in < num_inputs;
+             ++in)
         {
-            g.add_wire(
-                    {*mixer_procs[out].left, 0},
-                    {output_buses[out].left_amp_multiply_processor(), 0});
+            connect(g,
+                    {input_buses[in].left_amp_multiply_processor(), 0},
+                    {output_buses[out].left_amp_multiply_processor(), 0},
+                    mixer_procs);
 
-            g.add_wire(
-                    {*mixer_procs[out].right, 0},
-                    {output_buses[out].right_amp_multiply_processor(), 0});
-        }
-    }
-    else if (mixer_state.inputs.size() == 1)
-    {
-        for (std::size_t out = 0, num_outputs = mixer_state.outputs.size();
-             out < num_outputs;
-             ++out)
-        {
-            g.add_wire(
-                    {input_buses[0].left_amp_multiply_processor(), 0},
-                    {output_buses[out].left_amp_multiply_processor(), 0});
-
-            g.add_wire(
-                    {input_buses[0].right_amp_multiply_processor(), 0},
-                    {output_buses[out].right_amp_multiply_processor(), 0});
+            connect(g,
+                    {input_buses[in].right_amp_multiply_processor(), 0},
+                    {output_buses[out].right_amp_multiply_processor(), 0},
+                    mixer_procs);
         }
     }
 
@@ -310,9 +267,6 @@ audio_engine::audio_engine(
               num_device_output_channels))
     , m_input_buses(make_mixer_bus_vector(samplerate, mixer_state.inputs))
     , m_output_buses(make_mixer_bus_vector(samplerate, mixer_state.outputs))
-    , m_mixer_procs(make_mixer_processors(
-              mixer_state.inputs.size(),
-              mixer_state.outputs.size()))
     , m_graph(make_graph(
               mixer_state,
               *m_input_proc,

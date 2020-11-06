@@ -18,6 +18,7 @@
 #include <piejam/audio/engine/graph.h>
 
 #include <piejam/audio/engine/event_port.h>
+#include <piejam/functional/partial_compare.h>
 
 #include <boost/assert.hpp>
 
@@ -39,6 +40,19 @@ graph::add_wire(endpoint const& src, endpoint const& dst)
             "destination endpoint already added, missing a mixer?");
 
     m_wires.emplace(src, dst);
+}
+
+void
+graph::remove_wire(endpoint const& src, endpoint const& dst)
+{
+    auto from_source = m_wires.equal_range(src);
+    auto it = std::ranges::find_if(
+            from_source.first,
+            from_source.second,
+            equal_to(dst),
+            &wires_t::value_type::second);
+    BOOST_ASSERT(it != m_wires.end());
+    m_wires.erase(it);
 }
 
 void

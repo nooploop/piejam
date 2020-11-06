@@ -54,6 +54,7 @@ public:
 
     auto wires() const noexcept -> wires_t const& { return m_wires; }
     void add_wire(endpoint const& src, endpoint const& dst);
+    void remove_wire(endpoint const& src, endpoint const& dst);
 
     auto event_wires() const noexcept -> wires_t const&
     {
