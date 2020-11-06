@@ -28,6 +28,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/output_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_job.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/select_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/smoother_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice_algorithms.h
@@ -67,8 +68,10 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/multiply_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/output_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/select_processor.cpp
 )
 
+target_compile_options(piejam_audio PRIVATE -Wall -Wextra -Werror -pedantic-errors)
 target_include_directories(piejam_audio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_audio
     PUBLIC piejam_algorithm piejam_container piejam_functional piejam_io piejam_numeric piejam_thread

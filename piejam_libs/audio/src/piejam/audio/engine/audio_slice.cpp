@@ -54,4 +54,7 @@ template auto multiply(
 
 template void copy(audio_slice const&, std::span<float> const&) noexcept;
 
+template auto subslice(audio_slice const&, std::size_t, std::size_t) noexcept
+        -> audio_slice;
+
 } // namespace piejam::audio::engine

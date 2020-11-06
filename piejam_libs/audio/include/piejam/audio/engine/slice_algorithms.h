@@ -164,6 +164,33 @@ private:
     std::span<T> const m_out;
 };
 
+template <class T>
+struct subslice
+{
+    constexpr subslice(std::size_t const offset, std::size_t size) noexcept
+        : m_offset(offset)
+        , m_size(size)
+    {
+    }
+
+    constexpr auto operator()(T const c) const noexcept -> slice<T>
+    {
+        return c;
+    }
+
+    constexpr auto operator()(std::span<T const> const& buf) const noexcept
+            -> slice<T>
+    {
+        BOOST_ASSERT(m_offset < buf.size());
+        BOOST_ASSERT(m_offset + m_size <= buf.size());
+        return std::span<T const>(buf.data() + m_offset, m_size);
+    }
+
+private:
+    std::size_t const m_offset;
+    std::size_t const m_size;
+};
+
 } // namespace detail
 
 template <class T>
@@ -193,6 +220,16 @@ void
 copy(slice<T> const& s, std::span<T> const& out) noexcept
 {
     std::visit(detail::copy_visitor(out), s.as_variant());
+}
+
+template <class T>
+auto
+subslice(
+        slice<T> const& s,
+        std::size_t const offset,
+        std::size_t const size) noexcept -> slice<T>
+{
+    return std::visit(detail::subslice<T>(offset, size), s.as_variant());
 }
 
 } // namespace piejam::audio::engine

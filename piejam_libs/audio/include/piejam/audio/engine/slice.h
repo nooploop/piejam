@@ -88,4 +88,7 @@ multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
 template <class T>
 void copy(slice<T> const& src, std::span<T> const& out) noexcept;
 
+template <class T>
+auto subslice(slice<T> const&, std::size_t, std::size_t) noexcept -> slice<T>;
+
 } // namespace piejam::audio::engine

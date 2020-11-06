@@ -76,6 +76,7 @@ public:
             auto it_out = out.begin();
             for (event<T> const& ev : *ev_buf)
             {
+                BOOST_ASSERT(ev.offset() < ctx.buffer_size);
                 it_out = std::copy_n(
                         m_smoother.advance_iterator(),
                         ev.offset() - offset,
