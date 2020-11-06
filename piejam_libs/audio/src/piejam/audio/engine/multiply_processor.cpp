@@ -25,6 +25,7 @@
 #include <piejam/npos.h>
 
 #include <boost/assert.hpp>
+#include <boost/preprocessor/iteration/local.hpp>
 
 #include <algorithm>
 
@@ -114,6 +115,8 @@ private:
 
 } // namespace
 
+#define PIEJAM_MAX_NUM_FIXED_INPUTS_MULTIPLY_PROCESSOR 8
+
 auto
 make_multiply_processor(
         std::size_t const num_inputs,
@@ -121,16 +124,20 @@ make_multiply_processor(
 {
     switch (num_inputs)
     {
-        case 2:
-            return std::make_unique<multiply_processor<2>>(name);
-        case 3:
-            return std::make_unique<multiply_processor<3>>(name);
-        case 4:
-            return std::make_unique<multiply_processor<4>>(name);
+
+#define BOOST_PP_LOCAL_LIMITS                                                  \
+    (2, PIEJAM_MAX_NUM_FIXED_INPUTS_MULTIPLY_PROCESSOR)
+#define BOOST_PP_LOCAL_MACRO(n)                                                \
+    case n:                                                                    \
+        return std::make_unique<multiply_processor<n>>(name);
+#include BOOST_PP_LOCAL_ITERATE()
+
         default:
             BOOST_ASSERT(num_inputs > 1);
             return std::make_unique<multiply_processor<npos>>(num_inputs, name);
     }
 }
+
+#undef PIEJAM_MAX_NUM_FIXED_INPUTS_MULTIPLY_PROCESSOR
 
 } // namespace piejam::audio::engine

@@ -21,9 +21,11 @@
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
+#include <piejam/functional/partial_compare.h>
 #include <piejam/npos.h>
 
 #include <boost/assert.hpp>
+#include <boost/preprocessor/iteration/local.hpp>
 
 #include <algorithm>
 
@@ -113,26 +115,21 @@ private:
 
 } // namespace
 
+#define PIEJAM_MAX_NUM_FIXED_INPUTS_MIX_PROCESSOR 8
+
 auto
 make_mix_processor(std::size_t const num_inputs, std::string_view const& name)
         -> std::unique_ptr<processor>
 {
     switch (num_inputs)
     {
-        case 2:
-            return std::make_unique<mix_processor<2>>(name);
-        case 3:
-            return std::make_unique<mix_processor<3>>(name);
-        case 4:
-            return std::make_unique<mix_processor<4>>(name);
-        case 5:
-            return std::make_unique<mix_processor<5>>(name);
-        case 6:
-            return std::make_unique<mix_processor<6>>(name);
-        case 7:
-            return std::make_unique<mix_processor<7>>(name);
-        case 8:
-            return std::make_unique<mix_processor<8>>(name);
+
+#define BOOST_PP_LOCAL_LIMITS (2, PIEJAM_MAX_NUM_FIXED_INPUTS_MIX_PROCESSOR)
+#define BOOST_PP_LOCAL_MACRO(n)                                                \
+    case n:                                                                    \
+        return std::make_unique<mix_processor<n>>(name);
+#include BOOST_PP_LOCAL_ITERATE()
+
         default:
             BOOST_ASSERT(num_inputs > 1);
             return std::make_unique<mix_processor<npos>>(num_inputs, name);
@@ -143,19 +140,18 @@ bool
 is_mix_processor(processor const& proc) noexcept
 {
     static std::array mix_processor_typeids{
-            std::type_index(typeid(mix_processor<2>)),
-            std::type_index(typeid(mix_processor<3>)),
-            std::type_index(typeid(mix_processor<4>)),
-            std::type_index(typeid(mix_processor<5>)),
-            std::type_index(typeid(mix_processor<6>)),
-            std::type_index(typeid(mix_processor<7>)),
-            std::type_index(typeid(mix_processor<8>)),
+
+#define BOOST_PP_LOCAL_LIMITS (2, PIEJAM_MAX_NUM_FIXED_INPUTS_MIX_PROCESSOR)
+#define BOOST_PP_LOCAL_MACRO(n) std::type_index(typeid(mix_processor<n>)),
+#include BOOST_PP_LOCAL_ITERATE()
+
             std::type_index(typeid(mix_processor<npos>))};
+
     return std::ranges::any_of(
             mix_processor_typeids,
-            [ti = std::type_index(typeid(proc))](std::type_index const& mti) {
-                return ti == mti;
-            });
+            equal_to(std::type_index(typeid(proc))));
 }
+
+#undef PIEJAM_MAX_NUM_FIXED_INPUTS_MIX_PROCESSOR
 
 } // namespace piejam::audio::engine
