@@ -77,15 +77,13 @@ public:
     {
         audio::engine::verify_process_context(*this, ctx);
 
-        audio::engine::event_buffer<bool> const* const ev_buf_mute =
+        audio::engine::event_buffer<bool> const& ev_buf_mute =
                 ctx.event_inputs.get<bool>(0);
-        BOOST_ASSERT(ev_buf_mute);
 
-        audio::engine::event_buffer<std::size_t> const* const ev_buf_solo =
+        audio::engine::event_buffer<std::size_t> const& ev_buf_solo =
                 ctx.event_inputs.get<std::size_t>(1);
-        BOOST_ASSERT(ev_buf_solo);
 
-        if (ev_buf_mute->empty() && ev_buf_solo->empty())
+        if (ev_buf_mute.empty() && ev_buf_solo.empty())
             return;
 
         audio::engine::event_buffer<float>& ev_buf_mute_amp =
@@ -109,8 +107,8 @@ public:
                             }
                         },
                         std::tuple(m_last_mute, m_last_solo_index),
-                        *ev_buf_mute,
-                        *ev_buf_solo);
+                        ev_buf_mute,
+                        ev_buf_solo);
     }
 
 private:

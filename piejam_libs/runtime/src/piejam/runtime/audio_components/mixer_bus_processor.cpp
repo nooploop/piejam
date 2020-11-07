@@ -88,15 +88,13 @@ public:
     {
         audio::engine::verify_process_context(*this, ctx);
 
-        audio::engine::event_buffer<float> const* const ev_buf_pan =
+        audio::engine::event_buffer<float> const& ev_buf_pan =
                 ctx.event_inputs.get<float>(0);
-        BOOST_ASSERT(ev_buf_pan);
 
-        audio::engine::event_buffer<float> const* const ev_buf_vol =
+        audio::engine::event_buffer<float> const& ev_buf_vol =
                 ctx.event_inputs.get<float>(1);
-        BOOST_ASSERT(ev_buf_vol);
 
-        if (ev_buf_pan->empty() && ev_buf_vol->empty())
+        if (ev_buf_pan.empty() && ev_buf_vol.empty())
             return;
 
         audio::engine::event_buffer<float>& ev_buf_left =
@@ -115,8 +113,8 @@ public:
                             ev_buf_right.insert(offset, pbf.right * vol);
                         },
                         std::tuple(m_last_pan_balance, m_last_volume),
-                        *ev_buf_pan,
-                        *ev_buf_vol);
+                        ev_buf_pan,
+                        ev_buf_vol);
     }
 
 private:

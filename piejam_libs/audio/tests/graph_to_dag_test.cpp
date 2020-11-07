@@ -188,12 +188,9 @@ TEST(graph_to_dag, event_is_transferred)
             }));
 
     auto event_input_has_event = [](process_context const& ctx) {
-        auto* in_buf = ctx.event_inputs.size() == 1
-                               ? ctx.event_inputs.get<float>(0)
-                               : nullptr;
-        return in_buf && in_buf->size() == 1 &&
-               in_buf->begin()->offset() == 5 &&
-               in_buf->begin()->value() == 23.f;
+        auto const& in_buf = ctx.event_inputs.get<float>(0);
+        return in_buf.size() == 1 && in_buf.begin()->offset() == 5 &&
+               in_buf.begin()->value() == 23.f;
     };
     EXPECT_CALL(out_proc, process(Truly(event_input_has_event))).Times(1);
 

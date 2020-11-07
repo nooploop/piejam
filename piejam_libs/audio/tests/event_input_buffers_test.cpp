@@ -34,13 +34,13 @@ TEST(event_input_buffers, has_the_size_set_on_construction)
     EXPECT_EQ(5, sut.size());
 }
 
-TEST(event_input_buffers, buffers_are_not_set_after_construction)
+TEST(event_input_buffers, buffers_are_empty_after_construction)
 {
     event_input_buffers sut(3);
     ASSERT_EQ(3, sut.size());
-    EXPECT_EQ(nullptr, sut.get<float>(0));
-    EXPECT_EQ(nullptr, sut.get<float>(1));
-    EXPECT_EQ(nullptr, sut.get<float>(2));
+    EXPECT_TRUE(sut.get<float>(0).empty());
+    EXPECT_TRUE(sut.get<float>(1).empty());
+    EXPECT_TRUE(sut.get<float>(2).empty());
 }
 
 TEST(event_input_buffers, buffer_can_be_set_and_retrieved)
@@ -49,9 +49,8 @@ TEST(event_input_buffers, buffer_can_be_set_and_retrieved)
     event_buffer<float> buf(mem);
     event_input_buffers sut(1);
     ASSERT_EQ(1, sut.size());
-    EXPECT_EQ(nullptr, sut.get<float>(0));
     sut.set(0, buf);
-    EXPECT_EQ(std::addressof(buf), sut.get<float>(0));
+    EXPECT_EQ(std::addressof(buf), &sut.get<float>(0));
 }
 
 } // namespace piejam::audio::engine::test

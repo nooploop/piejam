@@ -266,7 +266,6 @@ make_graph(
         std::vector<audio_engine::mixer_bus> const& input_buses,
         std::vector<audio_engine::mixer_bus> const& output_buses,
         ns_ae::processor& input_solo_index,
-        ns_ae::processor& output_solo_index,
         std::vector<processor_ptr>& mixer_procs)
 {
     ns_ae::graph g;
@@ -303,8 +302,6 @@ make_graph(
                     {mb.right_mute_multiply_processor(), 0},
                     {output_proc, mb.device_channels().right},
                     mixer_procs);
-
-        g.add_event_wire({output_solo_index, 0}, {mb.mute_solo_processor(), 1});
     }
 
     for (std::size_t out = 0, num_outputs = mixer_state.outputs.size();
@@ -346,10 +343,6 @@ audio_engine::audio_engine(
               std::make_unique<aucomp::gui_input_processor<std::size_t>>(
                       mixer_state.input_solo_index,
                       "input_solo_index"))
-    , m_output_solo_index_proc(
-              std::make_unique<aucomp::gui_input_processor<std::size_t>>(
-                      npos,
-                      "output_solo_index"))
     , m_graph(make_graph(
               mixer_state,
               *m_input_proc,
@@ -357,7 +350,6 @@ audio_engine::audio_engine(
               m_input_buses,
               m_output_buses,
               *m_input_solo_index_proc,
-              *m_output_solo_index_proc,
               m_mixer_procs))
     , m_dag(ns_ae::graph_to_dag(m_graph, m_buffer_size)
                     .make_runnable(wt_configs))

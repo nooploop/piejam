@@ -52,14 +52,26 @@ public:
 
     template <class T>
     auto get(std::size_t const buffer_index) const noexcept
-            -> event_buffer<T> const*
+            -> event_buffer<T> const&
     {
         BOOST_ASSERT(buffer_index < m_event_buffers.size());
-        return boost::polymorphic_downcast<event_buffer<T> const*>(
-                m_event_buffers[buffer_index]);
+        abstract_event_buffer const* const ev_buf =
+                m_event_buffers[buffer_index];
+
+        return ev_buf ? *boost::polymorphic_downcast<event_buffer<T> const*>(
+                                ev_buf)
+                      : get_empty<T>();
     }
 
 private:
+    template <class T>
+    static auto get_empty() noexcept -> event_buffer<T> const&
+    {
+        static std::pmr::memory_resource* s_empty_ev_mem{};
+        static event_buffer<T> const s_empty(s_empty_ev_mem);
+        return s_empty;
+    }
+
     std::vector<abstract_event_buffer const*> m_event_buffers;
 };
 
