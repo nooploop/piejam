@@ -15,27 +15,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+import QtQuick 2.13
+import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.13
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
+Item {
+    id: root
 
-namespace piejam::runtime::actions
-{
+    property alias mute: muteButton.checked
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              set_input_channel_volume,
-              set_input_channel_pan,
-              set_input_channel_mute,
-              set_output_channel_volume,
-              set_output_channel_balance,
-              set_output_channel_mute,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info>
-{
-};
+    signal muteToggled()
 
-} // namespace piejam::runtime::actions
+    Button {
+        id: muteButton
+        width: 32
+        height: 32
+        text: qsTr("M")
+
+        checkable: true
+
+        anchors.right: parent.right
+        anchors.top: parent.top
+
+        onToggled: muteToggled()
+    }
+
+}

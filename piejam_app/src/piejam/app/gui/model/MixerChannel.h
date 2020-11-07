@@ -32,6 +32,7 @@ struct MixerChannelSelectors
     selector<container::boxed_string> name;
     selector<float> volume;
     selector<float> pan;
+    selector<bool> mute;
     selector<runtime::mixer::stereo_level> level;
 };
 

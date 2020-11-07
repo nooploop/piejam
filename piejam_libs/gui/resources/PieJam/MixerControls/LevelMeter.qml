@@ -25,8 +25,9 @@ import "../Util/MathExt.js" as MathExt
 Rectangle {
     id: root
 
-    property real levelLeft
-    property real levelRight
+    property real levelLeft: 0
+    property real levelRight: 0
+    property bool muted: false
 
     width: 64
     height: 300
@@ -63,6 +64,13 @@ Rectangle {
         GradientStop { position: 1; color: "#008000" }
     }
 
+    Gradient {
+        id: mutedLevelGradient
+
+        GradientStop { position: 0; color: "#c0c0c0" }
+        GradientStop { position: 1; color: "#909090" }
+    }
+
     LevelIndicator {
         id: indicator
         width: 5
@@ -74,7 +82,7 @@ Rectangle {
 
         level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelLeft)), privates.minPos, privates.maxPos, 0, 1)
 
-        gradient: levelGradient
+        gradient: root.muted ? mutedLevelGradient : levelGradient
 
         fillColor: Material.backgroundColor
     }
@@ -90,7 +98,7 @@ Rectangle {
 
         level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelRight)), privates.minPos, privates.maxPos, 0, 1)
 
-        gradient: levelGradient
+        gradient: root.muted ? mutedLevelGradient : levelGradient
 
         fillColor: Material.backgroundColor
     }

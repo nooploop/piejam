@@ -25,6 +25,7 @@ Item {
     property alias levelLeft: meter.levelLeft
     property alias levelRight: meter.levelRight
     property alias volume: fader.volume
+    property alias muted: meter.muted
 
     signal faderMoved(real newVolume)
 

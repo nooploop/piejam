@@ -60,6 +60,7 @@ Mixer::subscribeStep(
                                             bus),
                                     selectors::make_input_volume_selector(bus),
                                     selectors::make_input_pan_selector(bus),
+                                    selectors::make_input_mute_selector(bus),
                                     selectors::make_input_level_selector(
                                             bus)}));
                 }
@@ -89,6 +90,7 @@ Mixer::subscribeStep(
                                     selectors::make_output_volume_selector(bus),
                                     selectors::make_output_balance_selector(
                                             bus),
+                                    selectors::make_output_mute_selector(bus),
                                     selectors::make_output_level_selector(
                                             bus)}));
                 }
@@ -119,6 +121,15 @@ Mixer::setInputChannelPan(unsigned const index, double const pan)
 }
 
 void
+Mixer::setInputChannelMute(unsigned const index, bool const mute)
+{
+    runtime::actions::set_input_channel_mute action;
+    action.index = index;
+    action.mute = mute;
+    m_store.dispatch<runtime::actions::set_input_channel_mute>(action);
+}
+
+void
 Mixer::setOutputChannelVolume(unsigned const index, double const volume)
 {
     runtime::actions::set_output_channel_volume action;
@@ -134,6 +145,15 @@ Mixer::setOutputChannelBalance(unsigned const index, double const balance)
     action.index = index;
     action.balance = static_cast<float>(balance);
     m_store.dispatch<runtime::actions::set_output_channel_balance>(action);
+}
+
+void
+Mixer::setOutputChannelMute(unsigned const index, bool const mute)
+{
+    runtime::actions::set_output_channel_mute action;
+    action.index = index;
+    action.mute = mute;
+    m_store.dispatch<runtime::actions::set_output_channel_mute>(action);
 }
 
 void

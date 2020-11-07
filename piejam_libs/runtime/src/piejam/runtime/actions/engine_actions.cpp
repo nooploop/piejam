@@ -47,7 +47,20 @@ set_input_channel_pan::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-set_output_channel_volume::operator()(audio_state const& st) const -> audio_state
+set_input_channel_mute::operator()(audio_state const& st) const -> audio_state
+{
+    auto new_st = st;
+
+    assert(index < new_st.mixer_state.inputs.size());
+    auto& channel = new_st.mixer_state.inputs[index];
+    channel.mute = mute;
+
+    return new_st;
+}
+
+auto
+set_output_channel_volume::operator()(audio_state const& st) const
+        -> audio_state
 {
     auto new_st = st;
 
@@ -65,6 +78,17 @@ set_output_channel_balance::operator()(audio_state const& st) const
 
     assert(index < new_st.mixer_state.outputs.size());
     new_st.mixer_state.outputs[index].pan_balance = balance;
+
+    return new_st;
+}
+
+auto
+set_output_channel_mute::operator()(audio_state const& st) const -> audio_state
+{
+    auto new_st = st;
+
+    assert(index < new_st.mixer_state.outputs.size());
+    new_st.mixer_state.outputs[index].mute = mute;
 
     return new_st;
 }

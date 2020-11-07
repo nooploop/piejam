@@ -26,11 +26,14 @@ Item {
     property alias name: title.text
     property alias levelLeft: levelMeterFader.levelLeft
     property alias levelRight: levelMeterFader.levelRight
+    property alias meterMuted: levelMeterFader.muted
     property alias pan: panControls.value
     property alias volume: levelMeterFader.volume
+    property alias mute: channelControls.mute
 
     signal faderMoved(real newVolume)
     signal panMoved(real newPan)
+    signal muteToggled()
 
     id: root
 
@@ -38,6 +41,7 @@ Item {
     height: 400
 
     Frame {
+        id: frame
 
         anchors.fill: parent
 
@@ -74,11 +78,20 @@ Item {
 
             anchors.right: parent.right
             anchors.left: parent.left
-            anchors.bottom: parent.bottom
+            anchors.bottom: channelControls.top
             anchors.top: panControls.bottom
 
             onFaderMoved: root.faderMoved(newVolume)
         }
 
+        ChannelControls {
+            id: channelControls
+            height: 32
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: -8
+
+            onMuteToggled: root.muteToggled()
+        }
     }
 }

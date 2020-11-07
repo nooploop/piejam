@@ -57,6 +57,12 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
+            m_selectors.mute,
+            [this](bool x) { setMute(x); });
+
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             m_selectors.level,
             [this](runtime::mixer::stereo_level const& x) {
                 setLevel(x.left, x.right);

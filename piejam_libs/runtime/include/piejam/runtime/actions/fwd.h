@@ -41,8 +41,10 @@ struct delete_device_bus;
 
 struct set_input_channel_volume;
 struct set_input_channel_pan;
+struct set_input_channel_mute;
 struct set_output_channel_volume;
 struct set_output_channel_balance;
+struct set_output_channel_mute;
 struct request_levels_update;
 struct update_levels;
 struct request_info_update;

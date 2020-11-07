@@ -28,6 +28,7 @@
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/multiply_processor.h>
 #include <piejam/audio/engine/output_processor.h>
+#include <piejam/audio/engine/select_processor.h>
 #include <piejam/runtime/audio_components/mixer_bus_processor.h>
 
 #include <fmt/format.h>
@@ -56,6 +57,10 @@ public:
                           channel.pan_balance,
                           channel.type == audio::bus_type::mono ? "pan"
                                                                 : "balance"))
+        , m_mute_input_proc(
+                  std::make_unique<aucomp::gui_input_processor<std::size_t>>(
+                          0, //! \todo fix channel.mute
+                          "mute"))
         , m_channel_proc(
                   channel.type == audio::bus_type::mono
                           ? audio_components::make_mono_mixer_bus_processor()
@@ -66,6 +71,9 @@ public:
         , m_amp_multiply_procs(
                   ns_ae::make_multiply_processor(2, "L"),
                   ns_ae::make_multiply_processor(2, "R"))
+        , m_mute_select_procs(
+                  ns_ae::make_select_processor(1, "mute L"),
+                  ns_ae::make_select_processor(1, "mute R"))
         , m_level_meter_procs(
                   std::make_unique<aucomp::level_meter_processor>(
                           samplerate,
@@ -83,6 +91,7 @@ public:
 
     void set_volume(float vol) noexcept { m_volume_proc->set(vol); }
     void set_pan_balance(float pan) noexcept { m_pan_balance_proc->set(pan); }
+    void set_mute(bool const mute) noexcept { m_mute_input_proc->set(mute); }
 
     auto get_level() const noexcept -> mixer::stereo_level
     {
@@ -98,6 +107,11 @@ public:
     auto pan_balance_processor() const noexcept -> ns_ae::processor&
     {
         return *m_pan_balance_proc;
+    }
+
+    auto mute_input_processor() const noexcept -> ns_ae::processor&
+    {
+        return *m_mute_input_proc;
     }
 
     auto channel_processor() const noexcept -> ns_ae::processor&
@@ -125,6 +139,16 @@ public:
         return *m_amp_multiply_procs.right;
     }
 
+    auto left_mute_select_processor() const noexcept -> ns_ae::processor&
+    {
+        return *m_mute_select_procs.left;
+    }
+
+    auto right_mute_select_processor() const noexcept -> ns_ae::processor&
+    {
+        return *m_mute_select_procs.right;
+    }
+
     auto left_level_meter_processor() const noexcept -> ns_ae::processor&
     {
         return *m_level_meter_procs.left;
@@ -139,9 +163,11 @@ private:
     audio::channel_index_pair m_device_channels;
     std::unique_ptr<aucomp::gui_input_processor<float>> m_volume_proc;
     std::unique_ptr<aucomp::gui_input_processor<float>> m_pan_balance_proc;
+    std::unique_ptr<aucomp::gui_input_processor<std::size_t>> m_mute_input_proc;
     processor_ptr m_channel_proc;
     audio::pair<processor_ptr> m_amp_smoother_procs;
     audio::pair<processor_ptr> m_amp_multiply_procs;
+    audio::pair<processor_ptr> m_mute_select_procs;
     audio::pair<std::unique_ptr<aucomp::level_meter_processor>>
             m_level_meter_procs;
 };
@@ -175,6 +201,12 @@ connect_mixer_bus(ns_ae::graph& g, audio_engine::mixer_bus const& mb)
     g.add_event_wire(
             {mb.channel_processor(), 1},
             {mb.right_amp_smoother_processor(), 0});
+    g.add_event_wire(
+            {mb.mute_input_processor(), 0},
+            {mb.left_mute_select_processor(), 0});
+    g.add_event_wire(
+            {mb.mute_input_processor(), 0},
+            {mb.right_mute_select_processor(), 0});
     g.add_wire(
             {mb.left_amp_smoother_processor(), 0},
             {mb.left_amp_multiply_processor(), 1});
@@ -187,6 +219,12 @@ connect_mixer_bus(ns_ae::graph& g, audio_engine::mixer_bus const& mb)
     g.add_wire(
             {mb.right_amp_multiply_processor(), 0},
             {mb.right_level_meter_processor(), 0});
+    g.add_wire(
+            {mb.left_amp_multiply_processor(), 0},
+            {mb.left_mute_select_processor(), 0});
+    g.add_wire(
+            {mb.right_amp_multiply_processor(), 0},
+            {mb.right_mute_select_processor(), 0});
 }
 
 static auto
@@ -221,13 +259,13 @@ make_graph(
 
         if (mb.device_channels().left != npos)
             connect(g,
-                    {mb.left_amp_multiply_processor(), 0},
+                    {mb.left_mute_select_processor(), 0},
                     {output_proc, mb.device_channels().left},
                     mixer_procs);
 
         if (mb.device_channels().right != npos)
             connect(g,
-                    {mb.right_amp_multiply_processor(), 0},
+                    {mb.right_mute_select_processor(), 0},
                     {output_proc, mb.device_channels().right},
                     mixer_procs);
     }
@@ -241,12 +279,12 @@ make_graph(
              ++in)
         {
             connect(g,
-                    {input_buses[in].left_amp_multiply_processor(), 0},
+                    {input_buses[in].left_mute_select_processor(), 0},
                     {output_buses[out].left_amp_multiply_processor(), 0},
                     mixer_procs);
 
             connect(g,
-                    {input_buses[in].right_amp_multiply_processor(), 0},
+                    {input_buses[in].right_mute_select_processor(), 0},
                     {output_buses[out].right_amp_multiply_processor(), 0},
                     mixer_procs);
         }
@@ -282,40 +320,58 @@ audio_engine::audio_engine(
 audio_engine::~audio_engine() = default;
 
 void
-audio_engine::set_input_channel_volume(std::size_t index, float volume)
+audio_engine::set_input_channel_volume(
+        std::size_t const index,
+        float const volume)
 {
     m_input_buses[index].set_volume(volume);
 }
 
 void
 audio_engine::set_input_channel_pan_balance(
-        std::size_t index,
-        float pan_balance)
+        std::size_t const index,
+        float const pan_balance)
 {
     m_input_buses[index].set_pan_balance(pan_balance);
 }
 
 void
-audio_engine::set_output_channel_volume(std::size_t index, float volume)
+audio_engine::set_input_channel_mute(std::size_t const index, bool const mute)
+{
+    m_input_buses[index].set_mute(mute);
+}
+
+void
+audio_engine::set_output_channel_volume(
+        std::size_t const index,
+        float const volume)
 {
     m_output_buses[index].set_volume(volume);
 }
 
 void
-audio_engine::set_output_channel_balance(std::size_t index, float balance)
+audio_engine::set_output_channel_balance(
+        std::size_t const index,
+        float const balance)
 {
     m_output_buses[index].set_pan_balance(balance);
 }
 
+void
+audio_engine::set_output_channel_mute(std::size_t const index, bool const mute)
+{
+    m_output_buses[index].set_mute(mute);
+}
+
 auto
-audio_engine::get_input_level(std::size_t index) const noexcept
+audio_engine::get_input_level(std::size_t const index) const noexcept
         -> mixer::stereo_level
 {
     return m_input_buses[index].get_level();
 }
 
 auto
-audio_engine::get_output_level(std::size_t index) const noexcept
+audio_engine::get_output_level(std::size_t const index) const noexcept
         -> mixer::stereo_level
 {
     return m_output_buses[index].get_level();

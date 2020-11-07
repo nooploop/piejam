@@ -71,4 +71,14 @@ MixerChannel::setPanBalance(double const x)
     }
 }
 
+void
+MixerChannel::setMute(bool const mute)
+{
+    if (m_mute != mute)
+    {
+        m_mute = mute;
+        emit muteChanged();
+    }
+}
+
 } // namespace piejam::gui::model

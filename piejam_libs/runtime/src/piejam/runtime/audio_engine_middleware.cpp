@@ -283,6 +283,14 @@ audio_engine_middleware::process_engine_action(
                     m_engine->set_input_channel_pan_balance(a.index, a.pan);
                 }
             },
+            [this](actions::set_input_channel_mute const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->set_input_channel_mute(a.index, a.mute);
+                }
+            },
             [this](actions::set_output_channel_volume const& a) {
                 m_next(a);
 
@@ -297,6 +305,14 @@ audio_engine_middleware::process_engine_action(
                 if (m_engine)
                 {
                     m_engine->set_output_channel_balance(a.index, a.balance);
+                }
+            },
+            [this](actions::set_output_channel_mute const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->set_output_channel_mute(a.index, a.mute);
                 }
             },
             [this](actions::request_levels_update const&) {

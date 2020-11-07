@@ -48,8 +48,10 @@ public:
 
     void set_input_channel_volume(std::size_t index, float volume);
     void set_input_channel_pan_balance(std::size_t index, float pan_balance);
+    void set_input_channel_mute(std::size_t index, bool mute);
     void set_output_channel_volume(std::size_t index, float volume);
     void set_output_channel_balance(std::size_t index, float balance);
+    void set_output_channel_mute(std::size_t index, bool mute);
 
     auto get_input_level(std::size_t index) const noexcept
             -> mixer::stereo_level;

@@ -37,6 +37,7 @@ struct channel
     container::boxed_string name;
     float volume{1.f};
     float pan_balance{};
+    bool mute{};
     stereo_level level;
     channel_type type{};
 
@@ -52,4 +53,4 @@ struct state
     channels outputs;
 };
 
-} // namespace piejam::audio::mixer
+} // namespace piejam::runtime::mixer

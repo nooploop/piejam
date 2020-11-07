@@ -52,12 +52,15 @@ TopPane {
 
                 levelLeft: model.item.levelLeft
                 levelRight: model.item.levelRight
+                meterMuted: model.item.mute
                 pan: model.item.panBalance
                 volume: model.item.volume
+                mute: model.item.mute
                 name: model.item.name
 
                 onFaderMoved: root.model.setInputChannelVolume(index, newVolume)
                 onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
+                onMuteToggled: root.model.setInputChannelMute(index, !model.item.mute)
 
                 Component.onCompleted: model.item.subscribe()
             }
@@ -86,10 +89,12 @@ TopPane {
                 levelRight: model.item.levelRight
                 pan: model.item.panBalance
                 volume: model.item.volume
+                mute: model.item.mute
                 name: model.item.name
 
                 onFaderMoved: root.model.setOutputChannelVolume(index, newVolume)
                 onPanMoved: root.model.setOutputChannelBalance(index, newPan)
+                onMuteToggled: root.model.setOutputChannelMute(index, !model.item.mute)
 
                 Component.onCompleted: model.item.subscribe()
             }

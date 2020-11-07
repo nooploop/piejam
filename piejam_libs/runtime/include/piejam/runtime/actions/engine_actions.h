@@ -45,6 +45,16 @@ struct set_input_channel_pan final
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
+struct set_input_channel_mute final
+    : ui::action<audio_state>
+    , visitable_engine_action<set_input_channel_mute>
+{
+    std::size_t index{};
+    bool mute{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
 struct set_output_channel_volume final
     : ui::action<audio_state>
     , visitable_engine_action<set_output_channel_volume>
@@ -61,6 +71,16 @@ struct set_output_channel_balance final
 {
     std::size_t index{};
     float balance{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
+struct set_output_channel_mute final
+    : ui::action<audio_state>
+    , visitable_engine_action<set_output_channel_mute>
+{
+    std::size_t index{};
+    bool mute{};
 
     auto operator()(audio_state const&) const -> audio_state override;
 };

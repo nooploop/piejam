@@ -31,6 +31,7 @@ class MixerChannel : public QObject
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
     Q_PROPERTY(double panBalance READ panBalance NOTIFY panBalanceChanged FINAL)
+    Q_PROPERTY(bool mute READ mute NOTIFY muteChanged FINAL)
 
 public:
     MixerChannel(QObject* parent = nullptr);
@@ -51,6 +52,9 @@ public:
     auto panBalance() const noexcept -> double { return m_panBalance; }
     void setPanBalance(double);
 
+    auto mute() const noexcept -> bool { return m_mute; }
+    void setMute(bool);
+
 signals:
 
     void nameChanged();
@@ -58,6 +62,7 @@ signals:
     void levelLeftChanged();
     void levelRightChanged();
     void panBalanceChanged();
+    void muteChanged();
 
 private:
     QString m_name;
@@ -65,6 +70,7 @@ private:
     double m_levelLeft{};
     double m_levelRight{};
     double m_panBalance{};
+    bool m_mute{};
 };
 
 } // namespace piejam::gui::model

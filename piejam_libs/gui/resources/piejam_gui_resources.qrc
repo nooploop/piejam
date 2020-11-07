@@ -31,5 +31,6 @@
         <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
         <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
         <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
+        <file>PieJam/MixerControls/ChannelControls.qml</file>
     </qresource>
 </RCC>

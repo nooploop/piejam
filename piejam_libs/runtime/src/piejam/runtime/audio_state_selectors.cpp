@@ -235,6 +235,16 @@ make_input_pan_selector(std::size_t const index) -> selector<float>
 }
 
 auto
+make_input_mute_selector(std::size_t const index) -> selector<bool>
+{
+    return selector<bool>([index](audio_state const& st) -> bool {
+        return index < st.mixer_state.inputs.size()
+                       ? st.mixer_state.inputs[index].mute
+                       : false;
+    });
+}
+
+auto
 make_input_level_selector(std::size_t const index)
         -> selector<mixer::stereo_level>
 {
@@ -263,6 +273,16 @@ make_output_balance_selector(std::size_t const index) -> selector<float>
         return index < st.mixer_state.outputs.size()
                        ? st.mixer_state.outputs[index].pan_balance
                        : 0.f;
+    });
+}
+
+auto
+make_output_mute_selector(std::size_t const index) -> selector<bool>
+{
+    return selector<bool>([index](audio_state const& st) -> bool {
+        return index < st.mixer_state.outputs.size()
+                       ? st.mixer_state.outputs[index].mute
+                       : false;
     });
 }
 
