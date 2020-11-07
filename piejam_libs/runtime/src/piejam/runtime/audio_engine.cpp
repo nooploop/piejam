@@ -34,6 +34,7 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <fstream>
 #include <ranges>
 
 namespace piejam::runtime
@@ -234,9 +235,14 @@ make_graph(
         ns_ae::processor& output_proc,
         std::vector<audio_engine::mixer_bus> const& input_buses,
         std::vector<audio_engine::mixer_bus> const& output_buses,
+        ns_ae::processor& solo_index,
+        audio::pair<processor_ptr> const& solo_procs,
         std::vector<processor_ptr>& mixer_procs)
 {
     ns_ae::graph g;
+
+    g.add_event_wire({solo_index, 0}, {*solo_procs.left, 0});
+    g.add_event_wire({solo_index, 0}, {*solo_procs.right, 0});
 
     for (auto& mb : input_buses)
     {
@@ -270,24 +276,38 @@ make_graph(
                     mixer_procs);
     }
 
+    for (std::size_t in = 0, num_inputs = mixer_state.inputs.size();
+         in < num_inputs;
+         ++in)
+    {
+        connect(g,
+                {input_buses[in].left_mute_select_processor(), 0},
+                {*solo_procs.left, 0},
+                mixer_procs);
+
+        connect(g,
+                {input_buses[in].right_mute_select_processor(), 0},
+                {*solo_procs.right, 0},
+                mixer_procs);
+
+        g.add_wire(
+                {input_buses[in].left_amp_multiply_processor(), 0},
+                {*solo_procs.left, in + 1});
+        g.add_wire(
+                {input_buses[in].right_amp_multiply_processor(), 0},
+                {*solo_procs.right, in + 1});
+    }
+
     for (std::size_t out = 0, num_outputs = mixer_state.outputs.size();
          out < num_outputs;
          ++out)
     {
-        for (std::size_t in = 0, num_inputs = mixer_state.inputs.size();
-             in < num_inputs;
-             ++in)
-        {
-            connect(g,
-                    {input_buses[in].left_mute_select_processor(), 0},
-                    {output_buses[out].left_amp_multiply_processor(), 0},
-                    mixer_procs);
-
-            connect(g,
-                    {input_buses[in].right_mute_select_processor(), 0},
-                    {output_buses[out].right_amp_multiply_processor(), 0},
-                    mixer_procs);
-        }
+        g.add_wire(
+                {*solo_procs.left, 0},
+                {output_buses[out].left_amp_multiply_processor(), 0});
+        g.add_wire(
+                {*solo_procs.right, 0},
+                {output_buses[out].right_amp_multiply_processor(), 0});
     }
 
     return g;
@@ -305,16 +325,30 @@ audio_engine::audio_engine(
               num_device_output_channels))
     , m_input_buses(make_mixer_bus_vector(samplerate, mixer_state.inputs))
     , m_output_buses(make_mixer_bus_vector(samplerate, mixer_state.outputs))
+    , m_solo_index_proc(
+              std::make_unique<aucomp::gui_input_processor<std::size_t>>(
+                      "solo_select"))
+    , m_solo_procs(
+              ns_ae::make_select_processor(
+                      mixer_state.inputs.size() + 1,
+                      "solo L"),
+              ns_ae::make_select_processor(
+                      mixer_state.inputs.size() + 1,
+                      "solo R"))
     , m_graph(make_graph(
               mixer_state,
               *m_input_proc,
               *m_output_proc,
               m_input_buses,
               m_output_buses,
+              *m_solo_index_proc,
+              m_solo_procs,
               m_mixer_procs))
     , m_dag(ns_ae::graph_to_dag(m_graph, m_buffer_size)
                     .make_runnable(wt_configs))
 {
+    std::ofstream("graph.dot")
+            << audio::engine::export_graph_as_dot(m_graph) << std::endl;
 }
 
 audio_engine::~audio_engine() = default;
@@ -339,6 +373,13 @@ void
 audio_engine::set_input_channel_mute(std::size_t const index, bool const mute)
 {
     m_input_buses[index].set_mute(mute);
+}
+
+void
+audio_engine::set_input_solo(std::size_t const index)
+{
+    BOOST_ASSERT(index == npos || index < m_input_buses.size());
+    m_solo_index_proc->set(index + 1);
 }
 
 void

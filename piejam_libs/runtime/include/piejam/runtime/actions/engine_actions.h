@@ -55,6 +55,15 @@ struct set_input_channel_mute final
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
+struct set_input_solo final
+    : ui::action<audio_state>
+    , visitable_engine_action<set_input_solo>
+{
+    std::size_t index{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
 struct set_output_channel_volume final
     : ui::action<audio_state>
     , visitable_engine_action<set_output_channel_volume>

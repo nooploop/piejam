@@ -51,6 +51,7 @@ struct state
 {
     channels inputs;
     channels outputs;
+    std::size_t input_solo_index{npos};
 };
 
 } // namespace piejam::runtime::mixer

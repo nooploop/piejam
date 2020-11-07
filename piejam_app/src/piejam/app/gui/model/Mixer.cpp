@@ -61,6 +61,7 @@ Mixer::subscribeStep(
                                     selectors::make_input_volume_selector(bus),
                                     selectors::make_input_pan_selector(bus),
                                     selectors::make_input_mute_selector(bus),
+                                    selectors::make_input_solo_selector(bus),
                                     selectors::make_input_level_selector(
                                             bus)}));
                 }
@@ -91,6 +92,10 @@ Mixer::subscribeStep(
                                     selectors::make_output_balance_selector(
                                             bus),
                                     selectors::make_output_mute_selector(bus),
+                                    selector<bool>{
+                                            [](runtime::audio_state const&) {
+                                                return false;
+                                            }},
                                     selectors::make_output_level_selector(
                                             bus)}));
                 }
@@ -99,6 +104,14 @@ Mixer::subscribeStep(
                 {
                     outputChannels()->removeMixerChannel();
                 }
+            });
+
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
+            selectors::select_input_solo_active,
+            [this](bool const input_solo_active) {
+                setInputSoloActive(input_solo_active);
             });
 }
 
@@ -127,6 +140,14 @@ Mixer::setInputChannelMute(unsigned const index, bool const mute)
     action.index = index;
     action.mute = mute;
     m_store.dispatch<runtime::actions::set_input_channel_mute>(action);
+}
+
+void
+Mixer::setInputSolo(unsigned const index)
+{
+    runtime::actions::set_input_solo action;
+    action.index = index;
+    m_store.dispatch<runtime::actions::set_input_solo>(action);
 }
 
 void

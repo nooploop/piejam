@@ -49,6 +49,7 @@ public:
     void set_input_channel_volume(std::size_t index, float volume);
     void set_input_channel_pan_balance(std::size_t index, float pan_balance);
     void set_input_channel_mute(std::size_t index, bool mute);
+    void set_input_solo(std::size_t index);
     void set_output_channel_volume(std::size_t index, float volume);
     void set_output_channel_balance(std::size_t index, float balance);
     void set_output_channel_mute(std::size_t index, bool mute);
@@ -70,6 +71,9 @@ private:
 
     std::vector<mixer_bus> m_input_buses;
     std::vector<mixer_bus> m_output_buses;
+    std::unique_ptr<audio::components::gui_input_processor<std::size_t>>
+            m_solo_index_proc;
+    audio::pair<processor_ptr> m_solo_procs;
     std::vector<processor_ptr> m_mixer_procs;
 
     std::size_t m_buffer_size{};

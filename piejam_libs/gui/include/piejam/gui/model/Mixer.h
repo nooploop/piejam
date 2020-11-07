@@ -34,6 +34,8 @@ class Mixer : public QObject
 
     Q_PROPERTY(MixerChannelsList* inputChannels READ inputChannels CONSTANT)
     Q_PROPERTY(MixerChannelsList* outputChannels READ outputChannels CONSTANT)
+    Q_PROPERTY(bool inputSoloActive READ inputSoloActive NOTIFY
+                       inputSoloActiveChanged FINAL)
 
 public:
     Q_INVOKABLE virtual void subscribe() = 0;
@@ -51,10 +53,14 @@ public:
         return m_outputChannels.rowCount();
     }
 
+    auto inputSoloActive() const -> bool { return m_inputSoloActive; }
+    void setInputSoloActive(bool);
+
     virtual Q_INVOKABLE void
     setInputChannelVolume(unsigned index, double volume) = 0;
     virtual Q_INVOKABLE void setInputChannelPan(unsigned index, double pan) = 0;
     virtual Q_INVOKABLE void setInputChannelMute(unsigned index, bool mute) = 0;
+    virtual Q_INVOKABLE void setInputSolo(unsigned index) = 0;
     virtual Q_INVOKABLE void
     setOutputChannelVolume(unsigned index, double volume) = 0;
     virtual Q_INVOKABLE void
@@ -63,9 +69,14 @@ public:
     setOutputChannelMute(unsigned index, bool mute) = 0;
     virtual Q_INVOKABLE void requestLevelsUpdate() = 0;
 
+signals:
+
+    void inputSoloActiveChanged();
+
 private:
     MixerChannelsList m_inputChannels;
     MixerChannelsList m_outputChannels;
+    bool m_inputSoloActive{};
 };
 
 } // namespace piejam::gui::model

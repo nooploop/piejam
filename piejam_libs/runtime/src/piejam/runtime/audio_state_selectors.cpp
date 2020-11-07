@@ -245,6 +245,14 @@ make_input_mute_selector(std::size_t const index) -> selector<bool>
 }
 
 auto
+make_input_solo_selector(std::size_t const index) -> selector<bool>
+{
+    return selector<bool>([index](audio_state const& st) -> bool {
+        return index == st.mixer_state.input_solo_index;
+    });
+}
+
+auto
 make_input_level_selector(std::size_t const index)
         -> selector<mixer::stereo_level>
 {
@@ -255,6 +263,10 @@ make_input_level_selector(std::size_t const index)
                                : mixer::stereo_level{};
             });
 }
+
+const selector<bool> select_input_solo_active([](audio_state const& st) {
+    return st.mixer_state.input_solo_index != npos;
+});
 
 auto
 make_output_volume_selector(std::size_t const index) -> selector<float>

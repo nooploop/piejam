@@ -23,4 +23,14 @@
 namespace piejam::gui::model
 {
 
+void
+Mixer::setInputSoloActive(bool const x)
+{
+    if (m_inputSoloActive != x)
+    {
+        m_inputSoloActive = x;
+        emit inputSoloActiveChanged();
+    }
+}
+
 } // namespace piejam::gui::model

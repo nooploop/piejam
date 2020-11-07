@@ -52,15 +52,17 @@ TopPane {
 
                 levelLeft: model.item.levelLeft
                 levelRight: model.item.levelRight
-                meterMuted: model.item.mute
+                meterMuted: (model.item.mute && !model.item.solo) || (root.model.inputSoloActive && !model.item.solo)
                 pan: model.item.panBalance
                 volume: model.item.volume
                 mute: model.item.mute
+                solo: model.item.solo
                 name: model.item.name
 
                 onFaderMoved: root.model.setInputChannelVolume(index, newVolume)
                 onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
                 onMuteToggled: root.model.setInputChannelMute(index, !model.item.mute)
+                onSoloToggled: root.model.setInputSolo(index)
 
                 Component.onCompleted: model.item.subscribe()
             }
@@ -87,9 +89,11 @@ TopPane {
 
                 levelLeft: model.item.levelLeft
                 levelRight: model.item.levelRight
+                meterMuted: model.item.mute
                 pan: model.item.panBalance
                 volume: model.item.volume
                 mute: model.item.mute
+                soloEnabled: false
                 name: model.item.name
 
                 onFaderMoved: root.model.setOutputChannelVolume(index, newVolume)

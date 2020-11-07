@@ -18,26 +18,42 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
+import QtQuick.Layouts 1.12
 
 Item {
     id: root
 
+    property alias soloEnabled: soloButton.enabled
+    property alias solo: soloButton.checked
     property alias mute: muteButton.checked
 
+    signal soloToggled()
     signal muteToggled()
 
     Button {
-        id: muteButton
-        width: 32
-        height: 32
-        text: qsTr("M")
+        id: soloButton
+        width: 40
+        height: 40
+        text: qsTr("S")
+        anchors.right: muteButton.left
+        anchors.rightMargin: 8
 
         checkable: true
 
-        anchors.right: parent.right
-        anchors.top: parent.top
+        Material.accent: Material.Yellow
 
-        onToggled: muteToggled()
+        onToggled: root.soloToggled()
     }
 
+    Button {
+        id: muteButton
+        width: 40
+        height: 40
+        text: qsTr("M")
+        anchors.right: parent.right
+
+        checkable: true
+
+        onToggled: root.muteToggled()
+    }
 }

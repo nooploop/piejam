@@ -28,6 +28,7 @@ struct engine_action_visitor
               set_input_channel_volume,
               set_input_channel_pan,
               set_input_channel_mute,
+              set_input_solo,
               set_output_channel_volume,
               set_output_channel_balance,
               set_output_channel_mute,

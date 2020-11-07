@@ -30,10 +30,13 @@ Item {
     property alias pan: panControls.value
     property alias volume: levelMeterFader.volume
     property alias mute: channelControls.mute
+    property alias solo: channelControls.solo
+    property alias soloEnabled: channelControls.soloEnabled
 
     signal faderMoved(real newVolume)
     signal panMoved(real newPan)
     signal muteToggled()
+    signal soloToggled()
 
     id: root
 
@@ -92,6 +95,7 @@ Item {
             anchors.bottomMargin: -8
 
             onMuteToggled: root.muteToggled()
+            onSoloToggled: root.soloToggled()
         }
     }
 }

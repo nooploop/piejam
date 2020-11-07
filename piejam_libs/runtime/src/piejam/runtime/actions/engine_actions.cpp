@@ -59,6 +59,19 @@ set_input_channel_mute::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
+set_input_solo::operator()(audio_state const& st) const -> audio_state
+{
+    auto new_st = st;
+
+    assert(index < new_st.mixer_state.inputs.size());
+
+    new_st.mixer_state.input_solo_index =
+            index == new_st.mixer_state.input_solo_index ? npos : index;
+
+    return new_st;
+}
+
+auto
 set_output_channel_volume::operator()(audio_state const& st) const
         -> audio_state
 {

@@ -291,6 +291,15 @@ audio_engine_middleware::process_engine_action(
                     m_engine->set_input_channel_mute(a.index, a.mute);
                 }
             },
+            [this](actions::set_input_solo const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->set_input_solo(
+                            m_get_state().mixer_state.input_solo_index);
+                }
+            },
             [this](actions::set_output_channel_volume const& a) {
                 m_next(a);
 

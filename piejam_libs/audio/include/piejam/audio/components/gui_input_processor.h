@@ -36,10 +36,13 @@ class gui_input_processor final : public engine::named_processor
     static_assert(std::atomic<T>::is_always_lock_free);
 
 public:
-    gui_input_processor() = default;
-    gui_input_processor(
-            T const initial,
-            std::string_view const& name = {}) noexcept
+    gui_input_processor(std::string_view const& name = {})
+        : named_processor(name)
+        , m_event_output_ports{engine::event_port{typeid(T), std::string(name)}}
+    {
+    }
+
+    gui_input_processor(T const initial, std::string_view const& name = {})
         : named_processor(name)
         , m_event_output_ports{engine::event_port{typeid(T), std::string(name)}}
         , m_value{initial}

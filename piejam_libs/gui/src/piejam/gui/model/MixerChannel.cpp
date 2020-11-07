@@ -81,4 +81,14 @@ MixerChannel::setMute(bool const mute)
     }
 }
 
+void
+MixerChannel::setSolo(bool const solo)
+{
+    if (m_solo != solo)
+    {
+        m_solo = solo;
+        emit soloChanged();
+    }
+}
+
 } // namespace piejam::gui::model
