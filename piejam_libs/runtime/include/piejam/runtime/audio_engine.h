@@ -72,8 +72,9 @@ private:
     std::vector<mixer_bus> m_input_buses;
     std::vector<mixer_bus> m_output_buses;
     std::unique_ptr<audio::components::gui_input_processor<std::size_t>>
-            m_solo_index_proc;
-    audio::pair<processor_ptr> m_solo_procs;
+            m_input_solo_index_proc;
+    std::unique_ptr<audio::components::gui_input_processor<std::size_t>>
+            m_output_solo_index_proc; //! \todo remove
     std::vector<processor_ptr> m_mixer_procs;
 
     std::size_t m_buffer_size{};

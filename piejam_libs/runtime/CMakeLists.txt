@@ -11,6 +11,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_name.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_components/mixer_bus_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_components/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_state.h
@@ -27,6 +28,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_name.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_components/mixer_bus_processor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_components/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_state.cpp
