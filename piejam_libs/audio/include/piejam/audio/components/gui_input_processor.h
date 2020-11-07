@@ -38,13 +38,16 @@ class gui_input_processor final : public engine::named_processor
 public:
     gui_input_processor(std::string_view const& name = {})
         : named_processor(name)
-        , m_event_output_ports{engine::event_port{typeid(T), std::string(name)}}
+        , m_event_output_ports{
+                  engine::event_port{std::in_place_type<T>, std::string(name)}}
     {
     }
 
     gui_input_processor(T const initial, std::string_view const& name = {})
         : named_processor(name)
-        , m_event_output_ports{engine::event_port{typeid(T), std::string(name)}}
+        , m_event_output_ports{engine::event_port(
+                  std::in_place_type<T>,
+                  std::string(name))}
         , m_value{initial}
     {
     }

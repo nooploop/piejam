@@ -18,15 +18,29 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <typeindex>
+#include <utility>
 
 namespace piejam::audio::engine
 {
 
-struct event_port
+class event_port
 {
-    std::type_index type;
-    std::string name;
+public:
+    template <class T>
+    event_port(std::in_place_type_t<T>, std::string_view const& name = {})
+        : m_type(typeid(T))
+        , m_name(name)
+    {
+    }
+
+    auto type() const noexcept -> std::type_index const& { return m_type; }
+    auto name() const noexcept -> std::string const& { return m_name; }
+
+private:
+    std::type_index m_type;
+    std::string m_name;
 };
 
 } // namespace piejam::audio::engine

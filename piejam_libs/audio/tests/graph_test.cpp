@@ -154,8 +154,8 @@ TEST(graph, add_event_wire)
 {
     processor_mock proc_src;
     processor_mock proc_dst;
-    std::array src_outs{event_port{typeid(float), "src_out"}};
-    std::array dst_ins{event_port{typeid(float), "dst_in"}};
+    std::array src_outs{event_port(std::in_place_type<float>, "src_out")};
+    std::array dst_ins{event_port(std::in_place_type<float>, "dst_in")};
     ON_CALL(proc_src, event_outputs())
             .WillByDefault(::testing::Return(processor::event_ports{src_outs}));
     ON_CALL(proc_dst, event_inputs())

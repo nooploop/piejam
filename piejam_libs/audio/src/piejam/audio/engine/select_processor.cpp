@@ -51,7 +51,8 @@ public:
 
     auto event_inputs() const -> event_ports override
     {
-        static std::array s_ports{event_port{typeid(std::size_t), "select"}};
+        static std::array s_ports{
+                event_port(std::in_place_type<std::size_t>, "select")};
         return s_ports;
     }
 

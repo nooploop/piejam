@@ -53,7 +53,7 @@ public:
 
     auto event_inputs() const -> event_ports override
     {
-        static std::array s_ports{event_port{typeid(float), "e"}};
+        static std::array s_ports{event_port(std::in_place_type<float>, "e")};
         return s_ports;
     }
     auto event_outputs() const -> event_ports override { return {}; }

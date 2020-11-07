@@ -55,15 +55,18 @@ public:
     auto event_inputs() const -> event_ports override
     {
         static std::array s_ports{
-                audio::engine::event_port{typeid(bool), "mute"},
-                audio::engine::event_port{typeid(std::size_t), "solo_index"}};
+                audio::engine::event_port(std::in_place_type<bool>, "mute"),
+                audio::engine::event_port(
+                        std::in_place_type<std::size_t>,
+                        "solo_index")};
         return s_ports;
     }
 
     auto event_outputs() const -> event_ports override
     {
-        static std::array s_ports{
-                audio::engine::event_port{typeid(float), "mute_amp"}};
+        static std::array s_ports{audio::engine::event_port{
+                std::in_place_type<float>,
+                "mute_amp"}};
         return s_ports;
     }
 

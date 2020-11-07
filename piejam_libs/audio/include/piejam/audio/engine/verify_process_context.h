@@ -51,13 +51,13 @@ verify_process_context(processor const& proc, process_context const& ctx)
             proc.event_inputs(),
             ctx.event_inputs,
             [](event_port const& p, abstract_event_buffer const* b) {
-                return !b || p.type == b->type();
+                return !b || p.type() == b->type();
             }));
     BOOST_ASSERT(std::ranges::equal(
             proc.event_outputs(),
             ctx.event_outputs,
             [](event_port const& p, auto const& b) {
-                return p.type == b->type();
+                return p.type() == b->type();
             }));
 
     boost::ignore_unused(proc, ctx);

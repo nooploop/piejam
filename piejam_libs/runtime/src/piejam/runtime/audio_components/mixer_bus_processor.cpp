@@ -55,17 +55,17 @@ public:
     {
         static std::array s_ports{
                 audio::engine::event_port{
-                        typeid(float),
+                        std::in_place_type<float>,
                         C == audio::bus_type::mono ? "pan" : "balance"},
-                audio::engine::event_port{typeid(float), "volume"}};
+                audio::engine::event_port{std::in_place_type<float>, "volume"}};
         return s_ports;
     }
 
     auto event_outputs() const -> event_ports override
     {
         static std::array s_ports{
-                audio::engine::event_port{typeid(float), "gain L"},
-                audio::engine::event_port{typeid(float), "gain R"}};
+                audio::engine::event_port{std::in_place_type<float>, "gain L"},
+                audio::engine::event_port{std::in_place_type<float>, "gain R"}};
         return s_ports;
     }
 

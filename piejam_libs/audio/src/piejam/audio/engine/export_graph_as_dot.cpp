@@ -94,7 +94,7 @@ export_graph_as_dot(graph const& g) -> std::string
                               "<td port=\"ei{}\" bgcolor=\"{}\">{}</td>",
                               i,
                               event_color,
-                              p.event_inputs()[i].name)
+                              p.event_inputs()[i].name())
                    << std::endl;
             }
             ss << "</tr>" << std::endl;
@@ -128,7 +128,7 @@ export_graph_as_dot(graph const& g) -> std::string
                               "<td port=\"eo{}\" bgcolor=\"{}\">{}</td>",
                               i,
                               event_color,
-                              p.event_outputs()[i].name)
+                              p.event_outputs()[i].name())
                    << std::endl;
             }
             ss << "</tr>" << std::endl;
