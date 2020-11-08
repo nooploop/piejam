@@ -95,9 +95,6 @@ processor_job::operator()(thread_context const& ctx)
     for (std::span<float>& out : m_outputs)
         out = {out.data(), m_buffer_size};
 
-    // initialize results with output buffers
-    std::ranges::copy(m_outputs, m_results.begin());
-
     BOOST_ASSERT(ctx.event_memory);
     m_event_outputs.set_event_memory(ctx.event_memory);
 

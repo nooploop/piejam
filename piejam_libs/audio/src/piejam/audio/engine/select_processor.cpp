@@ -112,6 +112,8 @@ public:
              std::span<float>(
                      ctx.outputs[0].data() + from_offset,
                      subslice_size));
+
+        ctx.results[0] = ctx.outputs[0];
     }
 
 private:

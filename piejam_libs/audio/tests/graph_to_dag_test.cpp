@@ -49,12 +49,14 @@ TEST(graph_to_dag, audio_is_transferred_to_connected_proc)
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g, buffer_size).make_runnable();
 
-    EXPECT_CALL(in_proc, process(_)).WillOnce(Invoke([](auto const& ctx) {
-        ASSERT_EQ(1u, ctx.outputs.size());
-        auto const& buf = ctx.outputs[0];
-        ASSERT_EQ(1u, buf.size());
-        buf[0] = 23.f;
-    }));
+    EXPECT_CALL(in_proc, process(_))
+            .WillOnce(Invoke([](process_context const& ctx) {
+                ASSERT_EQ(1u, ctx.outputs.size());
+                auto const& buf = ctx.outputs[0];
+                ASSERT_EQ(1u, buf.size());
+                buf[0] = 23.f;
+                ctx.results[0] = buf;
+            }));
 
     auto input_has_sample = [](process_context const& ctx) {
         return ctx.inputs.size() == 1 &&
@@ -84,12 +86,14 @@ TEST(graph_to_dag, audio_can_spread_to_multiple_ins)
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g, buffer_size).make_runnable();
 
-    EXPECT_CALL(in_proc, process(_)).WillOnce(Invoke([](auto const& ctx) {
-        ASSERT_EQ(1u, ctx.outputs.size());
-        auto const& buf = ctx.outputs[0];
-        ASSERT_EQ(1u, buf.size());
-        buf[0] = 23.f;
-    }));
+    EXPECT_CALL(in_proc, process(_))
+            .WillOnce(Invoke([](process_context const& ctx) {
+                ASSERT_EQ(1u, ctx.outputs.size());
+                auto const& buf = ctx.outputs[0];
+                ASSERT_EQ(1u, buf.size());
+                buf[0] = 23.f;
+                ctx.results[0] = buf;
+            }));
 
     auto input_has_sample = [](process_context const& ctx) {
         return ctx.inputs.size() == 2 &&
@@ -143,7 +147,12 @@ TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g, buffer_size).make_runnable();
 
-    EXPECT_CALL(in_proc, process(_)).Times(1);
+    EXPECT_CALL(in_proc, process(_))
+            .WillOnce(Invoke([](process_context const& ctx) {
+                ASSERT_EQ(1u, ctx.outputs.size());
+                ASSERT_EQ(1u, ctx.results.size());
+                ctx.results[0] = ctx.outputs[0];
+            }));
 
     auto valid_ins = [](process_context const& ctx) {
         return ctx.inputs.size() == 2 &&
@@ -169,11 +178,6 @@ TEST(graph_to_dag, event_is_transferred)
     std::array event_out_ports{event_port(std::in_place_type<float>, {})};
 
     ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_in_ports));
-    //    ON_CALL(in_proc, create_event_output_buffers(_))
-    //            .WillByDefault(Invoke([](event_output_buffer_factory const&
-    //            fac) {
-    //                fac.add<float>();
-    //            }));
     ON_CALL(out_proc, event_inputs()).WillByDefault(Return(event_out_ports));
 
     g.add_event_wire({in_proc, 0}, {out_proc, 0});
@@ -211,11 +215,6 @@ TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
 
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(1));
     ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_out_ports));
-    //    ON_CALL(in_proc, create_event_output_buffers(_))
-    //            .WillByDefault(Invoke([](event_output_buffer_factory const&
-    //            fac) {
-    //                fac.add<float>();
-    //            }));
     ON_CALL(out_proc, num_inputs()).WillByDefault(Return(1));
     g.add_wire({in_proc, 0}, {out_proc, 0});
 

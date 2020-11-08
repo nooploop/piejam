@@ -53,7 +53,7 @@ public:
 
     auto event_inputs() const -> event_ports override
     {
-        static std::array s_ports{event_port(std::in_place_type<float>, "e")};
+        static std::array s_ports{event_port(std::in_place_type<float>, "ev")};
         return s_ports;
     }
     auto event_outputs() const -> event_ports override { return {}; }
@@ -73,6 +73,8 @@ public:
                     m_smoother.advance_iterator(),
                     ctx.buffer_size,
                     ctx.outputs[0].begin());
+
+            ctx.results[0] = ctx.outputs[0];
         }
         else
         {
@@ -89,6 +91,8 @@ public:
                 m_smoother.advance_iterator(),
                 ctx.buffer_size,
                 ctx.outputs[0].begin());
+
+        ctx.results[0] = ctx.outputs[0];
     }
 
     void process_event_slice(
@@ -112,6 +116,8 @@ public:
                 m_smoother.advance_iterator(),
                 ctx.buffer_size - from_offset,
                 std::next(ctx.outputs[0].begin(), from_offset));
+
+        ctx.results[0] = ctx.outputs[0];
     }
 
 private:
