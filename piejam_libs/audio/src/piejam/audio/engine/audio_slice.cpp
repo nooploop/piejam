@@ -42,19 +42,4 @@ is_silence(audio_slice const& sl) noexcept -> bool
     return std::visit(is_silence_visitor{}, sl.as_variant());
 }
 
-template auto
-add(audio_slice const& l,
-    audio_slice const& r,
-    std::span<float> const& out) noexcept -> audio_slice;
-
-template auto multiply(
-        audio_slice const& l,
-        audio_slice const& r,
-        std::span<float> const& out) noexcept -> audio_slice;
-
-template void copy(audio_slice const&, std::span<float> const&) noexcept;
-
-template auto subslice(audio_slice const&, std::size_t, std::size_t) noexcept
-        -> audio_slice;
-
 } // namespace piejam::audio::engine

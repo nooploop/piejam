@@ -194,7 +194,7 @@ private:
 } // namespace detail
 
 template <class T>
-auto
+constexpr auto
 add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
         -> slice<T>
 {
@@ -205,7 +205,7 @@ add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
 }
 
 template <class T>
-auto
+constexpr auto
 multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
         -> slice<T>
 {
@@ -216,14 +216,14 @@ multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
 }
 
 template <class T>
-void
+constexpr void
 copy(slice<T> const& s, std::span<T> const& out) noexcept
 {
     std::visit(detail::copy_visitor(out), s.as_variant());
 }
 
 template <class T>
-auto
+constexpr auto
 subslice(
         slice<T> const& s,
         std::size_t const offset,
