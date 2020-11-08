@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <xsimd/memory/xsimd_aligned_allocator.hpp>
+
 #include <boost/align/aligned_allocator_forward.hpp>
 
 #include <cstddef>
@@ -36,6 +38,12 @@ struct allocator_alignment<std::allocator<T>>
 
 template <class T, std::size_t Alignment>
 struct allocator_alignment<boost::alignment::aligned_allocator<T, Alignment>>
+{
+    static constexpr std::size_t value = Alignment;
+};
+
+template <class T, std::size_t Alignment>
+struct allocator_alignment<xsimd::aligned_allocator<T, Alignment>>
 {
     static constexpr std::size_t value = Alignment;
 };

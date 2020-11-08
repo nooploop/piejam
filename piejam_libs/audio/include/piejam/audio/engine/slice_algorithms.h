@@ -63,7 +63,7 @@ struct add_visitor
                     l_buf.begin(),
                     l_buf.end(),
                     m_out.begin(),
-                    [r_c](auto const x) { return r_c + x; });
+                    [r_c](auto&& x) { return r_c + x; });
 
             return m_out;
         }
@@ -140,7 +140,7 @@ struct multiply_visitor
                     l_buf.begin(),
                     l_buf.end(),
                     m_out.begin(),
-                    [r_c](auto const x) { return r_c * x; });
+                    [r_c](auto&& x) { return r_c * x; });
 
             return m_out;
         }
