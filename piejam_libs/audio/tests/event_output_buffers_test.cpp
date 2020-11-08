@@ -34,7 +34,7 @@ TEST(event_output_buffers, add_and_get)
     event_output_buffers sut;
     ASSERT_TRUE(sut.empty());
 
-    sut.add<float>();
+    sut.add(event_port(std::in_place_type<float>, {}));
     EXPECT_FALSE(sut.empty());
     ASSERT_EQ(1u, sut.size());
     auto& buf = sut.get<float>(0);
@@ -44,7 +44,7 @@ TEST(event_output_buffers, add_and_get)
 TEST(event_output_buffers, clear_buffers)
 {
     event_output_buffers sut;
-    sut.add<float>();
+    sut.add(event_port(std::in_place_type<float>, {}));
     ASSERT_EQ(1u, sut.size());
     auto& buf = sut.get<float>(0);
     buf.insert(5, 23.f);

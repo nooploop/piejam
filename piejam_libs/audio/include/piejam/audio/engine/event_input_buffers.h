@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/audio/engine/event_buffer.h>
+#include <piejam/audio/engine/event_port.h>
 
 #include <boost/polymorphic_cast.hpp>
 
@@ -30,24 +31,34 @@ class event_input_buffers final
 {
 public:
     event_input_buffers() = default;
-    event_input_buffers(std::size_t num_buffers)
-        : m_event_buffers(num_buffers)
-    {
-    }
 
     auto size() const noexcept -> std::size_t { return m_event_buffers.size(); }
 
     auto begin() const { return m_event_buffers.begin(); }
     auto end() const { return m_event_buffers.end(); }
 
+    void add(event_port const& port)
+    {
+        m_event_buffers.push_back(std::addressof(port.empty_event_buffer()));
+
+#ifndef NDEBUG
+        m_connected.push_back(false);
+#endif
+    }
+
     auto
     set(std::size_t const buffer_index, abstract_event_buffer const& ev_buf)
     {
         BOOST_ASSERT(buffer_index < m_event_buffers.size());
         BOOST_ASSERT_MSG(
-                !m_event_buffers[buffer_index],
+                !m_connected[buffer_index],
                 "Input already connected, event_merger needed?");
+        BOOST_ASSERT(m_event_buffers[buffer_index]->type() == ev_buf.type());
         m_event_buffers[buffer_index] = std::addressof(ev_buf);
+
+#ifndef NDEBUG
+        m_connected[buffer_index] = true;
+#endif
     }
 
     template <class T>
@@ -58,21 +69,15 @@ public:
         abstract_event_buffer const* const ev_buf =
                 m_event_buffers[buffer_index];
 
-        return ev_buf ? *boost::polymorphic_downcast<event_buffer<T> const*>(
-                                ev_buf)
-                      : get_empty<T>();
+        return *boost::polymorphic_downcast<event_buffer<T> const*>(ev_buf);
     }
 
 private:
-    template <class T>
-    static auto get_empty() noexcept -> event_buffer<T> const&
-    {
-        static std::pmr::memory_resource* s_empty_ev_mem{};
-        static event_buffer<T> const s_empty(s_empty_ev_mem);
-        return s_empty;
-    }
-
     std::vector<abstract_event_buffer const*> m_event_buffers;
+
+#ifndef NDEBUG
+    std::vector<bool> m_connected;
+#endif
 };
 
 } // namespace piejam::audio::engine

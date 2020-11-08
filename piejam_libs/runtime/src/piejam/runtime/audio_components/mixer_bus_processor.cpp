@@ -69,13 +69,6 @@ public:
         return s_ports;
     }
 
-    void create_event_output_buffers(
-            audio::engine::event_output_buffer_factory const& f) const override
-    {
-        f.add<float>();
-        f.add<float>();
-    }
-
     static constexpr auto pan_balance_factors(float const pan_balance)
             -> audio::stereo_gain
     {

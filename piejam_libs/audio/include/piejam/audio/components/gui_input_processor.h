@@ -66,11 +66,6 @@ public:
     {
         return m_event_output_ports;
     }
-    void create_event_output_buffers(
-            engine::event_output_buffer_factory const& f) const override
-    {
-        f.add<T>();
-    }
 
     void process(engine::process_context const& ctx) override
     {

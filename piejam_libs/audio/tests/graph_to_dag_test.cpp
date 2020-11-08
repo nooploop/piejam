@@ -169,10 +169,11 @@ TEST(graph_to_dag, event_is_transferred)
     std::array event_out_ports{event_port(std::in_place_type<float>, {})};
 
     ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_in_ports));
-    ON_CALL(in_proc, create_event_output_buffers(_))
-            .WillByDefault(Invoke([](event_output_buffer_factory const& fac) {
-                fac.add<float>();
-            }));
+    //    ON_CALL(in_proc, create_event_output_buffers(_))
+    //            .WillByDefault(Invoke([](event_output_buffer_factory const&
+    //            fac) {
+    //                fac.add<float>();
+    //            }));
     ON_CALL(out_proc, event_inputs()).WillByDefault(Return(event_out_ports));
 
     g.add_event_wire({in_proc, 0}, {out_proc, 0});
@@ -210,10 +211,11 @@ TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
 
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(1));
     ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_out_ports));
-    ON_CALL(in_proc, create_event_output_buffers(_))
-            .WillByDefault(Invoke([](event_output_buffer_factory const& fac) {
-                fac.add<float>();
-            }));
+    //    ON_CALL(in_proc, create_event_output_buffers(_))
+    //            .WillByDefault(Invoke([](event_output_buffer_factory const&
+    //            fac) {
+    //                fac.add<float>();
+    //            }));
     ON_CALL(out_proc, num_inputs()).WillByDefault(Return(1));
     g.add_wire({in_proc, 0}, {out_proc, 0});
 

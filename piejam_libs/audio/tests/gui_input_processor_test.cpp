@@ -49,7 +49,7 @@ TEST_F(gui_input_processor_test,
        initial_process_will_send_an_initial_event_with_initial_value)
 {
     components::gui_input_processor<float> sut(0.23f);
-    sut.create_event_output_buffers(ev_out_bufs);
+    ev_out_bufs.add(sut.event_outputs()[0]);
 
     sut.process({{}, {}, {}, {}, ev_out_bufs, buffer_size});
 
@@ -65,7 +65,7 @@ TEST_F(gui_input_processor_test,
        no_event_in_subsequent_process_if_input_value_doesnt_change)
 {
     components::gui_input_processor<float> sut(0.23f);
-    sut.create_event_output_buffers(ev_out_bufs);
+    ev_out_bufs.add(sut.event_outputs()[0]);
 
     sut.process({{}, {}, {}, {}, ev_out_bufs, buffer_size});
 
@@ -81,7 +81,7 @@ TEST_F(gui_input_processor_test,
 TEST_F(gui_input_processor_test, change_event_if_subsequent_value_changes)
 {
     components::gui_input_processor<float> sut(0.23f);
-    sut.create_event_output_buffers(ev_out_bufs);
+    ev_out_bufs.add(sut.event_outputs()[0]);
 
     sut.process({{}, {}, {}, {}, ev_out_bufs, buffer_size});
 

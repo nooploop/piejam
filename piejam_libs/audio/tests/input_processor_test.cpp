@@ -38,7 +38,7 @@ TEST(input_processor, input_table_is_propagated_to_outputs)
     std::array<float, 16> out_buf{};
     std::vector<std::span<float>> outputs{out_buf, out_buf};
     std::vector<audio_slice> results(2);
-    sut.process({{}, outputs, results, {0}, {}, 16});
+    sut.process({{}, outputs, results, {}, {}, 16});
 
     ASSERT_TRUE(results[0].is_buffer());
     EXPECT_EQ(results[0].buffer().data(), data.rows()[0].data());

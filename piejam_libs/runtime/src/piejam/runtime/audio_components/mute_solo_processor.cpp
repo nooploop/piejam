@@ -70,12 +70,6 @@ public:
         return s_ports;
     }
 
-    void create_event_output_buffers(
-            audio::engine::event_output_buffer_factory const& f) const override
-    {
-        f.add<float>();
-    }
-
     void process(audio::engine::process_context const& ctx) override
     {
         audio::engine::verify_process_context(*this, ctx);

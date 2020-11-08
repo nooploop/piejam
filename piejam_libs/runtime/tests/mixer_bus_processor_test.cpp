@@ -41,17 +41,21 @@ struct mixer_bus_processor_test : ::testing::Test
     std::pmr::memory_resource* ev_mem{&ev_buf_mem.memory_resource()};
     audio::engine::event_buffer<float> ev_in_pan_buf{ev_mem};
     audio::engine::event_buffer<float> ev_in_vol_buf{ev_mem};
-    audio::engine::event_input_buffers ev_in_bufs{2};
+    audio::engine::event_input_buffers ev_in_bufs;
     audio::engine::event_output_buffers ev_out_bufs;
     std::unique_ptr<audio::engine::processor> sut{
             make_mono_mixer_bus_processor()};
 
     mixer_bus_processor_test()
     {
+        audio::engine::event_port in_port(std::in_place_type<float>, {});
+        ev_in_bufs.add(in_port);
         ev_in_bufs.set(0, ev_in_pan_buf);
+        ev_in_bufs.add(in_port);
         ev_in_bufs.set(1, ev_in_vol_buf);
         ev_out_bufs.set_event_memory(&ev_buf_mem.memory_resource());
-        sut->create_event_output_buffers(ev_out_bufs);
+        ev_out_bufs.add(sut->event_outputs()[0]);
+        ev_out_bufs.add(sut->event_outputs()[1]);
     }
 };
 

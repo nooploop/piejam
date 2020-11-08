@@ -43,11 +43,6 @@ public:
     auto event_inputs() const -> event_ports override { return {}; }
     auto event_outputs() const -> event_ports override { return {}; }
 
-    void create_event_output_buffers(
-            event_output_buffer_factory const&) const override
-    {
-    }
-
     void process(process_context const&) override;
 
 private:

@@ -27,7 +27,6 @@ template <class T>
 class event_buffer;
 class event_buffer_memory;
 class event_input_buffers;
-class event_output_buffer_factory;
 class event_output_buffers;
 class event_port;
 

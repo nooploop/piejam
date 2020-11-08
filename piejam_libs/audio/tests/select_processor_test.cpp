@@ -47,12 +47,16 @@ struct select_processor_test : ::testing::Test
     event_buffer_memory ev_buf_mem{1024};
     std::pmr::memory_resource* ev_mem{&ev_buf_mem.memory_resource()};
     event_buffer<std::size_t> index_event_buffer{ev_mem};
-    event_input_buffers ev_in_bufs{1};
+    event_input_buffers ev_in_bufs;
     event_output_buffers ev_out_bufs;
     process_context ctx{inputs, outputs, results, ev_in_bufs, ev_out_bufs, 16};
     std::unique_ptr<processor> sut{make_select_processor(3)};
 
-    select_processor_test() { ev_in_bufs.set(0, index_event_buffer); }
+    select_processor_test()
+    {
+        ev_in_bufs.add(event_port(std::in_place_type<std::size_t>));
+        ev_in_bufs.set(0, index_event_buffer);
+    }
 };
 
 TEST_F(select_processor_test, default_constructed_selects_first_input)

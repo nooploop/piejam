@@ -28,15 +28,13 @@ TEST(event_input_buffers, empty_after_construction)
     EXPECT_EQ(0, sut.size());
 }
 
-TEST(event_input_buffers, has_the_size_set_on_construction)
+TEST(event_input_buffers, add_will_add_an_empty_event_buffer_reference)
 {
-    event_input_buffers sut(5);
-    EXPECT_EQ(5, sut.size());
-}
-
-TEST(event_input_buffers, buffers_are_empty_after_construction)
-{
-    event_input_buffers sut(3);
+    event_input_buffers sut;
+    event_port port(std::in_place_type<float>, {});
+    sut.add(port);
+    sut.add(port);
+    sut.add(port);
     ASSERT_EQ(3, sut.size());
     EXPECT_TRUE(sut.get<float>(0).empty());
     EXPECT_TRUE(sut.get<float>(1).empty());
@@ -47,7 +45,9 @@ TEST(event_input_buffers, buffer_can_be_set_and_retrieved)
 {
     std::pmr::memory_resource* mem{};
     event_buffer<float> buf(mem);
-    event_input_buffers sut(1);
+    event_input_buffers sut;
+    event_port port(std::in_place_type<float>, {});
+    sut.add(port);
     ASSERT_EQ(1, sut.size());
     sut.set(0, buf);
     EXPECT_EQ(std::addressof(buf), &sut.get<float>(0));

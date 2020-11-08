@@ -38,12 +38,6 @@ struct processor_mock : public processor
     MOCK_METHOD(event_ports, event_inputs, (), (const, override));
     MOCK_METHOD(event_ports, event_outputs, (), (const, override));
 
-    MOCK_METHOD(
-            void,
-            create_event_output_buffers,
-            (event_output_buffer_factory const&),
-            (const, override));
-
     MOCK_METHOD(void, process, (process_context const&), (override));
 };
 

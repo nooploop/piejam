@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/audio/engine/event_buffer.h>
+#include <piejam/audio/engine/event_port.h>
 
 #include <boost/assert.hpp>
 #include <boost/polymorphic_cast.hpp>
@@ -43,11 +44,9 @@ public:
         m_event_memory = event_memory;
     }
 
-    template <class T>
-    void add()
+    void add(event_port const& port)
     {
-        m_event_buffers.emplace_back(
-                std::make_unique<event_buffer<T>>(m_event_memory));
+        m_event_buffers.emplace_back(port.make_event_buffer(m_event_memory));
     }
 
     template <class T>
@@ -74,24 +73,6 @@ public:
 private:
     std::vector<std::unique_ptr<abstract_event_buffer>> m_event_buffers;
     std::pmr::memory_resource* m_event_memory{std::pmr::get_default_resource()};
-};
-
-class event_output_buffer_factory final
-{
-public:
-    event_output_buffer_factory(event_output_buffers& outputs)
-        : m_outputs(outputs)
-    {
-    }
-
-    template <class T>
-    void add() const
-    {
-        m_outputs.add<T>();
-    }
-
-private:
-    event_output_buffers& m_outputs;
 };
 
 } // namespace piejam::audio::engine

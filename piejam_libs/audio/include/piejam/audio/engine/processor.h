@@ -42,9 +42,6 @@ public:
     virtual auto event_inputs() const -> event_ports = 0;
     virtual auto event_outputs() const -> event_ports = 0;
 
-    virtual void
-    create_event_output_buffers(event_output_buffer_factory const&) const = 0;
-
     virtual void process(process_context const&) = 0;
 };
 

@@ -40,7 +40,7 @@ struct mix_processor_2_inputs : public ::testing::Test
     std::array<float, 2> out_buf{0.f, 0.f};
     std::array<std::span<float>, 1> outputs{out_buf};
     std::array<audio_slice, 1> results{outputs[0]};
-    event_input_buffers ev_ins{0};
+    event_input_buffers ev_ins;
     event_output_buffers ev_outs{};
     process_context ctx{inputs, outputs, results, ev_ins, ev_outs, 2};
 
@@ -114,7 +114,7 @@ TEST(mix_processor, mix_two_silence_channels)
 
     ASSERT_FALSE(is_silence(result[0]));
 
-    sut->process({in, out, result, {0}, {}, 1});
+    sut->process({in, out, result, {}, {}, 1});
 
     EXPECT_TRUE(is_silence(result[0]));
 }
@@ -136,7 +136,7 @@ TEST(mix_processor, mix_one_silence_one_non_silence_channel)
 
     ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
-    sut->process({in, out, result, {0}, {}, 1});
+    sut->process({in, out, result, {}, {}, 1});
 
     ASSERT_EQ(1u, result[0].buffer().size());
     EXPECT_FLOAT_EQ(0.23f, result[0].buffer()[0]);
@@ -159,7 +159,7 @@ TEST(mix_processor, mix_two_non_silence_channels)
 
     ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
-    sut->process({in, out, result, {0}, {}, 1});
+    sut->process({in, out, result, {}, {}, 1});
 
     ASSERT_EQ(1u, result[0].buffer().size());
     EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[0]);
@@ -182,7 +182,7 @@ TEST(mix_processor, mix_two_silence_one_non_silence_channel)
 
     ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
-    sut->process({in, out, result, {0}, {}, 1});
+    sut->process({in, out, result, {}, {}, 1});
 
     ASSERT_TRUE(result[0].is_buffer());
     ASSERT_EQ(1u, result[0].buffer().size());
@@ -208,7 +208,7 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
 
     ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
-    sut->process({in, out, result, {0}, {}, 1});
+    sut->process({in, out, result, {}, {}, 1});
 
     ASSERT_EQ(1u, result[0].buffer().size());
     EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[0]);
