@@ -6,7 +6,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_writer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/process_step.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/gui_input_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/value_input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/level_meter_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h

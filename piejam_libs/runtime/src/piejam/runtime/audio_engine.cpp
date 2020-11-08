@@ -17,7 +17,6 @@
 
 #include <piejam/runtime/audio_engine.h>
 
-#include <piejam/audio/components/gui_input_processor.h>
 #include <piejam/audio/components/level_meter_processor.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/event_to_audio_processor.h>
@@ -29,6 +28,7 @@
 #include <piejam/audio/engine/multiply_processor.h>
 #include <piejam/audio/engine/output_processor.h>
 #include <piejam/audio/engine/select_processor.h>
+#include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/runtime/audio_components/mixer_bus_processor.h>
 #include <piejam/runtime/audio_components/mute_solo_processor.h>
 
@@ -54,17 +54,18 @@ public:
             std::size_t channel_index,
             mixer::channel const& channel)
         : m_device_channels(channel.device_channels)
-        , m_volume_proc(std::make_unique<aucomp::gui_input_processor<float>>(
+        , m_volume_proc(std::make_unique<ns_ae::value_input_processor<float>>(
                   channel.volume,
                   "volume"))
         , m_pan_balance_proc(
-                  std::make_unique<aucomp::gui_input_processor<float>>(
+                  std::make_unique<ns_ae::value_input_processor<float>>(
                           channel.pan_balance,
                           channel.type == audio::bus_type::mono ? "pan"
                                                                 : "balance"))
-        , m_mute_input_proc(std::make_unique<aucomp::gui_input_processor<bool>>(
-                  channel.mute,
-                  "mute"))
+        , m_mute_input_proc(
+                  std::make_unique<ns_ae::value_input_processor<bool>>(
+                          channel.mute,
+                          "mute"))
         , m_channel_proc(
                   channel.type == audio::bus_type::mono
                           ? audio_components::make_mono_mixer_bus_processor()
@@ -185,9 +186,9 @@ public:
 
 private:
     audio::channel_index_pair m_device_channels;
-    std::unique_ptr<aucomp::gui_input_processor<float>> m_volume_proc;
-    std::unique_ptr<aucomp::gui_input_processor<float>> m_pan_balance_proc;
-    std::unique_ptr<aucomp::gui_input_processor<bool>> m_mute_input_proc;
+    std::unique_ptr<ns_ae::value_input_processor<float>> m_volume_proc;
+    std::unique_ptr<ns_ae::value_input_processor<float>> m_pan_balance_proc;
+    std::unique_ptr<ns_ae::value_input_processor<bool>> m_mute_input_proc;
     processor_ptr m_channel_proc;
     audio::pair<processor_ptr> m_amp_smoother_procs;
     audio::pair<processor_ptr> m_amp_multiply_procs;
@@ -340,7 +341,7 @@ audio_engine::audio_engine(
     , m_input_buses(make_mixer_bus_vector(samplerate, mixer_state.inputs))
     , m_output_buses(make_mixer_bus_vector(samplerate, mixer_state.outputs))
     , m_input_solo_index_proc(
-              std::make_unique<aucomp::gui_input_processor<std::size_t>>(
+              std::make_unique<ns_ae::value_input_processor<std::size_t>>(
                       mixer_state.input_solo_index,
                       "input_solo_index"))
     , m_graph(make_graph(

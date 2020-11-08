@@ -20,8 +20,6 @@
 namespace piejam::audio::components
 {
 
-template <class T>
-class gui_input_processor;
 class level_meter_processor;
 
 } // namespace piejam::audio::components

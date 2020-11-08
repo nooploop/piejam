@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/audio/components/gui_input_processor.h>
+#include <piejam/audio/engine/value_input_processor.h>
 
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -30,25 +30,25 @@
 #include <span>
 #include <vector>
 
-namespace piejam::audio::components::test
+namespace piejam::audio::engine::test
 {
 
-struct gui_input_processor_test : ::testing::Test
+struct value_input_processor_test : ::testing::Test
 {
     std::size_t const buffer_size{16};
-    engine::event_buffer_memory ev_buf_mem{1024};
-    engine::event_output_buffers ev_out_bufs;
+    event_buffer_memory ev_buf_mem{1024};
+    event_output_buffers ev_out_bufs;
 
-    gui_input_processor_test()
+    value_input_processor_test()
     {
         ev_out_bufs.set_event_memory(&ev_buf_mem.memory_resource());
     }
 };
 
-TEST_F(gui_input_processor_test,
+TEST_F(value_input_processor_test,
        initial_process_will_send_an_initial_event_with_initial_value)
 {
-    components::gui_input_processor<float> sut(0.23f);
+    value_input_processor<float> sut(0.23f);
     ev_out_bufs.add(sut.event_outputs()[0]);
 
     sut.process({{}, {}, {}, {}, ev_out_bufs, buffer_size});
@@ -61,10 +61,10 @@ TEST_F(gui_input_processor_test,
     EXPECT_FLOAT_EQ(.23f, ev.value());
 }
 
-TEST_F(gui_input_processor_test,
+TEST_F(value_input_processor_test,
        no_event_in_subsequent_process_if_input_value_doesnt_change)
 {
-    components::gui_input_processor<float> sut(0.23f);
+    value_input_processor<float> sut(0.23f);
     ev_out_bufs.add(sut.event_outputs()[0]);
 
     sut.process({{}, {}, {}, {}, ev_out_bufs, buffer_size});
@@ -78,9 +78,9 @@ TEST_F(gui_input_processor_test,
     EXPECT_EQ(0, ev_out_buf.size());
 }
 
-TEST_F(gui_input_processor_test, change_event_if_subsequent_value_changes)
+TEST_F(value_input_processor_test, change_event_if_subsequent_value_changes)
 {
-    components::gui_input_processor<float> sut(0.23f);
+    value_input_processor<float> sut(0.23f);
     ev_out_bufs.add(sut.event_outputs()[0]);
 
     sut.process({{}, {}, {}, {}, ev_out_bufs, buffer_size});
@@ -99,4 +99,4 @@ TEST_F(gui_input_processor_test, change_event_if_subsequent_value_changes)
     EXPECT_FLOAT_EQ(.58f, ev.value());
 }
 
-} // namespace piejam::audio::components::test
+} // namespace piejam::audio::engine::test

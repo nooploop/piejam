@@ -34,6 +34,8 @@ class processor;
 class named_processor;
 class input_processor;
 class output_processor;
+template <class T>
+class value_input_processor;
 
 class dag;
 class dag_executor;

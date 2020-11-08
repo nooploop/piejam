@@ -27,23 +27,23 @@
 #include <atomic>
 #include <functional>
 
-namespace piejam::audio::components
+namespace piejam::audio::engine
 {
 
 template <class T>
-class gui_input_processor final : public engine::named_processor
+class value_input_processor final : public engine::named_processor
 {
     static_assert(std::atomic<T>::is_always_lock_free);
 
 public:
-    gui_input_processor(std::string_view const& name = {})
+    value_input_processor(std::string_view const& name = {})
         : named_processor(name)
         , m_event_output_ports{
                   engine::event_port{std::in_place_type<T>, std::string(name)}}
     {
     }
 
-    gui_input_processor(T const initial, std::string_view const& name = {})
+    value_input_processor(T const initial, std::string_view const& name = {})
         : named_processor(name)
         , m_event_output_ports{engine::event_port(
                   std::in_place_type<T>,
@@ -79,7 +79,7 @@ private:
         T const value = m_value.load(std::memory_order_consume);
         ctx.event_outputs.get<T>(0).insert(0, value);
         m_last_sent_value = value;
-        m_process_fn = &gui_input_processor<T>::subsequent_process;
+        m_process_fn = &value_input_processor<T>::subsequent_process;
     }
 
     void subsequent_process(engine::process_context const& ctx)
@@ -97,8 +97,8 @@ private:
     std::atomic<T> m_value{};
     T m_last_sent_value{};
 
-    using process_fn_t = decltype(&gui_input_processor<T>::process);
-    process_fn_t m_process_fn{&gui_input_processor<T>::initial_process};
+    using process_fn_t = decltype(&value_input_processor<T>::process);
+    process_fn_t m_process_fn{&value_input_processor<T>::initial_process};
 };
 
-} // namespace piejam::audio::components
+} // namespace piejam::audio::engine
