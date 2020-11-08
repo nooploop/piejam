@@ -22,8 +22,9 @@ on how to create a Linux image for the Raspberry Pi.
 ![Audio settings](doc/images/audio_output_settings_v0_2_0.png "Audio output settings")
 
 #### Mixer page
-![Mixer](doc/images/mixer_v0_2_0.png "Mixer")
+![Mixer](doc/images/mixer_v0_3_0.png "Mixer")
 
 ## ChangeLog
-* v0.2.0 - In/out configuration. Panning and balance.
+* v0.3.0 - Mute and solo. Modular audio engine.
+* [v0.2.0 - In/out configuration. Panning and balance.](doc/release_v0.2.0.md)
 * [v0.1.0 - Initial release. Basic mixer.](doc/release_v0.1.0.md)
