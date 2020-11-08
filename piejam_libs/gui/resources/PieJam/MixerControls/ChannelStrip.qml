@@ -92,7 +92,6 @@ Item {
             height: 32
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: -8
 
             onMuteToggled: root.muteToggled()
             onSoloToggled: root.soloToggled()
