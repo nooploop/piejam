@@ -50,10 +50,10 @@ TEST(slice_algorithms_add, adding_zero_to_buffer_will_result_in_the_buffer)
 TEST(slice_algorithms_add, adding_non_zero_to_buffer_will_write_to_out)
 {
     slice<int> x{1};
-    std::array buf{2, 3, 5};
+    std::array buf{2, 3, 5, 7};
     slice<int> y(buf);
     decltype(buf) out{};
-    std::array expected{3, 4, 6};
+    std::array expected{3, 4, 6, 8};
 
     auto res = add(x, y, {out});
 
@@ -66,12 +66,12 @@ TEST(slice_algorithms_add, adding_non_zero_to_buffer_will_write_to_out)
 
 TEST(slice_algorithms_add, adding_buffers_will_write_to_out)
 {
-    std::array buf_x{2, 3, 5};
+    std::array buf_x{2, 3, 5, 7};
     slice<int> x{buf_x};
-    std::array buf_y{3, 4, 5};
+    std::array buf_y{3, 4, 5, 9};
     slice<int> y{buf_y};
     decltype(buf_x) out{};
-    std::array expected{5, 7, 10};
+    std::array expected{5, 7, 10, 16};
 
     auto res = add(x, y, {out});
 
@@ -85,7 +85,7 @@ TEST(slice_algorithms_add, adding_buffers_will_write_to_out)
 TEST(slice_algorithms_multiply,
      multiply_buffer_by_zero_will_result_in_zero_constant)
 {
-    std::array buf{2, 3, 5};
+    std::array buf{2, 3, 5, 7};
     slice<int> x(buf);
     slice<int> y;
 
@@ -97,7 +97,7 @@ TEST(slice_algorithms_multiply,
 
 TEST(slice_algorithms_multiply, multiply_buffer_by_one_will_result_in_buffer)
 {
-    std::array buf{2, 3, 5};
+    std::array buf{2, 3, 5, 7};
     slice<int> x(buf);
     slice<int> y(1);
 

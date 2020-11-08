@@ -19,6 +19,11 @@
 
 #include <piejam/audio/engine/slice.h>
 
+#include <xsimd/stl/algorithms.hpp>
+
+#include <boost/align/is_aligned.hpp>
+#include <boost/assert.hpp>
+
 #include <algorithm>
 
 namespace piejam::audio::engine
@@ -47,9 +52,18 @@ struct add_visitor
         if (r_c != T{})
         {
             BOOST_ASSERT(l_buf.size() == m_out.size());
-            std::ranges::transform(l_buf, m_out.begin(), [r_c](T const x) {
-                return r_c + x;
-            });
+            BOOST_ASSERT(boost::alignment::is_aligned(
+                    l_buf.data(),
+                    XSIMD_DEFAULT_ALIGNMENT));
+            BOOST_ASSERT(boost::alignment::is_aligned(
+                    m_out.data(),
+                    XSIMD_DEFAULT_ALIGNMENT));
+            BOOST_ASSERT(l_buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
+            xsimd::transform(
+                    l_buf.begin(),
+                    l_buf.end(),
+                    m_out.begin(),
+                    [r_c](auto const x) { return r_c + x; });
 
             return m_out;
         }
@@ -70,12 +84,22 @@ struct add_visitor
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
-        std::transform(
+        BOOST_ASSERT(boost::alignment::is_aligned(
+                l_buf.data(),
+                XSIMD_DEFAULT_ALIGNMENT));
+        BOOST_ASSERT(boost::alignment::is_aligned(
+                r_buf.data(),
+                XSIMD_DEFAULT_ALIGNMENT));
+        BOOST_ASSERT(boost::alignment::is_aligned(
+                m_out.data(),
+                XSIMD_DEFAULT_ALIGNMENT));
+        BOOST_ASSERT(l_buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
+        xsimd::transform(
                 l_buf.begin(),
                 l_buf.end(),
                 r_buf.begin(),
                 m_out.begin(),
-                std::plus<T>{});
+                std::plus<>{});
         return m_out;
     }
 
@@ -105,9 +129,18 @@ struct multiply_visitor
         else if (r_c != T{1})
         {
             BOOST_ASSERT(l_buf.size() == m_out.size());
-            std::ranges::transform(l_buf, m_out.begin(), [r_c](T const x) {
-                return r_c * x;
-            });
+            BOOST_ASSERT(boost::alignment::is_aligned(
+                    l_buf.data(),
+                    XSIMD_DEFAULT_ALIGNMENT));
+            BOOST_ASSERT(boost::alignment::is_aligned(
+                    m_out.data(),
+                    XSIMD_DEFAULT_ALIGNMENT));
+            BOOST_ASSERT(l_buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
+            xsimd::transform(
+                    l_buf.begin(),
+                    l_buf.end(),
+                    m_out.begin(),
+                    [r_c](auto const x) { return r_c * x; });
 
             return m_out;
         }
@@ -128,12 +161,22 @@ struct multiply_visitor
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
-        std::transform(
+        BOOST_ASSERT(boost::alignment::is_aligned(
+                l_buf.data(),
+                XSIMD_DEFAULT_ALIGNMENT));
+        BOOST_ASSERT(boost::alignment::is_aligned(
+                r_buf.data(),
+                XSIMD_DEFAULT_ALIGNMENT));
+        BOOST_ASSERT(boost::alignment::is_aligned(
+                m_out.data(),
+                XSIMD_DEFAULT_ALIGNMENT));
+        BOOST_ASSERT(l_buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
+        xsimd::transform(
                 l_buf.begin(),
                 l_buf.end(),
                 r_buf.begin(),
                 m_out.begin(),
-                std::multiplies<T>{});
+                std::multiplies<>{});
         return m_out;
     }
 

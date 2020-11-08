@@ -37,12 +37,12 @@ struct mix_processor_2_inputs : public ::testing::Test
     audio_slice in1;
     audio_slice in2;
     std::array<std::reference_wrapper<audio_slice const>, 2> inputs{in1, in2};
-    std::array<float, 2> out_buf{0.f, 0.f};
+    std::array<float, 4> out_buf{0.f, 0.f};
     std::array<std::span<float>, 1> outputs{out_buf};
     std::array<audio_slice, 1> results{outputs[0]};
     event_input_buffers ev_ins;
     event_output_buffers ev_outs{};
-    process_context ctx{inputs, outputs, results, ev_ins, ev_outs, 2};
+    process_context ctx{inputs, outputs, results, ev_ins, ev_outs, 4};
 
     std::unique_ptr<processor> sut{make_mix_processor(2)};
 };
@@ -61,22 +61,24 @@ TEST_F(mix_processor_2_inputs, mixing_constants_will_result_in_constant)
 TEST_F(mix_processor_2_inputs,
        mix_buffer_and_constant_result_will_be_written_into_output_buffer)
 {
-    std::array in1_buf{.23f, .58f};
+    std::array in1_buf{.23f, .58f, .77f, .99f};
     in1 = {in1_buf};
     in2 = {.77f};
 
     sut->process(ctx);
 
     ASSERT_TRUE(results[0].is_buffer());
-    ASSERT_EQ(2u, results[0].buffer().size());
+    ASSERT_EQ(4u, results[0].buffer().size());
     EXPECT_FLOAT_EQ(.23f + .77f, results[0].buffer()[0]);
     EXPECT_FLOAT_EQ(.58f + .77f, results[0].buffer()[1]);
+    EXPECT_FLOAT_EQ(.77f + .77f, results[0].buffer()[2]);
+    EXPECT_FLOAT_EQ(.99f + .77f, results[0].buffer()[3]);
 }
 
 TEST_F(mix_processor_2_inputs,
        mix_buffer_and_silence_result_will_point_to_the_input_buffer)
 {
-    std::array in1_buf{.23f, .58f};
+    std::array in1_buf{.23f, .58f, .77f, .99f};
     in1 = {in1_buf};
 
     sut->process(ctx);
@@ -88,17 +90,19 @@ TEST_F(mix_processor_2_inputs,
 
 TEST_F(mix_processor_2_inputs, mix_two_buffers_result_will_be_in_the_output)
 {
-    std::array in1_buf{.23f, .58f};
+    std::array in1_buf{.23f, .58f, .77f, .99f};
     in1 = {in1_buf};
-    std::array in2_buf{.99f, .77f};
+    std::array in2_buf{.99f, .77f, .58f, .23f};
     in2 = {in2_buf};
 
     sut->process(ctx);
 
     ASSERT_TRUE(results[0].is_buffer());
-    ASSERT_EQ(2u, results[0].buffer().size());
+    ASSERT_EQ(4u, results[0].buffer().size());
     EXPECT_FLOAT_EQ(.23f + .99f, results[0].buffer()[0]);
     EXPECT_FLOAT_EQ(.58f + .77f, results[0].buffer()[1]);
+    EXPECT_FLOAT_EQ(.77f + .58f, results[0].buffer()[2]);
+    EXPECT_FLOAT_EQ(.99f + .23f, results[0].buffer()[3]);
 }
 
 TEST(mix_processor, mix_two_silence_channels)
@@ -146,23 +150,27 @@ TEST(mix_processor, mix_two_non_silence_channels)
 {
     auto sut = make_mix_processor(2);
 
-    std::array in_buf1{0.23f};
+    std::array in_buf1{0.23f, 0.23f, 0.23f, 0.23f};
     audio_slice in_buf1_span(in_buf1);
-    std::array in_buf2{0.58f};
+    std::array in_buf2{0.58f, 0.58f, 0.58f, 0.58f};
     audio_slice in_buf2_span(in_buf2);
     std::vector<std::reference_wrapper<audio_slice const>> in{
             in_buf1_span,
             in_buf2_span};
-    std::array out_buf{0.f};
+    std::array out_buf{0.f, 0.f, 0.f, 0.f};
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 
     ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
-    sut->process({in, out, result, {}, {}, 1});
+    sut->process({in, out, result, {}, {}, 4});
 
-    ASSERT_EQ(1u, result[0].buffer().size());
+    ASSERT_TRUE(result[0].is_buffer());
+    ASSERT_EQ(4u, result[0].buffer().size());
     EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[0]);
+    EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[1]);
+    EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[2]);
+    EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[3]);
 }
 
 TEST(mix_processor, mix_two_silence_one_non_silence_channel)
@@ -194,24 +202,27 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
     auto sut = make_mix_processor(3);
 
     audio_slice const silence;
-    std::array in_buf1{0.23f};
+    std::array in_buf1{0.23f, 0.23f, 0.23f, 0.23f};
     audio_slice in_buf1_span(in_buf1);
-    std::array in_buf2{0.58f};
+    std::array in_buf2{0.58f, 0.58f, 0.58f, 0.58f};
     audio_slice in_buf2_span(in_buf2);
     std::vector<std::reference_wrapper<audio_slice const>> in{
             in_buf1_span,
             silence,
             in_buf2_span};
-    std::array out_buf{0.f};
+    std::array out_buf{0.f, 0.f, 0.f, 0.f};
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 
     ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
 
-    sut->process({in, out, result, {}, {}, 1});
+    sut->process({in, out, result, {}, {}, 4});
 
-    ASSERT_EQ(1u, result[0].buffer().size());
+    ASSERT_EQ(4u, result[0].buffer().size());
     EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[0]);
+    EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[1]);
+    EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[2]);
+    EXPECT_FLOAT_EQ(0.81f, result[0].buffer()[3]);
 }
 
 struct is_mix_processor_test : ::testing::TestWithParam<std::size_t>

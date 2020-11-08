@@ -52,9 +52,9 @@ public:
     {
     }
 
-    void set(T x) noexcept
+    void set(T const x) noexcept
     {
-        m_value.store(std::move(x), std::memory_order_release);
+        m_value.store(x, std::memory_order_release);
     }
 
     auto type_name() const -> std::string_view override { return "gui_input"; }
