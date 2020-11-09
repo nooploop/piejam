@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include <system_error>
+#include <utility>
 
 namespace piejam::system
 {
@@ -37,9 +38,8 @@ ioctl_device::ioctl_device(std::filesystem::path const& pathname)
 }
 
 ioctl_device::ioctl_device(ioctl_device&& other) noexcept
-    : m_fd(other.m_fd)
+    : m_fd(std::exchange(other.m_fd, invalid))
 {
-    other.m_fd = invalid;
 }
 
 ioctl_device::~ioctl_device()
