@@ -25,8 +25,6 @@ namespace piejam::system
 class ioctl_device
 {
 public:
-    static constexpr int invalid = -1;
-
     ioctl_device() noexcept = default;
     ioctl_device(std::filesystem::path const& pathname);
     ioctl_device(ioctl_device const&) = delete;
@@ -57,6 +55,8 @@ public:
 
 private:
     void ioctl(unsigned long request, void* p, std::size_t size) const;
+
+    static constexpr int invalid = -1;
 
     int m_fd{invalid};
 };

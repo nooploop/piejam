@@ -17,13 +17,13 @@
 
 #include <piejam/system/ioctl_device.h>
 
+#include <boost/assert.hpp>
 #include <boost/core/ignore_unused.hpp>
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include <cassert>
 #include <system_error>
 
 namespace piejam::system
@@ -64,7 +64,7 @@ ioctl_device::operator=(ioctl_device&& other) -> ioctl_device&
 void
 ioctl_device::ioctl(unsigned long const request) const
 {
-    assert(m_fd != invalid);
+    BOOST_ASSERT(m_fd != invalid);
     if (-1 == ::ioctl(m_fd, request))
         throw std::system_error(errno, std::generic_category());
 }
@@ -75,8 +75,8 @@ ioctl_device::ioctl(
         void* const p,
         std::size_t const size) const
 {
-    assert(m_fd != invalid);
-    assert(_IOC_SIZE(request) == size);
+    BOOST_ASSERT(m_fd != invalid);
+    BOOST_ASSERT(_IOC_SIZE(request) == size);
     boost::ignore_unused(size);
 
     if (-1 == ::ioctl(m_fd, request, p))
