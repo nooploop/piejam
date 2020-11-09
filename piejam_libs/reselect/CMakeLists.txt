@@ -9,6 +9,6 @@ target_sources(piejam_reselect INTERFACE
 )
 
 target_include_directories(piejam_reselect INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(piejam_reselect SYSTEM INTERFACE ${CMAKE_SOURCE_DIR}/libs/nod/include)
+target_link_libraries(piejam_reselect INTERFACE nod)
 
 add_subdirectory(tests)
