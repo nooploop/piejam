@@ -149,6 +149,9 @@ private:
 class dag_executor_mt final : public dag_executor_base
 {
 public:
+    static constexpr std::size_t job_deque_capacity = 256;
+    using job_deque_t = thread::job_deque<node, job_deque_capacity>;
+
     dag_executor_mt(
             dag::tasks_t const& tasks,
             dag::graph_t const& graph,
@@ -209,7 +212,7 @@ private:
                 std::size_t const worker_index,
                 std::size_t const event_memory_size,
                 std::atomic_size_t& nodes_to_process,
-                std::span<thread::job_deque<node>> run_queues)
+                std::span<job_deque_t> run_queues)
             : m_worker_index(worker_index)
             , m_event_memory(event_memory_size)
             , m_nodes_to_process(nodes_to_process)
@@ -249,7 +252,7 @@ private:
     private:
         auto process_node(node& n) -> node*
         {
-            thread::job_deque<node>& run_queue = m_run_queues[m_worker_index];
+            job_deque_t& run_queue = m_run_queues[m_worker_index];
 
             BOOST_ASSERT(n.parents_to_process == 0);
 
@@ -284,14 +287,14 @@ private:
         audio::engine::thread_context m_thread_context{
                 &m_event_memory.memory_resource()};
         std::atomic_size_t& m_nodes_to_process;
-        std::span<thread::job_deque<node>> m_run_queues;
+        std::span<job_deque_t> m_run_queues;
     };
 
     static auto make_workers(
             std::size_t const event_memory_size,
             std::span<thread::configuration const> const& wt_configs,
             std::atomic_size_t& nodes_to_process,
-            std::span<thread::job_deque<node>> run_queues) -> workers_t
+            std::span<job_deque_t> run_queues) -> workers_t
     {
         workers_t workers;
         workers.reserve(wt_configs.size());
@@ -311,7 +314,7 @@ private:
     }
 
     std::atomic_size_t m_nodes_to_process{};
-    std::vector<thread::job_deque<node>> m_run_queues;
+    std::vector<job_deque_t> m_run_queues;
     dag_worker m_main_worker;
     workers_t m_workers;
 };

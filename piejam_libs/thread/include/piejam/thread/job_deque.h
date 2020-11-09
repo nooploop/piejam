@@ -27,9 +27,7 @@
 namespace piejam::thread
 {
 
-inline constexpr std::size_t default_job_dequeue_capacity = 256;
-
-template <class Job, std::size_t Capacity = default_job_dequeue_capacity>
+template <class Job, std::size_t Capacity>
 class job_deque
 {
     static_assert(math::is_power_of_two(Capacity));
