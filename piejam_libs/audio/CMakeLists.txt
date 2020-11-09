@@ -1,3 +1,8 @@
+check_include_file("ladspa.h" LADSPA_HEADER)
+if(NOT LADSPA_HEADER)
+    message(FATAL_ERROR "LADSPA header not found")
+endif()
+
 add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/get_pcm_io_descriptors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/get_set_hw_params.h
