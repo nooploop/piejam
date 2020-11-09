@@ -19,7 +19,7 @@
 
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/process_function.h>
-#include <piejam/io/fwd.h>
+#include <piejam/system/fwd.h>
 
 #include <atomic>
 #include <memory>
@@ -35,8 +35,8 @@ class process_step
 {
 public:
     process_step(
-            io::ioctl_device& input_fd,
-            io::ioctl_device& output_fd,
+            system::ioctl_device& input_fd,
+            system::ioctl_device& output_fd,
             pcm_io_config const&,
             std::atomic<float>& cpu_load,
             std::atomic_size_t& xruns,
@@ -47,8 +47,8 @@ public:
     void operator()();
 
 private:
-    io::ioctl_device& m_input_fd;
-    io::ioctl_device& m_output_fd;
+    system::ioctl_device& m_input_fd;
+    system::ioctl_device& m_output_fd;
     pcm_io_config m_io_config;
     std::atomic<float>& m_cpu_load;
     std::atomic_size_t& m_xruns;

@@ -18,7 +18,7 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
-#include <piejam/io/fwd.h>
+#include <piejam/system/fwd.h>
 
 namespace piejam::audio::alsa
 {
@@ -26,7 +26,7 @@ namespace piejam::audio::alsa
 auto get_hw_params(pcm_descriptor const&) -> pcm_hw_params;
 
 void set_hw_params(
-        io::ioctl_device&,
+        system::ioctl_device&,
         pcm_device_config const&,
         pcm_process_config const&);
 

@@ -23,7 +23,7 @@
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
-#include <piejam/io/ioctl_device.h>
+#include <piejam/system/ioctl_device.h>
 
 #include <sound/asound.h>
 #include <sys/ioctl.h>
@@ -36,7 +36,7 @@ namespace piejam::audio::alsa
 
 static bool
 test_interval_value(
-        io::ioctl_device& fd,
+        system::ioctl_device& fd,
         snd_pcm_hw_params params,
         unsigned ival_index,
         unsigned value)
@@ -64,7 +64,7 @@ test_interval_value(
 
 static auto
 test_interval_value(
-        io::ioctl_device& fd,
+        system::ioctl_device& fd,
         snd_pcm_hw_params const& params,
         unsigned ival_index)
 {
@@ -251,7 +251,7 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
 
     auto hw_params = make_snd_pcm_hw_params_for_refine_any();
 
-    io::ioctl_device fd(pcm.path);
+    system::ioctl_device fd(pcm.path);
     fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, hw_params);
 
     result.interleaved =
@@ -318,7 +318,7 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
 
 void
 set_hw_params(
-        io::ioctl_device& fd,
+        system::ioctl_device& fd,
         pcm_device_config const& device_config,
         pcm_process_config const& process_config)
 {

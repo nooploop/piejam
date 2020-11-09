@@ -25,7 +25,7 @@
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/pcm_sample_type.h>
 #include <piejam/container/table.h>
-#include <piejam/io/ioctl_device.h>
+#include <piejam/system/ioctl_device.h>
 
 #include <xsimd/xsimd.hpp>
 
@@ -44,7 +44,7 @@ namespace
 template <class T>
 void
 transferi(
-        io::ioctl_device const& fd,
+        system::ioctl_device const& fd,
         unsigned long const request,
         T* const buffer,
         std::size_t const frames,
@@ -76,7 +76,7 @@ transferi(
 
 template <class T>
 void
-readi(io::ioctl_device const& fd,
+readi(system::ioctl_device const& fd,
       T* const buffer,
       std::size_t const frames,
       std::size_t const channels_per_frame)
@@ -91,7 +91,7 @@ readi(io::ioctl_device const& fd,
 
 template <class T>
 void
-writei(io::ioctl_device const& fd,
+writei(system::ioctl_device const& fd,
        T* const buffer,
        std::size_t const frames,
        std::size_t const channels_per_frame)
@@ -118,7 +118,7 @@ template <pcm_format F>
 struct interleaved_reader : pcm_reader
 {
     interleaved_reader(
-            io::ioctl_device& fd,
+            system::ioctl_device& fd,
             std::size_t const num_channels,
             std::size_t const period_size)
         : m_fd(fd)
@@ -148,7 +148,7 @@ struct interleaved_reader : pcm_reader
     }
 
 private:
-    io::ioctl_device& m_fd;
+    system::ioctl_device& m_fd;
     std::size_t m_num_channels;
     std::size_t m_period_size;
     std::vector<pcm_sample_t<F>> m_read_buffer;
@@ -160,7 +160,7 @@ private:
 
 auto
 make_reader(
-        io::ioctl_device& fd,
+        system::ioctl_device& fd,
         pcm_device_config const& config,
         std::size_t const period_size) -> std::unique_ptr<pcm_reader>
 {
@@ -218,7 +218,7 @@ template <pcm_format F>
 struct interleaved_writer : pcm_writer
 {
     interleaved_writer(
-            io::ioctl_device& fd,
+            system::ioctl_device& fd,
             std::size_t const num_channels,
             std::size_t const period_size)
         : m_fd(fd)
@@ -248,7 +248,7 @@ struct interleaved_writer : pcm_writer
     }
 
 private:
-    io::ioctl_device& m_fd;
+    system::ioctl_device& m_fd;
     std::size_t m_num_channels;
     std::size_t m_period_size;
     std::vector<pcm_sample_t<F>> m_write_buffer;
@@ -260,7 +260,7 @@ private:
 
 auto
 make_writer(
-        io::ioctl_device& fd,
+        system::ioctl_device& fd,
         pcm_device_config const& config,
         std::size_t const period_size) -> std::unique_ptr<pcm_writer>
 {
@@ -310,8 +310,8 @@ make_writer(
 } // namespace
 
 process_step::process_step(
-        io::ioctl_device& input_fd,
-        io::ioctl_device& output_fd,
+        system::ioctl_device& input_fd,
+        system::ioctl_device& output_fd,
         pcm_io_config const& io_config,
         std::atomic<float>& cpu_load,
         std::atomic_size_t& xruns,
@@ -379,7 +379,7 @@ process_step::operator()()
     {
         if (err.code() == std::make_error_code(std::errc::broken_pipe))
         {
-            io::ioctl_device& fd = m_input_fd ? m_input_fd : m_output_fd;
+            system::ioctl_device& fd = m_input_fd ? m_input_fd : m_output_fd;
             fd.ioctl(SNDRV_PCM_IOCTL_PREPARE);
             m_starting = true;
             ++m_xruns;

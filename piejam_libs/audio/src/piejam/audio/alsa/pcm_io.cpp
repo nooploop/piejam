@@ -34,11 +34,11 @@ static auto
 open_pcm(
         std::filesystem::path const& path,
         pcm_device_config const& device_config,
-        pcm_process_config const& process_config) -> io::ioctl_device
+        pcm_process_config const& process_config) -> system::ioctl_device
 {
     if (!path.empty())
     {
-        io::ioctl_device fd(path);
+        system::ioctl_device fd(path);
 
         set_hw_params(fd, device_config, process_config);
 
@@ -156,7 +156,7 @@ pcm_io::stop()
     m_process_thread->stop();
     m_process_thread.reset();
 
-    io::ioctl_device& fd = m_input_fd ? m_input_fd : m_output_fd;
+    system::ioctl_device& fd = m_input_fd ? m_input_fd : m_output_fd;
     fd.ioctl(SNDRV_PCM_IOCTL_DROP);
 }
 

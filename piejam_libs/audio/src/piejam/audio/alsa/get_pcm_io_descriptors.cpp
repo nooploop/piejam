@@ -17,7 +17,7 @@
 
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 
-#include <piejam/io/ioctl_device.h>
+#include <piejam/system/ioctl_device.h>
 
 #include <fmt/format.h>
 
@@ -56,7 +56,7 @@ soundcards() -> std::vector<soundcard>
                              "controlC%u",
                              &card))
             {
-                io::ioctl_device fd(entry.path());
+                system::ioctl_device fd(entry.path());
                 cards.push_back(
                         {entry.path(),
                          fd.ioctl<snd_ctl_card_info>(
@@ -74,7 +74,7 @@ get_devices(soundcard const& scard, int stream_type)
 {
     std::vector<snd_pcm_info> devices;
 
-    io::ioctl_device fd(scard.ctl_path);
+    system::ioctl_device fd(scard.ctl_path);
 
     int device{-1};
     do

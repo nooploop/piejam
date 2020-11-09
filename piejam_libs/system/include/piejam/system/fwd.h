@@ -17,9 +17,9 @@
 
 #pragma once
 
-namespace piejam::io
+namespace piejam::system
 {
 
 class ioctl_device;
 
-} // namespace piejam::io
+} // namespace piejam::system

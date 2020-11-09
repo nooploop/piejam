@@ -19,7 +19,7 @@
 
 #include <filesystem>
 
-namespace piejam::io
+namespace piejam::system
 {
 
 class ioctl_device
@@ -68,4 +68,4 @@ template <>
 void
 ioctl_device::ioctl(unsigned long request, ioctl_device const& other) const;
 
-} // namespace piejam::io
+} // namespace piejam::system

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/io/ioctl_device.h>
+#include <piejam/system/ioctl_device.h>
 
 #include <boost/core/ignore_unused.hpp>
 
@@ -26,7 +26,7 @@
 #include <cassert>
 #include <system_error>
 
-namespace piejam::io
+namespace piejam::system
 {
 
 ioctl_device::ioctl_device(std::filesystem::path const& pathname)
@@ -90,4 +90,4 @@ ioctl_device::ioctl(unsigned long request, ioctl_device const& other) const
     ioctl(request, reinterpret_cast<void*>(other.m_fd), sizeof(other.m_fd));
 }
 
-} // namespace piejam::io
+} // namespace piejam::system
