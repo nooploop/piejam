@@ -5,5 +5,6 @@ add_library(piejam_system STATIC
 )
 
 target_include_directories(piejam_system PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_options(piejam_system PRIVATE -Wall -Wextra -Werror -pedantic-errors)
 
 target_link_libraries(piejam_system PUBLIC stdc++fs)

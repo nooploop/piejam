@@ -10,6 +10,7 @@ add_library(piejam_thread STATIC
 )
 
 target_include_directories(piejam_thread PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_options(piejam_thread PRIVATE -Wall -Wextra -Werror -pedantic-errors)
 
 target_link_libraries(piejam_thread PUBLIC piejam_base PRIVATE pthread)
 
