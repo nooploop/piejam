@@ -29,7 +29,7 @@
 namespace piejam::thread
 {
 
-//! A thread which becomes a task assigned. The needs to be
+//! A thread which gets a task assigned. The worker needs to be
 //! woken up to execute the task. When the work on the task is done,
 //! the thread yields the cpu and waits for the next wakeup call.
 class worker
