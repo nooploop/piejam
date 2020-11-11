@@ -19,6 +19,7 @@
 
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/action_visitor.h>
 
 namespace piejam::runtime::actions
 {
