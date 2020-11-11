@@ -19,6 +19,7 @@
 
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fwd.h>
 
 #include <vector>
 
@@ -26,7 +27,7 @@ namespace piejam::runtime::actions
 {
 
 struct set_input_channel_volume final
-    : ui::action<audio_state>
+    : action
     , visitable_engine_action<set_input_channel_volume>
 {
     std::size_t index{};
@@ -36,7 +37,7 @@ struct set_input_channel_volume final
 };
 
 struct set_input_channel_pan final
-    : ui::action<audio_state>
+    : action
     , visitable_engine_action<set_input_channel_pan>
 {
     std::size_t index{};
@@ -46,7 +47,7 @@ struct set_input_channel_pan final
 };
 
 struct set_input_channel_mute final
-    : ui::action<audio_state>
+    : action
     , visitable_engine_action<set_input_channel_mute>
 {
     std::size_t index{};
@@ -56,7 +57,7 @@ struct set_input_channel_mute final
 };
 
 struct set_input_solo final
-    : ui::action<audio_state>
+    : action
     , visitable_engine_action<set_input_solo>
 {
     std::size_t index{};
@@ -65,7 +66,7 @@ struct set_input_solo final
 };
 
 struct set_output_channel_volume final
-    : ui::action<audio_state>
+    : action
     , visitable_engine_action<set_output_channel_volume>
 {
     std::size_t index{};
@@ -75,7 +76,7 @@ struct set_output_channel_volume final
 };
 
 struct set_output_channel_balance final
-    : ui::action<audio_state>
+    : action
     , visitable_engine_action<set_output_channel_balance>
 {
     std::size_t index{};
