@@ -22,8 +22,6 @@ namespace piejam::runtime::actions
 
 // actions
 
-struct renotify;
-
 struct device_action;
 struct engine_action;
 

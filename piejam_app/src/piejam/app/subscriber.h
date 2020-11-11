@@ -40,6 +40,4 @@ get_next_sub_id() -> subscription_id
     return s_id++;
 }
 
-using renotify_action = std::function<void()>;
-
 } // namespace piejam::app
