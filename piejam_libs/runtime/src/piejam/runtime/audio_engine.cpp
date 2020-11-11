@@ -51,7 +51,7 @@ class audio_engine::mixer_bus final
 {
 public:
     mixer_bus(
-            unsigned const samplerate,
+            audio::samplerate_t const samplerate,
             std::size_t channel_index,
             mixer::channel const& channel)
         : m_device_channels(channel.device_channels)
@@ -331,7 +331,7 @@ make_graph(
 
 audio_engine::audio_engine(
         std::span<thread::configuration const> const& wt_configs,
-        unsigned const samplerate,
+        audio::samplerate_t const samplerate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels,
         mixer::state const& mixer_state)

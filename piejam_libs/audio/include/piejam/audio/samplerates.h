@@ -17,14 +17,14 @@
 
 #pragma once
 
+#include <piejam/audio/types.h>
+
 #include <boost/container/static_vector.hpp>
 
 #include <array>
 
 namespace piejam::audio
 {
-
-using samplerate_t = unsigned;
 
 inline constexpr std::array preferred_samplerates{
         11025u,

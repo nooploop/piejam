@@ -20,6 +20,9 @@
 namespace piejam::audio
 {
 
+using samplerate_t = unsigned;
+using period_size_t = unsigned;
+
 enum class bus_direction : bool
 {
     input,

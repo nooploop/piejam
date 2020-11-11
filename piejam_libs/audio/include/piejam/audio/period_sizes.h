@@ -17,14 +17,14 @@
 
 #pragma once
 
+#include <piejam/audio/types.h>
+
 #include <boost/container/static_vector.hpp>
 
 #include <array>
 
 namespace piejam::audio
 {
-
-using period_size_t = unsigned;
 
 inline constexpr period_size_t max_period_size = 1024u;
 inline constexpr std::array preferred_period_sizes{
