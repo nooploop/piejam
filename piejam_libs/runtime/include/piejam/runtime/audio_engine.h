@@ -75,7 +75,6 @@ private:
             m_input_solo_index_proc;
     std::vector<processor_ptr> m_mixer_procs;
 
-    std::size_t m_buffer_size{};
     audio::engine::graph m_graph;
     std::unique_ptr<audio::engine::dag_executor> m_dag;
 };

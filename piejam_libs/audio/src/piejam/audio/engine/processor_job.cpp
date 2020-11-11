@@ -35,11 +35,8 @@ empty_result_ref() -> std::reference_wrapper<audio_slice const>
     return std::cref(res);
 }
 
-processor_job::processor_job(
-        processor& proc,
-        std::size_t const& buffer_size_ref)
+processor_job::processor_job(processor& proc)
     : m_proc(proc)
-    , m_buffer_size(buffer_size_ref)
     , m_output_buffers(m_proc.num_outputs(), output_buffer_t{})
     , m_inputs(m_proc.num_inputs(), empty_result_ref())
     , m_outputs(m_output_buffers.begin(), m_output_buffers.end())
@@ -96,16 +93,18 @@ processor_job::clear_event_output_buffers()
 }
 
 void
-processor_job::operator()(thread_context const& ctx)
+processor_job::operator()(
+        thread_context const& ctx,
+        std::size_t const buffer_size)
 {
     // set output buffer sizes
     for (std::span<float>& out : m_outputs)
-        out = {out.data(), m_buffer_size};
+        out = {out.data(), buffer_size};
 
     BOOST_ASSERT(ctx.event_memory);
     m_event_outputs.set_event_memory(ctx.event_memory);
 
-    m_process_context.buffer_size = m_buffer_size;
+    m_process_context.buffer_size = buffer_size;
     m_proc.process(m_process_context);
 }
 

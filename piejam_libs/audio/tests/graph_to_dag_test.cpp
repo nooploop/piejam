@@ -48,7 +48,7 @@ TEST(graph_to_dag, audio_is_transferred_to_connected_proc)
     g.add_wire({in_proc, 0}, {out_proc, 0});
 
     std::size_t buffer_size = 1;
-    auto d = graph_to_dag(g, buffer_size).make_runnable();
+    auto d = graph_to_dag(g).make_runnable();
 
     EXPECT_CALL(in_proc, process(_))
             .WillOnce(Invoke([](process_context const& ctx) {
@@ -67,7 +67,7 @@ TEST(graph_to_dag, audio_is_transferred_to_connected_proc)
 
     EXPECT_CALL(out_proc, process(Truly(input_has_sample))).Times(1);
 
-    (*d)();
+    (*d)(buffer_size);
 }
 
 TEST(graph_to_dag, audio_can_spread_to_multiple_ins)
@@ -85,7 +85,7 @@ TEST(graph_to_dag, audio_can_spread_to_multiple_ins)
     g.add_wire({in_proc, 0}, {out_proc, 1});
 
     std::size_t buffer_size = 1;
-    auto d = graph_to_dag(g, buffer_size).make_runnable();
+    auto d = graph_to_dag(g).make_runnable();
 
     EXPECT_CALL(in_proc, process(_))
             .WillOnce(Invoke([](process_context const& ctx) {
@@ -106,7 +106,7 @@ TEST(graph_to_dag, audio_can_spread_to_multiple_ins)
 
     EXPECT_CALL(out_proc, process(Truly(input_has_sample))).Times(1);
 
-    (*d)();
+    (*d)(buffer_size);
 }
 
 TEST(graph_to_dag, out_processor_is_called_once_even_with_two_wires_from_in)
@@ -124,12 +124,12 @@ TEST(graph_to_dag, out_processor_is_called_once_even_with_two_wires_from_in)
     g.add_wire({in_proc, 1}, {out_proc, 1});
 
     std::size_t buffer_size = 1;
-    auto d = graph_to_dag(g, buffer_size).make_runnable();
+    auto d = graph_to_dag(g).make_runnable();
 
     EXPECT_CALL(in_proc, process(_)).Times(1);
     EXPECT_CALL(out_proc, process(_)).Times(1);
 
-    (*d)();
+    (*d)(buffer_size);
 }
 
 TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
@@ -146,7 +146,7 @@ TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
     g.add_wire({in_proc, 0}, {out_proc, 0});
 
     std::size_t buffer_size = 1;
-    auto d = graph_to_dag(g, buffer_size).make_runnable();
+    auto d = graph_to_dag(g).make_runnable();
 
     EXPECT_CALL(in_proc, process(_))
             .WillOnce(Invoke([](process_context const& ctx) {
@@ -163,7 +163,7 @@ TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
 
     EXPECT_CALL(out_proc, process(Truly(valid_ins))).Times(1);
 
-    (*d)();
+    (*d)(buffer_size);
 }
 
 TEST(graph_to_dag, event_is_transferred)
@@ -184,7 +184,7 @@ TEST(graph_to_dag, event_is_transferred)
     g.add_event_wire({in_proc, 0}, {out_proc, 0});
 
     std::size_t buffer_size = 1;
-    auto d = graph_to_dag(g, buffer_size).make_runnable();
+    auto d = graph_to_dag(g).make_runnable();
 
     EXPECT_CALL(in_proc, process(_))
             .WillOnce(Invoke([](process_context const& ctx) {
@@ -200,7 +200,7 @@ TEST(graph_to_dag, event_is_transferred)
     };
     EXPECT_CALL(out_proc, process(Truly(event_input_has_event))).Times(1);
 
-    (*d)();
+    (*d)(buffer_size);
 }
 
 TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
@@ -220,7 +220,7 @@ TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
     g.add_wire({in_proc, 0}, {out_proc, 0});
 
     std::size_t buffer_size = 1;
-    auto d = graph_to_dag(g, buffer_size).make_runnable();
+    auto d = graph_to_dag(g).make_runnable();
 
     event_buffer<float>* ev_buf{};
     EXPECT_CALL(in_proc, process(_))
@@ -230,7 +230,7 @@ TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
                 EXPECT_EQ(1u, ev_buf->size());
             }));
 
-    (*d)();
+    (*d)(buffer_size);
 
     ASSERT_NE(nullptr, ev_buf);
     EXPECT_TRUE(ev_buf->empty());

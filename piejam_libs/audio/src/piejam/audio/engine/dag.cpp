@@ -102,7 +102,7 @@ public:
         m_run_queue.reserve(m_nodes.size());
     }
 
-    void operator()() override
+    void operator()(std::size_t const buffer_size) override
     {
         for (auto& [id, nd] : m_nodes)
         {
@@ -123,7 +123,7 @@ public:
             BOOST_ASSERT(
                     nd->parents_to_process.load(std::memory_order_relaxed) ==
                     0);
-            nd->task(m_thread_context);
+            nd->task(m_thread_context, buffer_size);
 
             for (node& child : nd->children)
             {
@@ -160,20 +160,27 @@ public:
             std::span<thread::configuration const> const& wt_configs)
         : dag_executor_base(tasks, graph)
         , m_run_queues(1 + wt_configs.size())
-        , m_main_worker(0, event_memory_size, m_nodes_to_process, m_run_queues)
+        , m_main_worker(
+                  0,
+                  event_memory_size,
+                  m_nodes_to_process,
+                  m_buffer_size,
+                  m_run_queues)
         , m_workers(make_workers(
                   event_memory_size,
                   wt_configs,
                   m_nodes_to_process,
+                  m_buffer_size,
                   m_run_queues))
     {
     }
 
-    void operator()() override
+    void operator()(std::size_t const buffer_size) override
     {
         BOOST_ASSERT(m_run_queues[0].size() == 0);
 
         m_nodes_to_process.store(m_nodes.size(), std::memory_order_release);
+        m_buffer_size.store(buffer_size, std::memory_order_release);
 
         for (auto& rq : m_run_queues)
             rq.reset();
@@ -213,22 +220,27 @@ private:
                 std::size_t const worker_index,
                 std::size_t const event_memory_size,
                 std::atomic_size_t& nodes_to_process,
+                std::atomic_size_t& buffer_size,
                 std::span<job_deque_t> run_queues)
             : m_worker_index(worker_index)
             , m_event_memory(event_memory_size)
             , m_nodes_to_process(nodes_to_process)
+            , m_buffer_size(buffer_size)
             , m_run_queues(std::move(run_queues))
         {
         }
 
         void operator()()
         {
+            std::size_t const buffer_size =
+                    m_buffer_size.load(std::memory_order_consume);
+
             while (m_nodes_to_process.load(std::memory_order_relaxed))
             {
                 if (node* n = m_run_queues[m_worker_index].pop())
                 {
                     while (n)
-                        n = process_node(*n);
+                        n = process_node(*n, buffer_size);
                 }
                 else
                 {
@@ -240,7 +252,7 @@ private:
                         if (node* n = m_run_queues[steal_index].steal())
                         {
                             while (n)
-                                n = process_node(*n);
+                                n = process_node(*n, buffer_size);
                             break;
                         }
                     }
@@ -251,13 +263,13 @@ private:
         }
 
     private:
-        auto process_node(node& n) -> node*
+        auto process_node(node& n, std::size_t const buffer_size) -> node*
         {
             job_deque_t& run_queue = m_run_queues[m_worker_index];
 
             BOOST_ASSERT(n.parents_to_process == 0);
 
-            n.task(m_thread_context);
+            n.task(m_thread_context, buffer_size);
 
             m_nodes_to_process.fetch_sub(1, std::memory_order_acq_rel);
 
@@ -288,6 +300,7 @@ private:
         audio::engine::thread_context m_thread_context{
                 &m_event_memory.memory_resource()};
         std::atomic_size_t& m_nodes_to_process;
+        std::atomic_size_t& m_buffer_size;
         std::span<job_deque_t> m_run_queues;
     };
 
@@ -295,6 +308,7 @@ private:
             std::size_t const event_memory_size,
             std::span<thread::configuration const> const& wt_configs,
             std::atomic_size_t& nodes_to_process,
+            std::atomic_size_t& buffer_size,
             std::span<job_deque_t> run_queues) -> workers_t
     {
         workers_t workers;
@@ -307,6 +321,7 @@ private:
                             i + 1,
                             event_memory_size,
                             nodes_to_process,
+                            buffer_size,
                             run_queues),
                     wt_configs[i]));
         }
@@ -318,6 +333,7 @@ private:
     std::vector<job_deque_t> m_run_queues;
     dag_worker m_main_worker;
     workers_t m_workers;
+    std::atomic_size_t m_buffer_size{};
 };
 
 bool

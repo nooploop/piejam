@@ -42,7 +42,7 @@ namespace piejam::audio::engine
 {
 
 auto
-graph_to_dag(graph const& g, std::size_t const& buffer_size_ref) -> dag
+graph_to_dag(graph const& g) -> dag
 {
     dag result;
 
@@ -55,10 +55,13 @@ graph_to_dag(graph const& g, std::size_t const& buffer_size_ref) -> dag
     std::vector<processor_job*> clear_event_buffer_jobs;
 
     auto add_job = [&](graph::endpoint const& e) {
-        auto job = std::make_shared<processor_job>(e.proc, buffer_size_ref);
+        auto job = std::make_shared<processor_job>(e.proc);
         auto job_ptr = job.get();
-        auto id = result.add_task(
-                [j = std::move(job)](thread_context const& ctx) { (*j)(ctx); });
+        auto id = result.add_task([j = std::move(job)](
+                                          thread_context const& ctx,
+                                          std::size_t const buffer_size) {
+            (*j)(ctx, buffer_size);
+        });
         processor_job_mapping.emplace(e.proc, std::pair(id, job_ptr));
         if (!e.proc.get().event_outputs().empty())
             clear_event_buffer_jobs.push_back(job_ptr);
@@ -133,7 +136,8 @@ graph_to_dag(graph const& g, std::size_t const& buffer_size_ref) -> dag
 
         auto clear_job_id =
                 result.add_task([jobs = std::move(clear_event_buffer_jobs)](
-                                        thread_context const&) {
+                                        thread_context const&,
+                                        std::size_t) {
                     for (auto job : jobs)
                         job->clear_event_output_buffers();
                 });

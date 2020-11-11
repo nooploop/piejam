@@ -41,7 +41,7 @@ class processor_job final
 public:
     using output_buffer_t = std::array<float, max_period_size>;
 
-    processor_job(processor& proc, std::size_t const& buffer_size_ref);
+    processor_job(processor& proc);
 
     auto result_ref(std::size_t index) const -> audio_slice const&;
     void connect_result(std::size_t index, audio_slice const& res);
@@ -53,11 +53,10 @@ public:
 
     void clear_event_output_buffers();
 
-    void operator()(thread_context const&);
+    void operator()(thread_context const&, std::size_t buffer_size);
 
 private:
     processor& m_proc;
-    std::size_t const& m_buffer_size;
     std::vector<
             output_buffer_t,
             xsimd::aligned_allocator<output_buffer_t, XSIMD_DEFAULT_ALIGNMENT>>

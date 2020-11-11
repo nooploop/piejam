@@ -354,8 +354,7 @@ audio_engine::audio_engine(
               m_output_buses,
               *m_input_solo_index_proc,
               m_mixer_procs))
-    , m_dag(ns_ae::graph_to_dag(m_graph, m_buffer_size)
-                    .make_runnable(wt_configs))
+    , m_dag(ns_ae::graph_to_dag(m_graph).make_runnable(wt_configs))
 {
     std::ofstream("graph.dot")
             << audio::engine::export_graph_as_dot(m_graph) << std::endl;
@@ -435,9 +434,8 @@ audio_engine::operator()(
 {
     m_input_proc->set_input(in_audio);
     m_output_proc->set_output(out_audio);
-    m_buffer_size = in_audio.minor_size();
 
-    (*m_dag)();
+    (*m_dag)(in_audio.minor_size());
 }
 
 } // namespace piejam::runtime

@@ -24,6 +24,6 @@
 namespace piejam::audio::engine
 {
 
-auto graph_to_dag(graph const&, std::size_t const& buffer_size_ref) -> dag;
+auto graph_to_dag(graph const&) -> dag;
 
 } // namespace piejam::audio::engine
