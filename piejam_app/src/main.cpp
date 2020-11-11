@@ -92,7 +92,31 @@ main(int argc, char* argv[]) -> int
         return [m](auto const& a) { m->operator()(a); };
     });
 
-    piejam::reselect::subscriber<runtime::audio_state> state_change_subscriber;
+    store.apply_middleware(
+            [app = &app, main_thread = std::this_thread::get_id()](
+                    auto /*get_state*/,
+                    auto dispatch,
+                    auto next) {
+                return [app,
+                        main_thread,
+                        dispatch = std::move(dispatch),
+                        next = std::move(next)](auto const& a) {
+                    if (main_thread == std::this_thread::get_id())
+                    {
+                        next(a);
+                    }
+                    else
+                    {
+                        QMetaObject::invokeMethod(
+                                app,
+                                [dispatch, cloned = a.clone()]() mutable {
+                                    dispatch(std::move(cloned));
+                                });
+                    }
+                };
+            });
+
+    piejam::app::subscriber state_change_subscriber;
 
     store.subscribe([&state_change_subscriber](auto const& state) {
         state_change_subscriber.notify(state);
