@@ -17,16 +17,12 @@
 
 #pragma once
 
+#include <piejam/audio/engine/fwd.h>
+
 #include <cstddef>
-#include <functional>
 
 namespace piejam::audio::engine
 {
-
-class dag;
-class graph;
-
-using prepare_process_fn_t = std::function<void(std::size_t)>;
 
 auto graph_to_dag(graph const&, std::size_t const& buffer_size_ref) -> dag;
 
