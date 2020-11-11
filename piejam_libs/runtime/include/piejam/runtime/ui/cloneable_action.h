@@ -22,15 +22,13 @@
 namespace piejam::runtime::ui
 {
 
-template <class State>
-struct action
+template <class DerivedAction, class ActionInterface>
+struct cloneable_action : public ActionInterface
 {
-    virtual ~action() = default;
-
-    virtual auto clone() const -> std::unique_ptr<action<State>> = 0;
-
-    // reduce state
-    virtual auto operator()(State const&) const -> State = 0;
+    auto clone() const -> std::unique_ptr<ActionInterface> override
+    {
+        return std::make_unique<DerivedAction>(static_cast<DerivedAction const&>(*this));
+    }
 };
 
 } // namespace piejam::runtime::ui

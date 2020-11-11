@@ -20,6 +20,7 @@
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 #include <vector>
 
@@ -27,7 +28,7 @@ namespace piejam::runtime::actions
 {
 
 struct set_input_channel_volume final
-    : action
+    : ui::cloneable_action<set_input_channel_volume, action>
     , visitable_engine_action<set_input_channel_volume>
 {
     std::size_t index{};
@@ -37,7 +38,7 @@ struct set_input_channel_volume final
 };
 
 struct set_input_channel_pan final
-    : action
+    : ui::cloneable_action<set_input_channel_pan, action>
     , visitable_engine_action<set_input_channel_pan>
 {
     std::size_t index{};
@@ -47,7 +48,7 @@ struct set_input_channel_pan final
 };
 
 struct set_input_channel_mute final
-    : action
+    : ui::cloneable_action<set_input_channel_mute, action>
     , visitable_engine_action<set_input_channel_mute>
 {
     std::size_t index{};
@@ -57,7 +58,7 @@ struct set_input_channel_mute final
 };
 
 struct set_input_solo final
-    : action
+    : ui::cloneable_action<set_input_solo, action>
     , visitable_engine_action<set_input_solo>
 {
     std::size_t index{};
@@ -66,7 +67,7 @@ struct set_input_solo final
 };
 
 struct set_output_channel_volume final
-    : action
+    : ui::cloneable_action<set_output_channel_volume, action>
     , visitable_engine_action<set_output_channel_volume>
 {
     std::size_t index{};
@@ -76,7 +77,7 @@ struct set_output_channel_volume final
 };
 
 struct set_output_channel_balance final
-    : action
+    : ui::cloneable_action<set_output_channel_balance, action>
     , visitable_engine_action<set_output_channel_balance>
 {
     std::size_t index{};
@@ -86,7 +87,7 @@ struct set_output_channel_balance final
 };
 
 struct set_output_channel_mute final
-    : ui::action<audio_state>
+    : ui::cloneable_action<set_output_channel_mute, action>
     , visitable_engine_action<set_output_channel_mute>
 {
     std::size_t index{};
@@ -96,14 +97,14 @@ struct set_output_channel_mute final
 };
 
 struct request_levels_update final
-    : ui::action<audio_state>
+    : ui::cloneable_action<request_levels_update, action>
     , visitable_engine_action<request_levels_update>
 {
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
 struct update_levels final
-    : ui::action<audio_state>
+    : ui::cloneable_action<update_levels, action>
     , visitable_engine_action<update_levels>
 {
     std::vector<mixer::stereo_level> in_levels;
@@ -113,14 +114,14 @@ struct update_levels final
 };
 
 struct request_info_update final
-    : ui::action<audio_state>
+    : ui::cloneable_action<request_info_update, action>
     , visitable_engine_action<request_info_update>
 {
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
 struct update_info final
-    : ui::action<audio_state>
+    : ui::cloneable_action<update_info, action>
     , visitable_engine_action<update_info>
 {
     std::size_t xruns{};

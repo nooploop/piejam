@@ -24,19 +24,20 @@
 #include <piejam/runtime/actions/device_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/selected_device.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
 
 struct refresh_devices final
-    : action
+    : ui::cloneable_action<refresh_devices, action>
     , visitable_device_action<refresh_devices>
 {
     auto operator()(audio_state const&) const -> audio_state override;
 };
 
 struct update_devices final
-    : action
+    : ui::cloneable_action<update_devices, action>
     , visitable_device_action<update_devices>
 {
     container::box<piejam::audio::pcm_io_descriptors> pcm_devices;
@@ -51,7 +52,7 @@ struct update_devices final
 };
 
 struct initiate_device_selection final
-    : action
+    : ui::cloneable_action<initiate_device_selection, action>
     , visitable_device_action<initiate_device_selection>
 {
     bool input{};
@@ -61,7 +62,7 @@ struct initiate_device_selection final
 };
 
 struct select_device final
-    : action
+    : ui::cloneable_action<select_device, action>
     , visitable_device_action<select_device>
 {
     bool input{};
@@ -79,7 +80,7 @@ operator==(select_device const& l, select_device const& r) noexcept
 }
 
 struct select_samplerate final
-    : action
+    : ui::cloneable_action<select_samplerate, action>
     , visitable_device_action<select_samplerate>
 {
     std::size_t index{};
@@ -88,7 +89,7 @@ struct select_samplerate final
 };
 
 struct select_period_size final
-    : action
+    : ui::cloneable_action<select_period_size, action>
     , visitable_device_action<select_period_size>
 {
     std::size_t index{};
@@ -97,7 +98,7 @@ struct select_period_size final
 };
 
 struct select_bus_channel final
-    : action
+    : ui::cloneable_action<select_bus_channel, action>
     , visitable_device_action<select_bus_channel>
 {
     audio::bus_direction direction{};
@@ -109,7 +110,7 @@ struct select_bus_channel final
 };
 
 struct add_device_bus final
-    : action
+    : ui::cloneable_action<add_device_bus, action>
     , visitable_device_action<add_device_bus>
 {
     audio::bus_direction direction{};
@@ -119,7 +120,7 @@ struct add_device_bus final
 };
 
 struct delete_device_bus final
-    : action
+    : ui::cloneable_action<delete_device_bus, action>
     , visitable_device_action<delete_device_bus>
 {
     audio::bus_direction direction{};

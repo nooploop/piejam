@@ -68,6 +68,11 @@ TEST_F(audio_engine_middleware_test,
 {
     struct non_device_action : action
     {
+        auto clone() const -> std::unique_ptr<action> override
+        {
+            return std::make_unique<non_device_action>();
+        }
+
         auto operator()(audio_state const& st) const -> audio_state override
         {
             return st;

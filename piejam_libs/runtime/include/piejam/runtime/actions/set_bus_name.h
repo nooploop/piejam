@@ -20,13 +20,14 @@
 #include <piejam/audio/types.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 #include <string>
 
 namespace piejam::runtime::actions
 {
 
-struct set_bus_name : action
+struct set_bus_name : ui::cloneable_action<set_bus_name, action>
 {
     audio::bus_direction bus_direction{};
     std::size_t bus{};
