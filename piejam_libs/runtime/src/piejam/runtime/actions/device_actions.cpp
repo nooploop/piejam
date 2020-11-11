@@ -89,7 +89,7 @@ select_device::operator()(audio_state const& st) const -> audio_state
         for (auto& in : new_st.mixer_state.inputs)
         {
             in.type = audio::bus_type::mono;
-            in.device_channels = audio::channel_index_pair{channel_index++};
+            in.device_channels = channel_index_pair{channel_index++};
             in.name = "In " + std::to_string(channel_index);
         }
     }
@@ -154,8 +154,7 @@ select_bus_channel::operator()(audio_state const& st) const -> audio_state
     {
         case audio::bus_channel::mono:
             assert(direction == audio::bus_direction::input);
-            channels[bus].device_channels =
-                    audio::channel_index_pair{channel_index};
+            channels[bus].device_channels = channel_index_pair{channel_index};
             break;
 
         case audio::bus_channel::left:

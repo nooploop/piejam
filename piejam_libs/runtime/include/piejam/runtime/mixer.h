@@ -21,6 +21,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/container/boxed_string.h>
 #include <piejam/npos.h>
+#include <piejam/runtime/channel_index_pair.h>
 
 #include <string>
 #include <variant>
@@ -42,7 +43,7 @@ struct channel
     channel_type type{};
 
     //! mono channels hold same device channel in the pair
-    audio::channel_index_pair device_channels{npos};
+    channel_index_pair device_channels{npos};
 };
 
 using channels = std::vector<channel>;

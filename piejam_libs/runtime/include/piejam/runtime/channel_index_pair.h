@@ -17,41 +17,11 @@
 
 #pragma once
 
-#include <piejam/audio/types.h>
-#include <piejam/runtime/channel_index_pair.h>
-
-#include <nlohmann/json.hpp>
-
-#include <filesystem>
-#include <string>
+#include <piejam/audio/pair.h>
 
 namespace piejam::runtime
 {
 
-inline constexpr unsigned current_app_config_version = 1;
-
-struct bus_config
-{
-    std::string name;
-    audio::bus_type bus_type;
-    channel_index_pair channels;
-};
-
-struct app_config
-{
-    std::string input_device_name;
-    std::string output_device_name;
-    unsigned samplerate{};
-    unsigned period_size{};
-
-    std::vector<bus_config> input_bus_config;
-    std::vector<bus_config> output_bus_config;
-};
-
-void to_json(nlohmann::json&, app_config const&);
-void from_json(nlohmann::json const&, app_config&);
-
-auto load_app_config(std::filesystem::path const&) -> app_config;
-void save_app_config(app_config const&, std::filesystem::path const&);
+using channel_index_pair = audio::pair<std::size_t>;
 
 } // namespace piejam::runtime

@@ -17,12 +17,8 @@
 
 #pragma once
 
-#include <piejam/audio/pair.h>
-
 namespace piejam::audio
 {
-
-using channel_index_pair = pair<std::size_t>;
 
 enum class bus_direction : bool
 {

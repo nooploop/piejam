@@ -31,6 +31,7 @@
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/runtime/audio_components/mixer_bus_processor.h>
 #include <piejam/runtime/audio_components/mute_solo_processor.h>
+#include <piejam/runtime/channel_index_pair.h>
 
 #include <fmt/format.h>
 
@@ -94,7 +95,7 @@ public:
     {
     }
 
-    auto device_channels() const noexcept -> audio::channel_index_pair const&
+    auto device_channels() const noexcept -> channel_index_pair const&
     {
         return m_device_channels;
     }
@@ -185,7 +186,7 @@ public:
     }
 
 private:
-    audio::channel_index_pair m_device_channels;
+    channel_index_pair m_device_channels;
     std::unique_ptr<ns_ae::value_input_processor<float>> m_volume_proc;
     std::unique_ptr<ns_ae::value_input_processor<float>> m_pan_balance_proc;
     std::unique_ptr<ns_ae::value_input_processor<bool>> m_mute_input_proc;
