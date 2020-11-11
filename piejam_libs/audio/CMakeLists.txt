@@ -11,6 +11,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/audio_slice.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag_executor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_buffer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_buffer_memory.h

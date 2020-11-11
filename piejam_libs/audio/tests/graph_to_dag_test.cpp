@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/dag.h>
+#include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/event_port.h>

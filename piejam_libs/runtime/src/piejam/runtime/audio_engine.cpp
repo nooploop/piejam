@@ -19,6 +19,7 @@
 
 #include <piejam/audio/components/level_meter_processor.h>
 #include <piejam/audio/engine/dag.h>
+#include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_to_audio_processor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_algorithms.h>

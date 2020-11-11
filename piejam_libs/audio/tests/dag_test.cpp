@@ -17,6 +17,7 @@
 
 #include <piejam/audio/engine/dag.h>
 
+#include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/thread_context.h>
 
 #include <gtest/gtest.h>
