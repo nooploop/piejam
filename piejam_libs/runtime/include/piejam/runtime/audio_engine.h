@@ -42,8 +42,7 @@ public:
             std::span<thread::configuration const> const& wt_configs,
             audio::samplerate_t,
             unsigned num_device_input_channels,
-            unsigned num_device_output_channels,
-            mixer::state const&);
+            unsigned num_device_output_channels);
     ~audio_engine();
 
     void set_input_channel_volume(std::size_t index, float volume);
@@ -59,6 +58,8 @@ public:
     auto get_output_level(std::size_t index) const noexcept
             -> mixer::stereo_level;
 
+    void rebuild(mixer::state const&);
+
     void operator()(
             range::table_view<float const> const& in_audio,
             range::table_view<float> const& out_audio) noexcept;
@@ -66,8 +67,10 @@ public:
 private:
     using processor_ptr = std::unique_ptr<audio::engine::processor>;
 
-    std::unique_ptr<audio::engine::input_processor> m_input_proc;
-    std::unique_ptr<audio::engine::output_processor> m_output_proc;
+    std::vector<thread::configuration> const m_wt_configs;
+    audio::samplerate_t const m_samplerate;
+
+    std::unique_ptr<audio::engine::process> m_process;
 
     std::vector<mixer_bus> m_input_buses;
     std::vector<mixer_bus> m_output_buses;
@@ -76,7 +79,6 @@ private:
     std::vector<processor_ptr> m_mixer_procs;
 
     audio::engine::graph m_graph;
-    std::unique_ptr<audio::engine::dag_executor> m_dag;
 };
 
 } // namespace piejam::runtime

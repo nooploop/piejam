@@ -104,10 +104,7 @@ audio_engine_middleware::process_device_action(
                 BOOST_ASSERT_MSG(false, "should not be sent by user");
             },
             [this](actions::select_samplerate const& a) { m_next(a); },
-            [this](actions::select_period_size const& a) { m_next(a); },
-            [this](actions::select_bus_channel const& a) { m_next(a); },
-            [this](actions::add_device_bus const& a) { m_next(a); },
-            [this](actions::delete_device_bus const& a) { m_next(a); });
+            [this](actions::select_period_size const& a) { m_next(a); });
 
     action.visit(v);
 
@@ -267,6 +264,30 @@ audio_engine_middleware::process_engine_action(
         actions::engine_action const& action)
 {
     auto v = ui::make_action_visitor<actions::engine_action_visitor>(
+            [this](actions::select_bus_channel const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->rebuild(m_get_state().mixer_state);
+                }
+            },
+            [this](actions::add_device_bus const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->rebuild(m_get_state().mixer_state);
+                }
+            },
+            [this](actions::delete_device_bus const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->rebuild(m_get_state().mixer_state);
+                }
+            },
             [this](actions::set_input_channel_volume const& a) {
                 m_next(a);
 
@@ -421,14 +442,15 @@ audio_engine_middleware::start_engine()
                 m_wt_configs,
                 state.samplerate,
                 state.input.hw_params->num_channels,
-                state.output.hw_params->num_channels,
-                state.mixer_state);
+                state.output.hw_params->num_channels);
 
         m_device->start(
                 m_audio_thread_config,
                 [engine = m_engine.get()](auto const& in, auto const& out) {
                     engine->operator()(in, out);
                 });
+
+        m_engine->rebuild(state.mixer_state);
     }
 }
 

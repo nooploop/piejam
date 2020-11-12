@@ -27,6 +27,38 @@
 namespace piejam::runtime::actions
 {
 
+struct select_bus_channel final
+    : ui::cloneable_action<select_bus_channel, action>
+    , visitable_engine_action<select_bus_channel>
+{
+    audio::bus_direction direction{};
+    std::size_t bus{};
+    audio::bus_channel channel_selector{};
+    std::size_t channel_index{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
+struct add_device_bus final
+    : ui::cloneable_action<add_device_bus, action>
+    , visitable_engine_action<add_device_bus>
+{
+    audio::bus_direction direction{};
+    audio::bus_type type{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
+struct delete_device_bus final
+    : ui::cloneable_action<delete_device_bus, action>
+    , visitable_engine_action<delete_device_bus>
+{
+    audio::bus_direction direction{};
+    std::size_t bus{};
+
+    auto operator()(audio_state const&) const -> audio_state override;
+};
+
 struct set_input_channel_volume final
     : ui::cloneable_action<set_input_channel_volume, action>
     , visitable_engine_action<set_input_channel_volume>

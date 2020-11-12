@@ -21,6 +21,7 @@
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/device_actions.h>
+#include <piejam/runtime/actions/engine_actions.h>
 #include <piejam/runtime/actions/set_bus_name.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/audio_state_selectors.h>

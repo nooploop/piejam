@@ -40,6 +40,7 @@ class value_input_processor;
 class dag;
 class dag_executor;
 class graph;
+class process;
 struct process_context;
 class processor_job;
 class thread_context;

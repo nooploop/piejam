@@ -28,11 +28,13 @@
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/multiply_processor.h>
 #include <piejam/audio/engine/output_processor.h>
+#include <piejam/audio/engine/process.h>
 #include <piejam/audio/engine/select_processor.h>
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/runtime/audio_components/mixer_bus_processor.h>
 #include <piejam/runtime/audio_components/mute_solo_processor.h>
 #include <piejam/runtime/channel_index_pair.h>
+#include <piejam/thread/configuration.h>
 
 #include <fmt/format.h>
 
@@ -334,30 +336,13 @@ audio_engine::audio_engine(
         std::span<thread::configuration const> const& wt_configs,
         audio::samplerate_t const samplerate,
         unsigned const num_device_input_channels,
-        unsigned const num_device_output_channels,
-        mixer::state const& mixer_state)
-    : m_input_proc(std::make_unique<ns_ae::input_processor>(
-              num_device_input_channels))
-    , m_output_proc(std::make_unique<ns_ae::output_processor>(
+        unsigned const num_device_output_channels)
+    : m_wt_configs(wt_configs.begin(), wt_configs.end())
+    , m_samplerate(samplerate)
+    , m_process(std::make_unique<audio::engine::process>(
+              num_device_input_channels,
               num_device_output_channels))
-    , m_input_buses(make_mixer_bus_vector(samplerate, mixer_state.inputs))
-    , m_output_buses(make_mixer_bus_vector(samplerate, mixer_state.outputs))
-    , m_input_solo_index_proc(
-              std::make_unique<ns_ae::value_input_processor<std::size_t>>(
-                      mixer_state.input_solo_index,
-                      "input_solo_index"))
-    , m_graph(make_graph(
-              mixer_state,
-              *m_input_proc,
-              *m_output_proc,
-              m_input_buses,
-              m_output_buses,
-              *m_input_solo_index_proc,
-              m_mixer_procs))
-    , m_dag(ns_ae::graph_to_dag(m_graph).make_runnable(wt_configs))
 {
-    std::ofstream("graph.dot")
-            << audio::engine::export_graph_as_dot(m_graph) << std::endl;
 }
 
 audio_engine::~audio_engine() = default;
@@ -428,14 +413,45 @@ audio_engine::get_output_level(std::size_t const index) const noexcept
 }
 
 void
+audio_engine::rebuild(mixer::state const& mixer_state)
+{
+    auto input_buses = make_mixer_bus_vector(m_samplerate, mixer_state.inputs);
+    auto output_buses =
+            make_mixer_bus_vector(m_samplerate, mixer_state.outputs);
+    auto input_solo_index_proc =
+            std::make_unique<ns_ae::value_input_processor<std::size_t>>(
+                    mixer_state.input_solo_index,
+                    "input_solo_index");
+    std::vector<processor_ptr> mixers;
+
+    auto new_graph = make_graph(
+            mixer_state,
+            m_process->input(),
+            m_process->output(),
+            input_buses,
+            output_buses,
+            *input_solo_index_proc,
+            mixers);
+
+    m_process->swap_executor(
+            ns_ae::graph_to_dag(new_graph).make_runnable(m_wt_configs));
+
+    m_graph = std::move(new_graph);
+    m_input_buses = std::move(input_buses);
+    m_output_buses = std::move(output_buses);
+    m_input_solo_index_proc = std::move(input_solo_index_proc);
+    m_mixer_procs = std::move(mixers);
+
+    std::ofstream("graph.dot")
+            << audio::engine::export_graph_as_dot(m_graph) << std::endl;
+}
+
+void
 audio_engine::operator()(
         range::table_view<float const> const& in_audio,
         range::table_view<float> const& out_audio) noexcept
 {
-    m_input_proc->set_input(in_audio);
-    m_output_proc->set_output(out_audio);
-
-    (*m_dag)(in_audio.minor_size());
+    (*m_process)(in_audio, out_audio);
 }
 
 } // namespace piejam::runtime

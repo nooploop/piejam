@@ -27,6 +27,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/multiply_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/named_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/output_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/process.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_job.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/select_processor.h
@@ -70,6 +71,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/mix_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/multiply_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/output_processor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/process.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/select_processor.cpp
 )

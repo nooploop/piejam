@@ -26,6 +26,9 @@ namespace piejam::runtime::actions
 
 struct engine_action_visitor
     : ui::action_visitor_interface<
+              select_bus_channel,
+              add_device_bus,
+              delete_device_bus,
               set_input_channel_volume,
               set_input_channel_pan,
               set_input_channel_mute,

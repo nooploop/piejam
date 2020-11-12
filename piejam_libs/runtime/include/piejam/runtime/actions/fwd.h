@@ -33,10 +33,10 @@ struct initiate_device_selection;
 struct select_device;
 struct select_samplerate;
 struct select_period_size;
+
 struct select_bus_channel;
 struct add_device_bus;
 struct delete_device_bus;
-
 struct set_input_channel_volume;
 struct set_input_channel_pan;
 struct set_input_channel_mute;
