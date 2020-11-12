@@ -17,19 +17,15 @@
 
 #pragma once
 
-#include <piejam/audio/engine/audio_slice.h>
-#include <piejam/audio/engine/event_input_buffers.h>
-#include <piejam/audio/engine/event_port.h>
-#include <piejam/audio/engine/named_processor.h>
-#include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/audio/smoother.h>
+#include <piejam/audio/engine/fwd.h>
 
-#include <type_traits>
+#include <memory>
+#include <string_view>
 
 namespace piejam::audio::engine
 {
 
-inline constexpr std::size_t default_event_to_audio_smooth_length = 128;
+inline constexpr std::size_t default_event_to_audio_smooth_length = 256;
 
 auto make_event_to_audio_processor(
         std::string_view const& name = {},
