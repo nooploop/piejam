@@ -51,7 +51,7 @@ private:
     std::unique_ptr<dag_executor> m_executor;
 
     std::atomic<dag_executor*> m_next_executor{};
-    std::promise<dag_executor*> m_prev_executor{};
+    std::promise<std::unique_ptr<dag_executor>> m_prev_executor{};
 };
 
 } // namespace piejam::audio::engine

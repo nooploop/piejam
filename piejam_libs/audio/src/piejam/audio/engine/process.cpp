@@ -63,7 +63,7 @@ process::swap_executor(std::unique_ptr<dag_executor> next_dag_executor)
             next_dag_executor.release(),
             std::memory_order_release);
 
-    delete prev_executor_future.get();
+    prev_executor_future.get();
 }
 
 void
@@ -78,7 +78,7 @@ process::operator()(
                 m_next_executor.exchange(nullptr, std::memory_order_acq_rel)))
     {
         std::swap(m_executor, next_dag_executor);
-        m_prev_executor.set_value(next_dag_executor.release());
+        m_prev_executor.set_value(std::move(next_dag_executor));
     }
 
     (*m_executor)(in_audio.minor_size());
