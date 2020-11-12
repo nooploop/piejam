@@ -24,10 +24,8 @@
 #include <piejam/audio/pcm_format.h>
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/pcm_sample_type.h>
-#include <piejam/container/table.h>
+#include <piejam/audio/table.h>
 #include <piejam/system/ioctl_device.h>
-
-#include <xsimd/xsimd.hpp>
 
 #include <sound/asound.h>
 #include <sys/ioctl.h>
@@ -152,10 +150,7 @@ private:
     std::size_t m_num_channels;
     std::size_t m_period_size;
     std::vector<pcm_sample_t<F>> m_read_buffer;
-    container::table<
-            float,
-            xsimd::aligned_allocator<float, XSIMD_DEFAULT_ALIGNMENT>>
-            m_buffer;
+    table m_buffer;
 };
 
 auto
@@ -252,10 +247,7 @@ private:
     std::size_t m_num_channels;
     std::size_t m_period_size;
     std::vector<pcm_sample_t<F>> m_write_buffer;
-    container::table<
-            float,
-            xsimd::aligned_allocator<float, XSIMD_DEFAULT_ALIGNMENT>>
-            m_buffer;
+    table m_buffer;
 };
 
 auto

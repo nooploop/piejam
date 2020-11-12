@@ -53,6 +53,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/process_thread.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/samplerates.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/smoother.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/table.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/types.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_pcm_io_descriptors.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_set_hw_params.cpp
