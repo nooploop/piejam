@@ -17,12 +17,10 @@
 
 #pragma once
 
-#include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/graph_endpoint.h>
 
-#include <functional>
 #include <map>
 #include <string>
-#include <vector>
 
 namespace piejam::audio::engine
 {
@@ -30,37 +28,17 @@ namespace piejam::audio::engine
 class graph
 {
 public:
-    struct endpoint
-    {
-        std::reference_wrapper<processor> proc;
-        std::size_t port{};
-
-        bool operator<(endpoint const& other) const noexcept
-        {
-            auto const proc_l = std::addressof(proc.get());
-            auto const proc_r = std::addressof(other.proc.get());
-            return proc_l < proc_r || (proc_l == proc_r && port < other.port);
-        }
-
-        bool operator==(endpoint const& other) const noexcept
-        {
-            auto const proc_l = std::addressof(proc.get());
-            auto const proc_r = std::addressof(other.proc.get());
-            return proc_l == proc_r && port == other.port;
-        }
-    };
-
-    using wires_t = std::multimap<endpoint, endpoint>;
+    using wires_t = std::multimap<graph_endpoint, graph_endpoint>;
 
     auto wires() const noexcept -> wires_t const& { return m_wires; }
-    void add_wire(endpoint const& src, endpoint const& dst);
-    void remove_wire(endpoint const& src, endpoint const& dst);
+    void add_wire(graph_endpoint const& src, graph_endpoint const& dst);
+    void remove_wire(graph_endpoint const& src, graph_endpoint const& dst);
 
     auto event_wires() const noexcept -> wires_t const&
     {
         return m_event_wires;
     }
-    void add_event_wire(endpoint const& src, endpoint const& dst);
+    void add_event_wire(graph_endpoint const& src, graph_endpoint const& dst);
 
 private:
     wires_t m_wires;

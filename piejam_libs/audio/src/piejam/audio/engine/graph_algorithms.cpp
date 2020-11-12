@@ -18,6 +18,7 @@
 #include <piejam/audio/engine/graph_algorithms.h>
 
 #include <piejam/audio/engine/mix_processor.h>
+#include <piejam/audio/engine/processor.h>
 #include <piejam/functional/partial_compare.h>
 
 #include <boost/assert.hpp>
@@ -32,8 +33,8 @@ namespace
 {
 
 auto
-connected_source(graph::wires_t const& ws, graph::endpoint const& dst)
-        -> std::optional<graph::endpoint>
+connected_source(graph::wires_t const& ws, graph_endpoint const& dst)
+        -> std::optional<graph_endpoint>
 {
     auto it = std::ranges::find_if(
             ws,
@@ -48,21 +49,21 @@ connected_source(graph::wires_t const& ws, graph::endpoint const& dst)
 } // namespace
 
 auto
-connected_source(graph const& g, graph::endpoint const& dst)
-        -> std::optional<graph::endpoint>
+connected_source(graph const& g, graph_endpoint const& dst)
+        -> std::optional<graph_endpoint>
 {
     return connected_source(g.wires(), dst);
 }
 
 auto
-connected_event_source(graph const& g, graph::endpoint const& dst)
-        -> std::optional<graph::endpoint>
+connected_event_source(graph const& g, graph_endpoint const& dst)
+        -> std::optional<graph_endpoint>
 {
     return connected_source(g.event_wires(), dst);
 }
 
 bool
-has_wire(graph const& g, graph::endpoint const& src, graph::endpoint const& dst)
+has_wire(graph const& g, graph_endpoint const& src, graph_endpoint const& dst)
 {
     auto connected = g.wires().equal_range(src);
     return connected.first != connected.second &&
@@ -75,8 +76,8 @@ has_wire(graph const& g, graph::endpoint const& src, graph::endpoint const& dst)
 
 auto
 connect(graph& g,
-        graph::endpoint const& src,
-        graph::endpoint const& dst,
+        graph_endpoint const& src,
+        graph_endpoint const& dst,
         std::vector<std::unique_ptr<processor>>& mixers)
         -> std::unique_ptr<processor>
 {
@@ -91,7 +92,7 @@ connect(graph& g,
             for (std::size_t in_index = 0; in_index < num_prev_inputs;
                  ++in_index)
             {
-                graph::endpoint prev_mixer_in{prev_mixer, in_index};
+                graph_endpoint prev_mixer_in{prev_mixer, in_index};
                 auto const connected_in_src =
                         connected_source(g, prev_mixer_in);
                 BOOST_ASSERT(connected_in_src);

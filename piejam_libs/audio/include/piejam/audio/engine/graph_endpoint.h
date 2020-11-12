@@ -17,31 +17,31 @@
 
 #pragma once
 
-#include <piejam/audio/engine/graph.h>
+#include <piejam/audio/engine/fwd.h>
 
-#include <memory>
-#include <optional>
-#include <vector>
+#include <functional>
 
 namespace piejam::audio::engine
 {
 
-auto connected_source(graph const&, graph_endpoint const& dst)
-        -> std::optional<graph_endpoint>;
-auto connected_event_source(graph const&, graph_endpoint const& dst)
-        -> std::optional<graph_endpoint>;
+struct graph_endpoint
+{
+    std::reference_wrapper<processor> proc;
+    std::size_t port{};
 
-bool
-has_wire(graph const&, graph_endpoint const& src, graph_endpoint const& dst);
+    bool operator<(graph_endpoint const& other) const noexcept
+    {
+        auto const proc_l = std::addressof(proc.get());
+        auto const proc_r = std::addressof(other.proc.get());
+        return proc_l < proc_r || (proc_l == proc_r && port < other.port);
+    }
 
-//! Smart connect function, which will insert a mixer if connecting to an
-//! already connected destination. The mixer will stored in the mixers vector.
-//! If the new mixer will replace an old one, the old one will be returned.
-auto
-connect(graph&,
-        graph_endpoint const& src,
-        graph_endpoint const& dst,
-        std::vector<std::unique_ptr<processor>>& mixers)
-        -> std::unique_ptr<processor>;
+    bool operator==(graph_endpoint const& other) const noexcept
+    {
+        auto const proc_l = std::addressof(proc.get());
+        auto const proc_r = std::addressof(other.proc.get());
+        return proc_l == proc_r && port == other.port;
+    }
+};
 
 } // namespace piejam::audio::engine

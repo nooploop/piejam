@@ -54,7 +54,7 @@ graph_to_dag(graph const& g) -> dag
 
     std::vector<processor_job*> clear_event_buffer_jobs;
 
-    auto add_job = [&](graph::endpoint const& e) {
+    auto add_job = [&](graph_endpoint const& e) {
         auto job = std::make_shared<processor_job>(e.proc);
         auto job_ptr = job.get();
         auto id = result.add_task([j = std::move(job)](

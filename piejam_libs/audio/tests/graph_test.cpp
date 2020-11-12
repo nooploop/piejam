@@ -27,7 +27,7 @@ namespace piejam::audio::engine::test
 TEST(graph_endpoint_less_compare, same_endpoint)
 {
     processor_mock proc;
-    graph::endpoint sut{proc, 0};
+    graph_endpoint sut{proc, 0};
 
     EXPECT_FALSE(sut < sut);
 }
@@ -35,8 +35,8 @@ TEST(graph_endpoint_less_compare, same_endpoint)
 TEST(graph_endpoint_less_compare, same_proc_and_different_ports_first_lower)
 {
     processor_mock proc;
-    graph::endpoint sut_l{proc, 0};
-    graph::endpoint sut_r{proc, 1};
+    graph_endpoint sut_l{proc, 0};
+    graph_endpoint sut_r{proc, 1};
 
     EXPECT_TRUE(sut_l < sut_r);
     EXPECT_FALSE(sut_r < sut_l);
@@ -45,8 +45,8 @@ TEST(graph_endpoint_less_compare, same_proc_and_different_ports_first_lower)
 TEST(graph_endpoint_less_compare, same_proc_and_different_ports_second_lower)
 {
     processor_mock proc;
-    graph::endpoint sut_l{proc, 1};
-    graph::endpoint sut_r{proc, 0};
+    graph_endpoint sut_l{proc, 1};
+    graph_endpoint sut_r{proc, 0};
 
     EXPECT_FALSE(sut_l < sut_r);
     EXPECT_TRUE(sut_r < sut_l);
@@ -56,8 +56,8 @@ TEST(graph_endpoint_less_compare, different_proc_and_same_ports)
 {
     processor_mock proc_l;
     processor_mock proc_r;
-    graph::endpoint sut_l{proc_l, 0};
-    graph::endpoint sut_r{proc_r, 0};
+    graph_endpoint sut_l{proc_l, 0};
+    graph_endpoint sut_r{proc_r, 0};
 
     EXPECT_TRUE(sut_l < sut_r);
     EXPECT_FALSE(sut_r < sut_l);
@@ -68,8 +68,8 @@ TEST(graph_endpoint_less_compare,
 {
     processor_mock proc_l;
     processor_mock proc_r;
-    graph::endpoint sut_l{proc_l, 0};
-    graph::endpoint sut_r{proc_r, 1};
+    graph_endpoint sut_l{proc_l, 0};
+    graph_endpoint sut_r{proc_r, 1};
 
     EXPECT_TRUE(sut_l < sut_r);
     EXPECT_FALSE(sut_r < sut_l);
@@ -80,8 +80,8 @@ TEST(graph_endpoint_less_compare,
 {
     processor_mock proc_l;
     processor_mock proc_r;
-    graph::endpoint sut_l{proc_l, 1};
-    graph::endpoint sut_r{proc_r, 0};
+    graph_endpoint sut_l{proc_l, 1};
+    graph_endpoint sut_r{proc_r, 0};
 
     EXPECT_TRUE(sut_l < sut_r);
     EXPECT_FALSE(sut_r < sut_l);
@@ -90,7 +90,7 @@ TEST(graph_endpoint_less_compare,
 TEST(graph_endpoint_equal_compare, same_endpoint)
 {
     processor_mock proc;
-    graph::endpoint sut{proc, 0};
+    graph_endpoint sut{proc, 0};
 
     EXPECT_EQ(sut, sut);
 }
@@ -98,8 +98,8 @@ TEST(graph_endpoint_equal_compare, same_endpoint)
 TEST(graph_endpoint_equal_compare, same_proc_different_ports)
 {
     processor_mock proc;
-    graph::endpoint sut_l{proc, 0};
-    graph::endpoint sut_r{proc, 1};
+    graph_endpoint sut_l{proc, 0};
+    graph_endpoint sut_r{proc, 1};
 
     EXPECT_NE(sut_l, sut_r);
     EXPECT_NE(sut_r, sut_l);
@@ -109,8 +109,8 @@ TEST(graph_endpoint_equal_compare, different_proc_same_ports)
 {
     processor_mock proc_l;
     processor_mock proc_r;
-    graph::endpoint sut_l{proc_l, 0};
-    graph::endpoint sut_r{proc_r, 0};
+    graph_endpoint sut_l{proc_l, 0};
+    graph_endpoint sut_r{proc_r, 0};
 
     EXPECT_NE(sut_l, sut_r);
     EXPECT_NE(sut_r, sut_l);
@@ -120,8 +120,8 @@ TEST(graph_endpoint_equal_compare, different_proc_different_ports)
 {
     processor_mock proc_l;
     processor_mock proc_r;
-    graph::endpoint sut_l{proc_l, 0};
-    graph::endpoint sut_r{proc_r, 1};
+    graph_endpoint sut_l{proc_l, 0};
+    graph_endpoint sut_r{proc_r, 1};
 
     EXPECT_NE(sut_l, sut_r);
     EXPECT_NE(sut_r, sut_l);
@@ -140,8 +140,8 @@ TEST(graph, add_wire)
     processor_mock proc_dst;
     ON_CALL(proc_src, num_outputs()).WillByDefault(::testing::Return(1));
     ON_CALL(proc_dst, num_inputs()).WillByDefault(::testing::Return(1));
-    graph::endpoint src{proc_src, 0};
-    graph::endpoint dst{proc_dst, 0};
+    graph_endpoint src{proc_src, 0};
+    graph_endpoint dst{proc_dst, 0};
     graph sut;
     sut.add_wire(src, dst);
     EXPECT_FALSE(sut.wires().empty());
@@ -160,8 +160,8 @@ TEST(graph, add_event_wire)
             .WillByDefault(::testing::Return(processor::event_ports{src_outs}));
     ON_CALL(proc_dst, event_inputs())
             .WillByDefault(::testing::Return(processor::event_ports{dst_ins}));
-    graph::endpoint src{proc_src, 0};
-    graph::endpoint dst{proc_dst, 0};
+    graph_endpoint src{proc_src, 0};
+    graph_endpoint dst{proc_dst, 0};
     graph sut;
     sut.add_event_wire(src, dst);
     EXPECT_FALSE(sut.event_wires().empty());
