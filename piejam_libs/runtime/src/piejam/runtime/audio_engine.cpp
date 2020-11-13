@@ -31,9 +31,9 @@
 #include <piejam/audio/engine/process.h>
 #include <piejam/audio/engine/select_processor.h>
 #include <piejam/audio/engine/value_input_processor.h>
-#include <piejam/runtime/audio_components/mixer_bus_processor.h>
-#include <piejam/runtime/audio_components/mute_solo_processor.h>
 #include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/processors/mixer_bus_processor.h>
+#include <piejam/runtime/processors/mute_solo_processor.h>
 #include <piejam/thread/configuration.h>
 
 #include <fmt/format.h>
@@ -71,16 +71,15 @@ public:
                           "mute"))
         , m_channel_proc(
                   channel.type == audio::bus_type::mono
-                          ? audio_components::make_mono_mixer_bus_processor()
-                          : audio_components::make_stereo_mixer_bus_processor())
+                          ? processors::make_mono_mixer_bus_processor()
+                          : processors::make_stereo_mixer_bus_processor())
         , m_amp_smoother_procs(
                   ns_ae::make_event_to_audio_processor("L"),
                   ns_ae::make_event_to_audio_processor("R"))
         , m_amp_multiply_procs(
                   ns_ae::make_multiply_processor(2, "L"),
                   ns_ae::make_multiply_processor(2, "R"))
-        , m_mute_solo_proc(
-                  audio_components::make_mute_solo_processor(channel_index))
+        , m_mute_solo_proc(processors::make_mute_solo_processor(channel_index))
         , m_mute_smoother_procs(
                   ns_ae::make_event_to_audio_processor("mute L"),
                   ns_ae::make_event_to_audio_processor("mute R"))

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/audio_components/mixer_bus_processor.h>
+#include <piejam/runtime/processors/mixer_bus_processor.h>
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
@@ -31,7 +31,7 @@
 
 #include <array>
 
-namespace piejam::runtime::audio_components
+namespace piejam::runtime::processors
 {
 
 namespace
@@ -131,4 +131,4 @@ make_stereo_mixer_bus_processor(std::string_view const& name)
     return std::make_unique<mixer_bus_processor<audio::bus_type::stereo>>(name);
 }
 
-} // namespace piejam::runtime::audio_components
+} // namespace piejam::runtime::processors

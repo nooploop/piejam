@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/audio_components/mixer_bus_processor.h>
+#include <piejam/runtime/processors/mixer_bus_processor.h>
 
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -31,7 +31,7 @@
 #include <span>
 #include <vector>
 
-namespace piejam::runtime::audio_components::test
+namespace piejam::runtime::processors::test
 {
 
 struct mixer_bus_processor_test : ::testing::Test
@@ -308,4 +308,4 @@ TEST_F(mixer_bus_processor_test, stereo_balance)
     EXPECT_TRUE(std::ranges::equal(ev_out_right, expected_right));
 }
 
-} // namespace piejam::runtime::audio_components::test
+} // namespace piejam::runtime::processors::test

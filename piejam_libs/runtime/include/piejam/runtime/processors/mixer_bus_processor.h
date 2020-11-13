@@ -22,10 +22,12 @@
 #include <memory>
 #include <string_view>
 
-namespace piejam::runtime::audio_components
+namespace piejam::runtime::processors
 {
 
-auto make_mute_solo_processor(std::size_t solo_index, std::string_view const& name = {})
+auto make_mono_mixer_bus_processor(std::string_view const& name = {})
+        -> std::unique_ptr<audio::engine::processor>;
+auto make_stereo_mixer_bus_processor(std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::processor>;
 
 } // namespace piejam::runtime::audio_components

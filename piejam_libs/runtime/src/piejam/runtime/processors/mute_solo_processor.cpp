@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/audio_components/mixer_bus_processor.h>
+#include <piejam/runtime/processors/mixer_bus_processor.h>
 
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
@@ -30,7 +30,7 @@
 
 #include <array>
 
-namespace piejam::runtime::audio_components
+namespace piejam::runtime::processors
 {
 
 namespace
@@ -126,4 +126,4 @@ make_mute_solo_processor(
     return std::make_unique<mute_solo_processor>(solo_index, name);
 }
 
-} // namespace piejam::runtime::audio_components
+} // namespace piejam::runtime::processors
