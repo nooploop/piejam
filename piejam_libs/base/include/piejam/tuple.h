@@ -22,16 +22,22 @@
 namespace piejam::tuple
 {
 
-template <class Tuple>
-struct decay_elements;
+template <template <class> class F, class Tuple>
+struct meta_apply;
 
-template <class... Args>
-struct decay_elements<std::tuple<Args...>>
+template <template <class> class F, class... Args>
+struct meta_apply<F, std::tuple<Args...>>
 {
-    using type = std::tuple<std::decay_t<Args>...>;
+    using type = std::tuple<F<Args>...>;
+};
+
+template <template <class> class F, class First, class Second>
+struct meta_apply<F, std::pair<First, Second>>
+{
+    using type = std::pair<F<First>, F<Second>>;
 };
 
 template <class Tuple>
-using decay_elements_t = typename decay_elements<Tuple>::type;
+using decay_elements_t = typename meta_apply<std::decay_t, Tuple>::type;
 
-} // namespace piejam::meta
+} // namespace piejam::tuple
