@@ -5,6 +5,7 @@ endif()
 find_package(GTest REQUIRED)
 add_executable(piejam_thread_test
     ${CMAKE_CURRENT_SOURCE_DIR}/job_deque_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/spsc_slot_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/worker_test.cpp
 )
 target_link_libraries(piejam_thread_test gtest gtest_main gmock piejam_thread)

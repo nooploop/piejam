@@ -4,6 +4,7 @@ add_library(piejam_thread STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/job_deque.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/priority.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/spsc_slot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/worker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/affinity.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/priority.cpp
