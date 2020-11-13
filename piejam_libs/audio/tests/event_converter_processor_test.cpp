@@ -15,31 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/audio/engine/event_converter_processor.h>
 
-#include <algorithm>
-#include <iterator>
-#include <string>
+#include <gtest/gtest.h>
 
-namespace piejam::algorithm
+namespace piejam::audio::engine::test
 {
 
-template <class Range>
-auto
-string_join(Range const& rng, char sep) -> std::string
+TEST(event_converter_processor, int_to_float)
 {
-    if (!std::empty(rng))
-    {
-        auto first = std::begin(rng);
-        std::string acc(*first);
-        std::for_each(
-                std::next(first),
-                std::end(rng),
-                [&acc, sep](auto const& s) { (acc += sep) += s; });
-        return acc;
-    }
-    else
-        return std::string();
+    event_converter_processor sut([](int x) -> float { return x; });
 }
 
-} // namespace piejam::algorithm
+} // namespace piejam::audio::engine::test

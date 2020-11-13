@@ -7,6 +7,7 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/dag_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_buffer_memory_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_buffer_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/event_converter_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_input_buffers_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_output_buffers_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_test.cpp

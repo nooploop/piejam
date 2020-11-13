@@ -15,107 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/processors/mixer_bus_processor.h>
+#include <piejam/runtime/processors/mute_solo_processor.h>
 
-#include <piejam/audio/engine/event_input_buffers.h>
-#include <piejam/audio/engine/event_output_buffers.h>
-#include <piejam/audio/engine/event_port.h>
-#include <piejam/audio/engine/lockstep_events.h>
-#include <piejam/audio/engine/named_processor.h>
-#include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/verify_process_context.h>
+#include <piejam/audio/engine/event_converter_processor.h>
 #include <piejam/npos.h>
-
-#include <boost/assert.hpp>
-
-#include <array>
 
 namespace piejam::runtime::processors
 {
-
-namespace
-{
-
-class mute_solo_processor final : public audio::engine::named_processor
-{
-public:
-    mute_solo_processor(
-            std::size_t const solo_index,
-            std::string_view const& name)
-        : audio::engine::named_processor(name)
-        , m_solo_index(solo_index)
-    {
-    }
-
-    auto type_name() const -> std::string_view override { return "mute_solo"; }
-
-    auto num_inputs() const -> std::size_t override { return 0; }
-    auto num_outputs() const -> std::size_t override { return 0; }
-
-    auto event_inputs() const -> event_ports override
-    {
-        static std::array s_ports{
-                audio::engine::event_port(std::in_place_type<bool>, "mute"),
-                audio::engine::event_port(
-                        std::in_place_type<std::size_t>,
-                        "solo_index")};
-        return s_ports;
-    }
-
-    auto event_outputs() const -> event_ports override
-    {
-        static std::array s_ports{audio::engine::event_port{
-                std::in_place_type<float>,
-                "mute_amp"}};
-        return s_ports;
-    }
-
-    void process(audio::engine::process_context const& ctx) override
-    {
-        audio::engine::verify_process_context(*this, ctx);
-
-        audio::engine::event_buffer<bool> const& ev_buf_mute =
-                ctx.event_inputs.get<bool>(0);
-
-        audio::engine::event_buffer<std::size_t> const& ev_buf_solo =
-                ctx.event_inputs.get<std::size_t>(1);
-
-        if (ev_buf_mute.empty() && ev_buf_solo.empty())
-            return;
-
-        audio::engine::event_buffer<float>& ev_buf_mute_amp =
-                ctx.event_outputs.get<float>(0);
-
-        std::tie(m_last_mute, m_last_solo_index) =
-                audio::engine::lockstep_events(
-                        [this, &ev_buf_mute_amp](
-                                std::size_t const offset,
-                                bool const mute,
-                                std::size_t const solo_index) {
-                            if (solo_index == npos)
-                            {
-                                ev_buf_mute_amp.insert(offset, !mute);
-                            }
-                            else
-                            {
-                                ev_buf_mute_amp.insert(
-                                        offset,
-                                        solo_index == m_solo_index);
-                            }
-                        },
-                        std::tuple(m_last_mute, m_last_solo_index),
-                        ev_buf_mute,
-                        ev_buf_solo);
-    }
-
-private:
-    std::size_t const m_solo_index;
-
-    bool m_last_mute{};
-    std::size_t m_last_solo_index{npos};
-};
-
-} // namespace
 
 auto
 make_mute_solo_processor(
@@ -123,7 +29,20 @@ make_mute_solo_processor(
         std::string_view const& name)
         -> std::unique_ptr<audio::engine::processor>
 {
-    return std::make_unique<mute_solo_processor>(solo_index, name);
+    static std::array s_input_names{
+            std::string_view("mute"),
+            std::string_view("solo_index")};
+    return std::unique_ptr<audio::engine::processor>{
+            new audio::engine::event_converter_processor(
+                    [solo_index](bool mute, std::size_t in_solo_index)
+                            -> float {
+                        return in_solo_index == npos
+                                       ? !mute
+                                       : in_solo_index == solo_index;
+                    },
+                    std::span(s_input_names),
+                    "gain",
+                    name)};
 }
 
 } // namespace piejam::runtime::processors
