@@ -17,7 +17,6 @@
 
 #include <piejam/runtime/audio_engine.h>
 
-#include <piejam/audio/components/level_meter_processor.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_to_audio_processor.h>
@@ -25,6 +24,7 @@
 #include <piejam/audio/engine/graph_algorithms.h>
 #include <piejam/audio/engine/graph_to_dag.h>
 #include <piejam/audio/engine/input_processor.h>
+#include <piejam/audio/engine/level_meter_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/multiply_processor.h>
 #include <piejam/audio/engine/output_processor.h>
@@ -45,7 +45,6 @@
 namespace piejam::runtime
 {
 
-namespace aucomp = audio::components;
 namespace ns_ae = audio::engine;
 
 using processor_ptr = std::unique_ptr<ns_ae::processor>;
@@ -89,10 +88,10 @@ public:
                   ns_ae::make_multiply_processor(2, "mute amp L"),
                   ns_ae::make_multiply_processor(2, "mute amp R"))
         , m_level_meter_procs(
-                  std::make_unique<aucomp::level_meter_processor>(
+                  std::make_unique<ns_ae::level_meter_processor>(
                           samplerate,
                           "L"),
-                  std::make_unique<aucomp::level_meter_processor>(
+                  std::make_unique<ns_ae::level_meter_processor>(
                           samplerate,
                           "R"))
     {
@@ -199,7 +198,7 @@ private:
     processor_ptr m_mute_solo_proc;
     audio::pair<processor_ptr> m_mute_smoother_procs;
     audio::pair<processor_ptr> m_mute_multiply_procs;
-    audio::pair<std::unique_ptr<aucomp::level_meter_processor>>
+    audio::pair<std::unique_ptr<ns_ae::level_meter_processor>>
             m_level_meter_procs;
 };
 

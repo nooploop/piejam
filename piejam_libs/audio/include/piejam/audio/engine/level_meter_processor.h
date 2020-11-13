@@ -22,10 +22,10 @@
 
 #include <atomic>
 
-namespace piejam::audio::components
+namespace piejam::audio::engine
 {
 
-class level_meter_processor final : public engine::named_processor
+class level_meter_processor final : public named_processor
 {
 public:
     level_meter_processor(

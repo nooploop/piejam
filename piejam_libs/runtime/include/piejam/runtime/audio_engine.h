@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <piejam/audio/components/fwd.h>
-#include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>

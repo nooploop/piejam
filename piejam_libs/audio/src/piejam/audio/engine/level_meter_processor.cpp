@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/audio/components/level_meter_processor.h>
+#include <piejam/audio/engine/level_meter_processor.h>
 
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/process_context.h>
@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <span>
 
-namespace piejam::audio::components
+namespace piejam::audio::engine
 {
 
 static constexpr auto
@@ -60,4 +60,4 @@ level_meter_processor::process(engine::process_context const& ctx)
     m_peak_level.store(m_lm.get(), std::memory_order_release);
 }
 
-} // namespace piejam::audio::components
+} // namespace piejam::audio::engine

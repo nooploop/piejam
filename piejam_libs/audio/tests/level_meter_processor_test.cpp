@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/audio/components/level_meter_processor.h>
+#include <piejam/audio/engine/level_meter_processor.h>
 
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -28,15 +28,15 @@
 #include <span>
 #include <vector>
 
-namespace piejam::audio::components::test
+namespace piejam::audio::engine::test
 {
 
 struct level_meter_processor_test : ::testing::Test
 {
     level_meter_processor sut{4800};
     std::array<float, 2> in_buf{};
-    std::vector<engine::audio_slice> in_buf_spans{in_buf};
-    std::vector<std::reference_wrapper<engine::audio_slice const>> in_bufs{
+    std::vector<audio_slice> in_buf_spans{in_buf};
+    std::vector<std::reference_wrapper<audio_slice const>> in_bufs{
             in_buf_spans.begin(),
             in_buf_spans.end()};
 };
@@ -73,4 +73,4 @@ TEST_F(level_meter_processor_test,
     EXPECT_LT(sut.peak_level(), .7f);
 }
 
-} // namespace piejam::audio::components::test
+} // namespace piejam::audio::engine::test
