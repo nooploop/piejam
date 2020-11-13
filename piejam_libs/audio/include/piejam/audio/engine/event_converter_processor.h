@@ -50,7 +50,7 @@ public:
     template <class F>
     event_converter_processor(
             F&& out_gen,
-            std::span<std::string_view> const& input_names = {},
+            std::span<std::string_view const> const& input_names = {},
             std::string_view const& output_name = {},
             std::string_view const& name = {})
         : named_processor(name)
@@ -113,7 +113,7 @@ private:
 
     template <std::size_t... I>
     static auto make_input_event_ports(
-            std::span<std::string_view> const& names,
+            std::span<std::string_view const> const& names,
             std::index_sequence<I...>)
     {
         std::size_t const num_names = names.size();
@@ -140,19 +140,19 @@ template <class F>
 event_converter_processor(F &&) -> event_converter_processor<F>;
 
 template <class F>
-event_converter_processor(F&&, std::span<std::string_view> const&)
+event_converter_processor(F&&, std::span<std::string_view const> const&)
         -> event_converter_processor<F>;
 
 template <class F>
 event_converter_processor(
         F&&,
-        std::span<std::string_view> const&,
+        std::span<std::string_view const> const&,
         std::string_view const&) -> event_converter_processor<F>;
 
 template <class F>
 event_converter_processor(
         F&&,
-        std::span<std::string_view> const&,
+        std::span<std::string_view const> const&,
         std::string_view const&,
         std::string_view const&) -> event_converter_processor<F>;
 

@@ -17,6 +17,8 @@
 
 #include <piejam/audio/engine/graph_algorithms.h>
 
+#include <piejam/audio/engine/component.h>
+#include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/functional/partial_compare.h>
@@ -131,6 +133,13 @@ connect(graph& g,
         g.add_wire(src, dst);
         return nullptr;
     }
+}
+
+void
+connect_stereo_components(graph& g, component const& src, component const& dst)
+{
+    g.add_wire(src.outputs()[0], dst.inputs()[0]);
+    g.add_wire(src.outputs()[1], dst.inputs()[1]);
 }
 
 } // namespace piejam::audio::engine

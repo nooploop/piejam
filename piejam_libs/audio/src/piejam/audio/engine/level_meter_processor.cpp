@@ -57,7 +57,7 @@ level_meter_processor::process(engine::process_context const& ctx)
                     }},
             ctx.inputs[0].get().as_variant());
 
-    m_peak_level.store(m_lm.get(), std::memory_order_release);
+    ctx.event_outputs.get<float>(0).insert(0, m_lm.get());
 }
 
 } // namespace piejam::audio::engine

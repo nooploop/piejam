@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/level_peak_meter.h>
 
@@ -32,11 +33,6 @@ public:
             unsigned samplerate,
             std::string_view const& name = {});
 
-    auto peak_level() const noexcept -> float
-    {
-        return m_peak_level.load(std::memory_order_consume);
-    }
-
     auto type_name() const -> std::string_view override
     {
         return "level_meter";
@@ -45,13 +41,17 @@ public:
     auto num_inputs() const -> std::size_t override { return 1; }
     auto num_outputs() const -> std::size_t override { return 0; }
     auto event_inputs() const -> event_ports override { return {}; }
-    auto event_outputs() const -> event_ports override { return {}; }
+    auto event_outputs() const -> event_ports override
+    {
+        static std::array s_ports{
+                event_port(std::in_place_type<float>, "peak_level")};
+        return s_ports;
+    }
 
     void process(engine::process_context const&) override;
 
 private:
     level_peak_meter m_lm;
-    std::atomic<float> m_peak_level{};
 };
 
-} // namespace piejam::audio::components
+} // namespace piejam::audio::engine

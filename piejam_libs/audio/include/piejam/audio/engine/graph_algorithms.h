@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/audio/engine/graph.h>
+#include <piejam/audio/engine/fwd.h>
 
 #include <memory>
 #include <optional>
@@ -43,5 +43,8 @@ connect(graph&,
         graph_endpoint const& dst,
         std::vector<std::unique_ptr<processor>>& mixers)
         -> std::unique_ptr<processor>;
+
+void
+connect_stereo_components(graph&, component const& src, component const& dst);
 
 } // namespace piejam::audio::engine

@@ -18,6 +18,7 @@
 #include <piejam/runtime/audio_engine.h>
 
 #include <piejam/audio/components/amplifier.h>
+#include <piejam/audio/components/level_meter.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/dag_executor.h>
@@ -33,6 +34,7 @@
 #include <piejam/audio/engine/process.h>
 #include <piejam/audio/engine/select_processor.h>
 #include <piejam/audio/engine/value_input_processor.h>
+#include <piejam/audio/engine/value_output_processor.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/processors/mixer_bus_processor.h>
 #include <piejam/runtime/processors/mute_solo_processor.h>
@@ -42,6 +44,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <optional>
 #include <ranges>
 
 namespace piejam::runtime
@@ -78,13 +81,10 @@ public:
         , m_amp(audio::components::make_stereo_split_amplifier("volume"))
         , m_mute_solo_proc(processors::make_mute_solo_processor(channel_index))
         , m_mute_amp(audio::components::make_stereo_amplifier("mute"))
-        , m_level_meter_procs(
-                  std::make_unique<ns_ae::level_meter_processor>(
-                          samplerate,
-                          "L"),
-                  std::make_unique<ns_ae::level_meter_processor>(
-                          samplerate,
-                          "R"))
+        , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
+        , m_peak_level_proc(
+                  std::make_unique<audio::engine::value_output_processor<
+                          mixer::stereo_level>>("stereo_level"))
     {
     }
 
@@ -97,10 +97,11 @@ public:
     void set_pan_balance(float pan) noexcept { m_pan_balance_proc->set(pan); }
     void set_mute(bool const mute) noexcept { m_mute_input_proc->set(mute); }
 
-    auto get_level() const noexcept -> mixer::stereo_level
+    auto get_level() const noexcept -> mixer::stereo_level const&
     {
-        return {m_level_meter_procs.left->peak_level(),
-                m_level_meter_procs.right->peak_level()};
+        m_peak_level_proc->consume(
+                [this](auto const& lvl) { m_last_level = lvl; });
+        return m_last_level;
     }
 
     auto volume_processor() const noexcept -> ns_ae::processor&
@@ -138,14 +139,14 @@ public:
         return *m_mute_amp;
     }
 
-    auto left_level_meter_processor() const noexcept -> ns_ae::processor&
+    auto level_meter_component() const noexcept -> ns_ae::component&
     {
-        return *m_level_meter_procs.left;
+        return *m_level_meter;
     }
 
-    auto right_level_meter_processor() const noexcept -> ns_ae::processor&
+    auto peak_level_processor() const noexcept -> ns_ae::processor&
     {
-        return *m_level_meter_procs.right;
+        return *m_peak_level_proc;
     }
 
 private:
@@ -157,8 +158,10 @@ private:
     component_ptr m_amp;
     processor_ptr m_mute_solo_proc;
     component_ptr m_mute_amp;
-    audio::pair<std::unique_ptr<ns_ae::level_meter_processor>>
-            m_level_meter_procs;
+    component_ptr m_level_meter;
+    std::unique_ptr<ns_ae::value_output_processor<mixer::stereo_level>>
+            m_peak_level_proc;
+    mutable mixer::stereo_level m_last_level{};
 };
 
 static auto
@@ -193,18 +196,18 @@ connect_mixer_bus(ns_ae::graph& g, audio_engine::mixer_bus const& mb)
             {mb.mute_solo_processor(), 0},
             mb.mute_amplifier_component().event_inputs()[0]);
     mb.amplifier_component().connect(g);
-    g.add_wire(
-            mb.amplifier_component().outputs()[0],
-            {mb.left_level_meter_processor(), 0});
-    g.add_wire(
-            mb.amplifier_component().outputs()[1],
-            {mb.right_level_meter_processor(), 0});
-    g.add_wire(
-            mb.amplifier_component().outputs()[0],
-            mb.mute_amplifier_component().inputs()[0]);
-    g.add_wire(
-            mb.amplifier_component().outputs()[1],
-            mb.mute_amplifier_component().inputs()[1]);
+    mb.level_meter_component().connect(g);
+    audio::engine::connect_stereo_components(
+            g,
+            mb.amplifier_component(),
+            mb.level_meter_component());
+    g.add_event_wire(
+            mb.level_meter_component().event_outputs()[0],
+            {mb.peak_level_processor(), 0});
+    audio::engine::connect_stereo_components(
+            g,
+            mb.amplifier_component(),
+            mb.mute_amplifier_component());
     mb.mute_amplifier_component().connect(g);
 }
 

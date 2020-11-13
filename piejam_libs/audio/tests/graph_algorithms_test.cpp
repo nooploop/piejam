@@ -19,6 +19,7 @@
 
 #include "processor_mock.h"
 
+#include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/mix_processor.h>
 
 #include <gtest/gtest.h>
