@@ -5,9 +5,11 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_reader.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_writer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/process_step.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/amplifier.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/audio_slice.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag_executor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event.h
@@ -59,6 +61,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_set_hw_params.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/pcm_io.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/process_step.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/amplifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/audio_slice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/dag.cpp

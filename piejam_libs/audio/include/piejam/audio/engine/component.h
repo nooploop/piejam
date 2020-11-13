@@ -17,34 +17,27 @@
 
 #pragma once
 
+#include <piejam/audio/engine/fwd.h>
+
+#include <span>
+
 namespace piejam::audio::engine
 {
 
-template <class T>
-class event;
-class abstract_event_buffer;
-template <class T>
-class event_buffer;
-class event_buffer_memory;
-class event_input_buffers;
-class event_output_buffers;
-class event_port;
+class component
+{
+public:
+    using endpoints = std::span<graph_endpoint const>;
 
-class component;
-class processor;
-class named_processor;
-class input_processor;
-class output_processor;
-template <class T>
-class value_input_processor;
+    virtual ~component() = default;
 
-class dag;
-class dag_executor;
-class graph;
-struct graph_endpoint;
-class process;
-struct process_context;
-class processor_job;
-class thread_context;
+    virtual auto inputs() const -> endpoints = 0;
+    virtual auto outputs() const -> endpoints = 0;
+
+    virtual auto event_inputs() const -> endpoints = 0;
+    virtual auto event_outputs() const -> endpoints = 0;
+
+    virtual void connect(graph&) = 0;
+};
 
 } // namespace piejam::audio::engine

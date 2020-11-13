@@ -64,6 +64,7 @@ public:
 
 private:
     using processor_ptr = std::unique_ptr<audio::engine::processor>;
+    using component_ptr = std::unique_ptr<audio::engine::component>;
 
     std::vector<thread::configuration> const m_wt_configs;
     audio::samplerate_t const m_samplerate;

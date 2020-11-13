@@ -17,6 +17,8 @@
 
 #include <piejam/runtime/audio_engine.h>
 
+#include <piejam/audio/components/amplifier.h>
+#include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_to_audio_processor.h>
@@ -73,19 +75,9 @@ public:
                   channel.type == audio::bus_type::mono
                           ? processors::make_mono_mixer_bus_processor()
                           : processors::make_stereo_mixer_bus_processor())
-        , m_amp_smoother_procs(
-                  ns_ae::make_event_to_audio_processor("L"),
-                  ns_ae::make_event_to_audio_processor("R"))
-        , m_amp_multiply_procs(
-                  ns_ae::make_multiply_processor(2, "L"),
-                  ns_ae::make_multiply_processor(2, "R"))
+        , m_amp(audio::components::make_stereo_split_amplifier("volume"))
         , m_mute_solo_proc(processors::make_mute_solo_processor(channel_index))
-        , m_mute_smoother_procs(
-                  ns_ae::make_event_to_audio_processor("mute L"),
-                  ns_ae::make_event_to_audio_processor("mute R"))
-        , m_mute_multiply_procs(
-                  ns_ae::make_multiply_processor(2, "mute amp L"),
-                  ns_ae::make_multiply_processor(2, "mute amp R"))
+        , m_mute_amp(audio::components::make_stereo_amplifier("mute"))
         , m_level_meter_procs(
                   std::make_unique<ns_ae::level_meter_processor>(
                           samplerate,
@@ -131,24 +123,9 @@ public:
         return *m_channel_proc;
     }
 
-    auto left_amp_smoother_processor() const noexcept -> ns_ae::processor&
+    auto amplifier_component() const noexcept -> ns_ae::component&
     {
-        return *m_amp_smoother_procs.left;
-    }
-
-    auto right_amp_smoother_processor() const noexcept -> ns_ae::processor&
-    {
-        return *m_amp_smoother_procs.right;
-    }
-
-    auto left_amp_multiply_processor() const noexcept -> ns_ae::processor&
-    {
-        return *m_amp_multiply_procs.left;
-    }
-
-    auto right_amp_multiply_processor() const noexcept -> ns_ae::processor&
-    {
-        return *m_amp_multiply_procs.right;
+        return *m_amp;
     }
 
     auto mute_solo_processor() const noexcept -> ns_ae::processor&
@@ -156,24 +133,9 @@ public:
         return *m_mute_solo_proc;
     }
 
-    auto left_mute_smoother_processor() const noexcept -> ns_ae::processor&
+    auto mute_amplifier_component() const noexcept -> ns_ae::component&
     {
-        return *m_mute_smoother_procs.left;
-    }
-
-    auto right_mute_smoother_processor() const noexcept -> ns_ae::processor&
-    {
-        return *m_mute_smoother_procs.right;
-    }
-
-    auto left_mute_multiply_processor() const noexcept -> ns_ae::processor&
-    {
-        return *m_mute_multiply_procs.left;
-    }
-
-    auto right_mute_multiply_processor() const noexcept -> ns_ae::processor&
-    {
-        return *m_mute_multiply_procs.right;
+        return *m_mute_amp;
     }
 
     auto left_level_meter_processor() const noexcept -> ns_ae::processor&
@@ -192,11 +154,9 @@ private:
     std::unique_ptr<ns_ae::value_input_processor<float>> m_pan_balance_proc;
     std::unique_ptr<ns_ae::value_input_processor<bool>> m_mute_input_proc;
     processor_ptr m_channel_proc;
-    audio::pair<processor_ptr> m_amp_smoother_procs;
-    audio::pair<processor_ptr> m_amp_multiply_procs;
+    component_ptr m_amp;
     processor_ptr m_mute_solo_proc;
-    audio::pair<processor_ptr> m_mute_smoother_procs;
-    audio::pair<processor_ptr> m_mute_multiply_procs;
+    component_ptr m_mute_amp;
     audio::pair<std::unique_ptr<ns_ae::level_meter_processor>>
             m_level_meter_procs;
 };
@@ -222,43 +182,30 @@ connect_mixer_bus(ns_ae::graph& g, audio_engine::mixer_bus const& mb)
     g.add_event_wire({mb.volume_processor(), 0}, {mb.channel_processor(), 1});
     g.add_event_wire(
             {mb.channel_processor(), 0},
-            {mb.left_amp_smoother_processor(), 0});
+            mb.amplifier_component().event_inputs()[0]);
     g.add_event_wire(
             {mb.channel_processor(), 1},
-            {mb.right_amp_smoother_processor(), 0});
+            mb.amplifier_component().event_inputs()[1]);
     g.add_event_wire(
             {mb.mute_input_processor(), 0},
             {mb.mute_solo_processor(), 0});
     g.add_event_wire(
             {mb.mute_solo_processor(), 0},
-            {mb.left_mute_smoother_processor(), 0});
-    g.add_event_wire(
-            {mb.mute_solo_processor(), 0},
-            {mb.right_mute_smoother_processor(), 0});
+            mb.mute_amplifier_component().event_inputs()[0]);
+    mb.amplifier_component().connect(g);
     g.add_wire(
-            {mb.left_amp_smoother_processor(), 0},
-            {mb.left_amp_multiply_processor(), 1});
-    g.add_wire(
-            {mb.right_amp_smoother_processor(), 0},
-            {mb.right_amp_multiply_processor(), 1});
-    g.add_wire(
-            {mb.left_amp_multiply_processor(), 0},
+            mb.amplifier_component().outputs()[0],
             {mb.left_level_meter_processor(), 0});
     g.add_wire(
-            {mb.right_amp_multiply_processor(), 0},
+            mb.amplifier_component().outputs()[1],
             {mb.right_level_meter_processor(), 0});
     g.add_wire(
-            {mb.left_amp_multiply_processor(), 0},
-            {mb.left_mute_multiply_processor(), 0});
+            mb.amplifier_component().outputs()[0],
+            mb.mute_amplifier_component().inputs()[0]);
     g.add_wire(
-            {mb.right_amp_multiply_processor(), 0},
-            {mb.right_mute_multiply_processor(), 0});
-    g.add_wire(
-            {mb.left_mute_smoother_processor(), 0},
-            {mb.left_mute_multiply_processor(), 1});
-    g.add_wire(
-            {mb.right_mute_smoother_processor(), 0},
-            {mb.right_mute_multiply_processor(), 1});
+            mb.amplifier_component().outputs()[1],
+            mb.mute_amplifier_component().inputs()[1]);
+    mb.mute_amplifier_component().connect(g);
 }
 
 static auto
@@ -280,12 +227,12 @@ make_graph(
         if (mb.device_channels().left != npos)
             g.add_wire(
                     {input_proc, mb.device_channels().left},
-                    {mb.left_amp_multiply_processor(), 0});
+                    mb.amplifier_component().inputs()[0]);
 
         if (mb.device_channels().right != npos)
             g.add_wire(
                     {input_proc, mb.device_channels().right},
-                    {mb.right_amp_multiply_processor(), 0});
+                    mb.amplifier_component().inputs()[1]);
 
         g.add_event_wire({input_solo_index, 0}, {mb.mute_solo_processor(), 1});
     }
@@ -296,13 +243,13 @@ make_graph(
 
         if (mb.device_channels().left != npos)
             connect(g,
-                    {mb.left_mute_multiply_processor(), 0},
+                    mb.mute_amplifier_component().outputs()[0],
                     {output_proc, mb.device_channels().left},
                     mixer_procs);
 
         if (mb.device_channels().right != npos)
             connect(g,
-                    {mb.right_mute_multiply_processor(), 0},
+                    mb.mute_amplifier_component().outputs()[1],
                     {output_proc, mb.device_channels().right},
                     mixer_procs);
     }
@@ -316,13 +263,13 @@ make_graph(
              ++in)
         {
             connect(g,
-                    {input_buses[in].left_mute_multiply_processor(), 0},
-                    {output_buses[out].left_amp_multiply_processor(), 0},
+                    input_buses[in].mute_amplifier_component().outputs()[0],
+                    output_buses[out].amplifier_component().inputs()[0],
                     mixer_procs);
 
             connect(g,
-                    {input_buses[in].right_mute_multiply_processor(), 0},
-                    {output_buses[out].right_amp_multiply_processor(), 0},
+                    input_buses[in].mute_amplifier_component().outputs()[1],
+                    output_buses[out].amplifier_component().inputs()[1],
                     mixer_procs);
         }
     }

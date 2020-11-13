@@ -17,34 +17,23 @@
 
 #pragma once
 
-namespace piejam::audio::engine
+#include <piejam/audio/engine/fwd.h>
+
+#include <memory>
+#include <string_view>
+
+namespace piejam::audio::components
 {
 
-template <class T>
-class event;
-class abstract_event_buffer;
-template <class T>
-class event_buffer;
-class event_buffer_memory;
-class event_input_buffers;
-class event_output_buffers;
-class event_port;
+auto make_mono_amplifier(std::string_view name = "amp")
+        -> std::unique_ptr<engine::component>;
 
-class component;
-class processor;
-class named_processor;
-class input_processor;
-class output_processor;
-template <class T>
-class value_input_processor;
+//! Applies gain to both input channels.
+auto make_stereo_amplifier(std::string_view name = "amp")
+        -> std::unique_ptr<engine::component>;
 
-class dag;
-class dag_executor;
-class graph;
-struct graph_endpoint;
-class process;
-struct process_context;
-class processor_job;
-class thread_context;
+//! Applies separate gains to both input channels.
+auto make_stereo_split_amplifier(std::string_view name = "amp")
+        -> std::unique_ptr<engine::component>;
 
-} // namespace piejam::audio::engine
+} // namespace piejam::audio::components
