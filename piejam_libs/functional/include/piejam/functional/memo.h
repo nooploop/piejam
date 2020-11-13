@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/meta/decay_tuple_elements.h>
+#include <piejam/tuple.h>
 
 #include <boost/callable_traits/args.hpp>
 #include <boost/callable_traits/return_type.hpp>
@@ -62,7 +62,7 @@ private:
     struct args_and_result
     {
         using args_tuple_type =
-                meta::decay_tuple_elements_t<boost::callable_traits::args_t<F>>;
+                tuple::decay_elements_t<boost::callable_traits::args_t<F>>;
         using result_type =
                 std::decay_t<boost::callable_traits::return_type_t<F>>;
 

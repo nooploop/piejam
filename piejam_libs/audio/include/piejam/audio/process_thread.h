@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <piejam/meta/type_traits.h>
 #include <piejam/thread/affinity.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/priority.h>
+#include <piejam/type_traits.h>
 
 #include <spdlog/spdlog.h>
 

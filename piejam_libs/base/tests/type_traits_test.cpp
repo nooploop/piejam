@@ -15,23 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/type_traits.h>
 
-#include <tuple>
+#include <gtest/gtest.h>
 
-namespace piejam::meta
+namespace piejam::test
 {
 
-template <class Tuple>
-struct decay_tuple_elements;
-
-template <class... Args>
-struct decay_tuple_elements<std::tuple<Args...>>
+struct default_ctor_except
 {
-    using type = std::tuple<std::decay_t<Args>...>;
+    default_ctor_except() noexcept(false) {}
 };
 
-template <class Tuple>
-using decay_tuple_elements_t = typename decay_tuple_elements<Tuple>::type;
+TEST(type_traits, is_nothrow_default_constructible)
+{
+    static_assert(is_nothrow_default_constructible_v<float>);
+    static_assert(!is_nothrow_default_constructible_v<default_ctor_except>);
+    static_assert(is_nothrow_default_constructible_v<float, int, char>);
+    static_assert(!is_nothrow_default_constructible_v<
+                  float,
+                  int,
+                  char,
+                  default_ctor_except>);
+}
 
-} // namespace piejam::meta
+} // namespace piejam::meta::test

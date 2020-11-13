@@ -22,7 +22,7 @@
 #include <piejam/audio/engine/lockstep_events.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/meta/decay_tuple_elements.h>
+#include <piejam/tuple.h>
 
 #include <fmt/format.h>
 
@@ -40,7 +40,7 @@ class event_converter_processor final : public named_processor
 public:
     using output_t = std::decay_t<
             boost::callable_traits::return_type_t<OutputGenerator>>;
-    using inputs_t = meta::decay_tuple_elements_t<
+    using inputs_t = tuple::decay_elements_t<
             boost::callable_traits::args_t<OutputGenerator>>;
 
     static constexpr std::size_t num_event_inputs = std::tuple_size_v<inputs_t>;
