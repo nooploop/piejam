@@ -28,6 +28,7 @@
 #include <piejam/log/generic_log_sink.h>
 #include <piejam/redux/queueing_middleware.h>
 #include <piejam/redux/store.h>
+#include <piejam/redux/thread_delegate_middleware.h>
 #include <piejam/reselect/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/device_actions.h>
@@ -95,29 +96,11 @@ main(int argc, char* argv[]) -> int
 
     store.apply_middleware(redux::make_queueing_middleware);
 
-    store.apply_middleware(
-            [app = &app, main_thread = std::this_thread::get_id()](
-                    auto /*get_state*/,
-                    auto dispatch,
-                    auto next) {
-                return [app,
-                        main_thread,
-                        dispatch = std::move(dispatch),
-                        next = std::move(next)](auto const& a) {
-                    if (main_thread == std::this_thread::get_id())
-                    {
-                        next(a);
-                    }
-                    else
-                    {
-                        QMetaObject::invokeMethod(
-                                app,
-                                [dispatch, cloned = a.clone()]() mutable {
-                                    dispatch(*cloned);
-                                });
-                    }
-                };
-            });
+    store.apply_middleware(redux::make_thread_delegate_middleware(
+            std::this_thread::get_id(),
+            [app = &app](auto&& f) {
+                QMetaObject::invokeMethod(app, std::forward<decltype(f)>(f));
+            }));
 
     piejam::app::subscriber state_change_subscriber;
 
