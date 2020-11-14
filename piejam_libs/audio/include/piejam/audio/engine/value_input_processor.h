@@ -22,10 +22,9 @@
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
+#include <piejam/thread/spsc_slot.h>
 
 #include <array>
-#include <atomic>
-#include <functional>
 
 namespace piejam::audio::engine
 {
@@ -41,21 +40,18 @@ public:
         , m_event_output_ports{
                   engine::event_port{std::in_place_type<T>, std::string(name)}}
     {
+        m_value.push(T{});
     }
 
     value_input_processor(T const initial, std::string_view const& name = {})
         : named_processor(name)
-        , m_event_output_ports{engine::event_port(
-                  std::in_place_type<T>,
-                  std::string(name))}
-        , m_value{initial}
+        , m_event_output_ports{
+                  engine::event_port(std::in_place_type<T>, std::string(name))}
     {
+        m_value.push(initial);
     }
 
-    void set(T const x) noexcept
-    {
-        m_value.store(x, std::memory_order_release);
-    }
+    void set(T const x) noexcept(noexcept(m_value.push(x))) { m_value.push(x); }
 
     auto type_name() const -> std::string_view override
     {
@@ -73,35 +69,16 @@ public:
     void process(engine::process_context const& ctx) override
     {
         engine::verify_process_context(*this, ctx);
-        std::invoke(m_process_fn, this, ctx);
+
+        m_value.consume([&ctx](T const& value) {
+            ctx.event_outputs.get<T>(0).insert(0, value);
+        });
     }
 
 private:
-    void initial_process(engine::process_context const& ctx)
-    {
-        T const value = m_value.load(std::memory_order_consume);
-        ctx.event_outputs.get<T>(0).insert(0, value);
-        m_last_sent_value = value;
-        m_process_fn = &value_input_processor<T>::subsequent_process;
-    }
-
-    void subsequent_process(engine::process_context const& ctx)
-    {
-        T const value = m_value.load(std::memory_order_consume);
-        if (m_last_sent_value == value)
-            return;
-
-        ctx.event_outputs.get<T>(0).insert(0, value);
-        m_last_sent_value = value;
-    }
-
     std::array<engine::event_port, 1> const m_event_output_ports;
 
-    std::atomic<T> m_value{};
-    T m_last_sent_value{};
-
-    using process_fn_t = decltype(&value_input_processor<T>::process);
-    process_fn_t m_process_fn{&value_input_processor<T>::initial_process};
+    thread::spsc_slot<T> m_value;
 };
 
 } // namespace piejam::audio::engine
