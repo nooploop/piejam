@@ -20,7 +20,6 @@
 #include <piejam/redux/functors.h>
 
 #include <cassert>
-#include <queue>
 #include <utility>
 
 namespace piejam::redux
@@ -52,32 +51,12 @@ public:
 
     auto state() const noexcept -> State const& { return m_state; }
 
-    void dispatch(std::unique_ptr<Action> action)
-    {
-        assert(action);
-
-        m_queued_actions.push(std::move(action));
-
-        if (!m_dispatching)
-        {
-            m_dispatching = true;
-
-            while (!m_queued_actions.empty())
-            {
-                auto action = std::move(m_queued_actions.front());
-                m_queued_actions.pop();
-                m_dispatch(*action);
-            }
-
-            m_dispatching = false;
-        }
-    }
+    void dispatch(Action const& action) { m_dispatch(action); }
 
     template <class DispatchedAction, class... Args>
     void dispatch(Args&&... args)
     {
-        dispatch(std::make_unique<DispatchedAction>(
-                std::forward<Args>(args)...));
+        dispatch(DispatchedAction{std::forward<Args>(args)...});
     }
 
     template <class MiddlewareFactory>
@@ -86,10 +65,8 @@ public:
         m_dispatch = std::invoke(
                 std::forward<MiddlewareFactory>(mf),
                 [this]() -> State const& { return m_state; }, // get_state
-                [this](std::unique_ptr<Action> a) {
-                    dispatch(std::move(a));
-                },                      // dispatch
-                std::move(m_dispatch)); // next
+                [this](Action const& a) { dispatch(a); },     // dispatch
+                std::move(m_dispatch));                       // next
     }
 
     void subscribe(subscriber_f s) { m_subscriber = std::move(s); }
@@ -99,8 +76,6 @@ private:
     State m_state;
 
     next_f m_dispatch;
-    bool m_dispatching{};
-    std::queue<std::unique_ptr<Action>> m_queued_actions;
 
     subscriber_f m_subscriber;
 };

@@ -42,7 +42,7 @@ TEST(store,
     sut.subscribe([&subscribed](state_t const& s) { subscribed = s; });
     ASSERT_TRUE(subscribed.empty());
 
-    sut.dispatch(std::make_unique<action_t>(5));
+    sut.dispatch(action_t(5));
 
     EXPECT_EQ(state_t({5}), subscribed);
 }
@@ -74,7 +74,7 @@ TEST(store,
     ASSERT_FALSE(middleware_called);
     ASSERT_TRUE(subscribed.empty());
 
-    sut.dispatch(std::make_unique<action_t>(5));
+    sut.dispatch(action_t(5));
 
     EXPECT_TRUE(middleware_called);
     EXPECT_EQ(state_t({5}), subscribed);
@@ -114,7 +114,7 @@ TEST(store, middlewares_are_called_in_reverse_order_of_their_registration)
     ASSERT_EQ(int{}, m1_called);
     ASSERT_EQ(int{}, m2_called);
 
-    sut.dispatch(std::make_unique<action_t>(5));
+    sut.dispatch(action_t(5));
 
     EXPECT_EQ(2, counter);
     EXPECT_EQ(1, m2_called);

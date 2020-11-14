@@ -26,6 +26,7 @@
 #include <piejam/audio/alsa/get_set_hw_params.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/log/generic_log_sink.h>
+#include <piejam/redux/queueing_middleware.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
@@ -92,6 +93,8 @@ main(int argc, char* argv[]) -> int
         return [m](auto const& a) { m->operator()(a); };
     });
 
+    store.apply_middleware(redux::make_queueing_middleware);
+
     store.apply_middleware(
             [app = &app, main_thread = std::this_thread::get_id()](
                     auto /*get_state*/,
@@ -110,7 +113,7 @@ main(int argc, char* argv[]) -> int
                         QMetaObject::invokeMethod(
                                 app,
                                 [dispatch, cloned = a.clone()]() mutable {
-                                    dispatch(std::move(cloned));
+                                    dispatch(*cloned);
                                 });
                     }
                 };
