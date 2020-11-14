@@ -28,6 +28,7 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/slice_algorithms_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/smoother_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/value_input_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/value_output_processor_test.cpp
 )
 target_link_libraries(piejam_audio_test gtest gtest_main gmock piejam_audio)
 target_compile_options(piejam_audio_test PRIVATE -Wall -Wextra -Werror -pedantic-errors)

@@ -28,6 +28,8 @@ namespace piejam::thread
 template <class T>
 class spsc_slot
 {
+    static_assert(std::atomic_size_t::is_always_lock_free);
+
 public:
     void push(T const& v) noexcept(std::is_nothrow_copy_assignable_v<T>)
     {
