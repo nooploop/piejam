@@ -34,7 +34,6 @@ input_processor::input_processor(
     : named_processor(name)
     , m_num_outputs(num_outputs)
 {
-    BOOST_ASSERT(m_num_outputs > 0);
 }
 
 void

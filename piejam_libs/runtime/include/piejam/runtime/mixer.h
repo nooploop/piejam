@@ -20,8 +20,11 @@
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/boxed_string.h>
+#include <piejam/entity_map.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
+
+#include <boost/assert.hpp>
 
 #include <string>
 #include <variant>
@@ -39,20 +42,70 @@ struct channel
     float volume{1.f};
     float pan_balance{};
     bool mute{};
-    stereo_level level;
+    stereo_level level{};
     channel_type type{};
 
     //! mono channels hold same device channel in the pair
     channel_index_pair device_channels{npos};
 };
 
-using channels = std::vector<channel>;
+using channel_id = entity_id<struct channel_tag>;
+
+using channel_ids_t = std::vector<channel_id>;
+using channels_t = entity_map<channel_id, channel>;
 
 struct state
 {
-    channels inputs;
-    channels outputs;
-    std::size_t input_solo_index{npos};
+    entity_map<channel_id, channel> channels;
+
+    channel_ids_t inputs;
+    channel_ids_t outputs;
+    channel_id input_solo_id;
 };
+
+inline auto
+input_channel(state& st, std::size_t index) -> channel&
+{
+    BOOST_ASSERT(index < st.inputs.size());
+    return st.channels[st.inputs[index]];
+}
+
+inline auto
+input_channel(state const& st, std::size_t index) -> channel const&
+{
+    BOOST_ASSERT(index < st.inputs.size());
+    return st.channels[st.inputs[index]];
+}
+
+inline auto
+output_channel(state& st, std::size_t index) -> channel&
+{
+    BOOST_ASSERT(index < st.outputs.size());
+    return st.channels[st.outputs[index]];
+}
+
+inline auto
+output_channel(state const& st, std::size_t index) -> channel const&
+{
+    BOOST_ASSERT(index < st.outputs.size());
+    return st.channels[st.outputs[index]];
+}
+
+inline auto
+add_channel(channels_t& chs, channel_ids_t& ch_ids, channel&& ch)
+{
+    auto id = chs.add(std::move(ch));
+    ch_ids.push_back(id);
+    return id;
+}
+
+inline void
+clear_channels(channels_t& chs, channel_ids_t& ch_ids)
+{
+    for (auto const& id : ch_ids)
+        chs.remove(id);
+
+    ch_ids.clear();
+}
 
 } // namespace piejam::runtime::mixer

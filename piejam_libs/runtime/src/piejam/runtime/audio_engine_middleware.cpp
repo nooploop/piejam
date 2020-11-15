@@ -318,7 +318,7 @@ audio_engine_middleware::process_engine_action(
                 if (m_engine)
                 {
                     m_engine->set_input_solo(
-                            m_get_state().mixer_state.input_solo_index);
+                            m_get_state().mixer_state.input_solo_id);
                 }
             },
             [this](actions::set_output_channel_volume const& a) {

@@ -19,6 +19,10 @@
 
 #include <piejam/runtime/audio_state.h>
 
+#include <fmt/format.h>
+
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::actions
 {
 
@@ -31,29 +35,33 @@ select_bus_channel::operator()(audio_state const& st) const -> audio_state
                              ? new_st.mixer_state.inputs
                              : new_st.mixer_state.outputs;
 
-    assert(bus < channels.size());
-    assert(channel_index == npos ||
-           channel_index < (direction == audio::bus_direction::input
-                                    ? new_st.input.hw_params->num_channels
-                                    : new_st.output.hw_params->num_channels));
+    BOOST_ASSERT(bus < channels.size());
+    BOOST_ASSERT(
+            channel_index == npos ||
+            channel_index < (direction == audio::bus_direction::input
+                                     ? new_st.input.hw_params->num_channels
+                                     : new_st.output.hw_params->num_channels));
 
+    auto& ch = new_st.mixer_state.channels[channels[bus]];
     switch (channel_selector)
     {
         case audio::bus_channel::mono:
-            assert(direction == audio::bus_direction::input);
-            channels[bus].device_channels = channel_index_pair{channel_index};
+            BOOST_ASSERT(direction == audio::bus_direction::input);
+            ch.device_channels = channel_index_pair{channel_index};
             break;
 
         case audio::bus_channel::left:
-            assert(direction == audio::bus_direction::input ||
-                   direction == audio::bus_direction::output);
-            channels[bus].device_channels.left = channel_index;
+            BOOST_ASSERT(
+                    direction == audio::bus_direction::input ||
+                    direction == audio::bus_direction::output);
+            ch.device_channels.left = channel_index;
             break;
 
         case audio::bus_channel::right:
-            assert(direction == audio::bus_direction::input ||
-                   direction == audio::bus_direction::output);
-            channels[bus].device_channels.right = channel_index;
+            BOOST_ASSERT(
+                    direction == audio::bus_direction::input ||
+                    direction == audio::bus_direction::output);
+            ch.device_channels.right = channel_index;
             break;
     }
 
@@ -67,19 +75,22 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
 
     if (direction == audio::bus_direction::input)
     {
-        auto& bus = new_st.mixer_state.inputs.emplace_back();
-        bus.type = type;
-        bus.name = "In " + std::to_string(new_st.mixer_state.inputs.size());
+        new_st.mixer_state.inputs.push_back(
+                new_st.mixer_state.channels.add(mixer::channel{
+                        .name = fmt::format(
+                                "In {}",
+                                new_st.mixer_state.inputs.size() + 1),
+                        .type = type}));
     }
     else
     {
-        assert(direction == audio::bus_direction::output);
-        auto& bus = new_st.mixer_state.outputs.emplace_back();
-        auto const new_size = new_st.mixer_state.outputs.size();
-        assert(type == audio::bus_type::stereo);
-        bus.type = type;
-        bus.name = new_size == 1 ? std::string("Main")
-                                 : "Aux " + std::to_string(new_size - 1);
+        BOOST_ASSERT(direction == audio::bus_direction::output);
+        auto const old_size = new_st.mixer_state.outputs.size();
+        BOOST_ASSERT(type == audio::bus_type::stereo);
+        auto name = old_size == 0 ? std::string("Main")
+                                  : fmt::format("Aux {}", old_size);
+        new_st.mixer_state.outputs.push_back(new_st.mixer_state.channels.add(
+                mixer::channel{.name = std::move(name), .type = type}));
     }
 
     return new_st;
@@ -93,16 +104,19 @@ delete_device_bus::operator()(audio_state const& st) const -> audio_state
     if (direction == audio::bus_direction::input)
     {
         auto& inputs = new_st.mixer_state.inputs;
-        assert(bus < inputs.size());
-        if (new_st.mixer_state.input_solo_index == bus)
-            new_st.mixer_state.input_solo_index = npos;
+        BOOST_ASSERT(bus < inputs.size());
+        auto const& id = inputs[bus];
+        if (new_st.mixer_state.input_solo_id == id)
+            new_st.mixer_state.input_solo_id = mixer::channel_id{};
+        new_st.mixer_state.channels.remove(inputs[bus]);
         inputs.erase(inputs.begin() + bus);
     }
     else
     {
         auto& outputs = new_st.mixer_state.outputs;
-        assert(direction == audio::bus_direction::output);
-        assert(bus < outputs.size());
+        BOOST_ASSERT(direction == audio::bus_direction::output);
+        BOOST_ASSERT(bus < outputs.size());
+        new_st.mixer_state.channels.remove(outputs[bus]);
         outputs.erase(outputs.begin() + bus);
     }
 
@@ -114,9 +128,7 @@ set_input_channel_volume::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    assert(index < new_st.mixer_state.inputs.size());
-    auto& channel = new_st.mixer_state.inputs[index];
-    channel.volume = volume;
+    mixer::input_channel(new_st.mixer_state, index).volume = volume;
 
     return new_st;
 }
@@ -126,9 +138,7 @@ set_input_channel_pan::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    assert(index < new_st.mixer_state.inputs.size());
-    auto& channel = new_st.mixer_state.inputs[index];
-    channel.pan_balance = pan;
+    mixer::input_channel(new_st.mixer_state, index).pan_balance = pan;
 
     return new_st;
 }
@@ -138,9 +148,7 @@ set_input_channel_mute::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    assert(index < new_st.mixer_state.inputs.size());
-    auto& channel = new_st.mixer_state.inputs[index];
-    channel.mute = mute;
+    mixer::input_channel(new_st.mixer_state, index).mute = mute;
 
     return new_st;
 }
@@ -150,10 +158,11 @@ set_input_solo::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    assert(index < new_st.mixer_state.inputs.size());
+    BOOST_ASSERT(index < new_st.mixer_state.inputs.size());
+    auto const& id = new_st.mixer_state.inputs[index];
 
-    new_st.mixer_state.input_solo_index =
-            index == new_st.mixer_state.input_solo_index ? npos : index;
+    new_st.mixer_state.input_solo_id =
+            id == new_st.mixer_state.input_solo_id ? mixer::channel_id{} : id;
 
     return new_st;
 }
@@ -164,8 +173,7 @@ set_output_channel_volume::operator()(audio_state const& st) const
 {
     auto new_st = st;
 
-    assert(index < new_st.mixer_state.outputs.size());
-    new_st.mixer_state.outputs[index].volume = volume;
+    mixer::output_channel(new_st.mixer_state, index).volume = volume;
 
     return new_st;
 }
@@ -176,8 +184,7 @@ set_output_channel_balance::operator()(audio_state const& st) const
 {
     auto new_st = st;
 
-    assert(index < new_st.mixer_state.outputs.size());
-    new_st.mixer_state.outputs[index].pan_balance = balance;
+    mixer::output_channel(new_st.mixer_state, index).pan_balance = balance;
 
     return new_st;
 }
@@ -187,8 +194,7 @@ set_output_channel_mute::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    assert(index < new_st.mixer_state.outputs.size());
-    new_st.mixer_state.outputs[index].mute = mute;
+    mixer::output_channel(new_st.mixer_state, index).mute = mute;
 
     return new_st;
 }
@@ -204,15 +210,16 @@ update_levels::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    auto const update = [](auto& channels, auto const& levels) {
-        std::size_t const num_levels = levels.size();
-        assert(num_levels == channels.size());
-        for (std::size_t index = 0; index < num_levels; ++index)
-            channels[index].level = levels[index];
-    };
+    auto const update =
+            [](auto& channels_map, auto const& channels, auto const& levels) {
+                std::size_t const num_levels = levels.size();
+                BOOST_ASSERT(num_levels == channels.size());
+                for (std::size_t index = 0; index < num_levels; ++index)
+                    channels_map[channels[index]].level = levels[index];
+            };
 
-    update(new_st.mixer_state.inputs, in_levels);
-    update(new_st.mixer_state.outputs, out_levels);
+    update(new_st.mixer_state.channels, new_st.mixer_state.inputs, in_levels);
+    update(new_st.mixer_state.channels, new_st.mixer_state.outputs, out_levels);
 
     return new_st;
 }

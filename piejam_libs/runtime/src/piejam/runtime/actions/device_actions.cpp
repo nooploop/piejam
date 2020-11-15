@@ -20,6 +20,10 @@
 #include <piejam/npos.h>
 #include <piejam/runtime/audio_state.h>
 
+#include <fmt/format.h>
+
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::actions
 {
 
@@ -48,15 +52,17 @@ update_devices::operator()(audio_state const& st) const -> audio_state
     new_st.period_size = period_size;
 
     std::size_t const num_in_channels = new_st.input.hw_params->num_channels;
-    for (auto& in : new_st.mixer_state.inputs)
+    for (auto const& in_id : new_st.mixer_state.inputs)
     {
+        auto& in = new_st.mixer_state.channels[in_id];
         update_channel(in.device_channels.left, num_in_channels);
         update_channel(in.device_channels.right, num_in_channels);
     }
 
     std::size_t const num_out_channels = new_st.output.hw_params->num_channels;
-    for (auto& out : new_st.mixer_state.outputs)
+    for (auto const& out_id : new_st.mixer_state.outputs)
     {
+        auto& out = new_st.mixer_state.channels[out_id];
         update_channel(out.device_channels.left, num_out_channels);
         update_channel(out.device_channels.right, num_out_channels);
     }
@@ -82,29 +88,32 @@ select_device::operator()(audio_state const& st) const -> audio_state
 
     if (input)
     {
-        new_st.mixer_state.inputs =
-                mixer::channels{new_st.input.hw_params->num_channels};
+        clear_channels(new_st.mixer_state.channels, new_st.mixer_state.inputs);
 
-        std::size_t channel_index{};
-        for (auto& in : new_st.mixer_state.inputs)
+        std::size_t const num_channels = new_st.input.hw_params->num_channels;
+        for (std::size_t index = 0; index < num_channels; ++index)
         {
-            in.type = audio::bus_type::mono;
-            in.device_channels = channel_index_pair{channel_index++};
-            in.name = "In " + std::to_string(channel_index);
+            new_st.mixer_state.inputs.push_back(
+                    new_st.mixer_state.channels.add(mixer::channel{
+                            .name = fmt::format("In {}", index + 1),
+                            .type = audio::bus_type::mono,
+                            .device_channels = channel_index_pair{index}}));
         }
     }
     else
     {
-        auto const num_channels = new_st.output.hw_params->num_channels;
-        new_st.mixer_state.outputs.clear();
+        clear_channels(new_st.mixer_state.channels, new_st.mixer_state.outputs);
 
+        auto const num_channels = new_st.output.hw_params->num_channels;
         if (num_channels)
         {
-            auto& out = new_st.mixer_state.outputs.emplace_back();
-            out.type = audio::bus_type::stereo;
-            out.name = std::string("Main");
-            out.device_channels.left = num_channels > 0 ? 0 : npos;
-            out.device_channels.right = num_channels > 1 ? 1 : npos;
+            new_st.mixer_state.outputs.push_back(
+                    new_st.mixer_state.channels.add(mixer::channel{
+                            .name = std::string("Main"),
+                            .type = audio::bus_type::stereo,
+                            .device_channels = channel_index_pair(
+                                    num_channels > 0 ? 0 : npos,
+                                    num_channels > 1 ? 1 : npos)}));
         }
     }
 
@@ -117,7 +126,7 @@ select_samplerate::operator()(audio_state const& st) const -> audio_state
     auto new_st = st;
 
     auto const srs = samplerates_from_state(new_st);
-    assert(index < srs.size());
+    BOOST_ASSERT(index < srs.size());
     new_st.samplerate = srs[index];
 
     return new_st;
@@ -129,7 +138,7 @@ select_period_size::operator()(audio_state const& st) const -> audio_state
     auto new_st = st;
 
     auto const pszs = period_sizes_from_state(new_st);
-    assert(index < pszs.size());
+    BOOST_ASSERT(index < pszs.size());
     new_st.period_size = pszs[index];
 
     return new_st;

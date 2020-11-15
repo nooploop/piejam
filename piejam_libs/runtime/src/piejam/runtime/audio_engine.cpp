@@ -59,7 +59,7 @@ class audio_engine::mixer_bus final
 public:
     mixer_bus(
             audio::samplerate_t const samplerate,
-            std::size_t channel_index,
+            mixer::channel_id ch_id,
             mixer::channel const& channel)
         : m_device_channels(channel.device_channels)
         , m_volume_proc(std::make_unique<ns_ae::value_input_processor<float>>(
@@ -79,7 +79,7 @@ public:
                           ? processors::make_mono_mixer_bus_processor()
                           : processors::make_stereo_mixer_bus_processor())
         , m_amp(audio::components::make_stereo_split_amplifier("volume"))
-        , m_mute_solo_proc(processors::make_mute_solo_processor(channel_index))
+        , m_mute_solo_proc(processors::make_mute_solo_processor(ch_id))
         , m_mute_amp(audio::components::make_stereo_amplifier("mute"))
         , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
         , m_peak_level_proc(
@@ -167,12 +167,13 @@ private:
 static auto
 make_mixer_bus_vector(
         unsigned const samplerate,
-        mixer::channels const& channels) -> std::vector<audio_engine::mixer_bus>
+        mixer::channels_t const& chs,
+        mixer::channel_ids_t const& ch_ids) -> std::vector<audio_engine::mixer_bus>
 {
     std::vector<audio_engine::mixer_bus> result;
-    result.reserve(channels.size());
-    for (std::size_t ch = 0, chs = channels.size(); ch < chs; ++ch)
-        result.emplace_back(samplerate, ch, channels[ch]);
+    result.reserve(ch_ids.size());
+    for (auto const& id : ch_ids)
+        result.emplace_back(samplerate, id, chs[id]);
     return result;
 }
 
@@ -318,10 +319,9 @@ audio_engine::set_input_channel_mute(std::size_t const index, bool const mute)
 }
 
 void
-audio_engine::set_input_solo(std::size_t const index)
+audio_engine::set_input_solo(mixer::channel_id const& id)
 {
-    BOOST_ASSERT(index == npos || index < m_input_buses.size());
-    m_input_solo_index_proc->set(index);
+    m_input_solo_index_proc->set(id);
 }
 
 void
@@ -363,12 +363,17 @@ audio_engine::get_output_level(std::size_t const index) const noexcept
 void
 audio_engine::rebuild(mixer::state const& mixer_state)
 {
-    auto input_buses = make_mixer_bus_vector(m_samplerate, mixer_state.inputs);
-    auto output_buses =
-            make_mixer_bus_vector(m_samplerate, mixer_state.outputs);
+    auto input_buses = make_mixer_bus_vector(
+            m_samplerate,
+            mixer_state.channels,
+            mixer_state.inputs);
+    auto output_buses = make_mixer_bus_vector(
+            m_samplerate,
+            mixer_state.channels,
+            mixer_state.outputs);
     auto input_solo_index_proc =
-            std::make_unique<ns_ae::value_input_processor<std::size_t>>(
-                    mixer_state.input_solo_index,
+            std::make_unique<ns_ae::value_input_processor<mixer::channel_id>>(
+                    mixer_state.input_solo_id,
                     "input_solo_index");
     std::vector<processor_ptr> mixers;
 

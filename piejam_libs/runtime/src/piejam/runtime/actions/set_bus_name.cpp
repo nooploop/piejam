@@ -19,6 +19,8 @@
 
 #include <piejam/runtime/audio_state.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::actions
 {
 
@@ -29,14 +31,12 @@ set_bus_name::operator()(audio_state const& st) const -> audio_state
 
     if (bus_direction == audio::bus_direction::input)
     {
-        assert(bus < new_st.mixer_state.inputs.size());
-        new_st.mixer_state.inputs[bus].name = name;
+        mixer::input_channel(new_st.mixer_state, bus).name = name;
     }
     else
     {
-        assert(bus_direction == audio::bus_direction::output);
-        assert(bus < new_st.mixer_state.outputs.size());
-        new_st.mixer_state.outputs[bus].name = name;
+        BOOST_ASSERT(bus_direction == audio::bus_direction::output);
+        mixer::output_channel(new_st.mixer_state, bus).name = name;
     }
 
     return new_st;

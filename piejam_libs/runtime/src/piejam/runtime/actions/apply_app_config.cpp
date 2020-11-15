@@ -34,32 +34,37 @@ apply_app_config::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    auto apply_bus_configs =
-            [](auto& channels, auto const& configs, std::size_t num_ch) {
-                channels.clear();
-                for (auto const& bus_conf : configs)
-                {
-                    auto& bus = channels.emplace_back();
-                    bus.name = bus_conf.name;
-                    bus.type = bus_conf.bus_type;
-                    bus.device_channels = bus_conf.channels;
-                    update_channel(bus.device_channels.left, num_ch);
-                    update_channel(bus.device_channels.right, num_ch);
-                }
-            };
+    auto apply_bus_configs = [](auto& chs,
+                                auto& ch_ids,
+                                auto const& configs,
+                                std::size_t num_ch) {
+        mixer::clear_channels(chs, ch_ids);
+        for (auto const& bus_conf : configs)
+        {
+            mixer::channel bus;
+            bus.name = bus_conf.name;
+            bus.type = bus_conf.bus_type;
+            bus.device_channels = bus_conf.channels;
+            update_channel(bus.device_channels.left, num_ch);
+            update_channel(bus.device_channels.right, num_ch);
+            ch_ids.push_back(chs.add(std::move(bus)));
+        }
+    };
 
     apply_bus_configs(
+            new_st.mixer_state.channels,
             new_st.mixer_state.inputs,
             conf.input_bus_config,
             new_st.input.hw_params->num_channels);
 
     apply_bus_configs(
+            new_st.mixer_state.channels,
             new_st.mixer_state.outputs,
             conf.output_bus_config,
             new_st.output.hw_params->num_channels);
 
-    for (auto& bus : new_st.mixer_state.outputs)
-        bus.type = audio::bus_type::stereo;
+    for (auto const& out_id : new_st.mixer_state.outputs)
+        new_st.mixer_state.channels[out_id].type = audio::bus_type::stereo;
 
     return new_st;
 }

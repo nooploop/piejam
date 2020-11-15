@@ -94,19 +94,33 @@ struct audio_engine_render_test : public ::testing::Test
 TEST_F(audio_engine_render_test, add_input_channel)
 {
     mixer::state mixer_state;
-    mixer_state.inputs.resize(1);
-    mixer_state.inputs[0].type = mixer::channel_type::mono;
-    mixer_state.inputs[0].device_channels = channel_index_pair(0);
-    mixer_state.outputs.resize(1);
-    mixer_state.outputs[0].type = mixer::channel_type::stereo;
-    mixer_state.outputs[0].device_channels = channel_index_pair(0, 1);
+
+    mixer::channel in_ch1;
+    in_ch1.type = mixer::channel_type::mono;
+    in_ch1.device_channels = channel_index_pair(0);
+    mixer::add_channel(
+            mixer_state.channels,
+            mixer_state.inputs,
+            std::move(in_ch1));
+
+    mixer::channel out_ch;
+    out_ch.type = mixer::channel_type::stereo;
+    out_ch.device_channels = channel_index_pair(0, 1);
+    mixer::add_channel(
+            mixer_state.channels,
+            mixer_state.outputs,
+            std::move(out_ch));
 
     rebuild(mixer_state);
     render(200);
 
-    mixer_state.inputs.resize(2);
-    mixer_state.inputs[1].type = mixer::channel_type::mono;
-    mixer_state.inputs[1].device_channels = channel_index_pair(1);
+    mixer::channel in_ch2;
+    in_ch2.type = mixer::channel_type::mono;
+    in_ch2.device_channels = channel_index_pair(1);
+    mixer::add_channel(
+            mixer_state.channels,
+            mixer_state.inputs,
+            std::move(in_ch2));
 
     rebuild(mixer_state);
     render(200);

@@ -34,7 +34,6 @@ output_processor::output_processor(
     : named_processor(name)
     , m_num_inputs(num_inputs)
 {
-    BOOST_ASSERT(m_num_inputs > 0);
 }
 
 void
@@ -43,11 +42,13 @@ output_processor::process(process_context const& ctx)
     verify_process_context(*this, ctx);
 
     BOOST_ASSERT(m_engine_output.minor_step() == 1);
-    BOOST_ASSERT(m_engine_output.minor_size() == ctx.buffer_size);
-    for (std::size_t ch = 0; ch < m_num_inputs; ++ch)
+    if (m_engine_output.minor_size() == ctx.buffer_size)
     {
-        copy(ctx.inputs[ch].get(),
-             {m_engine_output[ch].data(), m_engine_output.minor_size()});
+        for (std::size_t ch = 0; ch < m_num_inputs; ++ch)
+        {
+            copy(ctx.inputs[ch].get(),
+                 {m_engine_output[ch].data(), m_engine_output.minor_size()});
+        }
     }
 }
 
