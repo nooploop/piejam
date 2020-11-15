@@ -15,32 +15,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/set_bus_solo.h>
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+#include <piejam/runtime/actions/reduce.h>
+#include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              set_input_bus_volume,
-              set_input_bus_pan_balance,
-              set_input_bus_mute,
-              set_input_bus_solo,
-              set_output_bus_volume,
-              set_output_bus_balance,
-              set_output_bus_mute,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info>
+template <>
+auto
+reduce_mixer_state(
+        audio_state const& st,
+        set_bus_solo<audio::bus_direction::input> const& a) -> mixer::state
 {
-};
+    auto mixer_state = st.mixer_state;
+
+    BOOST_ASSERT(a.index < mixer_state.inputs.size());
+    auto const& id = mixer_state.inputs[a.index];
+
+    mixer_state.input_solo_id =
+            id == mixer_state.input_solo_id ? mixer::bus_id{} : id;
+
+    return mixer_state;
+}
+
+template auto
+reduce(audio_state const&, set_bus_solo<audio::bus_direction::input> const&)
+        -> audio_state;
 
 } // namespace piejam::runtime::actions

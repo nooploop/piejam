@@ -20,8 +20,9 @@
 #include <piejam/app/gui/model/BusConfig.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
-#include <piejam/runtime/actions/device_actions.h>
-#include <piejam/runtime/actions/engine_actions.h>
+#include <piejam/runtime/actions/add_bus.h>
+#include <piejam/runtime/actions/delete_bus.h>
+#include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/set_bus_name.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/audio_state_selectors.h>
@@ -107,7 +108,7 @@ AudioInputOutputSettings::setBusName(unsigned const bus, QString const& name)
     action.bus_direction = m_settings_type;
     action.bus = bus;
     action.name = name.toStdString();
-    m_store.dispatch<runtime::actions::set_bus_name>(action);
+    m_store.dispatch(action);
 }
 
 void
@@ -121,7 +122,7 @@ AudioInputOutputSettings::selectChannel(
     action.bus = bus;
     action.channel_selector = bc;
     action.channel_index = static_cast<std::size_t>(ch) - 1;
-    m_store.dispatch<runtime::actions::select_bus_channel>(action);
+    m_store.dispatch(action);
 }
 
 void
@@ -151,10 +152,10 @@ AudioInputOutputSettings::selectStereoRightChannel(
 void
 AudioInputOutputSettings::addBus(audio::bus_type bus_type)
 {
-    runtime::actions::add_device_bus action;
+    runtime::actions::add_bus action;
     action.direction = m_settings_type;
     action.type = bus_type;
-    m_store.dispatch<runtime::actions::add_device_bus>(action);
+    m_store.dispatch(action);
 }
 
 void
@@ -172,10 +173,10 @@ AudioInputOutputSettings::addStereoBus()
 void
 AudioInputOutputSettings::deleteBus(unsigned const bus)
 {
-    runtime::actions::delete_device_bus action;
+    runtime::actions::delete_bus action;
     action.direction = m_settings_type;
     action.bus = bus;
-    m_store.dispatch<runtime::actions::delete_device_bus>(action);
+    m_store.dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

@@ -17,30 +17,24 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+#include <piejam/audio/types.h>
+#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/reducible_action.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              set_input_bus_volume,
-              set_input_bus_pan_balance,
-              set_input_bus_mute,
-              set_input_bus_solo,
-              set_output_bus_volume,
-              set_output_bus_balance,
-              set_output_bus_mute,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info>
+template <audio::bus_direction D>
+struct set_bus_mute final
+    : reducible_action<
+              set_bus_mute<D>,
+              ui::cloneable_action<set_bus_mute<D>, action>>
+    , visitable_engine_action<set_bus_mute<D>>
 {
+    std::size_t index{};
+    bool mute{};
 };
 
 } // namespace piejam::runtime::actions

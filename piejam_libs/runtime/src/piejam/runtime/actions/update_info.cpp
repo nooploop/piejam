@@ -15,32 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/update_info.h>
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+#include <piejam/runtime/actions/reduce.h>
+#include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              set_input_bus_volume,
-              set_input_bus_pan_balance,
-              set_input_bus_mute,
-              set_input_bus_solo,
-              set_output_bus_volume,
-              set_output_bus_balance,
-              set_output_bus_mute,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info>
+template <>
+auto
+reduce_xruns(audio_state const&, update_info const& a) -> std::size_t
 {
-};
+    return a.xruns;
+}
+
+template <>
+auto
+reduce_cpu_load(audio_state const&, update_info const& a) -> float
+{
+    return a.cpu_load;
+}
+
+template auto reduce(audio_state const&, update_info const&) -> audio_state;
 
 } // namespace piejam::runtime::actions

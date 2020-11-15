@@ -30,7 +30,8 @@ struct device_action_visitor
               refresh_devices,
               update_devices,
               initiate_device_selection,
-              select_device,
+              select_input_device,
+              select_output_device,
               select_samplerate,
               select_period_size>
 {

@@ -19,7 +19,7 @@
 
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
-#include <piejam/runtime/actions/engine_actions.h>
+#include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/audio_state_selectors.h>
 
@@ -69,7 +69,7 @@ Info::unsubscribe()
 void
 Info::requestUpdate()
 {
-    m_store.dispatch<runtime::actions::request_info_update>();
+    m_store.dispatch(runtime::actions::request_info_update{});
 }
 
 } // namespace piejam::app::gui::model

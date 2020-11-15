@@ -53,10 +53,10 @@ public:
 
     void dispatch(Action const& action) { m_dispatch(action); }
 
-    template <class DispatchedAction, class... Args>
-    void dispatch(Args&&... args)
+    template <class DispatchedAction>
+    void dispatch(DispatchedAction&& action)
     {
-        dispatch(DispatchedAction{std::forward<Args>(args)...});
+        m_dispatch(std::forward<DispatchedAction>(action));
     }
 
     template <class MiddlewareFactory>

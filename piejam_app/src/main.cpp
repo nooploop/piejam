@@ -31,7 +31,7 @@
 #include <piejam/redux/thread_delegate_middleware.h>
 #include <piejam/reselect/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
-#include <piejam/runtime/actions/device_actions.h>
+#include <piejam/runtime/actions/refresh_devices.h>
 #include <piejam/runtime/app_config.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/audio_state.h>
@@ -159,7 +159,7 @@ main(int argc, char* argv[]) -> int
             &QQmlApplicationEngine::quit,
             &QGuiApplication::quit);
 
-    store.dispatch<runtime::actions::refresh_devices>();
+    store.dispatch(runtime::actions::refresh_devices{});
 
     app::config_access::load(store);
 

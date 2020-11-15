@@ -17,30 +17,21 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+#include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              set_input_bus_volume,
-              set_input_bus_pan_balance,
-              set_input_bus_mute,
-              set_input_bus_solo,
-              set_output_bus_volume,
-              set_output_bus_balance,
-              set_output_bus_mute,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info>
+template <class Action>
+auto reduce(audio_state const& st, Action const& a) -> audio_state;
+
+template <class Action, class Base>
+struct reducible_action : public Base
 {
+    auto reduce(audio_state const& st) const -> audio_state override
+    {
+        return actions::reduce(st, static_cast<Action const&>(*this));
+    }
 };
 
 } // namespace piejam::runtime::actions

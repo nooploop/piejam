@@ -22,11 +22,23 @@
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
+#include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/apply_app_config.h>
+#include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/device_action_visitor.h>
-#include <piejam/runtime/actions/device_actions.h>
 #include <piejam/runtime/actions/engine_action_visitor.h>
-#include <piejam/runtime/actions/engine_actions.h>
+#include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/select_bus_channel.h>
+#include <piejam/runtime/actions/select_device.h>
+#include <piejam/runtime/actions/select_period_size.h>
+#include <piejam/runtime/actions/select_samplerate.h>
+#include <piejam/runtime/actions/set_bus_mute.h>
+#include <piejam/runtime/actions/set_bus_pan_balance.h>
+#include <piejam/runtime/actions/set_bus_solo.h>
+#include <piejam/runtime/actions/set_bus_volume.h>
+#include <piejam/runtime/actions/update_devices.h>
+#include <piejam/runtime/actions/update_info.h>
+#include <piejam/runtime/actions/update_levels.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/audio_state.h>
 
@@ -100,7 +112,10 @@ audio_engine_middleware::process_device_action(
             [this](actions::initiate_device_selection const& a) {
                 process_initiate_device_selection_action(a);
             },
-            [](actions::select_device const&) {
+            [](actions::select_input_device const&) {
+                BOOST_ASSERT_MSG(false, "should not be sent by user");
+            },
+            [](actions::select_output_device const&) {
                 BOOST_ASSERT_MSG(false, "should not be sent by user");
             },
             [this](actions::select_samplerate const& a) { m_next(a); },
@@ -230,33 +245,36 @@ audio_engine_middleware::process_initiate_device_selection_action(
 
     std::size_t const index = action.index;
 
-    actions::select_device next_action;
-    next_action.input = action.input;
-    auto const& descriptors = action.input ? current_state.pcm_devices->inputs
-                                           : current_state.pcm_devices->outputs;
-    BOOST_ASSERT(index < descriptors.size());
-    next_action.device = {index, m_get_hw_params(descriptors[index])};
-
     if (action.input)
     {
+        actions::select_input_device next_action;
+        auto const& descriptors = current_state.pcm_devices->inputs;
+        next_action.device = {index, m_get_hw_params(descriptors[index])};
+
         std::tie(next_action.samplerate, next_action.period_size) =
                 next_samplerate_and_period_size(
                         next_action.device.hw_params,
                         current_state.output.hw_params,
                         current_state.samplerate,
                         current_state.period_size);
+
+        m_next(next_action);
     }
     else
     {
+        actions::select_output_device next_action;
+        auto const& descriptors = current_state.pcm_devices->outputs;
+        next_action.device = {index, m_get_hw_params(descriptors[index])};
+
         std::tie(next_action.samplerate, next_action.period_size) =
                 next_samplerate_and_period_size(
                         current_state.input.hw_params,
                         next_action.device.hw_params,
                         current_state.samplerate,
                         current_state.period_size);
-    }
 
-    m_next(next_action);
+        m_next(next_action);
+    }
 }
 
 void
@@ -272,7 +290,7 @@ audio_engine_middleware::process_engine_action(
                     m_engine->rebuild(m_get_state().mixer_state);
                 }
             },
-            [this](actions::add_device_bus const& a) {
+            [this](actions::add_bus const& a) {
                 m_next(a);
 
                 if (m_engine)
@@ -280,7 +298,7 @@ audio_engine_middleware::process_engine_action(
                     m_engine->rebuild(m_get_state().mixer_state);
                 }
             },
-            [this](actions::delete_device_bus const& a) {
+            [this](actions::delete_bus const& a) {
                 m_next(a);
 
                 if (m_engine)
@@ -288,7 +306,7 @@ audio_engine_middleware::process_engine_action(
                     m_engine->rebuild(m_get_state().mixer_state);
                 }
             },
-            [this](actions::set_input_channel_volume const& a) {
+            [this](actions::set_input_bus_volume const& a) {
                 m_next(a);
 
                 if (m_engine)
@@ -296,15 +314,17 @@ audio_engine_middleware::process_engine_action(
                     m_engine->set_input_channel_volume(a.index, a.volume);
                 }
             },
-            [this](actions::set_input_channel_pan const& a) {
+            [this](actions::set_input_bus_pan_balance const& a) {
                 m_next(a);
 
                 if (m_engine)
                 {
-                    m_engine->set_input_channel_pan_balance(a.index, a.pan);
+                    m_engine->set_input_channel_pan_balance(
+                            a.index,
+                            a.pan_balance);
                 }
             },
-            [this](actions::set_input_channel_mute const& a) {
+            [this](actions::set_input_bus_mute const& a) {
                 m_next(a);
 
                 if (m_engine)
@@ -312,7 +332,7 @@ audio_engine_middleware::process_engine_action(
                     m_engine->set_input_channel_mute(a.index, a.mute);
                 }
             },
-            [this](actions::set_input_solo const& a) {
+            [this](actions::set_input_bus_solo const& a) {
                 m_next(a);
 
                 if (m_engine)
@@ -321,7 +341,7 @@ audio_engine_middleware::process_engine_action(
                             m_get_state().mixer_state.input_solo_id);
                 }
             },
-            [this](actions::set_output_channel_volume const& a) {
+            [this](actions::set_output_bus_volume const& a) {
                 m_next(a);
 
                 if (m_engine)
@@ -329,15 +349,17 @@ audio_engine_middleware::process_engine_action(
                     m_engine->set_output_channel_volume(a.index, a.volume);
                 }
             },
-            [this](actions::set_output_channel_balance const& a) {
+            [this](actions::set_output_bus_balance const& a) {
                 m_next(a);
 
                 if (m_engine)
                 {
-                    m_engine->set_output_channel_balance(a.index, a.balance);
+                    m_engine->set_output_channel_balance(
+                            a.index,
+                            a.pan_balance);
                 }
             },
-            [this](actions::set_output_channel_mute const& a) {
+            [this](actions::set_output_bus_mute const& a) {
                 m_next(a);
 
                 if (m_engine)

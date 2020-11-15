@@ -15,7 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/device_actions.h>
+#include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/select_device.h>
+#include <piejam/runtime/actions/select_period_size.h>
+#include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/thread/configuration.h>
@@ -138,8 +141,7 @@ TEST_F(audio_engine_middleware_test,
     in_action.input = true;
     in_action.index = 1; // select another device
 
-    actions::select_device out_action;
-    out_action.input = true;
+    actions::select_input_device out_action;
     out_action.device.index = 1;
     out_action.device.hw_params = hw_params;
 
@@ -147,7 +149,8 @@ TEST_F(audio_engine_middleware_test,
             .WillOnce(Return(hw_params));
     EXPECT_CALL(
             m_ctrl,
-            next(WhenDynamicCastTo<actions::select_device const&>(out_action)));
+            next(WhenDynamicCastTo<actions::select_input_device const&>(
+                    out_action)));
 
     make_sut()(in_action);
 }

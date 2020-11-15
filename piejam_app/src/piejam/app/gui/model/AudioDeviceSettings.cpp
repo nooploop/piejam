@@ -21,7 +21,10 @@
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
-#include <piejam/runtime/actions/device_actions.h>
+#include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/refresh_devices.h>
+#include <piejam/runtime/actions/select_period_size.h>
+#include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/audio_state_selectors.h>
 
@@ -126,7 +129,7 @@ AudioDeviceSettings::subscribeStep(
 void
 AudioDeviceSettings::refreshDeviceLists()
 {
-    m_store.dispatch<runtime::actions::refresh_devices>();
+    m_store.dispatch(runtime::actions::refresh_devices{});
 }
 
 void
@@ -135,7 +138,7 @@ AudioDeviceSettings::selectInputDevice(unsigned const index)
     runtime::actions::initiate_device_selection action;
     action.input = true;
     action.index = index;
-    m_store.dispatch<runtime::actions::initiate_device_selection>(action);
+    m_store.dispatch(std::move(action));
 }
 
 void
@@ -144,7 +147,7 @@ AudioDeviceSettings::selectOutputDevice(unsigned const index)
     runtime::actions::initiate_device_selection action;
     action.input = false;
     action.index = index;
-    m_store.dispatch<runtime::actions::initiate_device_selection>(action);
+    m_store.dispatch(std::move(action));
 }
 
 void
@@ -152,7 +155,7 @@ AudioDeviceSettings::selectSamplerate(unsigned index)
 {
     runtime::actions::select_samplerate action;
     action.index = index;
-    m_store.dispatch<runtime::actions::select_samplerate>(action);
+    m_store.dispatch(std::move(action));
 }
 
 void
@@ -160,7 +163,7 @@ AudioDeviceSettings::selectPeriodSize(unsigned index)
 {
     runtime::actions::select_period_size action;
     action.index = index;
-    m_store.dispatch<runtime::actions::select_period_size>(action);
+    m_store.dispatch(std::move(action));
 }
 
 } // namespace piejam::app::gui::model

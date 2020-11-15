@@ -1,13 +1,30 @@
 add_library(piejam_runtime STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_app_config.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/device_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/device_action_visitor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/device_actions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/engine_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/engine_action_visitor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/engine_actions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/reduce.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/reducible_action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_info_update.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_levels_update.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_bus_channel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_device.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_period_size.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_samplerate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_mute.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_name.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_pan_balance.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_solo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_volume.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_devices.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_info.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_levels.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine_middleware.h
@@ -21,10 +38,25 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/device_actions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/engine_actions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_bus.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/initiate_device_selection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_devices.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_info_update.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_levels_update.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_bus_channel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_device.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_period_size.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_samplerate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_mute.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_name.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_pan_balance.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_solo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_volume.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_devices.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_info.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_levels.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
