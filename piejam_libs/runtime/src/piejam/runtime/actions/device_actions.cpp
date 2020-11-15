@@ -28,7 +28,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-refresh_devices::operator()(audio_state const& st) const -> audio_state
+refresh_devices::reduce(audio_state const& st) const -> audio_state
 {
     return st;
 }
@@ -41,7 +41,7 @@ update_channel(std::size_t& cur_ch, std::size_t const num_chs)
 }
 
 auto
-update_devices::operator()(audio_state const& st) const -> audio_state
+update_devices::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -71,14 +71,13 @@ update_devices::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-initiate_device_selection::operator()(audio_state const& st) const
-        -> audio_state
+initiate_device_selection::reduce(audio_state const& st) const -> audio_state
 {
     return st;
 }
 
 auto
-select_device::operator()(audio_state const& st) const -> audio_state
+select_device::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -88,9 +87,7 @@ select_device::operator()(audio_state const& st) const -> audio_state
 
     if (input)
     {
-        mixer::clear_buses(
-                new_st.mixer_state.buses,
-                new_st.mixer_state.inputs);
+        mixer::clear_buses(new_st.mixer_state.buses, new_st.mixer_state.inputs);
 
         std::size_t const num_channels = new_st.input.hw_params->num_channels;
         for (std::size_t index = 0; index < num_channels; ++index)
@@ -125,7 +122,7 @@ select_device::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-select_samplerate::operator()(audio_state const& st) const -> audio_state
+select_samplerate::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -137,7 +134,7 @@ select_samplerate::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-select_period_size::operator()(audio_state const& st) const -> audio_state
+select_period_size::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 

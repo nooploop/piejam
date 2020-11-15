@@ -27,7 +27,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-select_bus_channel::operator()(audio_state const& st) const -> audio_state
+select_bus_channel::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -69,7 +69,7 @@ select_bus_channel::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-add_device_bus::operator()(audio_state const& st) const -> audio_state
+add_device_bus::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -97,7 +97,7 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-delete_device_bus::operator()(audio_state const& st) const -> audio_state
+delete_device_bus::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -124,7 +124,7 @@ delete_device_bus::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-set_input_channel_volume::operator()(audio_state const& st) const -> audio_state
+set_input_channel_volume::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -134,7 +134,7 @@ set_input_channel_volume::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-set_input_channel_pan::operator()(audio_state const& st) const -> audio_state
+set_input_channel_pan::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -144,7 +144,7 @@ set_input_channel_pan::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-set_input_channel_mute::operator()(audio_state const& st) const -> audio_state
+set_input_channel_mute::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -154,7 +154,7 @@ set_input_channel_mute::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-set_input_solo::operator()(audio_state const& st) const -> audio_state
+set_input_solo::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -168,8 +168,7 @@ set_input_solo::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-set_output_channel_volume::operator()(audio_state const& st) const
-        -> audio_state
+set_output_channel_volume::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -179,8 +178,7 @@ set_output_channel_volume::operator()(audio_state const& st) const
 }
 
 auto
-set_output_channel_balance::operator()(audio_state const& st) const
-        -> audio_state
+set_output_channel_balance::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -190,7 +188,7 @@ set_output_channel_balance::operator()(audio_state const& st) const
 }
 
 auto
-set_output_channel_mute::operator()(audio_state const& st) const -> audio_state
+set_output_channel_mute::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -200,13 +198,13 @@ set_output_channel_mute::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-request_levels_update::operator()(audio_state const& st) const -> audio_state
+request_levels_update::reduce(audio_state const& st) const -> audio_state
 {
     return st;
 }
 
 auto
-update_levels::operator()(audio_state const& st) const -> audio_state
+update_levels::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
@@ -225,13 +223,13 @@ update_levels::operator()(audio_state const& st) const -> audio_state
 }
 
 auto
-request_info_update::operator()(audio_state const& st) const -> audio_state
+request_info_update::reduce(audio_state const& st) const -> audio_state
 {
     return st;
 }
 
 auto
-update_info::operator()(audio_state const& st) const -> audio_state
+update_info::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 

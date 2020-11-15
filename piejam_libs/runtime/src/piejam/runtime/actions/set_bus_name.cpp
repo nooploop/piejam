@@ -25,7 +25,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-set_bus_name::operator()(audio_state const& st) const -> audio_state
+set_bus_name::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 

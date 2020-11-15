@@ -30,7 +30,7 @@ update_channel(std::size_t& cur_ch, std::size_t const num_chs)
 }
 
 auto
-apply_app_config::operator()(audio_state const& st) const -> audio_state
+apply_app_config::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 

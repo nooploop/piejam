@@ -36,7 +36,7 @@ struct select_bus_channel final
     audio::bus_channel channel_selector{};
     std::size_t channel_index{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct add_device_bus final
@@ -46,7 +46,7 @@ struct add_device_bus final
     audio::bus_direction direction{};
     audio::bus_type type{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct delete_device_bus final
@@ -56,7 +56,7 @@ struct delete_device_bus final
     audio::bus_direction direction{};
     std::size_t bus{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct set_input_channel_volume final
@@ -66,7 +66,7 @@ struct set_input_channel_volume final
     std::size_t index{};
     float volume{1.f};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct set_input_channel_pan final
@@ -76,7 +76,7 @@ struct set_input_channel_pan final
     std::size_t index{};
     float pan{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct set_input_channel_mute final
@@ -86,7 +86,7 @@ struct set_input_channel_mute final
     std::size_t index{};
     bool mute{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct set_input_solo final
@@ -95,7 +95,7 @@ struct set_input_solo final
 {
     std::size_t index{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct set_output_channel_volume final
@@ -105,7 +105,7 @@ struct set_output_channel_volume final
     std::size_t index{};
     float volume{1.f};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct set_output_channel_balance final
@@ -115,7 +115,7 @@ struct set_output_channel_balance final
     std::size_t index{};
     float balance{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct set_output_channel_mute final
@@ -125,14 +125,14 @@ struct set_output_channel_mute final
     std::size_t index{};
     bool mute{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct request_levels_update final
     : ui::cloneable_action<request_levels_update, action>
     , visitable_engine_action<request_levels_update>
 {
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct update_levels final
@@ -142,14 +142,14 @@ struct update_levels final
     std::vector<mixer::stereo_level> in_levels;
     std::vector<mixer::stereo_level> out_levels;
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct request_info_update final
     : ui::cloneable_action<request_info_update, action>
     , visitable_engine_action<request_info_update>
 {
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct update_info final
@@ -159,7 +159,7 @@ struct update_info final
     std::size_t xruns{};
     float cpu_load{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

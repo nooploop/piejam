@@ -73,7 +73,7 @@ TEST_F(audio_engine_middleware_test,
             return std::make_unique<non_device_action>();
         }
 
-        auto operator()(audio_state const& st) const -> audio_state override
+        auto reduce(audio_state const& st) const -> audio_state override
         {
             return st;
         }

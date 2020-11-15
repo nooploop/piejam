@@ -78,7 +78,9 @@ main(int argc, char* argv[]) -> int
     Q_INIT_RESOURCE(piejam_gui_resources);
     Q_INIT_RESOURCE(piejam_app_resources);
 
-    app::store store([](auto const& st, auto const& a) { return a(st); }, {});
+    app::store store(
+            [](auto const& st, auto const& a) { return a.reduce(st); },
+            {});
 
     store.apply_middleware([](auto get_state, auto /*dispatch*/, auto next) {
         thread::configuration const audio_thread_config{2, 96};
@@ -91,7 +93,7 @@ main(int argc, char* argv[]) -> int
                 &runtime::open_alsa_device,
                 std::move(get_state),
                 std::move(next));
-        return [m](auto const& a) { m->operator()(a); };
+        return [m](auto const& a) { (*m)(a); };
     });
 
     store.apply_middleware(redux::make_queueing_middleware);

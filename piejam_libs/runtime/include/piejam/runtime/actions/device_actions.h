@@ -33,7 +33,7 @@ struct refresh_devices final
     : ui::cloneable_action<refresh_devices, action>
     , visitable_device_action<refresh_devices>
 {
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct update_devices final
@@ -48,7 +48,7 @@ struct update_devices final
     unsigned samplerate{};
     unsigned period_size{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct initiate_device_selection final
@@ -58,7 +58,7 @@ struct initiate_device_selection final
     bool input{};
     std::size_t index{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct select_device final
@@ -70,7 +70,7 @@ struct select_device final
     unsigned samplerate{};
     unsigned period_size{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 inline bool
@@ -85,7 +85,7 @@ struct select_samplerate final
 {
     std::size_t index{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 struct select_period_size final
@@ -94,7 +94,7 @@ struct select_period_size final
 {
     std::size_t index{};
 
-    auto operator()(audio_state const&) const -> audio_state override;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions
