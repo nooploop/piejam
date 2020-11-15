@@ -27,7 +27,7 @@ namespace piejam::runtime::processors
 {
 
 auto make_mute_solo_processor(
-        mixer::channel_id const& solo_id,
+        mixer::bus_id const& solo_id,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::processor>;
 

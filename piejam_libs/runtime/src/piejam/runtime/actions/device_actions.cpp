@@ -54,7 +54,7 @@ update_devices::operator()(audio_state const& st) const -> audio_state
     std::size_t const num_in_channels = new_st.input.hw_params->num_channels;
     for (auto const& in_id : new_st.mixer_state.inputs)
     {
-        auto& in = new_st.mixer_state.channels[in_id];
+        auto& in = new_st.mixer_state.buses[in_id];
         update_channel(in.device_channels.left, num_in_channels);
         update_channel(in.device_channels.right, num_in_channels);
     }
@@ -62,7 +62,7 @@ update_devices::operator()(audio_state const& st) const -> audio_state
     std::size_t const num_out_channels = new_st.output.hw_params->num_channels;
     for (auto const& out_id : new_st.mixer_state.outputs)
     {
-        auto& out = new_st.mixer_state.channels[out_id];
+        auto& out = new_st.mixer_state.buses[out_id];
         update_channel(out.device_channels.left, num_out_channels);
         update_channel(out.device_channels.right, num_out_channels);
     }
@@ -88,13 +88,15 @@ select_device::operator()(audio_state const& st) const -> audio_state
 
     if (input)
     {
-        clear_channels(new_st.mixer_state.channels, new_st.mixer_state.inputs);
+        mixer::clear_buses(
+                new_st.mixer_state.buses,
+                new_st.mixer_state.inputs);
 
         std::size_t const num_channels = new_st.input.hw_params->num_channels;
         for (std::size_t index = 0; index < num_channels; ++index)
         {
             new_st.mixer_state.inputs.push_back(
-                    new_st.mixer_state.channels.add(mixer::channel{
+                    new_st.mixer_state.buses.add(mixer::bus{
                             .name = fmt::format("In {}", index + 1),
                             .type = audio::bus_type::mono,
                             .device_channels = channel_index_pair{index}}));
@@ -102,13 +104,15 @@ select_device::operator()(audio_state const& st) const -> audio_state
     }
     else
     {
-        clear_channels(new_st.mixer_state.channels, new_st.mixer_state.outputs);
+        mixer::clear_buses(
+                new_st.mixer_state.buses,
+                new_st.mixer_state.outputs);
 
         auto const num_channels = new_st.output.hw_params->num_channels;
         if (num_channels)
         {
             new_st.mixer_state.outputs.push_back(
-                    new_st.mixer_state.channels.add(mixer::channel{
+                    new_st.mixer_state.buses.add(mixer::bus{
                             .name = std::string("Main"),
                             .type = audio::bus_type::stereo,
                             .device_channels = channel_index_pair(

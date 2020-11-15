@@ -38,10 +38,10 @@ apply_app_config::operator()(audio_state const& st) const -> audio_state
                                 auto& ch_ids,
                                 auto const& configs,
                                 std::size_t num_ch) {
-        mixer::clear_channels(chs, ch_ids);
+        mixer::clear_buses(chs, ch_ids);
         for (auto const& bus_conf : configs)
         {
-            mixer::channel bus;
+            mixer::bus bus;
             bus.name = bus_conf.name;
             bus.type = bus_conf.bus_type;
             bus.device_channels = bus_conf.channels;
@@ -52,19 +52,19 @@ apply_app_config::operator()(audio_state const& st) const -> audio_state
     };
 
     apply_bus_configs(
-            new_st.mixer_state.channels,
+            new_st.mixer_state.buses,
             new_st.mixer_state.inputs,
             conf.input_bus_config,
             new_st.input.hw_params->num_channels);
 
     apply_bus_configs(
-            new_st.mixer_state.channels,
+            new_st.mixer_state.buses,
             new_st.mixer_state.outputs,
             conf.output_bus_config,
             new_st.output.hw_params->num_channels);
 
     for (auto const& out_id : new_st.mixer_state.outputs)
-        new_st.mixer_state.channels[out_id].type = audio::bus_type::stereo;
+        new_st.mixer_state.buses[out_id].type = audio::bus_type::stereo;
 
     return new_st;
 }

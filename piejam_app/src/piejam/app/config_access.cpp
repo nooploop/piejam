@@ -85,7 +85,7 @@ save(runtime::audio_state const& state)
                     std::ranges::transform(
                             ch_ids,
                             std::back_inserter(configs),
-                            [&chs](runtime::mixer::channel_id const& ch_id)
+                            [&chs](runtime::mixer::bus_id const& ch_id)
                                     -> runtime::bus_config {
                                 auto const& ch = chs[ch_id];
                                 return {ch.name, ch.type, ch.device_channels};
@@ -93,12 +93,12 @@ save(runtime::audio_state const& state)
                 };
 
         channels_to_bus_configs(
-                state.mixer_state.channels,
+                state.mixer_state.buses,
                 state.mixer_state.inputs,
                 conf.input_bus_config);
 
         channels_to_bus_configs(
-                state.mixer_state.channels,
+                state.mixer_state.buses,
                 state.mixer_state.outputs,
                 conf.output_bus_config);
 

@@ -95,30 +95,30 @@ TEST_F(audio_engine_render_test, add_input_channel)
 {
     mixer::state mixer_state;
 
-    mixer::channel in_ch1;
+    mixer::bus in_ch1;
     in_ch1.type = mixer::channel_type::mono;
     in_ch1.device_channels = channel_index_pair(0);
-    mixer::add_channel(
-            mixer_state.channels,
+    mixer::add_bus(
+            mixer_state.buses,
             mixer_state.inputs,
             std::move(in_ch1));
 
-    mixer::channel out_ch;
+    mixer::bus out_ch;
     out_ch.type = mixer::channel_type::stereo;
     out_ch.device_channels = channel_index_pair(0, 1);
-    mixer::add_channel(
-            mixer_state.channels,
+    mixer::add_bus(
+            mixer_state.buses,
             mixer_state.outputs,
             std::move(out_ch));
 
     rebuild(mixer_state);
     render(200);
 
-    mixer::channel in_ch2;
+    mixer::bus in_ch2;
     in_ch2.type = mixer::channel_type::mono;
     in_ch2.device_channels = channel_index_pair(1);
-    mixer::add_channel(
-            mixer_state.channels,
+    mixer::add_bus(
+            mixer_state.buses,
             mixer_state.inputs,
             std::move(in_ch2));
 

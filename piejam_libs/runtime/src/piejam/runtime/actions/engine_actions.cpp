@@ -42,7 +42,7 @@ select_bus_channel::operator()(audio_state const& st) const -> audio_state
                                      ? new_st.input.hw_params->num_channels
                                      : new_st.output.hw_params->num_channels));
 
-    auto& ch = new_st.mixer_state.channels[channels[bus]];
+    auto& ch = new_st.mixer_state.buses[channels[bus]];
     switch (channel_selector)
     {
         case audio::bus_channel::mono:
@@ -76,7 +76,7 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
     if (direction == audio::bus_direction::input)
     {
         new_st.mixer_state.inputs.push_back(
-                new_st.mixer_state.channels.add(mixer::channel{
+                new_st.mixer_state.buses.add(mixer::bus{
                         .name = fmt::format(
                                 "In {}",
                                 new_st.mixer_state.inputs.size() + 1),
@@ -89,8 +89,8 @@ add_device_bus::operator()(audio_state const& st) const -> audio_state
         BOOST_ASSERT(type == audio::bus_type::stereo);
         auto name = old_size == 0 ? std::string("Main")
                                   : fmt::format("Aux {}", old_size);
-        new_st.mixer_state.outputs.push_back(new_st.mixer_state.channels.add(
-                mixer::channel{.name = std::move(name), .type = type}));
+        new_st.mixer_state.outputs.push_back(new_st.mixer_state.buses.add(
+                mixer::bus{.name = std::move(name), .type = type}));
     }
 
     return new_st;
@@ -107,8 +107,8 @@ delete_device_bus::operator()(audio_state const& st) const -> audio_state
         BOOST_ASSERT(bus < inputs.size());
         auto const& id = inputs[bus];
         if (new_st.mixer_state.input_solo_id == id)
-            new_st.mixer_state.input_solo_id = mixer::channel_id{};
-        new_st.mixer_state.channels.remove(inputs[bus]);
+            new_st.mixer_state.input_solo_id = mixer::bus_id{};
+        new_st.mixer_state.buses.remove(inputs[bus]);
         inputs.erase(inputs.begin() + bus);
     }
     else
@@ -116,7 +116,7 @@ delete_device_bus::operator()(audio_state const& st) const -> audio_state
         auto& outputs = new_st.mixer_state.outputs;
         BOOST_ASSERT(direction == audio::bus_direction::output);
         BOOST_ASSERT(bus < outputs.size());
-        new_st.mixer_state.channels.remove(outputs[bus]);
+        new_st.mixer_state.buses.remove(outputs[bus]);
         outputs.erase(outputs.begin() + bus);
     }
 
@@ -128,7 +128,7 @@ set_input_channel_volume::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    mixer::input_channel(new_st.mixer_state, index).volume = volume;
+    mixer::input_bus(new_st.mixer_state, index).volume = volume;
 
     return new_st;
 }
@@ -138,7 +138,7 @@ set_input_channel_pan::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    mixer::input_channel(new_st.mixer_state, index).pan_balance = pan;
+    mixer::input_bus(new_st.mixer_state, index).pan_balance = pan;
 
     return new_st;
 }
@@ -148,7 +148,7 @@ set_input_channel_mute::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    mixer::input_channel(new_st.mixer_state, index).mute = mute;
+    mixer::input_bus(new_st.mixer_state, index).mute = mute;
 
     return new_st;
 }
@@ -162,7 +162,7 @@ set_input_solo::operator()(audio_state const& st) const -> audio_state
     auto const& id = new_st.mixer_state.inputs[index];
 
     new_st.mixer_state.input_solo_id =
-            id == new_st.mixer_state.input_solo_id ? mixer::channel_id{} : id;
+            id == new_st.mixer_state.input_solo_id ? mixer::bus_id{} : id;
 
     return new_st;
 }
@@ -173,7 +173,7 @@ set_output_channel_volume::operator()(audio_state const& st) const
 {
     auto new_st = st;
 
-    mixer::output_channel(new_st.mixer_state, index).volume = volume;
+    mixer::output_bus(new_st.mixer_state, index).volume = volume;
 
     return new_st;
 }
@@ -184,7 +184,7 @@ set_output_channel_balance::operator()(audio_state const& st) const
 {
     auto new_st = st;
 
-    mixer::output_channel(new_st.mixer_state, index).pan_balance = balance;
+    mixer::output_bus(new_st.mixer_state, index).pan_balance = balance;
 
     return new_st;
 }
@@ -194,7 +194,7 @@ set_output_channel_mute::operator()(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    mixer::output_channel(new_st.mixer_state, index).mute = mute;
+    mixer::output_bus(new_st.mixer_state, index).mute = mute;
 
     return new_st;
 }
@@ -218,8 +218,8 @@ update_levels::operator()(audio_state const& st) const -> audio_state
                     channels_map[channels[index]].level = levels[index];
             };
 
-    update(new_st.mixer_state.channels, new_st.mixer_state.inputs, in_levels);
-    update(new_st.mixer_state.channels, new_st.mixer_state.outputs, out_levels);
+    update(new_st.mixer_state.buses, new_st.mixer_state.inputs, in_levels);
+    update(new_st.mixer_state.buses, new_st.mixer_state.outputs, out_levels);
 
     return new_st;
 }

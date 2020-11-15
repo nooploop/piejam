@@ -27,7 +27,6 @@
 #include <boost/assert.hpp>
 
 #include <string>
-#include <variant>
 #include <vector>
 
 namespace piejam::runtime::mixer
@@ -36,7 +35,7 @@ namespace piejam::runtime::mixer
 using stereo_level = audio::pair<float>;
 using channel_type = audio::bus_type;
 
-struct channel
+struct bus
 {
     container::boxed_string name;
     float volume{1.f};
@@ -49,63 +48,63 @@ struct channel
     channel_index_pair device_channels{npos};
 };
 
-using channel_id = entity_id<struct channel_tag>;
+using bus_id = entity_id<struct bus_id_tag>;
 
-using channel_ids_t = std::vector<channel_id>;
-using channels_t = entity_map<channel_id, channel>;
+using bus_ids_t = std::vector<bus_id>;
+using buses_t = entity_map<bus_id, bus>;
 
 struct state
 {
-    entity_map<channel_id, channel> channels;
+    entity_map<bus_id, bus> buses;
 
-    channel_ids_t inputs;
-    channel_ids_t outputs;
-    channel_id input_solo_id;
+    bus_ids_t inputs;
+    bus_ids_t outputs;
+    bus_id input_solo_id;
 };
 
 inline auto
-input_channel(state& st, std::size_t index) -> channel&
+input_bus(state& st, std::size_t index) -> bus&
 {
     BOOST_ASSERT(index < st.inputs.size());
-    return st.channels[st.inputs[index]];
+    return st.buses[st.inputs[index]];
 }
 
 inline auto
-input_channel(state const& st, std::size_t index) -> channel const&
+input_bus(state const& st, std::size_t index) -> bus const&
 {
     BOOST_ASSERT(index < st.inputs.size());
-    return st.channels[st.inputs[index]];
+    return st.buses[st.inputs[index]];
 }
 
 inline auto
-output_channel(state& st, std::size_t index) -> channel&
+output_bus(state& st, std::size_t index) -> bus&
 {
     BOOST_ASSERT(index < st.outputs.size());
-    return st.channels[st.outputs[index]];
+    return st.buses[st.outputs[index]];
 }
 
 inline auto
-output_channel(state const& st, std::size_t index) -> channel const&
+output_bus(state const& st, std::size_t index) -> bus const&
 {
     BOOST_ASSERT(index < st.outputs.size());
-    return st.channels[st.outputs[index]];
+    return st.buses[st.outputs[index]];
 }
 
 inline auto
-add_channel(channels_t& chs, channel_ids_t& ch_ids, channel&& ch)
+add_bus(buses_t& buses, bus_ids_t& bus_ids, bus&& b)
 {
-    auto id = chs.add(std::move(ch));
-    ch_ids.push_back(id);
+    auto id = buses.add(std::move(b));
+    bus_ids.push_back(id);
     return id;
 }
 
 inline void
-clear_channels(channels_t& chs, channel_ids_t& ch_ids)
+clear_buses(buses_t& buses, bus_ids_t& bus_ids)
 {
-    for (auto const& id : ch_ids)
-        chs.remove(id);
+    for (auto const& id : bus_ids)
+        buses.remove(id);
 
-    ch_ids.clear();
+    bus_ids.clear();
 }
 
 } // namespace piejam::runtime::mixer

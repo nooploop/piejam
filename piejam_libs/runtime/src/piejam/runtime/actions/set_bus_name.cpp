@@ -31,12 +31,12 @@ set_bus_name::operator()(audio_state const& st) const -> audio_state
 
     if (bus_direction == audio::bus_direction::input)
     {
-        mixer::input_channel(new_st.mixer_state, bus).name = name;
+        mixer::input_bus(new_st.mixer_state, bus).name = name;
     }
     else
     {
         BOOST_ASSERT(bus_direction == audio::bus_direction::output);
-        mixer::output_channel(new_st.mixer_state, bus).name = name;
+        mixer::output_bus(new_st.mixer_state, bus).name = name;
     }
 
     return new_st;
