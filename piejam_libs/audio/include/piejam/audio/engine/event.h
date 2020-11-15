@@ -19,6 +19,8 @@
 
 #include <boost/intrusive/set_hook.hpp>
 
+#include <type_traits>
+
 namespace piejam::audio::engine
 {
 
@@ -28,13 +30,15 @@ class event final : public boost::intrusive::set_base_hook<>
     static_assert(std::is_trivially_destructible_v<T>);
 
 public:
-    event() = default;
-    event(std::size_t const offset, T const& value)
+    event() noexcept(std::is_nothrow_default_constructible_v<T>) = default;
+    event(std::size_t const offset,
+          T const& value) noexcept(std::is_nothrow_copy_constructible_v<T>)
         : m_offset(offset)
         , m_value(value)
     {
     }
-    event(std::size_t const offset, T&& value)
+    event(std::size_t const offset,
+          T&& value) noexcept(std::is_nothrow_move_constructible_v<T>)
         : m_offset(offset)
         , m_value(std::move(value))
     {

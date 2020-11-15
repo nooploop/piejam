@@ -39,6 +39,14 @@ struct level_meter_processor_test : ::testing::Test
     std::vector<std::reference_wrapper<audio_slice const>> in_bufs{
             in_buf_spans.begin(),
             in_buf_spans.end()};
+    event_output_buffers ev_out_bufs;
+
+    level_meter_processor_test()
+    {
+        ev_out_bufs.set_event_memory(std::pmr::get_default_resource());
+        for (auto const& port : sut.event_outputs())
+            ev_out_bufs.add(port);
+    }
 };
 
 TEST_F(level_meter_processor_test, new_peak_is_meassured_from_input_buffer)
@@ -46,9 +54,10 @@ TEST_F(level_meter_processor_test, new_peak_is_meassured_from_input_buffer)
     in_buf[0] = .7f;
     in_buf_spans[0] = std::span{in_buf.data(), 1};
 
-    sut.process({in_bufs, {}, {}, {}, {}, 1});
+    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, 1});
 
-    //    EXPECT_FLOAT_EQ(.7f, sut.peak_level());
+    ASSERT_EQ(1u, ev_out_bufs.get<float>(0).size());
+    EXPECT_FLOAT_EQ(.7f, ev_out_bufs.get<float>(0).begin()->value());
 }
 
 TEST_F(level_meter_processor_test,
@@ -57,9 +66,10 @@ TEST_F(level_meter_processor_test,
     in_buf[0] = .7f;
     in_buf[1] = .8f;
 
-    sut.process({in_bufs, {}, {}, {}, {}, 2});
+    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, 2});
 
-    //    EXPECT_FLOAT_EQ(.8f, sut.peak_level());
+    ASSERT_EQ(1u, ev_out_bufs.get<float>(0).size());
+    EXPECT_FLOAT_EQ(.8f, ev_out_bufs.get<float>(0).begin()->value());
 }
 
 TEST_F(level_meter_processor_test,
@@ -68,9 +78,10 @@ TEST_F(level_meter_processor_test,
     in_buf[0] = .7f;
     in_buf[1] = .5f;
 
-    sut.process({in_bufs, {}, {}, {}, {}, 2});
+    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, 2});
 
-    //    EXPECT_LT(sut.peak_level(), .7f);
+    ASSERT_EQ(1u, ev_out_bufs.get<float>(0).size());
+    EXPECT_LT(ev_out_bufs.get<float>(0).begin()->value(), .7f);
 }
 
 } // namespace piejam::audio::engine::test
