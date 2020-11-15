@@ -19,6 +19,7 @@
 
 #include <piejam/redux/cloneable.h>
 #include <piejam/redux/functors.h>
+#include <piejam/redux/make_middleware.h>
 
 #include <memory>
 #include <queue>
@@ -73,8 +74,7 @@ inline constexpr struct
     template <class GetState, class Dispatch, class Action>
     auto operator()(GetState&&, Dispatch&&, next_f<Action> next) const
     {
-        auto m = std::make_shared<queueing_middleware<Action>>(std::move(next));
-        return [m](auto const& a) { (*m)(a); };
+        return make_middleware<queueing_middleware<Action>>(std::move(next));
     }
 } make_queueing_middleware;
 

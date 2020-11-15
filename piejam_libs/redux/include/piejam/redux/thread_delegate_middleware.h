@@ -19,6 +19,7 @@
 
 #include <piejam/redux/cloneable.h>
 #include <piejam/redux/functors.h>
+#include <piejam/redux/make_middleware.h>
 
 #include <memory>
 #include <thread>
@@ -32,11 +33,11 @@ requires cloneable<Action> class thread_delegate_middleware
 public:
     thread_delegate_middleware(
             std::thread::id delegate_to_id,
-            DelegateMethod delegate,
+            DelegateMethod delegate_method,
             dispatch_f<Action> dispatch,
             next_f<Action> next)
         : m_delegate_to_id(delegate_to_id)
-        , m_delegate(std::move(delegate))
+        , m_delegate_method(std::move(delegate_method))
         , m_dispatch(std::move(dispatch))
         , m_next(std::move(next))
     {
@@ -50,7 +51,7 @@ public:
         }
         else
         {
-            m_delegate([dispatch = m_dispatch, clone = a.clone()]() {
+            m_delegate_method([dispatch = m_dispatch, clone = a.clone()]() {
                 dispatch(*clone);
             });
         }
@@ -58,7 +59,7 @@ public:
 
 private:
     std::thread::id m_delegate_to_id;
-    DelegateMethod m_delegate;
+    DelegateMethod m_delegate_method;
     dispatch_f<Action> m_dispatch;
     next_f<Action> m_next;
 };
@@ -75,27 +76,26 @@ struct make_thread_delegate_middleware
 {
     make_thread_delegate_middleware(
             std::thread::id delegate_to_id,
-            DelegateMethod delegate)
+            DelegateMethod delegate_method)
         : m_delegate_to_id(delegate_to_id)
-        , m_delegate(std::move(delegate))
+        , m_delegate_method(std::move(delegate_method))
     {
     }
 
     template <class GetState, class Dispatch, class Action>
     auto operator()(GetState&&, Dispatch&& dispatch, next_f<Action> next) const
     {
-        auto m = std::make_shared<
+        return make_middleware<
                 thread_delegate_middleware<DelegateMethod, Action>>(
                 m_delegate_to_id,
-                m_delegate,
+                m_delegate_method,
                 std::move(dispatch),
                 std::move(next));
-        return [m](auto const& a) { (*m)(a); };
     }
 
 private:
     std::thread::id m_delegate_to_id;
-    DelegateMethod m_delegate;
+    DelegateMethod m_delegate_method;
 };
 
 template <class DelegateMethod>
