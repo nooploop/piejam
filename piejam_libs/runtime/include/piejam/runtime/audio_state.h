@@ -19,6 +19,7 @@
 
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
+#include <piejam/audio/types.h>
 #include <piejam/container/box.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/selected_device.h>
@@ -36,8 +37,8 @@ struct audio_state
     selected_device input;
     selected_device output;
 
-    unsigned samplerate{};
-    unsigned period_size{};
+    audio::samplerate_t samplerate{};
+    audio::period_size_t period_size{};
 
     mixer::state mixer_state{};
 
