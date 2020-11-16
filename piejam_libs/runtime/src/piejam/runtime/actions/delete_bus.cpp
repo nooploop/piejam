@@ -22,6 +22,8 @@
 
 #include <fmt/format.h>
 
+#include <boost/core/ignore_unused.hpp>
+
 namespace piejam::runtime::actions
 {
 
@@ -43,6 +45,7 @@ reduce_mixer_state(audio_state const& st, delete_bus const& a) -> mixer::state
     else
     {
         auto& outputs = mixer_state.outputs;
+        boost::ignore_unused(outputs);
         BOOST_ASSERT(a.direction == audio::bus_direction::output);
         BOOST_ASSERT(a.bus < outputs.size());
         mixer::remove_bus(mixer_state.buses, mixer_state.outputs, a.bus);

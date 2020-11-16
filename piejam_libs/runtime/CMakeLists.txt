@@ -87,4 +87,5 @@ target_link_libraries(piejam_runtime
     piejam_algorithm
     piejam_range)
 
+add_subdirectory(benchmarks)
 add_subdirectory(tests)
