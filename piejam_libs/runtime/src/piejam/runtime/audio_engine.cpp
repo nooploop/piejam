@@ -266,14 +266,10 @@ make_graph(
              in < num_inputs;
              ++in)
         {
-            connect(g,
-                    input_buses[in].mute_amplifier_component().outputs()[0],
-                    output_buses[out].amplifier_component().inputs()[0],
-                    mixer_procs);
-
-            connect(g,
-                    input_buses[in].mute_amplifier_component().outputs()[1],
-                    output_buses[out].amplifier_component().inputs()[1],
+            connect_stereo_components(
+                    g,
+                    input_buses[in].mute_amplifier_component(),
+                    output_buses[out].amplifier_component(),
                     mixer_procs);
         }
     }

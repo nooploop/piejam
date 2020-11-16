@@ -76,12 +76,11 @@ has_wire(graph const& g, graph_endpoint const& src, graph_endpoint const& dst)
                    &graph::wires_t::value_type::second) != connected.second;
 }
 
-auto
+void
 connect(graph& g,
         graph_endpoint const& src,
         graph_endpoint const& dst,
         std::vector<std::unique_ptr<processor>>& mixers)
-        -> std::unique_ptr<processor>
 {
     if (auto const connected_src = connected_source(g, dst))
     {
@@ -114,7 +113,6 @@ connect(graph& g,
                     });
             BOOST_ASSERT(it_mixer != mixers.end());
             std::swap(*it_mixer, mixer);
-            return mixer;
         }
         else
         {
@@ -125,13 +123,11 @@ connect(graph& g,
             g.add_wire(src, {*mixer, 1});
             g.add_wire({*mixer, 0}, dst);
             mixers.emplace_back(std::move(mixer));
-            return nullptr;
         }
     }
     else
     {
         g.add_wire(src, dst);
-        return nullptr;
     }
 }
 
@@ -140,6 +136,17 @@ connect_stereo_components(graph& g, component const& src, component const& dst)
 {
     g.add_wire(src.outputs()[0], dst.inputs()[0]);
     g.add_wire(src.outputs()[1], dst.inputs()[1]);
+}
+
+void
+connect_stereo_components(
+        graph& g,
+        component const& src,
+        component const& dst,
+        std::vector<std::unique_ptr<processor>>& mixers)
+{
+    connect(g, src.outputs()[0], dst.inputs()[0], mixers);
+    connect(g, src.outputs()[1], dst.inputs()[1], mixers);
 }
 
 } // namespace piejam::audio::engine

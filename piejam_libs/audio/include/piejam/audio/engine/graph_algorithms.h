@@ -35,16 +35,21 @@ bool
 has_wire(graph const&, graph_endpoint const& src, graph_endpoint const& dst);
 
 //! Smart connect function, which will insert a mixer if connecting to an
-//! already connected destination. The mixer will stored in the mixers vector.
-//! If the new mixer will replace an old one, the old one will be returned.
-auto
+//! already connected destination. The mixer will be stored in the mixers
+//! vector.
+void
 connect(graph&,
         graph_endpoint const& src,
         graph_endpoint const& dst,
-        std::vector<std::unique_ptr<processor>>& mixers)
-        -> std::unique_ptr<processor>;
+        std::vector<std::unique_ptr<processor>>& mixers);
 
 void
 connect_stereo_components(graph&, component const& src, component const& dst);
+
+void connect_stereo_components(
+        graph&,
+        component const& src,
+        component const& dst,
+        std::vector<std::unique_ptr<processor>>& mixers);
 
 } // namespace piejam::audio::engine
