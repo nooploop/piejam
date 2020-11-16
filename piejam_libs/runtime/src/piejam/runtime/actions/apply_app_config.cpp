@@ -47,7 +47,7 @@ apply_app_config::reduce(audio_state const& st) const -> audio_state
             bus.device_channels = bus_conf.channels;
             update_channel(bus.device_channels.left, num_ch);
             update_channel(bus.device_channels.right, num_ch);
-            ch_ids.push_back(chs.add(std::move(bus)));
+            mixer::add_bus(chs, ch_ids, std::move(bus));
         }
     };
 

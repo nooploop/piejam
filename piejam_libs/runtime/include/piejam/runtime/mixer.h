@@ -55,7 +55,7 @@ using buses_t = entity_map<bus_id, bus>;
 
 struct state
 {
-    entity_map<bus_id, bus> buses;
+    buses_t buses;
 
     bus_ids_t inputs;
     bus_ids_t outputs;
@@ -91,11 +91,16 @@ output_bus(state const& st, std::size_t index) -> bus const&
 }
 
 inline auto
-add_bus(buses_t& buses, bus_ids_t& bus_ids, bus&& b)
+add_bus(buses_t& buses, bus_ids_t& bus_ids, bus&& b) -> bus_id
 {
-    auto id = buses.add(std::move(b));
-    bus_ids.push_back(id);
-    return id;
+    return bus_ids.emplace_back(buses.add(std::move(b)));
+}
+
+inline void
+remove_bus(buses_t& buses, bus_ids_t& bus_ids, std::size_t index)
+{
+    buses.remove(bus_ids[index]);
+    bus_ids.erase(bus_ids.begin() + index);
 }
 
 inline void

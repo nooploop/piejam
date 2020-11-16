@@ -90,10 +90,13 @@ reduce_mixer_state(
     std::size_t const num_channels = a.device.hw_params->num_channels;
     for (std::size_t index = 0; index < num_channels; ++index)
     {
-        mixer_state.inputs.push_back(mixer_state.buses.add(mixer::bus{
-                .name = fmt::format("In {}", index + 1),
-                .type = audio::bus_type::mono,
-                .device_channels = channel_index_pair{index}}));
+        mixer::add_bus(
+                mixer_state.buses,
+                mixer_state.inputs,
+                mixer::bus{
+                        .name = fmt::format("In {}", index + 1),
+                        .type = audio::bus_type::mono,
+                        .device_channels = channel_index_pair{index}});
     }
 
     return mixer_state;
@@ -111,12 +114,15 @@ reduce_mixer_state(
 
     if (auto const num_channels = a.device.hw_params->num_channels)
     {
-        mixer_state.outputs.push_back(mixer_state.buses.add(mixer::bus{
-                .name = std::string("Main"),
-                .type = audio::bus_type::stereo,
-                .device_channels = channel_index_pair(
-                        num_channels > 0 ? 0 : npos,
-                        num_channels > 1 ? 1 : npos)}));
+        mixer::add_bus(
+                mixer_state.buses,
+                mixer_state.outputs,
+                mixer::bus{
+                        .name = std::string("Main"),
+                        .type = audio::bus_type::stereo,
+                        .device_channels = channel_index_pair(
+                                num_channels > 0 ? 0 : npos,
+                                num_channels > 1 ? 1 : npos)});
     }
 
     return mixer_state;

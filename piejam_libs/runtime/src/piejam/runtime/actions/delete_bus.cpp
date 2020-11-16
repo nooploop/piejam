@@ -38,16 +38,14 @@ reduce_mixer_state(audio_state const& st, delete_bus const& a) -> mixer::state
         auto const& id = inputs[a.bus];
         if (mixer_state.input_solo_id == id)
             mixer_state.input_solo_id = mixer::bus_id{};
-        mixer_state.buses.remove(inputs[a.bus]);
-        inputs.erase(inputs.begin() + a.bus);
+        mixer::remove_bus(mixer_state.buses, mixer_state.inputs, a.bus);
     }
     else
     {
         auto& outputs = mixer_state.outputs;
         BOOST_ASSERT(a.direction == audio::bus_direction::output);
         BOOST_ASSERT(a.bus < outputs.size());
-        mixer_state.buses.remove(outputs[a.bus]);
-        outputs.erase(outputs.begin() + a.bus);
+        mixer::remove_bus(mixer_state.buses, mixer_state.outputs, a.bus);
     }
 
     return mixer_state;
