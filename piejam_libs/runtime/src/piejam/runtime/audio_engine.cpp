@@ -59,9 +59,10 @@ class audio_engine::mixer_bus final
 public:
     mixer_bus(
             audio::samplerate_t const samplerate,
-            mixer::bus_id ch_id,
+            mixer::bus_id bus_id,
             mixer::bus const& channel)
-        : m_device_channels(channel.device_channels)
+        : m_id(bus_id)
+        , m_device_channels(channel.device_channels)
         , m_volume_proc(std::make_unique<ns_ae::value_input_processor<float>>(
                   channel.volume,
                   "volume"))
@@ -79,7 +80,7 @@ public:
                           ? processors::make_mono_mixer_bus_processor()
                           : processors::make_stereo_mixer_bus_processor())
         , m_amp(audio::components::make_stereo_split_amplifier("volume"))
-        , m_mute_solo_proc(processors::make_mute_solo_processor(ch_id))
+        , m_mute_solo_proc(processors::make_mute_solo_processor(bus_id))
         , m_mute_amp(audio::components::make_stereo_amplifier("mute"))
         , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
         , m_peak_level_proc(
@@ -87,6 +88,8 @@ public:
                           mixer::stereo_level>>("stereo_level"))
     {
     }
+
+    auto id() const noexcept -> mixer::bus_id { return m_id; }
 
     auto device_channels() const noexcept -> channel_index_pair const&
     {
@@ -150,6 +153,7 @@ public:
     }
 
 private:
+    mixer::bus_id m_id;
     channel_index_pair m_device_channels;
     std::unique_ptr<ns_ae::value_input_processor<float>> m_volume_proc;
     std::unique_ptr<ns_ae::value_input_processor<float>> m_pan_balance_proc;
@@ -166,14 +170,31 @@ private:
 
 static auto
 make_mixer_bus_vector(
+        std::vector<audio_engine::mixer_bus>& prev_buses,
         unsigned const samplerate,
         mixer::buses_t const& chs,
         mixer::bus_ids_t const& ch_ids) -> std::vector<audio_engine::mixer_bus>
 {
     std::vector<audio_engine::mixer_bus> result;
     result.reserve(ch_ids.size());
+
     for (auto const& id : ch_ids)
-        result.emplace_back(samplerate, id, chs[id]);
+    {
+        if (auto it = std::ranges::find(
+                    prev_buses,
+                    id,
+                    &audio_engine::mixer_bus::id);
+            it != prev_buses.end() &&
+            chs[id].device_channels == it->device_channels())
+        {
+            result.emplace_back(std::move(*it));
+        }
+        else
+        {
+            result.emplace_back(samplerate, id, chs[id]);
+        }
+    }
+
     return result;
 }
 
@@ -214,7 +235,6 @@ connect_mixer_bus(ns_ae::graph& g, audio_engine::mixer_bus const& mb)
 
 static auto
 make_graph(
-        mixer::state const& mixer_state,
         ns_ae::processor& input_proc,
         ns_ae::processor& output_proc,
         std::vector<audio_engine::mixer_bus> const& input_buses,
@@ -258,18 +278,14 @@ make_graph(
                     mixer_procs);
     }
 
-    for (std::size_t out = 0, num_outputs = mixer_state.outputs.size();
-         out < num_outputs;
-         ++out)
+    for (auto const& out : output_buses)
     {
-        for (std::size_t in = 0, num_inputs = mixer_state.inputs.size();
-             in < num_inputs;
-             ++in)
+        for (auto const& in : input_buses)
         {
             connect_stereo_components(
                     g,
-                    input_buses[in].mute_amplifier_component(),
-                    output_buses[out].amplifier_component(),
+                    in.mute_amplifier_component(),
+                    out.amplifier_component(),
                     mixer_procs);
         }
     }
@@ -360,10 +376,12 @@ void
 audio_engine::rebuild(mixer::state const& mixer_state)
 {
     auto input_buses = make_mixer_bus_vector(
+            m_input_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.inputs);
     auto output_buses = make_mixer_bus_vector(
+            m_output_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.outputs);
@@ -374,7 +392,6 @@ audio_engine::rebuild(mixer::state const& mixer_state)
     std::vector<processor_ptr> mixers;
 
     auto new_graph = make_graph(
-            mixer_state,
             m_process->input(),
             m_process->output(),
             input_buses,
