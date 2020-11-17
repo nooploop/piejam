@@ -26,6 +26,7 @@
 
 #include <boost/assert.hpp>
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -62,38 +63,54 @@ struct state
     bus_id input_solo_id;
 };
 
-inline auto
-input_bus(state& st, std::size_t index) -> bus&
+template <audio::bus_direction D>
+auto
+bus_ids(state const& st) -> bus_ids_t const&
 {
-    BOOST_ASSERT(index < st.inputs.size());
-    return st.buses[st.inputs[index]];
+    return D == audio::bus_direction::input ? st.inputs : st.outputs;
+}
+
+template <audio::bus_direction D>
+auto
+bus_ids(state& st) -> bus_ids_t&
+{
+    return D == audio::bus_direction::input ? st.inputs : st.outputs;
+}
+
+template <audio::bus_direction D>
+auto
+get_bus(state const& st, std::size_t index) -> bus const&
+{
+    BOOST_ASSERT(index < bus_ids<D>(st).size());
+    return st.buses[bus_ids<D>(st)[index]];
+}
+
+template <audio::bus_direction D, class Field, class Value>
+[[nodiscard]] auto
+update_bus_field(
+        state const& st,
+        std::size_t index,
+        Field&& field,
+        Value&& value) -> state
+{
+    auto new_st = st;
+    auto const& ids = bus_ids<D>(new_st);
+    std::invoke(std::forward<Field>(field), new_st.buses[ids[index]]) =
+            std::forward<Value>(value);
+    return new_st;
 }
 
 inline auto
-input_bus(state const& st, std::size_t index) -> bus const&
+add_bus(buses_t& buses, bus_ids_t& ids, bus&& b) -> bus_id
 {
-    BOOST_ASSERT(index < st.inputs.size());
-    return st.buses[st.inputs[index]];
+    return ids.emplace_back(buses.add(std::move(b)));
 }
 
-inline auto
-output_bus(state& st, std::size_t index) -> bus&
+template <audio::bus_direction D>
+auto
+add_bus(state& st, bus&& b) -> bus_id
 {
-    BOOST_ASSERT(index < st.outputs.size());
-    return st.buses[st.outputs[index]];
-}
-
-inline auto
-output_bus(state const& st, std::size_t index) -> bus const&
-{
-    BOOST_ASSERT(index < st.outputs.size());
-    return st.buses[st.outputs[index]];
-}
-
-inline auto
-add_bus(buses_t& buses, bus_ids_t& bus_ids, bus&& b) -> bus_id
-{
-    return bus_ids.emplace_back(buses.add(std::move(b)));
+    return add_bus(st.buses, bus_ids<D>(st), std::move(b));
 }
 
 inline void
@@ -103,6 +120,13 @@ remove_bus(buses_t& buses, bus_ids_t& bus_ids, std::size_t index)
     bus_ids.erase(bus_ids.begin() + index);
 }
 
+template <audio::bus_direction D>
+void
+remove_bus(state& st, std::size_t index)
+{
+    remove_bus(st.buses, bus_ids<D>(st), index);
+}
+
 inline void
 clear_buses(buses_t& buses, bus_ids_t& bus_ids)
 {
@@ -110,6 +134,13 @@ clear_buses(buses_t& buses, bus_ids_t& bus_ids)
         buses.remove(id);
 
     bus_ids.clear();
+}
+
+template <audio::bus_direction D>
+void
+clear_buses(state& st)
+{
+    clear_buses(st.buses, bus_ids<D>(st));
 }
 
 } // namespace piejam::runtime::mixer

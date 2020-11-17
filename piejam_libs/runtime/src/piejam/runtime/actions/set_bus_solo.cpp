@@ -20,6 +20,8 @@
 #include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::actions
 {
 

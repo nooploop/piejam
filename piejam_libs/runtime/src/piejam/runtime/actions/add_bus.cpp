@@ -31,26 +31,18 @@ reduce_mixer_state(audio_state const& st, add_bus const& a) -> mixer::state
 {
     auto mixer_state = st.mixer_state;
 
-    if (a.direction == audio::bus_direction::input)
-    {
-        auto name = fmt::format("In {}", mixer_state.inputs.size() + 1);
-        mixer::add_bus(
-                mixer_state.buses,
-                mixer_state.inputs,
-                mixer::bus{.name = std::move(name), .type = a.type});
-    }
-    else
-    {
-        BOOST_ASSERT(a.direction == audio::bus_direction::output);
-        auto const old_size = mixer_state.outputs.size();
-        BOOST_ASSERT(a.type == audio::bus_type::stereo);
-        auto name = old_size == 0 ? std::string("Main")
-                                  : fmt::format("Aux {}", old_size);
-        mixer::add_bus(
-                mixer_state.buses,
-                mixer_state.outputs,
-                mixer::bus{.name = std::move(name), .type = a.type});
-    }
+    auto& bus_ids = a.direction == audio::bus_direction::input
+                            ? mixer_state.inputs
+                            : mixer_state.outputs;
+    auto name = a.direction == audio::bus_direction::input
+                        ? fmt::format("In {}", bus_ids.size() + 1)
+                        : (bus_ids.size() == 0
+                                   ? std::string("Main")
+                                   : fmt::format("Aux {}", bus_ids.size()));
+    mixer::add_bus(
+            mixer_state.buses,
+            bus_ids,
+            mixer::bus{.name = std::move(name), .type = a.type});
 
     return mixer_state;
 }

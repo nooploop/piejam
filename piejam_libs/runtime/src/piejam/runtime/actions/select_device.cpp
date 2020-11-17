@@ -90,9 +90,8 @@ reduce_mixer_state(
     std::size_t const num_channels = a.device.hw_params->num_channels;
     for (std::size_t index = 0; index < num_channels; ++index)
     {
-        mixer::add_bus(
-                mixer_state.buses,
-                mixer_state.inputs,
+        mixer::add_bus<audio::bus_direction::input>(
+                mixer_state,
                 mixer::bus{
                         .name = fmt::format("In {}", index + 1),
                         .type = audio::bus_type::mono,
@@ -114,9 +113,8 @@ reduce_mixer_state(
 
     if (auto const num_channels = a.device.hw_params->num_channels)
     {
-        mixer::add_bus(
-                mixer_state.buses,
-                mixer_state.outputs,
+        mixer::add_bus<audio::bus_direction::output>(
+                mixer_state,
                 mixer::bus{
                         .name = std::string("Main"),
                         .type = audio::bus_type::stereo,

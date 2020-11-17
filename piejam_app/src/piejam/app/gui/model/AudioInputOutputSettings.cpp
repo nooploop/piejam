@@ -101,14 +101,29 @@ AudioInputOutputSettings::subscribeStep(
             });
 }
 
+template <audio::bus_direction D>
+void
+setBusName(store& st, unsigned const bus, QString const& name)
+{
+    runtime::actions::set_bus_name<D> action;
+    action.bus = bus;
+    action.name = name.toStdString();
+    st.dispatch(std::move(action));
+}
+
 void
 AudioInputOutputSettings::setBusName(unsigned const bus, QString const& name)
 {
-    runtime::actions::set_bus_name action;
-    action.bus_direction = m_settings_type;
-    action.bus = bus;
-    action.name = name.toStdString();
-    m_store.dispatch(action);
+    switch (m_settings_type)
+    {
+        case audio::bus_direction::input:
+            model::setBusName<audio::bus_direction::input>(m_store, bus, name);
+            break;
+
+        case audio::bus_direction::output:
+            model::setBusName<audio::bus_direction::output>(m_store, bus, name);
+            break;
+    }
 }
 
 void

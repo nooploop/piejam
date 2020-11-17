@@ -17,29 +17,30 @@
 
 #include <piejam/runtime/actions/set_bus_name.h>
 
+#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
-
-#include <boost/assert.hpp>
 
 namespace piejam::runtime::actions
 {
 
-auto
-set_bus_name::reduce(audio_state const& st) const -> audio_state
+template <audio::bus_direction D>
+static auto
+reduce_mixer_state(audio_state const& st, set_bus_name<D> const& a)
+        -> mixer::state
 {
-    auto new_st = st;
-
-    if (bus_direction == audio::bus_direction::input)
-    {
-        mixer::input_bus(new_st.mixer_state, bus).name = name;
-    }
-    else
-    {
-        BOOST_ASSERT(bus_direction == audio::bus_direction::output);
-        mixer::output_bus(new_st.mixer_state, bus).name = name;
-    }
-
-    return new_st;
+    return mixer::update_bus_field<D>(
+            st.mixer_state,
+            a.bus,
+            &mixer::bus::name,
+            a.name);
 }
+
+template auto
+reduce(audio_state const&, set_bus_name<audio::bus_direction::input> const&)
+        -> audio_state;
+
+template auto
+reduce(audio_state const&, set_bus_name<audio::bus_direction::output> const&)
+        -> audio_state;
 
 } // namespace piejam::runtime::actions

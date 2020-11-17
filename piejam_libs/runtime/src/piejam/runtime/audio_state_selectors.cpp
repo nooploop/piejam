@@ -93,6 +93,18 @@ make_num_busses_selector(audio::bus_direction const bd) -> selector<std::size_t>
     }
 }
 
+template <audio::bus_direction D>
+static auto
+make_bus_name_selector(std::size_t const bus)
+        -> selector<container::boxed_string>
+{
+    return [bus](audio_state const& st) -> container::boxed_string {
+        return bus < mixer::bus_ids<D>(st.mixer_state).size()
+                       ? mixer::get_bus<D>(st.mixer_state, bus).name
+                       : container::boxed_string();
+    };
+}
+
 auto
 make_bus_name_selector(audio::bus_direction const bd, std::size_t const bus)
         -> selector<container::boxed_string>
@@ -100,23 +112,22 @@ make_bus_name_selector(audio::bus_direction const bd, std::size_t const bus)
     switch (bd)
     {
         case audio::bus_direction::input:
-            return selector<container::boxed_string>(
-                    [bus](audio_state const& st) -> container::boxed_string {
-                        return bus < st.mixer_state.inputs.size()
-                                       ? mixer::input_bus(st.mixer_state, bus)
-                                                 .name
-                                       : container::boxed_string();
-                    });
+            return make_bus_name_selector<audio::bus_direction::input>(bus);
 
         case audio::bus_direction::output:
-            return selector<container::boxed_string>(
-                    [bus](audio_state const& st) -> container::boxed_string {
-                        return bus < st.mixer_state.outputs.size()
-                                       ? mixer::output_bus(st.mixer_state, bus)
-                                                 .name
-                                       : container::boxed_string();
-                    });
+            return make_bus_name_selector<audio::bus_direction::output>(bus);
     }
+}
+
+template <audio::bus_direction D>
+static auto
+make_bus_type_selector(std::size_t const bus, audio::bus_type const def)
+{
+    return [bus, def](audio_state const& st) -> audio::bus_type {
+        return bus < mixer::bus_ids<D>(st.mixer_state).size()
+                       ? mixer::get_bus<D>(st.mixer_state, bus).type
+                       : def;
+    };
 }
 
 auto
@@ -126,19 +137,40 @@ make_bus_type_selector(audio::bus_direction const bd, std::size_t const bus)
     switch (bd)
     {
         case audio::bus_direction::input:
-            return selector<audio::bus_type>(
-                    [bus](audio_state const& st) -> audio::bus_type {
-                        return bus < st.mixer_state.inputs.size()
-                                       ? mixer::input_bus(st.mixer_state, bus)
-                                                 .type
-                                       : audio::bus_type::mono;
-                    });
+            return make_bus_type_selector<audio::bus_direction::input>(
+                    bus,
+                    audio::bus_type::mono);
 
         case audio::bus_direction::output:
-            return selector<audio::bus_type>(
-                    [](audio_state const & /*st*/) -> audio::bus_type {
-                        return audio::bus_type::stereo;
-                    });
+            return make_bus_type_selector<audio::bus_direction::output>(
+                    bus,
+                    audio::bus_type::stereo);
+    }
+}
+
+template <audio::bus_direction D>
+static auto
+make_bus_channel_selector(std::size_t const bus, audio::bus_channel const bc)
+        -> selector<std::size_t>
+{
+    switch (bc)
+    {
+        case audio::bus_channel::mono:
+        case audio::bus_channel::left:
+            return [bus](audio_state const& st) -> std::size_t {
+                return bus < mixer::bus_ids<D>(st.mixer_state).size()
+                               ? mixer::get_bus<D>(st.mixer_state, bus)
+                                         .device_channels.left
+                               : piejam::npos;
+            };
+
+        case audio::bus_channel::right:
+            return [bus](audio_state const& st) -> std::size_t {
+                return bus < mixer::bus_ids<D>(st.mixer_state).size()
+                               ? mixer::get_bus<D>(st.mixer_state, bus)
+                                         .device_channels.right
+                               : piejam::npos;
+            };
     }
 
     throw;
@@ -150,111 +182,69 @@ make_bus_channel_selector(
         std::size_t const bus,
         audio::bus_channel const bc) -> selector<std::size_t>
 {
-
     switch (bd)
     {
         case audio::bus_direction::input:
-            switch (bc)
-            {
-                case audio::bus_channel::mono:
-                    return selector<std::size_t>(
-                            [bus](audio_state const& st) -> std::size_t {
-                                return bus < st.mixer_state.inputs.size()
-                                               ? mixer::input_bus(
-                                                         st.mixer_state,
-                                                         bus)
-                                                         .device_channels.left
-                                               : piejam::npos;
-                            });
-
-                case audio::bus_channel::left:
-                    return selector<std::size_t>(
-                            [bus](audio_state const& st) -> std::size_t {
-                                return bus < st.mixer_state.inputs.size()
-                                               ? mixer::input_bus(
-                                                         st.mixer_state,
-                                                         bus)
-                                                         .device_channels.left
-                                               : piejam::npos;
-                            });
-
-                case audio::bus_channel::right:
-                    return selector<std::size_t>(
-                            [bus](audio_state const& st) -> std::size_t {
-                                return bus < st.mixer_state.inputs.size()
-                                               ? mixer::input_bus(
-                                                         st.mixer_state,
-                                                         bus)
-                                                         .device_channels.right
-                                               : piejam::npos;
-                            });
-            }
-            break;
+            return make_bus_channel_selector<audio::bus_direction::input>(
+                    bus,
+                    bc);
 
         case audio::bus_direction::output:
-            switch (bc)
-            {
-                case audio::bus_channel::left:
-                    return selector<std::size_t>(
-                            [bus](audio_state const& st) -> std::size_t {
-                                return bus < st.mixer_state.outputs.size()
-                                               ? mixer::output_bus(
-                                                         st.mixer_state,
-                                                         bus)
-                                                         .device_channels.left
-                                               : piejam::npos;
-                            });
-
-                case audio::bus_channel::right:
-                    return selector<std::size_t>(
-                            [bus](audio_state const& st) -> std::size_t {
-                                return bus < st.mixer_state.outputs.size()
-                                               ? mixer::output_bus(
-                                                         st.mixer_state,
-                                                         bus)
-                                                         .device_channels.right
-                                               : piejam::npos;
-                            });
-
-                case audio::bus_channel::mono:
-                    return selector<std::size_t>(
-                            [](audio_state const&) -> std::size_t {
-                                return npos;
-                            });
-            }
+            return make_bus_channel_selector<audio::bus_direction::output>(
+                    bus,
+                    bc);
     }
+}
 
-    throw;
+template <audio::bus_direction D>
+static auto
+make_volume_selector(std::size_t const index) -> selector<float>
+{
+    return [index](audio_state const& st) -> float {
+        return index < mixer::bus_ids<D>(st.mixer_state).size()
+                       ? mixer::get_bus<D>(st.mixer_state, index).volume
+                       : 1.f;
+    };
 }
 
 auto
 make_input_volume_selector(std::size_t const index) -> selector<float>
 {
-    return selector<float>([index](audio_state const& st) -> float {
-        return index < st.mixer_state.inputs.size()
-                       ? mixer::input_bus(st.mixer_state, index).volume
-                       : 1.f;
-    });
+    return make_volume_selector<audio::bus_direction::input>(index);
+}
+
+template <audio::bus_direction D>
+static auto
+make_pan_balance_selector(std::size_t const index) -> selector<float>
+{
+    return [index](audio_state const& st) -> float {
+        return index < mixer::bus_ids<D>(st.mixer_state).size()
+                       ? mixer::get_bus<D>(st.mixer_state, index).pan_balance
+                       : 0.f;
+    };
 }
 
 auto
 make_input_pan_selector(std::size_t const index) -> selector<float>
 {
-    return selector<float>([index](audio_state const& st) -> float {
-        return index < st.mixer_state.inputs.size()
-                       ? mixer::input_bus(st.mixer_state, index).pan_balance
-                       : 0.f;
-    });
+    return make_pan_balance_selector<audio::bus_direction::input>(index);
+}
+
+template <audio::bus_direction D>
+static auto
+make_mute_selector(std::size_t const index) -> selector<bool>
+{
+    return [index](audio_state const& st) -> bool {
+        return index < mixer::bus_ids<D>(st.mixer_state).size()
+                       ? mixer::get_bus<D>(st.mixer_state, index).mute
+                       : false;
+    };
 }
 
 auto
 make_input_mute_selector(std::size_t const index) -> selector<bool>
 {
-    return selector<bool>([index](audio_state const& st) -> bool {
-        return index < st.mixer_state.inputs.size()
-                       ? mixer::input_bus(st.mixer_state, index).mute
-                       : false;
-    });
+    return make_mute_selector<audio::bus_direction::input>(index);
 }
 
 auto
@@ -265,16 +255,22 @@ make_input_solo_selector(std::size_t const index) -> selector<bool>
     });
 }
 
+template <audio::bus_direction D>
+static auto
+make_level_selector(std::size_t const index) -> selector<mixer::stereo_level>
+{
+    return [index](audio_state const& st) -> mixer::stereo_level {
+        return index < mixer::bus_ids<D>(st.mixer_state).size()
+                       ? mixer::get_bus<D>(st.mixer_state, index).level
+                       : mixer::stereo_level{};
+    };
+}
+
 auto
 make_input_level_selector(std::size_t const index)
         -> selector<mixer::stereo_level>
 {
-    return selector<mixer::stereo_level>(
-            [index](audio_state const& st) -> mixer::stereo_level {
-                return index < st.mixer_state.inputs.size()
-                               ? mixer::input_bus(st.mixer_state, index).level
-                               : mixer::stereo_level{};
-            });
+    return make_level_selector<audio::bus_direction::input>(index);
 }
 
 const selector<bool> select_input_solo_active([](audio_state const& st) {
@@ -284,43 +280,26 @@ const selector<bool> select_input_solo_active([](audio_state const& st) {
 auto
 make_output_volume_selector(std::size_t const index) -> selector<float>
 {
-    return selector<float>([index](audio_state const& st) -> float {
-        return index < st.mixer_state.outputs.size()
-                       ? mixer::output_bus(st.mixer_state, index).volume
-                       : 1.f;
-    });
+    return make_volume_selector<audio::bus_direction::output>(index);
 }
 
 auto
 make_output_balance_selector(std::size_t const index) -> selector<float>
 {
-    return selector<float>([index](audio_state const& st) -> float {
-        return index < st.mixer_state.outputs.size()
-                       ? mixer::output_bus(st.mixer_state, index).pan_balance
-                       : 0.f;
-    });
+    return make_pan_balance_selector<audio::bus_direction::output>(index);
 }
 
 auto
 make_output_mute_selector(std::size_t const index) -> selector<bool>
 {
-    return selector<bool>([index](audio_state const& st) -> bool {
-        return index < st.mixer_state.outputs.size()
-                       ? mixer::output_bus(st.mixer_state, index).mute
-                       : false;
-    });
+    return make_mute_selector<audio::bus_direction::output>(index);
 }
 
 auto
 make_output_level_selector(std::size_t const index)
         -> selector<mixer::stereo_level>
 {
-    return selector<mixer::stereo_level>(
-            [index](audio_state const& st) -> mixer::stereo_level {
-                return index < st.mixer_state.outputs.size()
-                               ? mixer::output_bus(st.mixer_state, index).level
-                               : mixer::stereo_level{};
-            });
+    return make_level_selector<audio::bus_direction::output>(index);
 }
 
 const selector<std::size_t> select_xruns([](audio_state const& st) {
