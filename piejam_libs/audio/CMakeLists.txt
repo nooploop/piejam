@@ -6,6 +6,9 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_writer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/process_step.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/amplifier.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/level_meter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/pan.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/stereo_balance.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/audio_slice.h
@@ -30,6 +33,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/multiply_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/named_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/output_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/pan_balance_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/process.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_job.h
@@ -65,6 +69,8 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/process_step.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/amplifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/level_meter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/pan.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/stereo_balance.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/audio_slice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/dag.cpp
@@ -78,6 +84,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/mix_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/multiply_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/output_processor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/pan_balance_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/process.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/select_processor.cpp

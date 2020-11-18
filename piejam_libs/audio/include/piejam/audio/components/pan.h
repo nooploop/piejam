@@ -18,17 +18,13 @@
 #pragma once
 
 #include <piejam/audio/engine/fwd.h>
-#include <piejam/runtime/mixer.h>
 
 #include <memory>
 #include <string_view>
 
-namespace piejam::runtime::processors
+namespace piejam::audio::components
 {
 
-auto make_mute_solo_processor(
-        mixer::bus_id solo_id,
-        std::string_view const& name = {})
-        -> std::unique_ptr<audio::engine::processor>;
+auto make_pan(std::string_view name = {}) -> std::unique_ptr<engine::component>;
 
-} // namespace piejam::runtime::processors
+} // namespace piejam::audio::components
