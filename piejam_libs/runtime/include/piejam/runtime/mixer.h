@@ -49,30 +49,29 @@ struct bus
     channel_index_pair device_channels{npos};
 };
 
-using bus_id = entity_id<struct bus_id_tag>;
-
-using bus_ids_t = std::vector<bus_id>;
-using buses_t = entity_map<bus_id, bus>;
+using buses_t = entity_map<bus>;
+using bus_id = typename buses_t::id_t;
+using bus_list_t = std::vector<bus_id>;
 
 struct state
 {
     buses_t buses;
 
-    bus_ids_t inputs;
-    bus_ids_t outputs;
+    bus_list_t inputs;
+    bus_list_t outputs;
     bus_id input_solo_id;
 };
 
 template <audio::bus_direction D>
 auto
-bus_ids(state const& st) -> bus_ids_t const&
+bus_ids(state const& st) -> bus_list_t const&
 {
     return D == audio::bus_direction::input ? st.inputs : st.outputs;
 }
 
 template <audio::bus_direction D>
 auto
-bus_ids(state& st) -> bus_ids_t&
+bus_ids(state& st) -> bus_list_t&
 {
     return D == audio::bus_direction::input ? st.inputs : st.outputs;
 }
@@ -101,7 +100,7 @@ update_bus_field(
 }
 
 inline auto
-add_bus(buses_t& buses, bus_ids_t& ids, bus&& b) -> bus_id
+add_bus(buses_t& buses, bus_list_t& ids, bus&& b) -> bus_id
 {
     return ids.emplace_back(buses.add(std::move(b)));
 }
@@ -114,7 +113,7 @@ add_bus(state& st, bus&& b) -> bus_id
 }
 
 inline void
-remove_bus(buses_t& buses, bus_ids_t& bus_ids, std::size_t index)
+remove_bus(buses_t& buses, bus_list_t& bus_ids, std::size_t index)
 {
     buses.remove(bus_ids[index]);
     bus_ids.erase(bus_ids.begin() + index);
@@ -128,7 +127,7 @@ remove_bus(state& st, std::size_t index)
 }
 
 inline void
-clear_buses(buses_t& buses, bus_ids_t& bus_ids)
+clear_buses(buses_t& buses, bus_list_t& bus_ids)
 {
     for (auto const& id : bus_ids)
         buses.remove(id);

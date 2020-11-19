@@ -9,3 +9,5 @@ target_sources(piejam_base INTERFACE
 )
 
 target_include_directories(piejam_base INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_subdirectory(tests)

@@ -15,29 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/meta/decay_tuple_elements.h>
+#include <piejam/tuple.h>
 
 #include <gtest/gtest.h>
 
-namespace piejam::meta::test
+namespace piejam::tuple::test
 {
 
 TEST(decay_tuple_elements, verify)
 {
     static_assert(std::is_same_v<
                   std::tuple<int, int>,
-                  decay_tuple_elements_t<std::tuple<int, int>>>);
+                  decay_elements_t<std::tuple<int, int>>>);
     static_assert(std::is_same_v<
                   std::tuple<int, int>,
-                  decay_tuple_elements_t<std::tuple<int const&, int>>>);
+                  decay_elements_t<std::tuple<int const&, int>>>);
     static_assert(std::is_same_v<
                   std::tuple<int, int>,
-                  decay_tuple_elements_t<std::tuple<int&, int>>>);
+                  decay_elements_t<std::tuple<int&, int>>>);
     static_assert(std::is_same_v<
                   std::tuple<int, int>,
-                  decay_tuple_elements_t<std::tuple<int&&, int>>>);
-    static_assert(
-            std::is_same_v<std::tuple<>, decay_tuple_elements_t<std::tuple<>>>);
+                  decay_elements_t<std::tuple<int&&, int>>>);
+    static_assert(std::is_same_v<std::tuple<>, decay_elements_t<std::tuple<>>>);
 }
 
-} // namespace piejam::meta::test
+} // namespace piejam::tuple::test

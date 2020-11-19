@@ -37,9 +37,9 @@ class process_thread
 {
 
 public:
-    process_thread() noexcept(meta::is_nothrow_default_constructible_v<
-                              std::atomic_bool,
-                              std::thread>) = default;
+    process_thread() noexcept(
+            is_nothrow_default_constructible_v<std::atomic_bool, std::thread>) =
+            default;
 
     ~process_thread() { stop(); }
 

@@ -18,9 +18,9 @@
 #pragma once
 
 #include <boost/assert.hpp>
+#include <boost/container/flat_map.hpp>
 
 #include <concepts>
-#include <map>
 
 namespace piejam
 {
@@ -60,15 +60,12 @@ private:
     std::size_t m_id{};
 };
 
-template <class, class>
-class entity_map;
-
-template <class EntityTag, class Value>
-class entity_map<entity_id<EntityTag>, Value>
+template <class Entity, class EntityTag = Entity>
+class entity_map
 {
 public:
     using id_t = entity_id<EntityTag>;
-    using map_t = std::map<id_t, Value>;
+    using map_t = boost::container::flat_map<id_t, Entity>;
 
     auto empty() const noexcept { return m_map.empty(); }
     auto size() const noexcept { return m_map.size(); }
@@ -76,35 +73,32 @@ public:
     auto begin() const noexcept { return m_map.begin(); }
     auto end() const noexcept { return m_map.end(); }
 
-    auto begin() noexcept { return m_map.begin(); }
-    auto end() noexcept { return m_map.end(); }
-
     auto contains(id_t id) const noexcept { return m_map.contains(id); }
 
     auto find(id_t id) const noexcept { return m_map.find(id); }
     auto find(id_t id) noexcept { return m_map.find(id); }
 
-    auto operator[](id_t id) const noexcept -> Value const&
+    auto operator[](id_t id) const noexcept -> Entity const&
     {
         BOOST_ASSERT(contains(id));
         return m_map.find(id)->second;
     }
 
-    auto operator[](id_t id) noexcept -> Value&
+    auto operator[](id_t id) noexcept -> Entity&
     {
         BOOST_ASSERT(contains(id));
         return m_map[id];
     }
 
     template <class V>
-    requires std::convertible_to<V, Value> auto add(V&& v) -> id_t
+    requires std::convertible_to<V, Entity> auto add(V&& v) -> id_t
     {
         auto id = id_t::generate();
-        m_map.emplace(id, std::forward<V>(v));
+        m_map.emplace_hint(m_map.end(), id, std::forward<V>(v));
         return id;
     }
 
-    auto remove(id_t id) { m_map.erase(id); }
+    auto remove(id_t id) { return m_map.erase(id); }
 
 private:
     map_t m_map;

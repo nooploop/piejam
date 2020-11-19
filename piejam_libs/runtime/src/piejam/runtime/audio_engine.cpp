@@ -163,7 +163,7 @@ make_mixer_bus_vector(
         std::vector<audio_engine::mixer_bus>& prev_buses,
         unsigned const samplerate,
         mixer::buses_t const& chs,
-        mixer::bus_ids_t const& ch_ids) -> std::vector<audio_engine::mixer_bus>
+        mixer::bus_list_t const& ch_ids) -> std::vector<audio_engine::mixer_bus>
 {
     std::vector<audio_engine::mixer_bus> result;
     result.reserve(ch_ids.size());
