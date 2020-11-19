@@ -23,6 +23,7 @@
 #include <piejam/entity_map.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/parameters.h>
 
 #include <boost/assert.hpp>
 
@@ -39,7 +40,7 @@ using channel_type = audio::bus_type;
 struct bus
 {
     container::boxed_string name;
-    float volume{1.f};
+    float_parameter_id volume;
     float pan_balance{};
     bool mute{};
     stereo_level level{};

@@ -37,6 +37,9 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/open_alsa_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_map.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/boolean.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/flt.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mixer_bus_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h

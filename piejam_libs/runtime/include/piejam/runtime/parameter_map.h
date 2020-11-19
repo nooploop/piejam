@@ -68,10 +68,16 @@ public:
     }
 
     template <std::convertible_to<value_type> V>
-    void set(id_t id, V&& value)
+    auto set(id_t id, V&& value) -> bool
     {
-        BOOST_ASSERT(contains(id) && m_values.contains(id));
-        m_values[id] = std::forward<V>(value);
+        auto it = m_values.find(id);
+        if (it != m_values.end())
+        {
+            it->second = std::forward<V>(value);
+            return true;
+        }
+
+        return false;
     }
 
 private:

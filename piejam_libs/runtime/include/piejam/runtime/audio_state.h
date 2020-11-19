@@ -22,6 +22,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/container/box.h>
 #include <piejam/runtime/mixer.h>
+#include <piejam/runtime/parameters.h>
 #include <piejam/runtime/selected_device.h>
 
 #include <functional>
@@ -39,6 +40,9 @@ struct audio_state
 
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
+
+    float_parameters float_params{};
+    bool_parameters bool_params{};
 
     mixer::state mixer_state{};
 
