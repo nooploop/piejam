@@ -27,110 +27,55 @@ namespace piejam::runtime::actions
 
 template <>
 auto
-reduce_input_device(
-        audio_state const&,
-        select_device<audio::bus_direction::input> const& a) -> selected_device
+select_device<audio::bus_direction::input>::reduce(audio_state const& st) const
+        -> audio_state
 {
-    return a.device;
-}
+    auto new_st = st;
 
-template <>
-auto
-reduce_input_device(
-        audio_state const& st,
-        select_device<audio::bus_direction::output> const&) -> selected_device
-{
-    return st.input;
-}
+    new_st.input = device;
+    new_st.samplerate = samplerate;
+    new_st.period_size = period_size;
 
-template <>
-auto
-reduce_output_device(
-        audio_state const& st,
-        select_device<audio::bus_direction::input> const&) -> selected_device
-{
-    return st.output;
-}
+    clear_mixer_buses<audio::bus_direction::input>(new_st);
 
-template <>
-auto
-reduce_output_device(
-        audio_state const&,
-        select_device<audio::bus_direction::output> const& a) -> selected_device
-{
-    return a.device;
-}
-
-template <audio::bus_direction D>
-auto
-reduce_samplerate(audio_state const&, select_device<D> const& a)
-        -> audio::samplerate_t
-{
-    return a.samplerate;
-}
-
-template <audio::bus_direction D>
-auto
-reduce_period_size(audio_state const&, select_device<D> const& a)
-        -> audio::period_size_t
-{
-    return a.period_size;
-}
-
-template <>
-auto
-reduce_mixer_state(
-        audio_state const& st,
-        select_device<audio::bus_direction::input> const& a) -> mixer::state
-{
-    auto mixer_state = st.mixer_state;
-
-    mixer::clear_buses(mixer_state.buses, mixer_state.inputs);
-
-    std::size_t const num_channels = a.device.hw_params->num_channels;
+    std::size_t const num_channels = device.hw_params->num_channels;
     for (std::size_t index = 0; index < num_channels; ++index)
     {
-        mixer::add_bus<audio::bus_direction::input>(
-                mixer_state,
-                mixer::bus{
-                        .name = fmt::format("In {}", index + 1),
-                        .type = audio::bus_type::mono,
-                        .device_channels = channel_index_pair{index}});
+        add_mixer_bus<audio::bus_direction::input>(
+                new_st,
+                fmt::format("In {}", index + 1),
+                audio::bus_type::mono,
+                channel_index_pair(index));
     }
 
-    return mixer_state;
+    return new_st;
 }
 
 template <>
 auto
-reduce_mixer_state(
-        audio_state const& st,
-        select_device<audio::bus_direction::output> const& a) -> mixer::state
+select_device<audio::bus_direction::output>::reduce(audio_state const& st) const
+        -> audio_state
 {
-    auto mixer_state = st.mixer_state;
+    auto new_st = st;
 
-    mixer::clear_buses(mixer_state.buses, mixer_state.outputs);
+    new_st.output = device;
+    new_st.samplerate = samplerate;
+    new_st.period_size = period_size;
 
-    if (auto const num_channels = a.device.hw_params->num_channels)
+    clear_mixer_buses<audio::bus_direction::output>(new_st);
+
+    if (auto const num_channels = device.hw_params->num_channels)
     {
-        mixer::add_bus<audio::bus_direction::output>(
-                mixer_state,
-                mixer::bus{
-                        .name = std::string("Main"),
-                        .type = audio::bus_type::stereo,
-                        .device_channels = channel_index_pair(
-                                num_channels > 0 ? 0 : npos,
-                                num_channels > 1 ? 1 : npos)});
+        add_mixer_bus<audio::bus_direction::output>(
+                new_st,
+                "Main",
+                audio::bus_type::stereo,
+                channel_index_pair(
+                        num_channels > 0 ? 0 : npos,
+                        num_channels > 1 ? 1 : npos));
     }
 
-    return mixer_state;
+    return new_st;
 }
-
-template auto
-reduce(audio_state const&, select_device<audio::bus_direction::input> const&)
-        -> audio_state;
-template auto
-reduce(audio_state const&, select_device<audio::bus_direction::output> const&)
-        -> audio_state;
 
 } // namespace piejam::runtime::actions

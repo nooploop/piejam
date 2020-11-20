@@ -100,47 +100,4 @@ update_bus_field(
     return new_st;
 }
 
-inline auto
-add_bus(buses_t& buses, bus_list_t& ids, bus&& b) -> bus_id
-{
-    return ids.emplace_back(buses.add(std::move(b)));
-}
-
-template <audio::bus_direction D>
-auto
-add_bus(state& st, bus&& b) -> bus_id
-{
-    return add_bus(st.buses, bus_ids<D>(st), std::move(b));
-}
-
-inline void
-remove_bus(buses_t& buses, bus_list_t& bus_ids, std::size_t index)
-{
-    buses.remove(bus_ids[index]);
-    bus_ids.erase(bus_ids.begin() + index);
-}
-
-template <audio::bus_direction D>
-void
-remove_bus(state& st, std::size_t index)
-{
-    remove_bus(st.buses, bus_ids<D>(st), index);
-}
-
-inline void
-clear_buses(buses_t& buses, bus_list_t& bus_ids)
-{
-    for (auto const& id : bus_ids)
-        buses.remove(id);
-
-    bus_ids.clear();
-}
-
-template <audio::bus_direction D>
-void
-clear_buses(state& st)
-{
-    clear_buses(st.buses, bus_ids<D>(st));
-}
-
 } // namespace piejam::runtime::mixer

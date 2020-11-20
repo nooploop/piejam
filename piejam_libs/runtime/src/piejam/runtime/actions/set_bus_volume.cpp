@@ -24,23 +24,18 @@ namespace piejam::runtime::actions
 {
 
 template <audio::bus_direction D>
-static auto
-reduce_mixer_state(audio_state const& st, set_bus_volume<D> const& a)
-        -> mixer::state
+auto
+set_bus_volume<D>::reduce(audio_state const& st) const -> audio_state
 {
-    return mixer::update_bus_field<D>(
-            st.mixer_state,
-            a.index,
-            &mixer::bus::volume,
-            a.volume);
+    auto new_st = st;
+
+    mixer::bus const& bus = mixer::get_bus<D>(new_st.mixer_state, index);
+    new_st.float_params.set(bus.volume, volume);
+
+    return new_st;
 }
 
-template auto
-reduce(audio_state const&, set_bus_volume<audio::bus_direction::input> const&)
-        -> audio_state;
-
-template auto
-reduce(audio_state const&, set_bus_volume<audio::bus_direction::output> const&)
-        -> audio_state;
+template struct set_bus_volume<audio::bus_direction::input>;
+template struct set_bus_volume<audio::bus_direction::output>;
 
 } // namespace piejam::runtime::actions

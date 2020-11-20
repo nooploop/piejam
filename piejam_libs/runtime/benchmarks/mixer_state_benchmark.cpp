@@ -23,25 +23,39 @@ namespace piejam::runtime
 {
 
 static void
+add_bus(mixer::buses_t& buses, mixer::bus_list_t& bus_ids, mixer::bus&& bus)
+{
+    bus_ids.emplace_back(buses.add(std::move(bus)));
+}
+
+static void
 BM_copy_mixer_state_benchmark(benchmark::State& state)
 {
     mixer::state st;
-    mixer::add_bus(
-            st.buses,
+    add_bus(st.buses,
             st.inputs,
-            mixer::bus{.name = "in1", .type = audio::bus_type::mono});
-    mixer::add_bus(
-            st.buses,
+            mixer::bus{
+                    .name = "in1",
+                    .volume{},
+                    .type = audio::bus_type::mono});
+    add_bus(st.buses,
             st.inputs,
-            mixer::bus{.name = "in2", .type = audio::bus_type::mono});
-    mixer::add_bus(
-            st.buses,
+            mixer::bus{
+                    .name = "in2",
+                    .volume{},
+                    .type = audio::bus_type::mono});
+    add_bus(st.buses,
             st.inputs,
-            mixer::bus{.name = "in3", .type = audio::bus_type::mono});
-    mixer::add_bus(
-            st.buses,
+            mixer::bus{
+                    .name = "in3",
+                    .volume{},
+                    .type = audio::bus_type::mono});
+    add_bus(st.buses,
             st.outputs,
-            mixer::bus{.name = "main", .type = audio::bus_type::stereo});
+            mixer::bus{
+                    .name = "main",
+                    .volume{},
+                    .type = audio::bus_type::stereo});
 
     for (auto _ : state)
     {

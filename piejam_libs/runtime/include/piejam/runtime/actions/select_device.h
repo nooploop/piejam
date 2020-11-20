@@ -18,8 +18,8 @@
 #pragma once
 
 #include <piejam/runtime/actions/device_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/selected_device.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
@@ -27,14 +27,14 @@ namespace piejam::runtime::actions
 
 template <audio::bus_direction D>
 struct select_device final
-    : reducible_action<
-              select_device<D>,
-              ui::cloneable_action<select_device<D>, action>>
+    : ui::cloneable_action<select_device<D>, action>
     , visitable_device_action<select_device<D>>
 {
     selected_device device;
     unsigned samplerate{};
     unsigned period_size{};
+
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 template <audio::bus_direction D>

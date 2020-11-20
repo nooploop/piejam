@@ -55,13 +55,14 @@ class audio_engine::mixer_bus final
 {
 public:
     mixer_bus(
+            float_parameters const& flt_params,
             audio::samplerate_t const samplerate,
             mixer::bus_id bus_id,
             mixer::bus const& channel)
         : m_id(bus_id)
         , m_volume_input_proc(
                   std::make_unique<ns_ae::value_input_processor<float>>(
-                          channel.volume,
+                          flt_params.get(channel.volume),
                           "volume"))
         , m_pan_balance_input_proc(
                   std::make_unique<ns_ae::value_input_processor<float>>(
@@ -160,6 +161,7 @@ private:
 
 static auto
 make_mixer_bus_vector(
+        float_parameters const& float_params,
         std::vector<audio_engine::mixer_bus>& prev_buses,
         unsigned const samplerate,
         mixer::buses_t const& chs,
@@ -180,7 +182,7 @@ make_mixer_bus_vector(
         }
         else
         {
-            result.emplace_back(samplerate, id, chs[id]);
+            result.emplace_back(float_params, samplerate, id, chs[id]);
         }
     }
 
@@ -376,14 +378,18 @@ audio_engine::get_output_level(std::size_t const index) const noexcept
 }
 
 void
-audio_engine::rebuild(mixer::state const& mixer_state)
+audio_engine::rebuild(
+        mixer::state const& mixer_state,
+        float_parameters const& float_params)
 {
     auto input_buses = make_mixer_bus_vector(
+            float_params,
             m_input_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.inputs);
     auto output_buses = make_mixer_bus_vector(
+            float_params,
             m_output_buses,
             m_samplerate,
             mixer_state.buses,

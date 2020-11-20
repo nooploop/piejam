@@ -18,7 +18,7 @@
 #include <piejam/audio/table.h>
 #include <piejam/audio/types.h>
 #include <piejam/runtime/audio_engine.h>
-#include <piejam/runtime/mixer.h>
+#include <piejam/runtime/audio_state.h>
 
 #include <gtest/gtest.h>
 
@@ -70,10 +70,10 @@ struct audio_engine_render_test : public ::testing::Test
             render_buffer();
     }
 
-    void rebuild(mixer::state const& mixer_state)
+    void rebuild(audio_state const& st)
     {
         auto engine_swap = std::async(std::launch::async, [&]() {
-            sut.rebuild(mixer_state);
+            sut.rebuild(st.mixer_state, st.float_params);
         });
 
         do
@@ -93,36 +93,33 @@ struct audio_engine_render_test : public ::testing::Test
 
 TEST_F(audio_engine_render_test, add_input_channel)
 {
-    mixer::state mixer_state;
+    audio_state st;
 
-    mixer::bus in_ch1;
-    in_ch1.type = mixer::channel_type::mono;
-    in_ch1.device_channels = channel_index_pair(0);
-    mixer::add_bus(
-            mixer_state.buses,
-            mixer_state.inputs,
-            std::move(in_ch1));
+    add_mixer_bus<audio::bus_direction::input>(
+            st,
+            "in1",
+            mixer::channel_type::mono,
+            channel_index_pair(0));
 
     mixer::bus out_ch;
     out_ch.type = mixer::channel_type::stereo;
     out_ch.device_channels = channel_index_pair(0, 1);
-    mixer::add_bus(
-            mixer_state.buses,
-            mixer_state.outputs,
-            std::move(out_ch));
+    add_mixer_bus<audio::bus_direction::output>(
+            st,
+            "out",
+            mixer::channel_type::stereo,
+            channel_index_pair(0, 1));
 
-    rebuild(mixer_state);
+    rebuild(st);
     render(200);
 
-    mixer::bus in_ch2;
-    in_ch2.type = mixer::channel_type::mono;
-    in_ch2.device_channels = channel_index_pair(1);
-    mixer::add_bus(
-            mixer_state.buses,
-            mixer_state.inputs,
-            std::move(in_ch2));
+    add_mixer_bus<audio::bus_direction::input>(
+            st,
+            "in2",
+            mixer::channel_type::mono,
+            channel_index_pair(1));
 
-    rebuild(mixer_state);
+    rebuild(st);
     render(200);
 
     dump_output("add_input_channel.txt");

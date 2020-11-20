@@ -202,7 +202,9 @@ make_volume_selector(std::size_t const index) -> selector<float>
 {
     return [index](audio_state const& st) -> float {
         return index < mixer::bus_ids<D>(st.mixer_state).size()
-                       ? mixer::get_bus<D>(st.mixer_state, index).volume
+                       ? st.float_params.get(
+                                 mixer::get_bus<D>(st.mixer_state, index)
+                                         .volume)
                        : 1.f;
     };
 }

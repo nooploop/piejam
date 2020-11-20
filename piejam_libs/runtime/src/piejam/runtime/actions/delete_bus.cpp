@@ -20,40 +20,26 @@
 #include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
-#include <fmt/format.h>
-
-#include <boost/core/ignore_unused.hpp>
-
 namespace piejam::runtime::actions
 {
 
-template <>
 auto
-reduce_mixer_state(audio_state const& st, delete_bus const& a) -> mixer::state
+delete_bus::reduce(audio_state const& st) const -> audio_state
 {
-    auto mixer_state = st.mixer_state;
+    auto new_st = st;
 
-    if (a.direction == audio::bus_direction::input)
+    switch (direction)
     {
-        auto& inputs = mixer_state.inputs;
-        BOOST_ASSERT(a.bus < inputs.size());
-        auto const& id = inputs[a.bus];
-        if (mixer_state.input_solo_id == id)
-            mixer_state.input_solo_id = mixer::bus_id{};
-        mixer::remove_bus(mixer_state.buses, mixer_state.inputs, a.bus);
-    }
-    else
-    {
-        auto& outputs = mixer_state.outputs;
-        boost::ignore_unused(outputs);
-        BOOST_ASSERT(a.direction == audio::bus_direction::output);
-        BOOST_ASSERT(a.bus < outputs.size());
-        mixer::remove_bus(mixer_state.buses, mixer_state.outputs, a.bus);
+        case audio::bus_direction::input:
+            remove_mixer_bus<audio::bus_direction::input>(new_st, bus);
+            break;
+
+        case audio::bus_direction::output:
+            remove_mixer_bus<audio::bus_direction::output>(new_st, bus);
+            break;
     }
 
-    return mixer_state;
+    return new_st;
 }
-
-template auto reduce(audio_state const&, delete_bus const&) -> audio_state;
 
 } // namespace piejam::runtime::actions

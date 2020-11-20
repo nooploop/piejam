@@ -60,6 +60,20 @@ reduce_period_size(audio_state const& st, Action const&) -> audio::period_size_t
 
 template <class Action>
 auto
+reduce_float_params(audio_state const& st, Action const&) -> float_parameters
+{
+    return st.float_params;
+}
+
+template <class Action>
+auto
+reduce_bool_params(audio_state const& st, Action const&) -> bool_parameters
+{
+    return st.bool_params;
+}
+
+template <class Action>
+auto
 reduce_mixer_state(audio_state const& st, Action const&) -> mixer::state
 {
     return st.mixer_state;
@@ -89,6 +103,8 @@ reduce(audio_state const& st, Action const& a) -> audio_state
             .output = reduce_output_device(st, a),
             .samplerate = reduce_samplerate(st, a),
             .period_size = reduce_period_size(st, a),
+            .float_params = reduce_float_params(st, a),
+            .bool_params = reduce_bool_params(st, a),
             .mixer_state = reduce_mixer_state(st, a),
             .xruns = reduce_xruns(st, a),
             .cpu_load = reduce_cpu_load(st, a)};

@@ -25,28 +25,33 @@
 namespace piejam::runtime::actions
 {
 
-template <>
 auto
-reduce_mixer_state(audio_state const& st, add_bus const& a) -> mixer::state
+add_bus::reduce(audio_state const& st) const -> audio_state
 {
-    auto mixer_state = st.mixer_state;
+    auto new_st = st;
 
-    auto& bus_ids = a.direction == audio::bus_direction::input
-                            ? mixer_state.inputs
-                            : mixer_state.outputs;
-    auto name = a.direction == audio::bus_direction::input
-                        ? fmt::format("In {}", bus_ids.size() + 1)
-                        : (bus_ids.size() == 0
-                                   ? std::string("Main")
-                                   : fmt::format("Aux {}", bus_ids.size()));
-    mixer::add_bus(
-            mixer_state.buses,
-            bus_ids,
-            mixer::bus{.name = std::move(name), .type = a.type});
+    switch (direction)
+    {
+        case audio::bus_direction::input:
+            add_mixer_bus<audio::bus_direction::input>(
+                    new_st,
+                    fmt::format("In {}", new_st.mixer_state.inputs.size() + 1),
+                    type);
+            break;
 
-    return mixer_state;
+        case audio::bus_direction::output:
+        {
+            auto const bus_ids_size = new_st.mixer_state.outputs.size();
+            add_mixer_bus<audio::bus_direction::output>(
+                    new_st,
+                    (bus_ids_size == 0 ? std::string("Main")
+                                       : fmt::format("Aux {}", bus_ids_size)),
+                    type);
+            break;
+        }
+    }
+
+    return st;
 }
-
-template auto reduce(audio_state const&, add_bus const&) -> audio_state;
 
 } // namespace piejam::runtime::actions

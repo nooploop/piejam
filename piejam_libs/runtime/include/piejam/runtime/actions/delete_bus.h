@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/runtime/actions/engine_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -26,11 +25,13 @@ namespace piejam::runtime::actions
 {
 
 struct delete_bus final
-    : reducible_action<delete_bus, ui::cloneable_action<delete_bus, action>>
+    : ui::cloneable_action<delete_bus, action>
     , visitable_engine_action<delete_bus>
 {
     audio::bus_direction direction{};
     std::size_t bus{};
+
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

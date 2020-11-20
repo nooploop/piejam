@@ -56,7 +56,7 @@ public:
     auto get_output_level(std::size_t index) const noexcept
             -> mixer::stereo_level;
 
-    void rebuild(mixer::state const&);
+    void rebuild(mixer::state const&, float_parameters const&);
 
     void operator()(
             range::table_view<float const> const& in_audio,

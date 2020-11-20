@@ -29,42 +29,42 @@ update_channel(std::size_t& cur_ch, std::size_t const num_chs)
         cur_ch = npos;
 }
 
+template <audio::bus_direction D>
+static auto
+apply_bus_configs(
+        audio_state& st,
+        std::vector<bus_config> const& configs,
+        std::size_t const num_ch)
+{
+    clear_mixer_buses<D>(st);
+    for (auto const& bus_conf : configs)
+    {
+        auto chs = bus_conf.channels;
+        update_channel(chs.left, num_ch);
+        update_channel(chs.right, num_ch);
+
+        auto const type = D == audio::bus_direction::output
+                                  ? audio::bus_type::stereo
+                                  : bus_conf.bus_type;
+
+        add_mixer_bus<D>(st, bus_conf.name, type, std::move(chs));
+    }
+}
+
 auto
 apply_app_config::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    auto apply_bus_configs = [](auto& chs,
-                                auto& ch_ids,
-                                auto const& configs,
-                                std::size_t num_ch) {
-        mixer::clear_buses(chs, ch_ids);
-        for (auto const& bus_conf : configs)
-        {
-            mixer::bus bus;
-            bus.name = bus_conf.name;
-            bus.type = bus_conf.bus_type;
-            bus.device_channels = bus_conf.channels;
-            update_channel(bus.device_channels.left, num_ch);
-            update_channel(bus.device_channels.right, num_ch);
-            mixer::add_bus(chs, ch_ids, std::move(bus));
-        }
-    };
-
-    apply_bus_configs(
-            new_st.mixer_state.buses,
-            new_st.mixer_state.inputs,
+    apply_bus_configs<audio::bus_direction::input>(
+            new_st,
             conf.input_bus_config,
             new_st.input.hw_params->num_channels);
 
-    apply_bus_configs(
-            new_st.mixer_state.buses,
-            new_st.mixer_state.outputs,
+    apply_bus_configs<audio::bus_direction::output>(
+            new_st,
             conf.output_bus_config,
             new_st.output.hw_params->num_channels);
-
-    for (auto const& out_id : new_st.mixer_state.outputs)
-        new_st.mixer_state.buses[out_id].type = audio::bus_type::stereo;
 
     return new_st;
 }

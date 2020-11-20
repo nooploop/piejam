@@ -287,7 +287,9 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->rebuild(m_get_state().mixer_state);
+                    m_engine->rebuild(
+                            m_get_state().mixer_state,
+                            m_get_state().float_params);
                 }
             },
             [this](actions::add_bus const& a) {
@@ -295,7 +297,9 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->rebuild(m_get_state().mixer_state);
+                    m_engine->rebuild(
+                            m_get_state().mixer_state,
+                            m_get_state().float_params);
                 }
             },
             [this](actions::delete_bus const& a) {
@@ -303,7 +307,9 @@ audio_engine_middleware::process_engine_action(
 
                 if (m_engine)
                 {
-                    m_engine->rebuild(m_get_state().mixer_state);
+                    m_engine->rebuild(
+                            m_get_state().mixer_state,
+                            m_get_state().float_params);
                 }
             },
             [this](actions::set_input_bus_volume const& a) {
@@ -472,7 +478,7 @@ audio_engine_middleware::start_engine()
                     engine->operator()(in, out);
                 });
 
-        m_engine->rebuild(state.mixer_state);
+        m_engine->rebuild(state.mixer_state, state.float_params);
     }
 }
 
