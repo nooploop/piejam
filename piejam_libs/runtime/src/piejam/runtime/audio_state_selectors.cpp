@@ -251,7 +251,10 @@ auto
 make_input_solo_selector(std::size_t const index) -> selector<bool>
 {
     return selector<bool>([index](audio_state const& st) -> bool {
-        return st.mixer_state.inputs[index] == st.mixer_state.input_solo_id;
+        return index < st.mixer_state.inputs.size()
+                       ? st.mixer_state.inputs[index] ==
+                                 st.mixer_state.input_solo_id
+                       : false;
     });
 }
 
