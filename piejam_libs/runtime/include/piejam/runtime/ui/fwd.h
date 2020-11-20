@@ -17,23 +17,28 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/fwd.h>
+#include <piejam/redux/functors.h>
 
-namespace piejam::runtime
+namespace piejam::runtime::ui
 {
 
-class audio_engine;
-struct audio_state;
-struct selected_device;
+template <class State>
+struct action;
 
-using action = ui::action<audio_state>;
-using get_state_f = ui::get_state_f<audio_state>;
-using dispatch_f = ui::dispatch_f<audio_state>;
-using thunk_f = ui::thunk_f<audio_state>;
-using thunk_action = ui::thunk_action<audio_state>;
+template <class DerivedAction, class ActionInterface>
+struct cloneable_action;
 
-template <class Parameter>
-class parameter_map;
+template <class State>
+using get_state_f = redux::get_state_f<State>;
 
-} // namespace piejam::runtime
+template <class State>
+using dispatch_f = redux::dispatch_f<action<State>>;
+
+template <class State>
+using thunk_f = std::function<
+        void(get_state_f<State> const&, dispatch_f<State> const&)>;
+
+template <class State>
+struct thunk_action;
+
+} // namespace piejam::runtime::ui

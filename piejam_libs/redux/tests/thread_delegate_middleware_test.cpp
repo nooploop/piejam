@@ -44,7 +44,7 @@ TEST(thread_delegate_middleware,
             std::this_thread::get_id(),
             [](auto&&) { FAIL(); });
     auto sut = factory(
-            []() {},
+            []() { FAIL(); },
             [](queaction const&) { FAIL(); },
             redux::next_f<queaction>(
                     [&next_result](queaction const& a) { next_result = a.x; }));
@@ -63,7 +63,7 @@ TEST(thread_delegate_middleware,
             std::this_thread::get_id(),
             [](auto&& f) { f(); });
     auto sut = factory(
-            []() {},
+            []() { FAIL(); },
             [&dispatch_result](queaction const& a) { dispatch_result = a.x; },
             redux::next_f<queaction>([](queaction const&) { FAIL(); }));
 

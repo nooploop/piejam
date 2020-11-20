@@ -8,6 +8,7 @@ target_sources(piejam_redux INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/queueing_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/store.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/thread_delegate_middleware.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/thunk_middleware.h
 )
 
 target_include_directories(piejam_redux INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

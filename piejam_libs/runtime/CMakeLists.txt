@@ -34,14 +34,18 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/open_alsa_device.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_map.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/boolean.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/flt.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_map.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mixer_bus_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action_visitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/cloneable_action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_bus.cpp

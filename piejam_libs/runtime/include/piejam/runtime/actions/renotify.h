@@ -17,15 +17,14 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
 
-struct renotify final
-    : ui::cloneable_action<renotify, action>
+struct renotify final : ui::cloneable_action<renotify, action>
 {
     auto reduce(audio_state const&) const -> audio_state override;
 };

@@ -29,6 +29,7 @@
 #include <piejam/redux/queueing_middleware.h>
 #include <piejam/redux/store.h>
 #include <piejam/redux/thread_delegate_middleware.h>
+#include <piejam/redux/thunk_middleware.h>
 #include <piejam/reselect/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/refresh_devices.h>
@@ -37,6 +38,7 @@
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/open_alsa_device.h>
 #include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/thunk_action.h>
 #include <piejam/thread/affinity.h>
 
 #include <QQuickStyle>
@@ -95,6 +97,10 @@ main(int argc, char* argv[]) -> int
                 std::move(next));
         return [m](auto const& a) { (*m)(a); };
     });
+
+    store.apply_middleware(redux::make_thunk_middleware<
+                           runtime::audio_state,
+                           runtime::action>{});
 
     store.apply_middleware(redux::make_queueing_middleware);
 
