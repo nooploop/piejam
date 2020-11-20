@@ -94,12 +94,12 @@ save(runtime::audio_state const& state)
 
         channels_to_bus_configs(
                 state.mixer_state.buses,
-                state.mixer_state.inputs,
+                state.mixer_state.inputs.get(),
                 conf.input_bus_config);
 
         channels_to_bus_configs(
                 state.mixer_state.buses,
-                state.mixer_state.outputs,
+                state.mixer_state.outputs.get(),
                 conf.output_bus_config);
 
         runtime::save_app_config(conf, config_file_path());

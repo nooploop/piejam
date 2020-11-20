@@ -39,7 +39,7 @@ update_devices::reduce(audio_state const& st) const -> audio_state
     new_st.period_size = period_size;
 
     std::size_t const num_in_channels = input.hw_params->num_channels;
-    for (auto const& in_id : new_st.mixer_state.inputs)
+    for (auto const& in_id : new_st.mixer_state.inputs.get())
     {
         auto& in = new_st.mixer_state.buses[in_id];
         update_channel(in.device_channels.left, num_in_channels);
@@ -47,7 +47,7 @@ update_devices::reduce(audio_state const& st) const -> audio_state
     }
 
     std::size_t const num_out_channels = output.hw_params->num_channels;
-    for (auto const& out_id : new_st.mixer_state.outputs)
+    for (auto const& out_id : new_st.mixer_state.outputs.get())
     {
         auto& out = new_st.mixer_state.buses[out_id];
         update_channel(out.device_channels.left, num_out_channels);

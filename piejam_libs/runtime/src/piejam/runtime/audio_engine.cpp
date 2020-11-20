@@ -237,8 +237,8 @@ make_graph(
 {
     ns_ae::graph g;
 
-    BOOST_ASSERT(mixer_state.inputs.size() == input_buses.size());
-    for (std::size_t idx = 0; idx < mixer_state.inputs.size(); ++idx)
+    BOOST_ASSERT(mixer_state.inputs->size() == input_buses.size());
+    for (std::size_t idx = 0; idx < mixer_state.inputs->size(); ++idx)
     {
         auto const& bus =
                 mixer::get_bus<audio::bus_direction::input>(mixer_state, idx);
@@ -261,8 +261,8 @@ make_graph(
                 mb.mute_solo_component().event_inputs()[1]);
     }
 
-    BOOST_ASSERT(mixer_state.outputs.size() == output_buses.size());
-    for (std::size_t idx = 0; idx < mixer_state.outputs.size(); ++idx)
+    BOOST_ASSERT(mixer_state.outputs->size() == output_buses.size());
+    for (std::size_t idx = 0; idx < mixer_state.outputs->size(); ++idx)
     {
         auto const& bus =
                 mixer::get_bus<audio::bus_direction::output>(mixer_state, idx);

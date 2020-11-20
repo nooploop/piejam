@@ -32,8 +32,8 @@ set_bus_solo<D>::reduce(audio_state const& st) const -> audio_state
 
     auto new_st = st;
 
-    BOOST_ASSERT(index < new_st.mixer_state.inputs.size());
-    auto const& id = new_st.mixer_state.inputs[index];
+    BOOST_ASSERT(index < new_st.mixer_state.inputs->size());
+    auto const& id = new_st.mixer_state.inputs.get()[index];
 
     new_st.mixer_state.input_solo_id =
             id == new_st.mixer_state.input_solo_id ? mixer::bus_id{} : id;

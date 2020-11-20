@@ -377,9 +377,9 @@ audio_engine_middleware::process_engine_action(
                 audio_state const& current_state = m_get_state();
 
                 std::size_t const num_inputs =
-                        current_state.mixer_state.inputs.size();
+                        current_state.mixer_state.inputs->size();
                 std::size_t const num_outputs =
-                        current_state.mixer_state.outputs.size();
+                        current_state.mixer_state.outputs->size();
 
                 actions::update_levels next_action;
                 next_action.in_levels.reserve(num_inputs);

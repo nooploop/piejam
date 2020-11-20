@@ -54,7 +54,8 @@ extern const selector<output_devices> select_output_devices;
 auto make_num_device_channels_selector(audio::bus_direction)
         -> selector<std::size_t>;
 
-auto make_num_busses_selector(audio::bus_direction) -> selector<std::size_t>;
+auto make_bus_list_selector(audio::bus_direction)
+        -> selector<container::box<mixer::bus_list_t>>;
 
 auto make_bus_name_selector(audio::bus_direction, std::size_t bus)
         -> selector<container::boxed_string>;

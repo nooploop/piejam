@@ -58,8 +58,8 @@ struct state
 {
     buses_t buses;
 
-    bus_list_t inputs;
-    bus_list_t outputs;
+    container::box<bus_list_t> inputs;
+    container::box<bus_list_t> outputs;
     bus_id input_solo_id;
 };
 
@@ -72,7 +72,7 @@ bus_ids(state const& st) -> bus_list_t const&
 
 template <audio::bus_direction D>
 auto
-bus_ids(state& st) -> bus_list_t&
+bus_ids(state& st) -> container::box<bus_list_t>&
 {
     return D == audio::bus_direction::input ? st.inputs : st.outputs;
 }
@@ -94,7 +94,7 @@ update_bus_field(
         Value&& value) -> state
 {
     auto new_st = st;
-    auto const& ids = bus_ids<D>(new_st);
+    auto const& ids = bus_ids<D>(new_st).get();
     std::invoke(std::forward<Field>(field), new_st.buses[ids[index]]) =
             std::forward<Value>(value);
     return new_st;

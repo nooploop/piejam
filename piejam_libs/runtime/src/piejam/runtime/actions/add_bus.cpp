@@ -34,13 +34,13 @@ add_bus::reduce(audio_state const& st) const -> audio_state
         case audio::bus_direction::input:
             add_mixer_bus<audio::bus_direction::input>(
                     new_st,
-                    fmt::format("In {}", new_st.mixer_state.inputs.size() + 1),
+                    fmt::format("In {}", new_st.mixer_state.inputs->size() + 1),
                     type);
             break;
 
         case audio::bus_direction::output:
         {
-            auto const bus_ids_size = new_st.mixer_state.outputs.size();
+            auto const bus_ids_size = new_st.mixer_state.outputs->size();
             add_mixer_bus<audio::bus_direction::output>(
                     new_st,
                     (bus_ids_size == 0 ? std::string("Main")
@@ -50,7 +50,7 @@ add_bus::reduce(audio_state const& st) const -> audio_state
         }
     }
 
-    return st;
+    return new_st;
 }
 
 } // namespace piejam::runtime::actions

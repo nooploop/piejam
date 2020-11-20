@@ -49,9 +49,10 @@ Mixer::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            selectors::make_num_busses_selector(audio::bus_direction::input),
-            [this, &state_change_subscriber](std::size_t const num_busses) {
-                while (num_busses > numInputChannels())
+            selectors::make_bus_list_selector(audio::bus_direction::input),
+            [this, &state_change_subscriber](
+                    container::box<runtime::mixer::bus_list_t> bus_ids) {
+                while (bus_ids->size() > numInputChannels())
                 {
                     auto const bus = numInputChannels();
                     inputChannels()->addMixerChannel(std::make_unique<
@@ -70,7 +71,7 @@ Mixer::subscribeStep(
                                             bus)}));
                 }
 
-                while (num_busses < numInputChannels())
+                while (bus_ids->size() < numInputChannels())
                 {
                     inputChannels()->removeMixerChannel();
                 }
@@ -79,9 +80,10 @@ Mixer::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            selectors::make_num_busses_selector(audio::bus_direction::output),
-            [this, &state_change_subscriber](std::size_t const num_busses) {
-                while (num_busses > numOutputChannels())
+            selectors::make_bus_list_selector(audio::bus_direction::output),
+            [this, &state_change_subscriber](
+                    container::box<runtime::mixer::bus_list_t> bus_ids) {
+                while (bus_ids->size() > numOutputChannels())
                 {
                     auto const bus = numOutputChannels();
                     outputChannels()->addMixerChannel(std::make_unique<
@@ -105,7 +107,7 @@ Mixer::subscribeStep(
                                             bus)}));
                 }
 
-                while (num_busses < numOutputChannels())
+                while (bus_ids->size() < numOutputChannels())
                 {
                     outputChannels()->removeMixerChannel();
                 }

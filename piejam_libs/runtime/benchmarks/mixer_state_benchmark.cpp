@@ -23,9 +23,13 @@ namespace piejam::runtime
 {
 
 static void
-add_bus(mixer::buses_t& buses, mixer::bus_list_t& bus_ids, mixer::bus&& bus)
+add_bus(mixer::buses_t& buses,
+        container::box<mixer::bus_list_t>& bus_ids,
+        mixer::bus&& bus)
 {
-    bus_ids.emplace_back(buses.add(std::move(bus)));
+    auto ids = bus_ids.get();
+    ids.emplace_back(buses.add(std::move(bus)));
+    bus_ids = ids;
 }
 
 static void

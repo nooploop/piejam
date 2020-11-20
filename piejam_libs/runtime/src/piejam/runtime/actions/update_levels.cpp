@@ -35,8 +35,12 @@ update_levels::reduce(audio_state const& st) const -> audio_state
                     channels_map[channels[index]].level = levels[index];
             };
 
-    update(new_st.mixer_state.buses, new_st.mixer_state.inputs, in_levels);
-    update(new_st.mixer_state.buses, new_st.mixer_state.outputs, out_levels);
+    update(new_st.mixer_state.buses,
+           new_st.mixer_state.inputs.get(),
+           in_levels);
+    update(new_st.mixer_state.buses,
+           new_st.mixer_state.outputs.get(),
+           out_levels);
 
     return new_st;
 }

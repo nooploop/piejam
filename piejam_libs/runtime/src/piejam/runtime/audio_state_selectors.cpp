@@ -75,21 +75,16 @@ make_num_device_channels_selector(audio::bus_direction const bd)
 }
 
 auto
-make_num_busses_selector(audio::bus_direction const bd) -> selector<std::size_t>
+make_bus_list_selector(audio::bus_direction const bd)
+        -> selector<container::box<mixer::bus_list_t>>
 {
     switch (bd)
     {
         case audio::bus_direction::input:
-            return selector<std::size_t>(
-                    [](audio_state const& st) -> std::size_t {
-                        return st.mixer_state.inputs.size();
-                    });
+            return [](audio_state const& st) { return st.mixer_state.inputs; };
 
         case audio::bus_direction::output:
-            return selector<std::size_t>(
-                    [](audio_state const& st) -> std::size_t {
-                        return st.mixer_state.outputs.size();
-                    });
+            return [](audio_state const& st) { return st.mixer_state.outputs; };
     }
 }
 
@@ -253,10 +248,9 @@ auto
 make_input_solo_selector(std::size_t const index) -> selector<bool>
 {
     return selector<bool>([index](audio_state const& st) -> bool {
-        return index < st.mixer_state.inputs.size()
-                       ? st.mixer_state.inputs[index] ==
-                                 st.mixer_state.input_solo_id
-                       : false;
+        return index < st.mixer_state.inputs->size() &&
+               st.mixer_state.inputs.get()[index] ==
+                       st.mixer_state.input_solo_id;
     });
 }
 

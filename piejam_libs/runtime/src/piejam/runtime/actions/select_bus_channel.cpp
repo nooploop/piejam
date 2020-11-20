@@ -28,8 +28,8 @@ select_bus_channel::reduce(audio_state const& st) const -> audio_state
     auto new_st = st;
 
     auto& channels = direction == audio::bus_direction::input
-                             ? new_st.mixer_state.inputs
-                             : new_st.mixer_state.outputs;
+                             ? new_st.mixer_state.inputs.get()
+                             : new_st.mixer_state.outputs.get();
 
     BOOST_ASSERT(bus < channels.size());
     BOOST_ASSERT(
