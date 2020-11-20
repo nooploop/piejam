@@ -59,7 +59,6 @@ private:
     void selectChannel(audio::bus_channel, unsigned bus, unsigned ch);
     void addBus(audio::bus_type);
 
-    store& m_store;
     audio::bus_direction m_settings_type;
 };
 

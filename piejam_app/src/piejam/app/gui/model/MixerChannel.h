@@ -46,7 +46,7 @@ class MixerChannel final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    MixerChannel(subscriber&, MixerChannelSelectors);
+    MixerChannel(store&, subscriber&, MixerChannelSelectors);
 
 signals:
     void subscribedChanged();

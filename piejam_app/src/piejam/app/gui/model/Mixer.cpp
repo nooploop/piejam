@@ -34,8 +34,7 @@ namespace piejam::app::gui::model
 {
 
 Mixer::Mixer(store& app_store, subscriber& state_change_subscriber)
-    : Subscribable(state_change_subscriber)
-    , m_store(app_store)
+    : Subscribable(app_store, state_change_subscriber)
 {
 }
 
@@ -57,6 +56,7 @@ Mixer::subscribeStep(
                     auto const bus = numInputChannels();
                     inputChannels()->addMixerChannel(std::make_unique<
                                                      MixerChannel>(
+                            app_store(),
                             state_change_subscriber,
                             MixerChannelSelectors{
                                     selectors::make_bus_name_selector(
@@ -86,6 +86,7 @@ Mixer::subscribeStep(
                     auto const bus = numOutputChannels();
                     outputChannels()->addMixerChannel(std::make_unique<
                                                       MixerChannel>(
+                            app_store(),
                             state_change_subscriber,
                             MixerChannelSelectors{
                                     selectors::make_bus_name_selector(
@@ -125,7 +126,7 @@ Mixer::setInputChannelVolume(unsigned const index, double const volume)
     runtime::actions::set_input_bus_volume action;
     action.index = index;
     action.volume = static_cast<float>(volume);
-    m_store.dispatch(std::move(action));
+    app_store().dispatch(action);
 }
 
 void
@@ -134,7 +135,7 @@ Mixer::setInputChannelPan(unsigned const index, double const pan)
     runtime::actions::set_input_bus_pan_balance action;
     action.index = index;
     action.pan_balance = static_cast<float>(pan);
-    m_store.dispatch(std::move(action));
+    app_store().dispatch(action);
 }
 
 void
@@ -143,7 +144,7 @@ Mixer::setInputChannelMute(unsigned const index, bool const mute)
     runtime::actions::set_input_bus_mute action;
     action.index = index;
     action.mute = mute;
-    m_store.dispatch(std::move(action));
+    app_store().dispatch(action);
 }
 
 void
@@ -151,7 +152,7 @@ Mixer::setInputSolo(unsigned const index)
 {
     runtime::actions::set_input_bus_solo action;
     action.index = index;
-    m_store.dispatch(std::move(action));
+    app_store().dispatch(action);
 }
 
 void
@@ -160,7 +161,7 @@ Mixer::setOutputChannelVolume(unsigned const index, double const volume)
     runtime::actions::set_output_bus_volume action;
     action.index = index;
     action.volume = static_cast<float>(volume);
-    m_store.dispatch(std::move(action));
+    app_store().dispatch(action);
 }
 
 void
@@ -169,7 +170,7 @@ Mixer::setOutputChannelBalance(unsigned const index, double const balance)
     runtime::actions::set_output_bus_balance action;
     action.index = index;
     action.pan_balance = static_cast<float>(balance);
-    m_store.dispatch(std::move(action));
+    app_store().dispatch(action);
 }
 
 void
@@ -178,13 +179,13 @@ Mixer::setOutputChannelMute(unsigned const index, bool const mute)
     runtime::actions::set_output_bus_mute action;
     action.index = index;
     action.mute = mute;
-    m_store.dispatch(std::move(action));
+    app_store().dispatch(action);
 }
 
 void
 Mixer::requestLevelsUpdate()
 {
-    m_store.dispatch(runtime::actions::request_levels_update{});
+    app_store().dispatch(runtime::actions::request_levels_update{});
 }
 
 } // namespace piejam::app::gui::model

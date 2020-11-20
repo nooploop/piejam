@@ -19,13 +19,15 @@
 
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/runtime/actions/renotify.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::app::gui::model
 {
 
-Subscribable::Subscribable(subscriber& state_change_subscriber)
-    : m_state_change_subscriber(state_change_subscriber)
+Subscribable::Subscribable(store& store, subscriber& state_change_subscriber)
+    : m_store(store)
+    , m_state_change_subscriber(state_change_subscriber)
 {
 }
 
@@ -40,6 +42,8 @@ Subscribable::subscribe()
     subscribeStep(m_state_change_subscriber, m_subs, m_subs_id);
 
     m_subscribed = true;
+
+    m_store.dispatch(runtime::actions::renotify{});
 }
 
 void

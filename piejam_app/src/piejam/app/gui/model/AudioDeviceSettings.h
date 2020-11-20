@@ -49,8 +49,6 @@ private:
             override;
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
-
-    store& m_store;
 };
 
 } // namespace piejam::app::gui::model

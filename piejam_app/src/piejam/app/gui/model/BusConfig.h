@@ -45,7 +45,7 @@ class BusConfig final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    BusConfig(subscriber&, BusConfigSelectors);
+    BusConfig(store&, subscriber&, BusConfigSelectors);
 
 signals:
     void subscribedChanged();

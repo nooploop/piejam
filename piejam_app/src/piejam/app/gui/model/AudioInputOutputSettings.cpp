@@ -37,8 +37,7 @@ AudioInputOutputSettings::AudioInputOutputSettings(
         store& app_store,
         subscriber& state_change_subscriber,
         audio::bus_direction const settings_type)
-    : Subscribable(state_change_subscriber)
-    , m_store(app_store)
+    : Subscribable(app_store, state_change_subscriber)
     , m_settings_type(settings_type)
 {
 }
@@ -73,6 +72,7 @@ AudioInputOutputSettings::subscribeStep(
                 {
                     auto const bus = numBusConfigs();
                     busConfigs()->addBusConfig(std::make_unique<BusConfig>(
+                            app_store(),
                             state_change_subscriber,
                             BusConfigSelectors{
                                     selectors::make_bus_name_selector(
@@ -100,18 +100,16 @@ AudioInputOutputSettings::subscribeStep(
                     busConfigs()->removeBusConfig();
                 }
             });
-
-    m_store.dispatch(runtime::actions::request_info_update{});
 }
 
 template <audio::bus_direction D>
-void
-setBusName(store& st, unsigned const bus, QString const& name)
+auto
+makeSetBusNameAction(unsigned const bus, QString const& name)
 {
     runtime::actions::set_bus_name<D> action;
     action.bus = bus;
     action.name = name.toStdString();
-    st.dispatch(std::move(action));
+    return action;
 }
 
 void
@@ -120,11 +118,17 @@ AudioInputOutputSettings::setBusName(unsigned const bus, QString const& name)
     switch (m_settings_type)
     {
         case audio::bus_direction::input:
-            model::setBusName<audio::bus_direction::input>(m_store, bus, name);
+            app_store().dispatch(
+                    makeSetBusNameAction<audio::bus_direction::input>(
+                            bus,
+                            name));
             break;
 
         case audio::bus_direction::output:
-            model::setBusName<audio::bus_direction::output>(m_store, bus, name);
+            app_store().dispatch(
+                    makeSetBusNameAction<audio::bus_direction::output>(
+                            bus,
+                            name));
             break;
     }
 }
@@ -140,7 +144,7 @@ AudioInputOutputSettings::selectChannel(
     action.bus = bus;
     action.channel_selector = bc;
     action.channel_index = static_cast<std::size_t>(ch) - 1;
-    m_store.dispatch(action);
+    app_store().dispatch(action);
 }
 
 void
@@ -173,7 +177,7 @@ AudioInputOutputSettings::addBus(audio::bus_type bus_type)
     runtime::actions::add_bus action;
     action.direction = m_settings_type;
     action.type = bus_type;
-    m_store.dispatch(action);
+    app_store().dispatch(action);
 }
 
 void
@@ -194,7 +198,7 @@ AudioInputOutputSettings::deleteBus(unsigned const bus)
     runtime::actions::delete_bus action;
     action.direction = m_settings_type;
     action.bus = bus;
-    m_store.dispatch(action);
+    app_store().dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

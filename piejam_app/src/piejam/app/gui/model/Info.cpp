@@ -27,8 +27,7 @@ namespace piejam::app::gui::model
 {
 
 Info::Info(store& app_store, subscriber& state_change_subscriber)
-    : Subscribable(state_change_subscriber)
-    , m_store(app_store)
+    : Subscribable(app_store, state_change_subscriber)
 {
 }
 
@@ -56,7 +55,7 @@ Info::subscribeStep(
 void
 Info::requestUpdate()
 {
-    m_store.dispatch(runtime::actions::request_info_update{});
+    app_store().dispatch(runtime::actions::request_info_update{});
 }
 
 } // namespace piejam::app::gui::model

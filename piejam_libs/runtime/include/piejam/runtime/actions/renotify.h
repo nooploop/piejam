@@ -17,36 +17,17 @@
 
 #pragma once
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/store.h>
-#include <piejam/app/subscriber.h>
-#include <piejam/gui/model/Info.h>
+#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
-namespace piejam::app::gui::model
+namespace piejam::runtime::actions
 {
 
-class Info final
-    : public piejam::gui::model::Info
-    , public Subscribable
+struct renotify final
+    : ui::cloneable_action<renotify, action>
 {
-    Q_OBJECT
-
-    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
-                       subscribedChanged)
-
-public:
-    Info(store&, subscriber&);
-
-    void requestUpdate() override;
-
-signals:
-    void subscribedChanged();
-
-private:
-    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
-            override;
-
-    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
-} // namespace piejam::app::gui::model
+} // namespace piejam::runtime::actions
