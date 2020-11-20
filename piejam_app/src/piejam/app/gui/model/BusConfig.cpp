@@ -21,10 +21,10 @@ namespace piejam::app::gui::model
 {
 
 BusConfig::BusConfig(
-        store& store,
+        store_dispatch store_dispatch,
         subscriber& state_change_subscriber,
         BusConfigSelectors selectors)
-    : Subscribable(store, state_change_subscriber)
+    : Subscribable(store_dispatch, state_change_subscriber)
     , m_selectors(std::move(selectors))
 {
 }

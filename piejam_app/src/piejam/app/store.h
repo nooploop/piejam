@@ -20,8 +20,6 @@
 #include <piejam/redux/fwd.h>
 #include <piejam/runtime/fwd.h>
 
-#include <cstddef>
-
 namespace piejam::app
 {
 

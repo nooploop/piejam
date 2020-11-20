@@ -17,35 +17,21 @@
 
 #pragma once
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/subscriber.h>
-#include <piejam/gui/model/Info.h>
+#include <piejam/app/store.h>
 
-namespace piejam::app::gui::model
+namespace piejam::app
 {
 
-class Info final
-    : public piejam::gui::model::Info
-    , public Subscribable
+struct store_dispatch
 {
-    Q_OBJECT
+    store_dispatch(store& app_store)
+        : m_store(&app_store)
+    {}
 
-    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
-                       subscribedChanged)
-
-public:
-    Info(store_dispatch, subscriber&);
-
-    void requestUpdate() override;
-
-signals:
-    void subscribedChanged();
+    void operator()(runtime::action const&) const;
 
 private:
-    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
-            override;
-
-    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
+    store* m_store;
 };
 
-} // namespace piejam::app::gui::model
+} // namespace piejam::app

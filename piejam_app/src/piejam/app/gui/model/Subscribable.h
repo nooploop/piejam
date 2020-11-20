@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/app/store.h>
+#include <piejam/app/store_dispatch.h>
 #include <piejam/app/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
 
@@ -27,7 +27,7 @@ namespace piejam::app::gui::model
 class Subscribable
 {
 public:
-    Subscribable(store&, subscriber&);
+    Subscribable(store_dispatch, subscriber&);
     virtual ~Subscribable();
 
     auto subscribed() const -> bool { return m_subscribed; }
@@ -44,19 +44,24 @@ public:
         }
     }
 
+    auto dispatch() const noexcept -> store_dispatch
+    {
+        return m_store_dispatch;
+    }
+
+    auto dispatch(runtime::action const& a) const { m_store_dispatch(a); }
+
 protected:
     virtual void
     subscribeStep(subscriber&, subscriptions_manager&, subscription_id) = 0;
 
     virtual void emitSubscribedChangedSignal() = 0;
 
-    auto app_store() -> store& { return m_store; }
-
 private:
     void subscribe();
     void unsubscribe();
 
-    store& m_store;
+    store_dispatch m_store_dispatch;
     subscriber& m_state_change_subscriber;
     subscriptions_manager m_subs;
     bool m_subscribed{};

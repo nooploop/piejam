@@ -17,10 +17,10 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/config_access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/config_access.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioInputOutputSettings.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioInputOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioDeviceSettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioDeviceSettings.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioInputOutputSettings.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioInputOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/BusConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/BusConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.cpp
@@ -29,9 +29,11 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Subscribable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Subscribable.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Subscribable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/store.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/store_dispatch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/store_dispatch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/subscriber.h
 )
 target_include_directories(piejam_app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

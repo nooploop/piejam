@@ -17,7 +17,6 @@
 
 #include <piejam/app/gui/model/Info.h>
 
-#include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/audio_state.h>
@@ -26,8 +25,8 @@
 namespace piejam::app::gui::model
 {
 
-Info::Info(store& app_store, subscriber& state_change_subscriber)
-    : Subscribable(app_store, state_change_subscriber)
+Info::Info(store_dispatch store_dispatch, subscriber& state_change_subscriber)
+    : Subscribable(store_dispatch, state_change_subscriber)
 {
 }
 
@@ -55,7 +54,7 @@ Info::subscribeStep(
 void
 Info::requestUpdate()
 {
-    app_store().dispatch(runtime::actions::request_info_update{});
+    dispatch(runtime::actions::request_info_update{});
 }
 
 } // namespace piejam::app::gui::model

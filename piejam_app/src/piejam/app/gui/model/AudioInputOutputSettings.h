@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/store.h>
 #include <piejam/app/subscriber.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
@@ -36,7 +35,7 @@ class AudioInputOutputSettings
                        subscribedChanged)
 
 protected:
-    AudioInputOutputSettings(store&, subscriber&, audio::bus_direction);
+    AudioInputOutputSettings(store_dispatch, subscriber&, audio::bus_direction);
 
 public:
     void setBusName(unsigned bus, QString const& name) override;

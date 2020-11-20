@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/store.h>
 #include <piejam/app/subscriber.h>
 #include <piejam/container/boxed_string.h>
 #include <piejam/gui/model/MixerChannel.h>
@@ -46,7 +45,7 @@ class MixerChannel final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    MixerChannel(store&, subscriber&, MixerChannelSelectors);
+    MixerChannel(store_dispatch, subscriber&, MixerChannelSelectors);
 
 signals:
     void subscribedChanged();

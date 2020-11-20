@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/store.h>
 #include <piejam/app/subscriber.h>
 #include <piejam/gui/model/Mixer.h>
 
@@ -34,7 +33,7 @@ class Mixer final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    Mixer(store&, subscriber&);
+    Mixer(store_dispatch, subscriber&);
 
     void setInputChannelVolume(unsigned index, double volume) override;
     void setInputChannelPan(unsigned index, double pan) override;

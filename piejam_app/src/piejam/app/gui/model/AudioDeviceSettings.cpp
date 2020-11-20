@@ -62,9 +62,9 @@ to_QStringList(Vector const& l) -> QStringList
 }
 
 AudioDeviceSettings::AudioDeviceSettings(
-        store& app_store,
+        store_dispatch store_dispatch,
         subscriber& state_change_subscriber)
-    : Subscribable(app_store, state_change_subscriber)
+    : Subscribable(store_dispatch, state_change_subscriber)
 {
 }
 
@@ -128,7 +128,7 @@ AudioDeviceSettings::subscribeStep(
 void
 AudioDeviceSettings::refreshDeviceLists()
 {
-    app_store().dispatch(runtime::actions::refresh_devices{});
+    dispatch(runtime::actions::refresh_devices{});
 }
 
 void
@@ -137,7 +137,7 @@ AudioDeviceSettings::selectInputDevice(unsigned const index)
     runtime::actions::initiate_device_selection action;
     action.input = true;
     action.index = index;
-    app_store().dispatch(action);
+    dispatch(action);
 }
 
 void
@@ -146,7 +146,7 @@ AudioDeviceSettings::selectOutputDevice(unsigned const index)
     runtime::actions::initiate_device_selection action;
     action.input = false;
     action.index = index;
-    app_store().dispatch(action);
+    dispatch(action);
 }
 
 void
@@ -154,7 +154,7 @@ AudioDeviceSettings::selectSamplerate(unsigned index)
 {
     runtime::actions::select_samplerate action;
     action.index = index;
-    app_store().dispatch(action);
+    dispatch(action);
 }
 
 void
@@ -162,7 +162,7 @@ AudioDeviceSettings::selectPeriodSize(unsigned index)
 {
     runtime::actions::select_period_size action;
     action.index = index;
-    app_store().dispatch(action);
+    dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

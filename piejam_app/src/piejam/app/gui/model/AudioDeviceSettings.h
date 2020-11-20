@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/store.h>
 #include <piejam/gui/model/AudioDeviceSettings.h>
 
 namespace piejam::app::gui::model
@@ -33,7 +32,7 @@ class AudioDeviceSettings final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    AudioDeviceSettings(store&, subscriber&);
+    AudioDeviceSettings(store_dispatch, subscriber&);
 
     virtual void refreshDeviceLists() override;
     virtual void selectInputDevice(unsigned index) override;

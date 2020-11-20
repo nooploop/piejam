@@ -15,37 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/app/store_dispatch.h>
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/subscriber.h>
-#include <piejam/gui/model/Info.h>
+#include <piejam/redux/store.h>
+#include <piejam/runtime/audio_state.h>
 
-namespace piejam::app::gui::model
+namespace piejam::app
 {
 
-class Info final
-    : public piejam::gui::model::Info
-    , public Subscribable
+void
+store_dispatch::operator()(runtime::action const& a) const
 {
-    Q_OBJECT
+    m_store->dispatch(a);
+}
 
-    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
-                       subscribedChanged)
-
-public:
-    Info(store_dispatch, subscriber&);
-
-    void requestUpdate() override;
-
-signals:
-    void subscribedChanged();
-
-private:
-    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
-            override;
-
-    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
-};
-
-} // namespace piejam::app::gui::model
+} // namespace piejam::app
