@@ -17,83 +17,44 @@
 
 #include <piejam/runtime/actions/update_devices.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-template <>
 auto
-reduce_pcm_devices(audio_state const&, update_devices const& a)
-        -> container::box<audio::pcm_io_descriptors>
+update_devices::reduce(audio_state const& st) const -> audio_state
 {
-    return a.pcm_devices;
-}
-
-template <>
-auto
-reduce_input_device(audio_state const&, update_devices const& a)
-        -> selected_device
-{
-    return a.input;
-}
-
-template <>
-auto
-reduce_output_device(audio_state const&, update_devices const& a)
-        -> selected_device
-{
-    return a.output;
-}
-
-template <>
-auto
-reduce_samplerate(audio_state const&, update_devices const& a)
-        -> audio::samplerate_t
-{
-    return a.samplerate;
-}
-
-template <>
-auto
-reduce_period_size(audio_state const&, update_devices const& a)
-        -> audio::period_size_t
-{
-    return a.period_size;
-}
-
-template <>
-auto
-reduce_mixer_state(audio_state const& st, update_devices const& a)
-        -> mixer::state
-{
-    auto mixer_state = st.mixer_state;
+    auto new_st = st;
 
     auto update_channel = [](std::size_t& ch, std::size_t const num_chs) {
         if (ch >= num_chs)
             ch = npos;
     };
 
-    std::size_t const num_in_channels = a.input.hw_params->num_channels;
-    for (auto const& in_id : mixer_state.inputs)
+    new_st.pcm_devices = pcm_devices;
+    new_st.input = input;
+    new_st.output = output;
+    new_st.samplerate = samplerate;
+    new_st.period_size = period_size;
+
+    std::size_t const num_in_channels = input.hw_params->num_channels;
+    for (auto const& in_id : new_st.mixer_state.inputs)
     {
-        auto& in = mixer_state.buses[in_id];
+        auto& in = new_st.mixer_state.buses[in_id];
         update_channel(in.device_channels.left, num_in_channels);
         update_channel(in.device_channels.right, num_in_channels);
     }
 
-    std::size_t const num_out_channels = a.output.hw_params->num_channels;
-    for (auto const& out_id : mixer_state.outputs)
+    std::size_t const num_out_channels = output.hw_params->num_channels;
+    for (auto const& out_id : new_st.mixer_state.outputs)
     {
-        auto& out = mixer_state.buses[out_id];
+        auto& out = new_st.mixer_state.buses[out_id];
         update_channel(out.device_channels.left, num_out_channels);
         update_channel(out.device_channels.right, num_out_channels);
     }
 
-    return mixer_state;
+    return new_st;
 }
-
-template auto reduce(audio_state const&, update_devices const&) -> audio_state;
 
 } // namespace piejam::runtime::actions

@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/runtime/actions/device_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -26,13 +25,13 @@ namespace piejam::runtime::actions
 {
 
 struct initiate_device_selection final
-    : reducible_action<
-              initiate_device_selection,
-              ui::cloneable_action<initiate_device_selection, action>>
+    : ui::cloneable_action<initiate_device_selection, action>
     , visitable_device_action<initiate_device_selection>
 {
     bool input{};
     std::size_t index{};
+
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

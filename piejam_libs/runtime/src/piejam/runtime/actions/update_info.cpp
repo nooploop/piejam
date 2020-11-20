@@ -17,26 +17,18 @@
 
 #include <piejam/runtime/actions/update_info.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-template <>
 auto
-reduce_xruns(audio_state const&, update_info const& a) -> std::size_t
+update_info::reduce(audio_state const& st) const -> audio_state
 {
-    return a.xruns;
+    auto new_st = st;
+    new_st.xruns = xruns;
+    new_st.cpu_load = cpu_load;
+    return new_st;
 }
-
-template <>
-auto
-reduce_cpu_load(audio_state const&, update_info const& a) -> float
-{
-    return a.cpu_load;
-}
-
-template auto reduce(audio_state const&, update_info const&) -> audio_state;
 
 } // namespace piejam::runtime::actions

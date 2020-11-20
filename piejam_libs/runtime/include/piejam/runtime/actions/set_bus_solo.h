@@ -19,7 +19,6 @@
 
 #include <piejam/audio/types.h>
 #include <piejam/runtime/actions/engine_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -28,13 +27,13 @@ namespace piejam::runtime::actions
 
 template <audio::bus_direction D>
 struct set_bus_solo final
-    : reducible_action<
-              set_bus_solo<D>,
-              ui::cloneable_action<set_bus_solo<D>, action>>
+    : ui::cloneable_action<set_bus_solo<D>, action>
     , visitable_engine_action<set_bus_solo<D>>
 {
     std::size_t index{};
     bool solo{};
+
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

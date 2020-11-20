@@ -17,12 +17,15 @@
 
 #include <piejam/runtime/actions/refresh_devices.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-template auto reduce(audio_state const&, refresh_devices const&) -> audio_state;
+auto
+refresh_devices::reduce(audio_state const& st) const -> audio_state
+{
+    return st;
+}
 
 } // namespace piejam::runtime::actions

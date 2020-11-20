@@ -18,21 +18,23 @@
 #pragma once
 
 #include <piejam/runtime/actions/engine_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/mixer.h>
 #include <piejam/runtime/ui/cloneable_action.h>
+
+#include <vector>
 
 namespace piejam::runtime::actions
 {
 
 struct update_levels final
-    : reducible_action<
-              update_levels,
-              ui::cloneable_action<update_levels, action>>
+    : ui::cloneable_action<update_levels, action>
     , visitable_engine_action<update_levels>
 {
     std::vector<mixer::stereo_level> in_levels;
     std::vector<mixer::stereo_level> out_levels;
+
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

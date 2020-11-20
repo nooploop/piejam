@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/runtime/actions/device_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -26,11 +25,10 @@ namespace piejam::runtime::actions
 {
 
 struct refresh_devices final
-    : reducible_action<
-              refresh_devices,
-              ui::cloneable_action<refresh_devices, action>>
+    : ui::cloneable_action<refresh_devices, action>
     , visitable_device_action<refresh_devices>
 {
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

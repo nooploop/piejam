@@ -17,57 +17,51 @@
 
 #include <piejam/runtime/actions/select_bus_channel.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-template <>
 auto
-reduce_mixer_state(audio_state const& st, select_bus_channel const& a)
-        -> mixer::state
+select_bus_channel::reduce(audio_state const& st) const -> audio_state
 {
-    auto mixer_state = st.mixer_state;
+    auto new_st = st;
 
-    auto& channels = a.direction == audio::bus_direction::input
-                             ? mixer_state.inputs
-                             : mixer_state.outputs;
+    auto& channels = direction == audio::bus_direction::input
+                             ? new_st.mixer_state.inputs
+                             : new_st.mixer_state.outputs;
 
-    BOOST_ASSERT(a.bus < channels.size());
+    BOOST_ASSERT(bus < channels.size());
     BOOST_ASSERT(
-            a.channel_index == npos ||
-            a.channel_index < (a.direction == audio::bus_direction::input
-                                       ? st.input.hw_params->num_channels
-                                       : st.output.hw_params->num_channels));
+            channel_index == npos ||
+            channel_index < (direction == audio::bus_direction::input
+                                     ? st.input.hw_params->num_channels
+                                     : st.output.hw_params->num_channels));
 
-    auto& ch = mixer_state.buses[channels[a.bus]];
-    switch (a.channel_selector)
+    auto& ch = new_st.mixer_state.buses[channels[bus]];
+    switch (channel_selector)
     {
         case audio::bus_channel::mono:
-            BOOST_ASSERT(a.direction == audio::bus_direction::input);
-            ch.device_channels = channel_index_pair{a.channel_index};
+            BOOST_ASSERT(direction == audio::bus_direction::input);
+            ch.device_channels = channel_index_pair{channel_index};
             break;
 
         case audio::bus_channel::left:
             BOOST_ASSERT(
-                    a.direction == audio::bus_direction::input ||
-                    a.direction == audio::bus_direction::output);
-            ch.device_channels.left = a.channel_index;
+                    direction == audio::bus_direction::input ||
+                    direction == audio::bus_direction::output);
+            ch.device_channels.left = channel_index;
             break;
 
         case audio::bus_channel::right:
             BOOST_ASSERT(
-                    a.direction == audio::bus_direction::input ||
-                    a.direction == audio::bus_direction::output);
-            ch.device_channels.right = a.channel_index;
+                    direction == audio::bus_direction::input ||
+                    direction == audio::bus_direction::output);
+            ch.device_channels.right = channel_index;
             break;
     }
 
-    return mixer_state;
+    return new_st;
 }
-
-template auto reduce(audio_state const&, select_bus_channel const&)
-        -> audio_state;
 
 } // namespace piejam::runtime::actions

@@ -8,8 +8,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/engine_action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/reduce.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/reducible_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/renotify.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_info_update.h

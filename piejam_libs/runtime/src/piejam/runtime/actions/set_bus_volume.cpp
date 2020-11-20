@@ -17,7 +17,6 @@
 
 #include <piejam/runtime/actions/set_bus_volume.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions

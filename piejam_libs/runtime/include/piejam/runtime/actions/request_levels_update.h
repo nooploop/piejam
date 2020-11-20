@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/runtime/actions/engine_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -26,11 +25,10 @@ namespace piejam::runtime::actions
 {
 
 struct request_levels_update final
-    : reducible_action<
-              request_levels_update,
-              ui::cloneable_action<request_levels_update, action>>
+    : ui::cloneable_action<request_levels_update, action>
     , visitable_engine_action<request_levels_update>
 {
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

@@ -17,30 +17,25 @@
 
 #include <piejam/runtime/actions/set_bus_mute.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
 template <audio::bus_direction D>
-static auto
-reduce_mixer_state(audio_state const& st, set_bus_mute<D> const& a)
-        -> mixer::state
+auto
+set_bus_mute<D>::reduce(audio_state const& st) const -> audio_state
 {
-    return mixer::update_bus_field<D>(
+    auto new_st = st;
+    new_st.mixer_state = mixer::update_bus_field<D>(
             st.mixer_state,
-            a.index,
+            index,
             &mixer::bus::mute,
-            a.mute);
+            mute);
+    return new_st;
 }
 
-template auto
-reduce(audio_state const&, set_bus_mute<audio::bus_direction::input> const&)
-        -> audio_state;
-
-template auto
-reduce(audio_state const&, set_bus_mute<audio::bus_direction::output> const&)
-        -> audio_state;
+template struct set_bus_mute<audio::bus_direction::input>;
+template struct set_bus_mute<audio::bus_direction::output>;
 
 } // namespace piejam::runtime::actions

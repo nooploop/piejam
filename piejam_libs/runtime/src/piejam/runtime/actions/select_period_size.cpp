@@ -17,21 +17,17 @@
 
 #include <piejam/runtime/actions/select_period_size.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-template <>
 auto
-reduce_period_size(audio_state const& st, select_period_size const& a)
-        -> audio::samplerate_t
+select_period_size::reduce(audio_state const& st) const -> audio_state
 {
-    return period_sizes_from_state(st)[a.index];
+    auto new_st = st;
+    new_st.period_size = period_sizes_from_state(st)[index];
+    return new_st;
 }
-
-template auto reduce(audio_state const&, select_period_size const&)
-        -> audio_state;
 
 } // namespace piejam::runtime::actions

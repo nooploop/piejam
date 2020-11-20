@@ -17,13 +17,15 @@
 
 #include <piejam/runtime/actions/initiate_device_selection.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-template auto reduce(audio_state const&, initiate_device_selection const&)
-        -> audio_state;
+auto
+initiate_device_selection::reduce(audio_state const& st) const -> audio_state
+{
+    return st;
+}
 
 } // namespace piejam::runtime::actions

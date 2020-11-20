@@ -17,7 +17,6 @@
 
 #include <piejam/runtime/actions/delete_bus.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions

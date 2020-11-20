@@ -17,19 +17,15 @@
 
 #include <piejam/runtime/actions/update_levels.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-template <>
 auto
-reduce_mixer_state(
-        audio_state const& st,
-        update_levels const& a) -> mixer::state
+update_levels::reduce(audio_state const& st) const -> audio_state
 {
-    auto mixer_state = st.mixer_state;
+    auto new_st = st;
 
     auto const update =
             [](auto& channels_map, auto const& channels, auto const& levels) {
@@ -39,13 +35,10 @@ reduce_mixer_state(
                     channels_map[channels[index]].level = levels[index];
             };
 
-    update(mixer_state.buses, mixer_state.inputs, a.in_levels);
-    update(mixer_state.buses, mixer_state.outputs, a.out_levels);
+    update(new_st.mixer_state.buses, new_st.mixer_state.inputs, in_levels);
+    update(new_st.mixer_state.buses, new_st.mixer_state.outputs, out_levels);
 
-    return mixer_state;
+    return new_st;
 }
-
-template auto reduce(audio_state const&, update_levels const&)
-        -> audio_state;
 
 } // namespace piejam::runtime::actions

@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/runtime/actions/engine_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -26,13 +25,13 @@ namespace piejam::runtime::actions
 {
 
 struct update_info final
-    : reducible_action<
-              update_info,
-              ui::cloneable_action<update_info, action>>
+    : ui::cloneable_action<update_info, action>
     , visitable_engine_action<update_info>
 {
     std::size_t xruns{};
     float cpu_load{};
+
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

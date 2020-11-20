@@ -17,18 +17,18 @@
 
 #pragma once
 
+#include <piejam/audio/fwd.h>
+#include <piejam/container/box.h>
 #include <piejam/runtime/actions/device_action.h>
-#include <piejam/runtime/actions/reducible_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/selected_device.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
 
 struct update_devices final
-    : reducible_action<
-              update_devices,
-              ui::cloneable_action<update_devices, action>>
+    : ui::cloneable_action<update_devices, action>
     , visitable_device_action<update_devices>
 {
     container::box<piejam::audio::pcm_io_descriptors> pcm_devices;
@@ -38,6 +38,8 @@ struct update_devices final
 
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
+
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
 } // namespace piejam::runtime::actions

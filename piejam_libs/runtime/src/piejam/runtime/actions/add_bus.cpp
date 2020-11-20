@@ -17,7 +17,6 @@
 
 #include <piejam/runtime/actions/add_bus.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 #include <fmt/format.h>

@@ -17,13 +17,15 @@
 
 #include <piejam/runtime/actions/request_info_update.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-template auto reduce(audio_state const&, request_info_update const&)
-        -> audio_state;
+auto
+request_info_update::reduce(audio_state const& st) const -> audio_state
+{
+    return st;
+}
 
 } // namespace piejam::runtime::actions

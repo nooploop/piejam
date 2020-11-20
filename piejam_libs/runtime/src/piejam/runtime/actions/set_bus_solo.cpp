@@ -17,7 +17,6 @@
 
 #include <piejam/runtime/actions/set_bus_solo.h>
 
-#include <piejam/runtime/actions/reduce.h>
 #include <piejam/runtime/audio_state.h>
 
 #include <boost/assert.hpp>
@@ -25,25 +24,23 @@
 namespace piejam::runtime::actions
 {
 
-template <>
+template <audio::bus_direction D>
 auto
-reduce_mixer_state(
-        audio_state const& st,
-        set_bus_solo<audio::bus_direction::input> const& a) -> mixer::state
+set_bus_solo<D>::reduce(audio_state const& st) const -> audio_state
 {
-    auto mixer_state = st.mixer_state;
+    static_assert(D == audio::bus_direction::input);
 
-    BOOST_ASSERT(a.index < mixer_state.inputs.size());
-    auto const& id = mixer_state.inputs[a.index];
+    auto new_st = st;
 
-    mixer_state.input_solo_id =
-            id == mixer_state.input_solo_id ? mixer::bus_id{} : id;
+    BOOST_ASSERT(index < new_st.mixer_state.inputs.size());
+    auto const& id = new_st.mixer_state.inputs[index];
 
-    return mixer_state;
+    new_st.mixer_state.input_solo_id =
+            id == new_st.mixer_state.input_solo_id ? mixer::bus_id{} : id;
+
+    return new_st;
 }
 
-template auto
-reduce(audio_state const&, set_bus_solo<audio::bus_direction::input> const&)
-        -> audio_state;
+template struct set_bus_solo<audio::bus_direction::input>;
 
 } // namespace piejam::runtime::actions
