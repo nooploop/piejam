@@ -60,7 +60,6 @@ MixerChannelsList::addMixerChannel(std::unique_ptr<MixerChannel> busConfig)
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     assert(busConfig);
     m_list.push_back(std::move(busConfig));
-    m_list.back()->subscribe();
     endInsertRows();
 }
 

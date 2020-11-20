@@ -22,6 +22,7 @@
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/delete_bus.h>
+#include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/set_bus_name.h>
 #include <piejam/runtime/audio_state.h>
@@ -36,7 +37,7 @@ AudioInputOutputSettings::AudioInputOutputSettings(
         store& app_store,
         subscriber& state_change_subscriber,
         audio::bus_direction const settings_type)
-    : base_t(state_change_subscriber)
+    : Subscribable(state_change_subscriber)
     , m_store(app_store)
     , m_settings_type(settings_type)
 {
@@ -99,6 +100,8 @@ AudioInputOutputSettings::subscribeStep(
                     busConfigs()->removeBusConfig();
                 }
             });
+
+    m_store.dispatch(runtime::actions::request_info_update{});
 }
 
 template <audio::bus_direction D>

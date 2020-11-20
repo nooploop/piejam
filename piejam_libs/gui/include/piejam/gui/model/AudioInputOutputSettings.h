@@ -38,9 +38,6 @@ class AudioInputOutputSettings : public QObject
     Q_PROPERTY(BusConfigsList* busConfigs READ busConfigs CONSTANT)
 
 public:
-    Q_INVOKABLE virtual void subscribe() = 0;
-    Q_INVOKABLE virtual void unsubscribe() = 0;
-
     auto channels() -> QStringList { return m_channels; }
     void setChannels(QStringList const& channels);
 

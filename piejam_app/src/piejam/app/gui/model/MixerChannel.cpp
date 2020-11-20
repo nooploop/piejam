@@ -23,7 +23,7 @@ namespace piejam::app::gui::model
 MixerChannel::MixerChannel(
         subscriber& state_change_subscriber,
         MixerChannelSelectors selectors)
-    : base_t(state_change_subscriber)
+    : Subscribable(state_change_subscriber)
     , m_selectors(std::move(selectors))
 {
 }

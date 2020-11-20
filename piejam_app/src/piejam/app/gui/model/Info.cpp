@@ -27,43 +27,30 @@ namespace piejam::app::gui::model
 {
 
 Info::Info(store& app_store, subscriber& state_change_subscriber)
-    : m_store(app_store)
-    , m_state_change_subscriber(state_change_subscriber)
+    : Subscribable(state_change_subscriber)
+    , m_store(app_store)
 {
 }
 
 void
-Info::subscribe()
+Info::subscribeStep(
+        subscriber& state_change_subscriber,
+        subscriptions_manager& subs,
+        subscription_id subs_id)
 {
-    if (m_subscribed)
-        return;
-
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             runtime::audio_state_selectors::select_xruns,
             [this](std::size_t const xruns) {
                 setXRuns(static_cast<unsigned>(xruns));
             });
 
-    m_subs.observe(
-            m_subs_id,
-            m_state_change_subscriber,
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
             runtime::audio_state_selectors::select_cpu_load,
             [this](float const cpu_load) { setAudioLoad(cpu_load); });
-
-    m_subscribed = true;
-}
-
-void
-Info::unsubscribe()
-{
-    if (!m_subscribed)
-        return;
-
-    m_subs.erase(m_subs_id);
-
-    m_subscribed = false;
 }
 
 void

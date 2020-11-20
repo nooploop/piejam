@@ -61,7 +61,11 @@ Item {
             onDeleteConfigClicked: root.model.deleteBus(index)
             onNameEdited: root.model.setBusName(index, name)
 
-            Component.onCompleted: model.item.subscribe()
+            Binding {
+                target: model.item
+                property: "subscribed"
+                value: visible
+            }
         }
     }
 
@@ -103,5 +107,10 @@ Item {
 
     }
 
-    Component.onCompleted: root.model.subscribe()
+    Binding {
+        when: root.model
+        target: root.model
+        property: "subscribed"
+        value: root.visible
+    }
 }

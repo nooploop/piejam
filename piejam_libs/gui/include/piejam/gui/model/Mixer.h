@@ -38,9 +38,6 @@ class Mixer : public QObject
                        inputSoloActiveChanged FINAL)
 
 public:
-    Q_INVOKABLE virtual void subscribe() = 0;
-    Q_INVOKABLE virtual void unsubscribe() = 0;
-
     auto inputChannels() -> MixerChannelsList* { return &m_inputChannels; }
     auto numInputChannels() const noexcept -> std::size_t
     {

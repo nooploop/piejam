@@ -40,9 +40,6 @@ class AudioSettings : public QObject
                        periodSizesChanged FINAL)
 
 public:
-    Q_INVOKABLE virtual void subscribe() = 0;
-    Q_INVOKABLE virtual void unsubscribe() = 0;
-
     auto inputDevices() -> StringList* { return &m_inputDevices; }
     auto outputDevices() -> StringList* { return &m_outputDevices; }
     auto samplerates() -> StringList* { return &m_samplerates; }

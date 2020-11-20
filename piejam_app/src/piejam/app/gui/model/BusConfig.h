@@ -36,16 +36,25 @@ struct BusConfigSelectors
     selector<std::size_t> stereo_right_channel;
 };
 
-class BusConfig final : public Subscribable<piejam::gui::model::BusConfig>
+class BusConfig final
+    : public piejam::gui::model::BusConfig
+    , public Subscribable
 {
-    using base_t = Subscribable<piejam::gui::model::BusConfig>;
+    Q_OBJECT
 
+    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
+                       subscribedChanged)
 public:
     BusConfig(subscriber&, BusConfigSelectors);
+
+signals:
+    void subscribedChanged();
 
 private:
     void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
             override;
+
+    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
     BusConfigSelectors m_selectors;
 };

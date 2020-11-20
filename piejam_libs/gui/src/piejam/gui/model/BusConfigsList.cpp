@@ -60,7 +60,6 @@ BusConfigsList::addBusConfig(std::unique_ptr<BusConfig> busConfig)
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     assert(busConfig);
     m_list.push_back(std::move(busConfig));
-    m_list.back()->subscribe();
     endInsertRows();
 }
 

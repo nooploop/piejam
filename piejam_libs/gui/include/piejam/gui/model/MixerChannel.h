@@ -37,9 +37,6 @@ class MixerChannel : public QObject
 public:
     MixerChannel(QObject* parent = nullptr);
 
-    Q_INVOKABLE virtual void subscribe() = 0;
-    Q_INVOKABLE virtual void unsubscribe() = 0;
-
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const&);
 

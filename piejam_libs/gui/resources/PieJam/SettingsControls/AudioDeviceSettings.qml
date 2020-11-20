@@ -171,5 +171,10 @@ Item {
         }
     }
 
-    Component.onCompleted: root.model.subscribe()
+    Binding {
+        when: root.model
+        target: root.model
+        property: "subscribed"
+        value: root.visible
+    }
 }

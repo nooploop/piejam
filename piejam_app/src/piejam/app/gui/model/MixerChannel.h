@@ -37,16 +37,25 @@ struct MixerChannelSelectors
     selector<runtime::mixer::stereo_level> level;
 };
 
-class MixerChannel final : public Subscribable<piejam::gui::model::MixerChannel>
+class MixerChannel final
+    : public piejam::gui::model::MixerChannel
+    , public Subscribable
 {
-    using base_t = Subscribable<piejam::gui::model::MixerChannel>;
+    Q_OBJECT
 
+    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
+                       subscribedChanged)
 public:
     MixerChannel(subscriber&, MixerChannelSelectors);
+
+signals:
+    void subscribedChanged();
 
 private:
     void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
             override;
+
+    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
     MixerChannelSelectors m_selectors;
 };

@@ -64,7 +64,7 @@ to_QStringList(Vector const& l) -> QStringList
 AudioDeviceSettings::AudioDeviceSettings(
         store& app_store,
         subscriber& state_change_subscriber)
-    : base_t(state_change_subscriber)
+    : Subscribable(state_change_subscriber)
     , m_store(app_store)
 {
 }

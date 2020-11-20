@@ -25,10 +25,14 @@
 namespace piejam::app::gui::model
 {
 
-class Mixer final : public Subscribable<piejam::gui::model::Mixer>
+class Mixer final
+    : public piejam::gui::model::Mixer
+    , public Subscribable
 {
-    using base_t = Subscribable<piejam::gui::model::Mixer>;
+    Q_OBJECT
 
+    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
+                       subscribedChanged)
 public:
     Mixer(store&, subscriber&);
 
@@ -41,9 +45,14 @@ public:
     void setOutputChannelMute(unsigned index, bool mute) override;
     void requestLevelsUpdate() override;
 
+signals:
+    void subscribedChanged();
+
 private:
     void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
             override;
+
+    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
     store& m_store;
 };

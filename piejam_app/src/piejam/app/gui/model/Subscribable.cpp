@@ -15,48 +15,42 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/app/gui/model/Subscribable.h>
 
-#include <piejam/app/subscriber.h>
+#include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/runtime/audio_state.h>
 
 namespace piejam::app::gui::model
 {
 
-class Subscribable
+Subscribable::Subscribable(subscriber& state_change_subscriber)
+    : m_state_change_subscriber(state_change_subscriber)
 {
-public:
-    Subscribable(subscriber& state_change_subscriber);
-    virtual ~Subscribable();
+}
 
-    auto subscribed() const -> bool { return m_subscribed; }
-    void setSubscribed(bool subs)
-    {
-        if (subscribed() != subs)
-        {
-            if (subs)
-                subscribe();
-            else
-                unsubscribe();
+Subscribable::~Subscribable() = default;
 
-            emitSubscribedChangedSignal();
-        }
-    }
+void
+Subscribable::subscribe()
+{
+    if (m_subscribed)
+        return;
 
-protected:
-    virtual void
-    subscribeStep(subscriber&, subscriptions_manager&, subscription_id) = 0;
+    subscribeStep(m_state_change_subscriber, m_subs, m_subs_id);
 
-    virtual void emitSubscribedChangedSignal() = 0;
+    m_subscribed = true;
+}
 
-private:
-    void subscribe();
-    void unsubscribe();
+void
+Subscribable::unsubscribe()
+{
+    if (!m_subscribed)
+        return;
 
-    subscriber& m_state_change_subscriber;
-    subscriptions_manager m_subs;
-    bool m_subscribed{};
-    subscription_id const m_subs_id{get_next_sub_id()};
-};
+    m_subs.erase(m_subs_id);
+
+    m_subscribed = false;
+}
 
 } // namespace piejam::app::gui::model

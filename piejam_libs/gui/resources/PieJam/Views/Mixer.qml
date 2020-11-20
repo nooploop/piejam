@@ -64,7 +64,11 @@ TopPane {
                 onMuteToggled: root.model.setInputChannelMute(index, !model.item.mute)
                 onSoloToggled: root.model.setInputSolo(index)
 
-                Component.onCompleted: model.item.subscribe()
+                Binding {
+                    target: model.item
+                    property: "subscribed"
+                    value: visible
+                }
             }
         }
 
@@ -100,7 +104,11 @@ TopPane {
                 onPanMoved: root.model.setOutputChannelBalance(index, newPan)
                 onMuteToggled: root.model.setOutputChannelMute(index, !model.item.mute)
 
-                Component.onCompleted: model.item.subscribe()
+                Binding {
+                    target: model.item
+                    property: "subscribed"
+                    value: visible
+                }
             }
         }
     }
@@ -112,5 +120,10 @@ TopPane {
         onTriggered: root.model.requestLevelsUpdate()
     }
 
-    Component.onCompleted: root.model.subscribe()
+    Binding {
+        when: root.model
+        target: root.model
+        property: "subscribed"
+        value: root.visible
+    }
 }
