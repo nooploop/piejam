@@ -44,7 +44,8 @@ public:
             unsigned num_device_output_channels);
     ~audio_engine();
 
-    void set_float_parameter(float_parameter_id id, float value);
+    void set_bool_parameter(bool_parameter_id, bool);
+    void set_float_parameter(float_parameter_id, float);
 
     void set_input_channel_pan_balance(std::size_t index, float pan_balance);
     void set_input_channel_mute(std::size_t index, bool mute);
@@ -58,7 +59,10 @@ public:
     auto get_output_level(std::size_t index) const noexcept
             -> mixer::stereo_level;
 
-    void rebuild(mixer::state const&, float_parameters const&);
+    void
+    rebuild(mixer::state const&,
+            bool_parameters const&,
+            float_parameters const&);
 
     void operator()(
             range::table_view<float const> const& in_audio,
@@ -70,6 +74,8 @@ private:
     using float_input_parameter_procs = std::map<
             float_parameter_id,
             audio::engine::value_input_processor<float>*>;
+    using bool_input_parameter_procs = std::
+            map<bool_parameter_id, audio::engine::value_input_processor<bool>*>;
 
     std::vector<thread::configuration> const m_wt_configs;
     audio::samplerate_t const m_samplerate;
@@ -83,6 +89,7 @@ private:
     std::vector<processor_ptr> m_mixer_procs;
 
     float_input_parameter_procs m_float_input_parameter_procs;
+    bool_input_parameter_procs m_bool_input_parameter_procs;
 
     audio::engine::graph m_graph;
 };

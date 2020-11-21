@@ -221,21 +221,19 @@ make_bus_pan_balance_selector(mixer::bus_id bus_id) -> selector<float>
     };
 }
 
-template <audio::bus_direction D>
-static auto
-make_mute_selector(std::size_t const index) -> selector<bool>
-{
-    return [index](audio_state const& st) -> bool {
-        return index < mixer::bus_ids<D>(st.mixer_state).size()
-                       ? mixer::get_bus<D>(st.mixer_state, index).mute
-                       : false;
-    };
-}
-
 auto
-make_input_mute_selector(std::size_t const index) -> selector<bool>
+make_bus_mute_selector(mixer::bus_id bus_id) -> selector<bool>
 {
-    return make_mute_selector<audio::bus_direction::input>(index);
+    return [bus_id](audio_state const& st) -> bool {
+        auto it = st.mixer_state.buses.find(bus_id);
+
+        bool mute{};
+        if (it != st.mixer_state.buses.end())
+        {
+            st.bool_params.get(it->second.mute, mute);
+        }
+        return mute;
+    };
 }
 
 auto
@@ -269,12 +267,6 @@ make_input_level_selector(std::size_t const index)
 const selector<bool> select_input_solo_active([](audio_state const& st) {
     return st.mixer_state.input_solo_id != mixer::bus_id{};
 });
-
-auto
-make_output_mute_selector(std::size_t const index) -> selector<bool>
-{
-    return make_mute_selector<audio::bus_direction::output>(index);
-}
 
 auto
 make_output_level_selector(std::size_t const index)

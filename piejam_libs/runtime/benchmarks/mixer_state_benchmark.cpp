@@ -42,6 +42,7 @@ BM_copy_mixer_state_benchmark(benchmark::State& state)
                     .name = "in1",
                     .volume{},
                     .pan_balance{},
+                    .mute{},
                     .type = audio::bus_type::mono});
     add_bus(st.buses,
             st.inputs,
@@ -49,6 +50,7 @@ BM_copy_mixer_state_benchmark(benchmark::State& state)
                     .name = "in2",
                     .volume{},
                     .pan_balance{},
+                    .mute{},
                     .type = audio::bus_type::mono});
     add_bus(st.buses,
             st.inputs,
@@ -56,6 +58,7 @@ BM_copy_mixer_state_benchmark(benchmark::State& state)
                     .name = "in3",
                     .volume{},
                     .pan_balance{},
+                    .mute{},
                     .type = audio::bus_type::mono});
     add_bus(st.buses,
             st.outputs,
@@ -63,6 +66,7 @@ BM_copy_mixer_state_benchmark(benchmark::State& state)
                     .name = "main",
                     .volume{},
                     .pan_balance{},
+                    .mute{},
                     .type = audio::bus_type::stereo});
 
     for (auto _ : state)

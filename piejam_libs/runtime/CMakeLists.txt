@@ -16,6 +16,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_period_size.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_samplerate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bool_parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_mute.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_name.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_pan_balance.h
@@ -59,6 +60,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_period_size.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_samplerate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bool_parameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_mute.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_name.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_pan_balance.cpp

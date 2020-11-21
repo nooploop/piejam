@@ -32,6 +32,7 @@
 #include <piejam/runtime/actions/select_device.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
+#include <piejam/runtime/actions/set_bool_parameter.h>
 #include <piejam/runtime/actions/set_bus_mute.h>
 #include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
@@ -289,6 +290,7 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->rebuild(
                             m_get_state().mixer_state,
+                            m_get_state().bool_params,
                             m_get_state().float_params);
                 }
             },
@@ -299,6 +301,7 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->rebuild(
                             m_get_state().mixer_state,
+                            m_get_state().bool_params,
                             m_get_state().float_params);
                 }
             },
@@ -309,7 +312,18 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->rebuild(
                             m_get_state().mixer_state,
+                            m_get_state().bool_params,
                             m_get_state().float_params);
+                }
+            },
+            [this](actions::set_bool_parameter const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->set_bool_parameter(
+                            a.id,
+                            m_get_state().bool_params.get(a.id));
                 }
             },
             [this](actions::set_float_parameter const& a) {
@@ -322,14 +336,6 @@ audio_engine_middleware::process_engine_action(
                             m_get_state().float_params.get(a.id));
                 }
             },
-            [this](actions::set_input_bus_mute const& a) {
-                m_next(a);
-
-                if (m_engine)
-                {
-                    m_engine->set_input_channel_mute(a.index, a.mute);
-                }
-            },
             [this](actions::set_input_bus_solo const& a) {
                 m_next(a);
 
@@ -337,14 +343,6 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->set_input_solo(
                             m_get_state().mixer_state.input_solo_id);
-                }
-            },
-            [this](actions::set_output_bus_mute const& a) {
-                m_next(a);
-
-                if (m_engine)
-                {
-                    m_engine->set_output_channel_mute(a.index, a.mute);
                 }
             },
             [this](actions::request_levels_update const&) {
@@ -452,7 +450,10 @@ audio_engine_middleware::start_engine()
                     engine->operator()(in, out);
                 });
 
-        m_engine->rebuild(state.mixer_state, state.float_params);
+        m_engine->rebuild(
+                state.mixer_state,
+                state.bool_params,
+                state.float_params);
     }
 }
 

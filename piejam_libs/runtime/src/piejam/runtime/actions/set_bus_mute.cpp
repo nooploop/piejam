@@ -15,27 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/set_bus_mute.h>
+#include <piejam/runtime/actions/set_bus_volume.h>
 
+#include <piejam/runtime/actions/set_bool_parameter.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::runtime::actions
 {
 
-template <audio::bus_direction D>
 auto
-set_bus_mute<D>::reduce(audio_state const& st) const -> audio_state
+set_bus_mute(mixer::bus_id bus_id, bool mute) -> thunk_action
 {
-    auto new_st = st;
-    new_st.mixer_state = mixer::update_bus_field<D>(
-            st.mixer_state,
-            index,
-            &mixer::bus::mute,
-            mute);
-    return new_st;
+    return [=](auto const& get_state, auto const& dispatch) {
+        audio_state const& st = get_state();
+        auto it = st.mixer_state.buses.find(bus_id);
+        if (it != st.mixer_state.buses.end())
+        {
+            if (st.bool_params.contains(it->second.mute))
+                dispatch(set_bool_parameter{it->second.mute, mute});
+        }
+    };
 }
-
-template struct set_bus_mute<audio::bus_direction::input>;
-template struct set_bus_mute<audio::bus_direction::output>;
 
 } // namespace piejam::runtime::actions

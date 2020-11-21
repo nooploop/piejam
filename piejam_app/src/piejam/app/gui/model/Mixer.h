@@ -35,9 +35,7 @@ class Mixer final
 public:
     Mixer(store_dispatch, subscriber&);
 
-    void setInputChannelMute(unsigned index, bool mute) override;
     void setInputSolo(unsigned index) override;
-    void setOutputChannelMute(unsigned index, bool mute) override;
     void requestLevelsUpdate() override;
 
 signals:

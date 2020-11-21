@@ -53,10 +53,7 @@ public:
     auto inputSoloActive() const -> bool { return m_inputSoloActive; }
     void setInputSoloActive(bool);
 
-    virtual Q_INVOKABLE void setInputChannelMute(unsigned index, bool mute) = 0;
     virtual Q_INVOKABLE void setInputSolo(unsigned index) = 0;
-    virtual Q_INVOKABLE void
-    setOutputChannelMute(unsigned index, bool mute) = 0;
     virtual Q_INVOKABLE void requestLevelsUpdate() = 0;
 
 signals:

@@ -54,6 +54,7 @@ public:
 
     auto mute() const noexcept -> bool { return m_mute; }
     void setMute(bool);
+    Q_INVOKABLE virtual void changeMute(bool) = 0;
 
     auto solo() const noexcept -> bool { return m_solo; }
     void setSolo(bool);

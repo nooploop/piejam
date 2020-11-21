@@ -17,12 +17,27 @@
 
 #pragma once
 
+#include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/mixer.h>
+#include <piejam/runtime/ui/cloneable_action.h>
+#include <piejam/runtime/parameters.h>
 
 namespace piejam::runtime::actions
 {
 
-auto set_bus_mute(mixer::bus_id, bool mute) -> thunk_action;
+struct set_bool_parameter final
+    : ui::cloneable_action<set_bool_parameter, action>
+    , visitable_engine_action<set_bool_parameter>
+{
+    set_bool_parameter(bool_parameter_id id, bool value)
+        : id(id)
+        , value(value)
+    {}
+
+    bool_parameter_id id{};
+    bool value{};
+
+    auto reduce(audio_state const&) const -> audio_state override;
+};
 
 } // namespace piejam::runtime::actions

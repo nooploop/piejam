@@ -67,9 +67,7 @@ public:
                           channel.type == audio::bus_type::mono ? "pan"
                                                                 : "balance"))
         , m_mute_input_proc(
-                  std::make_unique<ns_ae::value_input_processor<bool>>(
-                          channel.mute,
-                          "mute"))
+                  std::make_unique<ns_ae::value_input_processor<bool>>("mute"))
         , m_pan_balance(
                   channel.type == audio::bus_type::mono
                           ? audio::components::make_pan()
@@ -113,7 +111,8 @@ public:
         return *m_pan_balance_input_proc;
     }
 
-    auto mute_input_processor() const noexcept -> ns_ae::processor&
+    auto mute_input_processor() const noexcept
+            -> ns_ae::value_input_processor<bool>&
     {
         return *m_mute_input_proc;
     }
@@ -208,6 +207,33 @@ static auto
 initialize_float_input_parameters(
         float_parameters const& floats,
         float_input_parameter_procs const& procs)
+{
+    for (auto&& [id, proc] : procs)
+    {
+        proc->set(floats.get(id));
+    }
+}
+
+using bool_input_parameter_procs = std::
+        map<bool_parameter_id, audio::engine::value_input_processor<bool>*>;
+
+static auto
+gather_bool_input_parameters(
+        mixer::state const& mixer_state,
+        std::vector<audio_engine::mixer_bus> const& buses,
+        bool_input_parameter_procs& procs)
+{
+    for (auto const& mb : buses)
+    {
+        auto const& bus = mixer_state.buses[mb.id()];
+        procs.emplace(bus.mute, &mb.mute_input_processor());
+    }
+}
+
+static auto
+initialize_bool_input_parameters(
+        bool_parameters const& floats,
+        bool_input_parameter_procs const& procs)
 {
     for (auto&& [id, proc] : procs)
     {
@@ -340,6 +366,16 @@ audio_engine::audio_engine(
 audio_engine::~audio_engine() = default;
 
 void
+audio_engine::set_bool_parameter(bool_parameter_id const id, bool const value)
+{
+    auto it = m_bool_input_parameter_procs.find(id);
+    if (it != m_bool_input_parameter_procs.end())
+    {
+        it->second->set(value);
+    }
+}
+
+void
 audio_engine::set_float_parameter(
         float_parameter_id const id,
         float const value)
@@ -402,9 +438,11 @@ audio_engine::get_output_level(std::size_t const index) const noexcept
 void
 audio_engine::rebuild(
         mixer::state const& mixer_state,
+        bool_parameters const& bool_params,
         float_parameters const& float_params)
 {
     float_input_parameter_procs float_input_parameter_procs;
+    bool_input_parameter_procs bool_input_parameter_procs;
 
     auto input_buses = make_mixer_bus_vector(
             m_input_buses,
@@ -415,6 +453,10 @@ audio_engine::rebuild(
             mixer_state,
             input_buses,
             float_input_parameter_procs);
+    gather_bool_input_parameters(
+            mixer_state,
+            input_buses,
+            bool_input_parameter_procs);
     auto output_buses = make_mixer_bus_vector(
             m_output_buses,
             m_samplerate,
@@ -424,10 +466,15 @@ audio_engine::rebuild(
             mixer_state,
             output_buses,
             float_input_parameter_procs);
+    gather_bool_input_parameters(
+            mixer_state,
+            output_buses,
+            bool_input_parameter_procs);
 
     initialize_float_input_parameters(
             float_params,
             float_input_parameter_procs);
+    initialize_bool_input_parameters(bool_params, bool_input_parameter_procs);
 
     auto input_solo_index_proc =
             std::make_unique<ns_ae::value_input_processor<mixer::bus_id>>(
@@ -453,6 +500,7 @@ audio_engine::rebuild(
     m_input_solo_index_proc = std::move(input_solo_index_proc);
     m_mixer_procs = std::move(mixers);
     m_float_input_parameter_procs = std::move(float_input_parameter_procs);
+    m_bool_input_parameter_procs = std::move(bool_input_parameter_procs);
 
     std::ofstream("graph.dot")
             << audio::engine::export_graph_as_dot(m_graph) << std::endl;

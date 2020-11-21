@@ -63,7 +63,6 @@ Mixer::subscribeStep(
                                     selectors::make_bus_name_selector(
                                             piejam::audio::bus_direction::input,
                                             bus),
-                                    selectors::make_input_mute_selector(bus),
                                     selectors::make_input_solo_selector(bus),
                                     selectors::make_input_level_selector(bus)},
                             bus_ids.get()[bus]));
@@ -95,7 +94,6 @@ Mixer::subscribeStep(
                                             piejam::audio::bus_direction::
                                                     output,
                                             bus),
-                                    selectors::make_output_mute_selector(bus),
                                     selector<bool>{
                                             [](runtime::audio_state const&) {
                                                 return false;
@@ -120,28 +118,10 @@ Mixer::subscribeStep(
 }
 
 void
-Mixer::setInputChannelMute(unsigned const index, bool const mute)
-{
-    runtime::actions::set_input_bus_mute action;
-    action.index = index;
-    action.mute = mute;
-    dispatch(action);
-}
-
-void
 Mixer::setInputSolo(unsigned const index)
 {
     runtime::actions::set_input_bus_solo action;
     action.index = index;
-    dispatch(action);
-}
-
-void
-Mixer::setOutputChannelMute(unsigned const index, bool const mute)
-{
-    runtime::actions::set_output_bus_mute action;
-    action.index = index;
-    action.mute = mute;
     dispatch(action);
 }
 

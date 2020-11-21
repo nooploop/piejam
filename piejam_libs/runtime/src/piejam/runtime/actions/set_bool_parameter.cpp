@@ -15,14 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/set_bool_parameter.h>
 
-#include <piejam/runtime/fwd.h>
-#include <piejam/runtime/mixer.h>
+#include <piejam/runtime/audio_state.h>
+
+#include <boost/assert.hpp>
 
 namespace piejam::runtime::actions
 {
 
-auto set_bus_mute(mixer::bus_id, bool mute) -> thunk_action;
+auto
+set_bool_parameter::reduce(audio_state const& st) const -> audio_state
+{
+    auto new_st = st;
+    BOOST_VERIFY(new_st.bool_params.set(id, value));
+    return new_st;
+}
 
 } // namespace piejam::runtime::actions
