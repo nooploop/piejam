@@ -60,7 +60,7 @@ TopPane {
                 name: model.item.name
 
                 onFaderMoved: model.item.changeVolume(newVolume)
-                onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
+                onPanMoved: model.item.changePanBalance(newPan)
                 onMuteToggled: root.model.setInputChannelMute(index, !model.item.mute)
                 onSoloToggled: root.model.setInputSolo(index)
 
@@ -101,7 +101,7 @@ TopPane {
                 name: model.item.name
 
                 onFaderMoved: model.item.changeVolume(newVolume)
-                onPanMoved: root.model.setOutputChannelBalance(index, newPan)
+                onPanMoved: model.item.changePanBalance(newPan)
                 onMuteToggled: root.model.setOutputChannelMute(index, !model.item.mute)
 
                 Binding {

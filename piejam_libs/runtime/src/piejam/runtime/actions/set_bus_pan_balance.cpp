@@ -17,25 +17,27 @@
 
 #include <piejam/runtime/actions/set_bus_pan_balance.h>
 
+#include <piejam/runtime/actions/set_float_parameter.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::runtime::actions
 {
 
-template <audio::bus_direction D>
 auto
-set_bus_pan_balance<D>::reduce(audio_state const& st) const -> audio_state
+set_bus_pan_balance(mixer::bus_id bus_id, float pan_balance) -> thunk_action
 {
-    auto new_st = st;
-    new_st.mixer_state = mixer::update_bus_field<D>(
-            st.mixer_state,
-            index,
-            &mixer::bus::pan_balance,
-            pan_balance);
-    return new_st;
+    return [=](auto const& get_state, auto const& dispatch) {
+        audio_state const& st = get_state();
+        auto it = st.mixer_state.buses.find(bus_id);
+        if (it != st.mixer_state.buses.end())
+        {
+            if (st.float_params.contains(it->second.pan_balance))
+                dispatch(set_float_parameter{
+                        it->second.pan_balance,
+                        pan_balance});
+        }
+    };
 }
-
-template struct set_bus_pan_balance<audio::bus_direction::input>;
-template struct set_bus_pan_balance<audio::bus_direction::output>;
 
 } // namespace piejam::runtime::actions

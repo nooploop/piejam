@@ -17,23 +17,12 @@
 
 #pragma once
 
-#include <piejam/audio/types.h>
-#include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/ui/cloneable_action.h>
+#include <piejam/runtime/mixer.h>
 
 namespace piejam::runtime::actions
 {
 
-template <audio::bus_direction D>
-struct set_bus_pan_balance final
-    : ui::cloneable_action<set_bus_pan_balance<D>, action>
-    , visitable_engine_action<set_bus_pan_balance<D>>
-{
-    std::size_t index{};
-    float pan_balance{};
-
-    auto reduce(audio_state const&) const -> audio_state override;
-};
+auto set_bus_pan_balance(mixer::bus_id, float pan_balance) -> thunk_action;
 
 } // namespace piejam::runtime::actions

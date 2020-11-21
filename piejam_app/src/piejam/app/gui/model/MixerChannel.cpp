@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/MixerChannel.h>
 
+#include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_volume.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/audio_state_selectors.h>
@@ -59,7 +60,8 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.pan,
+            runtime::audio_state_selectors::make_bus_pan_balance_selector(
+                    m_bus_id),
             [this](float x) { setPanBalance(x); });
 
     subs.observe(
@@ -89,6 +91,14 @@ MixerChannel::changeVolume(double volume)
     dispatch(runtime::actions::set_bus_volume(
             m_bus_id,
             static_cast<float>(volume)));
+}
+
+void
+MixerChannel::changePanBalance(double pan_balance)
+{
+    dispatch(runtime::actions::set_bus_pan_balance(
+            m_bus_id,
+            static_cast<float>(pan_balance)));
 }
 
 } // namespace piejam::app::gui::model

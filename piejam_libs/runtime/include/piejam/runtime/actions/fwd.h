@@ -52,13 +52,6 @@ struct set_bus_solo;
 using set_input_bus_solo = set_bus_solo<audio::bus_direction::input>;
 
 template <audio::bus_direction>
-struct set_bus_pan_balance;
-using set_input_bus_pan_balance =
-        set_bus_pan_balance<audio::bus_direction::input>;
-using set_output_bus_balance =
-        set_bus_pan_balance<audio::bus_direction::output>;
-
-template <audio::bus_direction>
 struct set_bus_mute;
 using set_input_bus_mute = set_bus_mute<audio::bus_direction::input>;
 using set_output_bus_mute = set_bus_mute<audio::bus_direction::output>;

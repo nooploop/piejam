@@ -322,16 +322,6 @@ audio_engine_middleware::process_engine_action(
                             m_get_state().float_params.get(a.id));
                 }
             },
-            [this](actions::set_input_bus_pan_balance const& a) {
-                m_next(a);
-
-                if (m_engine)
-                {
-                    m_engine->set_input_channel_pan_balance(
-                            a.index,
-                            a.pan_balance);
-                }
-            },
             [this](actions::set_input_bus_mute const& a) {
                 m_next(a);
 
@@ -347,16 +337,6 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->set_input_solo(
                             m_get_state().mixer_state.input_solo_id);
-                }
-            },
-            [this](actions::set_output_bus_balance const& a) {
-                m_next(a);
-
-                if (m_engine)
-                {
-                    m_engine->set_output_channel_balance(
-                            a.index,
-                            a.pan_balance);
                 }
             },
             [this](actions::set_output_bus_mute const& a) {

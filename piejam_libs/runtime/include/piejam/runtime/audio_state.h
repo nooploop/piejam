@@ -72,11 +72,14 @@ add_mixer_bus(
 {
     auto volume_id = st.float_params.add(
             parameter::flt{.default_value = 1.f, .min = 0.f, .max = 8.f});
+    auto pan_balance_id = st.float_params.add(
+            parameter::flt{.default_value = 0.f, .min = -1.f, .max = 1.f});
 
     mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
     bus_ids.emplace_back(st.mixer_state.buses.add(mixer::bus{
             .name = std::move(name),
             .volume = volume_id,
+            .pan_balance = pan_balance_id,
             .type = type,
             .device_channels = std::move(chs)}));
     mixer::bus_ids<D>(st.mixer_state) = bus_ids;
@@ -98,6 +101,7 @@ remove_mixer_bus(audio_state& st, std::size_t index)
 
     mixer::bus const& bus = st.mixer_state.buses[bus_id];
     st.float_params.remove(bus.volume);
+    st.float_params.remove(bus.pan_balance);
     st.mixer_state.buses.remove(bus_id);
     bus_ids.erase(bus_ids.begin() + index);
 

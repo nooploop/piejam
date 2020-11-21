@@ -41,7 +41,7 @@ struct bus
 {
     container::boxed_string name;
     float_parameter_id volume;
-    float pan_balance{};
+    float_parameter_id pan_balance;
     bool mute{};
     stereo_level level{};
     channel_type type{};

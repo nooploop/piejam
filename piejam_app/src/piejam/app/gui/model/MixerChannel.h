@@ -29,7 +29,6 @@ namespace piejam::app::gui::model
 struct MixerChannelSelectors
 {
     selector<container::boxed_string> name;
-    selector<float> pan;
     selector<bool> mute;
     selector<bool> solo;
     selector<runtime::mixer::stereo_level> level;
@@ -51,6 +50,7 @@ public:
             runtime::mixer::bus_id);
 
     void changeVolume(double) override;
+    void changePanBalance(double) override;
 
 signals:
     void subscribedChanged();

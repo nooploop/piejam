@@ -24,7 +24,6 @@
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/request_levels_update.h>
 #include <piejam/runtime/actions/set_bus_mute.h>
-#include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/audio_state_selectors.h>
@@ -64,7 +63,6 @@ Mixer::subscribeStep(
                                     selectors::make_bus_name_selector(
                                             piejam::audio::bus_direction::input,
                                             bus),
-                                    selectors::make_input_pan_selector(bus),
                                     selectors::make_input_mute_selector(bus),
                                     selectors::make_input_solo_selector(bus),
                                     selectors::make_input_level_selector(bus)},
@@ -97,8 +95,6 @@ Mixer::subscribeStep(
                                             piejam::audio::bus_direction::
                                                     output,
                                             bus),
-                                    selectors::make_output_balance_selector(
-                                            bus),
                                     selectors::make_output_mute_selector(bus),
                                     selector<bool>{
                                             [](runtime::audio_state const&) {
@@ -124,15 +120,6 @@ Mixer::subscribeStep(
 }
 
 void
-Mixer::setInputChannelPan(unsigned const index, double const pan)
-{
-    runtime::actions::set_input_bus_pan_balance action;
-    action.index = index;
-    action.pan_balance = static_cast<float>(pan);
-    dispatch(action);
-}
-
-void
 Mixer::setInputChannelMute(unsigned const index, bool const mute)
 {
     runtime::actions::set_input_bus_mute action;
@@ -146,15 +133,6 @@ Mixer::setInputSolo(unsigned const index)
 {
     runtime::actions::set_input_bus_solo action;
     action.index = index;
-    dispatch(action);
-}
-
-void
-Mixer::setOutputChannelBalance(unsigned const index, double const balance)
-{
-    runtime::actions::set_output_bus_balance action;
-    action.index = index;
-    action.pan_balance = static_cast<float>(balance);
     dispatch(action);
 }
 

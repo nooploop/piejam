@@ -35,10 +35,8 @@ class Mixer final
 public:
     Mixer(store_dispatch, subscriber&);
 
-    void setInputChannelPan(unsigned index, double pan) override;
     void setInputChannelMute(unsigned index, bool mute) override;
     void setInputSolo(unsigned index) override;
-    void setOutputChannelBalance(unsigned index, double balance) override;
     void setOutputChannelMute(unsigned index, bool mute) override;
     void requestLevelsUpdate() override;
 

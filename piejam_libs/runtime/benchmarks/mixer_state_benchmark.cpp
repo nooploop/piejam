@@ -41,24 +41,28 @@ BM_copy_mixer_state_benchmark(benchmark::State& state)
             mixer::bus{
                     .name = "in1",
                     .volume{},
+                    .pan_balance{},
                     .type = audio::bus_type::mono});
     add_bus(st.buses,
             st.inputs,
             mixer::bus{
                     .name = "in2",
                     .volume{},
+                    .pan_balance{},
                     .type = audio::bus_type::mono});
     add_bus(st.buses,
             st.inputs,
             mixer::bus{
                     .name = "in3",
                     .volume{},
+                    .pan_balance{},
                     .type = audio::bus_type::mono});
     add_bus(st.buses,
             st.outputs,
             mixer::bus{
                     .name = "main",
                     .volume{},
+                    .pan_balance{},
                     .type = audio::bus_type::stereo});
 
     for (auto _ : state)

@@ -50,6 +50,7 @@ public:
 
     auto panBalance() const noexcept -> double { return m_panBalance; }
     void setPanBalance(double);
+    Q_INVOKABLE virtual void changePanBalance(double) = 0;
 
     auto mute() const noexcept -> bool { return m_mute; }
     void setMute(bool);

@@ -64,7 +64,6 @@ public:
                           "volume"))
         , m_pan_balance_input_proc(
                   std::make_unique<ns_ae::value_input_processor<float>>(
-                          channel.pan_balance,
                           channel.type == audio::bus_type::mono ? "pan"
                                                                 : "balance"))
         , m_mute_input_proc(
@@ -108,7 +107,8 @@ public:
         return *m_volume_input_proc;
     }
 
-    auto pan_balance_input_processor() const noexcept -> ns_ae::processor&
+    auto pan_balance_input_processor() const noexcept
+            -> ns_ae::value_input_processor<float>&
     {
         return *m_pan_balance_input_proc;
     }
@@ -198,9 +198,9 @@ gather_float_input_parameters(
 {
     for (auto const& mb : buses)
     {
-        procs.emplace(
-                mixer_state.buses[mb.id()].volume,
-                &mb.volume_input_processor());
+        auto const& bus = mixer_state.buses[mb.id()];
+        procs.emplace(bus.volume, &mb.volume_input_processor());
+        procs.emplace(bus.pan_balance, &mb.pan_balance_input_processor());
     }
 }
 
