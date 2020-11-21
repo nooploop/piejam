@@ -74,19 +74,6 @@ AudioInputOutputSettings::subscribeStep(
                     busConfigs()->addBusConfig(std::make_unique<BusConfig>(
                             dispatch(),
                             state_change_subscriber,
-                            BusConfigSelectors{
-                                    selectors::make_bus_channel_selector(
-                                            m_settings_type,
-                                            bus,
-                                            audio::bus_channel::mono),
-                                    selectors::make_bus_channel_selector(
-                                            m_settings_type,
-                                            bus,
-                                            audio::bus_channel::left),
-                                    selectors::make_bus_channel_selector(
-                                            m_settings_type,
-                                            bus,
-                                            audio::bus_channel::right)},
                             bus_ids.get()[bus]));
                 }
 

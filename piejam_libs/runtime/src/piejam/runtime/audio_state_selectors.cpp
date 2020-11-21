@@ -111,52 +111,29 @@ make_bus_type_selector(mixer::bus_id const bus_id) -> selector<audio::bus_type>
     };
 }
 
-template <audio::bus_direction D>
-static auto
-make_bus_channel_selector(std::size_t const bus, audio::bus_channel const bc)
-        -> selector<std::size_t>
+auto
+make_bus_channel_selector(
+        mixer::bus_id const bus_id,
+        audio::bus_channel const bc) -> selector<std::size_t>
 {
     switch (bc)
     {
         case audio::bus_channel::mono:
         case audio::bus_channel::left:
-            return [bus](audio_state const& st) -> std::size_t {
-                return bus < mixer::bus_ids<D>(st.mixer_state).size()
-                               ? mixer::get_bus<D>(st.mixer_state, bus)
-                                         .device_channels.left
-                               : piejam::npos;
+            return [bus_id](audio_state const& st) -> std::size_t {
+                mixer::bus const* const bus = st.mixer_state.buses[bus_id];
+                return bus ? bus->device_channels.left : piejam::npos;
             };
 
         case audio::bus_channel::right:
-            return [bus](audio_state const& st) -> std::size_t {
-                return bus < mixer::bus_ids<D>(st.mixer_state).size()
-                               ? mixer::get_bus<D>(st.mixer_state, bus)
-                                         .device_channels.right
-                               : piejam::npos;
+            return [bus_id](audio_state const& st) -> std::size_t {
+                mixer::bus const* const bus = st.mixer_state.buses[bus_id];
+                return bus ? bus->device_channels.right : piejam::npos;
             };
     }
 
-    throw;
-}
-
-auto
-make_bus_channel_selector(
-        audio::bus_direction const bd,
-        std::size_t const bus,
-        audio::bus_channel const bc) -> selector<std::size_t>
-{
-    switch (bd)
-    {
-        case audio::bus_direction::input:
-            return make_bus_channel_selector<audio::bus_direction::input>(
-                    bus,
-                    bc);
-
-        case audio::bus_direction::output:
-            return make_bus_channel_selector<audio::bus_direction::output>(
-                    bus,
-                    bc);
-    }
+    BOOST_ASSERT(false);
+    __builtin_unreachable();
 }
 
 auto

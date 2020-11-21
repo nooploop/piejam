@@ -62,10 +62,8 @@ auto make_bus_name_selector(mixer::bus_id) -> selector<container::boxed_string>;
 
 auto make_bus_type_selector(mixer::bus_id) -> selector<audio::bus_type>;
 
-auto make_bus_channel_selector(
-        audio::bus_direction,
-        std::size_t bus,
-        audio::bus_channel) -> selector<std::size_t>;
+auto make_bus_channel_selector(mixer::bus_id, audio::bus_channel)
+        -> selector<std::size_t>;
 
 auto make_bus_volume_selector(mixer::bus_id) -> selector<float>;
 auto make_bus_pan_balance_selector(mixer::bus_id) -> selector<float>;

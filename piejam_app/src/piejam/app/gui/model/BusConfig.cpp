@@ -25,10 +25,8 @@ namespace piejam::app::gui::model
 BusConfig::BusConfig(
         store_dispatch store_dispatch,
         subscriber& state_change_subscriber,
-        BusConfigSelectors selectors,
         runtime::mixer::bus_id bus_id)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_selectors(std::move(selectors))
     , m_bus_id(bus_id)
 {
 }
@@ -58,19 +56,25 @@ BusConfig::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.mono_channel,
+            runtime::audio_state_selectors::make_bus_channel_selector(
+                    m_bus_id,
+                    audio::bus_channel::mono),
             [this](std::size_t const ch) { setMonoChannel(ch + 1); });
 
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.stereo_left_channel,
+            runtime::audio_state_selectors::make_bus_channel_selector(
+                    m_bus_id,
+                    audio::bus_channel::left),
             [this](std::size_t const ch) { setStereoLeftChannel(ch + 1); });
 
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.stereo_right_channel,
+            runtime::audio_state_selectors::make_bus_channel_selector(
+                    m_bus_id,
+                    audio::bus_channel::right),
             [this](std::size_t const ch) { setStereoRightChannel(ch + 1); });
 }
 

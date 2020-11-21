@@ -27,13 +27,6 @@
 namespace piejam::app::gui::model
 {
 
-struct BusConfigSelectors
-{
-    selector<std::size_t> mono_channel;
-    selector<std::size_t> stereo_left_channel;
-    selector<std::size_t> stereo_right_channel;
-};
-
 class BusConfig final
     : public piejam::gui::model::BusConfig
     , public Subscribable
@@ -43,11 +36,7 @@ class BusConfig final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    BusConfig(
-            store_dispatch,
-            subscriber&,
-            BusConfigSelectors,
-            runtime::mixer::bus_id);
+    BusConfig(store_dispatch, subscriber&, runtime::mixer::bus_id);
 
 signals:
     void subscribedChanged();
@@ -58,7 +47,6 @@ private:
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
-    BusConfigSelectors m_selectors;
     runtime::mixer::bus_id m_bus_id;
 };
 
