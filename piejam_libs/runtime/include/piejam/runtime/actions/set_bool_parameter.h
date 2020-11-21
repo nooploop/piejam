@@ -20,7 +20,7 @@
 #include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/parameter/bool_.h>
+#include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 

@@ -20,11 +20,12 @@
 namespace piejam::runtime::parameter
 {
 
-struct bool_
+template <class Value>
+struct generic_value
 {
-    using value_type = bool;
+    using value_type = Value;
 
-    float default_value{};
+    Value default_value{};
 };
 
 } // namespace piejam::runtime::parameter

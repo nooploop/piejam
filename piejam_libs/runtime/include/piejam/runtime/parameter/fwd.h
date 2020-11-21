@@ -20,7 +20,10 @@
 namespace piejam::runtime::parameter
 {
 
-struct bool_;
+template <class Value>
+struct generic_value;
+
+using bool_ = generic_value<bool>;
 struct float_;
 
 template <class Parameter>

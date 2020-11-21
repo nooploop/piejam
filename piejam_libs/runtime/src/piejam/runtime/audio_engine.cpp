@@ -36,8 +36,8 @@
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/mixer.h>
-#include <piejam/runtime/parameter/bool_.h>
 #include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/processors/parameter_input_processor_factory.h>
 #include <piejam/thread/configuration.h>
