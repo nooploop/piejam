@@ -17,24 +17,25 @@
 
 #include <piejam/runtime/actions/set_bus_volume.h>
 
+#include <piejam/runtime/actions/set_float_parameter.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::runtime::actions
 {
 
-template <audio::bus_direction D>
 auto
-set_bus_volume<D>::reduce(audio_state const& st) const -> audio_state
+set_bus_volume(mixer::bus_id bus_id, float volume) -> thunk_action
 {
-    auto new_st = st;
-
-    mixer::bus const& bus = mixer::get_bus<D>(new_st.mixer_state, index);
-    new_st.float_params.set(bus.volume, volume);
-
-    return new_st;
+    return [=](auto const& get_state, auto const& dispatch) {
+        audio_state const& st = get_state();
+        auto it = st.mixer_state.buses.find(bus_id);
+        if (it != st.mixer_state.buses.end())
+        {
+            if (st.float_params.contains(it->second.volume))
+                dispatch(set_float_parameter{it->second.volume, volume});
+        }
+    };
 }
-
-template struct set_bus_volume<audio::bus_direction::input>;
-template struct set_bus_volume<audio::bus_direction::output>;
 
 } // namespace piejam::runtime::actions

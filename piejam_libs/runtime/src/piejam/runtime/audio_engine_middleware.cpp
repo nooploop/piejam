@@ -35,7 +35,7 @@
 #include <piejam/runtime/actions/set_bus_mute.h>
 #include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
-#include <piejam/runtime/actions/set_bus_volume.h>
+#include <piejam/runtime/actions/set_float_parameter.h>
 #include <piejam/runtime/actions/update_devices.h>
 #include <piejam/runtime/actions/update_info.h>
 #include <piejam/runtime/actions/update_levels.h>
@@ -312,12 +312,14 @@ audio_engine_middleware::process_engine_action(
                             m_get_state().float_params);
                 }
             },
-            [this](actions::set_input_bus_volume const& a) {
+            [this](actions::set_float_parameter const& a) {
                 m_next(a);
 
                 if (m_engine)
                 {
-                    m_engine->set_input_channel_volume(a.index, a.volume);
+                    m_engine->set_float_parameter(
+                            a.id,
+                            m_get_state().float_params.get(a.id));
                 }
             },
             [this](actions::set_input_bus_pan_balance const& a) {
@@ -345,14 +347,6 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->set_input_solo(
                             m_get_state().mixer_state.input_solo_id);
-                }
-            },
-            [this](actions::set_output_bus_volume const& a) {
-                m_next(a);
-
-                if (m_engine)
-                {
-                    m_engine->set_output_channel_volume(a.index, a.volume);
                 }
             },
             [this](actions::set_output_bus_balance const& a) {

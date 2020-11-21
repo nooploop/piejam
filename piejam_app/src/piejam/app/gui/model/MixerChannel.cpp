@@ -17,15 +17,22 @@
 
 #include <piejam/app/gui/model/MixerChannel.h>
 
+#include <piejam/runtime/actions/set_bus_volume.h>
+#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/audio_state_selectors.h>
+#include <piejam/runtime/ui/thunk_action.h>
+
 namespace piejam::app::gui::model
 {
 
 MixerChannel::MixerChannel(
         store_dispatch store_dispatch,
         subscriber& state_change_subscriber,
-        MixerChannelSelectors selectors)
+        MixerChannelSelectors selectors,
+        runtime::mixer::bus_id id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_selectors(std::move(selectors))
+    , m_bus_id(id)
 {
 }
 
@@ -46,7 +53,7 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.volume,
+            runtime::audio_state_selectors::make_bus_volume_selector(m_bus_id),
             [this](float x) { setVolume(x); });
 
     subs.observe(
@@ -74,6 +81,14 @@ MixerChannel::subscribeStep(
             [this](runtime::mixer::stereo_level const& x) {
                 setLevel(x.left, x.right);
             });
+}
+
+void
+MixerChannel::changeVolume(double volume)
+{
+    dispatch(runtime::actions::set_bus_volume(
+            m_bus_id,
+            static_cast<float>(volume)));
 }
 
 } // namespace piejam::app::gui::model

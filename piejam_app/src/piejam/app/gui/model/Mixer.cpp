@@ -26,7 +26,6 @@
 #include <piejam/runtime/actions/set_bus_mute.h>
 #include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
-#include <piejam/runtime/actions/set_bus_volume.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/audio_state_selectors.h>
 
@@ -52,9 +51,11 @@ Mixer::subscribeStep(
             selectors::make_bus_list_selector(audio::bus_direction::input),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> bus_ids) {
-                while (bus_ids->size() > numInputChannels())
+                auto const num_channels = bus_ids->size();
+
+                for (std::size_t bus = numInputChannels(); bus < num_channels;
+                     ++bus)
                 {
-                    auto const bus = numInputChannels();
                     inputChannels()->addMixerChannel(std::make_unique<
                                                      MixerChannel>(
                             dispatch(),
@@ -63,12 +64,11 @@ Mixer::subscribeStep(
                                     selectors::make_bus_name_selector(
                                             piejam::audio::bus_direction::input,
                                             bus),
-                                    selectors::make_input_volume_selector(bus),
                                     selectors::make_input_pan_selector(bus),
                                     selectors::make_input_mute_selector(bus),
                                     selectors::make_input_solo_selector(bus),
-                                    selectors::make_input_level_selector(
-                                            bus)}));
+                                    selectors::make_input_level_selector(bus)},
+                            bus_ids.get()[bus]));
                 }
 
                 while (bus_ids->size() < numInputChannels())
@@ -83,9 +83,11 @@ Mixer::subscribeStep(
             selectors::make_bus_list_selector(audio::bus_direction::output),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> bus_ids) {
-                while (bus_ids->size() > numOutputChannels())
+                auto const num_channels = bus_ids->size();
+
+                for (std::size_t bus = numOutputChannels(); bus < num_channels;
+                     ++bus)
                 {
-                    auto const bus = numOutputChannels();
                     outputChannels()->addMixerChannel(std::make_unique<
                                                       MixerChannel>(
                             dispatch(),
@@ -95,7 +97,6 @@ Mixer::subscribeStep(
                                             piejam::audio::bus_direction::
                                                     output,
                                             bus),
-                                    selectors::make_output_volume_selector(bus),
                                     selectors::make_output_balance_selector(
                                             bus),
                                     selectors::make_output_mute_selector(bus),
@@ -103,8 +104,8 @@ Mixer::subscribeStep(
                                             [](runtime::audio_state const&) {
                                                 return false;
                                             }},
-                                    selectors::make_output_level_selector(
-                                            bus)}));
+                                    selectors::make_output_level_selector(bus)},
+                            bus_ids.get()[bus]));
                 }
 
                 while (bus_ids->size() < numOutputChannels())
@@ -120,15 +121,6 @@ Mixer::subscribeStep(
             [this](bool const input_solo_active) {
                 setInputSoloActive(input_solo_active);
             });
-}
-
-void
-Mixer::setInputChannelVolume(unsigned const index, double const volume)
-{
-    runtime::actions::set_input_bus_volume action;
-    action.index = index;
-    action.volume = static_cast<float>(volume);
-    dispatch(action);
 }
 
 void
@@ -154,15 +146,6 @@ Mixer::setInputSolo(unsigned const index)
 {
     runtime::actions::set_input_bus_solo action;
     action.index = index;
-    dispatch(action);
-}
-
-void
-Mixer::setOutputChannelVolume(unsigned const index, double const volume)
-{
-    runtime::actions::set_output_bus_volume action;
-    action.index = index;
-    action.volume = static_cast<float>(volume);
     dispatch(action);
 }
 

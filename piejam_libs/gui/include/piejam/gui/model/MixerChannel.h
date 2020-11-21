@@ -42,6 +42,7 @@ public:
 
     auto volume() const noexcept -> double { return m_volume; }
     void setVolume(double);
+    Q_INVOKABLE virtual void changeVolume(double) = 0;
 
     auto levelLeft() const noexcept -> double { return m_levelLeft; }
     auto levelRight() const noexcept -> double { return m_levelRight; }

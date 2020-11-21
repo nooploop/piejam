@@ -68,7 +68,8 @@ auto make_bus_channel_selector(
         std::size_t bus,
         audio::bus_channel) -> selector<std::size_t>;
 
-auto make_input_volume_selector(std::size_t index) -> selector<float>;
+auto make_bus_volume_selector(mixer::bus_id) -> selector<float>;
+
 auto make_input_pan_selector(std::size_t index) -> selector<float>;
 auto make_input_mute_selector(std::size_t index) -> selector<bool>;
 auto make_input_solo_selector(std::size_t index) -> selector<bool>;
@@ -77,7 +78,6 @@ auto make_input_level_selector(std::size_t index)
 
 extern const selector<bool> select_input_solo_active;
 
-auto make_output_volume_selector(std::size_t index) -> selector<float>;
 auto make_output_balance_selector(std::size_t index) -> selector<float>;
 auto make_output_mute_selector(std::size_t index) -> selector<bool>;
 auto make_output_level_selector(std::size_t index)

@@ -59,11 +59,6 @@ using set_output_bus_balance =
         set_bus_pan_balance<audio::bus_direction::output>;
 
 template <audio::bus_direction>
-struct set_bus_volume;
-using set_input_bus_volume = set_bus_volume<audio::bus_direction::input>;
-using set_output_bus_volume = set_bus_volume<audio::bus_direction::output>;
-
-template <audio::bus_direction>
 struct set_bus_mute;
 using set_input_bus_mute = set_bus_mute<audio::bus_direction::input>;
 using set_output_bus_mute = set_bus_mute<audio::bus_direction::output>;
@@ -77,6 +72,8 @@ template <audio::bus_direction>
 struct set_bus_name;
 using set_input_bus_name = set_bus_name<audio::bus_direction::input>;
 using set_output_bus_name = set_bus_name<audio::bus_direction::output>;
+
+struct set_float_parameter;
 
 // visitors
 

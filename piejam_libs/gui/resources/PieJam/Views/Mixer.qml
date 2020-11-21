@@ -59,7 +59,7 @@ TopPane {
                 solo: model.item.solo
                 name: model.item.name
 
-                onFaderMoved: root.model.setInputChannelVolume(index, newVolume)
+                onFaderMoved: model.item.changeVolume(newVolume)
                 onPanMoved: root.model.setInputChannelPan(index, inputChannelStrip.pan)
                 onMuteToggled: root.model.setInputChannelMute(index, !model.item.mute)
                 onSoloToggled: root.model.setInputSolo(index)
@@ -100,7 +100,7 @@ TopPane {
                 soloEnabled: false
                 name: model.item.name
 
-                onFaderMoved: root.model.setOutputChannelVolume(index, newVolume)
+                onFaderMoved: model.item.changeVolume(newVolume)
                 onPanMoved: root.model.setOutputChannelBalance(index, newPan)
                 onMuteToggled: root.model.setOutputChannelMute(index, !model.item.mute)
 

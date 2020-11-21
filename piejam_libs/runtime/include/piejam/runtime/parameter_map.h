@@ -67,6 +67,19 @@ public:
         return m_values.find(id)->second;
     }
 
+    auto get(id_t id, value_type& result) const
+            noexcept(std::is_nothrow_copy_assignable_v<value_type>) -> bool
+    {
+        auto it = m_values.find(id);
+        if (it != m_values.end())
+        {
+            result = it->second;
+            return true;
+        }
+
+        return false;
+    }
+
     template <std::convertible_to<value_type> V>
     auto set(id_t id, V&& value) -> bool
     {

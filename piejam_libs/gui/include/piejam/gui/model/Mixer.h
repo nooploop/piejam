@@ -53,13 +53,9 @@ public:
     auto inputSoloActive() const -> bool { return m_inputSoloActive; }
     void setInputSoloActive(bool);
 
-    virtual Q_INVOKABLE void
-    setInputChannelVolume(unsigned index, double volume) = 0;
     virtual Q_INVOKABLE void setInputChannelPan(unsigned index, double pan) = 0;
     virtual Q_INVOKABLE void setInputChannelMute(unsigned index, bool mute) = 0;
     virtual Q_INVOKABLE void setInputSolo(unsigned index) = 0;
-    virtual Q_INVOKABLE void
-    setOutputChannelVolume(unsigned index, double volume) = 0;
     virtual Q_INVOKABLE void
     setOutputChannelBalance(unsigned index, double balance) = 0;
     virtual Q_INVOKABLE void

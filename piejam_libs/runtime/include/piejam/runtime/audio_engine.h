@@ -24,6 +24,7 @@
 #include <piejam/runtime/mixer.h>
 #include <piejam/thread/fwd.h>
 
+#include <map>
 #include <memory>
 #include <span>
 #include <vector>
@@ -43,11 +44,12 @@ public:
             unsigned num_device_output_channels);
     ~audio_engine();
 
-    void set_input_channel_volume(std::size_t index, float volume);
+    void set_float_parameter(float_parameter_id id, float value);
+
     void set_input_channel_pan_balance(std::size_t index, float pan_balance);
     void set_input_channel_mute(std::size_t index, bool mute);
     void set_input_solo(mixer::bus_id const&);
-    void set_output_channel_volume(std::size_t index, float volume);
+
     void set_output_channel_balance(std::size_t index, float balance);
     void set_output_channel_mute(std::size_t index, bool mute);
 
@@ -65,6 +67,9 @@ public:
 private:
     using processor_ptr = std::unique_ptr<audio::engine::processor>;
     using component_ptr = std::unique_ptr<audio::engine::component>;
+    using float_input_parameter_procs = std::map<
+            float_parameter_id,
+            audio::engine::value_input_processor<float>*>;
 
     std::vector<thread::configuration> const m_wt_configs;
     audio::samplerate_t const m_samplerate;
@@ -76,6 +81,8 @@ private:
     std::unique_ptr<audio::engine::value_input_processor<mixer::bus_id>>
             m_input_solo_index_proc;
     std::vector<processor_ptr> m_mixer_procs;
+
+    float_input_parameter_procs m_float_input_parameter_procs;
 
     audio::engine::graph m_graph;
 };

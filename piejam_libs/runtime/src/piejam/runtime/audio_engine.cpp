@@ -55,14 +55,12 @@ class audio_engine::mixer_bus final
 {
 public:
     mixer_bus(
-            float_parameters const& flt_params,
             audio::samplerate_t const samplerate,
             mixer::bus_id bus_id,
             mixer::bus const& channel)
         : m_id(bus_id)
         , m_volume_input_proc(
                   std::make_unique<ns_ae::value_input_processor<float>>(
-                          flt_params.get(channel.volume),
                           "volume"))
         , m_pan_balance_input_proc(
                   std::make_unique<ns_ae::value_input_processor<float>>(
@@ -104,7 +102,8 @@ public:
         return m_last_level;
     }
 
-    auto volume_input_processor() const noexcept -> ns_ae::processor&
+    auto volume_input_processor() const noexcept
+            -> ns_ae::value_input_processor<float>&
     {
         return *m_volume_input_proc;
     }
@@ -161,7 +160,6 @@ private:
 
 static auto
 make_mixer_bus_vector(
-        float_parameters const& float_params,
         std::vector<audio_engine::mixer_bus>& prev_buses,
         unsigned const samplerate,
         mixer::buses_t const& chs,
@@ -182,11 +180,39 @@ make_mixer_bus_vector(
         }
         else
         {
-            result.emplace_back(float_params, samplerate, id, chs[id]);
+            result.emplace_back(samplerate, id, chs[id]);
         }
     }
 
     return result;
+}
+
+using float_input_parameter_procs = std::
+        map<float_parameter_id, audio::engine::value_input_processor<float>*>;
+
+static auto
+gather_float_input_parameters(
+        mixer::state const& mixer_state,
+        std::vector<audio_engine::mixer_bus> const& buses,
+        float_input_parameter_procs& procs)
+{
+    for (auto const& mb : buses)
+    {
+        procs.emplace(
+                mixer_state.buses[mb.id()].volume,
+                &mb.volume_input_processor());
+    }
+}
+
+static auto
+initialize_float_input_parameters(
+        float_parameters const& floats,
+        float_input_parameter_procs const& procs)
+{
+    for (auto&& [id, proc] : procs)
+    {
+        proc->set(floats.get(id));
+    }
 }
 
 static void
@@ -314,11 +340,15 @@ audio_engine::audio_engine(
 audio_engine::~audio_engine() = default;
 
 void
-audio_engine::set_input_channel_volume(
-        std::size_t const index,
-        float const volume)
+audio_engine::set_float_parameter(
+        float_parameter_id const id,
+        float const value)
 {
-    m_input_buses[index].set_volume(volume);
+    auto it = m_float_input_parameter_procs.find(id);
+    if (it != m_float_input_parameter_procs.end())
+    {
+        it->second->set(value);
+    }
 }
 
 void
@@ -339,14 +369,6 @@ void
 audio_engine::set_input_solo(mixer::bus_id const& id)
 {
     m_input_solo_index_proc->set(id);
-}
-
-void
-audio_engine::set_output_channel_volume(
-        std::size_t const index,
-        float const volume)
-{
-    m_output_buses[index].set_volume(volume);
 }
 
 void
@@ -382,18 +404,31 @@ audio_engine::rebuild(
         mixer::state const& mixer_state,
         float_parameters const& float_params)
 {
+    float_input_parameter_procs float_input_parameter_procs;
+
     auto input_buses = make_mixer_bus_vector(
-            float_params,
             m_input_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.inputs);
+    gather_float_input_parameters(
+            mixer_state,
+            input_buses,
+            float_input_parameter_procs);
     auto output_buses = make_mixer_bus_vector(
-            float_params,
             m_output_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.outputs);
+    gather_float_input_parameters(
+            mixer_state,
+            output_buses,
+            float_input_parameter_procs);
+
+    initialize_float_input_parameters(
+            float_params,
+            float_input_parameter_procs);
+
     auto input_solo_index_proc =
             std::make_unique<ns_ae::value_input_processor<mixer::bus_id>>(
                     mixer_state.input_solo_id,
@@ -417,6 +452,7 @@ audio_engine::rebuild(
     m_output_buses = std::move(output_buses);
     m_input_solo_index_proc = std::move(input_solo_index_proc);
     m_mixer_procs = std::move(mixers);
+    m_float_input_parameter_procs = std::move(float_input_parameter_procs);
 
     std::ofstream("graph.dot")
             << audio::engine::export_graph_as_dot(m_graph) << std::endl;

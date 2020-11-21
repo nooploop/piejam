@@ -191,23 +191,19 @@ make_bus_channel_selector(
     }
 }
 
-template <audio::bus_direction D>
-static auto
-make_volume_selector(std::size_t const index) -> selector<float>
-{
-    return [index](audio_state const& st) -> float {
-        return index < mixer::bus_ids<D>(st.mixer_state).size()
-                       ? st.float_params.get(
-                                 mixer::get_bus<D>(st.mixer_state, index)
-                                         .volume)
-                       : 1.f;
-    };
-}
-
 auto
-make_input_volume_selector(std::size_t const index) -> selector<float>
+make_bus_volume_selector(mixer::bus_id bus_id) -> selector<float>
 {
-    return make_volume_selector<audio::bus_direction::input>(index);
+    return [bus_id](audio_state const& st) -> float {
+        auto it = st.mixer_state.buses.find(bus_id);
+
+        float volume{1.f};
+        if (it != st.mixer_state.buses.end())
+        {
+            st.float_params.get(it->second.volume, volume);
+        }
+        return volume;
+    };
 }
 
 template <audio::bus_direction D>
@@ -275,12 +271,6 @@ make_input_level_selector(std::size_t const index)
 const selector<bool> select_input_solo_active([](audio_state const& st) {
     return st.mixer_state.input_solo_id != mixer::bus_id{};
 });
-
-auto
-make_output_volume_selector(std::size_t const index) -> selector<float>
-{
-    return make_volume_selector<audio::bus_direction::output>(index);
-}
 
 auto
 make_output_balance_selector(std::size_t const index) -> selector<float>
