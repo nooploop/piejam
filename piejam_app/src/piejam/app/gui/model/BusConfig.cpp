@@ -17,7 +17,7 @@
 
 #include <piejam/app/gui/model/BusConfig.h>
 
-#include <piejam/runtime/audio_state_selectors.h>
+#include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
 {
@@ -40,7 +40,7 @@ BusConfig::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_name_selector(m_bus_id),
+            runtime::selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string name) {
                 setName(QString::fromStdString(*name));
             });
@@ -48,7 +48,7 @@ BusConfig::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_type_selector(m_bus_id),
+            runtime::selectors::make_bus_type_selector(m_bus_id),
             [this](audio::bus_type const t) {
                 setMono(t == audio::bus_type::mono);
             });
@@ -56,7 +56,7 @@ BusConfig::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_channel_selector(
+            runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::mono),
             [this](std::size_t const ch) { setMonoChannel(ch + 1); });
@@ -64,7 +64,7 @@ BusConfig::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_channel_selector(
+            runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::left),
             [this](std::size_t const ch) { setStereoLeftChannel(ch + 1); });
@@ -72,7 +72,7 @@ BusConfig::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_channel_selector(
+            runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::right),
             [this](std::size_t const ch) { setStereoRightChannel(ch + 1); });

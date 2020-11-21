@@ -30,7 +30,7 @@
 
 #include <cstddef>
 
-namespace piejam::runtime::audio_state_selectors
+namespace piejam::runtime::selectors
 {
 
 template <class Value>
@@ -77,4 +77,4 @@ extern const selector<bool> select_input_solo_active;
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;
 
-} // namespace piejam::runtime::audio_state_selectors
+} // namespace piejam::runtime::selectors

@@ -26,7 +26,7 @@
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/audio_state.h>
-#include <piejam/runtime/audio_state_selectors.h>
+#include <piejam/runtime/selectors.h>
 
 #include <boost/hof/compose.hpp>
 
@@ -74,7 +74,7 @@ AudioDeviceSettings::subscribeStep(
         subscriptions_manager& subs,
         subscription_id subs_id)
 {
-    namespace selectors = runtime::audio_state_selectors;
+    namespace selectors = runtime::selectors;
 
     subs.observe(
             subs_id,

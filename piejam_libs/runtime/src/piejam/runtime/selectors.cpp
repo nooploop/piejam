@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/audio_state_selectors.h>
+#include <piejam/runtime/selectors.h>
 
 #include <piejam/container/boxify_result.h>
 #include <piejam/functional/memo.h>
@@ -25,7 +25,7 @@
 
 #include <cassert>
 
-namespace piejam::runtime::audio_state_selectors
+namespace piejam::runtime::selectors
 {
 
 const selector<samplerate> select_samplerate(

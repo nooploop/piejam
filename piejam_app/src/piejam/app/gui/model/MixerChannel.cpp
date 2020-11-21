@@ -21,7 +21,7 @@
 #include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_volume.h>
 #include <piejam/runtime/audio_state.h>
-#include <piejam/runtime/audio_state_selectors.h>
+#include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::app::gui::model
@@ -45,7 +45,7 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_name_selector(m_bus_id),
+            runtime::selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string name) {
                 setName(QString::fromStdString(*name));
             });
@@ -53,32 +53,32 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_volume_selector(m_bus_id),
+            runtime::selectors::make_bus_volume_selector(m_bus_id),
             [this](float x) { setVolume(x); });
 
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_pan_balance_selector(
+            runtime::selectors::make_bus_pan_balance_selector(
                     m_bus_id),
             [this](float x) { setPanBalance(x); });
 
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_mute_selector(m_bus_id),
+            runtime::selectors::make_bus_mute_selector(m_bus_id),
             [this](bool x) { setMute(x); });
 
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_input_solo_selector(m_bus_id),
+            runtime::selectors::make_input_solo_selector(m_bus_id),
             [this](bool x) { setSolo(x); });
 
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::make_bus_level_selector(m_bus_id),
+            runtime::selectors::make_bus_level_selector(m_bus_id),
             [this](runtime::stereo_level const& x) {
                 setLevel(x.left, x.right);
             });

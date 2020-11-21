@@ -20,7 +20,7 @@
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/audio_state.h>
-#include <piejam/runtime/audio_state_selectors.h>
+#include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
 {
@@ -39,7 +39,7 @@ Info::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::select_xruns,
+            runtime::selectors::select_xruns,
             [this](std::size_t const xruns) {
                 setXRuns(static_cast<unsigned>(xruns));
             });
@@ -47,7 +47,7 @@ Info::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::audio_state_selectors::select_cpu_load,
+            runtime::selectors::select_cpu_load,
             [this](float const cpu_load) { setAudioLoad(cpu_load); });
 }
 

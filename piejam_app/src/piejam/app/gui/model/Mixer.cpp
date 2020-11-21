@@ -26,7 +26,7 @@
 #include <piejam/runtime/actions/set_bus_mute.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/audio_state.h>
-#include <piejam/runtime/audio_state_selectors.h>
+#include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
 {
@@ -42,7 +42,7 @@ Mixer::subscribeStep(
         subscriptions_manager& subs,
         subscription_id subs_id)
 {
-    namespace selectors = runtime::audio_state_selectors;
+    namespace selectors = runtime::selectors;
 
     subs.observe(
             subs_id,
