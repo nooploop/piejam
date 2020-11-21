@@ -59,9 +59,6 @@ Mixer::subscribeStep(
                             std::make_unique<MixerChannel>(
                                     dispatch(),
                                     state_change_subscriber,
-                                    MixerChannelSelectors{
-                                            selectors::make_input_solo_selector(
-                                                    bus)},
                                     bus_ids.get()[bus]));
                 }
 
@@ -86,10 +83,6 @@ Mixer::subscribeStep(
                             std::make_unique<MixerChannel>(
                                     dispatch(),
                                     state_change_subscriber,
-                                    MixerChannelSelectors{selector<bool>{
-                                            [](runtime::audio_state const&) {
-                                                return false;
-                                            }}},
                                     bus_ids.get()[bus]));
                 }
 

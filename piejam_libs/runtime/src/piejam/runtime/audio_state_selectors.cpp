@@ -206,7 +206,7 @@ make_bus_pan_balance_selector(mixer::bus_id bus_id) -> selector<float>
 }
 
 auto
-make_bus_mute_selector(mixer::bus_id bus_id) -> selector<bool>
+make_bus_mute_selector(mixer::bus_id const bus_id) -> selector<bool>
 {
     return [bus_id](audio_state const& st) -> bool {
         auto it = st.mixer_state.buses.find(bus_id);
@@ -218,13 +218,11 @@ make_bus_mute_selector(mixer::bus_id bus_id) -> selector<bool>
 }
 
 auto
-make_input_solo_selector(std::size_t const index) -> selector<bool>
+make_input_solo_selector(mixer::bus_id const bus_id) -> selector<bool>
 {
-    return selector<bool>([index](audio_state const& st) -> bool {
-        return index < st.mixer_state.inputs->size() &&
-               st.mixer_state.inputs.get()[index] ==
-                       st.mixer_state.input_solo_id;
-    });
+    return [bus_id](audio_state const& st) -> bool {
+        return bus_id == st.mixer_state.input_solo_id;
+    };
 }
 
 auto

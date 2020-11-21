@@ -28,11 +28,6 @@
 namespace piejam::app::gui::model
 {
 
-struct MixerChannelSelectors
-{
-    selector<bool> solo;
-};
-
 class MixerChannel final
     : public piejam::gui::model::MixerChannel
     , public Subscribable
@@ -42,11 +37,7 @@ class MixerChannel final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    MixerChannel(
-            store_dispatch,
-            subscriber&,
-            MixerChannelSelectors,
-            runtime::mixer::bus_id);
+    MixerChannel(store_dispatch, subscriber&, runtime::mixer::bus_id);
 
     void changeVolume(double) override;
     void changePanBalance(double) override;
@@ -61,7 +52,6 @@ private:
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
-    MixerChannelSelectors m_selectors;
     runtime::mixer::bus_id m_bus_id;
 };
 

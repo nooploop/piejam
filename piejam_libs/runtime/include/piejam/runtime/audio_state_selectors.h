@@ -73,7 +73,7 @@ auto make_bus_pan_balance_selector(mixer::bus_id) -> selector<float>;
 auto make_bus_mute_selector(mixer::bus_id) -> selector<bool>;
 auto make_bus_level_selector(mixer::bus_id) -> selector<stereo_level>;
 
-auto make_input_solo_selector(std::size_t index) -> selector<bool>;
+auto make_input_solo_selector(mixer::bus_id) -> selector<bool>;
 
 extern const selector<bool> select_input_solo_active;
 

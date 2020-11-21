@@ -30,10 +30,8 @@ namespace piejam::app::gui::model
 MixerChannel::MixerChannel(
         store_dispatch store_dispatch,
         subscriber& state_change_subscriber,
-        MixerChannelSelectors selectors,
         runtime::mixer::bus_id id)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_selectors(std::move(selectors))
     , m_bus_id(id)
 {
 }
@@ -74,7 +72,7 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.solo,
+            runtime::audio_state_selectors::make_input_solo_selector(m_bus_id),
             [this](bool x) { setSolo(x); });
 
     subs.observe(
