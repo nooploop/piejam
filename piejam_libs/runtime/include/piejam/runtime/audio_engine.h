@@ -36,8 +36,6 @@ namespace piejam::runtime
 class audio_engine
 {
 public:
-    class mixer_bus;
-
     audio_engine(
             std::span<thread::configuration const> const& wt_configs,
             audio::samplerate_t,
@@ -45,8 +43,8 @@ public:
             unsigned num_device_output_channels);
     ~audio_engine();
 
-    void set_bool_parameter(bool_parameter_id, bool);
-    void set_float_parameter(float_parameter_id, float);
+    void set_bool_parameter(bool_parameter_id, bool) const;
+    void set_float_parameter(float_parameter_id, float) const;
 
     void set_input_solo(mixer::bus_id const&);
 

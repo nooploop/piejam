@@ -21,6 +21,7 @@
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/box.h>
+#include <piejam/npos.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/bool_.h>
 #include <piejam/runtime/parameter/float_.h>
@@ -71,7 +72,7 @@ add_mixer_bus(
         audio_state& st,
         std::string name,
         audio::bus_type type,
-        channel_index_pair chs = {})
+        channel_index_pair chs = channel_index_pair{npos})
 {
     auto volume_id = st.float_params.add(
             parameter::float_{.default_value = 1.f, .min = 0.f, .max = 8.f});
