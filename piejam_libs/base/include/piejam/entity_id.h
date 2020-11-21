@@ -19,6 +19,14 @@
 
 #include <cstddef>
 
+namespace std
+{
+
+template <class>
+struct hash;
+
+} // namespace std
+
 namespace piejam
 {
 
@@ -49,13 +57,14 @@ struct entity_id
     }
 
 private:
-
     using id_t = std::size_t;
 
     constexpr entity_id(id_t const id) noexcept
         : m_id(id)
     {
     }
+
+    friend struct std::hash<entity_id<EntityTag>>;
 
     id_t m_id{};
 };

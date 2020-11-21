@@ -2,6 +2,7 @@ add_library(piejam_base INTERFACE)
 
 target_sources(piejam_base INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/entity_id.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/entity_id_hash.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/entity_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/math.h
