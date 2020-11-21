@@ -32,7 +32,6 @@ struct MixerChannelSelectors
 {
     selector<container::boxed_string> name;
     selector<bool> solo;
-    selector<runtime::stereo_level> level;
 };
 
 class MixerChannel final

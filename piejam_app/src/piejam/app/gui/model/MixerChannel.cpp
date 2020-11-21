@@ -80,7 +80,7 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.level,
+            runtime::audio_state_selectors::make_bus_level_selector(m_bus_id),
             [this](runtime::stereo_level const& x) {
                 setLevel(x.left, x.right);
             });

@@ -79,7 +79,7 @@ auto
 get_bus(state const& st, std::size_t index) -> bus const&
 {
     BOOST_ASSERT(index < bus_ids<D>(st).size());
-    return st.buses[bus_ids<D>(st)[index]];
+    return *st.buses[bus_ids<D>(st)[index]];
 }
 
 template <audio::bus_direction D, class Field, class Value>

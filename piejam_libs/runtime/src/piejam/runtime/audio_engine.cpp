@@ -184,15 +184,15 @@ static auto
 make_mixer_bus_vector(
         std::vector<mixer_bus>& prev_buses,
         unsigned const samplerate,
-        mixer::buses_t const& chs,
-        mixer::bus_list_t const& ch_ids,
+        mixer::buses_t const& buses,
+        mixer::bus_list_t const& bus_ids,
         parameter_input_processor_factory& param_in_factory)
         -> std::vector<mixer_bus>
 {
     std::vector<mixer_bus> result;
-    result.reserve(ch_ids.size());
+    result.reserve(bus_ids.size());
 
-    for (auto const& id : ch_ids)
+    for (auto const& id : bus_ids)
     {
         if (auto it = std::ranges::find(prev_buses, id, &mixer_bus::id);
             it != prev_buses.end())
@@ -201,7 +201,7 @@ make_mixer_bus_vector(
         }
         else
         {
-            result.emplace_back(samplerate, id, chs[id], param_in_factory);
+            result.emplace_back(samplerate, id, *buses[id], param_in_factory);
         }
     }
 

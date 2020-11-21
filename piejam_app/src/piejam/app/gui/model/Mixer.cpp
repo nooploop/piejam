@@ -63,8 +63,7 @@ Mixer::subscribeStep(
                                     selectors::make_bus_name_selector(
                                             piejam::audio::bus_direction::input,
                                             bus),
-                                    selectors::make_input_solo_selector(bus),
-                                    selectors::make_input_level_selector(bus)},
+                                    selectors::make_input_solo_selector(bus)},
                             bus_ids.get()[bus]));
                 }
 
@@ -97,8 +96,7 @@ Mixer::subscribeStep(
                                     selector<bool>{
                                             [](runtime::audio_state const&) {
                                                 return false;
-                                            }},
-                                    selectors::make_output_level_selector(bus)},
+                                            }}},
                             bus_ids.get()[bus]));
                 }
 

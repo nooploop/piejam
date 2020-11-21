@@ -46,10 +46,10 @@ public:
     auto find(id_t id) const noexcept { return m_map.find(id); }
     auto find(id_t id) noexcept { return m_map.find(id); }
 
-    auto operator[](id_t id) const noexcept -> Entity const&
+    auto operator[](id_t id) const noexcept -> Entity const*
     {
-        BOOST_ASSERT(contains(id));
-        return m_map.find(id)->second;
+        auto it = m_map.find(id);
+        return it != m_map.end() ? &(it->second) : nullptr;
     }
 
     auto operator[](id_t id) noexcept -> Entity&

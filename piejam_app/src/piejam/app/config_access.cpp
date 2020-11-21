@@ -79,25 +79,26 @@ save(runtime::audio_state const& state)
         conf.samplerate = state.samplerate;
         conf.period_size = state.period_size;
 
-        auto const channels_to_bus_configs =
-                [](auto const& chs, auto const& ch_ids, auto& configs) {
-                    configs.reserve(ch_ids.size());
-                    std::ranges::transform(
-                            ch_ids,
-                            std::back_inserter(configs),
-                            [&chs](runtime::mixer::bus_id const& ch_id)
-                                    -> runtime::bus_config {
-                                auto const& ch = chs[ch_id];
-                                return {ch.name, ch.type, ch.device_channels};
-                            });
-                };
+        auto const buses_to_bus_configs = [](auto const& chs,
+                                             auto const& ch_ids,
+                                             auto& configs) {
+            configs.reserve(ch_ids.size());
+            std::ranges::transform(
+                    ch_ids,
+                    std::back_inserter(configs),
+                    [&chs](runtime::mixer::bus_id const& ch_id)
+                            -> runtime::bus_config {
+                        runtime::mixer::bus const* bus = chs[ch_id];
+                        return {bus->name, bus->type, bus->device_channels};
+                    });
+        };
 
-        channels_to_bus_configs(
+        buses_to_bus_configs(
                 state.mixer_state.buses,
                 state.mixer_state.inputs.get(),
                 conf.input_bus_config);
 
-        channels_to_bus_configs(
+        buses_to_bus_configs(
                 state.mixer_state.buses,
                 state.mixer_state.outputs.get(),
                 conf.output_bus_config);
