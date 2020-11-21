@@ -323,7 +323,7 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->set_bool_parameter(
                             a.id,
-                            m_get_state().bool_params.get(a.id));
+                            *m_get_state().bool_params.get(a.id));
                 }
             },
             [this](actions::set_float_parameter const& a) {
@@ -333,7 +333,7 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->set_float_parameter(
                             a.id,
-                            m_get_state().float_params.get(a.id));
+                            *m_get_state().float_params.get(a.id));
                 }
             },
             [this](actions::set_input_bus_solo const& a) {

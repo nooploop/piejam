@@ -212,7 +212,7 @@ initialize_float_input_parameters(
 {
     for (auto&& [id, proc] : procs)
     {
-        proc->set(floats.get(id));
+        proc->set(*floats.get(id));
     }
 }
 
@@ -234,12 +234,12 @@ gather_bool_input_parameters(
 
 static auto
 initialize_bool_input_parameters(
-        bool_parameters const& floats,
+        bool_parameters const& bools,
         bool_input_parameter_procs const& procs)
 {
     for (auto&& [id, proc] : procs)
     {
-        proc->set(floats.get(id));
+        proc->set(*bools.get(id));
     }
 }
 

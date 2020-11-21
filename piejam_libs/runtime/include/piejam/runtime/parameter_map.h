@@ -61,23 +61,10 @@ public:
         return m_parameters.contains(id);
     }
 
-    auto get(id_t id) const noexcept -> value_type const&
-    {
-        BOOST_ASSERT(contains(id) && m_values.contains(id));
-        return m_values.find(id)->second;
-    }
-
-    auto get(id_t id, value_type& result) const
-            noexcept(std::is_nothrow_copy_assignable_v<value_type>) -> bool
+    auto get(id_t id) const noexcept -> value_type const*
     {
         auto it = m_values.find(id);
-        if (it != m_values.end())
-        {
-            result = it->second;
-            return true;
-        }
-
-        return false;
+        return it != m_values.end() ? std::addressof(it->second) : nullptr;
     }
 
     template <std::convertible_to<value_type> V>

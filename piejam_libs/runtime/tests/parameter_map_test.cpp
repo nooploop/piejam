@@ -35,8 +35,9 @@ TEST(parameter_map, add_default_get)
 
     auto id = sut.add(float_parameter{});
 
-    ASSERT_TRUE(sut.contains(id));
-    EXPECT_EQ(1.f, sut.get(id));
+    auto* v = sut.get(id);
+    ASSERT_NE(nullptr, v);
+    EXPECT_EQ(1.f, *v);
 }
 
 TEST(parameter_map, add_with_value)
@@ -45,8 +46,9 @@ TEST(parameter_map, add_with_value)
 
     auto id = sut.add(float_parameter{}, 2.f);
 
-    ASSERT_TRUE(sut.contains(id));
-    EXPECT_EQ(2.f, sut.get(id));
+    auto* v = sut.get(id);
+    ASSERT_NE(nullptr, v);
+    EXPECT_EQ(2.f, *v);
 }
 
 TEST(parameter_map, add_remove)

@@ -196,13 +196,11 @@ make_bus_volume_selector(mixer::bus_id bus_id) -> selector<float>
 {
     return [bus_id](audio_state const& st) -> float {
         auto it = st.mixer_state.buses.find(bus_id);
-
-        float volume{1.f};
-        if (it != st.mixer_state.buses.end())
-        {
-            st.float_params.get(it->second.volume, volume);
-        }
-        return volume;
+        float const* const volume =
+                it != st.mixer_state.buses.end()
+                        ? st.float_params.get(it->second.volume)
+                        : nullptr;
+        return volume ? *volume : 1.f;
     };
 }
 
@@ -211,13 +209,11 @@ make_bus_pan_balance_selector(mixer::bus_id bus_id) -> selector<float>
 {
     return [bus_id](audio_state const& st) -> float {
         auto it = st.mixer_state.buses.find(bus_id);
-
-        float pan_balance{0.f};
-        if (it != st.mixer_state.buses.end())
-        {
-            st.float_params.get(it->second.pan_balance, pan_balance);
-        }
-        return pan_balance;
+        float const* const pan_balance =
+                it != st.mixer_state.buses.end()
+                        ? st.float_params.get(it->second.pan_balance)
+                        : nullptr;
+        return pan_balance ? *pan_balance : 0.f;
     };
 }
 
@@ -226,13 +222,10 @@ make_bus_mute_selector(mixer::bus_id bus_id) -> selector<bool>
 {
     return [bus_id](audio_state const& st) -> bool {
         auto it = st.mixer_state.buses.find(bus_id);
-
-        bool mute{};
-        if (it != st.mixer_state.buses.end())
-        {
-            st.bool_params.get(it->second.mute, mute);
-        }
-        return mute;
+        bool const* const mute = it != st.mixer_state.buses.end()
+                                         ? st.bool_params.get(it->second.mute)
+                                         : nullptr;
+        return mute && *mute;
     };
 }
 
