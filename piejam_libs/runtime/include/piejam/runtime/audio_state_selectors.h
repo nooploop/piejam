@@ -58,8 +58,7 @@ auto make_num_device_channels_selector(audio::bus_direction)
 auto make_bus_list_selector(audio::bus_direction)
         -> selector<container::box<mixer::bus_list_t>>;
 
-auto make_bus_name_selector(audio::bus_direction, std::size_t bus)
-        -> selector<container::boxed_string>;
+auto make_bus_name_selector(mixer::bus_id) -> selector<container::boxed_string>;
 
 auto make_bus_type_selector(audio::bus_direction, std::size_t bus)
         -> selector<audio::bus_type>;

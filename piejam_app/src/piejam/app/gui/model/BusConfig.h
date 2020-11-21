@@ -21,6 +21,7 @@
 #include <piejam/app/subscriber.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/boxed_string.h>
+#include <piejam/entity_id.h>
 #include <piejam/gui/model/BusConfig.h>
 
 namespace piejam::app::gui::model
@@ -28,7 +29,6 @@ namespace piejam::app::gui::model
 
 struct BusConfigSelectors
 {
-    selector<container::boxed_string> name;
     selector<audio::bus_type> bus_type;
     selector<std::size_t> mono_channel;
     selector<std::size_t> stereo_left_channel;
@@ -44,7 +44,11 @@ class BusConfig final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    BusConfig(store_dispatch, subscriber&, BusConfigSelectors);
+    BusConfig(
+            store_dispatch,
+            subscriber&,
+            BusConfigSelectors,
+            runtime::mixer::bus_id);
 
 signals:
     void subscribedChanged();
@@ -56,6 +60,7 @@ private:
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
     BusConfigSelectors m_selectors;
+    runtime::mixer::bus_id m_bus_id;
 };
 
 } // namespace piejam::app::gui::model

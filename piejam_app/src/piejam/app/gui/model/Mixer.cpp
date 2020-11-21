@@ -55,16 +55,14 @@ Mixer::subscribeStep(
                 for (std::size_t bus = numInputChannels(); bus < num_channels;
                      ++bus)
                 {
-                    inputChannels()->addMixerChannel(std::make_unique<
-                                                     MixerChannel>(
-                            dispatch(),
-                            state_change_subscriber,
-                            MixerChannelSelectors{
-                                    selectors::make_bus_name_selector(
-                                            piejam::audio::bus_direction::input,
-                                            bus),
-                                    selectors::make_input_solo_selector(bus)},
-                            bus_ids.get()[bus]));
+                    inputChannels()->addMixerChannel(
+                            std::make_unique<MixerChannel>(
+                                    dispatch(),
+                                    state_change_subscriber,
+                                    MixerChannelSelectors{
+                                            selectors::make_input_solo_selector(
+                                                    bus)},
+                                    bus_ids.get()[bus]));
                 }
 
                 while (bus_ids->size() < numInputChannels())
@@ -84,20 +82,15 @@ Mixer::subscribeStep(
                 for (std::size_t bus = numOutputChannels(); bus < num_channels;
                      ++bus)
                 {
-                    outputChannels()->addMixerChannel(std::make_unique<
-                                                      MixerChannel>(
-                            dispatch(),
-                            state_change_subscriber,
-                            MixerChannelSelectors{
-                                    selectors::make_bus_name_selector(
-                                            piejam::audio::bus_direction::
-                                                    output,
-                                            bus),
-                                    selector<bool>{
+                    outputChannels()->addMixerChannel(
+                            std::make_unique<MixerChannel>(
+                                    dispatch(),
+                                    state_change_subscriber,
+                                    MixerChannelSelectors{selector<bool>{
                                             [](runtime::audio_state const&) {
                                                 return false;
                                             }}},
-                            bus_ids.get()[bus]));
+                                    bus_ids.get()[bus]));
                 }
 
                 while (bus_ids->size() < numOutputChannels())

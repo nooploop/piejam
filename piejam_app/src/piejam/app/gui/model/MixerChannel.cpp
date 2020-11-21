@@ -47,7 +47,7 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.name,
+            runtime::audio_state_selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string name) {
                 setName(QString::fromStdString(*name));
             });

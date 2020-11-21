@@ -30,7 +30,6 @@ namespace piejam::app::gui::model
 
 struct MixerChannelSelectors
 {
-    selector<container::boxed_string> name;
     selector<bool> solo;
 };
 

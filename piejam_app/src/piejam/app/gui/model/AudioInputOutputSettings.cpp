@@ -68,16 +68,13 @@ AudioInputOutputSettings::subscribeStep(
             selectors::make_bus_list_selector(m_settings_type),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> bus_ids) {
-                while (bus_ids->size() > numBusConfigs())
+                for (std::size_t bus = numBusConfigs(); bus < bus_ids->size();
+                     ++bus)
                 {
-                    auto const bus = numBusConfigs();
                     busConfigs()->addBusConfig(std::make_unique<BusConfig>(
                             dispatch(),
                             state_change_subscriber,
                             BusConfigSelectors{
-                                    selectors::make_bus_name_selector(
-                                            m_settings_type,
-                                            bus),
                                     selectors::make_bus_type_selector(
                                             m_settings_type,
                                             bus),
@@ -92,7 +89,8 @@ AudioInputOutputSettings::subscribeStep(
                                     selectors::make_bus_channel_selector(
                                             m_settings_type,
                                             bus,
-                                            audio::bus_channel::right)}));
+                                            audio::bus_channel::right)},
+                            bus_ids.get()[bus]));
                 }
 
                 while (bus_ids->size() < numBusConfigs())

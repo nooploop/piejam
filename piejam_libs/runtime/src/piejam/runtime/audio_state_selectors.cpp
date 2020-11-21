@@ -88,30 +88,18 @@ make_bus_list_selector(audio::bus_direction const bd)
     }
 }
 
-template <audio::bus_direction D>
-static auto
-make_bus_name_selector(std::size_t const bus)
-        -> selector<container::boxed_string>
-{
-    return [bus](audio_state const& st) -> container::boxed_string {
-        return bus < mixer::bus_ids<D>(st.mixer_state).size()
-                       ? mixer::get_bus<D>(st.mixer_state, bus).name
-                       : container::boxed_string();
-    };
-}
-
 auto
-make_bus_name_selector(audio::bus_direction const bd, std::size_t const bus)
+make_bus_name_selector(mixer::bus_id bus_id)
         -> selector<container::boxed_string>
 {
-    switch (bd)
-    {
-        case audio::bus_direction::input:
-            return make_bus_name_selector<audio::bus_direction::input>(bus);
+    return [bus_id](audio_state const& st) -> container::boxed_string {
+        if (mixer::bus const* bus = st.mixer_state.buses[bus_id])
+        {
+            return bus->name;
+        }
 
-        case audio::bus_direction::output:
-            return make_bus_name_selector<audio::bus_direction::output>(bus);
-    }
+        return {};
+    };
 }
 
 template <audio::bus_direction D>

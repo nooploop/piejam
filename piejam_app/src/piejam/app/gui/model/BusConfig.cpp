@@ -17,15 +17,19 @@
 
 #include <piejam/app/gui/model/BusConfig.h>
 
+#include <piejam/runtime/audio_state_selectors.h>
+
 namespace piejam::app::gui::model
 {
 
 BusConfig::BusConfig(
         store_dispatch store_dispatch,
         subscriber& state_change_subscriber,
-        BusConfigSelectors selectors)
+        BusConfigSelectors selectors,
+        runtime::mixer::bus_id bus_id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_selectors(std::move(selectors))
+    , m_bus_id(bus_id)
 {
 }
 
@@ -38,7 +42,7 @@ BusConfig::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.name,
+            runtime::audio_state_selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string name) {
                 setName(QString::fromStdString(*name));
             });
