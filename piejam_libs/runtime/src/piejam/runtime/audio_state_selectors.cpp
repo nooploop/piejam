@@ -244,9 +244,16 @@ static auto
 make_level_selector(std::size_t const index) -> selector<stereo_level>
 {
     return [index](audio_state const& st) -> stereo_level {
-        return index < mixer::bus_ids<D>(st.mixer_state).size()
-                       ? mixer::get_bus<D>(st.mixer_state, index).level
-                       : stereo_level{};
+        if (index < mixer::bus_ids<D>(st.mixer_state).size())
+        {
+            auto level_id = mixer::get_bus<D>(st.mixer_state, index).level;
+            if (stereo_level const* level = st.levels.get(level_id))
+            {
+                return *level;
+            }
+        }
+
+        return stereo_level{};
     };
 }
 

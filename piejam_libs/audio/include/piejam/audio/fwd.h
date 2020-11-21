@@ -31,4 +31,7 @@ struct pcm_hw_params;
 struct pcm_io_descriptors;
 struct pcm_process_config;
 
+template <class T>
+struct pair;
+
 } // namespace piejam::audio

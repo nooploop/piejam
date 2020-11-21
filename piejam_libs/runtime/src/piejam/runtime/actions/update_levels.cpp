@@ -27,20 +27,26 @@ update_levels::reduce(audio_state const& st) const -> audio_state
 {
     auto new_st = st;
 
-    auto const update =
-            [](auto& channels_map, auto const& channels, auto const& levels) {
-                std::size_t const num_levels = levels.size();
-                BOOST_ASSERT(num_levels == channels.size());
-                for (std::size_t index = 0; index < num_levels; ++index)
-                    channels_map[channels[index]].level = levels[index];
-            };
+    auto const update = [](auto& channels_map,
+                           auto const& channels,
+                           auto const& levels,
+                           auto& levels_params) {
+        std::size_t const num_levels = levels.size();
+        BOOST_ASSERT(num_levels == channels.size());
+        for (std::size_t index = 0; index < num_levels; ++index)
+            levels_params.set(
+                    channels_map[channels[index]].level,
+                    levels[index]);
+    };
 
     update(new_st.mixer_state.buses,
            new_st.mixer_state.inputs.get(),
-           in_levels);
+           in_levels,
+           new_st.levels);
     update(new_st.mixer_state.buses,
            new_st.mixer_state.outputs.get(),
-           out_levels);
+           out_levels,
+           new_st.levels);
 
     return new_st;
 }

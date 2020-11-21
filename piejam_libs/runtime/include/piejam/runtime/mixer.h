@@ -44,7 +44,7 @@ struct bus
     float_parameter_id volume;
     float_parameter_id pan_balance;
     bool_parameter_id mute;
-    stereo_level level{};
+    stereo_level_parameter_id level;
     channel_type type{};
 
     //! mono channels hold same device channel in the pair

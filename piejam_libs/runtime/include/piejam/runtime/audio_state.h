@@ -48,6 +48,8 @@ struct audio_state
     float_parameters float_params{};
     bool_parameters bool_params{};
 
+    stereo_level_parameters levels{};
+
     mixer::state mixer_state{};
 
     std::size_t xruns{};
@@ -79,6 +81,7 @@ add_mixer_bus(
     auto pan_balance_id = st.float_params.add(
             parameter::float_{.default_value = 0.f, .min = -1.f, .max = 1.f});
     auto mute_id = st.bool_params.add(parameter::bool_{.default_value = false});
+    auto level_id = st.levels.add(parameter::stereo_level{});
 
     mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
     bus_ids.emplace_back(st.mixer_state.buses.add(mixer::bus{
@@ -86,6 +89,7 @@ add_mixer_bus(
             .volume = volume_id,
             .pan_balance = pan_balance_id,
             .mute = mute_id,
+            .level = level_id,
             .type = type,
             .device_channels = std::move(chs)}));
     mixer::bus_ids<D>(st.mixer_state) = bus_ids;
@@ -109,6 +113,7 @@ remove_mixer_bus(audio_state& st, std::size_t index)
     st.float_params.remove(bus.volume);
     st.float_params.remove(bus.pan_balance);
     st.bool_params.remove(bus.mute);
+    st.levels.remove(bus.level);
     st.mixer_state.buses.remove(bus_id);
     bus_ids.erase(bus_ids.begin() + index);
 

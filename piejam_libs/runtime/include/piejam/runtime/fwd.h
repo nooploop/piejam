@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/fwd.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/fwd.h>
@@ -33,5 +34,7 @@ using get_state_f = ui::get_state_f<audio_state>;
 using dispatch_f = ui::dispatch_f<audio_state>;
 using thunk_f = ui::thunk_f<audio_state>;
 using thunk_action = ui::thunk_action<audio_state>;
+
+using stereo_level = audio::pair<float>;
 
 } // namespace piejam::runtime

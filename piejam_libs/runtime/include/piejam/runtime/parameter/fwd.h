@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <piejam/audio/fwd.h>
+
 namespace piejam::runtime::parameter
 {
 
@@ -25,6 +27,7 @@ struct generic_value;
 
 using bool_ = generic_value<bool>;
 struct float_;
+using stereo_level = generic_value<audio::pair<float>>;
 
 template <class Parameter>
 class map;
