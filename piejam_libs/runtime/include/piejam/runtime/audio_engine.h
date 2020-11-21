@@ -49,12 +49,7 @@ public:
     void set_bool_parameter(bool_parameter_id, bool);
     void set_float_parameter(float_parameter_id, float);
 
-    void set_input_channel_pan_balance(std::size_t index, float pan_balance);
-    void set_input_channel_mute(std::size_t index, bool mute);
     void set_input_solo(mixer::bus_id const&);
-
-    void set_output_channel_balance(std::size_t index, float balance);
-    void set_output_channel_mute(std::size_t index, bool mute);
 
     auto get_input_level(std::size_t index) const noexcept -> stereo_level;
     auto get_output_level(std::size_t index) const noexcept -> stereo_level;

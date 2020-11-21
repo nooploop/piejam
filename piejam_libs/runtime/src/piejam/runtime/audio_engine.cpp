@@ -393,37 +393,9 @@ audio_engine::set_float_parameter(
 }
 
 void
-audio_engine::set_input_channel_pan_balance(
-        std::size_t const index,
-        float const pan_balance)
-{
-    m_input_buses[index].set_pan_balance(pan_balance);
-}
-
-void
-audio_engine::set_input_channel_mute(std::size_t const index, bool const mute)
-{
-    m_input_buses[index].set_mute(mute);
-}
-
-void
 audio_engine::set_input_solo(mixer::bus_id const& id)
 {
     m_input_solo_index_proc->set(id);
-}
-
-void
-audio_engine::set_output_channel_balance(
-        std::size_t const index,
-        float const balance)
-{
-    m_output_buses[index].set_pan_balance(balance);
-}
-
-void
-audio_engine::set_output_channel_mute(std::size_t const index, bool const mute)
-{
-    m_output_buses[index].set_mute(mute);
 }
 
 auto
