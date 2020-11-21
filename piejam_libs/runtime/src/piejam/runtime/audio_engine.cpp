@@ -53,7 +53,34 @@ namespace piejam::runtime
 
 namespace ns_ae = audio::engine;
 
-using processor_ptr = std::unique_ptr<ns_ae::processor>;
+using processor_ptr = std::unique_ptr<audio::engine::processor>;
+using component_ptr = std::unique_ptr<audio::engine::component>;
+using float_input_parameter_procs_t = std::
+        map<float_parameter_id, audio::engine::value_input_processor<float>*>;
+using bool_input_parameter_procs_t = std::
+        map<bool_parameter_id, audio::engine::value_input_processor<bool>*>;
+
+struct audio_engine::impl
+{
+    impl(unsigned num_device_input_channels,
+         unsigned num_device_output_channels)
+        : process(num_device_input_channels, num_device_output_channels)
+    {
+    }
+
+    audio::engine::process process;
+
+    std::vector<mixer_bus> input_buses;
+    std::vector<mixer_bus> output_buses;
+    std::unique_ptr<audio::engine::value_input_processor<mixer::bus_id>>
+            input_solo_index_proc;
+    std::vector<processor_ptr> mixer_procs;
+
+    float_input_parameter_procs_t float_input_parameter_procs;
+    bool_input_parameter_procs_t bool_input_parameter_procs;
+
+    audio::engine::graph graph;
+};
 
 class audio_engine::mixer_bus final
 {
@@ -191,14 +218,11 @@ make_mixer_bus_vector(
     return result;
 }
 
-using float_input_parameter_procs = std::
-        map<float_parameter_id, audio::engine::value_input_processor<float>*>;
-
 static auto
 gather_float_input_parameters(
         mixer::state const& mixer_state,
         std::vector<audio_engine::mixer_bus> const& buses,
-        float_input_parameter_procs& procs)
+        float_input_parameter_procs_t& procs)
 {
     for (auto const& mb : buses)
     {
@@ -211,7 +235,7 @@ gather_float_input_parameters(
 static auto
 initialize_float_input_parameters(
         float_parameters const& floats,
-        float_input_parameter_procs const& procs)
+        float_input_parameter_procs_t const& procs)
 {
     for (auto&& [id, proc] : procs)
     {
@@ -219,14 +243,11 @@ initialize_float_input_parameters(
     }
 }
 
-using bool_input_parameter_procs = std::
-        map<bool_parameter_id, audio::engine::value_input_processor<bool>*>;
-
 static auto
 gather_bool_input_parameters(
         mixer::state const& mixer_state,
         std::vector<audio_engine::mixer_bus> const& buses,
-        bool_input_parameter_procs& procs)
+        bool_input_parameter_procs_t& procs)
 {
     for (auto const& mb : buses)
     {
@@ -238,7 +259,7 @@ gather_bool_input_parameters(
 static auto
 initialize_bool_input_parameters(
         bool_parameters const& bools,
-        bool_input_parameter_procs const& procs)
+        bool_input_parameter_procs_t const& procs)
 {
     for (auto&& [id, proc] : procs)
     {
@@ -362,7 +383,7 @@ audio_engine::audio_engine(
         unsigned const num_device_output_channels)
     : m_wt_configs(wt_configs.begin(), wt_configs.end())
     , m_samplerate(samplerate)
-    , m_process(std::make_unique<audio::engine::process>(
+    , m_impl(std::make_unique<impl>(
               num_device_input_channels,
               num_device_output_channels))
 {
@@ -373,8 +394,8 @@ audio_engine::~audio_engine() = default;
 void
 audio_engine::set_bool_parameter(bool_parameter_id const id, bool const value)
 {
-    auto it = m_bool_input_parameter_procs.find(id);
-    if (it != m_bool_input_parameter_procs.end())
+    auto it = m_impl->bool_input_parameter_procs.find(id);
+    if (it != m_impl->bool_input_parameter_procs.end())
     {
         it->second->set(value);
     }
@@ -385,8 +406,8 @@ audio_engine::set_float_parameter(
         float_parameter_id const id,
         float const value)
 {
-    auto it = m_float_input_parameter_procs.find(id);
-    if (it != m_float_input_parameter_procs.end())
+    auto it = m_impl->float_input_parameter_procs.find(id);
+    if (it != m_impl->float_input_parameter_procs.end())
     {
         it->second->set(value);
     }
@@ -395,21 +416,21 @@ audio_engine::set_float_parameter(
 void
 audio_engine::set_input_solo(mixer::bus_id const& id)
 {
-    m_input_solo_index_proc->set(id);
+    m_impl->input_solo_index_proc->set(id);
 }
 
 auto
 audio_engine::get_input_level(std::size_t const index) const noexcept
         -> stereo_level
 {
-    return m_input_buses[index].get_level();
+    return m_impl->input_buses[index].get_level();
 }
 
 auto
 audio_engine::get_output_level(std::size_t const index) const noexcept
         -> stereo_level
 {
-    return m_output_buses[index].get_level();
+    return m_impl->output_buses[index].get_level();
 }
 
 void
@@ -418,11 +439,11 @@ audio_engine::rebuild(
         bool_parameters const& bool_params,
         float_parameters const& float_params)
 {
-    float_input_parameter_procs float_input_parameter_procs;
-    bool_input_parameter_procs bool_input_parameter_procs;
+    float_input_parameter_procs_t float_input_parameter_procs;
+    bool_input_parameter_procs_t bool_input_parameter_procs;
 
     auto input_buses = make_mixer_bus_vector(
-            m_input_buses,
+            m_impl->input_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.inputs);
@@ -435,7 +456,7 @@ audio_engine::rebuild(
             input_buses,
             bool_input_parameter_procs);
     auto output_buses = make_mixer_bus_vector(
-            m_output_buses,
+            m_impl->output_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.outputs);
@@ -461,26 +482,27 @@ audio_engine::rebuild(
 
     auto new_graph = make_graph(
             mixer_state,
-            m_process->input(),
-            m_process->output(),
+            m_impl->process.input(),
+            m_impl->process.output(),
             input_buses,
             output_buses,
             *input_solo_index_proc,
             mixers);
 
-    m_process->swap_executor(
+    m_impl->process.swap_executor(
             ns_ae::graph_to_dag(new_graph).make_runnable(m_wt_configs));
 
-    m_graph = std::move(new_graph);
-    m_input_buses = std::move(input_buses);
-    m_output_buses = std::move(output_buses);
-    m_input_solo_index_proc = std::move(input_solo_index_proc);
-    m_mixer_procs = std::move(mixers);
-    m_float_input_parameter_procs = std::move(float_input_parameter_procs);
-    m_bool_input_parameter_procs = std::move(bool_input_parameter_procs);
+    m_impl->graph = std::move(new_graph);
+    m_impl->input_buses = std::move(input_buses);
+    m_impl->output_buses = std::move(output_buses);
+    m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
+    m_impl->mixer_procs = std::move(mixers);
+    m_impl->float_input_parameter_procs =
+            std::move(float_input_parameter_procs);
+    m_impl->bool_input_parameter_procs = std::move(bool_input_parameter_procs);
 
     std::ofstream("graph.dot")
-            << audio::engine::export_graph_as_dot(m_graph) << std::endl;
+            << audio::engine::export_graph_as_dot(m_impl->graph) << std::endl;
 }
 
 void
@@ -488,7 +510,7 @@ audio_engine::operator()(
         range::table_view<float const> const& in_audio,
         range::table_view<float> const& out_audio) noexcept
 {
-    (*m_process)(in_audio, out_audio);
+    m_impl->process(in_audio, out_audio);
 }
 
 } // namespace piejam::runtime

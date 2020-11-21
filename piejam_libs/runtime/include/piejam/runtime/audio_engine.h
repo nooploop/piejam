@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <piejam/audio/engine/graph.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
 #include <piejam/range/table_view.h>
@@ -64,29 +63,11 @@ public:
             range::table_view<float> const& out_audio) noexcept;
 
 private:
-    using processor_ptr = std::unique_ptr<audio::engine::processor>;
-    using component_ptr = std::unique_ptr<audio::engine::component>;
-    using float_input_parameter_procs = std::map<
-            float_parameter_id,
-            audio::engine::value_input_processor<float>*>;
-    using bool_input_parameter_procs = std::
-            map<bool_parameter_id, audio::engine::value_input_processor<bool>*>;
-
     std::vector<thread::configuration> const m_wt_configs;
     audio::samplerate_t const m_samplerate;
 
-    std::unique_ptr<audio::engine::process> m_process;
-
-    std::vector<mixer_bus> m_input_buses;
-    std::vector<mixer_bus> m_output_buses;
-    std::unique_ptr<audio::engine::value_input_processor<mixer::bus_id>>
-            m_input_solo_index_proc;
-    std::vector<processor_ptr> m_mixer_procs;
-
-    float_input_parameter_procs m_float_input_parameter_procs;
-    bool_input_parameter_procs m_bool_input_parameter_procs;
-
-    audio::engine::graph m_graph;
+    struct impl;
+    std::unique_ptr<impl> m_impl;
 };
 
 } // namespace piejam::runtime
