@@ -75,9 +75,6 @@ AudioInputOutputSettings::subscribeStep(
                             dispatch(),
                             state_change_subscriber,
                             BusConfigSelectors{
-                                    selectors::make_bus_type_selector(
-                                            m_settings_type,
-                                            bus),
                                     selectors::make_bus_channel_selector(
                                             m_settings_type,
                                             bus,

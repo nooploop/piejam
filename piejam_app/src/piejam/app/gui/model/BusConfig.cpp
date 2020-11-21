@@ -50,7 +50,7 @@ BusConfig::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            m_selectors.bus_type,
+            runtime::audio_state_selectors::make_bus_type_selector(m_bus_id),
             [this](audio::bus_type const t) {
                 setMono(t == audio::bus_type::mono);
             });

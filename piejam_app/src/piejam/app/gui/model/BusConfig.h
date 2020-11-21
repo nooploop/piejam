@@ -29,7 +29,6 @@ namespace piejam::app::gui::model
 
 struct BusConfigSelectors
 {
-    selector<audio::bus_type> bus_type;
     selector<std::size_t> mono_channel;
     selector<std::size_t> stereo_left_channel;
     selector<std::size_t> stereo_right_channel;
