@@ -23,11 +23,11 @@
 
 #include <concepts>
 
-namespace piejam::runtime
+namespace piejam::runtime::parameter
 {
 
 template <class Parameter>
-class parameter_map
+class map
 {
 public:
     using id_t = typename entity_map<Parameter>::id_t;

@@ -22,6 +22,9 @@
 #include <piejam/audio/types.h>
 #include <piejam/container/box.h>
 #include <piejam/runtime/mixer.h>
+#include <piejam/runtime/parameter/bool_.h>
+#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/selected_device.h>
 
@@ -71,11 +74,10 @@ add_mixer_bus(
         channel_index_pair chs = {})
 {
     auto volume_id = st.float_params.add(
-            parameter::flt{.default_value = 1.f, .min = 0.f, .max = 8.f});
+            parameter::float_{.default_value = 1.f, .min = 0.f, .max = 8.f});
     auto pan_balance_id = st.float_params.add(
-            parameter::flt{.default_value = 0.f, .min = -1.f, .max = 1.f});
-    auto mute_id =
-            st.bool_params.add(parameter::boolean{.default_value = false});
+            parameter::float_{.default_value = 0.f, .min = -1.f, .max = 1.f});
+    auto mute_id = st.bool_params.add(parameter::bool_{.default_value = false});
 
     mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
     bus_ids.emplace_back(st.mixer_state.buses.add(mixer::bus{

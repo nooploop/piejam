@@ -20,7 +20,7 @@
 namespace piejam::runtime::parameter
 {
 
-struct flt
+struct float_
 {
     using value_type = float;
 

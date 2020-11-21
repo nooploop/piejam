@@ -17,17 +17,16 @@
 
 #pragma once
 
-#include <piejam/runtime/parameter/boolean.h>
-#include <piejam/runtime/parameter/flt.h>
-#include <piejam/runtime/parameter_map.h>
+#include <piejam/fwd.h>
+#include <piejam/runtime/parameter/fwd.h>
 
 namespace piejam::runtime
 {
 
-using float_parameters = parameter_map<parameter::flt>;
-using float_parameter_id = typename float_parameters::id_t;
+using float_parameters = parameter::map<parameter::float_>;
+using float_parameter_id = entity_id<parameter::float_>;
 
-using bool_parameters = parameter_map<parameter::boolean>;
-using bool_parameter_id = typename bool_parameters::id_t;
+using bool_parameters = parameter::map<parameter::bool_>;
+using bool_parameter_id = entity_id<parameter::bool_>;
 
 } // namespace piejam::runtime

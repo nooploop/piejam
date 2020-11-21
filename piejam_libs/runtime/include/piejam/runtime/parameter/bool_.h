@@ -17,21 +17,14 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/mixer_fwd.h>
-#include <piejam/runtime/ui/fwd.h>
-
-namespace piejam::runtime
+namespace piejam::runtime::parameter
 {
 
-class audio_engine;
-struct audio_state;
-struct selected_device;
+struct bool_
+{
+    using value_type = bool;
 
-using action = ui::action<audio_state>;
-using get_state_f = ui::get_state_f<audio_state>;
-using dispatch_f = ui::dispatch_f<audio_state>;
-using thunk_f = ui::thunk_f<audio_state>;
-using thunk_action = ui::thunk_action<audio_state>;
+    float default_value{};
+};
 
-} // namespace piejam::runtime
+} // namespace piejam::runtime::parameter

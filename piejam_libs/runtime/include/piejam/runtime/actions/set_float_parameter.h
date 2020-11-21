@@ -17,10 +17,12 @@
 
 #pragma once
 
+#include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/ui/cloneable_action.h>
+#include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameters.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
@@ -32,7 +34,8 @@ struct set_float_parameter final
     set_float_parameter(float_parameter_id id, float value)
         : id(id)
         , value(value)
-    {}
+    {
+    }
 
     float_parameter_id id{};
     float value{};

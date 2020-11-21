@@ -20,11 +20,10 @@
 namespace piejam::runtime::parameter
 {
 
-struct boolean
-{
-    using value_type = bool;
+struct bool_;
+struct float_;
 
-    float default_value{};
-};
+template <class Parameter>
+class map;
 
 } // namespace piejam::runtime::parameter

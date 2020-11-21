@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/parameter_map.h>
+#include <piejam/runtime/parameter/map.h>
 
 #include <gtest/gtest.h>
 
-namespace piejam::runtime::test
+namespace piejam::runtime::parameter::test
 {
 
 struct float_parameter
@@ -31,7 +31,7 @@ struct float_parameter
 
 TEST(parameter_map, add_default_get)
 {
-    parameter_map<float_parameter> sut;
+    parameter::map<float_parameter> sut;
 
     auto id = sut.add(float_parameter{});
 
@@ -42,7 +42,7 @@ TEST(parameter_map, add_default_get)
 
 TEST(parameter_map, add_with_value)
 {
-    parameter_map<float_parameter> sut;
+    parameter::map<float_parameter> sut;
 
     auto id = sut.add(float_parameter{}, 2.f);
 
@@ -53,7 +53,7 @@ TEST(parameter_map, add_with_value)
 
 TEST(parameter_map, add_remove)
 {
-    parameter_map<float_parameter> sut;
+    parameter::map<float_parameter> sut;
 
     auto id = sut.add(float_parameter{});
     ASSERT_TRUE(sut.contains(id));
@@ -62,4 +62,4 @@ TEST(parameter_map, add_remove)
     EXPECT_FALSE(sut.contains(id));
 }
 
-} // namespace piejam::runtime::test
+} // namespace piejam::runtime::parameter::test

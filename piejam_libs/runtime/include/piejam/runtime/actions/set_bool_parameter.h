@@ -17,10 +17,12 @@
 
 #pragma once
 
+#include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/ui/cloneable_action.h>
+#include <piejam/runtime/parameter/bool_.h>
 #include <piejam/runtime/parameters.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
@@ -32,7 +34,8 @@ struct set_bool_parameter final
     set_bool_parameter(bool_parameter_id id, bool value)
         : id(id)
         , value(value)
-    {}
+    {
+    }
 
     bool_parameter_id id{};
     bool value{};
