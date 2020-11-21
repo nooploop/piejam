@@ -18,6 +18,7 @@
 #include <piejam/runtime/processors/mute_solo_processor.h>
 
 #include <piejam/audio/engine/event_converter_processor.h>
+#include <piejam/entity_id.h>
 #include <piejam/npos.h>
 
 namespace piejam::runtime::processors

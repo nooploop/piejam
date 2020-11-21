@@ -248,18 +248,17 @@ make_input_solo_selector(std::size_t const index) -> selector<bool>
 
 template <audio::bus_direction D>
 static auto
-make_level_selector(std::size_t const index) -> selector<mixer::stereo_level>
+make_level_selector(std::size_t const index) -> selector<stereo_level>
 {
-    return [index](audio_state const& st) -> mixer::stereo_level {
+    return [index](audio_state const& st) -> stereo_level {
         return index < mixer::bus_ids<D>(st.mixer_state).size()
                        ? mixer::get_bus<D>(st.mixer_state, index).level
-                       : mixer::stereo_level{};
+                       : stereo_level{};
     };
 }
 
 auto
-make_input_level_selector(std::size_t const index)
-        -> selector<mixer::stereo_level>
+make_input_level_selector(std::size_t const index) -> selector<stereo_level>
 {
     return make_level_selector<audio::bus_direction::input>(index);
 }
@@ -269,8 +268,7 @@ const selector<bool> select_input_solo_active([](audio_state const& st) {
 });
 
 auto
-make_output_level_selector(std::size_t const index)
-        -> selector<mixer::stereo_level>
+make_output_level_selector(std::size_t const index) -> selector<stereo_level>
 {
     return make_level_selector<audio::bus_direction::output>(index);
 }

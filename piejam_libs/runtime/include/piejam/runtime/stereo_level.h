@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <piejam/runtime/fwd.h>
+#include <piejam/audio/pair.h>
 
-namespace piejam::runtime::actions
+namespace piejam::runtime
 {
 
-auto set_bus_mute(mixer::bus_id, bool mute) -> thunk_action;
+using stereo_level = audio::pair<float>;
 
-} // namespace piejam::runtime::actions
+} // namespace piejam::runtime

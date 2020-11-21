@@ -17,11 +17,21 @@
 
 #pragma once
 
-#include <piejam/runtime/fwd.h>
+#include <piejam/fwd.h>
 
-namespace piejam::runtime::actions
+#include <vector>
+
+namespace piejam::runtime::mixer
 {
 
-auto set_bus_mute(mixer::bus_id, bool mute) -> thunk_action;
+struct bus_tag;
+using bus_id = entity_id<bus_tag>;
 
-} // namespace piejam::runtime::actions
+struct bus;
+using buses_t = entity_map<bus, bus_tag>;
+
+using bus_list_t = std::vector<bus_id>;
+
+struct state;
+
+} // namespace piejam::runtime::mixer

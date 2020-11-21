@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/mixer.h>
 
 namespace piejam::runtime::actions
 {

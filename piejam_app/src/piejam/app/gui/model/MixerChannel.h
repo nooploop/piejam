@@ -20,8 +20,10 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/app/subscriber.h>
 #include <piejam/container/boxed_string.h>
+#include <piejam/entity_id.h>
 #include <piejam/gui/model/MixerChannel.h>
-#include <piejam/runtime/mixer.h>
+#include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/stereo_level.h>
 
 namespace piejam::app::gui::model
 {
@@ -30,7 +32,7 @@ struct MixerChannelSelectors
 {
     selector<container::boxed_string> name;
     selector<bool> solo;
-    selector<runtime::mixer::stereo_level> level;
+    selector<runtime::stereo_level> level;
 };
 
 class MixerChannel final

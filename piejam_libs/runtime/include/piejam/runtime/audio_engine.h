@@ -21,7 +21,9 @@
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
 #include <piejam/range/table_view.h>
-#include <piejam/runtime/mixer.h>
+#include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/parameters.h>
+#include <piejam/runtime/stereo_level.h>
 #include <piejam/thread/fwd.h>
 
 #include <map>
@@ -54,10 +56,8 @@ public:
     void set_output_channel_balance(std::size_t index, float balance);
     void set_output_channel_mute(std::size_t index, bool mute);
 
-    auto get_input_level(std::size_t index) const noexcept
-            -> mixer::stereo_level;
-    auto get_output_level(std::size_t index) const noexcept
-            -> mixer::stereo_level;
+    auto get_input_level(std::size_t index) const noexcept -> stereo_level;
+    auto get_output_level(std::size_t index) const noexcept -> stereo_level;
 
     void
     rebuild(mixer::state const&,

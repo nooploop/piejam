@@ -25,7 +25,8 @@
 #include <piejam/container/boxed_string.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/mixer.h>
+#include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/stereo_level.h>
 
 #include <cstddef>
 
@@ -73,13 +74,11 @@ auto make_bus_pan_balance_selector(mixer::bus_id) -> selector<float>;
 auto make_bus_mute_selector(mixer::bus_id) -> selector<bool>;
 
 auto make_input_solo_selector(std::size_t index) -> selector<bool>;
-auto make_input_level_selector(std::size_t index)
-        -> selector<mixer::stereo_level>;
+auto make_input_level_selector(std::size_t index) -> selector<stereo_level>;
 
 extern const selector<bool> select_input_solo_active;
 
-auto make_output_level_selector(std::size_t index)
-        -> selector<mixer::stereo_level>;
+auto make_output_level_selector(std::size_t index) -> selector<stereo_level>;
 
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;

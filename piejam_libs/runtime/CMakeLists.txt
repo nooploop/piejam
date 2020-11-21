@@ -35,6 +35,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/open_alsa_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/boolean.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/flt.h
@@ -43,6 +44,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mixer_bus_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/stereo_level.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/cloneable_action.h

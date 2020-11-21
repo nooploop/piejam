@@ -22,6 +22,7 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_endpoint.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/entity_id.h>
 #include <piejam/runtime/processors/mute_solo_processor.h>
 
 #include <array>

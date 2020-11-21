@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/runtime/actions/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/fwd.h>
 
 namespace piejam::runtime

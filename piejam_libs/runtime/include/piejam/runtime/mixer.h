@@ -23,7 +23,9 @@
 #include <piejam/entity_map.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
+#include <piejam/runtime/stereo_level.h>
 
 #include <boost/assert.hpp>
 
@@ -34,7 +36,6 @@
 namespace piejam::runtime::mixer
 {
 
-using stereo_level = audio::pair<float>;
 using channel_type = audio::bus_type;
 
 struct bus
@@ -49,10 +50,6 @@ struct bus
     //! mono channels hold same device channel in the pair
     channel_index_pair device_channels{npos};
 };
-
-using buses_t = entity_map<bus>;
-using bus_id = typename buses_t::id_t;
-using bus_list_t = std::vector<bus_id>;
 
 struct state
 {

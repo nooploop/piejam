@@ -35,6 +35,7 @@
 #include <piejam/audio/engine/value_output_processor.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/mute_solo.h>
+#include <piejam/runtime/mixer.h>
 #include <piejam/thread/configuration.h>
 
 #include <fmt/format.h>
@@ -76,8 +77,9 @@ public:
         , m_mute_solo(components::make_mute_solo(bus_id))
         , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
         , m_peak_level_proc(
-                  std::make_unique<audio::engine::value_output_processor<
-                          mixer::stereo_level>>("stereo_level"))
+                  std::make_unique<
+                          audio::engine::value_output_processor<stereo_level>>(
+                          "stereo_level"))
     {
     }
 
@@ -92,7 +94,7 @@ public:
 
     void set_mute(bool const mute) noexcept { m_mute_input_proc->set(mute); }
 
-    auto get_level() const noexcept -> mixer::stereo_level const&
+    auto get_level() const noexcept -> stereo_level const&
     {
         m_peak_level_proc->consume(
                 [this](auto const& lvl) { m_last_level = lvl; });
@@ -152,9 +154,9 @@ private:
     component_ptr m_volume_amp;
     component_ptr m_mute_solo;
     component_ptr m_level_meter;
-    std::unique_ptr<ns_ae::value_output_processor<mixer::stereo_level>>
+    std::unique_ptr<ns_ae::value_output_processor<stereo_level>>
             m_peak_level_proc;
-    mutable mixer::stereo_level m_last_level{};
+    mutable stereo_level m_last_level{};
 };
 
 static auto
@@ -423,14 +425,14 @@ audio_engine::set_output_channel_mute(std::size_t const index, bool const mute)
 
 auto
 audio_engine::get_input_level(std::size_t const index) const noexcept
-        -> mixer::stereo_level
+        -> stereo_level
 {
     return m_input_buses[index].get_level();
 }
 
 auto
 audio_engine::get_output_level(std::size_t const index) const noexcept
-        -> mixer::stereo_level
+        -> stereo_level
 {
     return m_output_buses[index].get_level();
 }

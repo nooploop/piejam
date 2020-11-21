@@ -22,7 +22,6 @@
 #include <piejam/redux/functors.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/mixer.h>
 #include <piejam/thread/configuration.h>
 
 #include <functional>
