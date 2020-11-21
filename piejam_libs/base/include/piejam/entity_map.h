@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <piejam/entity_id.h>
+
 #include <boost/assert.hpp>
 #include <boost/container/flat_map.hpp>
 
@@ -24,41 +26,6 @@
 
 namespace piejam
 {
-
-template <class EntityTag>
-struct entity_id
-{
-    constexpr entity_id() noexcept = default;
-
-    constexpr bool operator==(entity_id const& other) const noexcept
-    {
-        return m_id == other.m_id;
-    }
-
-    constexpr bool operator!=(entity_id const& other) const noexcept
-    {
-        return m_id != other.m_id;
-    }
-
-    constexpr bool operator<(entity_id const& other) const noexcept
-    {
-        return m_id < other.m_id;
-    }
-
-    static auto generate() noexcept -> entity_id<EntityTag>
-    {
-        static std::size_t s_id{};
-        return {++s_id};
-    }
-
-private:
-    constexpr entity_id(std::size_t const id) noexcept
-        : m_id(id)
-    {
-    }
-
-    std::size_t m_id{};
-};
 
 template <class Entity, class EntityTag = Entity>
 class entity_map
@@ -69,6 +36,7 @@ public:
 
     auto empty() const noexcept { return m_map.empty(); }
     auto size() const noexcept { return m_map.size(); }
+    auto capacity() const noexcept { return m_map.capacity(); }
 
     auto begin() const noexcept { return m_map.begin(); }
     auto end() const noexcept { return m_map.end(); }
