@@ -21,7 +21,6 @@
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/Mixer.h>
 #include <piejam/app/store.h>
-#include <piejam/app/subscriber.h>
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
 #include <piejam/gui/qt_log.h>
@@ -37,6 +36,7 @@
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/open_alsa_device.h>
+#include <piejam/runtime/subscriber.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/thunk_action.h>
 #include <piejam/thread/affinity.h>
@@ -110,7 +110,7 @@ main(int argc, char* argv[]) -> int
                 QMetaObject::invokeMethod(app, std::forward<decltype(f)>(f));
             }));
 
-    piejam::app::subscriber state_change_subscriber;
+    piejam::runtime::subscriber state_change_subscriber;
 
     store.subscribe([&state_change_subscriber](auto const& state) {
         state_change_subscriber.notify(state);

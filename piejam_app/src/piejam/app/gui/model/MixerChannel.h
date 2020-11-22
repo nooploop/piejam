@@ -18,12 +18,12 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/subscriber.h>
 #include <piejam/container/boxed_string.h>
 #include <piejam/entity_id.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/stereo_level.h>
+#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {
@@ -37,7 +37,7 @@ class MixerChannel final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    MixerChannel(store_dispatch, subscriber&, runtime::mixer::bus_id);
+    MixerChannel(store_dispatch, runtime::subscriber&, runtime::mixer::bus_id);
 
     void changeVolume(double) override;
     void changePanBalance(double) override;
@@ -47,8 +47,10 @@ signals:
     void subscribedChanged();
 
 private:
-    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
-            override;
+    void subscribeStep(
+            runtime::subscriber&,
+            runtime::subscriptions_manager&,
+            runtime::subscription_id) override;
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 

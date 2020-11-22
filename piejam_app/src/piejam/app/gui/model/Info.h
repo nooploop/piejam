@@ -18,8 +18,8 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/subscriber.h>
 #include <piejam/gui/model/Info.h>
+#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {
@@ -34,7 +34,7 @@ class Info final
                        subscribedChanged)
 
 public:
-    Info(store_dispatch, subscriber&);
+    Info(store_dispatch, runtime::subscriber&);
 
     void requestUpdate() override;
 
@@ -42,8 +42,10 @@ signals:
     void subscribedChanged();
 
 private:
-    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
-            override;
+    void subscribeStep(
+            runtime::subscriber&,
+            runtime::subscriptions_manager&,
+            runtime::subscription_id) override;
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 };

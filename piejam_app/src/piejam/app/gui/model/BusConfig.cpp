@@ -24,7 +24,7 @@ namespace piejam::app::gui::model
 
 BusConfig::BusConfig(
         store_dispatch store_dispatch,
-        subscriber& state_change_subscriber,
+        runtime::subscriber& state_change_subscriber,
         runtime::mixer::bus_id bus_id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_bus_id(bus_id)
@@ -33,9 +33,9 @@ BusConfig::BusConfig(
 
 void
 BusConfig::subscribeStep(
-        subscriber& state_change_subscriber,
-        subscriptions_manager& subs,
-        subscription_id subs_id)
+        runtime::subscriber& state_change_subscriber,
+        runtime::subscriptions_manager& subs,
+        runtime::subscription_id subs_id)
 {
     subs.observe(
             subs_id,

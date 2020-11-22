@@ -34,7 +34,7 @@ namespace piejam::app::gui::model
 
 AudioInputOutputSettings::AudioInputOutputSettings(
         store_dispatch store_dispatch,
-        subscriber& state_change_subscriber,
+        runtime::subscriber& state_change_subscriber,
         audio::bus_direction const settings_type)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_settings_type(settings_type)
@@ -43,9 +43,9 @@ AudioInputOutputSettings::AudioInputOutputSettings(
 
 void
 AudioInputOutputSettings::subscribeStep(
-        subscriber& state_change_subscriber,
-        subscriptions_manager& subs,
-        subscription_id subs_id)
+        runtime::subscriber& state_change_subscriber,
+        runtime::subscriptions_manager& subs,
+        runtime::subscription_id subs_id)
 {
     namespace selectors = runtime::selectors;
 

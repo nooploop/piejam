@@ -22,13 +22,13 @@
 
 #include <functional>
 
-namespace piejam::app
+namespace piejam::runtime
 {
 
-using subscriber = reselect::subscriber<runtime::audio_state>;
+using subscriber = reselect::subscriber<audio_state>;
 
 template <class Value>
-using selector = reselect::selector<Value, runtime::audio_state>;
+using selector = reselect::selector<Value, audio_state>;
 
 using subscription_id = std::size_t;
 using subscriptions_manager = reselect::subscriptions_manager<subscription_id>;
@@ -40,4 +40,4 @@ get_next_sub_id() -> subscription_id
     return s_id++;
 }
 
-} // namespace piejam::app
+} // namespace piejam::runtime

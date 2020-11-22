@@ -25,16 +25,18 @@
 namespace piejam::app::gui::model
 {
 
-Info::Info(store_dispatch store_dispatch, subscriber& state_change_subscriber)
+Info::Info(
+        store_dispatch store_dispatch,
+        runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
 {
 }
 
 void
 Info::subscribeStep(
-        subscriber& state_change_subscriber,
-        subscriptions_manager& subs,
-        subscription_id subs_id)
+        runtime::subscriber& state_change_subscriber,
+        runtime::subscriptions_manager& subs,
+        runtime::subscription_id subs_id)
 {
     subs.observe(
             subs_id,

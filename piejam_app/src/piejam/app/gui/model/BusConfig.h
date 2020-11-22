@@ -18,11 +18,11 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/subscriber.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/boxed_string.h>
 #include <piejam/entity_id.h>
 #include <piejam/gui/model/BusConfig.h>
+#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {
@@ -36,14 +36,16 @@ class BusConfig final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    BusConfig(store_dispatch, subscriber&, runtime::mixer::bus_id);
+    BusConfig(store_dispatch, runtime::subscriber&, runtime::mixer::bus_id);
 
 signals:
     void subscribedChanged();
 
 private:
-    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
-            override;
+    void subscribeStep(
+            runtime::subscriber&,
+            runtime::subscriptions_manager&,
+            runtime::subscription_id) override;
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 

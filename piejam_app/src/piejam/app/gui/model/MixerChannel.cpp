@@ -29,7 +29,7 @@ namespace piejam::app::gui::model
 
 MixerChannel::MixerChannel(
         store_dispatch store_dispatch,
-        subscriber& state_change_subscriber,
+        runtime::subscriber& state_change_subscriber,
         runtime::mixer::bus_id id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_bus_id(id)
@@ -38,9 +38,9 @@ MixerChannel::MixerChannel(
 
 void
 MixerChannel::subscribeStep(
-        subscriber& state_change_subscriber,
-        subscriptions_manager& subs,
-        subscription_id subs_id)
+        runtime::subscriber& state_change_subscriber,
+        runtime::subscriptions_manager& subs,
+        runtime::subscription_id subs_id)
 {
     subs.observe(
             subs_id,
@@ -59,8 +59,7 @@ MixerChannel::subscribeStep(
     subs.observe(
             subs_id,
             state_change_subscriber,
-            runtime::selectors::make_bus_pan_balance_selector(
-                    m_bus_id),
+            runtime::selectors::make_bus_pan_balance_selector(m_bus_id),
             [this](float x) { setPanBalance(x); });
 
     subs.observe(

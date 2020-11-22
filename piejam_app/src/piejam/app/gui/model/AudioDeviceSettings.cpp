@@ -63,16 +63,16 @@ to_QStringList(Vector const& l) -> QStringList
 
 AudioDeviceSettings::AudioDeviceSettings(
         store_dispatch store_dispatch,
-        subscriber& state_change_subscriber)
+        runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
 {
 }
 
 void
 AudioDeviceSettings::subscribeStep(
-        subscriber& state_change_subscriber,
-        subscriptions_manager& subs,
-        subscription_id subs_id)
+        runtime::subscriber& state_change_subscriber,
+        runtime::subscriptions_manager& subs,
+        runtime::subscription_id subs_id)
 {
     namespace selectors = runtime::selectors;
 

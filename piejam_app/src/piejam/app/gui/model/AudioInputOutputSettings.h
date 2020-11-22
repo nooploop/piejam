@@ -18,9 +18,9 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/subscriber.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
+#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {
@@ -35,7 +35,10 @@ class AudioInputOutputSettings
                        subscribedChanged)
 
 protected:
-    AudioInputOutputSettings(store_dispatch, subscriber&, audio::bus_direction);
+    AudioInputOutputSettings(
+            store_dispatch,
+            runtime::subscriber&,
+            audio::bus_direction);
 
 public:
     void setBusName(unsigned bus, QString const& name) override;
@@ -50,8 +53,10 @@ signals:
     void subscribedChanged();
 
 private:
-    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
-            override;
+    void subscribeStep(
+            runtime::subscriber&,
+            runtime::subscriptions_manager&,
+            runtime::subscription_id) override;
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
@@ -64,7 +69,7 @@ private:
 class AudioInputSettings final : public AudioInputOutputSettings
 {
 public:
-    AudioInputSettings(store& st, subscriber& subs)
+    AudioInputSettings(store& st, runtime::subscriber& subs)
         : AudioInputOutputSettings(st, subs, audio::bus_direction::input)
     {
     }
@@ -73,7 +78,7 @@ public:
 class AudioOutputSettings final : public AudioInputOutputSettings
 {
 public:
-    AudioOutputSettings(store& st, subscriber& subs)
+    AudioOutputSettings(store& st, runtime::subscriber& subs)
         : AudioInputOutputSettings(st, subs, audio::bus_direction::output)
     {
     }

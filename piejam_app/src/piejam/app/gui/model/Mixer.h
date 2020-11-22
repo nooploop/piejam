@@ -18,8 +18,8 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/app/subscriber.h>
 #include <piejam/gui/model/Mixer.h>
+#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {
@@ -33,7 +33,7 @@ class Mixer final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    Mixer(store_dispatch, subscriber&);
+    Mixer(store_dispatch, runtime::subscriber&);
 
     void setInputSolo(unsigned index) override;
     void requestLevelsUpdate() override;
@@ -42,8 +42,10 @@ signals:
     void subscribedChanged();
 
 private:
-    void subscribeStep(subscriber&, subscriptions_manager&, subscription_id)
-            override;
+    void subscribeStep(
+            runtime::subscriber&,
+            runtime::subscriptions_manager&,
+            runtime::subscription_id) override;
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 

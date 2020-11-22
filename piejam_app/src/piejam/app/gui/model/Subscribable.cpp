@@ -27,7 +27,7 @@ namespace piejam::app::gui::model
 
 Subscribable::Subscribable(
         store_dispatch store_dispatch,
-        subscriber& state_change_subscriber)
+        runtime::subscriber& state_change_subscriber)
     : m_store_dispatch(store_dispatch)
     , m_state_change_subscriber(state_change_subscriber)
 {
