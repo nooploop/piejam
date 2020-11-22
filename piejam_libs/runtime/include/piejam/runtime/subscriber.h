@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/entity_id_hash.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
 
@@ -30,14 +31,7 @@ using subscriber = reselect::subscriber<audio_state>;
 template <class Value>
 using selector = reselect::selector<Value, audio_state>;
 
-using subscription_id = std::size_t;
+using subscription_id = entity_id<struct subs>;
 using subscriptions_manager = reselect::subscriptions_manager<subscription_id>;
-
-inline auto
-get_next_sub_id() -> subscription_id
-{
-    static subscription_id s_id{};
-    return s_id++;
-}
 
 } // namespace piejam::runtime

@@ -67,7 +67,8 @@ private:
     runtime::subscriber& m_state_change_subscriber;
     runtime::subscriptions_manager m_subs;
     bool m_subscribed{};
-    runtime::subscription_id const m_subs_id{runtime::get_next_sub_id()};
+    runtime::subscription_id const m_subs_id{
+            runtime::subscription_id::generate()};
 };
 
 } // namespace piejam::app::gui::model
