@@ -23,6 +23,7 @@
 #include <piejam/container/box.h>
 #include <piejam/indexed_access.h>
 #include <piejam/npos.h>
+#include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
@@ -50,6 +51,8 @@ struct audio_state
     bool_parameters bool_params{};
 
     stereo_level_parameters levels{};
+
+    fx::modules_t fx_modules{};
 
     mixer::state mixer_state{};
 

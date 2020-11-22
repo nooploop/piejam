@@ -35,6 +35,10 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/config_access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/gain.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/type.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
@@ -88,6 +92,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_state.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/config_access.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/gain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/open_alsa_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mixer_bus_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp

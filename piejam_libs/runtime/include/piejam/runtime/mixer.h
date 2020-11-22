@@ -23,6 +23,7 @@
 #include <piejam/entity_map.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/stereo_level.h>
@@ -49,6 +50,8 @@ struct bus
 
     //! mono channels hold same device channel in the pair
     channel_index_pair device_channels{npos};
+
+    fx::chain_t fx_chain{};
 };
 
 struct state
