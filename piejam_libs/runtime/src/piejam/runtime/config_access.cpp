@@ -15,48 +15,44 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/app/config_access.h>
+#include <piejam/runtime/config_access.h>
 
 #include <piejam/algorithm/index_of.h>
 #include <piejam/redux/store.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/app_config.h>
 #include <piejam/runtime/audio_state.h>
-
-#include <QStandardPaths>
+#include <piejam/runtime/locations.h>
+#include <piejam/runtime/store_dispatch.h>
 
 #include <spdlog/spdlog.h>
+
+#include <boost/assert.hpp>
 
 #include <algorithm>
 #include <filesystem>
 
-namespace piejam::app::config_access
+namespace piejam::runtime::config_access
 {
 
 static auto
-config_file_path()
+config_file_path(locations const& locs)
 {
-    static auto const config_dir = std::filesystem::path(
-            QStandardPaths::writableLocation(
-                    QStandardPaths::StandardLocation::ConfigLocation)
-                    .toStdString());
-    static auto const s_file = config_dir / "piejam.config";
+    BOOST_ASSERT(!locs.config_dir.empty());
 
-    if (!std::filesystem::exists(config_dir))
-        std::filesystem::create_directories(config_dir);
+    if (!std::filesystem::exists(locs.config_dir))
+        std::filesystem::create_directories(locs.config_dir);
 
-    return s_file;
+    return locs.config_dir / "piejam.config";
 }
 
 void
-load(runtime::store_dispatch dispatch)
+load(locations const& locs, store_dispatch dispatch)
 {
-    using namespace piejam::runtime;
-
     try
     {
         actions::apply_app_config action;
-        action.conf = load_app_config(config_file_path());
+        action.conf = load_app_config(config_file_path(locs));
         dispatch(action);
     }
     catch (std::exception const& err)
@@ -66,11 +62,11 @@ load(runtime::store_dispatch dispatch)
 }
 
 void
-save(runtime::audio_state const& state)
+save(locations const& locs, audio_state const& state)
 {
     try
     {
-        runtime::app_config conf;
+        app_config conf;
 
         conf.input_device_name =
                 state.pcm_devices->inputs[state.input.index].name;
@@ -86,9 +82,8 @@ save(runtime::audio_state const& state)
             std::ranges::transform(
                     ch_ids,
                     std::back_inserter(configs),
-                    [&chs](runtime::mixer::bus_id const& ch_id)
-                            -> runtime::bus_config {
-                        runtime::mixer::bus const* bus = chs[ch_id];
+                    [&chs](mixer::bus_id const& ch_id) -> bus_config {
+                        mixer::bus const* bus = chs[ch_id];
                         return {bus->name, bus->type, bus->device_channels};
                     });
         };
@@ -103,7 +98,7 @@ save(runtime::audio_state const& state)
                 state.mixer_state.outputs.get(),
                 conf.output_bus_config);
 
-        runtime::save_app_config(conf, config_file_path());
+        runtime::save_app_config(conf, config_file_path(locs));
     }
     catch (std::exception const& err)
     {
@@ -111,4 +106,4 @@ save(runtime::audio_state const& state)
     }
 }
 
-} // namespace piejam::app::config_access
+} // namespace piejam::runtime::config_access

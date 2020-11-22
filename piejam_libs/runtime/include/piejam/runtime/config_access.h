@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <piejam/runtime/store_dispatch.h>
+#include <piejam/runtime/fwd.h>
 
-namespace piejam::app::config_access
+namespace piejam::runtime::config_access
 {
 
-void load(runtime::store_dispatch);
-void save(runtime::audio_state const&);
+void load(locations const&, store_dispatch);
+void save(locations const&, audio_state const&);
 
-} // namespace piejam::app::config_access
+} // namespace piejam::runtime::config_access

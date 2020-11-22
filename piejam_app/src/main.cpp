@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/app/config_access.h>
 #include <piejam/app/gui/model/AudioDeviceSettings.h>
 #include <piejam/app/gui/model/AudioInputOutputSettings.h>
 #include <piejam/app/gui/model/Info.h>
@@ -34,6 +33,8 @@
 #include <piejam/runtime/app_config.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/config_access.h>
+#include <piejam/runtime/locations.h>
 #include <piejam/runtime/open_alsa_device.h>
 #include <piejam/runtime/store.h>
 #include <piejam/runtime/subscriber.h>
@@ -167,11 +168,16 @@ main(int argc, char* argv[]) -> int
 
     store.dispatch(runtime::actions::refresh_devices{});
 
-    app::config_access::load(store);
+    runtime::locations locs;
+    locs.config_dir = QStandardPaths::writableLocation(
+                              QStandardPaths::StandardLocation::ConfigLocation)
+                              .toStdString();
+
+    runtime::config_access::load(locs, store);
 
     auto const app_exec_result = app.exec();
 
-    app::config_access::save(store.state());
+    runtime::config_access::save(locs, store.state());
 
     return app_exec_result;
 }

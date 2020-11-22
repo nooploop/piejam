@@ -15,8 +15,6 @@ endif()
 add_executable(piejam_app
     ${RESOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/config_access.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/config_access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioDeviceSettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioDeviceSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioInputOutputSettings.cpp
