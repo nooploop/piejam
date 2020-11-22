@@ -20,6 +20,8 @@
 #include <piejam/audio/fwd.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/parameter/fwd.h>
+#include <piejam/runtime/processors/fwd.h>
 #include <piejam/runtime/ui/fwd.h>
 
 namespace piejam::runtime
@@ -39,5 +41,9 @@ using thunk_action = ui::thunk_action<audio_state>;
 using stereo_level = audio::pair<float>;
 
 struct locations;
+
+using parameter_processor_factory = processors::parameter_processor_factory<
+        std::tuple<parameter::float_, parameter::bool_>,
+        std::tuple<parameter::stereo_level>>;
 
 } // namespace piejam::runtime

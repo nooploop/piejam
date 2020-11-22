@@ -48,12 +48,14 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/generic_value.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/map.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mixer_bus_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_input_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_output_processor_factory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/stereo_level.h

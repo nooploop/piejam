@@ -17,23 +17,10 @@
 
 #pragma once
 
-#include <piejam/audio/engine/fwd.h>
-#include <piejam/runtime/fwd.h>
-#include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/parameter/float_.h>
-#include <piejam/runtime/parameters.h>
-
-#include <functional>
-#include <memory>
-#include <string_view>
-
-namespace piejam::runtime::components
+namespace piejam::runtime::processors
 {
 
-auto make_fx_gain(
-        parameter_processor_factory&,
-        fx::module const&,
-        std::string_view const& name = {})
-        -> std::unique_ptr<audio::engine::component>;
+template <class, class>
+class parameter_processor_factory;
 
-} // namespace piejam::runtime::components
+} // namespace piejam::runtime::processors

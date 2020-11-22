@@ -36,11 +36,8 @@
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/mixer.h>
-#include <piejam/runtime/parameter/float_.h>
-#include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/map.h>
-#include <piejam/runtime/processors/parameter_input_processor_factory.h>
-#include <piejam/runtime/processors/parameter_output_processor_factory.h>
+#include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/thread/configuration.h>
 
 #include <fmt/format.h>
@@ -58,11 +55,6 @@ namespace ns_ae = audio::engine;
 using processor_ptr = std::unique_ptr<audio::engine::processor>;
 using component_ptr = std::unique_ptr<audio::engine::component>;
 
-using parameter_input_processor_factory = processors::
-        parameter_input_processor_factory<parameter::float_, parameter::bool_>;
-using parameter_output_processor_factory =
-        processors::parameter_output_processor_factory<parameter::stereo_level>;
-
 class mixer_bus final
 {
 public:
@@ -70,21 +62,15 @@ public:
             audio::samplerate_t const samplerate,
             mixer::bus_id bus_id,
             mixer::bus const& channel,
-            parameter_input_processor_factory& param_in_factory,
-            parameter_output_processor_factory& param_out_factory)
+            parameter_processor_factory& param_procs)
         : m_id(bus_id)
         , m_volume_input_proc(
-                  param_in_factory.make_processor<parameter::float_>(
-                          channel.volume,
-                          "volume"))
-        , m_pan_balance_input_proc(
-                  param_in_factory.make_processor<parameter::float_>(
-                          channel.pan_balance,
-                          channel.type == audio::bus_type::mono ? "pan"
-                                                                : "balance"))
-        , m_mute_input_proc(param_in_factory.make_processor<parameter::bool_>(
-                  channel.mute,
-                  "mute"))
+                  param_procs.make_input_processor(channel.volume, "volume"))
+        , m_pan_balance_input_proc(param_procs.make_input_processor(
+                  channel.pan_balance,
+                  channel.type == audio::bus_type::mono ? "pan" : "balance"))
+        , m_mute_input_proc(
+                  param_procs.make_input_processor(channel.mute, "mute"))
         , m_pan_balance(
                   channel.type == audio::bus_type::mono
                           ? audio::components::make_pan()
@@ -92,10 +78,9 @@ public:
         , m_volume_amp(audio::components::make_stereo_amplifier("volume"))
         , m_mute_solo(components::make_mute_solo(bus_id))
         , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
-        , m_peak_level_proc(
-                  param_out_factory.make_processor<parameter::stereo_level>(
-                          channel.level,
-                          "stereo_level"))
+        , m_peak_level_proc(param_procs.make_output_processor(
+                  channel.level,
+                  "stereo_level"))
     {
     }
 
@@ -179,8 +164,7 @@ struct audio_engine::impl
             input_solo_index_proc;
     std::vector<processor_ptr> mixer_procs;
 
-    parameter_input_processor_factory param_in_procs;
-    parameter_output_processor_factory param_out_procs;
+    parameter_processor_factory param_procs;
 
     audio::engine::graph graph;
 };
@@ -191,9 +175,7 @@ make_mixer_bus_vector(
         unsigned const samplerate,
         mixer::buses_t const& buses,
         mixer::bus_list_t const& bus_ids,
-        parameter_input_processor_factory& param_in_factory,
-        parameter_output_processor_factory& param_out_factory)
-        -> std::vector<mixer_bus>
+        parameter_processor_factory& param_procs) -> std::vector<mixer_bus>
 {
     std::vector<mixer_bus> result;
     result.reserve(bus_ids.size());
@@ -207,12 +189,7 @@ make_mixer_bus_vector(
         }
         else
         {
-            result.emplace_back(
-                    samplerate,
-                    id,
-                    *buses[id],
-                    param_in_factory,
-                    param_out_factory);
+            result.emplace_back(samplerate, id, *buses[id], param_procs);
         }
     }
 
@@ -347,7 +324,7 @@ void
 audio_engine::set_bool_parameter(bool_parameter_id const id, bool const value)
         const
 {
-    m_impl->param_in_procs.set(id, value);
+    m_impl->param_procs.set(id, value);
 }
 
 void
@@ -355,7 +332,7 @@ audio_engine::set_float_parameter(
         float_parameter_id const id,
         float const value) const
 {
-    m_impl->param_in_procs.set(id, value);
+    m_impl->param_procs.set(id, value);
 }
 
 void
@@ -369,7 +346,7 @@ audio_engine::get_level(stereo_level_parameter_id const id) const
         -> std::optional<stereo_level>
 {
     std::optional<stereo_level> result;
-    m_impl->param_out_procs.consume(id, [&result](stereo_level lvl) {
+    m_impl->param_procs.consume(id, [&result](stereo_level lvl) {
         result = std::move(lvl);
     });
     return result;
@@ -386,18 +363,16 @@ audio_engine::rebuild(
             m_samplerate,
             mixer_state.buses,
             mixer_state.inputs,
-            m_impl->param_in_procs,
-            m_impl->param_out_procs);
+            m_impl->param_procs);
     auto output_buses = make_mixer_bus_vector(
             m_impl->output_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.outputs,
-            m_impl->param_in_procs,
-            m_impl->param_out_procs);
+            m_impl->param_procs);
 
-    m_impl->param_in_procs.initialize(float_params);
-    m_impl->param_in_procs.initialize(bool_params);
+    m_impl->param_procs.initialize(float_params);
+    m_impl->param_procs.initialize(bool_params);
 
     auto input_solo_index_proc =
             std::make_unique<ns_ae::value_input_processor<mixer::bus_id>>(
@@ -423,8 +398,7 @@ audio_engine::rebuild(
     m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
     m_impl->mixer_procs = std::move(mixers);
 
-    m_impl->param_in_procs.clear_expired();
-    m_impl->param_out_procs.clear_expired();
+    m_impl->param_procs.clear_expired();
 
     std::ofstream("graph.dot")
             << audio::engine::export_graph_as_dot(m_impl->graph) << std::endl;

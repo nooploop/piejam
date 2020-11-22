@@ -23,6 +23,7 @@
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/parameter_processor_factory.h>
 
 #include <fmt/format.h>
 
@@ -37,11 +38,10 @@ namespace
 class fx_gain final : public audio::engine::component
 {
 public:
-    fx_gain(processors::make_parameter_input_processor_f<
-                    parameter::float_> const& proc_factory,
+    fx_gain(parameter_processor_factory& proc_factory,
             fx::module const& fx_mod,
             std::string_view const& name)
-        : m_gain_input_proc(proc_factory(
+        : m_gain_input_proc(proc_factory.make_input_processor(
                   fx_mod.parameters
                           .at(static_cast<std::size_t>(
                                   fx::gain_parameter_key::gain))
@@ -84,8 +84,7 @@ private:
 
 auto
 make_fx_gain(
-        processors::make_parameter_input_processor_f<parameter::float_> const&
-                proc_factory,
+        parameter_processor_factory& proc_factory,
         fx::module const& fx_mod,
         std::string_view const& name)
         -> std::unique_ptr<audio::engine::component>
