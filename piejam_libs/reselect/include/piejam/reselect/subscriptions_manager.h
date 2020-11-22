@@ -34,10 +34,12 @@ public:
     void
     observe(Id id,
             subscriber<State>& subscriber,
-            selector<Value, State> const& sel,
+            selector<Value, State> sel,
             Handler&& h)
     {
-        m_conns.emplace(id, subscriber.observe(sel, std::forward<Handler>(h)));
+        m_conns.emplace(
+                id,
+                subscriber.observe(std::move(sel), std::forward<Handler>(h)));
     }
 
     void erase(Id id) { m_conns.erase(id); }

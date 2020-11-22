@@ -47,7 +47,7 @@ apply_bus_configs(
                                   ? audio::bus_type::stereo
                                   : bus_conf.bus_type;
 
-        add_mixer_bus<D>(st, bus_conf.name, type, std::move(chs));
+        add_mixer_bus<D>(st, bus_conf.name, type, chs);
     }
 }
 

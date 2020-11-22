@@ -30,7 +30,7 @@ namespace
 class dummy_dag_executor final : public dag_executor
 {
 public:
-    void operator()(std::size_t) {}
+    void operator()(std::size_t) override {}
 };
 
 } // namespace

@@ -34,12 +34,12 @@ class subscriber
 {
 public:
     template <class Value, class Handler>
-    auto observe(selector<Value, State> const& sel, Handler&& h) -> subscription
+    auto observe(selector<Value, State> sel, Handler&& h) -> subscription
     {
         m_renotify = true;
         auto token = std::make_shared<subscription::token>();
         return {m_observer.connect(
-                        [sel,
+                        [sel = std::move(sel),
                          h = std::forward<Handler>(h),
                          token = std::weak_ptr(token),
                          last = std::make_shared<std::optional<Value>>()](

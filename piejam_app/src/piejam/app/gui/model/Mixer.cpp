@@ -53,7 +53,7 @@ Mixer::subscribeStep(
             state_change_subscriber,
             selectors::make_bus_list_selector(audio::bus_direction::input),
             [this, &state_change_subscriber](
-                    container::box<runtime::mixer::bus_list_t> bus_ids) {
+                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 m_all = m_inputs = bus_ids;
                 boost::push_back(m_all, m_outputs);
 
@@ -80,7 +80,7 @@ Mixer::subscribeStep(
             state_change_subscriber,
             selectors::make_bus_list_selector(audio::bus_direction::output),
             [this, &state_change_subscriber](
-                    container::box<runtime::mixer::bus_list_t> bus_ids) {
+                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 m_all = m_outputs = bus_ids;
                 boost::push_back(m_all, m_inputs);
 

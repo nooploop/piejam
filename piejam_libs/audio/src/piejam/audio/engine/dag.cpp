@@ -336,11 +336,11 @@ private:
     std::atomic_size_t m_buffer_size{};
 };
 
-bool
+auto
 is_descendent(
         dag::graph_t const& t,
         dag::task_id_t const parent,
-        dag::task_id_t const descendent)
+        dag::task_id_t const descendent) -> bool
 {
     if (parent == descendent)
         return true;
@@ -405,12 +405,12 @@ dag::make_runnable(
                 m_tasks,
                 m_graph,
                 event_memory_size);
-    else
-        return std::make_unique<dag_executor_mt>(
-                m_tasks,
-                m_graph,
-                event_memory_size,
-                wt_configs);
+
+    return std::make_unique<dag_executor_mt>(
+            m_tasks,
+            m_graph,
+            event_memory_size,
+            wt_configs);
 }
 
 } // namespace piejam::audio::engine

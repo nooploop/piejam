@@ -34,12 +34,12 @@
 namespace piejam::audio::alsa
 {
 
-static bool
+static auto
 test_interval_value(
         system::ioctl_device& fd,
         snd_pcm_hw_params params,
         unsigned ival_index,
-        unsigned value)
+        unsigned value) -> bool
 {
     try
     {
