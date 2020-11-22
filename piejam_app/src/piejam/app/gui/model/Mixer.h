@@ -46,6 +46,10 @@ private:
             override;
 
     void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
+
+    runtime::mixer::bus_list_t m_inputs;
+    runtime::mixer::bus_list_t m_outputs;
+    runtime::mixer::bus_list_t m_all;
 };
 
 } // namespace piejam::app::gui::model

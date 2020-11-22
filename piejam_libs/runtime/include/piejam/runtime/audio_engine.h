@@ -27,6 +27,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <span>
 #include <vector>
 
@@ -48,8 +49,8 @@ public:
 
     void set_input_solo(mixer::bus_id const&);
 
-    auto get_input_level(std::size_t index) const noexcept -> stereo_level;
-    auto get_output_level(std::size_t index) const noexcept -> stereo_level;
+    auto get_level(stereo_level_parameter_id) const
+            -> std::optional<stereo_level>;
 
     void
     rebuild(mixer::state const&,
@@ -65,7 +66,7 @@ private:
     audio::samplerate_t const m_samplerate;
 
     struct impl;
-    std::unique_ptr<impl> m_impl;
+    std::unique_ptr<impl> const m_impl;
 };
 
 } // namespace piejam::runtime

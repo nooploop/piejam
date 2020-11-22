@@ -22,11 +22,13 @@
 #include <piejam/functional/overload.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
-#include <piejam/runtime/actions/request_levels_update.h>
-#include <piejam/runtime/actions/set_bus_mute.h>
+#include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
+#include <piejam/runtime/ui/thunk_action.h>
+
+#include <boost/range/algorithm_ext/push_back.hpp>
 
 namespace piejam::app::gui::model
 {
@@ -50,6 +52,9 @@ Mixer::subscribeStep(
             selectors::make_bus_list_selector(audio::bus_direction::input),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> bus_ids) {
+                m_all = m_inputs = bus_ids;
+                boost::push_back(m_all, m_outputs);
+
                 auto const num_channels = bus_ids->size();
 
                 for (std::size_t bus = numInputChannels(); bus < num_channels;
@@ -74,6 +79,9 @@ Mixer::subscribeStep(
             selectors::make_bus_list_selector(audio::bus_direction::output),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> bus_ids) {
+                m_all = m_outputs = bus_ids;
+                boost::push_back(m_all, m_inputs);
+
                 auto const num_channels = bus_ids->size();
 
                 for (std::size_t bus = numOutputChannels(); bus < num_channels;
@@ -112,7 +120,7 @@ Mixer::setInputSolo(unsigned const index)
 void
 Mixer::requestLevelsUpdate()
 {
-    dispatch(runtime::actions::request_levels_update{});
+    dispatch(runtime::actions::request_mixer_levels_update(m_all));
 }
 
 } // namespace piejam::app::gui::model

@@ -15,22 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/update_levels.h>
+#pragma once
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fwd.h>
+
+#include <vector>
 
 namespace piejam::runtime::actions
 {
 
-auto
-update_levels::reduce(audio_state const& st) const -> audio_state
-{
-    auto new_st = st;
-
-    for (auto&& [id, lvl] : levels)
-        new_st.levels.set(id, lvl);
-
-    return new_st;
-}
+auto request_mixer_levels_update(std::vector<mixer::bus_id>) -> thunk_action;
 
 } // namespace piejam::runtime::actions

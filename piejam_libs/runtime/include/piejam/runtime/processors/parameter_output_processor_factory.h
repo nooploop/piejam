@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/audio/engine/value_input_processor.h>
+#include <piejam/audio/engine/value_output_processor.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/runtime/parameter/map.h>
 
@@ -33,7 +33,7 @@ namespace piejam::runtime::processors
 {
 
 template <class... Parameter>
-class parameter_input_processor_factory
+class parameter_output_processor_factory
 {
 public:
     template <class P>
@@ -41,7 +41,7 @@ public:
 
     template <class P>
     using parameter_processor =
-            audio::engine::value_input_processor<typename P::value_type>;
+            audio::engine::value_output_processor<typename P::value_type>;
 
     template <class P>
     using processor_map = std::unordered_map<
@@ -58,32 +58,15 @@ public:
         return proc;
     }
 
-    template <class P>
-    void initialize(parameter::map<P> const& params) const
+    template <class P, class F>
+    auto consume(parameter_id<P> id, F&& f) const
     {
-        for (auto&& [id, weak_proc] : std::get<processor_map<P>>(m_procs))
-        {
-            if (auto proc = weak_proc.lock())
-            {
-                if (auto const* value = params.get(id))
-                {
-                    proc->set(*value);
-                }
-            }
-        }
-    }
-
-    template <class P, std::convertible_to<typename P::value_type> V>
-    void set(parameter_id<P> id, V&& value) const
-    {
-        auto const& proc_map = std::get<processor_map<P>>(m_procs);
+        auto& proc_map = std::get<processor_map<P>>(m_procs);
         auto it = proc_map.find(id);
         if (it != proc_map.end())
         {
             if (auto proc = it->second.lock())
-            {
-                proc->set(std::forward<V>(value));
-            }
+                proc->consume(std::forward<F>(f));
         }
     }
 

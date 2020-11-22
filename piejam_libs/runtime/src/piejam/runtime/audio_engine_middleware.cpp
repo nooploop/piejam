@@ -28,6 +28,7 @@
 #include <piejam/runtime/actions/device_action_visitor.h>
 #include <piejam/runtime/actions/engine_action_visitor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/request_levels_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_device.h>
 #include <piejam/runtime/actions/select_period_size.h>
@@ -345,30 +346,19 @@ audio_engine_middleware::process_engine_action(
                             m_get_state().mixer_state.input_solo_id);
                 }
             },
-            [this](actions::request_levels_update const&) {
-                audio_state const& current_state = m_get_state();
-
-                std::size_t const num_inputs =
-                        current_state.mixer_state.inputs->size();
-                std::size_t const num_outputs =
-                        current_state.mixer_state.outputs->size();
-
-                actions::update_levels next_action;
-                next_action.in_levels.reserve(num_inputs);
-                next_action.out_levels.reserve(num_outputs);
-
+            [this](actions::request_levels_update const& a) {
                 if (m_engine)
                 {
-                    for (std::size_t index = 0; index < num_inputs; ++index)
-                        next_action.in_levels.push_back(
-                                m_engine->get_input_level(index));
+                    actions::update_levels next_action;
 
-                    for (std::size_t index = 0; index < num_outputs; ++index)
-                        next_action.out_levels.push_back(
-                                m_engine->get_output_level(index));
+                    for (auto&& id : a.level_ids)
+                    {
+                        if (auto lvl = m_engine->get_level(id))
+                            next_action.levels.emplace_back(id, *lvl);
+                    }
+
+                    m_next(next_action);
                 }
-
-                m_next(next_action);
             },
             [](actions::update_levels const&) {},
             [this](actions::request_info_update const&) {

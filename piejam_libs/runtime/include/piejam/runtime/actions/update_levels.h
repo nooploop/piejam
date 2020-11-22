@@ -19,6 +19,7 @@
 
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/parameters.h>
 #include <piejam/runtime/stereo_level.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -31,8 +32,7 @@ struct update_levels final
     : ui::cloneable_action<update_levels, action>
     , visitable_engine_action<update_levels>
 {
-    std::vector<stereo_level> in_levels;
-    std::vector<stereo_level> out_levels;
+    std::vector<std::pair<stereo_level_parameter_id, stereo_level>> levels;
 
     auto reduce(audio_state const&) const -> audio_state override;
 };

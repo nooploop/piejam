@@ -40,6 +40,7 @@
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/processors/parameter_input_processor_factory.h>
+#include <piejam/runtime/processors/parameter_output_processor_factory.h>
 #include <piejam/thread/configuration.h>
 
 #include <fmt/format.h>
@@ -59,6 +60,8 @@ using component_ptr = std::unique_ptr<audio::engine::component>;
 
 using parameter_input_processor_factory = processors::
         parameter_input_processor_factory<parameter::float_, parameter::bool_>;
+using parameter_output_processor_factory =
+        processors::parameter_output_processor_factory<parameter::stereo_level>;
 
 class mixer_bus final
 {
@@ -67,7 +70,8 @@ public:
             audio::samplerate_t const samplerate,
             mixer::bus_id bus_id,
             mixer::bus const& channel,
-            parameter_input_processor_factory& param_in_factory)
+            parameter_input_processor_factory& param_in_factory,
+            parameter_output_processor_factory& param_out_factory)
         : m_id(bus_id)
         , m_volume_input_proc(
                   param_in_factory.make_processor<parameter::float_>(
@@ -89,8 +93,8 @@ public:
         , m_mute_solo(components::make_mute_solo(bus_id))
         , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
         , m_peak_level_proc(
-                  std::make_unique<
-                          audio::engine::value_output_processor<stereo_level>>(
+                  param_out_factory.make_processor<parameter::stereo_level>(
+                          channel.level,
                           "stereo_level"))
     {
     }
@@ -154,7 +158,7 @@ private:
     component_ptr m_volume_amp;
     component_ptr m_mute_solo;
     component_ptr m_level_meter;
-    std::unique_ptr<ns_ae::value_output_processor<stereo_level>>
+    std::shared_ptr<ns_ae::value_output_processor<stereo_level>>
             m_peak_level_proc;
     mutable stereo_level m_last_level{};
 };
@@ -176,6 +180,7 @@ struct audio_engine::impl
     std::vector<processor_ptr> mixer_procs;
 
     parameter_input_processor_factory param_in_procs;
+    parameter_output_processor_factory param_out_procs;
 
     audio::engine::graph graph;
 };
@@ -186,7 +191,8 @@ make_mixer_bus_vector(
         unsigned const samplerate,
         mixer::buses_t const& buses,
         mixer::bus_list_t const& bus_ids,
-        parameter_input_processor_factory& param_in_factory)
+        parameter_input_processor_factory& param_in_factory,
+        parameter_output_processor_factory& param_out_factory)
         -> std::vector<mixer_bus>
 {
     std::vector<mixer_bus> result;
@@ -201,7 +207,12 @@ make_mixer_bus_vector(
         }
         else
         {
-            result.emplace_back(samplerate, id, *buses[id], param_in_factory);
+            result.emplace_back(
+                    samplerate,
+                    id,
+                    *buses[id],
+                    param_in_factory,
+                    param_out_factory);
         }
     }
 
@@ -354,17 +365,14 @@ audio_engine::set_input_solo(mixer::bus_id const& id)
 }
 
 auto
-audio_engine::get_input_level(std::size_t const index) const noexcept
-        -> stereo_level
+audio_engine::get_level(stereo_level_parameter_id const id) const
+        -> std::optional<stereo_level>
 {
-    return m_impl->input_buses[index].get_level();
-}
-
-auto
-audio_engine::get_output_level(std::size_t const index) const noexcept
-        -> stereo_level
-{
-    return m_impl->output_buses[index].get_level();
+    std::optional<stereo_level> result;
+    m_impl->param_out_procs.consume(id, [&result](stereo_level lvl) {
+        result = std::move(lvl);
+    });
+    return result;
 }
 
 void
@@ -378,13 +386,15 @@ audio_engine::rebuild(
             m_samplerate,
             mixer_state.buses,
             mixer_state.inputs,
-            m_impl->param_in_procs);
+            m_impl->param_in_procs,
+            m_impl->param_out_procs);
     auto output_buses = make_mixer_bus_vector(
             m_impl->output_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.outputs,
-            m_impl->param_in_procs);
+            m_impl->param_in_procs,
+            m_impl->param_out_procs);
 
     m_impl->param_in_procs.initialize(float_params);
     m_impl->param_in_procs.initialize(bool_params);
@@ -414,6 +424,7 @@ audio_engine::rebuild(
     m_impl->mixer_procs = std::move(mixers);
 
     m_impl->param_in_procs.clear_expired();
+    m_impl->param_out_procs.clear_expired();
 
     std::ofstream("graph.dot")
             << audio::engine::export_graph_as_dot(m_impl->graph) << std::endl;
