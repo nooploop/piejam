@@ -32,7 +32,7 @@ class AudioDeviceSettings final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    AudioDeviceSettings(store_dispatch, runtime::subscriber&);
+    AudioDeviceSettings(runtime::store_dispatch, runtime::subscriber&);
 
     virtual void refreshDeviceLists() override;
     virtual void selectInputDevice(unsigned index) override;

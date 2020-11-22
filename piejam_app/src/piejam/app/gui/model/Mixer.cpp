@@ -34,7 +34,7 @@ namespace piejam::app::gui::model
 {
 
 Mixer::Mixer(
-        store_dispatch store_dispatch,
+        runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
 {

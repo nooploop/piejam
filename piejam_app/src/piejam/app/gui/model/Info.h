@@ -34,7 +34,7 @@ class Info final
                        subscribedChanged)
 
 public:
-    Info(store_dispatch, runtime::subscriber&);
+    Info(runtime::store_dispatch, runtime::subscriber&);
 
     void requestUpdate() override;
 

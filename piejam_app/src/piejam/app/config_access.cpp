@@ -49,7 +49,7 @@ config_file_path()
 }
 
 void
-load(store& st)
+load(runtime::store_dispatch dispatch)
 {
     using namespace piejam::runtime;
 
@@ -57,7 +57,7 @@ load(store& st)
     {
         actions::apply_app_config action;
         action.conf = load_app_config(config_file_path());
-        st.dispatch<actions::apply_app_config>(std::move(action));
+        dispatch(action);
     }
     catch (std::exception const& err)
     {

@@ -36,7 +36,7 @@ class AudioInputOutputSettings
 
 protected:
     AudioInputOutputSettings(
-            store_dispatch,
+            runtime::store_dispatch,
             runtime::subscriber&,
             audio::bus_direction);
 
@@ -69,7 +69,7 @@ private:
 class AudioInputSettings final : public AudioInputOutputSettings
 {
 public:
-    AudioInputSettings(store& st, runtime::subscriber& subs)
+    AudioInputSettings(runtime::store_dispatch st, runtime::subscriber& subs)
         : AudioInputOutputSettings(st, subs, audio::bus_direction::input)
     {
     }
@@ -78,7 +78,7 @@ public:
 class AudioOutputSettings final : public AudioInputOutputSettings
 {
 public:
-    AudioOutputSettings(store& st, runtime::subscriber& subs)
+    AudioOutputSettings(runtime::store_dispatch st, runtime::subscriber& subs)
         : AudioInputOutputSettings(st, subs, audio::bus_direction::output)
     {
     }

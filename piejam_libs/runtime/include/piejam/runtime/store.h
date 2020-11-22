@@ -20,9 +20,9 @@
 #include <piejam/redux/fwd.h>
 #include <piejam/runtime/fwd.h>
 
-namespace piejam::app
+namespace piejam::runtime
 {
 
-using store = redux::store<runtime::audio_state, runtime::action>;
+using store = redux::store<audio_state, action>;
 
-} // namespace piejam::app
+} // namespace piejam::runtime

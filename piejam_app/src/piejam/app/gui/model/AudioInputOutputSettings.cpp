@@ -33,7 +33,7 @@ namespace piejam::app::gui::model
 {
 
 AudioInputOutputSettings::AudioInputOutputSettings(
-        store_dispatch store_dispatch,
+        runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         audio::bus_direction const settings_type)
     : Subscribable(store_dispatch, state_change_subscriber)

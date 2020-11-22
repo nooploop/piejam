@@ -36,7 +36,10 @@ class BusConfig final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    BusConfig(store_dispatch, runtime::subscriber&, runtime::mixer::bus_id);
+    BusConfig(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::mixer::bus_id);
 
 signals:
     void subscribedChanged();

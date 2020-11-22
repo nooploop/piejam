@@ -23,7 +23,7 @@ namespace piejam::app::gui::model
 {
 
 BusConfig::BusConfig(
-        store_dispatch store_dispatch,
+        runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::bus_id bus_id)
     : Subscribable(store_dispatch, state_change_subscriber)

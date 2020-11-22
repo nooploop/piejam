@@ -15,18 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/app/store_dispatch.h>
+#pragma once
 
-#include <piejam/redux/store.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/store.h>
 
-namespace piejam::app
+namespace piejam::runtime
 {
 
-void
-store_dispatch::operator()(runtime::action const& a) const
+struct store_dispatch
 {
-    m_store->dispatch(a);
-}
+    store_dispatch(store& app_store)
+        : m_store(&app_store)
+    {
+    }
 
-} // namespace piejam::app
+    void operator()(runtime::action const&) const;
+
+private:
+    store* m_store;
+};
+
+} // namespace piejam::runtime

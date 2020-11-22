@@ -33,7 +33,7 @@ class Mixer final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    Mixer(store_dispatch, runtime::subscriber&);
+    Mixer(runtime::store_dispatch, runtime::subscriber&);
 
     void setInputSolo(unsigned index) override;
     void requestLevelsUpdate() override;

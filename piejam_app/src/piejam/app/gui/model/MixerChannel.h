@@ -37,7 +37,10 @@ class MixerChannel final
     Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
                        subscribedChanged)
 public:
-    MixerChannel(store_dispatch, runtime::subscriber&, runtime::mixer::bus_id);
+    MixerChannel(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::mixer::bus_id);
 
     void changeVolume(double) override;
     void changePanBalance(double) override;

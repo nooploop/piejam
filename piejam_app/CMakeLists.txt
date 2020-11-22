@@ -31,9 +31,6 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Subscribable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Subscribable.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/store.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/store_dispatch.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/store_dispatch.h
 )
 target_include_directories(piejam_app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(piejam_app PRIVATE piejam_runtime piejam_redux piejam_algorithm piejam_log piejam_gui)

@@ -49,6 +49,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/stereo_level.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store_dispatch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/subscriber.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action_visitor.h
@@ -87,6 +89,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mixer_bus_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/selectors.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/store_dispatch.cpp
 )
 
 find_package(nlohmann_json REQUIRED)
