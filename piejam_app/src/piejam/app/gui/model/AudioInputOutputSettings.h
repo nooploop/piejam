@@ -64,6 +64,8 @@ private:
     void addBus(audio::bus_type);
 
     audio::bus_direction m_settings_type;
+
+    runtime::mixer::bus_list_t m_bus_ids;
 };
 
 class AudioInputSettings final : public AudioInputOutputSettings

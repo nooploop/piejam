@@ -19,6 +19,8 @@
 
 #include <piejam/gui/model/BusConfig.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::gui::model
 {
 
@@ -55,20 +57,30 @@ BusConfigsList::roleNames() const -> QHash<int, QByteArray>
 }
 
 void
-BusConfigsList::addBusConfig(std::unique_ptr<BusConfig> busConfig)
+BusConfigsList::addBusConfig(
+        std::size_t const pos,
+        std::unique_ptr<BusConfig> busConfig)
 {
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    assert(busConfig);
-    m_list.push_back(std::move(busConfig));
+    BOOST_ASSERT(pos <= m_list.size());
+    beginInsertRows(
+            QModelIndex(),
+            static_cast<int>(pos),
+            static_cast<int>(pos));
+    BOOST_ASSERT(busConfig);
+    m_list.insert(std::next(m_list.begin(), pos), std::move(busConfig));
     endInsertRows();
 }
 
 void
-BusConfigsList::removeBusConfig()
+BusConfigsList::removeBusConfig(std::size_t const pos)
 {
-    beginRemoveRows(QModelIndex(), rowCount() - 1, rowCount() - 1);
-    assert(!m_list.empty());
-    m_list.erase(std::next(m_list.begin(), m_list.size() - 1));
+    BOOST_ASSERT(pos < m_list.size());
+    beginRemoveRows(
+            QModelIndex(),
+            static_cast<int>(pos),
+            static_cast<int>(pos));
+    BOOST_ASSERT(!m_list.empty());
+    m_list.erase(std::next(m_list.begin(), pos));
     endRemoveRows();
 }
 

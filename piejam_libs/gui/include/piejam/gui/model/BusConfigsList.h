@@ -42,8 +42,8 @@ public:
 
     auto roleNames() const -> QHash<int, QByteArray> override;
 
-    void addBusConfig(std::unique_ptr<BusConfig>);
-    void removeBusConfig();
+    void addBusConfig(std::size_t pos, std::unique_ptr<BusConfig>);
+    void removeBusConfig(std::size_t pos);
 
 private:
     enum Roles : int

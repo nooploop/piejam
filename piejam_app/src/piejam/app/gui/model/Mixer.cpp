@@ -17,9 +17,9 @@
 
 #include <piejam/app/gui/model/Mixer.h>
 
+#include <piejam/algorithm/edit_script.h>
 #include <piejam/app/gui/model/MixerChannel.h>
 #include <piejam/audio/types.h>
-#include <piejam/functional/overload.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
@@ -32,6 +32,34 @@
 
 namespace piejam::app::gui::model
 {
+
+namespace
+{
+
+struct mixer_channels_edit_script_executor
+{
+    piejam::gui::model::MixerChannelsList& list;
+    runtime::store_dispatch dispatch;
+    runtime::subscriber& state_change_subscriber;
+
+    void operator()(algorithm::edit_script_deletion const& del)
+    {
+        list.removeMixerChannel(del.pos);
+    }
+
+    void operator()(
+            algorithm::edit_script_insertion<runtime::mixer::bus_id> const& ins)
+    {
+        list.addMixerChannel(
+                ins.pos,
+                std::make_unique<MixerChannel>(
+                        dispatch,
+                        state_change_subscriber,
+                        ins.value));
+    }
+};
+
+} // namespace
 
 Mixer::Mixer(
         runtime::store_dispatch store_dispatch,
@@ -54,25 +82,20 @@ Mixer::subscribeStep(
             selectors::make_bus_list_selector(audio::bus_direction::input),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+                mixer_channels_edit_script_executor visitor{
+                        *inputChannels(),
+                        dispatch(),
+                        state_change_subscriber};
+
+                for (auto const& op :
+                     algorithm::prepare_edit_script_ops_for_linear_execution(
+                             algorithm::edit_script(m_inputs, *bus_ids)))
+                {
+                    std::visit(visitor, op);
+                }
+
                 m_all = m_inputs = bus_ids;
                 boost::push_back(m_all, m_outputs);
-
-                auto const num_channels = bus_ids->size();
-
-                for (std::size_t bus = numInputChannels(); bus < num_channels;
-                     ++bus)
-                {
-                    inputChannels()->addMixerChannel(
-                            std::make_unique<MixerChannel>(
-                                    dispatch(),
-                                    state_change_subscriber,
-                                    bus_ids.get()[bus]));
-                }
-
-                while (bus_ids->size() < numInputChannels())
-                {
-                    inputChannels()->removeMixerChannel();
-                }
             });
 
     subs.observe(
@@ -81,25 +104,20 @@ Mixer::subscribeStep(
             selectors::make_bus_list_selector(audio::bus_direction::output),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+                mixer_channels_edit_script_executor visitor{
+                        *outputChannels(),
+                        dispatch(),
+                        state_change_subscriber};
+
+                for (auto const& op :
+                     algorithm::prepare_edit_script_ops_for_linear_execution(
+                             algorithm::edit_script(m_outputs, *bus_ids)))
+                {
+                    std::visit(visitor, op);
+                }
+
                 m_all = m_outputs = bus_ids;
                 boost::push_back(m_all, m_inputs);
-
-                auto const num_channels = bus_ids->size();
-
-                for (std::size_t bus = numOutputChannels(); bus < num_channels;
-                     ++bus)
-                {
-                    outputChannels()->addMixerChannel(
-                            std::make_unique<MixerChannel>(
-                                    dispatch(),
-                                    state_change_subscriber,
-                                    bus_ids.get()[bus]));
-                }
-
-                while (bus_ids->size() < numOutputChannels())
-                {
-                    outputChannels()->removeMixerChannel();
-                }
             });
 
     subs.observe(

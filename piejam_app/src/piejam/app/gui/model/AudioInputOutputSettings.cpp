@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/AudioInputOutputSettings.h>
 
+#include <piejam/algorithm/edit_script.h>
 #include <piejam/app/gui/model/BusConfig.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/add_bus.h>
@@ -31,6 +32,34 @@
 
 namespace piejam::app::gui::model
 {
+
+namespace
+{
+
+struct bus_configs_edit_script_executor
+{
+    piejam::gui::model::BusConfigsList& list;
+    runtime::store_dispatch dispatch;
+    runtime::subscriber& state_change_subscriber;
+
+    void operator()(algorithm::edit_script_deletion const& del)
+    {
+        list.removeBusConfig(del.pos);
+    }
+
+    void operator()(
+            algorithm::edit_script_insertion<runtime::mixer::bus_id> const& ins)
+    {
+        list.addBusConfig(
+                ins.pos,
+                std::make_unique<BusConfig>(
+                        dispatch,
+                        state_change_subscriber,
+                        ins.value));
+    }
+};
+
+} // namespace
 
 AudioInputOutputSettings::AudioInputOutputSettings(
         runtime::store_dispatch store_dispatch,
@@ -68,19 +97,18 @@ AudioInputOutputSettings::subscribeStep(
             selectors::make_bus_list_selector(m_settings_type),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                for (std::size_t bus = numBusConfigs(); bus < bus_ids->size();
-                     ++bus)
+                bus_configs_edit_script_executor visitor{
+                        *busConfigs(),
+                        dispatch(),
+                        state_change_subscriber};
+                for (auto const& op :
+                     algorithm::prepare_edit_script_ops_for_linear_execution(
+                             algorithm::edit_script(m_bus_ids, *bus_ids)))
                 {
-                    busConfigs()->addBusConfig(std::make_unique<BusConfig>(
-                            dispatch(),
-                            state_change_subscriber,
-                            bus_ids.get()[bus]));
+                    std::visit(visitor, op);
                 }
 
-                while (bus_ids->size() < numBusConfigs())
-                {
-                    busConfigs()->removeBusConfig();
-                }
+                m_bus_ids = bus_ids;
             });
 }
 

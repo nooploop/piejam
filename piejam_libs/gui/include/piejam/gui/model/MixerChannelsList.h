@@ -42,8 +42,8 @@ public:
 
     auto roleNames() const -> QHash<int, QByteArray> override;
 
-    void addMixerChannel(std::unique_ptr<MixerChannel>);
-    void removeMixerChannel();
+    void addMixerChannel(std::size_t pos, std::unique_ptr<MixerChannel>);
+    void removeMixerChannel(std::size_t pos);
 
 private:
     enum Roles : int
