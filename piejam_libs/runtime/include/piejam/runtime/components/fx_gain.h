@@ -17,34 +17,23 @@
 
 #pragma once
 
-#include <piejam/entity_id.h>
-#include <piejam/runtime/fx/type.h>
+#include <piejam/audio/engine/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameters.h>
+#include <piejam/runtime/processors/parameter_processor.h>
 
-#include <boost/container/flat_map.hpp>
+#include <functional>
+#include <memory>
+#include <string_view>
 
-#include <string>
-#include <vector>
-
-namespace piejam::runtime::fx
+namespace piejam::runtime::components
 {
 
-struct parameter
-{
-    float_parameter_id id;
-    std::string name;
-};
+auto make_fx_gain(
+        processors::make_parameter_input_processor_f<parameter::float_> const&,
+        fx::module const&,
+        std::string_view const& name = {})
+        -> std::unique_ptr<audio::engine::component>;
 
-using parameter_key = std::size_t;
-
-struct module
-{
-    type fx_type;
-    boost::container::flat_map<parameter_key, parameter> parameters;
-};
-
-using module_id = entity_id<module>;
-using modules_t = entity_map<module, module>;
-using chain_t = std::vector<module_id>;
-
-} // namespace piejam::runtime::fx
+} // namespace piejam::runtime::components

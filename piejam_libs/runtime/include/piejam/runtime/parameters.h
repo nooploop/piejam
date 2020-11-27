@@ -17,19 +17,18 @@
 
 #pragma once
 
-#include <piejam/fwd.h>
 #include <piejam/runtime/parameter/fwd.h>
 
 namespace piejam::runtime
 {
 
 using float_parameters = parameter::map<parameter::float_>;
-using float_parameter_id = entity_id<parameter::float_>;
+using float_parameter_id = parameter::id_t<parameter::float_>;
 
 using bool_parameters = parameter::map<parameter::bool_>;
-using bool_parameter_id = entity_id<parameter::bool_>;
+using bool_parameter_id = parameter::id_t<parameter::bool_>;
 
 using stereo_level_parameters = parameter::map<parameter::stereo_level>;
-using stereo_level_parameter_id = entity_id<parameter::stereo_level>;
+using stereo_level_parameter_id = parameter::id_t<parameter::stereo_level>;
 
 } // namespace piejam::runtime

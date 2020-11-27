@@ -32,6 +32,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_state.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/channel_index_pair.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_gain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/config_access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fwd.h
@@ -52,6 +53,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_input_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_output_processor_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/stereo_level.h
@@ -90,6 +92,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_state.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_gain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/config_access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/gain.cpp

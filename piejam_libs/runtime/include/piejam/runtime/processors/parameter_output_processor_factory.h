@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/value_output_processor.h>
 #include <piejam/entity_id_hash.h>
+#include <piejam/runtime/parameter/fwd.h>
 #include <piejam/runtime/parameter/map.h>
 
 #include <boost/assert.hpp>
@@ -37,19 +38,17 @@ class parameter_output_processor_factory
 {
 public:
     template <class P>
-    using parameter_id = entity_id<P>;
-
-    template <class P>
     using parameter_processor =
             audio::engine::value_output_processor<typename P::value_type>;
 
     template <class P>
     using processor_map = std::unordered_map<
-            parameter_id<P>,
+            parameter::id_t<P>,
             std::weak_ptr<parameter_processor<P>>>;
 
     template <class P>
-    auto make_processor(parameter_id<P> id, std::string_view const& name = {})
+    auto
+    make_processor(parameter::id_t<P> id, std::string_view const& name = {})
             -> std::shared_ptr<parameter_processor<P>>
     {
         auto proc = std::make_shared<parameter_processor<P>>(name);
@@ -59,7 +58,7 @@ public:
     }
 
     template <class P, class F>
-    auto consume(parameter_id<P> id, F&& f) const
+    auto consume(parameter::id_t<P> id, F&& f) const
     {
         auto& proc_map = std::get<processor_map<P>>(m_procs);
         auto it = proc_map.find(id);

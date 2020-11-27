@@ -25,16 +25,20 @@ namespace piejam::runtime::fx
 {
 
 auto
-make_gain(float_parameters& float_params) -> module
+make_gain_module(float_parameters& float_params) -> module
 {
     module mod;
     mod.fx_type = type::gain;
-    mod.parameters.emplace_back(
-            float_params.add(runtime::parameter::float_{
-                    .default_value = 1.f,
-                    .min = 0.f,
-                    .max = 8.f}),
-            "gain");
+
+    mod.parameters.emplace(
+            static_cast<std::size_t>(gain_parameter_key::gain),
+            parameter{
+                    .id = float_params.add(runtime::parameter::float_{
+                            .default_value = 1.f,
+                            .min = 0.f,
+                            .max = 8.f}),
+                    .name = "gain"});
+
     return mod;
 }
 

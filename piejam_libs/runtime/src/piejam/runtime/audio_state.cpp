@@ -65,4 +65,101 @@ period_sizes_from_state(audio_state const& state) -> audio::period_sizes_t
     return period_sizes(state.input.hw_params, state.output.hw_params);
 }
 
+static void
+remove_fx_module(audio_state& st, fx::module_id id)
+{
+    if (fx::module const* const fx_mod = std::as_const(st.fx_modules)[id])
+    {
+        for (auto&& [key, fx_param] : fx_mod->parameters)
+            st.float_params.remove(fx_param.id);
+
+        st.fx_modules.remove(id);
+    }
+}
+
+template <audio::bus_direction D>
+void
+add_mixer_bus(
+        audio_state& st,
+        std::string name,
+        audio::bus_type type,
+        channel_index_pair chs)
+{
+    auto volume_id = st.float_params.add(
+            parameter::float_{.default_value = 1.f, .min = 0.f, .max = 8.f});
+    auto pan_balance_id = st.float_params.add(
+            parameter::float_{.default_value = 0.f, .min = -1.f, .max = 1.f});
+    auto mute_id = st.bool_params.add(parameter::bool_{.default_value = false});
+    auto level_id = st.levels.add(parameter::stereo_level{});
+
+    mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
+    bus_ids.emplace_back(st.mixer_state.buses.add(mixer::bus{
+            .name = std::move(name),
+            .volume = volume_id,
+            .pan_balance = pan_balance_id,
+            .mute = mute_id,
+            .level = level_id,
+            .type = type,
+            .device_channels = std::move(chs)}));
+    mixer::bus_ids<D>(st.mixer_state) = bus_ids;
+}
+
+template void add_mixer_bus<audio::bus_direction::input>(
+        audio_state&,
+        std::string,
+        audio::bus_type,
+        channel_index_pair);
+template void add_mixer_bus<audio::bus_direction::output>(
+        audio_state&,
+        std::string,
+        audio::bus_type,
+        channel_index_pair);
+
+template <audio::bus_direction D>
+void
+remove_mixer_bus(audio_state& st, std::size_t index)
+{
+    mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
+    BOOST_ASSERT(index < bus_ids.size());
+    mixer::bus_id const bus_id = bus_ids[index];
+
+    if constexpr (D == audio::bus_direction::input)
+    {
+        if (st.mixer_state.input_solo_id == bus_id)
+            st.mixer_state.input_solo_id = mixer::bus_id{};
+    }
+
+    mixer::bus const* const bus = std::as_const(st.mixer_state).buses[bus_id];
+    BOOST_ASSERT(bus);
+    st.float_params.remove(bus->volume);
+    st.float_params.remove(bus->pan_balance);
+    st.bool_params.remove(bus->mute);
+    st.levels.remove(bus->level);
+
+    for (auto&& fx_mod_id : bus->fx_chain)
+        remove_fx_module(st, fx_mod_id);
+
+    st.mixer_state.buses.remove(bus_id);
+    bus_ids.erase(bus_ids.begin() + index);
+
+    mixer::bus_ids<D>(st.mixer_state) = bus_ids;
+}
+
+template void
+remove_mixer_bus<audio::bus_direction::input>(audio_state&, std::size_t);
+template void
+remove_mixer_bus<audio::bus_direction::output>(audio_state&, std::size_t);
+
+template <audio::bus_direction D>
+void
+clear_mixer_buses(audio_state& st)
+{
+    std::size_t num_buses = mixer::bus_ids<D>(st.mixer_state)->size();
+    while (num_buses--)
+        remove_mixer_bus<D>(st, num_buses);
+}
+
+template void clear_mixer_buses<audio::bus_direction::input>(audio_state&);
+template void clear_mixer_buses<audio::bus_direction::output>(audio_state&);
+
 } // namespace piejam::runtime

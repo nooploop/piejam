@@ -23,6 +23,11 @@
 namespace piejam::runtime::fx
 {
 
-auto make_gain(float_parameters&) -> module;
+enum class gain_parameter_key : parameter_key
+{
+    gain
+};
+
+auto make_gain_module(float_parameters&) -> module;
 
 } // namespace piejam::runtime::fx

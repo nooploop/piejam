@@ -29,8 +29,10 @@ enum class type : unsigned;
 struct parameter;
 struct module;
 
+using parameter_key = std::size_t;
+
 using module_id = entity_id<module>;
-using modules_t = entity_map<module_id, module>;
+using modules_t = entity_map<module, module>;
 
 using chain_t = std::vector<module_id>;
 

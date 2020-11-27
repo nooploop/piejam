@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
+#include <piejam/fwd.h>
 
 namespace piejam::runtime::parameter
 {
@@ -31,5 +32,8 @@ using stereo_level = generic_value<audio::pair<float>>;
 
 template <class Parameter>
 class map;
+
+template <class Parameter>
+using id_t = entity_id<Parameter>;
 
 } // namespace piejam::runtime::parameter
