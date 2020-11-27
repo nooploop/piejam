@@ -17,11 +17,13 @@
 
 #include <piejam/app/gui/model/AudioDeviceSettings.h>
 #include <piejam/app/gui/model/AudioInputOutputSettings.h>
+#include <piejam/app/gui/model/FxChain.h>
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/Mixer.h>
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
 #include <piejam/gui/model/BusConfig.h>
+#include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/log/generic_log_sink.h>
@@ -133,6 +135,7 @@ main(int argc, char* argv[]) -> int
             state_change_subscriber);
     app::gui::model::Mixer mixer(store, state_change_subscriber);
     app::gui::model::Info info_model(store, state_change_subscriber);
+    app::gui::model::FxChain fx_chain(store, state_change_subscriber);
 
     spdlog::default_logger()->sinks().push_back(
             std::make_shared<core::generic_log_sink_mt>(
@@ -158,6 +161,7 @@ main(int argc, char* argv[]) -> int
             &audio_output_settings);
     engine.rootContext()->setContextProperty("g_mixer", &mixer);
     engine.rootContext()->setContextProperty("g_info", &info_model);
+    engine.rootContext()->setContextProperty("g_fx_chain", &fx_chain);
 
     engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
     if (engine.rootObjects().isEmpty())

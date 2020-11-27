@@ -17,24 +17,23 @@
 
 #pragma once
 
-#include <piejam/gui/model/GenericListModel.h>
-#include <piejam/gui/model/SubscribableModel.h>
-#include <piejam/gui/model/fwd.h>
+#include <piejam/app/gui/model/Subscribable.h>
+#include <piejam/gui/model/FxChain.h>
+#include <piejam/runtime/subscriber.h>
 
-namespace piejam::gui::model
+namespace piejam::app::gui::model
 {
 
-class FxChain : public SubscribableModel
+class FxChain final : public Subscribable<piejam::gui::model::FxChain>
 {
-    Q_OBJECT
-
-    Q_PROPERTY(QAbstractListModel* modules READ modules CONSTANT)
-
 public:
-    auto modules() -> FxModulesList* { return &m_modules; }
+    FxChain(runtime::store_dispatch, runtime::subscriber&);
 
 private:
-    FxModulesList m_modules;
+    void subscribeStep(
+            runtime::subscriber&,
+            runtime::subscriptions_manager&,
+            runtime::subscription_id) override;
 };
 
-} // namespace piejam::gui::model
+} // namespace piejam::app::gui::model

@@ -15,26 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/app/gui/model/FxChain.h>
 
-#include <piejam/gui/model/GenericListModel.h>
-#include <piejam/gui/model/SubscribableModel.h>
-#include <piejam/gui/model/fwd.h>
+#include <piejam/gui/model/FxModule.h>
 
-namespace piejam::gui::model
+namespace piejam::app::gui::model
 {
 
-class FxChain : public SubscribableModel
+FxChain::FxChain(
+        runtime::store_dispatch store_dispatch,
+        runtime::subscriber& state_change_subscriber)
+    : Subscribable(store_dispatch, state_change_subscriber)
 {
-    Q_OBJECT
+}
 
-    Q_PROPERTY(QAbstractListModel* modules READ modules CONSTANT)
+void
+FxChain::subscribeStep(
+        runtime::subscriber& /*state_change_subscriber*/,
+        runtime::subscriptions_manager& /*subs*/,
+        runtime::subscription_id /*subs_id*/)
+{
+}
 
-public:
-    auto modules() -> FxModulesList* { return &m_modules; }
-
-private:
-    FxModulesList m_modules;
-};
-
-} // namespace piejam::gui::model
+} // namespace piejam::app::gui::model

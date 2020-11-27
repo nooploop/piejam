@@ -28,16 +28,5 @@ MainWindow {
     audioSettingsPage.outputModel: g_audioOutputSettings
     mixerPage.model: g_mixer
     infoPage.model: g_info
-
-    fxChainPage.model: {
-        "channels": [
-            "in1", "in2", "in3", "main"
-        ],
-        "modules": [
-            {"name": "fx1",
-             "parameters": [{"name": "foo", "value":0.5, "valueText":"0.5"},{"name":"bar","value":0.75,"valueText":"0.75"}]},
-            {"name": "fx2 with very very very very very long name",
-             "parameters": [{"name": "bla","value":0.25,"valueText":"0.25"}]}
-        ]
-    }
+    fxChainPage.model: g_fx_chain
 }
