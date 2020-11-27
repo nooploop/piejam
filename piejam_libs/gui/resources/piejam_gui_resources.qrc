@@ -32,5 +32,8 @@
         <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
         <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
         <file>PieJam/MixerControls/ChannelControls.qml</file>
+        <file>PieJam/Views/FxChain.qml</file>
+        <file>PieJam/FxChainControls/FxChainModule.qml</file>
+        <file>PieJam/FxChainControls/ParameterControl.qml</file>
     </qresource>
 </RCC>

@@ -19,23 +19,23 @@ set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)
 
 add_library(piejam_gui STATIC
     ${RESOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioInputOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioDeviceSettings.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioInputOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusConfig.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusConfigsList.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChain.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/GenericListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelsList.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/qt_log.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioInputOutputSettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/BusConfig.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/BusConfigsList.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Info.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Mixer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelsList.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StringList.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
 )

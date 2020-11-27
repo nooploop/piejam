@@ -17,11 +17,10 @@
 
 #pragma once
 
-#include <piejam/gui/model/BusConfig.h>
-#include <piejam/gui/model/BusConfigsList.h>
+#include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/fwd.h>
 
 #include <QObject>
-#include <QQmlListProperty>
 #include <QStringList>
 
 #include <memory>
@@ -35,18 +34,13 @@ class AudioInputOutputSettings : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QStringList channels READ channels NOTIFY channelsChanged FINAL)
-    Q_PROPERTY(BusConfigsList* busConfigs READ busConfigs CONSTANT)
+    Q_PROPERTY(QAbstractListModel* busConfigs READ busConfigs CONSTANT)
 
 public:
     auto channels() -> QStringList { return m_channels; }
     void setChannels(QStringList const& channels);
 
     auto busConfigs() -> BusConfigsList* { return &m_busConfigs; }
-
-    auto numBusConfigs() const noexcept -> std::size_t
-    {
-        return m_busConfigs.rowCount();
-    }
 
     Q_INVOKABLE virtual void setBusName(unsigned name, QString const&) = 0;
     Q_INVOKABLE virtual void selectMonoChannel(unsigned bus, unsigned ch) = 0;

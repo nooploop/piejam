@@ -18,6 +18,7 @@
 #include <piejam/app/gui/model/Mixer.h>
 
 #include <piejam/algorithm/edit_script.h>
+#include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/MixerChannel.h>
 #include <piejam/audio/types.h>
 #include <piejam/redux/store.h>
@@ -32,34 +33,6 @@
 
 namespace piejam::app::gui::model
 {
-
-namespace
-{
-
-struct mixer_channels_edit_script_executor
-{
-    piejam::gui::model::MixerChannelsList& list;
-    runtime::store_dispatch dispatch;
-    runtime::subscriber& state_change_subscriber;
-
-    void operator()(algorithm::edit_script_deletion const& del)
-    {
-        list.removeMixerChannel(del.pos);
-    }
-
-    void operator()(
-            algorithm::edit_script_insertion<runtime::mixer::bus_id> const& ins)
-    {
-        list.addMixerChannel(
-                ins.pos,
-                std::make_unique<MixerChannel>(
-                        dispatch,
-                        state_change_subscriber,
-                        ins.value));
-    }
-};
-
-} // namespace
 
 Mixer::Mixer(
         runtime::store_dispatch store_dispatch,
@@ -82,17 +55,16 @@ Mixer::subscribeStep(
             selectors::make_bus_list_selector(audio::bus_direction::input),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                mixer_channels_edit_script_executor visitor{
-                        *inputChannels(),
-                        dispatch(),
-                        state_change_subscriber};
+                generic_list_model_edit_script_executor<
+                        piejam::gui::model::MixerChannel,
+                        MixerChannel>
+                        visitor{*inputChannels(),
+                                dispatch(),
+                                state_change_subscriber};
 
-                for (auto const& op :
-                     algorithm::prepare_edit_script_ops_for_linear_execution(
-                             algorithm::edit_script(m_inputs, *bus_ids)))
-                {
-                    std::visit(visitor, op);
-                }
+                algorithm::apply_edit_script(
+                        algorithm::edit_script(m_inputs, *bus_ids),
+                        visitor);
 
                 m_all = m_inputs = bus_ids;
                 boost::push_back(m_all, m_outputs);
@@ -104,17 +76,16 @@ Mixer::subscribeStep(
             selectors::make_bus_list_selector(audio::bus_direction::output),
             [this, &state_change_subscriber](
                     container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                mixer_channels_edit_script_executor visitor{
-                        *outputChannels(),
-                        dispatch(),
-                        state_change_subscriber};
+                generic_list_model_edit_script_executor<
+                        piejam::gui::model::MixerChannel,
+                        MixerChannel>
+                        visitor{*outputChannels(),
+                                dispatch(),
+                                state_change_subscriber};
 
-                for (auto const& op :
-                     algorithm::prepare_edit_script_ops_for_linear_execution(
-                             algorithm::edit_script(m_outputs, *bus_ids)))
-                {
-                    std::visit(visitor, op);
-                }
+                algorithm::apply_edit_script(
+                        algorithm::edit_script(m_outputs, *bus_ids),
+                        visitor);
 
                 m_all = m_outputs = bus_ids;
                 boost::push_back(m_all, m_inputs);

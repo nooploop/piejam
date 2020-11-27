@@ -28,6 +28,7 @@ ApplicationWindow {
     property alias audioSettingsPage: audioSettingsPane
     property alias mixerPage: mixerPane
     property alias infoPage: infoPane
+    property alias fxChainPage: fxChainPane
 
     width: 800
     height: 480
@@ -50,6 +51,15 @@ ApplicationWindow {
             anchors.left: parent.left
 
             onClicked: { content.currentIndex = 2 }
+        }
+
+        ToolButton {
+            id: btnFxChain
+
+            text: "FX"
+            anchors.left: btnMixer.right
+
+            onClicked: { content.currentIndex = 4 }
         }
 
         ToolButton {
@@ -102,6 +112,10 @@ ApplicationWindow {
 
         Info {
             id: infoPane
+        }
+
+        FxChain {
+            id: fxChainPane
         }
     }
 

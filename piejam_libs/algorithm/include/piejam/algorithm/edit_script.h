@@ -196,6 +196,9 @@ edit_script(Src const& src, Dst const& dst)
     return result;
 }
 
+namespace detail
+{
+
 template <class T>
 auto
 prepare_edit_script_ops_for_linear_execution(edit_script_ops<T>&& ops)
@@ -250,6 +253,26 @@ prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> const& ops)
             [&visitor](auto const& op) { return std::visit(visitor, op); });
 
     return result;
+}
+
+} // namespace detail
+
+template <class T, class Visitor>
+auto
+apply_edit_script(edit_script_ops<T>&& ops, Visitor&& v)
+{
+    for (auto const& op :
+         detail::prepare_edit_script_ops_for_linear_execution(std::move(ops)))
+        std::visit(std::forward<Visitor>(v), op);
+}
+
+template <class T, class Visitor>
+auto
+apply_edit_script(edit_script_ops<T> const& ops, Visitor&& v)
+{
+    for (auto const& op :
+         detail::prepare_edit_script_ops_for_linear_execution(ops))
+        std::visit(std::forward<Visitor>(v), op);
 }
 
 } // namespace piejam::algorithm

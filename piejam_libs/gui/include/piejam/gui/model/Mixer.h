@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <piejam/gui/model/MixerChannel.h>
-#include <piejam/gui/model/MixerChannelsList.h>
+#include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/fwd.h>
 
 #include <QObject>
 
@@ -32,23 +32,14 @@ class Mixer : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(MixerChannelsList* inputChannels READ inputChannels CONSTANT)
-    Q_PROPERTY(MixerChannelsList* outputChannels READ outputChannels CONSTANT)
+    Q_PROPERTY(QAbstractListModel* inputChannels READ inputChannels CONSTANT)
+    Q_PROPERTY(QAbstractListModel* outputChannels READ outputChannels CONSTANT)
     Q_PROPERTY(bool inputSoloActive READ inputSoloActive NOTIFY
                        inputSoloActiveChanged FINAL)
 
 public:
     auto inputChannels() -> MixerChannelsList* { return &m_inputChannels; }
-    auto numInputChannels() const noexcept -> std::size_t
-    {
-        return m_inputChannels.rowCount();
-    }
-
     auto outputChannels() -> MixerChannelsList* { return &m_outputChannels; }
-    auto numOutputChannels() const noexcept -> std::size_t
-    {
-        return m_outputChannels.rowCount();
-    }
 
     auto inputSoloActive() const -> bool { return m_inputSoloActive; }
     void setInputSoloActive(bool);

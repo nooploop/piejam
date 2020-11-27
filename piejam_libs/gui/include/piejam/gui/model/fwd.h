@@ -17,41 +17,21 @@
 
 #pragma once
 
-#include <QAbstractListModel>
-
-#include <memory>
-#include <vector>
-
 namespace piejam::gui::model
 {
 
+template <class ListItem>
+class GenericListModel;
+
+class FxChain;
+class FxModule;
+using FxModulesList = GenericListModel<FxModule>;
+
+class Mixer;
+class MixerChannel;
+using MixerChannelsList = GenericListModel<MixerChannel>;
+
 class BusConfig;
-
-class BusConfigsList : public QAbstractListModel
-{
-    Q_OBJECT
-
-public:
-    BusConfigsList(QObject* parent = nullptr);
-    ~BusConfigsList();
-
-    auto rowCount(const QModelIndex& parent = QModelIndex()) const
-            -> int override;
-    auto data(const QModelIndex& index, int role = Qt::DisplayRole) const
-            -> QVariant override;
-
-    auto roleNames() const -> QHash<int, QByteArray> override;
-
-    void addBusConfig(std::size_t pos, std::unique_ptr<BusConfig>);
-    void removeBusConfig(std::size_t pos);
-
-private:
-    enum Roles : int
-    {
-        ItemRole = Qt::UserRole
-    };
-
-    std::vector<std::unique_ptr<BusConfig>> m_list;
-};
+using BusConfigsList = GenericListModel<BusConfig>;
 
 } // namespace piejam::gui::model

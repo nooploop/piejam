@@ -17,41 +17,25 @@
 
 #pragma once
 
-#include <QAbstractListModel>
+#include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/fwd.h>
 
-#include <memory>
-#include <vector>
+#include <QObject>
 
 namespace piejam::gui::model
 {
 
-class MixerChannel;
-
-class MixerChannelsList : public QAbstractListModel
+class FxChain : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QAbstractListModel* modules READ modules CONSTANT)
+
 public:
-    MixerChannelsList(QObject* parent = nullptr);
-    ~MixerChannelsList();
-
-    auto rowCount(const QModelIndex& parent = QModelIndex()) const
-            -> int override;
-    auto data(const QModelIndex& index, int role = Qt::DisplayRole) const
-            -> QVariant override;
-
-    auto roleNames() const -> QHash<int, QByteArray> override;
-
-    void addMixerChannel(std::size_t pos, std::unique_ptr<MixerChannel>);
-    void removeMixerChannel(std::size_t pos);
+    auto modules() -> FxModulesList* { return &m_modules; }
 
 private:
-    enum Roles : int
-    {
-        ItemRole = Qt::UserRole
-    };
-
-    std::vector<std::unique_ptr<MixerChannel>> m_list;
+    FxModulesList m_modules;
 };
 
 } // namespace piejam::gui::model

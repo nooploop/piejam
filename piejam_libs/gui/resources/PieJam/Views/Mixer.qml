@@ -34,7 +34,7 @@ TopPane {
             id: inputs
 
             SplitView.fillWidth: true
-            SplitView.minimumWidth: 142
+            SplitView.minimumWidth: 150
 
             spacing: 2
             clip: true
@@ -75,7 +75,7 @@ TopPane {
         ListView {
             id: outputs
 
-            SplitView.minimumWidth: 142
+            SplitView.minimumWidth: 150
 
             spacing: 2
             clip: true

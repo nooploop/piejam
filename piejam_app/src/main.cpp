@@ -21,6 +21,8 @@
 #include <piejam/app/gui/model/Mixer.h>
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
+#include <piejam/gui/model/BusConfig.h>
+#include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/log/generic_log_sink.h>
 #include <piejam/redux/queueing_middleware.h>
