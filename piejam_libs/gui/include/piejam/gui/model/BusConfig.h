@@ -58,6 +58,8 @@ public:
     }
     void setStereoRightChannel(unsigned);
 
+    auto toQString() const -> QString { return m_name; }
+
 signals:
 
     void nameChanged();

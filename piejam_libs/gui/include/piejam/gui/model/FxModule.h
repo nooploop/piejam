@@ -27,6 +27,7 @@ class FxModule : public QObject
     Q_OBJECT
 
 public:
+    auto toQString() const -> QString { return QString(); }
 };
 
 } // namespace piejam::gui::model

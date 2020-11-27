@@ -15,30 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/select_fx_chain_bus.h>
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/gui/model/BusConfig.h>
-#include <piejam/runtime/subscriber.h>
+#include <piejam/runtime/audio_state.h>
 
-namespace piejam::app::gui::model
+namespace piejam::runtime::actions
 {
 
-class BusConfig final : public Subscribable<piejam::gui::model::BusConfig>
+auto
+select_fx_chain_bus::reduce(audio_state const& st) const -> audio_state
 {
-public:
-    BusConfig(
-            runtime::store_dispatch,
-            runtime::subscriber&,
-            runtime::mixer::bus_id);
+    auto new_st = st;
 
-private:
-    void subscribeStep(
-            runtime::subscriber&,
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
+    new_st.fx_chain_bus = bus_id;
 
-    runtime::mixer::bus_id m_bus_id;
-};
+    return new_st;
+}
 
-} // namespace piejam::app::gui::model
+} // namespace piejam::runtime::actions

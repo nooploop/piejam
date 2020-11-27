@@ -15,6 +15,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_mixer_levels_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_bus_channel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_device.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_fx_chain_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_period_size.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_samplerate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bool_parameter.h
@@ -79,6 +80,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_mixer_levels_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_bus_channel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_device.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_fx_chain_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_period_size.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_samplerate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bool_parameter.cpp

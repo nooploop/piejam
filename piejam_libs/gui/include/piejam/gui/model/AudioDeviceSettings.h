@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/gui/model/StringList.h>
-
 #include <piejam/gui/model/SubscribableModel.h>
 
 #include <memory>

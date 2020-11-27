@@ -17,7 +17,16 @@
 
 #include <piejam/app/gui/model/FxChain.h>
 
+#include <piejam/algorithm/edit_script.h>
+#include <piejam/algorithm/index_of.h>
+#include <piejam/app/gui/generic_list_model_edit_script_executor.h>
+#include <piejam/app/gui/model/BusName.h>
+#include <piejam/functional/overload.h>
 #include <piejam/gui/model/FxModule.h>
+#include <piejam/runtime/actions/select_fx_chain_bus.h>
+#include <piejam/runtime/selectors.h>
+
+#include <boost/range/algorithm_ext/push_back.hpp>
 
 namespace piejam::app::gui::model
 {
@@ -31,10 +40,98 @@ FxChain::FxChain(
 
 void
 FxChain::subscribeStep(
-        runtime::subscriber& /*state_change_subscriber*/,
-        runtime::subscriptions_manager& /*subs*/,
-        runtime::subscription_id /*subs_id*/)
+        runtime::subscriber& state_change_subscriber,
+        runtime::subscriptions_manager& subs,
+        runtime::subscription_id subs_id)
 {
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
+            runtime::selectors::make_bus_list_selector(
+                    audio::bus_direction::input),
+            [this, &state_change_subscriber](
+                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+                updateBuses(
+                        audio::bus_direction::input,
+                        bus_ids,
+                        state_change_subscriber);
+            });
+
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
+            runtime::selectors::make_bus_list_selector(
+                    audio::bus_direction::output),
+            [this, &state_change_subscriber](
+                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+                updateBuses(
+                        audio::bus_direction::output,
+                        bus_ids,
+                        state_change_subscriber);
+            });
+
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
+            runtime::selectors::select_fx_chain_bus,
+            [this](runtime::mixer::bus_id const& fx_chain_bus) {
+                setSelectedBus(static_cast<int>(
+                        algorithm::index_of(m_all, fx_chain_bus)));
+            });
+}
+
+void
+FxChain::updateBuses(
+        audio::bus_direction bus_dir,
+        container::box<runtime::mixer::bus_list_t> const& bus_ids,
+        runtime::subscriber& state_change_subscriber)
+{
+    (bus_dir == audio::bus_direction::input ? m_inputs : m_outputs) = bus_ids;
+
+    auto visitor = overload{
+            [this](algorithm::edit_script_deletion const& del) {
+                buses()->remove(del.pos);
+            },
+            [this,
+             &state_change_subscriber](algorithm::edit_script_insertion<
+                                       runtime::mixer::bus_id> const& ins) {
+                auto busName = std::make_unique<BusName>(
+                        dispatch(),
+                        state_change_subscriber,
+                        ins.value);
+
+                QObject::connect(
+                        this,
+                        &FxChain::subscribedChanged,
+                        busName.get(),
+                        [this, name = busName.get()]() {
+                            name->setSubscribed(subscribed());
+                        });
+
+                buses()->add(ins.pos, std::move(busName));
+            }};
+
+    runtime::mixer::bus_list_t all;
+    all.reserve(m_inputs.size() + m_outputs.size());
+    boost::push_back(all, m_inputs);
+    boost::push_back(all, m_outputs);
+
+    algorithm::apply_edit_script(algorithm::edit_script(m_all, all), visitor);
+
+    m_all = all;
+}
+
+void
+FxChain::selectBus(int pos)
+{
+    runtime::actions::select_fx_chain_bus action;
+
+    if (auto const index = static_cast<std::size_t>(pos); index < m_all.size())
+    {
+        action.bus_id = m_all[index];
+    }
+
+    dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

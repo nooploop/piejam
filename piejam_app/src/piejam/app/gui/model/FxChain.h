@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
+#include <piejam/container/box.h>
 #include <piejam/gui/model/FxChain.h>
 #include <piejam/runtime/subscriber.h>
 
@@ -29,11 +30,22 @@ class FxChain final : public Subscribable<piejam::gui::model::FxChain>
 public:
     FxChain(runtime::store_dispatch, runtime::subscriber&);
 
+    void selectBus(int) override;
+
 private:
     void subscribeStep(
             runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) override;
+
+    void updateBuses(
+            audio::bus_direction,
+            container::box<runtime::mixer::bus_list_t> const&,
+            runtime::subscriber&);
+
+    runtime::mixer::bus_list_t m_inputs;
+    runtime::mixer::bus_list_t m_outputs;
+    runtime::mixer::bus_list_t m_all;
 };
 
 } // namespace piejam::app::gui::model

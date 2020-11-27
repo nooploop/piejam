@@ -201,7 +201,7 @@ namespace detail
 
 template <class T>
 auto
-prepare_edit_script_ops_for_linear_execution(edit_script_ops<T>&& ops)
+prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> ops)
         -> edit_script_ops<T>
 {
     struct
@@ -223,55 +223,14 @@ prepare_edit_script_ops_for_linear_execution(edit_script_ops<T>&& ops)
     return ops;
 }
 
-template <class T>
-auto
-prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> const& ops)
-        -> edit_script_ops<T>
-{
-    struct
-    {
-        std::size_t deletion_offset{};
-
-        auto operator()(edit_script_deletion const& del)
-        {
-            return edit_script_deletion{del.pos - deletion_offset++};
-        }
-
-        auto operator()(edit_script_insertion<T> const& ins)
-        {
-            --deletion_offset;
-            return ins;
-        }
-    } visitor;
-
-    edit_script_ops<T> result;
-    result.reserve(ops.size());
-
-    std::ranges::transform(
-            ops,
-            std::back_inserter(result),
-            [&visitor](auto const& op) { return std::visit(visitor, op); });
-
-    return result;
-}
-
 } // namespace detail
 
 template <class T, class Visitor>
 auto
-apply_edit_script(edit_script_ops<T>&& ops, Visitor&& v)
+apply_edit_script(edit_script_ops<T> ops, Visitor&& v)
 {
     for (auto const& op :
          detail::prepare_edit_script_ops_for_linear_execution(std::move(ops)))
-        std::visit(std::forward<Visitor>(v), op);
-}
-
-template <class T, class Visitor>
-auto
-apply_edit_script(edit_script_ops<T> const& ops, Visitor&& v)
-{
-    for (auto const& op :
-         detail::prepare_edit_script_ops_for_linear_execution(ops))
         std::visit(std::forward<Visitor>(v), op);
 }
 

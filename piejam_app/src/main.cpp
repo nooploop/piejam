@@ -23,6 +23,7 @@
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
 #include <piejam/gui/model/BusConfig.h>
+#include <piejam/gui/model/BusName.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/qt_log.h>

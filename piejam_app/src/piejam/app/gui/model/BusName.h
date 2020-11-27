@@ -18,16 +18,16 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/gui/model/BusConfig.h>
+#include <piejam/gui/model/BusName.h>
 #include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {
 
-class BusConfig final : public Subscribable<piejam::gui::model::BusConfig>
+class BusName final : public Subscribable<piejam::gui::model::BusName>
 {
 public:
-    BusConfig(
+    BusName(
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::bus_id);

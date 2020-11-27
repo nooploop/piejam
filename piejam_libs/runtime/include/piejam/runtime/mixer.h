@@ -51,7 +51,7 @@ struct bus
     //! mono channels hold same device channel in the pair
     channel_index_pair device_channels{npos};
 
-    fx::chain_t fx_chain{};
+    container::box<fx::chain_t> fx_chain{};
 };
 
 struct state

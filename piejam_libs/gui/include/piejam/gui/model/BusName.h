@@ -17,28 +17,37 @@
 
 #pragma once
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/gui/model/BusConfig.h>
-#include <piejam/runtime/subscriber.h>
+#include <piejam/gui/model/SubscribableModel.h>
 
-namespace piejam::app::gui::model
+namespace piejam::gui::model
 {
 
-class BusConfig final : public Subscribable<piejam::gui::model::BusConfig>
+class BusName : public SubscribableModel
 {
+    Q_OBJECT
+
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
+
 public:
-    BusConfig(
-            runtime::store_dispatch,
-            runtime::subscriber&,
-            runtime::mixer::bus_id);
+    using SubscribableModel::SubscribableModel;
+
+    auto name() const noexcept -> QString const& { return m_name; }
+    void setName(QString const& x)
+    {
+        if (m_name != x)
+        {
+            m_name = x;
+            emit nameChanged();
+        }
+    }
+
+    auto toQString() const -> QString { return m_name; }
+
+signals:
+    void nameChanged();
 
 private:
-    void subscribeStep(
-            runtime::subscriber&,
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
-
-    runtime::mixer::bus_id m_bus_id;
+    QString m_name;
 };
 
-} // namespace piejam::app::gui::model
+} // namespace piejam::gui::model

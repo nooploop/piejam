@@ -22,6 +22,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioDeviceSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioInputOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusConfig.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusName.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/GenericListModel.h

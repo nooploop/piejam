@@ -18,6 +18,7 @@
 #include <piejam/runtime/audio_state.h>
 
 #include <piejam/indexed_access.h>
+#include <piejam/runtime/fx/gain.h>
 
 #include <algorithm>
 
@@ -67,6 +68,12 @@ period_sizes_from_state(audio_state const& state) -> audio::period_sizes_t
     return period_sizes(state.input.hw_params, state.output.hw_params);
 }
 
+static auto
+make_fx_gain(audio_state& st)
+{
+    return st.fx_modules.add(fx::make_gain_module(st.float_params));
+}
+
 static void
 remove_fx_module(audio_state& st, fx::module_id id)
 {
@@ -85,7 +92,7 @@ add_mixer_bus(
         audio_state& st,
         std::string name,
         audio::bus_type type,
-        channel_index_pair chs)
+        channel_index_pair const& chs)
 {
     mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
     bus_ids.emplace_back(st.mixer_state.buses.add(mixer::bus{
@@ -102,7 +109,8 @@ add_mixer_bus(
                     parameter::bool_{.default_value = false}),
             .level = st.levels.add(parameter::stereo_level{}),
             .type = type,
-            .device_channels = std::move(chs)}));
+            .device_channels = chs,
+            .fx_chain = fx::chain_t{make_fx_gain(st)}}));
     mixer::bus_ids<D>(st.mixer_state) = bus_ids;
 }
 
@@ -110,12 +118,12 @@ template void add_mixer_bus<audio::bus_direction::input>(
         audio_state&,
         std::string,
         audio::bus_type,
-        channel_index_pair);
+        channel_index_pair const&);
 template void add_mixer_bus<audio::bus_direction::output>(
         audio_state&,
         std::string,
         audio::bus_type,
-        channel_index_pair);
+        channel_index_pair const&);
 
 template <audio::bus_direction D>
 void
@@ -138,8 +146,11 @@ remove_mixer_bus(audio_state& st, std::size_t index)
     st.bool_params.remove(bus->mute);
     st.levels.remove(bus->level);
 
-    for (auto&& fx_mod_id : bus->fx_chain)
+    for (auto&& fx_mod_id : *bus->fx_chain)
         remove_fx_module(st, fx_mod_id);
+
+    if (st.fx_chain_bus == bus_id)
+        st.fx_chain_bus = {};
 
     st.mixer_state.buses.remove(bus_id);
     erase_at(bus_ids, index);

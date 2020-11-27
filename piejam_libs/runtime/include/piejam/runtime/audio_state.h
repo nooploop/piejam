@@ -56,6 +56,8 @@ struct audio_state
 
     mixer::state mixer_state{};
 
+    mixer::bus_id fx_chain_bus{};
+
     std::size_t xruns{};
     float cpu_load{};
 };
@@ -77,7 +79,7 @@ void add_mixer_bus(
         audio_state&,
         std::string name,
         audio::bus_type type,
-        channel_index_pair chs = channel_index_pair{npos});
+        channel_index_pair const& chs = channel_index_pair{npos});
 
 template <audio::bus_direction D>
 void remove_mixer_bus(audio_state&, std::size_t index);

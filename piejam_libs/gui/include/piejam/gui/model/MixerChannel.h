@@ -59,6 +59,8 @@ public:
     auto solo() const noexcept -> bool { return m_solo; }
     void setSolo(bool);
 
+    auto toQString() const -> QString { return m_name; }
+
 signals:
 
     void nameChanged();

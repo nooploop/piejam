@@ -38,12 +38,7 @@ public:
         ItemRole = Qt::UserRole
     };
 
-    GenericListModel(QObject* parent = nullptr)
-        : QAbstractListModel(parent)
-    {
-    }
-
-    ~GenericListModel() = default;
+    using QAbstractListModel::QAbstractListModel;
 
     auto rowCount(QModelIndex const& = QModelIndex()) const -> int override
     {
@@ -55,6 +50,8 @@ public:
     {
         switch (role)
         {
+            case Qt::DisplayRole:
+                return QVariant::fromValue(m_list[index.row()]->toQString());
             case ItemRole:
                 return QVariant::fromValue(m_list[index.row()].get());
             default:
@@ -64,7 +61,9 @@ public:
 
     auto roleNames() const -> QHash<int, QByteArray> override
     {
-        static QHash<int, QByteArray> s_roles = {{ItemRole, "item"}};
+        static QHash<int, QByteArray> s_roles = {
+                {Qt::DisplayRole, "display"},
+                {ItemRole, "item"}};
         return s_roles;
     }
 
@@ -90,6 +89,11 @@ public:
         BOOST_ASSERT(!m_list.empty());
         erase_at(m_list, pos);
         endRemoveRows();
+    }
+
+    auto at(std::size_t pos) const -> ListItem const&
+    {
+        return *m_list.at(pos);
     }
 
 private:

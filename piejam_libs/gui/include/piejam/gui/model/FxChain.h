@@ -29,12 +29,32 @@ class FxChain : public SubscribableModel
     Q_OBJECT
 
     Q_PROPERTY(QAbstractListModel* modules READ modules CONSTANT)
+    Q_PROPERTY(QAbstractListModel* buses READ buses CONSTANT)
+    Q_PROPERTY(int selectedBus READ selectedBus NOTIFY selectedBusChanged FINAL)
 
 public:
     auto modules() -> FxModulesList* { return &m_modules; }
+    auto buses() -> BusNamesList* { return &m_buses; }
+
+    auto selectedBus() const noexcept -> int { return m_selectedBus; }
+    void setSelectedBus(int bus)
+    {
+        if (m_selectedBus != bus)
+        {
+            m_selectedBus = bus;
+            emit selectedBusChanged();
+        }
+    }
+
+    Q_INVOKABLE virtual void selectBus(int) = 0;
+
+signals:
+    void selectedBusChanged();
 
 private:
     FxModulesList m_modules;
+    BusNamesList m_buses;
+    int m_selectedBus{-1};
 };
 
 } // namespace piejam::gui::model

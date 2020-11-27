@@ -22,6 +22,8 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/AudioInputOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/BusConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/BusConfig.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/BusName.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/BusName.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxChain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxChain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.cpp

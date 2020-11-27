@@ -65,6 +65,8 @@ TopPane {
                 anchors.left: parent.left
                 anchors.leftMargin: 4
 
+                visible: root.model.selectedBus !== -1
+
                 text: "+"
             }
         }
@@ -84,7 +86,12 @@ TopPane {
             width: 128
             height: 48
 
-            model: root.model.channels
+            currentIndex: root.model.selectedBus
+            model: root.model.buses
+
+            textRole: "display"
+
+            onActivated: root.model.selectBus(index)
         }
 
         LevelMeterFader {
@@ -95,5 +102,12 @@ TopPane {
             width: 128
             height: 340
         }
+    }
+
+    Binding {
+        when: root.model
+        target: root.model
+        property: "subscribed"
+        value: root.visible
     }
 }

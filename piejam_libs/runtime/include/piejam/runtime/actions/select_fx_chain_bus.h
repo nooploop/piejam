@@ -17,28 +17,20 @@
 
 #pragma once
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/gui/model/BusConfig.h>
-#include <piejam/runtime/subscriber.h>
+#include <piejam/entity_id.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
-namespace piejam::app::gui::model
+namespace piejam::runtime::actions
 {
 
-class BusConfig final : public Subscribable<piejam::gui::model::BusConfig>
+struct select_fx_chain_bus final
+    : ui::cloneable_action<select_fx_chain_bus, action>
 {
-public:
-    BusConfig(
-            runtime::store_dispatch,
-            runtime::subscriber&,
-            runtime::mixer::bus_id);
+    mixer::bus_id bus_id{};
 
-private:
-    void subscribeStep(
-            runtime::subscriber&,
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
-
-    runtime::mixer::bus_id m_bus_id;
+    auto reduce(audio_state const&) const -> audio_state override;
 };
 
-} // namespace piejam::app::gui::model
+} // namespace piejam::runtime::actions

@@ -50,6 +50,8 @@ struct entity_id
         return m_id < other.m_id;
     }
 
+    constexpr operator bool() const noexcept { return m_id; }
+
     static auto generate() noexcept -> entity_id<EntityTag>
     {
         static id_t s_id{};

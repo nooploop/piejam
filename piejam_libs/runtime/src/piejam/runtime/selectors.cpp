@@ -191,6 +191,10 @@ const selector<bool> select_input_solo_active([](audio_state const& st) {
     return st.mixer_state.input_solo_id != mixer::bus_id{};
 });
 
+const selector<mixer::bus_id> select_fx_chain_bus([](audio_state const& st) {
+    return st.fx_chain_bus;
+});
+
 const selector<std::size_t> select_xruns([](audio_state const& st) {
     return st.xruns;
 });
@@ -199,4 +203,4 @@ const selector<float> select_cpu_load([](audio_state const& st) {
     return st.cpu_load;
 });
 
-} // namespace piejam::runtime::audio_state_selectors
+} // namespace piejam::runtime::selectors

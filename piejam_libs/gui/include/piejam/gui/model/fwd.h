@@ -34,4 +34,7 @@ using MixerChannelsList = GenericListModel<MixerChannel>;
 class BusConfig;
 using BusConfigsList = GenericListModel<BusConfig>;
 
+class BusName;
+using BusNamesList = GenericListModel<BusName>;
+
 } // namespace piejam::gui::model
