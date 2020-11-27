@@ -48,7 +48,7 @@ public:
     auto event_inputs() const -> endpoints override { return m_event_inputs; }
     auto event_outputs() const -> endpoints override { return {}; }
 
-    void connect(audio::engine::graph& g) override
+    void connect(audio::engine::graph& g) const override
     {
         m_mute_solo_amp->connect(g);
 

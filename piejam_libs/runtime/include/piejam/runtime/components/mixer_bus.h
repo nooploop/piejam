@@ -18,26 +18,20 @@
 #pragma once
 
 #include <piejam/audio/engine/fwd.h>
+#include <piejam/audio/types.h>
+#include <piejam/runtime/fwd.h>
 
-#include <span>
+#include <memory>
+#include <string_view>
 
-namespace piejam::audio::engine
+namespace piejam::runtime::components
 {
 
-class component
-{
-public:
-    using endpoints = std::span<graph_endpoint const>;
+auto make_mixer_bus(audio::samplerate_t const samplerate,
+                    mixer::bus_id bus_id,
+                    mixer::bus const& channel,
+                    parameter_processor_factory& param_procs,
+                    std::string_view const& name = {})
+        -> std::unique_ptr<audio::engine::component>;
 
-    virtual ~component() = default;
-
-    virtual auto inputs() const -> endpoints = 0;
-    virtual auto outputs() const -> endpoints = 0;
-
-    virtual auto event_inputs() const -> endpoints = 0;
-    virtual auto event_outputs() const -> endpoints = 0;
-
-    virtual void connect(graph&) const = 0;
-};
-
-} // namespace piejam::audio::engine
+} // namespace piejam::runtime::components

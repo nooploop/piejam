@@ -17,6 +17,8 @@
 
 #include <piejam/runtime/audio_state.h>
 
+#include <piejam/indexed_access.h>
+
 #include <algorithm>
 
 namespace piejam::runtime
@@ -85,20 +87,20 @@ add_mixer_bus(
         audio::bus_type type,
         channel_index_pair chs)
 {
-    auto volume_id = st.float_params.add(
-            parameter::float_{.default_value = 1.f, .min = 0.f, .max = 8.f});
-    auto pan_balance_id = st.float_params.add(
-            parameter::float_{.default_value = 0.f, .min = -1.f, .max = 1.f});
-    auto mute_id = st.bool_params.add(parameter::bool_{.default_value = false});
-    auto level_id = st.levels.add(parameter::stereo_level{});
-
     mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
     bus_ids.emplace_back(st.mixer_state.buses.add(mixer::bus{
             .name = std::move(name),
-            .volume = volume_id,
-            .pan_balance = pan_balance_id,
-            .mute = mute_id,
-            .level = level_id,
+            .volume = st.float_params.add(parameter::float_{
+                    .default_value = 1.f,
+                    .min = 0.f,
+                    .max = 8.f}),
+            .pan_balance = st.float_params.add(parameter::float_{
+                    .default_value = 0.f,
+                    .min = -1.f,
+                    .max = 1.f}),
+            .mute = st.bool_params.add(
+                    parameter::bool_{.default_value = false}),
+            .level = st.levels.add(parameter::stereo_level{}),
             .type = type,
             .device_channels = std::move(chs)}));
     mixer::bus_ids<D>(st.mixer_state) = bus_ids;
@@ -140,7 +142,7 @@ remove_mixer_bus(audio_state& st, std::size_t index)
         remove_fx_module(st, fx_mod_id);
 
     st.mixer_state.buses.remove(bus_id);
-    bus_ids.erase(bus_ids.begin() + index);
+    erase_at(bus_ids, index);
 
     mixer::bus_ids<D>(st.mixer_state) = bus_ids;
 }

@@ -66,7 +66,7 @@ public:
 
     auto event_outputs() const -> endpoints override { return {}; }
 
-    void connect(audio::engine::graph& g) override
+    void connect(audio::engine::graph& g) const override
     {
         m_amplifier->connect(g);
 

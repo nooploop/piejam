@@ -53,7 +53,7 @@ public:
     auto event_inputs() const -> endpoints override { return m_event_inputs; }
     auto event_outputs() const -> endpoints override { return {}; }
 
-    void connect(engine::graph& g) override
+    void connect(engine::graph& g) const override
     {
         m_amp_comp->connect(g);
 

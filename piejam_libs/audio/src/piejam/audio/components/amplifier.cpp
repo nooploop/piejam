@@ -50,7 +50,7 @@ public:
     auto event_inputs() const -> endpoints override { return m_event_inputs; }
     auto event_outputs() const -> endpoints override { return {}; }
 
-    void connect(engine::graph& g) override
+    void connect(engine::graph& g) const override
     {
         g.add_wire({*m_gain_proc, 0}, {*m_amp_proc, 1});
     }
@@ -85,7 +85,7 @@ public:
     auto event_inputs() const -> endpoints override { return m_event_inputs; }
     auto event_outputs() const -> endpoints override { return {}; }
 
-    void connect(engine::graph& g) override
+    void connect(engine::graph& g) const override
     {
         g.add_wire({*m_gain_proc, 0}, {*m_left_amp_proc, 1});
         g.add_wire({*m_gain_proc, 0}, {*m_right_amp_proc, 1});
@@ -126,7 +126,7 @@ public:
     auto event_inputs() const -> endpoints override { return m_event_inputs; }
     auto event_outputs() const -> endpoints override { return {}; }
 
-    void connect(engine::graph& g) override
+    void connect(engine::graph& g) const override
     {
         g.add_wire({*m_left_gain_proc, 0}, {*m_left_amp_proc, 1});
         g.add_wire({*m_right_gain_proc, 0}, {*m_right_amp_proc, 1});

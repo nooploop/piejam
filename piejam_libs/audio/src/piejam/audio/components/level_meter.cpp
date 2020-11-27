@@ -54,7 +54,7 @@ public:
     auto event_inputs() const -> endpoints override { return {}; }
     auto event_outputs() const -> endpoints override { return m_event_outputs; }
 
-    void connect(engine::graph& g) override
+    void connect(engine::graph& g) const override
     {
         g.add_event_wire({*m_left_lm_proc, 0}, {*m_level_convert_proc, 0});
         g.add_event_wire({*m_right_lm_proc, 0}, {*m_level_convert_proc, 1});
