@@ -18,6 +18,7 @@
 #include <piejam/gui/model/BusConfigsList.h>
 
 #include <piejam/gui/model/BusConfig.h>
+#include <piejam/indexed_access.h>
 
 #include <boost/assert.hpp>
 
@@ -67,7 +68,7 @@ BusConfigsList::addBusConfig(
             static_cast<int>(pos),
             static_cast<int>(pos));
     BOOST_ASSERT(busConfig);
-    m_list.insert(std::next(m_list.begin(), pos), std::move(busConfig));
+    insert_at(m_list, pos, std::move(busConfig));
     endInsertRows();
 }
 
@@ -80,7 +81,7 @@ BusConfigsList::removeBusConfig(std::size_t const pos)
             static_cast<int>(pos),
             static_cast<int>(pos));
     BOOST_ASSERT(!m_list.empty());
-    m_list.erase(std::next(m_list.begin(), pos));
+    erase_at(m_list, pos);
     endRemoveRows();
 }
 

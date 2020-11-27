@@ -21,6 +21,7 @@
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/box.h>
+#include <piejam/indexed_access.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/float_.h>
@@ -115,7 +116,7 @@ remove_mixer_bus(audio_state& st, std::size_t index)
     st.bool_params.remove(bus.mute);
     st.levels.remove(bus.level);
     st.mixer_state.buses.remove(bus_id);
-    bus_ids.erase(bus_ids.begin() + index);
+    erase_at(bus_ids, index);
 
     mixer::bus_ids<D>(st.mixer_state) = bus_ids;
 }

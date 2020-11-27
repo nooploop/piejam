@@ -40,5 +40,5 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
 )
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(piejam_gui Qt5::Quick Qt5::QuickControls2 Qt5::VirtualKeyboard fmt spdlog::spdlog)
+target_link_libraries(piejam_gui Qt5::Quick Qt5::QuickControls2 Qt5::VirtualKeyboard fmt spdlog::spdlog piejam_base)
 target_compile_options(piejam_gui PRIVATE -Wall -Wextra -Werror -pedantic-errors)
