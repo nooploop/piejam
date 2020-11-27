@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include <QObject>
+#include <piejam/gui/model/SubscribableModel.h>
+
 #include <QStringList>
 
 #include <memory>
@@ -27,7 +28,7 @@
 namespace piejam::gui::model
 {
 
-class Info : public QObject
+class Info : public SubscribableModel
 {
     Q_OBJECT
 

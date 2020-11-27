@@ -19,14 +19,14 @@
 
 #include <piejam/gui/model/StringList.h>
 
-#include <QObject>
+#include <piejam/gui/model/SubscribableModel.h>
 
 #include <memory>
 
 namespace piejam::gui::model
 {
 
-class AudioSettings : public QObject
+class AudioDeviceSettings : public SubscribableModel
 {
     Q_OBJECT
 
@@ -52,7 +52,6 @@ public:
     virtual Q_INVOKABLE void selectPeriodSize(unsigned index) = 0;
 
 signals:
-
     void inputDevicesChanged();
     void outputDevicesChanged();
     void sampleratesChanged();

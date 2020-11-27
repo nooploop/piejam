@@ -20,11 +20,6 @@
 namespace piejam::gui::model
 {
 
-MixerChannel::MixerChannel(QObject* parent)
-    : QObject(parent)
-{
-}
-
 void
 MixerChannel::setName(QString const& x)
 {

@@ -18,32 +18,26 @@
 #pragma once
 
 #include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/runtime/actions/renotify.h>
 #include <piejam/runtime/store_dispatch.h>
 #include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {
 
-class Subscribable
+template <class Model>
+class Subscribable : public Model
 {
 public:
-    Subscribable(runtime::store_dispatch, runtime::subscriber&);
-    virtual ~Subscribable();
-
-    auto subscribed() const -> bool { return m_subscribed; }
-    void setSubscribed(bool subs)
+    Subscribable(
+            runtime::store_dispatch store_dispatch,
+            runtime::subscriber& state_change_subscriber)
+        : m_store_dispatch(store_dispatch)
+        , m_state_change_subscriber(state_change_subscriber)
     {
-        if (subscribed() != subs)
-        {
-            if (subs)
-                subscribe();
-            else
-                unsubscribe();
-
-            emitSubscribedChangedSignal();
-        }
     }
 
+protected:
     auto dispatch() const noexcept -> runtime::store_dispatch
     {
         return m_store_dispatch;
@@ -51,17 +45,20 @@ public:
 
     auto dispatch(runtime::action const& a) const { m_store_dispatch(a); }
 
-protected:
     virtual void subscribeStep(
             runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) = 0;
 
-    virtual void emitSubscribedChangedSignal() = 0;
-
 private:
-    void subscribe();
-    void unsubscribe();
+    void subscribe() override
+    {
+        subscribeStep(m_state_change_subscriber, m_subs, m_subs_id);
+
+        m_store_dispatch(runtime::actions::renotify{});
+    }
+
+    void unsubscribe() override { m_subs.erase(m_subs_id); }
 
     runtime::store_dispatch m_store_dispatch;
     runtime::subscriber& m_state_change_subscriber;

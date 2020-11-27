@@ -18,9 +18,8 @@
 #pragma once
 
 #include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
-
-#include <QObject>
 
 #include <memory>
 #include <vector>
@@ -28,7 +27,7 @@
 namespace piejam::gui::model
 {
 
-class Mixer : public QObject
+class Mixer : public SubscribableModel
 {
     Q_OBJECT
 

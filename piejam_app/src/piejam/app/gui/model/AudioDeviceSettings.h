@@ -24,13 +24,8 @@ namespace piejam::app::gui::model
 {
 
 class AudioDeviceSettings final
-    : public piejam::gui::model::AudioSettings
-    , public Subscribable
+    : public Subscribable<piejam::gui::model::AudioDeviceSettings>
 {
-    Q_OBJECT
-
-    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
-                       subscribedChanged)
 public:
     AudioDeviceSettings(runtime::store_dispatch, runtime::subscriber&);
 
@@ -40,16 +35,11 @@ public:
     virtual void selectSamplerate(unsigned index) override;
     virtual void selectPeriodSize(unsigned index) override;
 
-signals:
-    void subscribedChanged();
-
 private:
     void subscribeStep(
             runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) override;
-
-    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 };
 
 } // namespace piejam::app::gui::model

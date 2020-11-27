@@ -26,14 +26,8 @@ namespace piejam::app::gui::model
 {
 
 class AudioInputOutputSettings
-    : public piejam::gui::model::AudioInputOutputSettings
-    , public Subscribable
+    : public Subscribable<piejam::gui::model::AudioInputOutputSettings>
 {
-    Q_OBJECT
-
-    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
-                       subscribedChanged)
-
 protected:
     AudioInputOutputSettings(
             runtime::store_dispatch,
@@ -49,16 +43,11 @@ public:
     void addStereoBus() override;
     void deleteBus(unsigned bus) override;
 
-signals:
-    void subscribedChanged();
-
 private:
     void subscribeStep(
             runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) override;
-
-    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
     void selectChannel(audio::bus_channel, unsigned bus, unsigned ch);
     void addBus(audio::bus_type);

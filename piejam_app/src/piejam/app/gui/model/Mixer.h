@@ -24,30 +24,19 @@
 namespace piejam::app::gui::model
 {
 
-class Mixer final
-    : public piejam::gui::model::Mixer
-    , public Subscribable
+class Mixer final : public Subscribable<piejam::gui::model::Mixer>
 {
-    Q_OBJECT
-
-    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
-                       subscribedChanged)
 public:
     Mixer(runtime::store_dispatch, runtime::subscriber&);
 
     void setInputSolo(unsigned index) override;
     void requestLevelsUpdate() override;
 
-signals:
-    void subscribedChanged();
-
 private:
     void subscribeStep(
             runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) override;
-
-    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
     runtime::mixer::bus_list_t m_inputs;
     runtime::mixer::bus_list_t m_outputs;

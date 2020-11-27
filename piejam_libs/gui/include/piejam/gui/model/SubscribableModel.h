@@ -17,25 +17,46 @@
 
 #pragma once
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/gui/model/Info.h>
-#include <piejam/runtime/subscriber.h>
+#include <QObject>
 
-namespace piejam::app::gui::model
+namespace piejam::gui::model
 {
 
-class Info final : public Subscribable<piejam::gui::model::Info>
+class SubscribableModel : public QObject
 {
+    Q_OBJECT
+
+    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
+                       subscribedChanged)
+
 public:
-    Info(runtime::store_dispatch, runtime::subscriber&);
+    using QObject::QObject;
 
-    void requestUpdate() override;
+    auto subscribed() const -> bool { return m_subscribed; }
+    void setSubscribed(bool subs)
+    {
+        if (m_subscribed != subs)
+        {
+            if (subs)
+                subscribe();
+            else
+                unsubscribe();
+
+            m_subscribed = subs;
+
+            emit subscribedChanged();
+        }
+    }
+
+signals:
+    void subscribedChanged();
+
+protected:
+    virtual void subscribe() = 0;
+    virtual void unsubscribe() = 0;
 
 private:
-    void subscribeStep(
-            runtime::subscriber&,
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
+    bool m_subscribed{};
 };
 
-} // namespace piejam::app::gui::model
+} // namespace piejam::gui::model

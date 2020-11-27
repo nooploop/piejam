@@ -18,9 +18,9 @@
 #pragma once
 
 #include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
-#include <QObject>
 #include <QStringList>
 
 #include <memory>
@@ -29,7 +29,7 @@
 namespace piejam::gui::model
 {
 
-class AudioInputOutputSettings : public QObject
+class AudioInputOutputSettings : public SubscribableModel
 {
     Q_OBJECT
 
@@ -53,7 +53,6 @@ public:
     Q_INVOKABLE virtual void deleteBus(unsigned bus) = 0;
 
 signals:
-
     void channelsChanged();
 
 private:

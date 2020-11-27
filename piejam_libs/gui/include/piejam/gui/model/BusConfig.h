@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <QObject>
+#include <piejam/gui/model/SubscribableModel.h>
 
 namespace piejam::gui::model
 {
 
-class BusConfig : public QObject
+class BusConfig : public SubscribableModel
 {
     Q_OBJECT
 
@@ -35,7 +35,7 @@ class BusConfig : public QObject
                        stereoRightChannelChanged FINAL)
 
 public:
-    BusConfig(QObject* parent = nullptr);
+    using SubscribableModel::SubscribableModel;
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const&);

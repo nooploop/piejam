@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <QObject>
+#include <piejam/gui/model/SubscribableModel.h>
 
 namespace piejam::gui::model
 {
 
-class MixerChannel : public QObject
+class MixerChannel : public SubscribableModel
 {
     Q_OBJECT
 
@@ -35,7 +35,7 @@ class MixerChannel : public QObject
     Q_PROPERTY(bool solo READ solo NOTIFY soloChanged FINAL)
 
 public:
-    MixerChannel(QObject* parent = nullptr);
+    using SubscribableModel::SubscribableModel;
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const&);

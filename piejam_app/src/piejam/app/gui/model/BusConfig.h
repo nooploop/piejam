@@ -27,30 +27,19 @@
 namespace piejam::app::gui::model
 {
 
-class BusConfig final
-    : public piejam::gui::model::BusConfig
-    , public Subscribable
+class BusConfig final : public Subscribable<piejam::gui::model::BusConfig>
 {
-    Q_OBJECT
-
-    Q_PROPERTY(bool subscribed READ subscribed WRITE setSubscribed NOTIFY
-                       subscribedChanged)
 public:
     BusConfig(
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::bus_id);
 
-signals:
-    void subscribedChanged();
-
 private:
     void subscribeStep(
             runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) override;
-
-    void emitSubscribedChangedSignal() override { emit subscribedChanged(); }
 
     runtime::mixer::bus_id m_bus_id;
 };

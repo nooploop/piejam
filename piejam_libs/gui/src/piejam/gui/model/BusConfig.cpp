@@ -20,11 +20,6 @@
 namespace piejam::gui::model
 {
 
-BusConfig::BusConfig(QObject* parent)
-    : QObject(parent)
-{
-}
-
 void
 BusConfig::setName(QString const& x)
 {
