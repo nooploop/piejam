@@ -17,17 +17,35 @@
 
 #pragma once
 
-#include <QObject>
+#include <piejam/gui/model/SubscribableModel.h>
 
 namespace piejam::gui::model
 {
 
-class FxModule : public QObject
+class FxModule : public SubscribableModel
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
+
 public:
-    auto toQString() const -> QString { return QString(); }
+    auto name() const noexcept -> QString const& { return m_name; }
+    void setName(QString const& x)
+    {
+        if (m_name != x)
+        {
+            m_name = x;
+            emit nameChanged();
+        }
+    }
+
+    auto toQString() const -> QString { return m_name; }
+
+signals:
+    void nameChanged();
+
+private:
+    QString m_name;
 };
 
 } // namespace piejam::gui::model

@@ -17,36 +17,29 @@
 
 #pragma once
 
-#include <piejam/container/boxed_string.h>
-#include <piejam/entity_id.h>
-#include <piejam/runtime/fx/type.h>
-#include <piejam/runtime/parameters.h>
+#include <piejam/app/gui/model/Subscribable.h>
+#include <piejam/gui/model/FxModule.h>
+#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/subscriber.h>
 
-#include <boost/container/flat_map.hpp>
-
-#include <string>
-#include <vector>
-
-namespace piejam::runtime::fx
+namespace piejam::app::gui::model
 {
 
-struct parameter
+class FxModule final : public Subscribable<piejam::gui::model::FxModule>
 {
-    float_parameter_id id;
-    std::string name;
+public:
+    FxModule(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::fx::module_id);
+
+private:
+    void subscribeStep(
+            runtime::subscriber&,
+            runtime::subscriptions_manager&,
+            runtime::subscription_id) override;
+
+    runtime::fx::module_id m_fx_mod_id;
 };
 
-using parameter_key = std::size_t;
-
-struct module
-{
-    type fx_type;
-    container::boxed_string name;
-    boost::container::flat_map<parameter_key, parameter> parameters;
-};
-
-using module_id = entity_id<module>;
-using modules_t = entity_map<module, module>;
-using chain_t = std::vector<module_id>;
-
-} // namespace piejam::runtime::fx
+} // namespace piejam::app::gui::model

@@ -77,6 +77,11 @@ extern const selector<bool> select_input_solo_active;
 
 extern const selector<mixer::bus_id> select_fx_chain_bus;
 
+extern const selector<container::box<fx::chain_t>> select_current_fx_chain;
+
+auto make_fx_module_name_selector(fx::module_id)
+        -> selector<container::boxed_string>;
+
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;
 

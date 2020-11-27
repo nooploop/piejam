@@ -29,6 +29,7 @@ make_gain_module(float_parameters& float_params) -> module
 {
     module mod;
     mod.fx_type = type::gain;
+    mod.name = std::string("gain");
 
     mod.parameters.emplace(
             static_cast<std::size_t>(gain_parameter_key::gain),

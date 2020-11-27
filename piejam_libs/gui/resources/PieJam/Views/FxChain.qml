@@ -44,8 +44,14 @@ TopPane {
         delegate: FxChainModule {
             height: 412
 
-            name: modelData.name
-            parameters: modelData.parameters
+            name: model.item.name
+            parameters: model.item.parameters
+
+            Binding {
+                target: model.item
+                property: "subscribed"
+                value: visible
+            }
         }
 
         footer: Item {

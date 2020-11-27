@@ -20,6 +20,7 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/container/box.h>
 #include <piejam/gui/model/FxChain.h>
+#include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
@@ -43,9 +44,11 @@ private:
             container::box<runtime::mixer::bus_list_t> const&,
             runtime::subscriber&);
 
-    runtime::mixer::bus_list_t m_inputs;
-    runtime::mixer::bus_list_t m_outputs;
+    container::box<runtime::mixer::bus_list_t> m_inputs;
+    container::box<runtime::mixer::bus_list_t> m_outputs;
     runtime::mixer::bus_list_t m_all;
+
+    container::box<runtime::fx::chain_t> m_fx_chain;
 };
 
 } // namespace piejam::app::gui::model

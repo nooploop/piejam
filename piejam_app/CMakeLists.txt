@@ -26,6 +26,8 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/BusName.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxChain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxChain.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxModule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Mixer.cpp

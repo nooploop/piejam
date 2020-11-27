@@ -195,6 +195,24 @@ const selector<mixer::bus_id> select_fx_chain_bus([](audio_state const& st) {
     return st.fx_chain_bus;
 });
 
+const selector<container::box<fx::chain_t>>
+        select_current_fx_chain([](audio_state const& st) {
+            static container::box<fx::chain_t> s_empty_fx_chain;
+            mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+            return bus ? bus->fx_chain : s_empty_fx_chain;
+        });
+
+auto
+make_fx_module_name_selector(fx::module_id fx_mod_id)
+        -> selector<container::boxed_string>
+{
+    return [fx_mod_id](audio_state const& st) -> container::boxed_string {
+        static container::boxed_string s_empty_name;
+        fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
+        return fx_mod ? fx_mod->name : s_empty_name;
+    };
+}
+
 const selector<std::size_t> select_xruns([](audio_state const& st) {
     return st.xruns;
 });

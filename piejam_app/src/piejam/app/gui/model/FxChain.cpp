@@ -21,8 +21,8 @@
 #include <piejam/algorithm/index_of.h>
 #include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/BusName.h>
+#include <piejam/app/gui/model/FxModule.h>
 #include <piejam/functional/overload.h>
-#include <piejam/gui/model/FxModule.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
 #include <piejam/runtime/selectors.h>
 
@@ -78,6 +78,26 @@ FxChain::subscribeStep(
                 setSelectedBus(static_cast<int>(
                         algorithm::index_of(m_all, fx_chain_bus)));
             });
+
+    subs.observe(
+            subs_id,
+            state_change_subscriber,
+            runtime::selectors::select_current_fx_chain,
+            [this, &state_change_subscriber](
+                    container::box<runtime::fx::chain_t> const& fx_chain) {
+                generic_list_model_edit_script_executor<
+                        piejam::gui::model::FxModule,
+                        FxModule>
+                        visitor{*modules(),
+                                dispatch(),
+                                state_change_subscriber};
+
+                algorithm::apply_edit_script(
+                        algorithm::edit_script(*m_fx_chain, *fx_chain),
+                        visitor);
+
+                m_fx_chain = fx_chain;
+            });
 }
 
 void
@@ -112,9 +132,9 @@ FxChain::updateBuses(
             }};
 
     runtime::mixer::bus_list_t all;
-    all.reserve(m_inputs.size() + m_outputs.size());
-    boost::push_back(all, m_inputs);
-    boost::push_back(all, m_outputs);
+    all.reserve(m_inputs->size() + m_outputs->size());
+    boost::push_back(all, *m_inputs);
+    boost::push_back(all, *m_outputs);
 
     algorithm::apply_edit_script(algorithm::edit_script(m_all, all), visitor);
 
