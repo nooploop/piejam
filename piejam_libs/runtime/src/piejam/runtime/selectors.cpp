@@ -227,8 +227,9 @@ make_fx_module_parameters_selector(fx::module_id fx_mod_id)
 
 auto
 make_fx_parameter_name_selector(
-        fx::module_id fx_mod_id,
-        fx::parameter_key fx_param_key) -> selector<container::boxed_string>
+        fx::module_id const fx_mod_id,
+        fx::parameter_key const fx_param_key)
+        -> selector<container::boxed_string>
 {
     return [fx_mod_id,
             fx_param_key](audio_state const& st) -> container::boxed_string {
@@ -242,6 +243,25 @@ make_fx_parameter_name_selector(
             }
         }
         return s_empty;
+    };
+}
+
+auto
+make_fx_parameter_id_selector(
+        fx::module_id const fx_mod_id,
+        fx::parameter_key const fx_param_key) -> selector<float_parameter_id>
+{
+    return [fx_mod_id,
+            fx_param_key](audio_state const& st) -> float_parameter_id {
+        if (fx::module const* const fx_mod = st.fx_modules[fx_mod_id])
+        {
+            if (auto it = fx_mod->parameters->find(fx_param_key);
+                it != fx_mod->parameters->end())
+            {
+                return it->second.id;
+            }
+        }
+        return {};
     };
 }
 
