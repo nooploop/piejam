@@ -48,16 +48,16 @@ Mixer::subscribe_step()
 
     observe(selectors::make_bus_list_selector(audio::bus_direction::input),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                generic_list_model_edit_script_executor<
-                        piejam::gui::model::MixerChannel,
-                        MixerChannel>
-                        visitor{*inputChannels(),
-                                dispatch(),
-                                state_change_subscriber()};
-
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_inputs, *bus_ids),
-                        visitor);
+                        generic_list_model_edit_script_executor{
+                                *inputChannels(),
+                                [this](runtime::mixer::bus_id bus_id) {
+                                    return std::make_unique<MixerChannel>(
+                                            dispatch(),
+                                            state_change_subscriber(),
+                                            bus_id);
+                                }});
 
                 m_all = m_inputs = bus_ids;
                 boost::push_back(m_all, m_outputs);
@@ -65,16 +65,16 @@ Mixer::subscribe_step()
 
     observe(selectors::make_bus_list_selector(audio::bus_direction::output),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                generic_list_model_edit_script_executor<
-                        piejam::gui::model::MixerChannel,
-                        MixerChannel>
-                        visitor{*outputChannels(),
-                                dispatch(),
-                                state_change_subscriber()};
-
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_outputs, *bus_ids),
-                        visitor);
+                        generic_list_model_edit_script_executor{
+                                *outputChannels(),
+                                [this](runtime::mixer::bus_id bus_id) {
+                                    return std::make_unique<MixerChannel>(
+                                            dispatch(),
+                                            state_change_subscriber(),
+                                            bus_id);
+                                }});
 
                 m_all = m_outputs = bus_ids;
                 boost::push_back(m_all, m_inputs);

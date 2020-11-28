@@ -60,16 +60,16 @@ AudioInputOutputSettings::subscribe_step()
 
     observe(selectors::make_bus_list_selector(m_settings_type),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                generic_list_model_edit_script_executor<
-                        piejam::gui::model::BusConfig,
-                        BusConfig>
-                        visitor{*busConfigs(),
-                                dispatch(),
-                                state_change_subscriber()};
-
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_bus_ids, *bus_ids),
-                        visitor);
+                        generic_list_model_edit_script_executor{
+                                *busConfigs(),
+                                [this](runtime::mixer::bus_id bus_id) {
+                                    return std::make_unique<BusConfig>(
+                                            dispatch(),
+                                            state_change_subscriber(),
+                                            bus_id);
+                                }});
 
                 m_bus_ids = bus_ids;
             });

@@ -23,7 +23,6 @@
 #include <piejam/app/gui/model/BusName.h>
 #include <piejam/app/gui/model/FxModule.h>
 #include <piejam/app/gui/model/FxParameter.h>
-#include <piejam/functional/overload.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
 #include <piejam/runtime/selectors.h>
 
@@ -62,16 +61,16 @@ FxChain::subscribe_step()
 
     observe(runtime::selectors::select_current_fx_chain,
             [this](container::box<runtime::fx::chain_t> const& fx_chain) {
-                generic_list_model_edit_script_executor<
-                        piejam::gui::model::FxModule,
-                        FxModule>
-                        visitor{*modules(),
-                                dispatch(),
-                                state_change_subscriber()};
-
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_fx_chain, *fx_chain),
-                        visitor);
+                        generic_list_model_edit_script_executor{
+                                *modules(),
+                                [this](runtime::fx::module_id fx_mod_id) {
+                                    return std::make_unique<FxModule>(
+                                            dispatch(),
+                                            state_change_subscriber(),
+                                            fx_mod_id);
+                                }});
 
                 m_fx_chain = fx_chain;
             });
@@ -84,28 +83,25 @@ FxChain::updateBuses(
 {
     (bus_dir == audio::bus_direction::input ? m_inputs : m_outputs) = bus_ids;
 
-    auto visitor = overload{
-            [this](algorithm::edit_script_deletion const& del) {
-                buses()->remove(del.pos);
-            },
-            [this](algorithm::edit_script_insertion<
-                    runtime::mixer::bus_id> const& ins) {
-                auto busName = std::make_unique<BusName>(
-                        dispatch(),
-                        state_change_subscriber(),
-                        ins.value);
-
-                connect(*busName);
-
-                buses()->add(ins.pos, std::move(busName));
-            }};
-
     runtime::mixer::bus_list_t all;
     all.reserve(m_inputs->size() + m_outputs->size());
     boost::push_back(all, *m_inputs);
     boost::push_back(all, *m_outputs);
 
-    algorithm::apply_edit_script(algorithm::edit_script(m_all, all), visitor);
+    algorithm::apply_edit_script(
+            algorithm::edit_script(m_all, all),
+            generic_list_model_edit_script_executor{
+                    *buses(),
+                    [this](runtime::mixer::bus_id bus_id) {
+                        auto busName = std::make_unique<BusName>(
+                                dispatch(),
+                                state_change_subscriber(),
+                                bus_id);
+
+                        connect(*busName);
+
+                        return busName;
+                    }});
 
     m_all = all;
 }

@@ -25,12 +25,11 @@
 namespace piejam::app::gui
 {
 
-template <class ListItem, class CreatableListItem = ListItem>
+template <class ListItem, class ListItemFactory>
 struct generic_list_model_edit_script_executor
 {
     piejam::gui::model::GenericListModel<ListItem>& list;
-    runtime::store_dispatch dispatch;
-    runtime::subscriber& state_change_subscriber;
+    ListItemFactory make_list_item;
 
     void operator()(algorithm::edit_script_deletion const& del) const
     {
@@ -41,13 +40,14 @@ struct generic_list_model_edit_script_executor
     void
     operator()(algorithm::edit_script_insertion<EditValue> const& ins) const
     {
-        list.add(
-                ins.pos,
-                std::make_unique<CreatableListItem>(
-                        dispatch,
-                        state_change_subscriber,
-                        ins.value));
+        list.add(ins.pos, make_list_item(ins.value));
     }
 };
+
+template <class ListItem, class ListItemFactory>
+generic_list_model_edit_script_executor(
+        piejam::gui::model::GenericListModel<ListItem>&,
+        ListItemFactory&&)
+        -> generic_list_model_edit_script_executor<ListItem, ListItemFactory>;
 
 } // namespace piejam::app::gui
