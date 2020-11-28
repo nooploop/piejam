@@ -27,23 +27,18 @@ namespace piejam::runtime::fx
 auto
 make_gain_module(float_parameters& float_params) -> module
 {
-    module mod;
-    mod.fx_type = type::gain;
-    mod.name = std::string("gain");
-
-    fx::parameters_t parameters;
-    parameters.emplace(
-            static_cast<std::size_t>(gain_parameter_key::gain),
-            parameter{
-                    .id = float_params.add(runtime::parameter::float_{
-                            .default_value = 1.f,
-                            .min = 0.f,
-                            .max = 8.f}),
-                    .name = "gain"});
-
-    mod.parameters = std::move(parameters);
-
-    return mod;
+    using namespace std::string_literals;
+    return module{
+            .fx_type = type::gain,
+            .name = "gain"s,
+            .parameters = fx::parameters_t{
+                    {static_cast<std::size_t>(gain_parameter_key::gain),
+                     parameter{
+                             .id = float_params.add(runtime::parameter::float_{
+                                     .default_value = 1.f,
+                                     .min = 0.f,
+                                     .max = 8.f}),
+                             .name = "gain"}}}};
 }
 
 } // namespace piejam::runtime::fx
