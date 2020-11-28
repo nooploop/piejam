@@ -72,6 +72,8 @@ private:
     void open_device();
     void start_engine();
 
+    void rebuild();
+
     thread::configuration m_audio_thread_config;
     std::vector<thread::configuration> m_wt_configs;
 

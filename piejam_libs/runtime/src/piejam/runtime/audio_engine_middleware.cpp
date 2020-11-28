@@ -288,34 +288,19 @@ audio_engine_middleware::process_engine_action(
                 m_next(a);
 
                 if (m_engine)
-                {
-                    m_engine->rebuild(
-                            m_get_state().mixer_state,
-                            m_get_state().bool_params,
-                            m_get_state().float_params);
-                }
+                    rebuild();
             },
             [this](actions::add_bus const& a) {
                 m_next(a);
 
                 if (m_engine)
-                {
-                    m_engine->rebuild(
-                            m_get_state().mixer_state,
-                            m_get_state().bool_params,
-                            m_get_state().float_params);
-                }
+                    rebuild();
             },
             [this](actions::delete_bus const& a) {
                 m_next(a);
 
                 if (m_engine)
-                {
-                    m_engine->rebuild(
-                            m_get_state().mixer_state,
-                            m_get_state().bool_params,
-                            m_get_state().float_params);
-                }
+                    rebuild();
             },
             [this](actions::set_bool_parameter const& a) {
                 m_next(a);
@@ -440,11 +425,20 @@ audio_engine_middleware::start_engine()
                     engine->operator()(in, out);
                 });
 
-        m_engine->rebuild(
-                state.mixer_state,
-                state.bool_params,
-                state.float_params);
+        rebuild();
     }
+}
+
+void
+audio_engine_middleware::rebuild()
+{
+    BOOST_ASSERT(m_engine);
+    auto const& st = m_get_state();
+    m_engine->rebuild(
+            st.mixer_state,
+            st.fx_modules,
+            st.bool_params,
+            st.float_params);
 }
 
 } // namespace piejam::runtime

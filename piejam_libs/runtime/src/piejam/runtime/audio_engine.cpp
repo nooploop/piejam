@@ -34,8 +34,10 @@
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/audio/engine/value_output_processor.h>
 #include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/components/fx_gain.h>
 #include <piejam/runtime/components/mixer_bus.h>
 #include <piejam/runtime/components/mute_solo.h>
+#include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameter_processor_factory.h>
@@ -43,18 +45,44 @@
 
 #include <fmt/format.h>
 
+#include <boost/range/algorithm_ext/push_back.hpp>
+
 #include <algorithm>
 #include <fstream>
 #include <optional>
 #include <ranges>
+#include <unordered_map>
 
 namespace piejam::runtime
+{
+
+namespace
 {
 
 namespace ns_ae = audio::engine;
 
 using processor_ptr = std::unique_ptr<audio::engine::processor>;
 using component_ptr = std::unique_ptr<audio::engine::component>;
+
+struct fx_module_component_mapping
+{
+    fx::module_id fx_mod_id;
+    component_ptr component;
+};
+
+using fx_chain_components = std::vector<fx_module_component_mapping>;
+
+using fx_chains_map = std::unordered_map<mixer::bus_id, fx_chain_components>;
+
+struct mixer_bus_component_mapping
+{
+    mixer::bus_id bus_id;
+    component_ptr component;
+};
+
+using mixer_bus_components = std::vector<mixer_bus_component_mapping>;
+
+} // namespace
 
 struct audio_engine::impl
 {
@@ -66,8 +94,9 @@ struct audio_engine::impl
 
     audio::engine::process process;
 
-    std::vector<std::pair<mixer::bus_id, component_ptr>> input_buses;
-    std::vector<std::pair<mixer::bus_id, component_ptr>> output_buses;
+    mixer_bus_components input_buses;
+    mixer_bus_components output_buses;
+    fx_chains_map fx_chains;
     std::unique_ptr<audio::engine::value_input_processor<mixer::bus_id>>
             input_solo_index_proc;
     std::vector<processor_ptr> mixer_procs;
@@ -79,14 +108,13 @@ struct audio_engine::impl
 
 static auto
 make_mixer_bus_vector(
-        std::vector<std::pair<mixer::bus_id, component_ptr>>& prev_buses,
+        mixer_bus_components& prev_buses,
         unsigned const samplerate,
         mixer::buses_t const& buses,
         mixer::bus_list_t const& bus_ids,
-        parameter_processor_factory& param_procs)
-        -> std::vector<std::pair<mixer::bus_id, component_ptr>>
+        parameter_processor_factory& param_procs) -> mixer_bus_components
 {
-    std::vector<std::pair<mixer::bus_id, component_ptr>> result;
+    mixer_bus_components result;
     result.reserve(bus_ids.size());
 
     for (auto const& id : bus_ids)
@@ -94,7 +122,7 @@ make_mixer_bus_vector(
         if (auto it = std::ranges::find(
                     prev_buses,
                     id,
-                    &std::pair<mixer::bus_id, component_ptr>::first);
+                    &mixer_bus_component_mapping::bus_id);
             it != prev_buses.end())
         {
             result.emplace_back(std::move(*it));
@@ -116,13 +144,74 @@ make_mixer_bus_vector(
 }
 
 static auto
+make_fx_chains_map(
+        fx_chains_map& prev_fx_chains,
+        fx::modules_t const& fx_modules,
+        mixer::buses_t const& buses,
+        mixer::bus_list_t const& inputs,
+        mixer::bus_list_t const& outputs,
+        parameter_processor_factory& param_procs) -> fx_chains_map
+{
+    mixer::bus_list_t all_ids;
+    all_ids.reserve(inputs.size() + outputs.size());
+    boost::push_back(all_ids, inputs);
+    boost::push_back(all_ids, outputs);
+
+    fx_chains_map fx_chains;
+
+    for (mixer::bus_id const bus_id : all_ids)
+    {
+        fx_chain_components& fx_chain_comps = fx_chains[bus_id];
+
+        if (auto it = prev_fx_chains.find(bus_id); it != prev_fx_chains.end())
+        {
+            for (fx::module_id const fx_mod_id : *buses[bus_id]->fx_chain)
+            {
+                if (auto it_fx_mod = std::ranges::find(
+                            it->second,
+                            fx_mod_id,
+                            &fx_module_component_mapping::fx_mod_id);
+                    it_fx_mod != it->second.end())
+                {
+                    fx_chain_comps.emplace_back(std::move(*it_fx_mod));
+                    it->second.erase(it_fx_mod);
+                }
+                else
+                {
+                    fx::module const* const fx_mod = fx_modules[fx_mod_id];
+                    BOOST_ASSERT(fx_mod);
+                    BOOST_ASSERT(fx_mod->fx_type == fx::type::gain);
+                    fx_chain_comps.emplace_back(
+                            fx_mod_id,
+                            components::make_fx_gain(param_procs, *fx_mod));
+                }
+            }
+        }
+        else
+        {
+            for (fx::module_id const fx_mod_id : *buses[bus_id]->fx_chain)
+            {
+                fx::module const* const fx_mod = fx_modules[fx_mod_id];
+                BOOST_ASSERT(fx_mod);
+                BOOST_ASSERT(fx_mod->fx_type == fx::type::gain);
+                fx_chain_comps.emplace_back(
+                        fx_mod_id,
+                        components::make_fx_gain(param_procs, *fx_mod));
+            }
+        }
+    }
+
+    return fx_chains;
+}
+
+static auto
 make_graph(
         mixer::state const& mixer_state,
         ns_ae::processor& input_proc,
         ns_ae::processor& output_proc,
-        std::vector<std::pair<mixer::bus_id, component_ptr>> const& input_buses,
-        std::vector<std::pair<mixer::bus_id, component_ptr>> const&
-                output_buses,
+        mixer_bus_components const& input_buses,
+        mixer_bus_components const& output_buses,
+        fx_chains_map const&,
         ns_ae::processor& input_solo_index,
         std::vector<processor_ptr>& mixer_procs)
 {
@@ -231,6 +320,7 @@ audio_engine::get_level(stereo_level_parameter_id const id) const
 void
 audio_engine::rebuild(
         mixer::state const& mixer_state,
+        fx::modules_t const& fx_modules,
         bool_parameters const& bool_params,
         float_parameters const& float_params)
 {
@@ -244,6 +334,13 @@ audio_engine::rebuild(
             m_impl->output_buses,
             m_samplerate,
             mixer_state.buses,
+            mixer_state.outputs,
+            m_impl->param_procs);
+    auto fx_chains = make_fx_chains_map(
+            m_impl->fx_chains,
+            fx_modules,
+            mixer_state.buses,
+            mixer_state.inputs,
             mixer_state.outputs,
             m_impl->param_procs);
 
@@ -262,6 +359,7 @@ audio_engine::rebuild(
             m_impl->process.output(),
             input_buses,
             output_buses,
+            fx_chains,
             *input_solo_index_proc,
             mixers);
 
@@ -271,6 +369,7 @@ audio_engine::rebuild(
     m_impl->graph = std::move(new_graph);
     m_impl->input_buses = std::move(input_buses);
     m_impl->output_buses = std::move(output_buses);
+    m_impl->fx_chains = std::move(fx_chains);
     m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
     m_impl->mixer_procs = std::move(mixers);
 

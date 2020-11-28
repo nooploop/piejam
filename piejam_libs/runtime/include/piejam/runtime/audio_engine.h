@@ -20,6 +20,7 @@
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
 #include <piejam/range/table_view.h>
+#include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/stereo_level.h>
@@ -54,6 +55,7 @@ public:
 
     void
     rebuild(mixer::state const&,
+            fx::modules_t const&,
             bool_parameters const&,
             float_parameters const&);
 
