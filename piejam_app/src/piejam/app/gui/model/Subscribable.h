@@ -50,14 +50,22 @@ protected:
 
     auto dispatch(runtime::action const& a) const { m_store_dispatch(a); }
 
-    virtual void subscribeStep(
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) = 0;
+    template <class Value, class Handler>
+    void observe(runtime::selector<Value> sel, Handler&& h)
+    {
+        m_subs.observe(
+                m_subs_id,
+                m_state_change_subscriber,
+                std::move(sel),
+                std::forward<Handler>(h));
+    }
+
+    virtual void subscribe_step() = 0;
 
 private:
     void subscribe() override
     {
-        subscribeStep(m_subs, m_subs_id);
+        subscribe_step();
 
         m_store_dispatch(runtime::actions::renotify{});
     }

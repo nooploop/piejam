@@ -41,9 +41,7 @@ public:
     void changeMute(bool) override;
 
 private:
-    void subscribeStep(
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
+    void subscribe_step() override;
 
     runtime::mixer::bus_id m_bus_id;
 };

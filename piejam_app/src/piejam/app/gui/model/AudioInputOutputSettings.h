@@ -44,9 +44,7 @@ public:
     void deleteBus(unsigned bus) override;
 
 private:
-    void subscribeStep(
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
+    void subscribe_step() override;
 
     void selectChannel(audio::bus_channel, unsigned bus, unsigned ch);
     void addBus(audio::bus_type);

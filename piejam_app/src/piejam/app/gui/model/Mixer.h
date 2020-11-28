@@ -33,9 +33,7 @@ public:
     void requestLevelsUpdate() override;
 
 private:
-    void subscribeStep(
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
+    void subscribe_step() override;
 
     runtime::mixer::bus_list_t m_inputs;
     runtime::mixer::bus_list_t m_outputs;

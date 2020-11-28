@@ -36,9 +36,7 @@ public:
     virtual void selectPeriodSize(unsigned index) override;
 
 private:
-    void subscribeStep(
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
+    void subscribe_step() override;
 };
 
 } // namespace piejam::app::gui::model

@@ -32,46 +32,29 @@ BusConfig::BusConfig(
 }
 
 void
-BusConfig::subscribeStep(
-        runtime::subscriptions_manager& subs,
-        runtime::subscription_id subs_id)
+BusConfig::subscribe_step()
 {
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::make_bus_name_selector(m_bus_id),
+    observe(runtime::selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::make_bus_type_selector(m_bus_id),
+    observe(runtime::selectors::make_bus_type_selector(m_bus_id),
             [this](audio::bus_type const t) {
                 setMono(t == audio::bus_type::mono);
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::make_bus_channel_selector(
+    observe(runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::mono),
             [this](std::size_t const ch) { setMonoChannel(ch + 1); });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::make_bus_channel_selector(
+    observe(runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::left),
             [this](std::size_t const ch) { setStereoLeftChannel(ch + 1); });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::make_bus_channel_selector(
+    observe(runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::right),
             [this](std::size_t const ch) { setStereoRightChannel(ch + 1); });

@@ -34,9 +34,7 @@ public:
     void selectBus(int) override;
 
 private:
-    void subscribeStep(
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
+    void subscribe_step() override;
 
     void updateBuses(
             audio::bus_direction,

@@ -42,16 +42,11 @@ Mixer::Mixer(
 }
 
 void
-Mixer::subscribeStep(
-        runtime::subscriptions_manager& subs,
-        runtime::subscription_id subs_id)
+Mixer::subscribe_step()
 {
     namespace selectors = runtime::selectors;
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::make_bus_list_selector(audio::bus_direction::input),
+    observe(selectors::make_bus_list_selector(audio::bus_direction::input),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 generic_list_model_edit_script_executor<
                         piejam::gui::model::MixerChannel,
@@ -68,10 +63,7 @@ Mixer::subscribeStep(
                 boost::push_back(m_all, m_outputs);
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::make_bus_list_selector(audio::bus_direction::output),
+    observe(selectors::make_bus_list_selector(audio::bus_direction::output),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 generic_list_model_edit_script_executor<
                         piejam::gui::model::MixerChannel,
@@ -88,10 +80,7 @@ Mixer::subscribeStep(
                 boost::push_back(m_all, m_inputs);
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::select_input_solo_active,
+    observe(selectors::select_input_solo_active,
             [this](bool const input_solo_active) {
                 setInputSoloActive(input_solo_active);
             });

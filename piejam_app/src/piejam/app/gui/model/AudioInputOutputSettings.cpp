@@ -44,16 +44,11 @@ AudioInputOutputSettings::AudioInputOutputSettings(
 }
 
 void
-AudioInputOutputSettings::subscribeStep(
-        runtime::subscriptions_manager& subs,
-        runtime::subscription_id subs_id)
+AudioInputOutputSettings::subscribe_step()
 {
     namespace selectors = runtime::selectors;
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::make_num_device_channels_selector(m_settings_type),
+    observe(selectors::make_num_device_channels_selector(m_settings_type),
             [this](std::size_t const num_input_channels) {
                 QStringList channels;
                 channels.push_back("-");
@@ -63,10 +58,7 @@ AudioInputOutputSettings::subscribeStep(
                 setChannels(channels);
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::make_bus_list_selector(m_settings_type),
+    observe(selectors::make_bus_list_selector(m_settings_type),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 generic_list_model_edit_script_executor<
                         piejam::gui::model::BusConfig,

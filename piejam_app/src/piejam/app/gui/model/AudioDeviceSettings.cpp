@@ -69,16 +69,11 @@ AudioDeviceSettings::AudioDeviceSettings(
 }
 
 void
-AudioDeviceSettings::subscribeStep(
-        runtime::subscriptions_manager& subs,
-        runtime::subscription_id subs_id)
+AudioDeviceSettings::subscribe_step()
 {
     namespace selectors = runtime::selectors;
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::select_input_devices,
+    observe(selectors::select_input_devices,
             [this](selectors::input_devices const& input_devices) {
                 inputDevices()->setElements(
                         device_names(input_devices.first->inputs));
@@ -86,10 +81,7 @@ AudioDeviceSettings::subscribeStep(
                         static_cast<int>(input_devices.second));
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::select_output_devices,
+    observe(selectors::select_output_devices,
             [this](selectors::output_devices const& output_devices) {
                 outputDevices()->setElements(
                         device_names(output_devices.first->outputs));
@@ -97,10 +89,7 @@ AudioDeviceSettings::subscribeStep(
                         static_cast<int>(output_devices.second));
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::select_samplerate,
+    observe(selectors::select_samplerate,
             [this](selectors::samplerate const& samplerate) {
                 auto const index = algorithm::index_of(
                         *samplerate.first,
@@ -110,10 +99,7 @@ AudioDeviceSettings::subscribeStep(
                 samplerates()->setFocused(static_cast<int>(index));
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            selectors::select_period_size,
+    observe(selectors::select_period_size,
             [this](selectors::period_size const& period_size) {
                 auto const index = algorithm::index_of(
                         *period_size.first,

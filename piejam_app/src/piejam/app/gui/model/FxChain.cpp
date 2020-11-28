@@ -39,41 +39,27 @@ FxChain::FxChain(
 }
 
 void
-FxChain::subscribeStep(
-        runtime::subscriptions_manager& subs,
-        runtime::subscription_id subs_id)
+FxChain::subscribe_step()
 {
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::make_bus_list_selector(
+    observe(runtime::selectors::make_bus_list_selector(
                     audio::bus_direction::input),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 updateBuses(audio::bus_direction::input, bus_ids);
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::make_bus_list_selector(
+    observe(runtime::selectors::make_bus_list_selector(
                     audio::bus_direction::output),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 updateBuses(audio::bus_direction::output, bus_ids);
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::select_fx_chain_bus,
+    observe(runtime::selectors::select_fx_chain_bus,
             [this](runtime::mixer::bus_id const& fx_chain_bus) {
                 setSelectedBus(static_cast<int>(
                         algorithm::index_of(m_all, fx_chain_bus)));
             });
 
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::select_current_fx_chain,
+    observe(runtime::selectors::select_current_fx_chain,
             [this](container::box<runtime::fx::chain_t> const& fx_chain) {
                 generic_list_model_edit_script_executor<
                         piejam::gui::model::FxModule,

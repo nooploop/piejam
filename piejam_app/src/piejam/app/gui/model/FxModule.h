@@ -34,9 +34,7 @@ public:
             runtime::fx::module_id);
 
 private:
-    void subscribeStep(
-            runtime::subscriptions_manager&,
-            runtime::subscription_id) override;
+    void subscribe_step() override;
 
     runtime::fx::module_id m_fx_mod_id;
 };

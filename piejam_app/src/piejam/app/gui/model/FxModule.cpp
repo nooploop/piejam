@@ -32,14 +32,9 @@ FxModule::FxModule(
 }
 
 void
-FxModule::subscribeStep(
-        runtime::subscriptions_manager& subs,
-        runtime::subscription_id subs_id)
+FxModule::subscribe_step()
 {
-    subs.observe(
-            subs_id,
-            state_change_subscriber(),
-            runtime::selectors::make_fx_module_name_selector(m_fx_mod_id),
+    observe(runtime::selectors::make_fx_module_name_selector(m_fx_mod_id),
             [this](container::boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
