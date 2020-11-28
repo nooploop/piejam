@@ -31,7 +31,7 @@ struct add_bus final
     audio::bus_direction direction{};
     audio::bus_type type{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

@@ -25,7 +25,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-set_bool_parameter::reduce(audio_state const& st) const -> audio_state
+set_bool_parameter::reduce(state const& st) const -> state
 {
     auto new_st = st;
     BOOST_VERIFY(new_st.bool_params.set(id, value));

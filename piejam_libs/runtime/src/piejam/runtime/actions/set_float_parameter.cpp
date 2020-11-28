@@ -25,7 +25,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-set_float_parameter::reduce(audio_state const& st) const -> audio_state
+set_float_parameter::reduce(state const& st) const -> state
 {
     auto new_st = st;
     BOOST_VERIFY(new_st.float_params.set(id, value));

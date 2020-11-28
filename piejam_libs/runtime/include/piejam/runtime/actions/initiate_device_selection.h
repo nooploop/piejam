@@ -31,7 +31,7 @@ struct initiate_device_selection final
     bool input{};
     std::size_t index{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

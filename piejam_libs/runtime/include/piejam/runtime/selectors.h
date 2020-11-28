@@ -36,7 +36,7 @@ namespace piejam::runtime::selectors
 {
 
 template <class Value>
-using selector = reselect::selector<Value, audio_state>;
+using selector = reselect::selector<Value, state>;
 
 using samplerate = std::pair<container::box<audio::samplerates_t>, unsigned>;
 extern const selector<samplerate> select_samplerate;

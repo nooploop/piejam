@@ -33,7 +33,7 @@ struct request_levels_update final
 {
     std::vector<stereo_level_parameter_id> level_ids;
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

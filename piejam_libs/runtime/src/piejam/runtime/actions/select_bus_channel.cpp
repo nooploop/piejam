@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-select_bus_channel::reduce(audio_state const& st) const -> audio_state
+select_bus_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 

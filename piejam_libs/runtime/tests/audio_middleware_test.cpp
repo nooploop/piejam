@@ -39,8 +39,8 @@ struct audio_engine_middleware_test : ::testing::Test
                 audio::pcm_hw_params(audio::pcm_descriptor const&));
         MOCK_CONST_METHOD1(
                 create_device,
-                std::unique_ptr<audio::device>(audio_state const&));
-        MOCK_CONST_METHOD0(get_state, audio_state const&());
+                std::unique_ptr<audio::device>(state const&));
+        MOCK_CONST_METHOD0(get_state, state const&());
         MOCK_CONST_METHOD1(next, void(action const&));
     };
 
@@ -57,11 +57,10 @@ struct audio_engine_middleware_test : ::testing::Test
                 [this](audio::pcm_descriptor const& d) -> audio::pcm_hw_params {
                     return m_ctrl.get_hw_params(d);
                 },
-                [this](audio_state const& st)
-                        -> std::unique_ptr<audio::device> {
+                [this](state const& st) -> std::unique_ptr<audio::device> {
                     return m_ctrl.create_device(st);
                 },
-                [this]() -> audio_state const& { return m_ctrl.get_state(); },
+                [this]() -> state const& { return m_ctrl.get_state(); },
                 [this](action const& a) { m_ctrl.next(a); });
     }
 };
@@ -76,10 +75,7 @@ TEST_F(audio_engine_middleware_test,
             return std::make_unique<non_device_action>();
         }
 
-        auto reduce(audio_state const& st) const -> audio_state override
-        {
-            return st;
-        }
+        auto reduce(state const& st) const -> state override { return st; }
     } action;
     EXPECT_CALL(m_ctrl, next(::testing::Ref(action)));
     make_sut()(action);
@@ -88,8 +84,7 @@ TEST_F(audio_engine_middleware_test,
 TEST_F(audio_engine_middleware_test, select_samplerate_is_passed_to_next)
 {
     using namespace testing;
-    EXPECT_CALL(m_ctrl, get_state())
-            .WillRepeatedly(ReturnRefOfCopy(audio_state()));
+    EXPECT_CALL(m_ctrl, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
     EXPECT_CALL(m_ctrl, create_device(_))
             .WillOnce(Return(
                     ByMove(std::make_unique<piejam::audio::dummy_device>())));
@@ -103,8 +98,7 @@ TEST_F(audio_engine_middleware_test, select_samplerate_is_passed_to_next)
 TEST_F(audio_engine_middleware_test, select_period_size_is_passed_to_next)
 {
     using namespace testing;
-    EXPECT_CALL(m_ctrl, get_state())
-            .WillRepeatedly(ReturnRefOfCopy(audio_state()));
+    EXPECT_CALL(m_ctrl, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
     EXPECT_CALL(m_ctrl, create_device(_))
             .WillOnce(Return(
                     ByMove(std::make_unique<piejam::audio::dummy_device>())));
@@ -124,7 +118,7 @@ TEST_F(audio_engine_middleware_test,
     hw_params.samplerates = {44100};
     hw_params.period_sizes = {128};
 
-    audio_state st;
+    state st;
     st.input.hw_params = hw_params;
     st.output.hw_params = hw_params;
 

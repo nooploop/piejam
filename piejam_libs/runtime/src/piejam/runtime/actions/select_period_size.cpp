@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-select_period_size::reduce(audio_state const& st) const -> audio_state
+select_period_size::reduce(state const& st) const -> state
 {
     auto new_st = st;
     new_st.period_size = period_sizes_from_state(st)[index];

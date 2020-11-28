@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-delete_bus::reduce(audio_state const& st) const -> audio_state
+delete_bus::reduce(state const& st) const -> state
 {
     auto new_st = st;
 

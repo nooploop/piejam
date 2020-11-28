@@ -28,7 +28,7 @@ auto
 set_bus_mute(mixer::bus_id bus_id, bool mute) -> thunk_action
 {
     return [=](auto const& get_state, auto const& dispatch) {
-        audio_state const& st = get_state();
+        state const& st = get_state();
         auto it = st.mixer_state.buses.find(bus_id);
         if (it != st.mixer_state.buses.end())
         {

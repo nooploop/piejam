@@ -28,7 +28,7 @@ auto
 set_bus_volume(mixer::bus_id bus_id, float volume) -> thunk_action
 {
     return [=](auto const& get_state, auto const& dispatch) {
-        audio_state const& st = get_state();
+        state const& st = get_state();
         auto it = st.mixer_state.buses.find(bus_id);
         if (it != st.mixer_state.buses.end())
         {

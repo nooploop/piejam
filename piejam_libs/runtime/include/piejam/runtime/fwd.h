@@ -32,11 +32,13 @@ struct audio_state;
 struct selected_device;
 struct store_dispatch;
 
-using action = ui::action<audio_state>;
-using get_state_f = ui::get_state_f<audio_state>;
-using dispatch_f = ui::dispatch_f<audio_state>;
-using thunk_f = ui::thunk_f<audio_state>;
-using thunk_action = ui::thunk_action<audio_state>;
+using state = audio_state;
+
+using action = ui::action<state>;
+using get_state_f = ui::get_state_f<state>;
+using dispatch_f = ui::dispatch_f<state>;
+using thunk_f = ui::thunk_f<state>;
+using thunk_action = ui::thunk_action<state>;
 
 using stereo_level = audio::pair<float>;
 

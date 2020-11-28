@@ -31,7 +31,7 @@ namespace piejam::runtime::selectors
 const selector<samplerate> select_samplerate(
         [get_samplerates =
                  memoized(container::boxify_result(&runtime::samplerates))](
-                audio_state const& st) mutable -> samplerate {
+                state const& st) mutable -> samplerate {
             return {get_samplerates(st.input.hw_params, st.output.hw_params),
                     st.samplerate};
         });
@@ -39,18 +39,18 @@ const selector<samplerate> select_samplerate(
 const selector<period_size> select_period_size(
         [get_period_sizes =
                  memoized(container::boxify_result(&runtime::period_sizes))](
-                audio_state const& st) mutable -> period_size {
+                state const& st) mutable -> period_size {
             return {get_period_sizes(st.input.hw_params, st.output.hw_params),
                     st.period_size};
         });
 
 const selector<input_devices>
-        select_input_devices([](audio_state const& st) -> input_devices {
+        select_input_devices([](state const& st) -> input_devices {
             return {st.pcm_devices, st.input.index};
         });
 
 const selector<output_devices>
-        select_output_devices([](audio_state const& st) -> output_devices {
+        select_output_devices([](state const& st) -> output_devices {
             return {st.pcm_devices, st.output.index};
         });
 
@@ -62,13 +62,13 @@ make_num_device_channels_selector(audio::bus_direction const bd)
     {
         case audio::bus_direction::input:
             return selector<std::size_t>(
-                    [](audio_state const& st) -> std::size_t {
+                    [](state const& st) -> std::size_t {
                         return st.input.hw_params->num_channels;
                     });
 
         case audio::bus_direction::output:
             return selector<std::size_t>(
-                    [](audio_state const& st) -> std::size_t {
+                    [](state const& st) -> std::size_t {
                         return st.output.hw_params->num_channels;
                     });
     }
@@ -81,10 +81,10 @@ make_bus_list_selector(audio::bus_direction const bd)
     switch (bd)
     {
         case audio::bus_direction::input:
-            return [](audio_state const& st) { return st.mixer_state.inputs; };
+            return [](state const& st) { return st.mixer_state.inputs; };
 
         case audio::bus_direction::output:
-            return [](audio_state const& st) { return st.mixer_state.outputs; };
+            return [](state const& st) { return st.mixer_state.outputs; };
     }
 }
 
@@ -92,7 +92,7 @@ auto
 make_bus_name_selector(mixer::bus_id bus_id)
         -> selector<container::boxed_string>
 {
-    return [bus_id](audio_state const& st) -> container::boxed_string {
+    return [bus_id](state const& st) -> container::boxed_string {
         if (mixer::bus const* bus = st.mixer_state.buses[bus_id])
         {
             return bus->name;
@@ -105,7 +105,7 @@ make_bus_name_selector(mixer::bus_id bus_id)
 auto
 make_bus_type_selector(mixer::bus_id const bus_id) -> selector<audio::bus_type>
 {
-    return [bus_id](audio_state const& st) -> audio::bus_type {
+    return [bus_id](state const& st) -> audio::bus_type {
         mixer::bus const* bus = st.mixer_state.buses[bus_id];
         return bus ? bus->type : audio::bus_type::mono;
     };
@@ -120,13 +120,13 @@ make_bus_channel_selector(
     {
         case audio::bus_channel::mono:
         case audio::bus_channel::left:
-            return [bus_id](audio_state const& st) -> std::size_t {
+            return [bus_id](state const& st) -> std::size_t {
                 mixer::bus const* const bus = st.mixer_state.buses[bus_id];
                 return bus ? bus->device_channels.left : piejam::npos;
             };
 
         case audio::bus_channel::right:
-            return [bus_id](audio_state const& st) -> std::size_t {
+            return [bus_id](state const& st) -> std::size_t {
                 mixer::bus const* const bus = st.mixer_state.buses[bus_id];
                 return bus ? bus->device_channels.right : piejam::npos;
             };
@@ -139,7 +139,7 @@ make_bus_channel_selector(
 auto
 make_bus_volume_selector(mixer::bus_id bus_id) -> selector<float>
 {
-    return [bus_id](audio_state const& st) -> float {
+    return [bus_id](state const& st) -> float {
         mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         float const* const volume =
                 bus ? st.float_params.get(bus->volume) : nullptr;
@@ -150,7 +150,7 @@ make_bus_volume_selector(mixer::bus_id bus_id) -> selector<float>
 auto
 make_bus_pan_balance_selector(mixer::bus_id bus_id) -> selector<float>
 {
-    return [bus_id](audio_state const& st) -> float {
+    return [bus_id](state const& st) -> float {
         mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         float const* const pan_balance =
                 bus ? st.float_params.get(bus->pan_balance) : nullptr;
@@ -161,7 +161,7 @@ make_bus_pan_balance_selector(mixer::bus_id bus_id) -> selector<float>
 auto
 make_bus_mute_selector(mixer::bus_id const bus_id) -> selector<bool>
 {
-    return [bus_id](audio_state const& st) -> bool {
+    return [bus_id](state const& st) -> bool {
         mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         bool const* const mute = bus ? st.bool_params.get(bus->mute) : nullptr;
         return mute && *mute;
@@ -171,7 +171,7 @@ make_bus_mute_selector(mixer::bus_id const bus_id) -> selector<bool>
 auto
 make_input_solo_selector(mixer::bus_id const bus_id) -> selector<bool>
 {
-    return [bus_id](audio_state const& st) -> bool {
+    return [bus_id](state const& st) -> bool {
         return bus_id == st.mixer_state.input_solo_id;
     };
 }
@@ -179,7 +179,7 @@ make_input_solo_selector(mixer::bus_id const bus_id) -> selector<bool>
 auto
 make_bus_level_selector(mixer::bus_id const bus_id) -> selector<stereo_level>
 {
-    return [bus_id](audio_state const& st) -> stereo_level {
+    return [bus_id](state const& st) -> stereo_level {
         mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         stereo_level const* const level =
                 bus ? st.levels.get(bus->level) : nullptr;
@@ -187,16 +187,16 @@ make_bus_level_selector(mixer::bus_id const bus_id) -> selector<stereo_level>
     };
 }
 
-const selector<bool> select_input_solo_active([](audio_state const& st) {
+const selector<bool> select_input_solo_active([](state const& st) {
     return st.mixer_state.input_solo_id != mixer::bus_id{};
 });
 
-const selector<mixer::bus_id> select_fx_chain_bus([](audio_state const& st) {
+const selector<mixer::bus_id> select_fx_chain_bus([](state const& st) {
     return st.fx_chain_bus;
 });
 
 const selector<container::box<fx::chain_t>>
-        select_current_fx_chain([](audio_state const& st) {
+        select_current_fx_chain([](state const& st) {
             static container::box<fx::chain_t> s_empty_fx_chain;
             mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
             return bus ? bus->fx_chain : s_empty_fx_chain;
@@ -206,7 +206,7 @@ auto
 make_fx_module_name_selector(fx::module_id fx_mod_id)
         -> selector<container::boxed_string>
 {
-    return [fx_mod_id](audio_state const& st) -> container::boxed_string {
+    return [fx_mod_id](state const& st) -> container::boxed_string {
         static container::boxed_string s_empty_name;
         fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
         return fx_mod ? fx_mod->name : s_empty_name;
@@ -218,7 +218,7 @@ make_fx_module_parameters_selector(fx::module_id fx_mod_id)
         -> selector<container::box<fx::parameters_t>>
 {
     return [fx_mod_id](
-                   audio_state const& st) -> container::box<fx::parameters_t> {
+                   state const& st) -> container::box<fx::parameters_t> {
         static container::box<fx::parameters_t> s_empty;
         fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
         return fx_mod ? fx_mod->parameters : s_empty;
@@ -232,7 +232,7 @@ make_fx_parameter_name_selector(
         -> selector<container::boxed_string>
 {
     return [fx_mod_id,
-            fx_param_key](audio_state const& st) -> container::boxed_string {
+            fx_param_key](state const& st) -> container::boxed_string {
         static container::boxed_string s_empty;
         if (fx::module const* const fx_mod = st.fx_modules[fx_mod_id])
         {
@@ -252,7 +252,7 @@ make_fx_parameter_id_selector(
         fx::parameter_key const fx_param_key) -> selector<float_parameter_id>
 {
     return [fx_mod_id,
-            fx_param_key](audio_state const& st) -> float_parameter_id {
+            fx_param_key](state const& st) -> float_parameter_id {
         if (fx::module const* const fx_mod = st.fx_modules[fx_mod_id])
         {
             if (auto it = fx_mod->parameters->find(fx_param_key);
@@ -265,11 +265,11 @@ make_fx_parameter_id_selector(
     };
 }
 
-const selector<std::size_t> select_xruns([](audio_state const& st) {
+const selector<std::size_t> select_xruns([](state const& st) {
     return st.xruns;
 });
 
-const selector<float> select_cpu_load([](audio_state const& st) {
+const selector<float> select_cpu_load([](state const& st) {
     return st.cpu_load;
 });
 

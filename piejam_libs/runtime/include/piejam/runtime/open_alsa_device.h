@@ -25,7 +25,7 @@
 namespace piejam::runtime
 {
 
-auto open_alsa_device(audio_state const&)
+auto open_alsa_device(state const&)
         -> std::unique_ptr<piejam::audio::device>;
 
 } // namespace piejam::runtime

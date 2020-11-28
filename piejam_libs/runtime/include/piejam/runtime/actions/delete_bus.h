@@ -31,7 +31,7 @@ struct delete_bus final
     audio::bus_direction direction{};
     std::size_t bus{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

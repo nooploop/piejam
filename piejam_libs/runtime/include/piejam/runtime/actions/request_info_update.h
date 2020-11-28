@@ -28,7 +28,7 @@ struct request_info_update final
     : ui::cloneable_action<request_info_update, action>
     , visitable_engine_action<request_info_update>
 {
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

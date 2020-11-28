@@ -36,15 +36,14 @@ class audio_engine_middleware
 {
 
 public:
-    using get_state_f = redux::get_state_f<audio_state>;
+    using get_state_f = redux::get_state_f<state>;
     using next_f = redux::next_f<action>;
     using get_pcm_io_descriptors_f =
             std::function<piejam::audio::pcm_io_descriptors()>;
     using get_hw_params_f = std::function<piejam::audio::pcm_hw_params(
             piejam::audio::pcm_descriptor const&)>;
     using device_factory_f =
-            std::function<std::unique_ptr<piejam::audio::device>(
-                    audio_state const&)>;
+            std::function<std::unique_ptr<piejam::audio::device>(state const&)>;
 
     audio_engine_middleware(
             thread::configuration const& audio_thread_config,

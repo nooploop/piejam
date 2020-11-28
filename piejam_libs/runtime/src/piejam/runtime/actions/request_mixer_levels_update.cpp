@@ -31,7 +31,7 @@ request_mixer_levels_update(std::vector<mixer::bus_id> bus_ids) -> thunk_action
 {
     return [bus_ids = std::move(
                     bus_ids)](auto const& get_state, auto const& dispatch) {
-        audio_state const& st = get_state();
+        state const& st = get_state();
         request_levels_update next_action;
         for (mixer::bus_id const bus_id : bus_ids)
         {

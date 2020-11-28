@@ -32,7 +32,7 @@ update_channel(std::size_t& cur_ch, std::size_t const num_chs)
 template <audio::bus_direction D>
 static auto
 apply_bus_configs(
-        audio_state& st,
+        state& st,
         std::vector<bus_config> const& configs,
         std::size_t const num_ch)
 {
@@ -52,7 +52,7 @@ apply_bus_configs(
 }
 
 auto
-apply_app_config::reduce(audio_state const& st) const -> audio_state
+apply_app_config::reduce(state const& st) const -> state
 {
     auto new_st = st;
 

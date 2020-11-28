@@ -40,7 +40,7 @@ struct set_bool_parameter final
     bool_parameter_id id{};
     bool value{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

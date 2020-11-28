@@ -26,7 +26,7 @@ namespace piejam::runtime::actions
 
 template <audio::bus_direction D>
 auto
-set_bus_solo<D>::reduce(audio_state const& st) const -> audio_state
+set_bus_solo<D>::reduce(state const& st) const -> state
 {
     static_assert(D == audio::bus_direction::input);
 

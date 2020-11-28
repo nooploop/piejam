@@ -33,7 +33,7 @@ struct set_bus_solo final
     std::size_t index{};
     bool solo{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

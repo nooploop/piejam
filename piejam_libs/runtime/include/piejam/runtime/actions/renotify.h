@@ -26,7 +26,7 @@ namespace piejam::runtime::actions
 
 struct renotify final : ui::cloneable_action<renotify, action>
 {
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

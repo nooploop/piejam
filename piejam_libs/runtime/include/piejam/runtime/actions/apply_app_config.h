@@ -31,7 +31,7 @@ struct apply_app_config final
 {
     app_config conf;
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

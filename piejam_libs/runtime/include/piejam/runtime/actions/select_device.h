@@ -34,7 +34,7 @@ struct select_device final
     unsigned samplerate{};
     unsigned period_size{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 template <audio::bus_direction D>

@@ -33,7 +33,7 @@ struct set_bus_name final : ui::cloneable_action<set_bus_name<D>, action>
     std::size_t bus{};
     std::string name;
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

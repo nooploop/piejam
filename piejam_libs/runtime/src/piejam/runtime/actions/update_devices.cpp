@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-update_devices::reduce(audio_state const& st) const -> audio_state
+update_devices::reduce(state const& st) const -> state
 {
     auto new_st = st;
 

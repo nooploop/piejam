@@ -26,8 +26,8 @@ namespace piejam::runtime::actions
 
 template <>
 auto
-select_device<audio::bus_direction::input>::reduce(audio_state const& st) const
-        -> audio_state
+select_device<audio::bus_direction::input>::reduce(state const& st) const
+        -> state
 {
     auto new_st = st;
 
@@ -52,8 +52,8 @@ select_device<audio::bus_direction::input>::reduce(audio_state const& st) const
 
 template <>
 auto
-select_device<audio::bus_direction::output>::reduce(audio_state const& st) const
-        -> audio_state
+select_device<audio::bus_direction::output>::reduce(state const& st) const
+        -> state
 {
     auto new_st = st;
 

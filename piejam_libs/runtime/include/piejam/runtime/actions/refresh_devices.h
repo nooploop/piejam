@@ -28,7 +28,7 @@ struct refresh_devices final
     : ui::cloneable_action<refresh_devices, action>
     , visitable_device_action<refresh_devices>
 {
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

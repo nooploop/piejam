@@ -24,7 +24,7 @@ namespace piejam::runtime::actions
 
 template <audio::bus_direction D>
 auto
-set_bus_name<D>::reduce(audio_state const& st) const -> audio_state
+set_bus_name<D>::reduce(state const& st) const -> state
 {
     auto new_st = st;
     new_st.mixer_state = mixer::update_bus_field<D>(

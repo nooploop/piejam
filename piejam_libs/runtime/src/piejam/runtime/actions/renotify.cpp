@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-renotify::reduce(audio_state const& st) const -> audio_state
+renotify::reduce(state const& st) const -> state
 {
     return st;
 }

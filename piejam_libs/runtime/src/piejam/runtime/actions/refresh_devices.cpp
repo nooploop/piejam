@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-refresh_devices::reduce(audio_state const& st) const -> audio_state
+refresh_devices::reduce(state const& st) const -> state
 {
     return st;
 }

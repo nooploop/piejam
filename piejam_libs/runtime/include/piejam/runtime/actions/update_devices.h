@@ -39,7 +39,7 @@ struct update_devices final
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

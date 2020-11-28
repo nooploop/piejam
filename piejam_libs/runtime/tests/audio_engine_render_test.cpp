@@ -19,6 +19,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fwd.h>
 
 #include <gtest/gtest.h>
 
@@ -70,7 +71,7 @@ struct audio_engine_render_test : public ::testing::Test
             render_buffer();
     }
 
-    void rebuild(audio_state const& st)
+    void rebuild(state const& st)
     {
         auto engine_swap = std::async(std::launch::async, [&]() {
             sut.rebuild(
@@ -97,7 +98,7 @@ struct audio_engine_render_test : public ::testing::Test
 
 TEST_F(audio_engine_render_test, add_input_channel)
 {
-    audio_state st;
+    state st;
 
     add_mixer_bus<audio::bus_direction::input>(
             st,

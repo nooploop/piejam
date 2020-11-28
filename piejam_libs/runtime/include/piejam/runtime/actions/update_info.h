@@ -31,7 +31,7 @@ struct update_info final
     std::size_t xruns{};
     float cpu_load{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

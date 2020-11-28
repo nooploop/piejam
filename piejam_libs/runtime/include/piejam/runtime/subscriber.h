@@ -24,10 +24,10 @@
 namespace piejam::runtime
 {
 
-using subscriber = reselect::subscriber<audio_state>;
+using subscriber = reselect::subscriber<state>;
 
 template <class Value>
-using selector = reselect::selector<Value, audio_state>;
+using selector = reselect::selector<Value, state>;
 
 using subscription_id = entity_id<struct subs>;
 using subscriptions_manager = reselect::subscriptions_manager<subscription_id>;

@@ -62,7 +62,7 @@ load(locations const& locs, store_dispatch dispatch)
 }
 
 void
-save(locations const& locs, audio_state const& state)
+save(locations const& locs, state const& state)
 {
     try
     {

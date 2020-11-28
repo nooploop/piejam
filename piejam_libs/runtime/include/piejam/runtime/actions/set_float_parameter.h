@@ -40,7 +40,7 @@ struct set_float_parameter final
     float_parameter_id id{};
     float value{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

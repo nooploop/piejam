@@ -33,7 +33,7 @@ struct select_bus_channel final
     audio::bus_channel channel_selector{};
     std::size_t channel_index{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

@@ -30,7 +30,7 @@ struct select_fx_chain_bus final
 {
     mixer::bus_id bus_id{};
 
-    auto reduce(audio_state const&) const -> audio_state override;
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

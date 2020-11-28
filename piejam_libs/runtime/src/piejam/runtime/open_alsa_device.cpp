@@ -24,7 +24,7 @@ namespace piejam::runtime
 {
 
 static auto
-period_count(audio_state const& state) -> unsigned
+period_count(state const& state) -> unsigned
 {
     constexpr unsigned default_period_count = 2u;
     unsigned min_period_count{};
@@ -54,7 +54,7 @@ period_count(audio_state const& state) -> unsigned
 }
 
 auto
-open_alsa_device(audio_state const& state) -> std::unique_ptr<audio::device>
+open_alsa_device(state const& state) -> std::unique_ptr<audio::device>
 {
     return std::make_unique<audio::alsa::pcm_io>(
             state.pcm_devices->inputs[state.input.index],

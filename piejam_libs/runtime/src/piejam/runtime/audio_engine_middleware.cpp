@@ -151,7 +151,7 @@ void
 audio_engine_middleware::process_apply_app_config_action(
         actions::apply_app_config const& a)
 {
-    audio_state const& current_state = m_get_state();
+    state const& current_state = m_get_state();
 
     actions::update_devices prep_action;
     prep_action.pcm_devices = current_state.pcm_devices;
@@ -204,7 +204,7 @@ void
 audio_engine_middleware::process_refresh_devices_action(
         actions::refresh_devices const&)
 {
-    audio_state const& current_state = m_get_state();
+    state const& current_state = m_get_state();
 
     actions::update_devices next_action;
     next_action.pcm_devices = m_get_pcm_io_descriptors();
@@ -243,7 +243,7 @@ void
 audio_engine_middleware::process_initiate_device_selection_action(
         actions::initiate_device_selection const& action)
 {
-    audio_state const& current_state = m_get_state();
+    state const& current_state = m_get_state();
 
     std::size_t const index = action.index;
 

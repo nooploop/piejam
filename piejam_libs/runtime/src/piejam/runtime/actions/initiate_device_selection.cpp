@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-initiate_device_selection::reduce(audio_state const& st) const -> audio_state
+initiate_device_selection::reduce(state const& st) const -> state
 {
     return st;
 }

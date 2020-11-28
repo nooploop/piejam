@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 auto
-request_info_update::reduce(audio_state const& st) const -> audio_state
+request_info_update::reduce(state const& st) const -> state
 {
     return st;
 }

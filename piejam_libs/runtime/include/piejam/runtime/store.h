@@ -23,6 +23,6 @@
 namespace piejam::runtime
 {
 
-using store = redux::store<audio_state, action>;
+using store = redux::store<state, action>;
 
 } // namespace piejam::runtime
