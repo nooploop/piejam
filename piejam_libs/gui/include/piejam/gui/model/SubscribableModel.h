@@ -52,6 +52,15 @@ signals:
     void subscribedChanged();
 
 protected:
+    auto connect(SubscribableModel& child)
+    {
+        return QObject::connect(
+                this,
+                &SubscribableModel::subscribedChanged,
+                &child,
+                [this, &child]() { child.setSubscribed(subscribed()); });
+    }
+
     virtual void subscribe() = 0;
     virtual void unsubscribe() = 0;
 

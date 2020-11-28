@@ -94,13 +94,7 @@ FxChain::updateBuses(
                         state_change_subscriber(),
                         ins.value);
 
-                QObject::connect(
-                        this,
-                        &FxChain::subscribedChanged,
-                        busName.get(),
-                        [this, name = busName.get()]() {
-                            name->setSubscribed(subscribed());
-                        });
+                connect(*busName);
 
                 buses()->add(ins.pos, std::move(busName));
             }};
