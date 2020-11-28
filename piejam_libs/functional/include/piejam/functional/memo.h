@@ -22,6 +22,7 @@
 #include <boost/callable_traits/args.hpp>
 #include <boost/callable_traits/return_type.hpp>
 
+#include <functional>
 #include <optional>
 #include <tuple>
 #include <type_traits>
@@ -48,11 +49,11 @@ public:
             std::add_const_t<std::invoke_result_t<F, Args&&...>>>
     {
         if (!m_last ||
-            m_last->args != std::tuple<Args&&...>(std::forward<Args>(args)...))
+            m_last->args != std::forward_as_tuple(std::forward<Args>(args)...))
         {
             m_last.emplace(
                     std::tuple<Args...>(args...),
-                    m_f(std::forward<Args>(args)...));
+                    std::invoke(m_f, std::forward<Args>(args)...));
         }
 
         return m_last->result;
@@ -84,6 +85,6 @@ private:
 template <class F>
 memoized(F const&) -> memoized<F>;
 template <class F>
-memoized(F &&) -> memoized<F>;
+memoized(F&&) -> memoized<F>;
 
 } // namespace piejam
