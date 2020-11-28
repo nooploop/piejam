@@ -45,7 +45,6 @@ AudioInputOutputSettings::AudioInputOutputSettings(
 
 void
 AudioInputOutputSettings::subscribeStep(
-        runtime::subscriber& state_change_subscriber,
         runtime::subscriptions_manager& subs,
         runtime::subscription_id subs_id)
 {
@@ -53,7 +52,7 @@ AudioInputOutputSettings::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::make_num_device_channels_selector(m_settings_type),
             [this](std::size_t const num_input_channels) {
                 QStringList channels;
@@ -66,16 +65,15 @@ AudioInputOutputSettings::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::make_bus_list_selector(m_settings_type),
-            [this, &state_change_subscriber](
-                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+            [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 generic_list_model_edit_script_executor<
                         piejam::gui::model::BusConfig,
                         BusConfig>
                         visitor{*busConfigs(),
                                 dispatch(),
-                                state_change_subscriber};
+                                state_change_subscriber()};
 
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_bus_ids, *bus_ids),

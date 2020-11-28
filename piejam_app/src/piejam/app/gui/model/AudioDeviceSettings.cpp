@@ -70,7 +70,6 @@ AudioDeviceSettings::AudioDeviceSettings(
 
 void
 AudioDeviceSettings::subscribeStep(
-        runtime::subscriber& state_change_subscriber,
         runtime::subscriptions_manager& subs,
         runtime::subscription_id subs_id)
 {
@@ -78,7 +77,7 @@ AudioDeviceSettings::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::select_input_devices,
             [this](selectors::input_devices const& input_devices) {
                 inputDevices()->setElements(
@@ -89,7 +88,7 @@ AudioDeviceSettings::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::select_output_devices,
             [this](selectors::output_devices const& output_devices) {
                 outputDevices()->setElements(
@@ -100,7 +99,7 @@ AudioDeviceSettings::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::select_samplerate,
             [this](selectors::samplerate const& samplerate) {
                 auto const index = algorithm::index_of(
@@ -113,7 +112,7 @@ AudioDeviceSettings::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::select_period_size,
             [this](selectors::period_size const& period_size) {
                 auto const index = algorithm::index_of(

@@ -27,14 +27,12 @@ namespace piejam::app::gui::model
 class BusName final : public Subscribable<piejam::gui::model::BusName>
 {
 public:
-    BusName(
-            runtime::store_dispatch,
+    BusName(runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::bus_id);
 
 private:
     void subscribeStep(
-            runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) override;
 

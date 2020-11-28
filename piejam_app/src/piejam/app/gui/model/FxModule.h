@@ -35,7 +35,6 @@ public:
 
 private:
     void subscribeStep(
-            runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) override;
 

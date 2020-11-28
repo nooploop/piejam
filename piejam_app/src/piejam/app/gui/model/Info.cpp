@@ -34,13 +34,12 @@ Info::Info(
 
 void
 Info::subscribeStep(
-        runtime::subscriber& state_change_subscriber,
         runtime::subscriptions_manager& subs,
         runtime::subscription_id subs_id)
 {
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::select_xruns,
             [this](std::size_t const xruns) {
                 setXRuns(static_cast<unsigned>(xruns));
@@ -48,7 +47,7 @@ Info::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::select_cpu_load,
             [this](float const cpu_load) { setAudioLoad(cpu_load); });
 }

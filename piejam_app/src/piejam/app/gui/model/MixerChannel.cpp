@@ -38,13 +38,12 @@ MixerChannel::MixerChannel(
 
 void
 MixerChannel::subscribeStep(
-        runtime::subscriber& state_change_subscriber,
         runtime::subscriptions_manager& subs,
         runtime::subscription_id subs_id)
 {
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string const& name) {
                 setName(QString::fromStdString(*name));
@@ -52,31 +51,31 @@ MixerChannel::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_volume_selector(m_bus_id),
             [this](float x) { setVolume(x); });
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_pan_balance_selector(m_bus_id),
             [this](float x) { setPanBalance(x); });
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_mute_selector(m_bus_id),
             [this](bool x) { setMute(x); });
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_input_solo_selector(m_bus_id),
             [this](bool x) { setSolo(x); });
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_level_selector(m_bus_id),
             [this](runtime::stereo_level const& x) {
                 setLevel(x.left, x.right);

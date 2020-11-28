@@ -33,13 +33,12 @@ BusConfig::BusConfig(
 
 void
 BusConfig::subscribeStep(
-        runtime::subscriber& state_change_subscriber,
         runtime::subscriptions_manager& subs,
         runtime::subscription_id subs_id)
 {
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string const& name) {
                 setName(QString::fromStdString(*name));
@@ -47,7 +46,7 @@ BusConfig::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_type_selector(m_bus_id),
             [this](audio::bus_type const t) {
                 setMono(t == audio::bus_type::mono);
@@ -55,7 +54,7 @@ BusConfig::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::mono),
@@ -63,7 +62,7 @@ BusConfig::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::left),
@@ -71,7 +70,7 @@ BusConfig::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_channel_selector(
                     m_bus_id,
                     audio::bus_channel::right),

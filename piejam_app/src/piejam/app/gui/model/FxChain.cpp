@@ -40,39 +40,30 @@ FxChain::FxChain(
 
 void
 FxChain::subscribeStep(
-        runtime::subscriber& state_change_subscriber,
         runtime::subscriptions_manager& subs,
         runtime::subscription_id subs_id)
 {
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_list_selector(
                     audio::bus_direction::input),
-            [this, &state_change_subscriber](
-                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                updateBuses(
-                        audio::bus_direction::input,
-                        bus_ids,
-                        state_change_subscriber);
+            [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+                updateBuses(audio::bus_direction::input, bus_ids);
             });
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_list_selector(
                     audio::bus_direction::output),
-            [this, &state_change_subscriber](
-                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                updateBuses(
-                        audio::bus_direction::output,
-                        bus_ids,
-                        state_change_subscriber);
+            [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+                updateBuses(audio::bus_direction::output, bus_ids);
             });
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::select_fx_chain_bus,
             [this](runtime::mixer::bus_id const& fx_chain_bus) {
                 setSelectedBus(static_cast<int>(
@@ -81,16 +72,15 @@ FxChain::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::select_current_fx_chain,
-            [this, &state_change_subscriber](
-                    container::box<runtime::fx::chain_t> const& fx_chain) {
+            [this](container::box<runtime::fx::chain_t> const& fx_chain) {
                 generic_list_model_edit_script_executor<
                         piejam::gui::model::FxModule,
                         FxModule>
                         visitor{*modules(),
                                 dispatch(),
-                                state_change_subscriber};
+                                state_change_subscriber()};
 
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_fx_chain, *fx_chain),
@@ -103,8 +93,7 @@ FxChain::subscribeStep(
 void
 FxChain::updateBuses(
         audio::bus_direction bus_dir,
-        container::box<runtime::mixer::bus_list_t> const& bus_ids,
-        runtime::subscriber& state_change_subscriber)
+        container::box<runtime::mixer::bus_list_t> const& bus_ids)
 {
     (bus_dir == audio::bus_direction::input ? m_inputs : m_outputs) = bus_ids;
 
@@ -112,12 +101,11 @@ FxChain::updateBuses(
             [this](algorithm::edit_script_deletion const& del) {
                 buses()->remove(del.pos);
             },
-            [this,
-             &state_change_subscriber](algorithm::edit_script_insertion<
-                                       runtime::mixer::bus_id> const& ins) {
+            [this](algorithm::edit_script_insertion<
+                    runtime::mixer::bus_id> const& ins) {
                 auto busName = std::make_unique<BusName>(
                         dispatch(),
-                        state_change_subscriber,
+                        state_change_subscriber(),
                         ins.value);
 
                 QObject::connect(

@@ -33,13 +33,12 @@ BusName::BusName(
 
 void
 BusName::subscribeStep(
-        runtime::subscriber& state_change_subscriber,
         runtime::subscriptions_manager& subs,
         runtime::subscription_id subs_id)
 {
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             runtime::selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string const& name) {
                 setName(QString::fromStdString(*name));

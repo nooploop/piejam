@@ -38,6 +38,11 @@ public:
     }
 
 protected:
+    auto state_change_subscriber() const noexcept -> runtime::subscriber&
+    {
+        return m_state_change_subscriber;
+    }
+
     auto dispatch() const noexcept -> runtime::store_dispatch
     {
         return m_store_dispatch;
@@ -46,14 +51,13 @@ protected:
     auto dispatch(runtime::action const& a) const { m_store_dispatch(a); }
 
     virtual void subscribeStep(
-            runtime::subscriber&,
             runtime::subscriptions_manager&,
             runtime::subscription_id) = 0;
 
 private:
     void subscribe() override
     {
-        subscribeStep(m_state_change_subscriber, m_subs, m_subs_id);
+        subscribeStep(m_subs, m_subs_id);
 
         m_store_dispatch(runtime::actions::renotify{});
     }

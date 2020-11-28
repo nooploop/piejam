@@ -43,7 +43,6 @@ Mixer::Mixer(
 
 void
 Mixer::subscribeStep(
-        runtime::subscriber& state_change_subscriber,
         runtime::subscriptions_manager& subs,
         runtime::subscription_id subs_id)
 {
@@ -51,16 +50,15 @@ Mixer::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::make_bus_list_selector(audio::bus_direction::input),
-            [this, &state_change_subscriber](
-                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+            [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 generic_list_model_edit_script_executor<
                         piejam::gui::model::MixerChannel,
                         MixerChannel>
                         visitor{*inputChannels(),
                                 dispatch(),
-                                state_change_subscriber};
+                                state_change_subscriber()};
 
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_inputs, *bus_ids),
@@ -72,16 +70,15 @@ Mixer::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::make_bus_list_selector(audio::bus_direction::output),
-            [this, &state_change_subscriber](
-                    container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+            [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
                 generic_list_model_edit_script_executor<
                         piejam::gui::model::MixerChannel,
                         MixerChannel>
                         visitor{*outputChannels(),
                                 dispatch(),
-                                state_change_subscriber};
+                                state_change_subscriber()};
 
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_outputs, *bus_ids),
@@ -93,7 +90,7 @@ Mixer::subscribeStep(
 
     subs.observe(
             subs_id,
-            state_change_subscriber,
+            state_change_subscriber(),
             selectors::select_input_solo_active,
             [this](bool const input_solo_active) {
                 setInputSoloActive(input_solo_active);
