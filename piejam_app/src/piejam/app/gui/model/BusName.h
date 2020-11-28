@@ -19,7 +19,6 @@
 
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/gui/model/BusName.h>
-#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {

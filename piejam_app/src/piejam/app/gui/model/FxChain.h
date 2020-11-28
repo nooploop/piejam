@@ -21,7 +21,6 @@
 #include <piejam/container/box.h>
 #include <piejam/gui/model/FxChain.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {

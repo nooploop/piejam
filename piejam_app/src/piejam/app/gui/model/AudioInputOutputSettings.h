@@ -20,7 +20,6 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
-#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {

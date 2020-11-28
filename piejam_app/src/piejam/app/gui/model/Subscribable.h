@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/entity_id_hash.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/renotify.h>
 #include <piejam/runtime/store_dispatch.h>

@@ -20,7 +20,6 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {

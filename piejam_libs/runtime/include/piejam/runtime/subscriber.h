@@ -17,11 +17,9 @@
 
 #pragma once
 
-#include <piejam/entity_id_hash.h>
+#include <piejam/fwd.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
-
-#include <functional>
 
 namespace piejam::runtime
 {

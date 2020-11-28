@@ -18,12 +18,8 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/container/boxed_string.h>
-#include <piejam/entity_id.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/runtime/mixer_fwd.h>
-#include <piejam/runtime/stereo_level.h>
-#include <piejam/runtime/subscriber.h>
 
 namespace piejam::app::gui::model
 {
