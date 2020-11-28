@@ -27,6 +27,9 @@ class FxParameter : public SubscribableModel
     Q_OBJECT
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
+    Q_PROPERTY(double value READ value NOTIFY valueChanged FINAL)
+    Q_PROPERTY(double min READ min NOTIFY minChanged FINAL)
+    Q_PROPERTY(double max READ max NOTIFY maxChanged FINAL)
 
 public:
     using SubscribableModel::SubscribableModel;
@@ -41,13 +44,49 @@ public:
         }
     }
 
+    auto value() const noexcept -> double { return m_value; }
+    void setValue(double x)
+    {
+        if (m_value != x)
+        {
+            m_value = x;
+            emit valueChanged();
+        }
+    }
+
+    auto min() const noexcept -> double { return m_min; }
+    void setMin(double x)
+    {
+        if (m_min != x)
+        {
+            m_min = x;
+            emit minChanged();
+        }
+    }
+
+    auto max() const noexcept -> double { return m_max; }
+    void setMax(double x)
+    {
+        if (m_max != x)
+        {
+            m_max = x;
+            emit valueChanged();
+        }
+    }
+
     auto toQString() const -> QString { return m_name; }
 
 signals:
     void nameChanged();
+    void valueChanged();
+    void minChanged();
+    void maxChanged();
 
 private:
     QString m_name;
+    double m_value{};
+    double m_min{};
+    double m_max{};
 };
 
 } // namespace piejam::gui::model
