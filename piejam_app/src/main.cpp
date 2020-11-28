@@ -25,6 +25,7 @@
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/BusName.h>
 #include <piejam/gui/model/FxModule.h>
+#include <piejam/gui/model/FxParameter.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/log/generic_log_sink.h>
@@ -121,9 +122,6 @@ main(int argc, char* argv[]) -> int
     store.subscribe([&state_change_subscriber](auto const& state) {
         state_change_subscriber.notify(state);
     });
-
-    qmlRegisterInterface<gui::model::BusConfig>("BusConfig", 1);
-    qmlRegisterInterface<gui::model::MixerChannel>("MixerChannel", 1);
 
     app::gui::model::AudioDeviceSettings audio_settings(
             store,

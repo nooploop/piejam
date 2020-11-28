@@ -15,30 +15,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/app/gui/model/FxParameter.h>
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/container/box.h>
-#include <piejam/gui/model/FxModule.h>
-#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
 {
 
-class FxModule final : public Subscribable<piejam::gui::model::FxModule>
+FxParameter::FxParameter(
+        runtime::store_dispatch store_dispatch,
+        runtime::subscriber& state_change_subscriber,
+        runtime::fx::module_id fx_mod_id,
+        runtime::fx::parameter_key fx_param_key)
+    : Subscribable(store_dispatch, state_change_subscriber)
+    , m_fx_mod_id(fx_mod_id)
+    , m_fx_param_key(fx_param_key)
 {
-public:
-    FxModule(
-            runtime::store_dispatch,
-            runtime::subscriber&,
-            runtime::fx::module_id);
+}
 
-private:
-    void subscribe_step() override;
-
-    runtime::fx::module_id const m_fx_mod_id;
-
-    container::box<runtime::fx::parameters_t> m_param_ids;
-};
+void
+FxParameter::subscribe_step()
+{
+    observe(runtime::selectors::make_fx_parameter_name_selector(
+                    m_fx_mod_id,
+                    m_fx_param_key),
+            [this](container::boxed_string const& name) {
+                setName(QString::fromStdString(*name));
+            });
+}
 
 } // namespace piejam::app::gui::model

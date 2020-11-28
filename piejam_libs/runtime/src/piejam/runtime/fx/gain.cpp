@@ -31,7 +31,8 @@ make_gain_module(float_parameters& float_params) -> module
     mod.fx_type = type::gain;
     mod.name = std::string("gain");
 
-    mod.parameters.emplace(
+    fx::parameters_t parameters;
+    parameters.emplace(
             static_cast<std::size_t>(gain_parameter_key::gain),
             parameter{
                     .id = float_params.add(runtime::parameter::float_{
@@ -39,6 +40,8 @@ make_gain_module(float_parameters& float_params) -> module
                             .min = 0.f,
                             .max = 8.f}),
                     .name = "gain"});
+
+    mod.parameters = std::move(parameters);
 
     return mod;
 }

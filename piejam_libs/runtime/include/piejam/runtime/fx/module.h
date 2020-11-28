@@ -33,16 +33,29 @@ namespace piejam::runtime::fx
 struct parameter
 {
     float_parameter_id id;
-    std::string name;
+    container::boxed_string name;
 };
 
+constexpr bool
+operator==(parameter const& l, parameter const& r) noexcept
+{
+    return l.id == r.id;
+}
+
+constexpr bool
+operator!=(parameter const& l, parameter const& r) noexcept
+{
+    return l.id != r.id;
+}
+
 using parameter_key = std::size_t;
+using parameters_t = boost::container::flat_map<parameter_key, parameter>;
 
 struct module
 {
     type fx_type;
     container::boxed_string name;
-    boost::container::flat_map<parameter_key, parameter> parameters;
+    container::box<parameters_t> parameters;
 };
 
 using module_id = entity_id<module>;

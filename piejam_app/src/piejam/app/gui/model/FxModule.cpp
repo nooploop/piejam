@@ -17,6 +17,10 @@
 
 #include <piejam/app/gui/model/FxModule.h>
 
+#include <piejam/algorithm/edit_script.h>
+#include <piejam/app/gui/model/FxParameter.h>
+#include <piejam/functional/overload.h>
+#include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
@@ -31,12 +35,51 @@ FxModule::FxModule(
 {
 }
 
+static auto
+get_parameter_keys(runtime::fx::parameters_t const& params)
+{
+    std::vector<runtime::fx::parameter_key> result;
+    result.reserve(params.size());
+    std::ranges::transform(
+            params,
+            std::back_inserter(result),
+            &runtime::fx::parameters_t::value_type::first);
+    return result;
+}
+
 void
 FxModule::subscribe_step()
 {
     observe(runtime::selectors::make_fx_module_name_selector(m_fx_mod_id),
             [this](container::boxed_string const& name) {
                 setName(QString::fromStdString(*name));
+            });
+
+    observe(runtime::selectors::make_fx_module_parameters_selector(m_fx_mod_id),
+            [this](container::box<runtime::fx::parameters_t> const& param_ids) {
+                auto visitor = overload{
+                        [this](algorithm::edit_script_deletion const& del) {
+                            parameters()->remove(del.pos);
+                        },
+                        [this](algorithm::edit_script_insertion<
+                                runtime::fx::parameter_key> const ins) {
+                            parameters()->add(
+                                    ins.pos,
+                                    std::make_unique<FxParameter>(
+                                            dispatch(),
+                                            state_change_subscriber(),
+                                            m_fx_mod_id,
+                                            ins.value));
+                        }};
+
+                auto const old_keys = get_parameter_keys(*m_param_ids);
+                auto const new_keys = get_parameter_keys(*param_ids);
+
+                algorithm::apply_edit_script(
+                        algorithm::edit_script(old_keys, new_keys),
+                        visitor);
+
+                m_param_ids = param_ids;
             });
 }
 

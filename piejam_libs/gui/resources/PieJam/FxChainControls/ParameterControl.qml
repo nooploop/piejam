@@ -39,7 +39,7 @@ Item {
         anchors.topMargin: 4
         anchors.horizontalCenter: parent.horizontalCenter
 
-        padding: 2
+        padding: 4
         verticalAlignment: Text.AlignVCenter
         background: Rectangle {
             color: Material.color(Material.Grey, Material.Shade800)

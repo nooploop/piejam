@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/gui/model/fwd.h>
 
 namespace piejam::gui::model
 {
@@ -27,6 +29,7 @@ class FxModule : public SubscribableModel
     Q_OBJECT
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
+    Q_PROPERTY(QAbstractListModel* parameters READ parameters CONSTANT)
 
 public:
     auto name() const noexcept -> QString const& { return m_name; }
@@ -39,6 +42,8 @@ public:
         }
     }
 
+    auto parameters() noexcept -> FxParametersList* { return &m_parameters; }
+
     auto toQString() const -> QString { return m_name; }
 
 signals:
@@ -46,6 +51,7 @@ signals:
 
 private:
     QString m_name;
+    FxParametersList m_parameters;
 };
 
 } // namespace piejam::gui::model

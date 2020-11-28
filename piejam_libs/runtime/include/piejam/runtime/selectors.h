@@ -81,6 +81,10 @@ extern const selector<container::box<fx::chain_t>> select_current_fx_chain;
 
 auto make_fx_module_name_selector(fx::module_id)
         -> selector<container::boxed_string>;
+auto make_fx_module_parameters_selector(fx::module_id)
+        -> selector<container::box<fx::parameters_t>>;
+auto make_fx_parameter_name_selector(fx::module_id, fx::parameter_key)
+        -> selector<container::boxed_string>;
 
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;

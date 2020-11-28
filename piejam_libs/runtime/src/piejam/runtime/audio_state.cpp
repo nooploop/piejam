@@ -79,7 +79,7 @@ remove_fx_module(audio_state& st, fx::module_id id)
 {
     if (fx::module const* const fx_mod = std::as_const(st.fx_modules)[id])
     {
-        for (auto&& [key, fx_param] : fx_mod->parameters)
+        for (auto&& [key, fx_param] : *fx_mod->parameters)
             st.float_params.remove(fx_param.id);
 
         st.fx_modules.remove(id);

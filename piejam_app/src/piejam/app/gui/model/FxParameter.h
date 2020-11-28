@@ -17,26 +17,27 @@
 
 #pragma once
 
-#include <piejam/fwd.h>
+#include <piejam/app/gui/model/Subscribable.h>
+#include <piejam/gui/model/FxParameter.h>
+#include <piejam/runtime/fx/fwd.h>
 
-#include <boost/container/container_fwd.hpp>
-
-#include <vector>
-
-namespace piejam::runtime::fx
+namespace piejam::app::gui::model
 {
 
-enum class type : unsigned;
+class FxParameter final : public Subscribable<piejam::gui::model::FxParameter>
+{
+public:
+    FxParameter(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::fx::module_id fx_mod_id,
+            runtime::fx::parameter_key fx_param_key);
 
-struct parameter;
-struct module;
+private:
+    void subscribe_step() override;
 
-using parameter_key = std::size_t;
-using parameters_t = boost::container::flat_map<parameter_key, parameter>;
+    runtime::fx::module_id m_fx_mod_id;
+    runtime::fx::parameter_key m_fx_param_key;
+};
 
-using module_id = entity_id<module>;
-using modules_t = entity_map<module, module>;
-
-using chain_t = std::vector<module_id>;
-
-} // namespace piejam::runtime::fx
+} // namespace piejam::app::gui::model

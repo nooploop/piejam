@@ -43,7 +43,7 @@ public:
             std::string_view const& name)
         : m_gain_input_proc(proc_factory.make_input_processor(
                   fx_mod.parameters
-                          .at(static_cast<std::size_t>(
+                          ->at(static_cast<std::size_t>(
                                   fx::gain_parameter_key::gain))
                           .id,
                   fmt::format("gain {}", name)))

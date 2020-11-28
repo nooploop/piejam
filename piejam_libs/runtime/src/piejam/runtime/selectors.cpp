@@ -213,6 +213,38 @@ make_fx_module_name_selector(fx::module_id fx_mod_id)
     };
 }
 
+auto
+make_fx_module_parameters_selector(fx::module_id fx_mod_id)
+        -> selector<container::box<fx::parameters_t>>
+{
+    return [fx_mod_id](
+                   audio_state const& st) -> container::box<fx::parameters_t> {
+        static container::box<fx::parameters_t> s_empty;
+        fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
+        return fx_mod ? fx_mod->parameters : s_empty;
+    };
+}
+
+auto
+make_fx_parameter_name_selector(
+        fx::module_id fx_mod_id,
+        fx::parameter_key fx_param_key) -> selector<container::boxed_string>
+{
+    return [fx_mod_id,
+            fx_param_key](audio_state const& st) -> container::boxed_string {
+        static container::boxed_string s_empty;
+        if (fx::module const* const fx_mod = st.fx_modules[fx_mod_id])
+        {
+            if (auto it = fx_mod->parameters->find(fx_param_key);
+                it != fx_mod->parameters->end())
+            {
+                return it->second.name;
+            }
+        }
+        return s_empty;
+    };
+}
+
 const selector<std::size_t> select_xruns([](audio_state const& st) {
     return st.xruns;
 });

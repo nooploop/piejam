@@ -43,7 +43,7 @@ Item {
         Label {
             id: nameLabel
 
-            padding: 2
+            padding: 4
             verticalAlignment: Text.AlignVCenter
             background: Rectangle {
                 color: Material.primaryColor
@@ -56,14 +56,14 @@ Item {
         Button {
             id: deleteButton
             width: 24
-            height: 34
+            height: 35
 
             text: "x"
             anchors.right: parent.right
             anchors.top: nameLabel.top
             font.bold: true
             font.pixelSize: 12
-            anchors.topMargin: -8
+            anchors.topMargin: -6
 
             onClicked: deleteButtonClicked()
         }
@@ -80,11 +80,17 @@ Item {
             implicitWidth: contentWidth
 
             delegate: ParameterControl {
-                name: modelData.name
-                value: modelData.value
-                valueText: modelData.valueText
+                name: model.item.name
+                value: model.item.value
+                valueText: model.item.valueText
 
                 height: parametersList.height
+
+                Binding {
+                    target: model.item
+                    property: "subscribed"
+                    value: visible
+                }
             }
         }
     }

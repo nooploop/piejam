@@ -37,4 +37,7 @@ using BusConfigsList = GenericListModel<BusConfig>;
 class BusName;
 using BusNamesList = GenericListModel<BusName>;
 
+class FxParameter;
+using FxParametersList = GenericListModel<FxParameter>;
+
 } // namespace piejam::gui::model

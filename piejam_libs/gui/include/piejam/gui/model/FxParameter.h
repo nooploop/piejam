@@ -17,26 +17,37 @@
 
 #pragma once
 
-#include <piejam/fwd.h>
+#include <piejam/gui/model/SubscribableModel.h>
 
-#include <boost/container/container_fwd.hpp>
-
-#include <vector>
-
-namespace piejam::runtime::fx
+namespace piejam::gui::model
 {
 
-enum class type : unsigned;
+class FxParameter : public SubscribableModel
+{
+    Q_OBJECT
 
-struct parameter;
-struct module;
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
 
-using parameter_key = std::size_t;
-using parameters_t = boost::container::flat_map<parameter_key, parameter>;
+public:
+    using SubscribableModel::SubscribableModel;
 
-using module_id = entity_id<module>;
-using modules_t = entity_map<module, module>;
+    auto name() const noexcept -> QString const& { return m_name; }
+    void setName(QString const& x)
+    {
+        if (m_name != x)
+        {
+            m_name = x;
+            emit nameChanged();
+        }
+    }
 
-using chain_t = std::vector<module_id>;
+    auto toQString() const -> QString { return m_name; }
 
-} // namespace piejam::runtime::fx
+signals:
+    void nameChanged();
+
+private:
+    QString m_name;
+};
+
+} // namespace piejam::gui::model

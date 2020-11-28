@@ -25,6 +25,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusName.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/GenericListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Mixer.h
