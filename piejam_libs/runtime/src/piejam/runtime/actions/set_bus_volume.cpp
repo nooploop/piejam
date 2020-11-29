@@ -29,11 +29,10 @@ set_bus_volume(mixer::bus_id bus_id, float volume) -> thunk_action
 {
     return [=](auto const& get_state, auto const& dispatch) {
         state const& st = get_state();
-        auto it = st.mixer_state.buses.find(bus_id);
-        if (it != st.mixer_state.buses.end())
+        if (mixer::bus const* const bus = st.mixer_state.buses[bus_id])
         {
-            if (st.float_params.contains(it->second.volume))
-                dispatch(set_float_parameter{it->second.volume, volume});
+            if (st.float_params.contains(bus->volume))
+                dispatch(set_float_parameter{bus->volume, volume});
         }
     };
 }

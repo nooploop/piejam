@@ -80,6 +80,7 @@ extern const selector<mixer::bus_id> select_fx_chain_bus;
 
 extern const selector<container::box<fx::chain_t>> select_current_fx_chain;
 extern const selector<stereo_level> select_current_fx_chain_bus_level;
+extern const selector<float> select_current_fx_chain_bus_volume;
 
 auto make_fx_module_name_selector(fx::module_id)
         -> selector<container::boxed_string>;

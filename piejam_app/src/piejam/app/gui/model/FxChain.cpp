@@ -25,6 +25,7 @@
 #include <piejam/app/gui/model/FxParameter.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
+#include <piejam/runtime/actions/set_bus_volume.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
@@ -84,6 +85,9 @@ FxChain::subscribe_step()
             [this](runtime::stereo_level const& level) {
                 setLevel(level.left, level.right);
             });
+
+    observe(runtime::selectors::select_current_fx_chain_bus_volume,
+            [this](float const volume) { setVolume(volume); });
 }
 
 void
@@ -133,6 +137,12 @@ void
 FxChain::requestLevelsUpdate()
 {
     dispatch(runtime::actions::request_mixer_levels_update({m_bus_id}));
+}
+
+void
+FxChain::changeVolume(double volume)
+{
+    dispatch(runtime::actions::set_bus_volume(m_bus_id, volume));
 }
 
 } // namespace piejam::app::gui::model

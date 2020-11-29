@@ -209,6 +209,14 @@ const selector<stereo_level>
             return level ? *level : stereo_level();
         });
 
+const selector<float>
+select_current_fx_chain_bus_volume([](state const& st) -> float {
+    mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+    float const* const volume =
+            bus ? st.float_params.get(bus->volume) : nullptr;
+    return volume ? *volume : 0.f;
+});
+
 auto
 make_fx_module_name_selector(fx::module_id fx_mod_id)
         -> selector<container::boxed_string>

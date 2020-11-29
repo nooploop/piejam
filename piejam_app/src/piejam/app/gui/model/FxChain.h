@@ -32,6 +32,7 @@ public:
 
     void selectBus(int) override;
     void requestLevelsUpdate() override;
+    void changeVolume(double) override;
 
 private:
     void subscribe_step() override;

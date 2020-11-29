@@ -110,6 +110,11 @@ TopPane {
 
             levelLeft: root.model.levelLeft
             levelRight: root.model.levelRight
+            volume: root.model.volume
+
+            enabled: channelSelector.currentIndex != -1
+
+            onFaderMoved: root.model.changeVolume(newVolume)
         }
     }
 
