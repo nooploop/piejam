@@ -78,6 +78,21 @@ make_fx_gain(audio_state& st)
 }
 
 void
+add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::type fx_type)
+{
+    mixer::bus& bus = st.mixer_state.buses[bus_id];
+
+    auto fx_chain = *bus.fx_chain;
+    switch (fx_type)
+    {
+        case fx::type::gain:
+            fx_chain.emplace_back(make_fx_gain(st));
+            break;
+    }
+    bus.fx_chain = std::move(fx_chain);
+}
+
+void
 remove_fx_module(audio_state& st, fx::module_id id)
 {
     if (fx::module const* const fx_mod = std::as_const(st.fx_modules)[id])
@@ -123,7 +138,7 @@ add_mixer_bus(
             .level = st.levels.add(parameter::stereo_level{}),
             .type = type,
             .device_channels = chs,
-            .fx_chain = fx::chain_t{make_fx_gain(st)}}));
+            .fx_chain = {}}));
     mixer::bus_ids<D>(st.mixer_state) = bus_ids;
 }
 
@@ -159,7 +174,8 @@ remove_mixer_bus(audio_state& st, std::size_t index)
     st.bool_params.remove(bus->mute);
     st.levels.remove(bus->level);
 
-    for (auto&& fx_mod_id : *bus->fx_chain)
+    auto const fx_chain = *bus->fx_chain;
+    for (auto&& fx_mod_id : fx_chain)
         remove_fx_module(st, fx_mod_id);
 
     if (st.fx_chain_bus == bus_id)

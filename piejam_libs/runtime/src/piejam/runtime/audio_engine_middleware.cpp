@@ -23,6 +23,7 @@
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/runtime/actions/add_bus.h>
+#include <piejam/runtime/actions/add_fx_module.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
@@ -298,6 +299,12 @@ audio_engine_middleware::process_engine_action(
                     rebuild();
             },
             [this](actions::delete_bus const& a) {
+                m_next(a);
+
+                if (m_engine)
+                    rebuild();
+            },
+            [this](actions::add_fx_module const& a) {
                 m_next(a);
 
                 if (m_engine)

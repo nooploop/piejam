@@ -15,30 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/add_fx_module.h>
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+#include <piejam/runtime/audio_state.h>
+
+#include <fmt/format.h>
 
 namespace piejam::runtime::actions
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              add_fx_module,
-              delete_fx_module,
-              set_bool_parameter,
-              set_float_parameter,
-              set_input_bus_solo,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info>
+auto
+add_fx_module::reduce(state const& st) const -> state
 {
-};
+    auto new_st = st;
+
+    runtime::add_fx_module(new_st, bus_id, fx_type);
+
+    return new_st;
+}
 
 } // namespace piejam::runtime::actions

@@ -76,6 +76,8 @@ TopPane {
                 visible: root.model.selectedBus !== -1
 
                 text: "+"
+
+                onClicked: root.model.addModule()
             }
         }
     }

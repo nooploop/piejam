@@ -47,6 +47,7 @@ struct select_bus_channel;
 struct add_bus;
 struct delete_bus;
 
+struct add_fx_module;
 struct delete_fx_module;
 
 template <audio::bus_direction>

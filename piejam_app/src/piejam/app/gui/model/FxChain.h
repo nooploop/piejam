@@ -31,6 +31,7 @@ public:
     FxChain(runtime::store_dispatch, runtime::subscriber&);
 
     void selectBus(int) override;
+    void addModule() override;
     void deleteModule(int) override;
     void requestLevelsUpdate() override;
     void changeVolume(double) override;
