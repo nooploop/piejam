@@ -21,6 +21,8 @@
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/parameter.h>
 
+#include <boost/range/algorithm_ext/erase.hpp>
+
 #include <algorithm>
 
 namespace piejam::runtime
@@ -75,11 +77,21 @@ make_fx_gain(audio_state& st)
     return st.fx_modules.add(fx::make_gain_module(st.float_params));
 }
 
-static void
+void
 remove_fx_module(audio_state& st, fx::module_id id)
 {
     if (fx::module const* const fx_mod = std::as_const(st.fx_modules)[id])
     {
+        for (auto&& [bus_id, bus] : st.mixer_state.buses)
+        {
+            if (std::ranges::find(*bus.fx_chain, id) != bus.fx_chain->end())
+            {
+                auto fx_chain = *bus.fx_chain;
+                boost::remove_erase(fx_chain, id);
+                bus.fx_chain = std::move(fx_chain);
+            }
+        }
+
         for (auto&& [key, fx_param] : *fx_mod->parameters)
             st.float_params.remove(fx_param.id);
 

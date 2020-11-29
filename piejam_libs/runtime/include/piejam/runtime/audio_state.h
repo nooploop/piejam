@@ -87,4 +87,6 @@ void remove_mixer_bus(audio_state&, std::size_t index);
 template <audio::bus_direction D>
 void clear_mixer_buses(audio_state&);
 
+void remove_fx_module(audio_state& st, fx::module_id id);
+
 } // namespace piejam::runtime

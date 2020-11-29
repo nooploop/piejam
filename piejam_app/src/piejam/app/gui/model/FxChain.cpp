@@ -23,6 +23,7 @@
 #include <piejam/app/gui/model/BusName.h>
 #include <piejam/app/gui/model/FxModule.h>
 #include <piejam/app/gui/model/FxParameter.h>
+#include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
 #include <piejam/runtime/actions/set_bus_volume.h>
@@ -131,6 +132,18 @@ FxChain::selectBus(int pos)
     }
 
     dispatch(action);
+}
+
+void
+FxChain::deleteModule(int pos)
+{
+    std::size_t const index = static_cast<std::size_t>(pos);
+    if (index < m_fx_chain->size())
+    {
+        runtime::actions::delete_fx_module action;
+        action.fx_mod_id = m_fx_chain.get()[index];
+        dispatch(action);
+    }
 }
 
 void

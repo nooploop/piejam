@@ -25,6 +25,7 @@
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/delete_bus.h>
+#include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/device_action_visitor.h>
 #include <piejam/runtime/actions/engine_action_visitor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
@@ -297,6 +298,12 @@ audio_engine_middleware::process_engine_action(
                     rebuild();
             },
             [this](actions::delete_bus const& a) {
+                m_next(a);
+
+                if (m_engine)
+                    rebuild();
+            },
+            [this](actions::delete_fx_module const& a) {
                 m_next(a);
 
                 if (m_engine)

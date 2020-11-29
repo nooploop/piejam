@@ -47,6 +47,8 @@ struct select_bus_channel;
 struct add_bus;
 struct delete_bus;
 
+struct delete_fx_module;
+
 template <audio::bus_direction>
 struct set_bus_solo;
 using set_input_bus_solo = set_bus_solo<audio::bus_direction::input>;

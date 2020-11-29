@@ -47,6 +47,8 @@ TopPane {
             name: model.item.name
             parameters: model.item.parameters
 
+            onDeleteButtonClicked: root.model.deleteModule(index)
+
             Binding {
                 target: model.item
                 property: "subscribed"

@@ -50,6 +50,8 @@ public:
     }
     Q_INVOKABLE virtual void selectBus(int) = 0;
 
+    Q_INVOKABLE virtual void deleteModule(int) = 0;
+
     auto levelLeft() const noexcept -> double { return m_levelLeft; }
     auto levelRight() const noexcept -> double { return m_levelRight; }
     void setLevel(double left, double right)
