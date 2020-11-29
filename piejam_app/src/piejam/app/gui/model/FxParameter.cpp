@@ -17,7 +17,10 @@
 
 #include <piejam/app/gui/model/FxParameter.h>
 
+#include <piejam/runtime/actions/set_float_parameter_normalized.h>
+#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::app::gui::model
 {
@@ -43,10 +46,26 @@ FxParameter::subscribe_step()
                 setName(QString::fromStdString(*name));
             });
 
-    observe(runtime::selectors::make_fx_parameter_value_selector(
+    observe(runtime::selectors::make_fx_parameter_id_selector(
                     m_fx_mod_id,
                     m_fx_param_key),
-            [this](float const x) { setValue(x); });
+            [this](runtime::float_parameter_id const param_id) {
+                observe(runtime::selectors::
+                                make_float_parameter_normalized_value_selector(
+                                        param_id),
+                        [this](float const norm_value) {
+                            setValue(norm_value);
+                        });
+                m_param_id = param_id;
+            });
+}
+
+void
+FxParameter::changeValue(double value)
+{
+    dispatch(runtime::actions::set_float_parameter_normalized(
+            m_param_id,
+            value));
 }
 
 } // namespace piejam::app::gui::model

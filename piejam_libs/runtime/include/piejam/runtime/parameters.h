@@ -22,13 +22,16 @@
 namespace piejam::runtime
 {
 
-using float_parameters = parameter::map<parameter::float_>;
-using float_parameter_id = parameter::id_t<parameter::float_>;
+using float_parameter = parameter::float_;
+using float_parameters = parameter::map<float_parameter>;
+using float_parameter_id = parameter::id_t<float_parameter>;
 
-using bool_parameters = parameter::map<parameter::bool_>;
-using bool_parameter_id = parameter::id_t<parameter::bool_>;
+using bool_parameter = parameter::bool_;
+using bool_parameters = parameter::map<bool_parameter>;
+using bool_parameter_id = parameter::id_t<bool_parameter>;
 
-using stereo_level_parameters = parameter::map<parameter::stereo_level>;
-using stereo_level_parameter_id = parameter::id_t<parameter::stereo_level>;
+using stereo_level_parameter = parameter::stereo_level;
+using stereo_level_parameters = parameter::map<stereo_level_parameter>;
+using stereo_level_parameter_id = parameter::id_t<stereo_level_parameter>;
 
 } // namespace piejam::runtime

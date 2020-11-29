@@ -26,6 +26,8 @@ Item {
     property alias value: valueSlider.value
     property alias valueText: valueLabel.text
 
+    signal sliderMoved(real newValue)
+
     implicitWidth: nameLabel.width
 
     Label {
@@ -92,6 +94,8 @@ Item {
             anchors.topMargin: 8
             anchors.horizontalCenter: parent.horizontalCenter
             orientation: Qt.Vertical
+
+            onMoved: sliderMoved(valueSlider.value)
         }
     }
 }

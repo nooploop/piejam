@@ -82,9 +82,11 @@ Item {
             delegate: ParameterControl {
                 name: model.item.name
                 value: model.item.value
-                valueText: model.item.valueText
+                valueText: model.item.value.toFixed(2)
 
                 height: parametersList.height
+
+                onSliderMoved: model.item.changeValue(newValue)
 
                 Binding {
                     target: model.item

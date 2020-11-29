@@ -20,15 +20,28 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/map.h>
 
 namespace piejam::runtime::fx
 {
 
+namespace
+{
+
+struct dB_ival
+{
+    static constexpr auto min{(std::log(0.0625f) / std::log(10)) * 20.f};
+    static constexpr auto max{(std::log(8.f) / std::log(10)) * 20.f};
+};
+
+} // namespace
+
 auto
 make_gain_module(float_parameters& float_params) -> module
 {
     using namespace std::string_literals;
+
     return module{
             .fx_type = type::gain,
             .name = "gain"s,
@@ -37,8 +50,14 @@ make_gain_module(float_parameters& float_params) -> module
                      parameter{
                              .id = float_params.add(runtime::parameter::float_{
                                      .default_value = 1.f,
-                                     .min = 0.f,
-                                     .max = 8.f}),
+                                     .min = 0.0625f,
+                                     .max = 8.f,
+                                     .to_normalized = runtime::parameter::
+                                             to_normalized_db<dB_ival>,
+                                     .from_normalized =
+                                             &runtime::parameter::
+                                                     from_normalized_db<
+                                                             dB_ival>}),
                              .name = "gain"}}}};
 }
 

@@ -17,22 +17,12 @@
 
 #pragma once
 
-namespace piejam::runtime::parameter
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/parameters.h>
+
+namespace piejam::runtime::actions
 {
 
-struct float_
-{
-    using value_type = float;
-    using to_normalized_f = float (*)(float_ const&, float);
-    using from_normalized_f = float (*)(float_ const&, float);
+auto set_float_parameter_normalized(float_parameter_id, float norm_value) -> thunk_action;
 
-    float default_value{};
-
-    float min{};
-    float max{1.f};
-
-    to_normalized_f to_normalized{[](auto const&, float x) { return x; }};
-    from_normalized_f from_normalized{[](auto const&, float x) { return x; }};
-};
-
-} // namespace piejam::runtime::parameter
+} // namespace piejam::runtime::actions

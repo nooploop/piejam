@@ -20,10 +20,7 @@
 #include <piejam/audio/engine/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/parameter/float_.h>
-#include <piejam/runtime/parameters.h>
 
-#include <functional>
 #include <memory>
 #include <string_view>
 

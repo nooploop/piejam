@@ -15,31 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/set_float_parameter_normalized.h>
 
-#include <piejam/entity_id.h>
-#include <piejam/runtime/actions/engine_action.h>
-#include <piejam/runtime/fwd.h>
-#include <piejam/runtime/parameters.h>
-#include <piejam/runtime/ui/cloneable_action.h>
+#include <piejam/runtime/actions/set_float_parameter.h>
+#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::runtime::actions
 {
 
-struct set_float_parameter final
-    : ui::cloneable_action<set_float_parameter, action>
-    , visitable_engine_action<set_float_parameter>
+auto
+set_float_parameter_normalized(float_parameter_id param_id, float norm_value)
+        -> thunk_action
 {
-    set_float_parameter(float_parameter_id id, float value)
-        : id(id)
-        , value(value)
-    {
-    }
-
-    float_parameter_id id{};
-    float value{};
-
-    auto reduce(state const&) const -> state override;
-};
+    return [=](auto const& get_state, auto const& dispatch) {
+        state const& st = get_state();
+        if (float_parameter const* const param =
+                    st.float_params.get_parameter(param_id))
+            dispatch(set_float_parameter{
+                    param_id,
+                    param->from_normalized(*param, norm_value)});
+    };
+}
 
 } // namespace piejam::runtime::actions

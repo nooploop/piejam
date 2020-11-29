@@ -245,20 +245,35 @@ make_fx_parameter_name_selector(
 }
 
 auto
-make_fx_parameter_value_selector(
+make_fx_parameter_id_selector(
         fx::module_id const fx_mod_id,
-        fx::parameter_key const fx_param_key) -> selector<float>
+        fx::parameter_key const fx_param_key) -> selector<float_parameter_id>
 {
-    return [fx_mod_id, fx_param_key](state const& st) -> float {
+    return [fx_mod_id, fx_param_key](state const& st) -> float_parameter_id {
         if (fx::module const* const fx_mod = st.fx_modules[fx_mod_id])
         {
             if (auto it = fx_mod->parameters->find(fx_param_key);
                 it != fx_mod->parameters->end())
             {
-                if (float const* const value =
-                            st.float_params.get(it->second.id))
-                    return *value;
+                return it->second.id;
             }
+        }
+        return {};
+    };
+}
+
+auto
+make_float_parameter_normalized_value_selector(
+        float_parameter_id const param_id) -> selector<float>
+{
+    return [param_id](state const& st) -> float {
+        if (float_parameter const* const param =
+                    st.float_params.get_parameter(param_id))
+        {
+            float const* const value = st.float_params.get(param_id);
+            BOOST_ASSERT(value);
+            BOOST_ASSERT(param->to_normalized);
+            return param->to_normalized(*param, *value);
         }
         return {};
     };

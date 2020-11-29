@@ -52,6 +52,8 @@ public:
         }
     }
 
+    Q_INVOKABLE virtual void changeValue(double) = 0;
+
     auto toQString() const -> QString { return m_name; }
 
 signals:
