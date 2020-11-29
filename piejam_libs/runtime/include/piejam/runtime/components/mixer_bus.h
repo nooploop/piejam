@@ -27,11 +27,18 @@
 namespace piejam::runtime::components
 {
 
-auto make_mixer_bus(audio::samplerate_t const samplerate,
-                    mixer::bus_id bus_id,
-                    mixer::bus const& channel,
-                    parameter_processor_factory& param_procs,
-                    std::string_view const& name = {})
+auto make_mixer_bus_input(
+        mixer::bus const&,
+        parameter_processor_factory& param_procs,
+        std::string_view const& name = {})
+        -> std::unique_ptr<audio::engine::component>;
+
+auto make_mixer_bus_output(
+        audio::samplerate_t const samplerate,
+        mixer::bus_id,
+        mixer::bus const&,
+        parameter_processor_factory& param_procs,
+        std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;
 
 } // namespace piejam::runtime::components

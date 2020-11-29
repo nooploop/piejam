@@ -77,7 +77,8 @@ using fx_chains_map = std::unordered_map<mixer::bus_id, fx_chain_components>;
 struct mixer_bus_component_mapping
 {
     mixer::bus_id bus_id;
-    component_ptr component;
+    component_ptr input;
+    component_ptr output;
 };
 
 using mixer_bus_components = std::vector<mixer_bus_component_mapping>;
@@ -132,7 +133,8 @@ make_mixer_bus_vector(
         {
             result.emplace_back(
                     id,
-                    components::make_mixer_bus(
+                    components::make_mixer_bus_input(*buses[id], param_procs),
+                    components::make_mixer_bus_output(
                             samplerate,
                             id,
                             *buses[id],
@@ -204,6 +206,73 @@ make_fx_chains_map(
     return fx_chains;
 }
 
+template <class Range, class BinaryOp>
+void
+for_each_adjacent(Range&& rng, BinaryOp&& op)
+{
+    auto first = std::begin(rng);
+    auto second =
+            first != std::end(rng) ? std::next(std::begin(rng)) : std::end(rng);
+    auto const end = std::end(rng);
+
+    while (second != end)
+    {
+        std::invoke(std::forward<BinaryOp>(op), *first, *second);
+        std::advance(first, 1);
+        std::advance(second, 1);
+    }
+}
+
+static auto
+connect_fx_chain(
+        ns_ae::graph& g,
+        fx_chain_components const& fx_chain,
+        std::vector<processor_ptr>& mixer_procs)
+{
+    for (auto const& comp : fx_chain)
+        comp.component->connect(g);
+
+    for_each_adjacent(
+            fx_chain,
+            [&g, &mixer_procs](
+                    fx_module_component_mapping const& l_comp,
+                    fx_module_component_mapping const& r_comp) {
+                connect_stereo_components(
+                        g,
+                        *l_comp.component,
+                        *r_comp.component,
+                        mixer_procs);
+            });
+}
+
+static auto
+connect_mixer_bus_with_fx_chain(
+        ns_ae::graph& g,
+        ns_ae::component& mb_in,
+        fx_chain_components const& fx_chain,
+        ns_ae::component& mb_out,
+        std::vector<processor_ptr>& mixer_procs)
+{
+    if (fx_chain.empty())
+    {
+        connect_stereo_components(g, mb_in, mb_out, mixer_procs);
+    }
+    else
+    {
+        connect_stereo_components(
+                g,
+                mb_in,
+                *fx_chain.front().component,
+                mixer_procs);
+        connect_fx_chain(g, fx_chain, mixer_procs);
+        connect_stereo_components(
+                g,
+                *fx_chain.back().component,
+                mb_out,
+                mixer_procs);
+    }
+}
+
 static auto
 make_graph(
         mixer::state const& mixer_state,
@@ -211,7 +280,7 @@ make_graph(
         ns_ae::processor& output_proc,
         mixer_bus_components const& input_buses,
         mixer_bus_components const& output_buses,
-        fx_chains_map const&,
+        fx_chains_map const& fx_chains,
         ns_ae::processor& input_solo_index,
         std::vector<processor_ptr>& mixer_procs)
 {
@@ -222,19 +291,29 @@ make_graph(
     {
         auto const& bus =
                 mixer::get_bus<audio::bus_direction::input>(mixer_state, idx);
-        auto const& [id, mb] = input_buses[idx];
+        auto const& [id, mb_in, mb_out] = input_buses[idx];
 
-        mb->connect(g);
+        mb_in->connect(g);
+        mb_out->connect(g);
+
+        connect_mixer_bus_with_fx_chain(
+                g,
+                *mb_in,
+                fx_chains.at(id),
+                *mb_out,
+                mixer_procs);
 
         if (bus.device_channels.left != npos)
-            g.add_wire({input_proc, bus.device_channels.left}, mb->inputs()[0]);
+            g.add_wire(
+                    {input_proc, bus.device_channels.left},
+                    mb_in->inputs()[0]);
 
         if (bus.device_channels.right != npos)
             g.add_wire(
                     {input_proc, bus.device_channels.right},
-                    mb->inputs()[1]);
+                    mb_in->inputs()[1]);
 
-        g.add_event_wire({input_solo_index, 0}, mb->event_inputs()[0]);
+        g.add_event_wire({input_solo_index, 0}, mb_out->event_inputs()[0]);
     }
 
     BOOST_ASSERT(mixer_state.outputs->size() == output_buses.size());
@@ -242,28 +321,36 @@ make_graph(
     {
         auto const& bus =
                 mixer::get_bus<audio::bus_direction::output>(mixer_state, idx);
-        auto const& [id, mb] = output_buses[idx];
+        auto const& [id, mb_in, mb_out] = output_buses[idx];
 
-        mb->connect(g);
+        mb_in->connect(g);
+        mb_out->connect(g);
+
+        connect_mixer_bus_with_fx_chain(
+                g,
+                *mb_in,
+                fx_chains.at(id),
+                *mb_out,
+                mixer_procs);
 
         if (bus.device_channels.left != npos)
             connect(g,
-                    mb->outputs()[0],
+                    mb_out->outputs()[0],
                     {output_proc, bus.device_channels.left},
                     mixer_procs);
 
         if (bus.device_channels.right != npos)
             connect(g,
-                    mb->outputs()[1],
+                    mb_out->outputs()[1],
                     {output_proc, bus.device_channels.right},
                     mixer_procs);
     }
 
-    for (auto const& [id, out] : output_buses)
+    for (auto const& [id, out_mb_in, out_mb_out] : output_buses)
     {
-        for (auto const& [id, in] : input_buses)
+        for (auto const& [id, in_mb_in, in_mb_out] : input_buses)
         {
-            connect_stereo_components(g, *in, *out, mixer_procs);
+            connect_stereo_components(g, *in_mb_out, *out_mb_in, mixer_procs);
         }
     }
 

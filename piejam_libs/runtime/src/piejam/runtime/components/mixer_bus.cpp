@@ -35,31 +35,19 @@ namespace piejam::runtime::components
 namespace
 {
 
-class mixer_bus final : public audio::engine::component
+class mixer_bus_input final : public audio::engine::component
 {
 public:
-    mixer_bus(
-            audio::samplerate_t const samplerate,
-            mixer::bus_id bus_id,
-            mixer::bus const& channel,
+    mixer_bus_input(
+            mixer::bus const& bus,
             parameter_processor_factory& param_procs)
-        : m_volume_input_proc(
-                  param_procs.make_input_processor(channel.volume, "volume"))
-        , m_pan_balance_input_proc(param_procs.make_input_processor(
-                  channel.pan_balance,
-                  channel.type == audio::bus_type::mono ? "pan" : "balance"))
-        , m_mute_input_proc(
-                  param_procs.make_input_processor(channel.mute, "mute"))
+        : m_pan_balance_input_proc(param_procs.make_input_processor(
+                  bus.pan_balance,
+                  bus.type == audio::bus_type::mono ? "pan" : "balance"))
         , m_pan_balance(
-                  channel.type == audio::bus_type::mono
+                  bus.type == audio::bus_type::mono
                           ? audio::components::make_pan()
                           : audio::components::make_stereo_balance())
-        , m_volume_amp(audio::components::make_stereo_amplifier("volume"))
-        , m_mute_solo(components::make_mute_solo(bus_id))
-        , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
-        , m_peak_level_proc(param_procs.make_output_processor(
-                  channel.level,
-                  "stereo_level"))
     {
     }
 
@@ -67,6 +55,49 @@ public:
     {
         return m_pan_balance->inputs();
     }
+    auto outputs() const -> endpoints override
+    {
+        return m_pan_balance->outputs();
+    }
+
+    auto event_inputs() const -> endpoints override { return {}; }
+    auto event_outputs() const -> endpoints override { return {}; }
+
+    void connect(audio::engine::graph& g) const override
+    {
+        m_pan_balance->connect(g);
+
+        g.add_event_wire(
+                {*m_pan_balance_input_proc, 0},
+                m_pan_balance->event_inputs()[0]);
+    }
+
+private:
+    std::shared_ptr<audio::engine::value_input_processor<float>>
+            m_pan_balance_input_proc;
+    std::unique_ptr<audio::engine::component> m_pan_balance;
+};
+
+class mixer_bus_output final : public audio::engine::component
+{
+public:
+    mixer_bus_output(
+            audio::samplerate_t const samplerate,
+            mixer::bus_id bus_id,
+            mixer::bus const& bus,
+            parameter_processor_factory& param_procs)
+        : m_volume_input_proc(
+                  param_procs.make_input_processor(bus.volume, "volume"))
+        , m_mute_input_proc(param_procs.make_input_processor(bus.mute, "mute"))
+        , m_volume_amp(audio::components::make_stereo_amplifier("volume"))
+        , m_mute_solo(components::make_mute_solo(bus_id))
+        , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
+        , m_peak_level_proc(
+                  param_procs.make_output_processor(bus.level, "stereo_level"))
+    {
+    }
+
+    auto inputs() const -> endpoints override { return m_volume_amp->inputs(); }
     auto outputs() const -> endpoints override
     {
         return m_mute_solo->outputs();
@@ -77,14 +108,10 @@ public:
 
     void connect(audio::engine::graph& g) const override
     {
-        m_pan_balance->connect(g);
         m_volume_amp->connect(g);
         m_mute_solo->connect(g);
         m_level_meter->connect(g);
 
-        g.add_event_wire(
-                {*m_pan_balance_input_proc, 0},
-                m_pan_balance->event_inputs()[0]);
         g.add_event_wire(
                 {*m_volume_input_proc, 0},
                 m_volume_amp->event_inputs()[0]);
@@ -92,10 +119,6 @@ public:
                 {*m_mute_input_proc, 0},
                 m_mute_solo->event_inputs()[0]);
 
-        audio::engine::connect_stereo_components(
-                g,
-                *m_pan_balance,
-                *m_volume_amp);
         audio::engine::connect_stereo_components(
                 g,
                 *m_volume_amp,
@@ -113,11 +136,8 @@ public:
 private:
     std::shared_ptr<audio::engine::value_input_processor<float>>
             m_volume_input_proc;
-    std::shared_ptr<audio::engine::value_input_processor<float>>
-            m_pan_balance_input_proc;
     std::shared_ptr<audio::engine::value_input_processor<bool>>
             m_mute_input_proc;
-    std::unique_ptr<audio::engine::component> m_pan_balance;
     std::unique_ptr<audio::engine::component> m_volume_amp;
     std::unique_ptr<audio::engine::component> m_mute_solo;
     std::unique_ptr<audio::engine::component> m_level_meter;
@@ -131,7 +151,17 @@ private:
 } // namespace
 
 auto
-make_mixer_bus(
+make_mixer_bus_input(
+        mixer::bus const& bus,
+        parameter_processor_factory& param_procs,
+        std::string_view const& /*name*/)
+        -> std::unique_ptr<audio::engine::component>
+{
+    return std::make_unique<mixer_bus_input>(bus, param_procs);
+}
+
+auto
+make_mixer_bus_output(
         audio::samplerate_t const samplerate,
         mixer::bus_id bus_id,
         mixer::bus const& channel,
@@ -139,7 +169,7 @@ make_mixer_bus(
         std::string_view const& /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<mixer_bus>(
+    return std::make_unique<mixer_bus_output>(
             samplerate,
             bus_id,
             channel,
