@@ -201,6 +201,14 @@ const selector<container::box<fx::chain_t>>
             return bus ? bus->fx_chain : s_empty_fx_chain;
         });
 
+const selector<stereo_level>
+        select_current_fx_chain_bus_level([](state const& st) -> stereo_level {
+            mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+            stereo_level const* const level =
+                    bus ? st.levels.get(bus->level) : nullptr;
+            return level ? *level : stereo_level();
+        });
+
 auto
 make_fx_module_name_selector(fx::module_id fx_mod_id)
         -> selector<container::boxed_string>

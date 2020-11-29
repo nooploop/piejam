@@ -31,6 +31,8 @@ class FxChain : public SubscribableModel
     Q_PROPERTY(QAbstractListModel* modules READ modules CONSTANT)
     Q_PROPERTY(QAbstractListModel* buses READ buses CONSTANT)
     Q_PROPERTY(int selectedBus READ selectedBus NOTIFY selectedBusChanged FINAL)
+    Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
+    Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
 
 public:
     auto modules() -> FxModulesList* { return &m_modules; }
@@ -46,15 +48,37 @@ public:
         }
     }
 
+    auto levelLeft() const noexcept -> double { return m_levelLeft; }
+    auto levelRight() const noexcept -> double { return m_levelRight; }
+    void setLevel(double left, double right)
+    {
+        if (m_levelLeft != left)
+        {
+            m_levelLeft = left;
+            emit levelLeftChanged();
+        }
+
+        if (m_levelRight != right)
+        {
+            m_levelRight = right;
+            emit levelRightChanged();
+        }
+    }
+
     Q_INVOKABLE virtual void selectBus(int) = 0;
+    Q_INVOKABLE virtual void requestLevelsUpdate() = 0;
 
 signals:
     void selectedBusChanged();
+    void levelLeftChanged();
+    void levelRightChanged();
 
 private:
     FxModulesList m_modules;
     BusNamesList m_buses;
     int m_selectedBus{-1};
+    double m_levelLeft{};
+    double m_levelRight{};
 };
 
 } // namespace piejam::gui::model

@@ -23,8 +23,11 @@
 #include <piejam/app/gui/model/BusName.h>
 #include <piejam/app/gui/model/FxModule.h>
 #include <piejam/app/gui/model/FxParameter.h>
+#include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
+#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 #include <boost/range/algorithm_ext/push_back.hpp>
 
@@ -57,6 +60,8 @@ FxChain::subscribe_step()
             [this](runtime::mixer::bus_id const& fx_chain_bus) {
                 setSelectedBus(static_cast<int>(
                         algorithm::index_of(m_all, fx_chain_bus)));
+
+                m_bus_id = fx_chain_bus;
             });
 
     observe(runtime::selectors::select_current_fx_chain,
@@ -73,6 +78,11 @@ FxChain::subscribe_step()
                                 }});
 
                 m_fx_chain = fx_chain;
+            });
+
+    observe(runtime::selectors::select_current_fx_chain_bus_level,
+            [this](runtime::stereo_level const& level) {
+                setLevel(level.left, level.right);
             });
 }
 
@@ -117,6 +127,12 @@ FxChain::selectBus(int pos)
     }
 
     dispatch(action);
+}
+
+void
+FxChain::requestLevelsUpdate()
+{
+    dispatch(runtime::actions::request_mixer_levels_update({m_bus_id}));
 }
 
 } // namespace piejam::app::gui::model

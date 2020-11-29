@@ -31,6 +31,7 @@ public:
     FxChain(runtime::store_dispatch, runtime::subscriber&);
 
     void selectBus(int) override;
+    void requestLevelsUpdate() override;
 
 private:
     void subscribe_step() override;
@@ -39,6 +40,7 @@ private:
             audio::bus_direction,
             container::box<runtime::mixer::bus_list_t> const&);
 
+    runtime::mixer::bus_id m_bus_id;
     container::box<runtime::mixer::bus_list_t> m_inputs;
     container::box<runtime::mixer::bus_list_t> m_outputs;
     runtime::mixer::bus_list_t m_all;

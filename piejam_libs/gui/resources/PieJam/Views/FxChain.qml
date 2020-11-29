@@ -107,7 +107,17 @@ TopPane {
             y: 54
             width: 128
             height: 340
+
+            levelLeft: root.model.levelLeft
+            levelRight: root.model.levelRight
         }
+    }
+
+    Timer {
+        interval: 16
+        running: root.visible
+        repeat: true
+        onTriggered: root.model.requestLevelsUpdate()
     }
 
     Binding {
