@@ -57,8 +57,9 @@ public:
 
     auto operator[](id_t id) noexcept -> Entity&
     {
-        BOOST_ASSERT(contains(id));
-        return m_map[id];
+        auto it = m_map.find(id);
+        BOOST_ASSERT(it != m_map.end());
+        return it->second;
     }
 
     template <class V>
