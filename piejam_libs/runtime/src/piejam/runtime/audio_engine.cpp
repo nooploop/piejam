@@ -17,6 +17,7 @@
 
 #include <piejam/runtime/audio_engine.h>
 
+#include <piejam/algorithm/for_each_adjacent.h>
 #include <piejam/audio/components/amplifier.h>
 #include <piejam/audio/components/level_meter.h>
 #include <piejam/audio/components/pan.h>
@@ -206,23 +207,6 @@ make_fx_chains_map(
     return fx_chains;
 }
 
-template <class Range, class BinaryOp>
-void
-for_each_adjacent(Range&& rng, BinaryOp&& op)
-{
-    auto first = std::begin(rng);
-    auto second =
-            first != std::end(rng) ? std::next(std::begin(rng)) : std::end(rng);
-    auto const end = std::end(rng);
-
-    while (second != end)
-    {
-        std::invoke(std::forward<BinaryOp>(op), *first, *second);
-        std::advance(first, 1);
-        std::advance(second, 1);
-    }
-}
-
 static auto
 connect_fx_chain(
         ns_ae::graph& g,
@@ -232,7 +216,7 @@ connect_fx_chain(
     for (auto const& comp : fx_chain)
         comp.component->connect(g);
 
-    for_each_adjacent(
+    algorithm::for_each_adjacent(
             fx_chain,
             [&g, &mixer_procs](
                     fx_module_component_mapping const& l_comp,
