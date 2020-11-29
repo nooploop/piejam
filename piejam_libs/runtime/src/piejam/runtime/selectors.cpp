@@ -22,6 +22,7 @@
 #include <piejam/npos.h>
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fx/parameter.h>
 
 #include <cassert>
 
@@ -61,16 +62,14 @@ make_num_device_channels_selector(audio::bus_direction const bd)
     switch (bd)
     {
         case audio::bus_direction::input:
-            return selector<std::size_t>(
-                    [](state const& st) -> std::size_t {
-                        return st.input.hw_params->num_channels;
-                    });
+            return selector<std::size_t>([](state const& st) -> std::size_t {
+                return st.input.hw_params->num_channels;
+            });
 
         case audio::bus_direction::output:
-            return selector<std::size_t>(
-                    [](state const& st) -> std::size_t {
-                        return st.output.hw_params->num_channels;
-                    });
+            return selector<std::size_t>([](state const& st) -> std::size_t {
+                return st.output.hw_params->num_channels;
+            });
     }
 }
 
@@ -217,8 +216,7 @@ auto
 make_fx_module_parameters_selector(fx::module_id fx_mod_id)
         -> selector<container::box<fx::parameters_t>>
 {
-    return [fx_mod_id](
-                   state const& st) -> container::box<fx::parameters_t> {
+    return [fx_mod_id](state const& st) -> container::box<fx::parameters_t> {
         static container::box<fx::parameters_t> s_empty;
         fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
         return fx_mod ? fx_mod->parameters : s_empty;
@@ -247,18 +245,19 @@ make_fx_parameter_name_selector(
 }
 
 auto
-make_fx_parameter_id_selector(
+make_fx_parameter_value_selector(
         fx::module_id const fx_mod_id,
-        fx::parameter_key const fx_param_key) -> selector<float_parameter_id>
+        fx::parameter_key const fx_param_key) -> selector<float>
 {
-    return [fx_mod_id,
-            fx_param_key](state const& st) -> float_parameter_id {
+    return [fx_mod_id, fx_param_key](state const& st) -> float {
         if (fx::module const* const fx_mod = st.fx_modules[fx_mod_id])
         {
             if (auto it = fx_mod->parameters->find(fx_param_key);
                 it != fx_mod->parameters->end())
             {
-                return it->second.id;
+                if (float const* const value =
+                            st.float_params.get(it->second.id))
+                    return *value;
             }
         }
         return {};

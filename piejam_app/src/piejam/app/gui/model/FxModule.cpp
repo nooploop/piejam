@@ -21,7 +21,10 @@
 #include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/FxParameter.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/selectors.h>
+
+#include <boost/container/flat_map.hpp>
 
 namespace piejam::app::gui::model
 {

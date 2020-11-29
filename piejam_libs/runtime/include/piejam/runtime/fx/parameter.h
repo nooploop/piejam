@@ -19,29 +19,27 @@
 
 #include <piejam/container/boxed_string.h>
 #include <piejam/entity_id.h>
-#include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/type.h>
 #include <piejam/runtime/parameters.h>
-
-#include <boost/container/container_fwd.hpp>
-
-#include <vector>
 
 namespace piejam::runtime::fx
 {
 
-using parameter_key = std::size_t;
-using parameters_t = boost::container::flat_map<parameter_key, parameter>;
-
-struct module
+struct parameter
 {
-    type fx_type;
+    float_parameter_id id;
     container::boxed_string name;
-    container::box<parameters_t> parameters;
 };
 
-using module_id = entity_id<module>;
-using modules_t = entity_map<module, module>;
-using chain_t = std::vector<module_id>;
+constexpr bool
+operator==(parameter const& l, parameter const& r) noexcept
+{
+    return l.id == r.id;
+}
+
+constexpr bool
+operator!=(parameter const& l, parameter const& r) noexcept
+{
+    return l.id != r.id;
+}
 
 } // namespace piejam::runtime::fx

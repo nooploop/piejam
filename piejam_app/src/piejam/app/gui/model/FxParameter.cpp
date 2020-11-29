@@ -42,6 +42,11 @@ FxParameter::subscribe_step()
             [this](container::boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
+
+    observe(runtime::selectors::make_fx_parameter_value_selector(
+                    m_fx_mod_id,
+                    m_fx_param_key),
+            [this](float const x) { setValue(x); });
 }
 
 } // namespace piejam::app::gui::model

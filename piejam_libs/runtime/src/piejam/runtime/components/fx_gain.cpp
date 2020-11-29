@@ -23,6 +23,7 @@
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 
 #include <fmt/format.h>

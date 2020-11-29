@@ -61,6 +61,11 @@ public:
         return m_parameters.contains(id);
     }
 
+    auto get_parameter(id_t id) const noexcept -> Parameter const*
+    {
+        return m_parameters[id];
+    }
+
     auto get(id_t id) const noexcept -> value_type const*
     {
         auto it = m_values.find(id);
@@ -85,4 +90,4 @@ private:
     boost::container::flat_map<id_t, value_type> m_values;
 };
 
-} // namespace piejam::runtime
+} // namespace piejam::runtime::parameter

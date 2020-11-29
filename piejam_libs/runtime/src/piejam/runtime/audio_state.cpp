@@ -19,6 +19,7 @@
 
 #include <piejam/indexed_access.h>
 #include <piejam/runtime/fx/gain.h>
+#include <piejam/runtime/fx/parameter.h>
 
 #include <algorithm>
 
@@ -100,7 +101,7 @@ add_mixer_bus(
             .volume = st.float_params.add(parameter::float_{
                     .default_value = 1.f,
                     .min = 0.f,
-                    .max = 8.f}),
+                    .max = 4.f}),
             .pan_balance = st.float_params.add(parameter::float_{
                     .default_value = 0.f,
                     .min = -1.f,

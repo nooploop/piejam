@@ -86,8 +86,8 @@ auto make_fx_module_parameters_selector(fx::module_id)
         -> selector<container::box<fx::parameters_t>>;
 auto make_fx_parameter_name_selector(fx::module_id, fx::parameter_key)
         -> selector<container::boxed_string>;
-auto make_fx_parameter_id_selector(fx::module_id, fx::parameter_key)
-        -> selector<float_parameter_id>;
+auto make_fx_parameter_value_selector(fx::module_id, fx::parameter_key)
+        -> selector<float>;
 
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;
