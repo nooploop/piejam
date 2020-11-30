@@ -22,10 +22,10 @@
 namespace piejam::test
 {
 
-TEST(memoized, is_called_only_once_when_called_with_same_arguments_twice)
+TEST(memo, is_called_only_once_when_called_with_same_arguments_twice)
 {
     int called{};
-    memoized m([&called](int x, int y) {
+    memo m([&called](int x, int y) {
         ++called;
         return x + y;
     });
@@ -37,10 +37,10 @@ TEST(memoized, is_called_only_once_when_called_with_same_arguments_twice)
     EXPECT_EQ(1, called);
 }
 
-TEST(memoized, is_recalled_when_called_with_new_arguments)
+TEST(memo, is_recalled_when_called_with_new_arguments)
 {
     int called{};
-    memoized m([&called](int x, int y) {
+    memo m([&called](int x, int y) {
         ++called;
         return x + y;
     });

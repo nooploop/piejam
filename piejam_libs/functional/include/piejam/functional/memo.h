@@ -32,14 +32,14 @@ namespace piejam
 {
 
 template <class F>
-class memoized
+class memo
 {
 public:
-    memoized(F const& f) noexcept(std::is_nothrow_copy_constructible_v<F>)
+    memo(F const& f) noexcept(std::is_nothrow_copy_constructible_v<F>)
         : m_f(f)
     {
     }
-    memoized(F&& f) noexcept(std::is_nothrow_move_constructible_v<F>)
+    memo(F&& f) noexcept(std::is_nothrow_move_constructible_v<F>)
         : m_f(std::move(f))
     {
     }
@@ -83,8 +83,8 @@ private:
 };
 
 template <class F>
-memoized(F const&) -> memoized<F>;
+memo(F const&) -> memo<F>;
 template <class F>
-memoized(F&&) -> memoized<F>;
+memo(F&&) -> memo<F>;
 
 } // namespace piejam

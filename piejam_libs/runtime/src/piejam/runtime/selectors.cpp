@@ -31,7 +31,7 @@ namespace piejam::runtime::selectors
 
 const selector<samplerate> select_samplerate(
         [get_samplerates =
-                 memoized(container::boxify_result(&runtime::samplerates))](
+                 memo(container::boxify_result(&runtime::samplerates))](
                 state const& st) mutable -> samplerate {
             return {get_samplerates(st.input.hw_params, st.output.hw_params),
                     st.samplerate};
@@ -39,7 +39,7 @@ const selector<samplerate> select_samplerate(
 
 const selector<period_size> select_period_size(
         [get_period_sizes =
-                 memoized(container::boxify_result(&runtime::period_sizes))](
+                 memo(container::boxify_result(&runtime::period_sizes))](
                 state const& st) mutable -> period_size {
             return {get_period_sizes(st.input.hw_params, st.output.hw_params),
                     st.period_size};
