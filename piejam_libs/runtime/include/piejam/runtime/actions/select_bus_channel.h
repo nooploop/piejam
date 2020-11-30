@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -28,8 +29,7 @@ struct select_bus_channel final
     : ui::cloneable_action<select_bus_channel, action>
     , visitable_engine_action<select_bus_channel>
 {
-    audio::bus_direction direction{};
-    std::size_t bus{};
+    mixer::bus_id bus_id{};
     audio::bus_channel channel_selector{};
     std::size_t channel_index{};
 

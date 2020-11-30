@@ -24,7 +24,6 @@
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/request_info_update.h>
-#include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
 
@@ -72,44 +71,6 @@ AudioInputOutputSettings::subscribe_step()
 
                 m_bus_ids = bus_ids;
             });
-}
-
-void
-AudioInputOutputSettings::selectChannel(
-        audio::bus_channel const bc,
-        unsigned const bus,
-        unsigned const ch)
-{
-    runtime::actions::select_bus_channel action;
-    action.direction = m_settings_type;
-    action.bus = bus;
-    action.channel_selector = bc;
-    action.channel_index = static_cast<std::size_t>(ch) - 1;
-    dispatch(action);
-}
-
-void
-AudioInputOutputSettings::selectMonoChannel(
-        unsigned const bus,
-        unsigned const ch)
-{
-    selectChannel(audio::bus_channel::mono, bus, ch);
-}
-
-void
-AudioInputOutputSettings::selectStereoLeftChannel(
-        unsigned const bus,
-        unsigned const ch)
-{
-    selectChannel(audio::bus_channel::left, bus, ch);
-}
-
-void
-AudioInputOutputSettings::selectStereoRightChannel(
-        unsigned const bus,
-        unsigned const ch)
-{
-    selectChannel(audio::bus_channel::right, bus, ch);
 }
 
 void

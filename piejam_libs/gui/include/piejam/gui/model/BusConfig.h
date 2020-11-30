@@ -46,18 +46,21 @@ public:
 
     auto monoChannel() const noexcept -> unsigned { return m_monoChannel; }
     void setMonoChannel(unsigned);
+    Q_INVOKABLE virtual void changeMonoChannel(unsigned) = 0;
 
     auto stereoLeftChannel() const noexcept -> unsigned
     {
         return m_stereoLeftChannel;
     }
     void setStereoLeftChannel(unsigned);
+    Q_INVOKABLE virtual void changeStereoLeftChannel(unsigned) = 0;
 
     auto stereoRightChannel() const noexcept -> unsigned
     {
         return m_stereoRightChannel;
     }
     void setStereoRightChannel(unsigned);
+    Q_INVOKABLE virtual void changeStereoRightChannel(unsigned) = 0;
 
     auto toQString() const -> QString { return m_name; }
 

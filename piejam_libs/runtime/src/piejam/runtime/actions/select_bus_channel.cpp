@@ -27,37 +27,20 @@ select_bus_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    auto& channels = direction == audio::bus_direction::input
-                             ? new_st.mixer_state.inputs.get()
-                             : new_st.mixer_state.outputs.get();
+    mixer::bus& bus = new_st.mixer_state.buses[bus_id];
 
-    BOOST_ASSERT(bus < channels.size());
-    BOOST_ASSERT(
-            channel_index == npos ||
-            channel_index < (direction == audio::bus_direction::input
-                                     ? st.input.hw_params->num_channels
-                                     : st.output.hw_params->num_channels));
-
-    auto& ch = new_st.mixer_state.buses[channels[bus]];
     switch (channel_selector)
     {
         case audio::bus_channel::mono:
-            BOOST_ASSERT(direction == audio::bus_direction::input);
-            ch.device_channels = channel_index_pair{channel_index};
+            bus.device_channels = channel_index_pair{channel_index};
             break;
 
         case audio::bus_channel::left:
-            BOOST_ASSERT(
-                    direction == audio::bus_direction::input ||
-                    direction == audio::bus_direction::output);
-            ch.device_channels.left = channel_index;
+            bus.device_channels.left = channel_index;
             break;
 
         case audio::bus_channel::right:
-            BOOST_ASSERT(
-                    direction == audio::bus_direction::input ||
-                    direction == audio::bus_direction::output);
-            ch.device_channels.right = channel_index;
+            bus.device_channels.right = channel_index;
             break;
     }
 

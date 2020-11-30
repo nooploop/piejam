@@ -34,9 +34,6 @@ protected:
             audio::bus_direction);
 
 public:
-    void selectMonoChannel(unsigned bus, unsigned ch) override;
-    void selectStereoLeftChannel(unsigned bus, unsigned ch) override;
-    void selectStereoRightChannel(unsigned bus, unsigned ch) override;
     void addMonoBus() override;
     void addStereoBus() override;
     void deleteBus(unsigned bus) override;
@@ -44,7 +41,6 @@ public:
 private:
     void subscribe_step() override;
 
-    void selectChannel(audio::bus_channel, unsigned bus, unsigned ch);
     void addBus(audio::bus_type);
 
     audio::bus_direction m_settings_type;

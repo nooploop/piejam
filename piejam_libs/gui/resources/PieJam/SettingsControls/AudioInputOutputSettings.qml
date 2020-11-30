@@ -55,9 +55,9 @@ Item {
             anchors.left: if (parent) parent.left
             anchors.right: if (parent) parent.right
 
-            onMonoChannelSelected: root.model.selectMonoChannel(index, ch)
-            onStereoLeftChannelSelected: root.model.selectStereoLeftChannel(index, ch)
-            onStereoRightChannelSelected: root.model.selectStereoRightChannel(index, ch)
+            onMonoChannelSelected: model.item.changeMonoChannel(ch)
+            onStereoLeftChannelSelected: model.item.changeStereoLeftChannel(ch)
+            onStereoRightChannelSelected: model.item.changeStereoRightChannel(index, ch)
             onDeleteConfigClicked: root.model.deleteBus(index)
             onNameEdited: model.item.changeName(name)
 

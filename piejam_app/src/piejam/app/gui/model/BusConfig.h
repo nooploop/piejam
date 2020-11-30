@@ -32,9 +32,14 @@ public:
             runtime::mixer::bus_id);
 
     void changeName(QString const&) override;
+    void changeMonoChannel(unsigned) override;
+    void changeStereoLeftChannel(unsigned) override;
+    void changeStereoRightChannel(unsigned) override;
 
 private:
     void subscribe_step() override;
+
+    void changeChannel(audio::bus_channel, unsigned);
 
     runtime::mixer::bus_id m_bus_id;
 };

@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/BusConfig.h>
 
+#include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/set_bus_name.h>
 #include <piejam/runtime/selectors.h>
 
@@ -67,6 +68,34 @@ BusConfig::changeName(QString const& name)
     runtime::actions::set_bus_name action;
     action.bus_id = m_bus_id;
     action.name = name.toStdString();
+    dispatch(action);
+}
+
+void
+BusConfig::changeMonoChannel(unsigned const ch)
+{
+    changeChannel(audio::bus_channel::mono, ch);
+}
+
+void
+BusConfig::changeStereoLeftChannel(unsigned const ch)
+{
+    changeChannel(audio::bus_channel::left, ch);
+}
+
+void
+BusConfig::changeStereoRightChannel(unsigned const ch)
+{
+    changeChannel(audio::bus_channel::right, ch);
+}
+
+void
+BusConfig::changeChannel(audio::bus_channel const bc, unsigned const ch)
+{
+    runtime::actions::select_bus_channel action;
+    action.bus_id = m_bus_id;
+    action.channel_selector = bc;
+    action.channel_index = static_cast<std::size_t>(ch) - 1;
     dispatch(action);
 }
 
