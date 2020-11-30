@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/StringList.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
@@ -29,25 +30,15 @@ class FxChain : public SubscribableModel
     Q_OBJECT
 
     Q_PROPERTY(QAbstractListModel* modules READ modules CONSTANT)
-    Q_PROPERTY(QAbstractListModel* buses READ buses CONSTANT)
-    Q_PROPERTY(int selectedBus READ selectedBus NOTIFY selectedBusChanged FINAL)
+    Q_PROPERTY(StringList* buses READ buses NOTIFY busesChanged FINAL)
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
     Q_PROPERTY(double volume READ volume NOTIFY volumeChanged FINAL)
 
 public:
     auto modules() -> FxModulesList* { return &m_modules; }
-    auto buses() -> BusNamesList* { return &m_buses; }
+    auto buses() -> StringList* { return &m_buses; }
 
-    auto selectedBus() const noexcept -> int { return m_selectedBus; }
-    void setSelectedBus(int bus)
-    {
-        if (m_selectedBus != bus)
-        {
-            m_selectedBus = bus;
-            emit selectedBusChanged();
-        }
-    }
     Q_INVOKABLE virtual void selectBus(int) = 0;
 
     Q_INVOKABLE virtual void addModule() = 0;
@@ -83,6 +74,7 @@ public:
     Q_INVOKABLE virtual void changeVolume(double) = 0;
 
 signals:
+    void busesChanged();
     void selectedBusChanged();
     void levelLeftChanged();
     void levelRightChanged();
@@ -90,8 +82,7 @@ signals:
 
 private:
     FxModulesList m_modules;
-    BusNamesList m_buses;
-    int m_selectedBus{-1};
+    StringList m_buses;
     double m_levelLeft{};
     double m_levelRight{};
     double m_volume{1.};

@@ -85,19 +85,4 @@ get_bus(state const& st, std::size_t index) -> bus const&
     return *st.buses[bus_ids<D>(st)[index]];
 }
 
-template <audio::bus_direction D, class Field, class Value>
-[[nodiscard]] auto
-update_bus_field(
-        state const& st,
-        std::size_t index,
-        Field&& field,
-        Value&& value) -> state
-{
-    auto new_st = st;
-    auto const& ids = bus_ids<D>(new_st).get();
-    std::invoke(std::forward<Field>(field), new_st.buses[ids[index]]) =
-            std::forward<Value>(value);
-    return new_st;
-}
-
 } // namespace piejam::runtime::mixer

@@ -39,14 +39,16 @@ public:
 private:
     void subscribe_step() override;
 
-    void updateBuses(
+    void updateBusNames(
             audio::bus_direction,
             container::box<runtime::mixer::bus_list_t> const&);
+    void rebuildBusesList();
 
     runtime::mixer::bus_id m_bus_id;
     container::box<runtime::mixer::bus_list_t> m_inputs;
     container::box<runtime::mixer::bus_list_t> m_outputs;
     runtime::mixer::bus_list_t m_all;
+    piejam::gui::model::BusNamesList m_busNames;
 
     container::box<runtime::fx::chain_t> m_fx_chain;
 };

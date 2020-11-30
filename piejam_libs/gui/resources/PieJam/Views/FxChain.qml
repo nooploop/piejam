@@ -73,7 +73,7 @@ TopPane {
                 anchors.left: parent.left
                 anchors.leftMargin: 4
 
-                visible: root.model.selectedBus !== -1
+                visible: root.model.buses.focused !== -1
 
                 text: "+"
 
@@ -96,12 +96,13 @@ TopPane {
             width: 128
             height: 48
 
-            currentIndex: root.model.selectedBus
-            model: root.model.buses
+            model: root.model.buses.elements
+            currentIndex: root.model.buses.focused
 
-            textRole: "display"
+            displayText: root.model.buses.focused === -1 ? "[Select]" : currentText
 
             onActivated: root.model.selectBus(index)
+            onModelChanged: currentIndex = root.model.buses.focused
         }
 
         LevelMeterFader {
@@ -116,7 +117,7 @@ TopPane {
             levelRight: root.model.levelRight
             volume: root.model.volume
 
-            enabled: channelSelector.currentIndex != -1
+            enabled: root.model.buses.focused !== -1
 
             onFaderMoved: root.model.changeVolume(newVolume)
         }

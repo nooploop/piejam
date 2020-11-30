@@ -27,11 +27,10 @@ auto
 set_bus_name<D>::reduce(state const& st) const -> state
 {
     auto new_st = st;
-    new_st.mixer_state = mixer::update_bus_field<D>(
-            st.mixer_state,
-            bus,
-            &mixer::bus::name,
-            name);
+
+    new_st.mixer_state.buses[mixer::bus_ids<D>(st.mixer_state)[bus]].name =
+            name;
+
     return new_st;
 }
 

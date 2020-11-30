@@ -50,18 +50,18 @@ FxChain::subscribe_step()
     observe(runtime::selectors::make_bus_list_selector(
                     audio::bus_direction::input),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                updateBuses(audio::bus_direction::input, bus_ids);
+                updateBusNames(audio::bus_direction::input, bus_ids);
             });
 
     observe(runtime::selectors::make_bus_list_selector(
                     audio::bus_direction::output),
             [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
-                updateBuses(audio::bus_direction::output, bus_ids);
+                updateBusNames(audio::bus_direction::output, bus_ids);
             });
 
     observe(runtime::selectors::select_fx_chain_bus,
             [this](runtime::mixer::bus_id const& fx_chain_bus) {
-                setSelectedBus(static_cast<int>(
+                buses()->setFocused(static_cast<int>(
                         algorithm::index_of(m_all, fx_chain_bus)));
 
                 m_bus_id = fx_chain_bus;
@@ -93,7 +93,7 @@ FxChain::subscribe_step()
 }
 
 void
-FxChain::updateBuses(
+FxChain::updateBusNames(
         audio::bus_direction bus_dir,
         container::box<runtime::mixer::bus_list_t> const& bus_ids)
 {
@@ -107,7 +107,7 @@ FxChain::updateBuses(
     algorithm::apply_edit_script(
             algorithm::edit_script(m_all, all),
             generic_list_model_edit_script_executor{
-                    *buses(),
+                    m_busNames,
                     [this](runtime::mixer::bus_id bus_id) {
                         auto busName = std::make_unique<BusName>(
                                 dispatch(),
@@ -116,10 +116,35 @@ FxChain::updateBuses(
 
                         connect(*busName);
 
+                        QObject::connect(
+                                busName.get(),
+                                &piejam::gui::model::BusName::nameChanged,
+                                this,
+                                &FxChain::rebuildBusesList);
+
                         return busName;
                     }});
 
     m_all = all;
+
+    rebuildBusesList();
+}
+
+void
+FxChain::rebuildBusesList()
+{
+    QStringList names;
+    for (int i = 0, end = m_busNames.rowCount(); i < end; ++i)
+    {
+        auto const* const busName =
+                m_busNames.index(i)
+                        .data(piejam::gui::model::BusNamesList::ItemRole)
+                        .value<piejam::gui::model::BusName*>();
+        names.append(busName->name());
+    }
+
+    buses()->setElements(names);
+    buses()->setFocused(static_cast<int>(algorithm::index_of(m_all, m_bus_id)));
 }
 
 void
