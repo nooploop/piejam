@@ -35,6 +35,7 @@ public:
     void changeMonoChannel(unsigned) override;
     void changeStereoLeftChannel(unsigned) override;
     void changeStereoRightChannel(unsigned) override;
+    void deleteBus() override;
 
 private:
     void subscribe_step() override;

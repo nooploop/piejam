@@ -22,7 +22,6 @@
 #include <piejam/app/gui/model/BusConfig.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/add_bus.h>
-#include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
@@ -92,15 +91,6 @@ void
 AudioInputOutputSettings::addStereoBus()
 {
     addBus(audio::bus_type::stereo);
-}
-
-void
-AudioInputOutputSettings::deleteBus(unsigned const bus)
-{
-    runtime::actions::delete_bus action;
-    action.direction = m_settings_type;
-    action.bus = bus;
-    dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

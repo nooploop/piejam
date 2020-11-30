@@ -27,16 +27,7 @@ delete_bus::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    switch (direction)
-    {
-        case audio::bus_direction::input:
-            remove_mixer_bus<audio::bus_direction::input>(new_st, bus);
-            break;
-
-        case audio::bus_direction::output:
-            remove_mixer_bus<audio::bus_direction::output>(new_st, bus);
-            break;
-    }
+    remove_mixer_bus(new_st, bus_id);
 
     return new_st;
 }

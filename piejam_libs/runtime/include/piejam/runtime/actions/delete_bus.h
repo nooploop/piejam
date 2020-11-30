@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -28,8 +29,7 @@ struct delete_bus final
     : ui::cloneable_action<delete_bus, action>
     , visitable_engine_action<delete_bus>
 {
-    audio::bus_direction direction{};
-    std::size_t bus{};
+    mixer::bus_id bus_id{};
 
     auto reduce(state const&) const -> state override;
 };

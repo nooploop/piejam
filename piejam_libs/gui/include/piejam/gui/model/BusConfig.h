@@ -62,6 +62,8 @@ public:
     void setStereoRightChannel(unsigned);
     Q_INVOKABLE virtual void changeStereoRightChannel(unsigned) = 0;
 
+    Q_INVOKABLE virtual void deleteBus() = 0;
+
     auto toQString() const -> QString { return m_name; }
 
 signals:

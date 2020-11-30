@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/BusConfig.h>
 
+#include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/set_bus_name.h>
 #include <piejam/runtime/selectors.h>
@@ -96,6 +97,14 @@ BusConfig::changeChannel(audio::bus_channel const bc, unsigned const ch)
     action.bus_id = m_bus_id;
     action.channel_selector = bc;
     action.channel_index = static_cast<std::size_t>(ch) - 1;
+    dispatch(action);
+}
+
+void
+BusConfig::deleteBus()
+{
+    runtime::actions::delete_bus action;
+    action.bus_id = m_bus_id;
     dispatch(action);
 }
 

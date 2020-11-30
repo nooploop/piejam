@@ -57,8 +57,8 @@ Item {
 
             onMonoChannelSelected: model.item.changeMonoChannel(ch)
             onStereoLeftChannelSelected: model.item.changeStereoLeftChannel(ch)
-            onStereoRightChannelSelected: model.item.changeStereoRightChannel(index, ch)
-            onDeleteConfigClicked: root.model.deleteBus(index)
+            onStereoRightChannelSelected: model.item.changeStereoRightChannel(ch)
+            onDeleteConfigClicked: model.item.deleteBus()
             onNameEdited: model.item.changeName(name)
 
             Binding {

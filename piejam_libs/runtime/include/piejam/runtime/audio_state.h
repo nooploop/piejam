@@ -81,8 +81,7 @@ void add_mixer_bus(
         audio::bus_type type,
         channel_index_pair const& chs = channel_index_pair{npos});
 
-template <audio::bus_direction D>
-void remove_mixer_bus(audio_state&, std::size_t index);
+void remove_mixer_bus(audio_state&, mixer::bus_id);
 
 template <audio::bus_direction D>
 void clear_mixer_buses(audio_state&);

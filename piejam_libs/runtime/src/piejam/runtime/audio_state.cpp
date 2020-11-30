@@ -153,19 +153,11 @@ template void add_mixer_bus<audio::bus_direction::output>(
         audio::bus_type,
         channel_index_pair const&);
 
-template <audio::bus_direction D>
 void
-remove_mixer_bus(audio_state& st, std::size_t index)
+remove_mixer_bus(audio_state& st, mixer::bus_id const bus_id)
 {
-    mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
-    BOOST_ASSERT(index < bus_ids.size());
-    mixer::bus_id const bus_id = bus_ids[index];
-
-    if constexpr (D == audio::bus_direction::input)
-    {
-        if (st.mixer_state.input_solo_id == bus_id)
-            st.mixer_state.input_solo_id = mixer::bus_id{};
-    }
+    if (st.mixer_state.input_solo_id == bus_id)
+        st.mixer_state.input_solo_id = mixer::bus_id{};
 
     mixer::bus const* const bus = std::as_const(st.mixer_state).buses[bus_id];
     BOOST_ASSERT(bus);
@@ -181,24 +173,29 @@ remove_mixer_bus(audio_state& st, std::size_t index)
     if (st.fx_chain_bus == bus_id)
         st.fx_chain_bus = {};
 
+    if (std::ranges::find(*st.mixer_state.inputs, bus_id) !=
+        st.mixer_state.inputs->end())
+    {
+        auto bus_ids = *st.mixer_state.inputs;
+        st.mixer_state.inputs = std::move(boost::remove_erase(bus_ids, bus_id));
+    }
+    else
+    {
+        auto bus_ids = *st.mixer_state.outputs;
+        st.mixer_state.outputs =
+                std::move(boost::remove_erase(bus_ids, bus_id));
+    }
+
     st.mixer_state.buses.remove(bus_id);
-    erase_at(bus_ids, index);
-
-    mixer::bus_ids<D>(st.mixer_state) = bus_ids;
 }
-
-template void
-remove_mixer_bus<audio::bus_direction::input>(audio_state&, std::size_t);
-template void
-remove_mixer_bus<audio::bus_direction::output>(audio_state&, std::size_t);
 
 template <audio::bus_direction D>
 void
 clear_mixer_buses(audio_state& st)
 {
-    std::size_t num_buses = mixer::bus_ids<D>(st.mixer_state)->size();
-    while (num_buses--)
-        remove_mixer_bus<D>(st, num_buses);
+    auto const bus_ids = *mixer::bus_ids<D>(st.mixer_state);
+    for (auto const bus_id : bus_ids)
+        remove_mixer_bus(st, bus_id);
 }
 
 template void clear_mixer_buses<audio::bus_direction::input>(audio_state&);

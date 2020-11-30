@@ -36,7 +36,6 @@ protected:
 public:
     void addMonoBus() override;
     void addStereoBus() override;
-    void deleteBus(unsigned bus) override;
 
 private:
     void subscribe_step() override;
