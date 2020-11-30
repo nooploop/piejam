@@ -31,6 +31,8 @@ public:
             runtime::subscriber&,
             runtime::mixer::bus_id);
 
+    void changeName(QString const&) override;
+
 private:
     void subscribe_step() override;
 

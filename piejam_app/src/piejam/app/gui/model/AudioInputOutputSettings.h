@@ -34,7 +34,6 @@ protected:
             audio::bus_direction);
 
 public:
-    void setBusName(unsigned bus, QString const& name) override;
     void selectMonoChannel(unsigned bus, unsigned ch) override;
     void selectStereoLeftChannel(unsigned bus, unsigned ch) override;
     void selectStereoRightChannel(unsigned bus, unsigned ch) override;

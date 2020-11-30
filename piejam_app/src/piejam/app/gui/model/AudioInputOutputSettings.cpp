@@ -25,7 +25,6 @@
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
-#include <piejam/runtime/actions/set_bus_name.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
 
@@ -73,35 +72,6 @@ AudioInputOutputSettings::subscribe_step()
 
                 m_bus_ids = bus_ids;
             });
-}
-
-template <audio::bus_direction D>
-auto
-makeSetBusNameAction(unsigned const bus, QString const& name)
-{
-    runtime::actions::set_bus_name<D> action;
-    action.bus = bus;
-    action.name = name.toStdString();
-    return action;
-}
-
-void
-AudioInputOutputSettings::setBusName(unsigned const bus, QString const& name)
-{
-    switch (m_settings_type)
-    {
-        case audio::bus_direction::input:
-            dispatch(makeSetBusNameAction<audio::bus_direction::input>(
-                    bus,
-                    name));
-            break;
-
-        case audio::bus_direction::output:
-            dispatch(makeSetBusNameAction<audio::bus_direction::output>(
-                    bus,
-                    name));
-            break;
-    }
 }
 
 void

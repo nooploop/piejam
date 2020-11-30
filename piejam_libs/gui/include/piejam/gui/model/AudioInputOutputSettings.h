@@ -42,7 +42,6 @@ public:
 
     auto busConfigs() -> BusConfigsList* { return &m_busConfigs; }
 
-    Q_INVOKABLE virtual void setBusName(unsigned name, QString const&) = 0;
     Q_INVOKABLE virtual void selectMonoChannel(unsigned bus, unsigned ch) = 0;
     Q_INVOKABLE virtual void
     selectStereoLeftChannel(unsigned bus, unsigned ch) = 0;

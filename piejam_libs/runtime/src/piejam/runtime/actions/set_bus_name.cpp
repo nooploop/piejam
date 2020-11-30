@@ -22,19 +22,14 @@
 namespace piejam::runtime::actions
 {
 
-template <audio::bus_direction D>
 auto
-set_bus_name<D>::reduce(state const& st) const -> state
+set_bus_name::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.buses[mixer::bus_ids<D>(st.mixer_state)[bus]].name =
-            name;
+    new_st.mixer_state.buses[bus_id].name = name;
 
     return new_st;
 }
-
-template struct set_bus_name<audio::bus_direction::input>;
-template struct set_bus_name<audio::bus_direction::output>;
 
 } // namespace piejam::runtime::actions

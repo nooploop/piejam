@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/BusConfig.h>
 
+#include <piejam/runtime/actions/set_bus_name.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
@@ -58,6 +59,15 @@ BusConfig::subscribe_step()
                     m_bus_id,
                     audio::bus_channel::right),
             [this](std::size_t const ch) { setStereoRightChannel(ch + 1); });
+}
+
+void
+BusConfig::changeName(QString const& name)
+{
+    runtime::actions::set_bus_name action;
+    action.bus_id = m_bus_id;
+    action.name = name.toStdString();
+    dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/audio/types.h>
+#include <piejam/entity_id.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -27,10 +27,9 @@
 namespace piejam::runtime::actions
 {
 
-template <audio::bus_direction D>
-struct set_bus_name final : ui::cloneable_action<set_bus_name<D>, action>
+struct set_bus_name final : ui::cloneable_action<set_bus_name, action>
 {
-    std::size_t bus{};
+    mixer::bus_id bus_id;
     std::string name;
 
     auto reduce(state const&) const -> state override;

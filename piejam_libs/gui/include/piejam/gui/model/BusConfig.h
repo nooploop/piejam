@@ -39,6 +39,7 @@ public:
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const&);
+    Q_INVOKABLE virtual void changeName(QString const&) = 0;
 
     auto mono() const noexcept -> bool { return m_mono; }
     void setMono(bool);

@@ -59,10 +59,7 @@ struct update_levels;
 struct request_info_update;
 struct update_info;
 
-template <audio::bus_direction>
 struct set_bus_name;
-using set_input_bus_name = set_bus_name<audio::bus_direction::input>;
-using set_output_bus_name = set_bus_name<audio::bus_direction::output>;
 
 struct set_bool_parameter;
 struct set_float_parameter;
