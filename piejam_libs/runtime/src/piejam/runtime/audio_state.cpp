@@ -17,6 +17,7 @@
 
 #include <piejam/runtime/audio_state.h>
 
+#include <piejam/algorithm/contains.h>
 #include <piejam/indexed_access.h>
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -99,7 +100,7 @@ remove_fx_module(audio_state& st, fx::module_id id)
     {
         for (auto&& [bus_id, bus] : st.mixer_state.buses)
         {
-            if (std::ranges::find(*bus.fx_chain, id) != bus.fx_chain->end())
+            if (algorithm::contains(*bus.fx_chain, id))
             {
                 auto fx_chain = *bus.fx_chain;
                 boost::remove_erase(fx_chain, id);
@@ -173,17 +174,17 @@ remove_mixer_bus(audio_state& st, mixer::bus_id const bus_id)
     if (st.fx_chain_bus == bus_id)
         st.fx_chain_bus = {};
 
-    if (std::ranges::find(*st.mixer_state.inputs, bus_id) !=
-        st.mixer_state.inputs->end())
+    if (algorithm::contains(*st.mixer_state.inputs, bus_id))
     {
         auto bus_ids = *st.mixer_state.inputs;
-        st.mixer_state.inputs = std::move(boost::remove_erase(bus_ids, bus_id));
+        boost::remove_erase(bus_ids, bus_id);
+        st.mixer_state.inputs = std::move(bus_ids);
     }
     else
     {
         auto bus_ids = *st.mixer_state.outputs;
-        st.mixer_state.outputs =
-                std::move(boost::remove_erase(bus_ids, bus_id));
+        boost::remove_erase(bus_ids, bus_id);
+        st.mixer_state.outputs = std::move(bus_ids);
     }
 
     st.mixer_state.buses.remove(bus_id);
@@ -193,8 +194,8 @@ template <audio::bus_direction D>
 void
 clear_mixer_buses(audio_state& st)
 {
-    auto const bus_ids = *mixer::bus_ids<D>(st.mixer_state);
-    for (auto const bus_id : bus_ids)
+    auto const bus_ids = mixer::bus_ids<D>(st.mixer_state);
+    for (auto const bus_id : *bus_ids)
         remove_mixer_bus(st, bus_id);
 }
 
