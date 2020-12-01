@@ -89,12 +89,12 @@ save(locations const& locs, state const& state)
         };
 
         buses_to_bus_configs(
-                state.mixer_state.buses,
+                state.mixer_state.buses.get(),
                 state.mixer_state.inputs.get(),
                 conf.input_bus_config);
 
         buses_to_bus_configs(
-                state.mixer_state.buses,
+                state.mixer_state.buses.get(),
                 state.mixer_state.outputs.get(),
                 conf.output_bus_config);
 

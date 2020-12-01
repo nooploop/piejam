@@ -29,7 +29,7 @@ set_bus_mute(mixer::bus_id bus_id, bool mute) -> thunk_action
 {
     return [=](auto const& get_state, auto const& dispatch) {
         state const& st = get_state();
-        if (mixer::bus const* const bus = st.mixer_state.buses[bus_id])
+        if (mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id])
         {
             if (st.bool_params.contains(bus->mute))
                 dispatch(set_bool_parameter{bus->mute, mute});

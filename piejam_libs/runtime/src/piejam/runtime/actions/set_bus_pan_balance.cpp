@@ -29,7 +29,7 @@ set_bus_pan_balance(mixer::bus_id bus_id, float pan_balance) -> thunk_action
 {
     return [=](auto const& get_state, auto const& dispatch) {
         state const& st = get_state();
-        if (mixer::bus const* const bus = st.mixer_state.buses[bus_id])
+        if (mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id])
         {
             if (st.float_params.contains(bus->pan_balance))
                 dispatch(set_float_parameter{bus->pan_balance, pan_balance});

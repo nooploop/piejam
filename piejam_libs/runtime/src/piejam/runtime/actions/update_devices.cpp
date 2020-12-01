@@ -22,15 +22,17 @@
 namespace piejam::runtime::actions
 {
 
+static constexpr void
+update_channel(std::size_t& ch, std::size_t const num_chs)
+{
+    if (ch >= num_chs)
+        ch = npos;
+}
+
 auto
 update_devices::reduce(state const& st) const -> state
 {
     auto new_st = st;
-
-    auto update_channel = [](std::size_t& ch, std::size_t const num_chs) {
-        if (ch >= num_chs)
-            ch = npos;
-    };
 
     new_st.pcm_devices = pcm_devices;
     new_st.input = input;
@@ -38,21 +40,27 @@ update_devices::reduce(state const& st) const -> state
     new_st.samplerate = samplerate;
     new_st.period_size = period_size;
 
-    std::size_t const num_in_channels = input.hw_params->num_channels;
-    for (auto const& in_id : new_st.mixer_state.inputs.get())
-    {
-        auto& in = new_st.mixer_state.buses[in_id];
-        update_channel(in.device_channels.left, num_in_channels);
-        update_channel(in.device_channels.right, num_in_channels);
-    }
+    new_st.mixer_state.buses = [this](mixer::buses_t buses,
+                                      mixer::bus_list_t const& in_ids,
+                                      mixer::bus_list_t const& out_ids) {
+        std::size_t const num_in_channels = input.hw_params->num_channels;
+        for (auto const& in_id : in_ids)
+        {
+            auto& in = buses[in_id];
+            update_channel(in.device_channels.left, num_in_channels);
+            update_channel(in.device_channels.right, num_in_channels);
+        }
 
-    std::size_t const num_out_channels = output.hw_params->num_channels;
-    for (auto const& out_id : new_st.mixer_state.outputs.get())
-    {
-        auto& out = new_st.mixer_state.buses[out_id];
-        update_channel(out.device_channels.left, num_out_channels);
-        update_channel(out.device_channels.right, num_out_channels);
-    }
+        std::size_t const num_out_channels = output.hw_params->num_channels;
+        for (auto const& out_id : out_ids)
+        {
+            auto& out = buses[out_id];
+            update_channel(out.device_channels.left, num_out_channels);
+            update_channel(out.device_channels.right, num_out_channels);
+        }
+
+        return buses;
+    }(new_st.mixer_state.buses, st.mixer_state.inputs, st.mixer_state.outputs);
 
     return new_st;
 }

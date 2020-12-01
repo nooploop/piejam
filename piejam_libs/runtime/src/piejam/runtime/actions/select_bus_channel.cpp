@@ -27,22 +27,26 @@ select_bus_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    mixer::bus& bus = new_st.mixer_state.buses[bus_id];
+    new_st.mixer_state.buses = [this](mixer::buses_t buses) {
+        mixer::bus& bus = buses[bus_id];
 
-    switch (channel_selector)
-    {
-        case audio::bus_channel::mono:
-            bus.device_channels = channel_index_pair{channel_index};
-            break;
+        switch (channel_selector)
+        {
+            case audio::bus_channel::mono:
+                bus.device_channels = channel_index_pair{channel_index};
+                break;
 
-        case audio::bus_channel::left:
-            bus.device_channels.left = channel_index;
-            break;
+            case audio::bus_channel::left:
+                bus.device_channels.left = channel_index;
+                break;
 
-        case audio::bus_channel::right:
-            bus.device_channels.right = channel_index;
-            break;
-    }
+            case audio::bus_channel::right:
+                bus.device_channels.right = channel_index;
+                break;
+        }
+
+        return buses;
+    }(new_st.mixer_state.buses);
 
     return new_st;
 }
