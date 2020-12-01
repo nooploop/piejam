@@ -116,15 +116,15 @@ remove_fx_module(audio_state& st, fx::module_id id)
 }
 
 template <audio::bus_direction D>
-void
+auto
 add_mixer_bus(
         audio_state& st,
         std::string name,
         audio::bus_type type,
-        channel_index_pair const& chs)
+        channel_index_pair const& chs) -> mixer::bus_id
 {
     mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
-    bus_ids.emplace_back(st.mixer_state.buses.add(mixer::bus{
+    auto bus_id = st.mixer_state.buses.add(mixer::bus{
             .name = std::move(name),
             .volume = st.float_params.add(parameter::float_{
                     .default_value = 1.f,
@@ -139,20 +139,22 @@ add_mixer_bus(
             .level = st.levels.add(parameter::stereo_level{}),
             .type = type,
             .device_channels = chs,
-            .fx_chain = {}}));
+            .fx_chain = {}});
+    bus_ids.emplace_back(bus_id);
     mixer::bus_ids<D>(st.mixer_state) = bus_ids;
+    return bus_id;
 }
 
-template void add_mixer_bus<audio::bus_direction::input>(
+template auto add_mixer_bus<audio::bus_direction::input>(
         audio_state&,
         std::string,
         audio::bus_type,
-        channel_index_pair const&);
-template void add_mixer_bus<audio::bus_direction::output>(
+        channel_index_pair const&) -> mixer::bus_id;
+template auto add_mixer_bus<audio::bus_direction::output>(
         audio_state&,
         std::string,
         audio::bus_type,
-        channel_index_pair const&);
+        channel_index_pair const&) -> mixer::bus_id;
 
 void
 remove_mixer_bus(audio_state& st, mixer::bus_id const bus_id)
