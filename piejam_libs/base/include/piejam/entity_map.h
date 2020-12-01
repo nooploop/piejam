@@ -36,7 +36,6 @@ public:
 
     auto empty() const noexcept { return m_map.empty(); }
     auto size() const noexcept { return m_map.size(); }
-    auto capacity() const noexcept { return m_map.capacity(); }
 
     auto begin() const noexcept { return m_map.begin(); }
     auto end() const noexcept { return m_map.end(); }
@@ -45,9 +44,6 @@ public:
     auto end() noexcept { return m_map.end(); }
 
     auto contains(id_t id) const noexcept { return m_map.contains(id); }
-
-    auto find(id_t id) const noexcept { return m_map.find(id); }
-    auto find(id_t id) noexcept { return m_map.find(id); }
 
     auto operator[](id_t id) const noexcept -> Entity const*
     {
@@ -62,8 +58,8 @@ public:
         return it->second;
     }
 
-    template <class V>
-    requires std::convertible_to<V, Entity> auto add(V&& v) -> id_t
+    template <std::convertible_to<Entity> V>
+    auto add(V&& v) -> id_t
     {
         auto id = id_t::generate();
         m_map.emplace_hint(m_map.end(), id, std::forward<V>(v));
