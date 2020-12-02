@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
-        <file>PieJam/MixerControls/DbConvert.js</file>
         <file>PieJam/MixerControls/DbScale.qml</file>
         <file>PieJam/MixerControls/DbScaleData.qml</file>
         <file>PieJam/MixerControls/DbScaleTick.qml</file>
@@ -35,5 +34,6 @@
         <file>PieJam/Views/FxChain.qml</file>
         <file>PieJam/FxChainControls/FxChainModule.qml</file>
         <file>PieJam/FxChainControls/ParameterControl.qml</file>
+        <file>PieJam/Util/DbConvert.js</file>
     </qresource>
 </RCC>

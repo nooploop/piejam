@@ -19,8 +19,8 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 
-import "DbConvert.js" as DbConvert
 import "../Controls/Color.js" as ColorUtil
+import "../Util/DbConvert.js" as DbConvert
 import "../Util/MathExt.js" as MathExt
 
 Item {

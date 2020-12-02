@@ -63,8 +63,6 @@ signals:
 private:
     QString m_name;
     double m_value{};
-    double m_min{};
-    double m_max{};
 };
 
 } // namespace piejam::gui::model
