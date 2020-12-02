@@ -21,11 +21,8 @@
 #include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/MixerChannel.h>
 #include <piejam/audio/types.h>
-#include <piejam/redux/store.h>
-#include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
-#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 

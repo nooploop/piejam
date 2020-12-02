@@ -17,40 +17,25 @@
 
 #pragma once
 
-#include <piejam/redux/functors.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/cloneable_action.h>
-
-#include <functional>
+#include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::runtime::ui
 {
 
 template <class State>
-struct thunk_action final : cloneable_action<thunk_action<State>, action<State>>
+void
+thunk_action<State>::operator()(
+        get_state_f const& get_state,
+        dispatch_f const& dispatch) const
 {
-    using get_state_f = redux::get_state_f<State>;
-    using dispatch_f = redux::dispatch_f<action<State>>;
-
-    template <class Thunk>
-    thunk_action(Thunk&& thunk)
-        : m_thunk(std::forward<Thunk>(thunk))
-    {
-    }
-
-    void operator()(get_state_f const&, dispatch_f const&) const;
-
-    auto reduce(State const&) const -> State override;
-
-private:
-    std::function<void(get_state_f const&, dispatch_f const&)> m_thunk;
-};
+    m_thunk(get_state, dispatch);
+}
 
 template <class State>
 auto
-as_thunk_action(action<State> const& a) -> thunk_action<State> const*
+thunk_action<State>::reduce(State const&) const -> State
 {
-    return dynamic_cast<thunk_action<State> const*>(&a);
+    throw std::runtime_error("thunk_action is not reducible.");
 }
 
 } // namespace piejam::runtime::ui

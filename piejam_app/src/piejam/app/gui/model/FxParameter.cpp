@@ -18,7 +18,6 @@
 #include <piejam/app/gui/model/FxParameter.h>
 
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
-#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 

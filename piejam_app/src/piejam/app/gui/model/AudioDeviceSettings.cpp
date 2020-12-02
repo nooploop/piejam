@@ -25,7 +25,6 @@
 #include <piejam/runtime/actions/refresh_devices.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
-#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
 
 #include <boost/hof/compose.hpp>

@@ -21,7 +21,6 @@
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/box.h>
-#include <piejam/indexed_access.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/mixer.h>

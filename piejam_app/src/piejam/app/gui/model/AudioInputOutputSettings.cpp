@@ -20,10 +20,8 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/BusConfig.h>
-#include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/request_info_update.h>
-#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
 
 #include <string>
