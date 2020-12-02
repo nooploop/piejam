@@ -35,11 +35,7 @@ template <class F>
 class memo
 {
 public:
-    memo(F const& f) noexcept(std::is_nothrow_copy_constructible_v<F>)
-        : m_f(f)
-    {
-    }
-    memo(F&& f) noexcept(std::is_nothrow_move_constructible_v<F>)
+    memo(F f) noexcept(std::is_nothrow_move_constructible_v<F>)
         : m_f(std::move(f))
     {
     }
@@ -83,8 +79,6 @@ private:
 };
 
 template <class F>
-memo(F const&) -> memo<F>;
-template <class F>
-memo(F&&) -> memo<F>;
+memo(F) -> memo<F>;
 
 } // namespace piejam

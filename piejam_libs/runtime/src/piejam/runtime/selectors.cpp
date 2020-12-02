@@ -91,13 +91,9 @@ auto
 make_bus_name_selector(mixer::bus_id bus_id)
         -> selector<container::boxed_string>
 {
-    return [bus_id](state const& st) -> container::boxed_string {
-        if (mixer::bus const* bus = st.mixer_state.buses.get()[bus_id])
-        {
-            return bus->name;
-        }
-
-        return {};
+    return [bus_id](state const& st) mutable -> container::boxed_string {
+        mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
+        return bus ? bus->name : container::boxed_string();
     };
 }
 
