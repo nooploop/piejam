@@ -81,11 +81,11 @@ make_fx_gain(fx::modules_t& fx_modules, float_parameters& float_params)
 void
 add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::type fx_type)
 {
-    st.mixer_state.buses =
+    std::tie(st.mixer_state.buses, st.fx_modules) =
             [bus_id, fx_type](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
-                    fx::modules_t& fx_modules,
+                    fx::modules_t fx_modules,
                     float_parameters& float_params) {
                 mixer::bus& bus = buses[bus_id];
 
@@ -99,7 +99,7 @@ add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::type fx_type)
 
                 bus.fx_chain = std::move(fx_chain);
 
-                return buses;
+                return std::pair(std::move(buses), std::move(fx_modules));
             }(st.mixer_state.buses,
               st.mixer_state.buses.get()[bus_id]->fx_chain,
               st.fx_modules,
@@ -109,7 +109,7 @@ add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::type fx_type)
 void
 remove_fx_module(audio_state& st, fx::module_id id)
 {
-    if (fx::module const* const fx_mod = std::as_const(st.fx_modules)[id])
+    if (fx::module const* const fx_mod = st.fx_modules.get()[id])
     {
         st.mixer_state.buses = [id](mixer::buses_t buses) {
             for (auto&& [bus_id, bus] : buses)
@@ -128,7 +128,10 @@ remove_fx_module(audio_state& st, fx::module_id id)
         for (auto&& [key, fx_param] : *fx_mod->parameters)
             st.float_params.remove(fx_param.id);
 
-        st.fx_modules.remove(id);
+        st.fx_modules = [id](fx::modules_t fx_modules) {
+            fx_modules.remove(id);
+            return fx_modules;
+        }(st.fx_modules);
     }
 }
 

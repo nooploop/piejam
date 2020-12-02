@@ -52,7 +52,7 @@ struct audio_state
 
     stereo_level_parameters levels{};
 
-    fx::modules_t fx_modules{};
+    container::box<fx::modules_t> fx_modules{};
 
     mixer::state mixer_state{};
 
