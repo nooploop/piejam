@@ -27,43 +27,30 @@ namespace piejam::app::gui::model
 FxParameter::FxParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::fx::module_id fx_mod_id,
-        runtime::fx::parameter_key fx_param_key)
+        runtime::fx::parameter_id fx_param_id)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_fx_mod_id(fx_mod_id)
-    , m_fx_param_key(fx_param_key)
+    , m_fx_param_id(fx_param_id)
 {
 }
 
 void
 FxParameter::subscribe_step()
 {
-    observe(runtime::selectors::make_fx_parameter_name_selector(
-                    m_fx_mod_id,
-                    m_fx_param_key),
+    observe(runtime::selectors::make_fx_parameter_name_selector(m_fx_param_id),
             [this](container::boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
 
-    observe(runtime::selectors::make_fx_parameter_id_selector(
-                    m_fx_mod_id,
-                    m_fx_param_key),
-            [this](runtime::float_parameter_id const param_id) {
-                observe(runtime::selectors::
-                                make_float_parameter_normalized_value_selector(
-                                        param_id),
-                        [this](float const norm_value) {
-                            setValue(norm_value);
-                        });
-                m_param_id = param_id;
-            });
+    observe(runtime::selectors::make_float_parameter_normalized_value_selector(
+                    m_fx_param_id),
+            [this](float const norm_value) { setValue(norm_value); });
 }
 
 void
 FxParameter::changeValue(double value)
 {
     dispatch(runtime::actions::set_float_parameter_normalized(
-            m_param_id,
+            m_fx_param_id,
             value));
 }
 

@@ -29,6 +29,36 @@
 namespace piejam::app::gui::model
 {
 
+namespace
+{
+
+struct parameter_key_id
+{
+    runtime::fx::parameter_key key;
+    runtime::fx::parameter_id id;
+
+    constexpr bool operator==(parameter_key_id const& other) const noexcept
+    {
+        return key == other.key;
+    }
+};
+
+auto
+parameter_key_ids(runtime::fx::module_parameters const& params)
+{
+    std::vector<parameter_key_id> result;
+    result.reserve(params.size());
+    std::ranges::transform(
+            params,
+            std::back_inserter(result),
+            [](auto&& mod_param) {
+                return parameter_key_id{mod_param.first, mod_param.second};
+            });
+    return result;
+}
+
+} // namespace
+
 FxModule::FxModule(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
@@ -36,18 +66,6 @@ FxModule::FxModule(
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_fx_mod_id(fx_mod_id)
 {
-}
-
-static auto
-get_parameter_keys(runtime::fx::module_parameters const& params)
-{
-    std::vector<runtime::fx::parameter_key> result;
-    result.reserve(params.size());
-    std::ranges::transform(
-            params,
-            std::back_inserter(result),
-            &runtime::fx::module_parameters::value_type::first);
-    return result;
 }
 
 void
@@ -59,19 +77,19 @@ FxModule::subscribe_step()
             });
 
     observe(runtime::selectors::make_fx_module_parameters_selector(m_fx_mod_id),
-            [this](container::box<runtime::fx::module_parameters> const& param_ids) {
+            [this](container::box<runtime::fx::module_parameters> const&
+                           param_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
-                                get_parameter_keys(*m_param_ids),
-                                get_parameter_keys(*param_ids)),
+                                parameter_key_ids(*m_param_ids),
+                                parameter_key_ids(*param_ids)),
                         generic_list_model_edit_script_executor{
                                 *parameters(),
-                                [this](runtime::fx::parameter_key param_key) {
+                                [this](parameter_key_id const& param_key_id) {
                                     return std::make_unique<FxParameter>(
                                             dispatch(),
                                             state_change_subscriber(),
-                                            m_fx_mod_id,
-                                            param_key);
+                                            param_key_id.id);
                                 }});
 
                 m_param_ids = param_ids;
