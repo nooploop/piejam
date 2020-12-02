@@ -39,14 +39,14 @@ FxModule::FxModule(
 }
 
 static auto
-get_parameter_keys(runtime::fx::parameters_t const& params)
+get_parameter_keys(runtime::fx::module_parameters const& params)
 {
     std::vector<runtime::fx::parameter_key> result;
     result.reserve(params.size());
     std::ranges::transform(
             params,
             std::back_inserter(result),
-            &runtime::fx::parameters_t::value_type::first);
+            &runtime::fx::module_parameters::value_type::first);
     return result;
 }
 
@@ -59,7 +59,7 @@ FxModule::subscribe_step()
             });
 
     observe(runtime::selectors::make_fx_module_parameters_selector(m_fx_mod_id),
-            [this](container::box<runtime::fx::parameters_t> const& param_ids) {
+            [this](container::box<runtime::fx::module_parameters> const& param_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
                                 get_parameter_keys(*m_param_ids),

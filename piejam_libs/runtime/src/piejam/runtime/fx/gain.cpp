@@ -38,17 +38,24 @@ struct dB_ival
 } // namespace
 
 auto
-make_gain_module(float_parameters& float_params) -> module
+make_gain_module(parameters_t& fx_params, float_parameters& float_params)
+        -> module
 {
     using namespace std::string_literals;
+
+    auto add_param = [&](auto&& p, auto&& name) {
+        auto id = float_params.add(std::forward<decltype(p)>(p));
+        fx_params.emplace(id, std::forward<decltype(name)>(name));
+        return id;
+    };
 
     return module{
             .fx_type = type::gain,
             .name = "gain"s,
-            .parameters = fx::parameters_t{
+            .parameters = fx::module_parameters{
                     {static_cast<std::size_t>(gain_parameter_key::gain),
-                     parameter{
-                             .id = float_params.add(runtime::parameter::float_{
+                     add_param(
+                             runtime::parameter::float_{
                                      .default_value = 1.f,
                                      .min = 0.0625f,
                                      .max = 8.f,
@@ -57,8 +64,8 @@ make_gain_module(float_parameters& float_params) -> module
                                      .from_normalized =
                                              &runtime::parameter::
                                                      from_normalized_db<
-                                                             dB_ival>}),
-                             .name = "gain"}}}};
+                                                             dB_ival>},
+                             "gain"s)}}};
 }
 
 } // namespace piejam::runtime::fx

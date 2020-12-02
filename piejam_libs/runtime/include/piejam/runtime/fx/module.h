@@ -31,13 +31,14 @@ namespace piejam::runtime::fx
 {
 
 using parameter_key = std::size_t;
-using parameters_t = boost::container::flat_map<parameter_key, parameter>;
+using module_parameters =
+        boost::container::flat_map<parameter_key, parameter_id>;
 
 struct module
 {
     type fx_type;
     container::boxed_string name;
-    container::box<parameters_t> parameters;
+    container::box<module_parameters> parameters;
 };
 
 using module_id = entity_id<module>;

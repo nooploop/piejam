@@ -85,7 +85,7 @@ extern const selector<float> select_current_fx_chain_bus_volume;
 auto make_fx_module_name_selector(fx::module_id)
         -> selector<container::boxed_string>;
 auto make_fx_module_parameters_selector(fx::module_id)
-        -> selector<container::box<fx::parameters_t>>;
+        -> selector<container::box<fx::module_parameters>>;
 auto make_fx_parameter_name_selector(fx::module_id, fx::parameter_key)
         -> selector<container::boxed_string>;
 auto make_fx_parameter_id_selector(fx::module_id, fx::parameter_key)

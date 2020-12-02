@@ -230,10 +230,11 @@ make_fx_module_name_selector(fx::module_id fx_mod_id)
 
 auto
 make_fx_module_parameters_selector(fx::module_id fx_mod_id)
-        -> selector<container::box<fx::parameters_t>>
+        -> selector<container::box<fx::module_parameters>>
 {
-    return [fx_mod_id](state const& st) -> container::box<fx::parameters_t> {
-        static container::box<fx::parameters_t> s_empty;
+    return [fx_mod_id](
+                   state const& st) -> container::box<fx::module_parameters> {
+        static container::box<fx::module_parameters> s_empty;
         fx::module const* const fx_mod = st.fx_modules.get()[fx_mod_id];
         return fx_mod ? fx_mod->parameters : s_empty;
     };
@@ -253,7 +254,11 @@ make_fx_parameter_name_selector(
             if (auto it = fx_mod->parameters->find(fx_param_key);
                 it != fx_mod->parameters->end())
             {
-                return it->second.name;
+                if (auto it_param = st.fx_parameters->find(it->second);
+                    it_param != st.fx_parameters->end())
+                {
+                    return it_param->second.name;
+                }
             }
         }
         return s_empty;
@@ -271,7 +276,7 @@ make_fx_parameter_id_selector(
             if (auto it = fx_mod->parameters->find(fx_param_key);
                 it != fx_mod->parameters->end())
             {
-                return it->second.id;
+                return it->second;
             }
         }
         return {};

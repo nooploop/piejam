@@ -73,36 +73,46 @@ period_sizes_from_state(audio_state const& state) -> audio::period_sizes_t
 }
 
 static auto
-make_fx_gain(fx::modules_t& fx_modules, float_parameters& float_params)
+make_fx_gain(
+        fx::modules_t& fx_modules,
+        fx::parameters_t& fx_params,
+        float_parameters& float_params)
 {
-    return fx_modules.add(fx::make_gain_module(float_params));
+    return fx_modules.add(fx::make_gain_module(fx_params, float_params));
 }
 
 void
 add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::type fx_type)
 {
-    std::tie(st.mixer_state.buses, st.fx_modules) =
+    std::tie(st.mixer_state.buses, st.fx_modules, st.fx_parameters) =
             [bus_id, fx_type](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
                     fx::modules_t fx_modules,
+                    fx::parameters_t fx_params,
                     float_parameters& float_params) {
                 mixer::bus& bus = buses[bus_id];
 
                 switch (fx_type)
                 {
                     case fx::type::gain:
-                        fx_chain.emplace_back(
-                                make_fx_gain(fx_modules, float_params));
+                        fx_chain.emplace_back(make_fx_gain(
+                                fx_modules,
+                                fx_params,
+                                float_params));
                         break;
                 }
 
                 bus.fx_chain = std::move(fx_chain);
 
-                return std::pair(std::move(buses), std::move(fx_modules));
+                return std::tuple(
+                        std::move(buses),
+                        std::move(fx_modules),
+                        std::move(fx_params));
             }(st.mixer_state.buses,
               st.mixer_state.buses.get()[bus_id]->fx_chain,
               st.fx_modules,
+              st.fx_parameters,
               st.float_params);
 }
 
@@ -125,8 +135,15 @@ remove_fx_module(audio_state& st, fx::module_id id)
             return buses;
         }(st.mixer_state.buses);
 
-        for (auto&& [key, fx_param] : *fx_mod->parameters)
-            st.float_params.remove(fx_param.id);
+        for (auto&& [key, fx_param_id] : *fx_mod->parameters)
+        {
+            st.float_params.remove(fx_param_id);
+            st.fx_parameters = [](fx::parameters_t fx_params,
+                                  fx::parameter_id id) {
+                fx_params.erase(id);
+                return fx_params;
+            }(st.fx_parameters, fx_param_id);
+        }
 
         st.fx_modules = [id](fx::modules_t fx_modules) {
             fx_modules.remove(id);

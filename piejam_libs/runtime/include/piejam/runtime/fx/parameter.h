@@ -26,20 +26,7 @@ namespace piejam::runtime::fx
 
 struct parameter
 {
-    float_parameter_id id;
     container::boxed_string name;
 };
-
-constexpr bool
-operator==(parameter const& l, parameter const& r) noexcept
-{
-    return l.id == r.id;
-}
-
-constexpr bool
-operator!=(parameter const& l, parameter const& r) noexcept
-{
-    return l.id != r.id;
-}
 
 } // namespace piejam::runtime::fx

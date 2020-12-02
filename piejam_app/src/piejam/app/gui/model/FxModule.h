@@ -38,7 +38,7 @@ private:
 
     runtime::fx::module_id const m_fx_mod_id;
 
-    container::box<runtime::fx::parameters_t> m_param_ids;
+    container::box<runtime::fx::module_parameters> m_param_ids;
 };
 
 } // namespace piejam::app::gui::model

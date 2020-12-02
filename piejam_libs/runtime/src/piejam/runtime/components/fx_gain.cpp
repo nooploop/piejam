@@ -43,10 +43,8 @@ public:
             fx::module const& fx_mod,
             std::string_view const& name)
         : m_gain_input_proc(proc_factory.make_input_processor(
-                  fx_mod.parameters
-                          ->at(static_cast<std::size_t>(
-                                  fx::gain_parameter_key::gain))
-                          .id,
+                  fx_mod.parameters->at(static_cast<std::size_t>(
+                          fx::gain_parameter_key::gain)),
                   fmt::format("gain {}", name)))
         , m_amplifier(audio::components::make_stereo_amplifier(
                   fmt::format("amp {}", name)))

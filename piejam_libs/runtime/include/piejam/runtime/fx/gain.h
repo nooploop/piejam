@@ -28,6 +28,6 @@ enum class gain_parameter_key : parameter_key
     gain
 };
 
-auto make_gain_module(float_parameters&) -> module;
+auto make_gain_module(parameters_t&, float_parameters&) -> module;
 
 } // namespace piejam::runtime::fx

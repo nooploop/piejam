@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/fwd.h>
+#include <piejam/runtime/parameters.h>
 
 #include <boost/container/container_fwd.hpp>
 
@@ -31,8 +32,11 @@ enum class type : unsigned;
 struct parameter;
 struct module;
 
+using parameter_id = float_parameter_id;
 using parameter_key = std::size_t;
-using parameters_t = boost::container::flat_map<parameter_key, parameter>;
+using module_parameters =
+        boost::container::flat_map<parameter_key, parameter_id>;
+using parameters_t = boost::container::flat_map<parameter_id, parameter>;
 
 using module_id = entity_id<module>;
 using modules_t = entity_map<module, module>;
