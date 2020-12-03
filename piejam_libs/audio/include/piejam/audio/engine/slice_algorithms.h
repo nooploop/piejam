@@ -255,6 +255,14 @@ struct slice_transform
     constexpr auto operator()(std::span<T const> const& buf) const noexcept
             -> slice<T>
     {
+        BOOST_ASSERT(buf.size() == m_out.size());
+        BOOST_ASSERT(boost::alignment::is_aligned(
+                buf.data(),
+                XSIMD_DEFAULT_ALIGNMENT));
+        BOOST_ASSERT(boost::alignment::is_aligned(
+                m_out.data(),
+                XSIMD_DEFAULT_ALIGNMENT));
+        BOOST_ASSERT(buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
         xsimd::transform(buf.begin(), buf.end(), m_out.begin(), m_f);
         return m_out;
     }
