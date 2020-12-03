@@ -21,6 +21,8 @@
 #include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
 
+#include <xsimd/math/xsimd_basic_math.hpp>
+
 #include <boost/assert.hpp>
 
 #include <algorithm>
@@ -46,8 +48,20 @@ output_processor::process(process_context const& ctx)
     {
         for (std::size_t ch = 0; ch < m_num_inputs; ++ch)
         {
-            copy(ctx.inputs[ch].get(),
-                 {m_engine_output[ch].data(), m_engine_output.minor_size()});
+            std::span out(
+                    m_engine_output[ch].data(),
+                    m_engine_output.minor_size());
+            copy(transform(
+                         ctx.inputs[ch].get(),
+                         out,
+                         [](auto&& x) {
+                             using x_t = std::decay_t<decltype(x)>;
+                             return xsimd::clip(
+                                     std::forward<decltype(x)>(x),
+                                     x_t{-1.f},
+                                     x_t{1.f});
+                         }),
+                 out);
         }
     }
 }

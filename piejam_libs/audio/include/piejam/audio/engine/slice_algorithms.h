@@ -33,9 +33,9 @@ namespace detail
 {
 
 template <class T>
-struct add_visitor
+struct slice_add
 {
-    constexpr add_visitor(std::span<T> const& out) noexcept
+    constexpr slice_add(std::span<T> const& out) noexcept
         : m_out(out)
     {
     }
@@ -108,9 +108,9 @@ private:
 };
 
 template <class T>
-struct multiply_visitor
+struct slice_multiply
 {
-    constexpr multiply_visitor(std::span<T> const& out) noexcept
+    constexpr slice_multiply(std::span<T> const& out) noexcept
         : m_out(out)
     {
     }
@@ -185,9 +185,9 @@ private:
 };
 
 template <class T>
-struct copy_visitor
+struct slice_copy
 {
-    constexpr copy_visitor(std::span<T> const& out) noexcept
+    constexpr slice_copy(std::span<T> const& out) noexcept
         : m_out(out)
     {
     }
@@ -199,8 +199,11 @@ struct copy_visitor
 
     constexpr void operator()(std::span<T const> const& buf) const noexcept
     {
-        BOOST_ASSERT(buf.size() == m_out.size());
-        std::ranges::copy(buf, m_out.begin());
+        if (buf.data() != m_out.data())
+        {
+            BOOST_ASSERT(buf.size() == m_out.size());
+            std::ranges::copy(buf, m_out.begin());
+        }
     }
 
 private:
@@ -234,6 +237,33 @@ private:
     std::size_t const m_size;
 };
 
+template <class T, class F>
+struct slice_transform
+{
+    template <std::convertible_to<F> G>
+    constexpr slice_transform(std::span<T> const& out, G&& g)
+        : m_out(out)
+        , m_f(std::forward<G>(g))
+    {
+    }
+
+    constexpr auto operator()(T const c) const noexcept -> slice<T>
+    {
+        return m_f(c);
+    }
+
+    constexpr auto operator()(std::span<T const> const& buf) const noexcept
+            -> slice<T>
+    {
+        xsimd::transform(buf.begin(), buf.end(), m_out.begin(), m_f);
+        return m_out;
+    }
+
+private:
+    std::span<T> const m_out;
+    F m_f;
+};
+
 } // namespace detail
 
 template <class T>
@@ -242,7 +272,7 @@ add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
         -> slice<T>
 {
     return std::visit(
-            detail::add_visitor<T>(out),
+            detail::slice_add<T>(out),
             l.as_variant(),
             r.as_variant());
 }
@@ -253,7 +283,7 @@ multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
         -> slice<T>
 {
     return std::visit(
-            detail::multiply_visitor<T>(out),
+            detail::slice_multiply<T>(out),
             l.as_variant(),
             r.as_variant());
 }
@@ -262,7 +292,17 @@ template <class T>
 constexpr void
 copy(slice<T> const& s, std::span<T> const& out) noexcept
 {
-    std::visit(detail::copy_visitor(out), s.as_variant());
+    std::visit(detail::slice_copy(out), s.as_variant());
+}
+
+template <class T, class F>
+constexpr auto
+transform(slice<T> const& s, std::span<T> const& out, F&& f) noexcept
+        -> slice<T>
+{
+    return std::visit(
+            detail::slice_transform<T, F>(out, std::forward<F>(f)),
+            s.as_variant());
 }
 
 template <class T>
