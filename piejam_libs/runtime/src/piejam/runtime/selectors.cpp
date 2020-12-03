@@ -274,6 +274,33 @@ make_fx_parameter_id_selector(
 }
 
 auto
+make_fx_parameter_unit_selector(fx::parameter_id const param_id)
+        -> selector<fx::parameter_unit>
+{
+    return [param_id](state const& st) -> fx::parameter_unit {
+        auto it = st.fx_parameters->find(param_id);
+        return it != st.fx_parameters->end() ? it->second.unit
+                                             : fx::parameter_unit::none;
+    };
+}
+
+auto
+make_float_parameter_value_selector(float_parameter_id const param_id)
+        -> selector<float>
+{
+    return [param_id](state const& st) -> float {
+        if (float_parameter const* const param =
+                    st.float_params.get_parameter(param_id))
+        {
+            float const* const value = st.float_params.get(param_id);
+            BOOST_ASSERT(value);
+            return *value;
+        }
+        return {};
+    };
+}
+
+auto
 make_float_parameter_normalized_value_selector(
         float_parameter_id const param_id) -> selector<float>
 {

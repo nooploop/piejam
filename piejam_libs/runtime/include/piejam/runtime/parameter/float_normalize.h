@@ -59,7 +59,7 @@ from_normalized_db(float_ const& p, float const norm_value) -> float
     float const max_db = (std::log(p.max) / std::log(10)) * 20.f;
     float const min_db = (std::log(p.min) / std::log(10)) * 20.f;
     float const value_db = norm_value * (max_db - min_db) + min_db;
-    return std::pow(10, value_db / 20.f);
+    return std::pow(10.f, value_db / 20.f);
 }
 
 template <class DbInterval>
@@ -68,7 +68,7 @@ from_normalized_db(float_ const&, float const norm_value) -> float
 {
     float const value_db =
             norm_value * (DbInterval::max - DbInterval::min) + DbInterval::min;
-    return std::pow(10, value_db / 20.f);
+    return std::pow(10.f, value_db / 20.f);
 }
 
 } // namespace piejam::runtime::parameter

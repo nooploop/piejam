@@ -28,6 +28,8 @@ class FxParameter : public SubscribableModel
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(double value READ value NOTIFY valueChanged FINAL)
+    Q_PROPERTY(QString valueString READ valueString NOTIFY valueStringChanged
+                       FINAL)
 
 public:
     using SubscribableModel::SubscribableModel;
@@ -54,15 +56,31 @@ public:
 
     Q_INVOKABLE virtual void changeValue(double) = 0;
 
+    auto valueString() const noexcept -> QString const&
+    {
+        return m_valueString;
+    }
+
+    void setValueString(QString const& x)
+    {
+        if (m_valueString != x)
+        {
+            m_valueString = x;
+            emit valueStringChanged();
+        }
+    }
+
     auto toQString() const -> QString { return m_name; }
 
 signals:
     void nameChanged();
     void valueChanged();
+    void valueStringChanged();
 
 private:
     QString m_name;
     double m_value{};
+    QString m_valueString;
 };
 
 } // namespace piejam::gui::model

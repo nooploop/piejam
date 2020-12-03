@@ -32,6 +32,8 @@ enum class type : unsigned;
 struct parameter;
 struct module;
 
+enum class parameter_unit : unsigned;
+
 using parameter_id = float_parameter_id;
 using parameter_key = std::size_t;
 using module_parameters =

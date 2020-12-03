@@ -82,7 +82,7 @@ Item {
             verticalAlignment: Text.AlignVCenter
             anchors.topMargin: 4
             font.pixelSize: 12
-            horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignRight
         }
 
         Slider {
@@ -99,3 +99,9 @@ Item {
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

@@ -82,7 +82,7 @@ Item {
             delegate: ParameterControl {
                 name: model.item.name
                 value: model.item.value
-                valueText: model.item.value.toFixed(2)
+                valueText: model.item.valueString
 
                 height: parametersList.height
 

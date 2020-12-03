@@ -24,9 +24,16 @@
 namespace piejam::runtime::fx
 {
 
+enum class parameter_unit : unsigned
+{
+    none,
+    dB
+};
+
 struct parameter
 {
     container::boxed_string name;
+    parameter_unit unit;
 };
 
 } // namespace piejam::runtime::fx

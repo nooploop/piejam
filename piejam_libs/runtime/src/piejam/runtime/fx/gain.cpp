@@ -31,8 +31,15 @@ namespace
 
 struct dB_ival
 {
-    static constexpr auto min{(std::log(0.0625f) / std::log(10)) * 20.f};
-    static constexpr auto max{(std::log(8.f) / std::log(10)) * 20.f};
+    static constexpr auto min{-24.f};
+    static constexpr auto max{24.f};
+};
+
+struct gain_defaults
+{
+    static constexpr float default_value{1.f};
+    static constexpr float min{std::pow(10.f, dB_ival::min / 20.f)};
+    static constexpr float max{std::pow(10.f, dB_ival::max / 20.f)};
 };
 
 } // namespace
@@ -45,7 +52,11 @@ make_gain_module(parameters_t& fx_params, float_parameters& float_params)
 
     auto add_param = [&](auto&& p, auto&& name) {
         auto id = float_params.add(std::forward<decltype(p)>(p));
-        fx_params.emplace(id, std::forward<decltype(name)>(name));
+        fx_params.emplace(
+                id,
+                parameter{
+                        .name = std::forward<decltype(name)>(name),
+                        .unit = parameter_unit::dB});
         return id;
     };
 
@@ -56,9 +67,10 @@ make_gain_module(parameters_t& fx_params, float_parameters& float_params)
                     {static_cast<std::size_t>(gain_parameter_key::gain),
                      add_param(
                              runtime::parameter::float_{
-                                     .default_value = 1.f,
-                                     .min = 0.0625f,
-                                     .max = 8.f,
+                                     .default_value =
+                                             gain_defaults::default_value,
+                                     .min = gain_defaults::min,
+                                     .max = gain_defaults::max,
                                      .to_normalized = runtime::parameter::
                                              to_normalized_db<dB_ival>,
                                      .from_normalized =
