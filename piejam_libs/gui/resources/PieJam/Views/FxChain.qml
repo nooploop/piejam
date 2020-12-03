@@ -30,10 +30,11 @@ TopPane {
     ListView {
         id: fxModules
 
-        x: 5
-        y: 7
-        width: 627
-        height: 418
+        anchors.left: parent.left
+        anchors.right: levelMeterFrame.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.margins: 8
 
         model: root.model.modules
 
@@ -42,7 +43,8 @@ TopPane {
         spacing: 4
 
         delegate: FxChainModule {
-            height: 412
+            anchors.top: if (parent) parent.top
+            anchors.bottom: if (parent) parent.bottom
 
             name: model.item.name
             parameters: model.item.parameters
@@ -69,7 +71,7 @@ TopPane {
 
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 4
+                anchors.bottomMargin: -1
                 anchors.left: parent.left
                 anchors.leftMargin: 4
 
@@ -83,18 +85,22 @@ TopPane {
     }
 
     Frame {
-        x: 638
-        y: 7
-        width: 153
-        height: 418
+        id: levelMeterFrame
+
+        width: 150
+
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.margins: 8
 
         ComboBox {
             id: channelSelector
 
-            x: 0
-            y: 0
-            width: 128
             height: 48
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
 
             model: root.model.buses.elements
             currentIndex: root.model.buses.focused
@@ -108,10 +114,11 @@ TopPane {
         LevelMeterFader {
             id: levelMeterFader
 
-            x: 0
-            y: 54
-            width: 128
-            height: 340
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: channelSelector.bottom
+            anchors.bottom: parent.bottom
+            anchors.topMargin: 4
 
             levelLeft: root.model.levelLeft
             levelRight: root.model.levelRight
