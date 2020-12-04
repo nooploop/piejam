@@ -23,7 +23,6 @@
 #include <piejam/app/gui/model/BusName.h>
 #include <piejam/app/gui/model/FxModule.h>
 #include <piejam/app/gui/model/FxParameter.h>
-#include <piejam/runtime/actions/add_fx_module.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
@@ -175,14 +174,6 @@ void
 FxChain::requestLevelsUpdate()
 {
     dispatch(runtime::actions::request_mixer_levels_update({m_bus_id}));
-}
-
-void
-FxChain::addModule()
-{
-    runtime::actions::add_fx_module action;
-    action.bus_id = m_bus_id;
-    dispatch(action);
 }
 
 void

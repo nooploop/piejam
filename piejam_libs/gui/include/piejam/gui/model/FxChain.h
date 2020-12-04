@@ -36,12 +36,11 @@ class FxChain : public SubscribableModel
     Q_PROPERTY(double volume READ volume NOTIFY volumeChanged FINAL)
 
 public:
-    auto modules() -> FxModulesList* { return &m_modules; }
-    auto buses() -> StringList* { return &m_buses; }
+    auto modules() noexcept -> FxModulesList* { return &m_modules; }
+    auto buses() noexcept -> StringList* { return &m_buses; }
 
     Q_INVOKABLE virtual void selectBus(int) = 0;
 
-    Q_INVOKABLE virtual void addModule() = 0;
     Q_INVOKABLE virtual void deleteModule(int) = 0;
 
     auto levelLeft() const noexcept -> double { return m_levelLeft; }

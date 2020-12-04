@@ -20,7 +20,7 @@
 #include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/fx/type.h>
+#include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
@@ -30,8 +30,7 @@ struct add_fx_module final
     : ui::cloneable_action<add_fx_module, action>
     , visitable_engine_action<add_fx_module>
 {
-    mixer::bus_id bus_id;
-    fx::type fx_type{fx::type::gain};
+    fx::registry::item reg_item;
 
     auto reduce(state const&) const -> state override;
 };

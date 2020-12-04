@@ -17,31 +17,28 @@
 
 #pragma once
 
-namespace piejam::gui::model
+#include <piejam/app/gui/model/Subscribable.h>
+#include <piejam/gui/model/FxBrowserEntry.h>
+#include <piejam/runtime/fx/registry.h>
+
+namespace piejam::app::gui::model
 {
 
-template <class ListItem>
-class GenericListModel;
+class FxBrowserEntry final
+    : public Subscribable<piejam::gui::model::FxBrowserEntry>
+{
+public:
+    FxBrowserEntry(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::fx::registry::item);
 
-class FxChain;
-class FxModule;
-using FxModulesList = GenericListModel<FxModule>;
+    void addModule() override;
 
-class Mixer;
-class MixerChannel;
-using MixerChannelsList = GenericListModel<MixerChannel>;
+private:
+    void subscribe_step() override;
 
-class BusConfig;
-using BusConfigsList = GenericListModel<BusConfig>;
+    runtime::fx::registry::item m_registry_item;
+};
 
-class BusName;
-using BusNamesList = GenericListModel<BusName>;
-
-class FxParameter;
-using FxParametersList = GenericListModel<FxParameter>;
-
-class FxBrowser;
-class FxBrowserEntry;
-using FxBrowserList = GenericListModel<FxBrowserEntry>;
-
-} // namespace piejam::gui::model
+} // namespace piejam::app::gui::model

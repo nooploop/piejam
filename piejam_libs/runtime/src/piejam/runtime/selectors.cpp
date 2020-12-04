@@ -23,6 +23,7 @@
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/fx/parameter.h>
+#include <piejam/runtime/fx/registry.h>
 
 #include <cassert>
 
@@ -316,6 +317,10 @@ make_float_parameter_normalized_value_selector(
         return {};
     };
 }
+
+const selector<fx::registry> select_fx_registry([](state const& st) {
+    return st.fx_registry;
+});
 
 const selector<std::size_t> select_xruns([](state const& st) {
     return st.xruns;

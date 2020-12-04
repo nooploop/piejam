@@ -21,6 +21,8 @@
 
 #include <fmt/format.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::actions
 {
 
@@ -29,7 +31,8 @@ add_fx_module::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    runtime::add_fx_module(new_st, bus_id, fx_type);
+    BOOST_ASSERT(st.fx_chain_bus != mixer::bus_id{});
+    runtime::add_fx_module(new_st, st.fx_chain_bus, reg_item);
 
     return new_st;
 }

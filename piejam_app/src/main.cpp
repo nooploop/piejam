@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/AudioDeviceSettings.h>
 #include <piejam/app/gui/model/AudioInputOutputSettings.h>
+#include <piejam/app/gui/model/FxBrowser.h>
 #include <piejam/app/gui/model/FxChain.h>
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/Mixer.h>
@@ -135,6 +136,7 @@ main(int argc, char* argv[]) -> int
     app::gui::model::Mixer mixer(store, state_change_subscriber);
     app::gui::model::Info info_model(store, state_change_subscriber);
     app::gui::model::FxChain fx_chain(store, state_change_subscriber);
+    app::gui::model::FxBrowser fx_browser(store, state_change_subscriber);
 
     spdlog::default_logger()->sinks().push_back(
             std::make_shared<core::generic_log_sink_mt>(
@@ -161,6 +163,7 @@ main(int argc, char* argv[]) -> int
     engine.rootContext()->setContextProperty("g_mixer", &mixer);
     engine.rootContext()->setContextProperty("g_info", &info_model);
     engine.rootContext()->setContextProperty("g_fx_chain", &fx_chain);
+    engine.rootContext()->setContextProperty("g_fx_browser", &fx_browser);
 
     engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
     if (engine.rootObjects().isEmpty())

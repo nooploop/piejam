@@ -15,33 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+import QtQuick 2.13
+import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.13
 
-namespace piejam::gui::model
-{
+Label {
+    id: title
 
-template <class ListItem>
-class GenericListModel;
-
-class FxChain;
-class FxModule;
-using FxModulesList = GenericListModel<FxModule>;
-
-class Mixer;
-class MixerChannel;
-using MixerChannelsList = GenericListModel<MixerChannel>;
-
-class BusConfig;
-using BusConfigsList = GenericListModel<BusConfig>;
-
-class BusName;
-using BusNamesList = GenericListModel<BusName>;
-
-class FxParameter;
-using FxParametersList = GenericListModel<FxParameter>;
-
-class FxBrowser;
-class FxBrowserEntry;
-using FxBrowserList = GenericListModel<FxBrowserEntry>;
-
-} // namespace piejam::gui::model
+    padding: 2
+    verticalAlignment: Text.AlignVCenter
+    background: Rectangle {
+        color: Material.primaryColor
+        radius: 2
+    }
+    font.bold: true
+    font.pixelSize: 12
+}

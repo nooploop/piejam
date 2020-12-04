@@ -17,31 +17,25 @@
 
 #pragma once
 
+#include <piejam/gui/model/FxBrowserEntry.h>
+#include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/gui/model/fwd.h>
+
 namespace piejam::gui::model
 {
 
-template <class ListItem>
-class GenericListModel;
+class FxBrowser : public SubscribableModel
+{
+    Q_OBJECT
 
-class FxChain;
-class FxModule;
-using FxModulesList = GenericListModel<FxModule>;
+    Q_PROPERTY(QAbstractListModel* entries READ entries CONSTANT)
 
-class Mixer;
-class MixerChannel;
-using MixerChannelsList = GenericListModel<MixerChannel>;
+public:
+    auto entries() noexcept -> FxBrowserList* { return &m_entries; }
 
-class BusConfig;
-using BusConfigsList = GenericListModel<BusConfig>;
-
-class BusName;
-using BusNamesList = GenericListModel<BusName>;
-
-class FxParameter;
-using FxParametersList = GenericListModel<FxParameter>;
-
-class FxBrowser;
-class FxBrowserEntry;
-using FxBrowserList = GenericListModel<FxBrowserEntry>;
+private:
+    FxBrowserList m_entries;
+};
 
 } // namespace piejam::gui::model

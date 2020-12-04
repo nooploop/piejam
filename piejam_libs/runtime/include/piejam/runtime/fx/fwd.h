@@ -31,6 +31,7 @@ enum class type : unsigned;
 
 struct parameter;
 struct module;
+struct registry;
 
 enum class parameter_unit : unsigned;
 

@@ -26,113 +26,142 @@ TopPane {
     id: root
 
     property var model
+    property alias browser: fxBrowser.model
 
-    ListView {
-        id: fxModules
+    StackView {
+        id: stack
 
-        anchors.left: parent.left
-        anchors.right: levelMeterFrame.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.margins: 8
+        anchors.fill: parent
 
-        model: root.model.modules
-
-        clip: true
-        orientation: ListView.Horizontal
-        spacing: 4
-
-        delegate: FxChainModule {
-            anchors.top: if (parent) parent.top
-            anchors.bottom: if (parent) parent.bottom
-
-            name: model.item.name
-            parameters: model.item.parameters
-
-            onDeleteButtonClicked: root.model.deleteModule(index)
-
-            Binding {
-                target: model.item
-                property: "subscribed"
-                value: visible
-            }
-        }
-
-        footer: Item {
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-
-            implicitWidth: addButton.implicitWidth + 8
-
-            Button {
-                id: addButton
-
-                implicitWidth: 32
-
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: -1
-                anchors.left: parent.left
-                anchors.leftMargin: 4
-
-                visible: root.model.buses.focused !== -1
-
-                text: "+"
-
-                onClicked: root.model.addModule()
-            }
-        }
+        initialItem: fxChain
     }
 
-    Frame {
-        id: levelMeterFrame
+    Item {
+        id: fxChain
 
-        width: 150
+        visible: false
 
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.margins: 8
+        ListView {
+            id: fxModules
 
-        ComboBox {
-            id: channelSelector
-
-            height: 48
             anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.right: levelMeterFrame.left
             anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.margins: 8
 
-            model: root.model.buses.elements
-            currentIndex: root.model.buses.focused
+            model: root.model.modules
 
-            displayText: root.model.buses.focused === -1 ? "[Select]" : currentText
+            clip: true
+            orientation: ListView.Horizontal
+            spacing: 4
 
-            onActivated: root.model.selectBus(index)
-            onModelChanged: currentIndex = root.model.buses.focused
+            delegate: FxChainModule {
+                anchors.top: if (parent) parent.top
+                anchors.bottom: if (parent) parent.bottom
+
+                name: model.item.name
+                parameters: model.item.parameters
+
+                onDeleteButtonClicked: root.model.deleteModule(index)
+
+                Binding {
+                    target: model.item
+                    property: "subscribed"
+                    value: visible
+                }
+            }
+
+            footer: Item {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+
+                implicitWidth: addButton.implicitWidth + 8
+
+                Button {
+                    id: addButton
+
+                    implicitWidth: 32
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: -1
+                    anchors.left: parent.left
+                    anchors.leftMargin: 4
+
+                    visible: root.model.buses.focused !== -1
+
+                    text: "+"
+
+                    onClicked: stack.push(fxBrowser)
+                }
+            }
         }
 
-        LevelMeterFader {
-            id: levelMeterFader
+        Frame {
+            id: levelMeterFrame
 
-            anchors.left: parent.left
+            width: 150
+
             anchors.right: parent.right
-            anchors.top: channelSelector.bottom
+            anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.topMargin: 4
+            anchors.margins: 8
 
-            levelLeft: root.model.levelLeft
-            levelRight: root.model.levelRight
-            volume: root.model.volume
+            ComboBox {
+                id: channelSelector
 
-            enabled: root.model.buses.focused !== -1
+                height: 48
 
-            onFaderMoved: root.model.changeVolume(newVolume)
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+
+                model: root.model.buses.elements
+                currentIndex: root.model.buses.focused
+
+                displayText: root.model.buses.focused === -1 ? "[Select]" : currentText
+
+                onActivated: root.model.selectBus(index)
+                onModelChanged: currentIndex = root.model.buses.focused
+            }
+
+            LevelMeterFader {
+                id: levelMeterFader
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: channelSelector.bottom
+                anchors.bottom: parent.bottom
+                anchors.topMargin: 4
+
+                levelLeft: root.model.levelLeft
+                levelRight: root.model.levelRight
+                volume: root.model.volume
+
+                enabled: root.model.buses.focused !== -1
+
+                onFaderMoved: root.model.changeVolume(newVolume)
+            }
+        }
+
+    }
+
+    FxBrowser {
+        id: fxBrowser
+
+        visible: false
+
+        onCancelClicked: stack.pop()
+        onAddClicked: {
+            stack.pop()
+            fxModules.positionViewAtEnd()
         }
     }
 
     Timer {
         interval: 16
-        running: root.visible
+        running: levelMeterFader.visible
         repeat: true
         onTriggered: root.model.requestLevelsUpdate()
     }

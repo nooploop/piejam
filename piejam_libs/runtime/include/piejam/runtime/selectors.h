@@ -97,6 +97,8 @@ auto make_float_parameter_value_selector(float_parameter_id) -> selector<float>;
 auto make_float_parameter_normalized_value_selector(float_parameter_id)
         -> selector<float>;
 
+extern const selector<fx::registry> select_fx_registry;
+
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;
 

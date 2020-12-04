@@ -29,4 +29,5 @@ MainWindow {
     mixerPage.model: g_mixer
     infoPage.model: g_info
     fxChainPage.model: g_fx_chain
+    fxChainPage.browser: g_fx_browser
 }

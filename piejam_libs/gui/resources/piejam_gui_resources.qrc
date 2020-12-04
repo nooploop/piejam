@@ -35,5 +35,7 @@
         <file>PieJam/FxChainControls/FxChainModule.qml</file>
         <file>PieJam/FxChainControls/ParameterControl.qml</file>
         <file>PieJam/Util/DbConvert.js</file>
+        <file>PieJam/FxChainControls/FxBrowser.qml</file>
+        <file>PieJam/Controls/HeaderLabel.qml</file>
     </qresource>
 </RCC>

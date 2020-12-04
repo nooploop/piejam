@@ -17,31 +17,36 @@
 
 #pragma once
 
-namespace piejam::gui::model
+#include <piejam/runtime/fx/type.h>
+
+#include <vector>
+
+namespace piejam::runtime::fx
 {
 
-template <class ListItem>
-class GenericListModel;
+struct registry
+{
+    using item = type;
 
-class FxChain;
-class FxModule;
-using FxModulesList = GenericListModel<FxModule>;
+    std::vector<item> entries;
+};
 
-class Mixer;
-class MixerChannel;
-using MixerChannelsList = GenericListModel<MixerChannel>;
+inline bool
+operator==(registry const& l, registry const& r) noexcept
+{
+    return l.entries == r.entries;
+}
 
-class BusConfig;
-using BusConfigsList = GenericListModel<BusConfig>;
+inline bool
+operator!=(registry const& l, registry const& r) noexcept
+{
+    return l.entries != r.entries;
+}
 
-class BusName;
-using BusNamesList = GenericListModel<BusName>;
+inline auto
+make_default_registry() -> registry
+{
+    return {.entries = {type::gain}};
+}
 
-class FxParameter;
-using FxParametersList = GenericListModel<FxParameter>;
-
-class FxBrowser;
-class FxBrowserEntry;
-using FxBrowserList = GenericListModel<FxBrowserEntry>;
-
-} // namespace piejam::gui::model
+} // namespace piejam::runtime::fx
