@@ -23,11 +23,15 @@ Label {
     id: title
 
     padding: 2
+    leftPadding: 4
+    rightPadding: 4
+
     verticalAlignment: Text.AlignVCenter
+    font.bold: true
+    font.pixelSize: 12
+
     background: Rectangle {
         color: Material.primaryColor
         radius: 2
     }
-    font.bold: true
-    font.pixelSize: 12
 }

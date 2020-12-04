@@ -48,21 +48,14 @@ Item {
 
         anchors.fill: parent
 
-        Label {
+        HeaderLabel {
             id: title
 
             height: 18
+
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.left: parent.left
-            padding: 2
-            verticalAlignment: Text.AlignVCenter
-            background: Rectangle {
-                color: Material.primaryColor
-                radius: 2
-            }
-            font.bold: true
-            font.pixelSize: 12
         }
 
         BipolarSlider {
