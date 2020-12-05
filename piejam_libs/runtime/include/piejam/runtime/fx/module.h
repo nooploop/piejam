@@ -36,7 +36,7 @@ using module_parameters =
 
 struct module
 {
-    internal fx_type;
+    type_id fx_type_id;
     container::boxed_string name;
     container::box<module_parameters> parameters;
 };

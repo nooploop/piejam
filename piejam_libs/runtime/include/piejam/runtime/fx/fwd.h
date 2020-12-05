@@ -22,12 +22,15 @@
 
 #include <boost/container/container_fwd.hpp>
 
+#include <variant>
 #include <vector>
 
 namespace piejam::runtime::fx
 {
 
 enum class internal : unsigned;
+using ladspa_instance_id = entity_id<struct ladspa_instance>;
+using type_id = std::variant<internal, ladspa_instance_id>;
 
 struct parameter;
 struct module;

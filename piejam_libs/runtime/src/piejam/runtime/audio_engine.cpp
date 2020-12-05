@@ -183,7 +183,9 @@ make_fx_chains_map(
                 {
                     fx::module const* const fx_mod = fx_modules[fx_mod_id];
                     BOOST_ASSERT(fx_mod);
-                    BOOST_ASSERT(fx_mod->fx_type == fx::internal::gain);
+                    BOOST_ASSERT(
+                            fx_mod->fx_type_id ==
+                            fx::type_id(fx::internal::gain));
                     fx_chain_comps.emplace_back(
                             fx_mod_id,
                             components::make_fx_gain(param_procs, *fx_mod));
@@ -196,7 +198,8 @@ make_fx_chains_map(
             {
                 fx::module const* const fx_mod = fx_modules[fx_mod_id];
                 BOOST_ASSERT(fx_mod);
-                BOOST_ASSERT(fx_mod->fx_type == fx::internal::gain);
+                BOOST_ASSERT(
+                        fx_mod->fx_type_id == fx::type_id(fx::internal::gain));
                 fx_chain_comps.emplace_back(
                         fx_mod_id,
                         components::make_fx_gain(param_procs, *fx_mod));
