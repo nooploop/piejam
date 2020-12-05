@@ -65,6 +65,7 @@ Item {
             property var currentEntry
 
             anchors.fill: parent
+            clip: true
 
             model: root.model.entries
 

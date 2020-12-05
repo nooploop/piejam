@@ -18,43 +18,21 @@
 #pragma once
 
 #include <piejam/audio/ladspa/plugin_descriptor.h>
-#include <piejam/runtime/fx/type.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
-#include <variant>
 #include <vector>
 
-namespace piejam::runtime::fx
+namespace piejam::runtime::actions
 {
 
-struct registry
+struct finalize_ladspa_fx_plugin_scan final
+    : ui::cloneable_action<finalize_ladspa_fx_plugin_scan, action>
 {
-    using item = std::variant<type, audio::ladspa::plugin_descriptor>;
+    std::vector<audio::ladspa::plugin_descriptor> plugins;
 
-    std::vector<item> entries;
+    auto reduce(state const&) const -> state override;
 };
 
-inline bool
-operator==(registry const& l, registry const& r) noexcept
-{
-    return l.entries == r.entries;
-}
-
-inline bool
-operator!=(registry const& l, registry const& r) noexcept
-{
-    return l.entries != r.entries;
-}
-
-inline auto
-make_internal_fx_registry_entries()
-{
-    return std::vector<registry::item>{{type::gain}};
-}
-
-inline auto
-make_default_registry() -> registry
-{
-    return {.entries = make_internal_fx_registry_entries()};
-}
-
-} // namespace piejam::runtime::fx
+} // namespace piejam::runtime::actions

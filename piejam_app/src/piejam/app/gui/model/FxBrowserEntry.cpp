@@ -17,8 +17,11 @@
 
 #include <piejam/app/gui/model/FxBrowserEntry.h>
 
+#include <piejam/functional/overload.h>
 #include <piejam/runtime/actions/add_fx_module.h>
 #include <piejam/runtime/selectors.h>
+
+#include <fmt/format.h>
 
 namespace piejam::app::gui::model
 {
@@ -30,14 +33,31 @@ FxBrowserEntry::FxBrowserEntry(
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_registry_item(registry_item)
 {
-    switch (registry_item)
-    {
-        case runtime::fx::type::gain:
-            setName("Gain");
-            setSection("Internal");
-            setDescription("Amplify or attenuate a signal.");
-            break;
-    }
+    static QString s_section_internal{tr("Internal")};
+    static QString s_section_ladspa{tr("LADSPA Plugin")};
+
+    std::visit(
+            overload{
+                    [this](runtime::fx::type fx_type) {
+                        switch (fx_type)
+                        {
+                            case runtime::fx::type::gain:
+                                setName(tr("Gain"));
+                                setSection(s_section_internal);
+                                setDescription(
+                                        tr("Amplify or attenuate a signal."));
+                                break;
+                        }
+                    },
+                    [this](audio::ladspa::plugin_descriptor const& pd) {
+                        setName(QString::fromStdString(pd.name));
+                        setSection(s_section_ladspa);
+                        setDescription(QString::fromStdString(fmt::format(
+                                "Author: {}, Copyright: {}",
+                                pd.author,
+                                pd.copyright)));
+                    }},
+            m_registry_item);
 }
 
 void

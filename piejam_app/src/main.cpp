@@ -37,6 +37,7 @@
 #include <piejam/reselect/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/refresh_devices.h>
+#include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
 #include <piejam/runtime/app_config.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/audio_state.h>
@@ -175,6 +176,7 @@ main(int argc, char* argv[]) -> int
             &QGuiApplication::quit);
 
     store.dispatch(runtime::actions::refresh_devices{});
+    store.dispatch(runtime::actions::scan_ladspa_fx_plugins("/usr/lib/ladspa"));
 
     runtime::locations locs;
     locs.config_dir = QStandardPaths::writableLocation(

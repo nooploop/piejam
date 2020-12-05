@@ -22,6 +22,8 @@
 
 #include <ladspa.h>
 
+#include <spdlog/spdlog.h>
+
 #include <boost/assert.hpp>
 #include <boost/range/algorithm_ext/push_back.hpp>
 
@@ -100,8 +102,9 @@ scan_directory(std::filesystem::path const& dir)
             {
                 boost::push_back(result, scan_file(entry.path()));
             }
-            catch (std::system_error const&)
+            catch (std::system_error const& err)
             {
+                spdlog::error("LADSPA fx plugin scan: {}", err.what());
             }
         }
     }

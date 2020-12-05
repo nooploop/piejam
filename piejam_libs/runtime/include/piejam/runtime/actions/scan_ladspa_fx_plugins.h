@@ -17,44 +17,13 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/plugin_descriptor.h>
-#include <piejam/runtime/fx/type.h>
+#include <piejam/runtime/fwd.h>
 
-#include <variant>
-#include <vector>
+#include <filesystem>
 
-namespace piejam::runtime::fx
+namespace piejam::runtime::actions
 {
 
-struct registry
-{
-    using item = std::variant<type, audio::ladspa::plugin_descriptor>;
+auto scan_ladspa_fx_plugins(std::filesystem::path const& dir) -> thunk_action;
 
-    std::vector<item> entries;
-};
-
-inline bool
-operator==(registry const& l, registry const& r) noexcept
-{
-    return l.entries == r.entries;
-}
-
-inline bool
-operator!=(registry const& l, registry const& r) noexcept
-{
-    return l.entries != r.entries;
-}
-
-inline auto
-make_internal_fx_registry_entries()
-{
-    return std::vector<registry::item>{{type::gain}};
-}
-
-inline auto
-make_default_registry() -> registry
-{
-    return {.entries = make_internal_fx_registry_entries()};
-}
-
-} // namespace piejam::runtime::fx
+} // namespace piejam::runtime::actions

@@ -15,38 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
 
-#include <filesystem>
-#include <string>
-#include <vector>
+#include <piejam/audio/ladspa/scan.h>
+#include <piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h>
+#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
-namespace piejam::audio::ladspa
+#include <thread>
+
+namespace piejam::runtime::actions
 {
 
-struct plugin_descriptor
+auto
+scan_ladspa_fx_plugins(std::filesystem::path const& dir) -> thunk_action
 {
-    std::filesystem::path file;
-    unsigned long index{};
-    unsigned long id{};
-    std::string label;
-    std::string name;
-    std::string author;
-    std::string copyright;
-    std::size_t num_inputs{};
-    std::size_t num_outputs{};
-};
-
-inline bool
-operator==(plugin_descriptor const& l, plugin_descriptor const& r)
-{
-    return l.id == r.id;
+    return [&](auto const&, auto const& dispatch) {
+        std::thread([=]() {
+            actions::finalize_ladspa_fx_plugin_scan action;
+            action.plugins = audio::ladspa::scan_directory(dir);
+            dispatch(action);
+        }).detach();
+    };
 }
 
-inline bool
-operator!=(plugin_descriptor const& l, plugin_descriptor const& r)
-{
-    return l.id != r.id;
-}
-
-} // namespace piejam::audio::ladspa
+} // namespace piejam::runtime::actions

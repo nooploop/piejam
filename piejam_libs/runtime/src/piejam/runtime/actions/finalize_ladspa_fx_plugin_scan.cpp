@@ -15,34 +15,38 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/add_fx_module.h>
+#include <piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h>
 
-#include <piejam/functional/overload.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fx/registry.h>
 
-#include <fmt/format.h>
-
-#include <boost/assert.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
+#include <boost/range/algorithm_ext/push_back.hpp>
 
 namespace piejam::runtime::actions
 {
 
+static void
+filter_fx_plugins(std::vector<audio::ladspa::plugin_descriptor>& plugins)
+{
+    boost::remove_erase_if(
+            plugins,
+            [](audio::ladspa::plugin_descriptor const& pd) {
+                return (pd.num_inputs != pd.num_outputs) ||
+                       (pd.num_inputs != 1 && pd.num_inputs != 2);
+            });
+}
+
 auto
-add_fx_module::reduce(state const& st) const -> state
+finalize_ladspa_fx_plugin_scan::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    BOOST_ASSERT(st.fx_chain_bus != mixer::bus_id{});
-    std::visit(
-            overload{
-                    [&](fx::type fx_type) {
-                        runtime::add_fx_module(
-                                new_st,
-                                st.fx_chain_bus,
-                                fx_type);
-                    },
-                    [](audio::ladspa::plugin_descriptor const&) {}},
-            reg_item);
+    auto fxs = fx::make_internal_fx_registry_entries();
+    auto ladspa_plugins = plugins;
+    filter_fx_plugins(ladspa_plugins);
+    boost::push_back(fxs, ladspa_plugins);
+    new_st.fx_registry.entries = std::move(fxs);
 
     return new_st;
 }
