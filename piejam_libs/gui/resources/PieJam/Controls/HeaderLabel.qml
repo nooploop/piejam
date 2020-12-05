@@ -20,7 +20,9 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 
 Label {
-    id: title
+    id: root
+
+    property var backgroundColor: Material.primaryColor
 
     padding: 2
     leftPadding: 4
@@ -30,8 +32,10 @@ Label {
     font.bold: true
     font.pixelSize: 12
 
+    elide: Label.ElideRight
+
     background: Rectangle {
-        color: Material.primaryColor
+        color: root.backgroundColor
         radius: 2
     }
 }

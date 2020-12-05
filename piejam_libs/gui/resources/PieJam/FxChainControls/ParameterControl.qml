@@ -19,6 +19,8 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 
+import "../Controls"
+
 Item {
     id: root
 
@@ -30,7 +32,7 @@ Item {
 
     implicitWidth: nameLabel.width
 
-    Label {
+    HeaderLabel {
         id: nameLabel
 
         text: "name"
@@ -41,15 +43,7 @@ Item {
         anchors.topMargin: 4
         anchors.horizontalCenter: parent.horizontalCenter
 
-        clip: true
-        padding: 4
-        verticalAlignment: Text.AlignVCenter
-        background: Rectangle {
-            color: Material.color(Material.Grey, Material.Shade800)
-            radius: 2
-        }
-        font.bold: true
-        font.pixelSize: 12
+        backgroundColor: Material.color(Material.Grey, Material.Shade800)
     }
 
     Rectangle {
