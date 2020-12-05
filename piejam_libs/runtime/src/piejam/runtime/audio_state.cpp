@@ -82,7 +82,7 @@ make_fx_gain(
 }
 
 void
-add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::type fx_type)
+add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::internal fx_type)
 {
     std::tie(st.mixer_state.buses, st.fx_modules, st.fx_parameters) =
             [bus_id, fx_type](
@@ -95,7 +95,7 @@ add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::type fx_type)
 
                 switch (fx_type)
                 {
-                    case fx::type::gain:
+                    case fx::internal::gain:
                         fx_chain.emplace_back(make_fx_gain(
                                 fx_modules,
                                 fx_params,

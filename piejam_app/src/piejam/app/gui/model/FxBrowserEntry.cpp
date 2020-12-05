@@ -38,10 +38,10 @@ FxBrowserEntry::FxBrowserEntry(
 
     std::visit(
             overload{
-                    [this](runtime::fx::type fx_type) {
+                    [this](runtime::fx::internal fx_type) {
                         switch (fx_type)
                         {
-                            case runtime::fx::type::gain:
+                            case runtime::fx::internal::gain:
                                 setName(tr("Gain"));
                                 setSection(s_section_internal);
                                 setDescription(

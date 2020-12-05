@@ -61,7 +61,7 @@ make_gain_module(parameters_t& fx_params, float_parameters& float_params)
     };
 
     return module{
-            .fx_type = type::gain,
+            .fx_type = internal::gain,
             .name = "gain"s,
             .parameters = fx::module_parameters{
                     {static_cast<std::size_t>(gain_parameter_key::gain),

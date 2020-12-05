@@ -32,22 +32,22 @@ BM_copy_state_benchmark(benchmark::State& state)
             st,
             "In1yohohofoobarbaz",
             audio::bus_type::mono);
-    add_fx_module(st, in1, fx::type::gain);
+    add_fx_module(st, in1, fx::internal::gain);
     auto in2 = add_mixer_bus<audio::bus_direction::input>(
             st,
             "In2",
             audio::bus_type::mono);
-    add_fx_module(st, in2, fx::type::gain);
+    add_fx_module(st, in2, fx::internal::gain);
     auto in3 = add_mixer_bus<audio::bus_direction::input>(
             st,
             "In3",
             audio::bus_type::mono);
-    add_fx_module(st, in3, fx::type::gain);
+    add_fx_module(st, in3, fx::internal::gain);
     auto out = add_mixer_bus<audio::bus_direction::output>(
             st,
             "out",
             audio::bus_type::stereo);
-    add_fx_module(st, out, fx::type::gain);
+    add_fx_module(st, out, fx::internal::gain);
 
     for (auto _ : state)
     {
@@ -67,22 +67,22 @@ BM_get_bus_name_benchmark(benchmark::State& state)
             st,
             "In1",
             audio::bus_type::mono);
-    add_fx_module(st, in1, fx::type::gain);
+    add_fx_module(st, in1, fx::internal::gain);
     auto in2 = add_mixer_bus<audio::bus_direction::input>(
             st,
             "In2",
             audio::bus_type::mono);
-    add_fx_module(st, in2, fx::type::gain);
+    add_fx_module(st, in2, fx::internal::gain);
     auto in3 = add_mixer_bus<audio::bus_direction::input>(
             st,
             "In3",
             audio::bus_type::mono);
-    add_fx_module(st, in3, fx::type::gain);
+    add_fx_module(st, in3, fx::internal::gain);
     auto out = add_mixer_bus<audio::bus_direction::output>(
             st,
             "out",
             audio::bus_type::stereo);
-    add_fx_module(st, out, fx::type::gain);
+    add_fx_module(st, out, fx::internal::gain);
 
     auto const get_name = selectors::make_bus_name_selector(in1);
 

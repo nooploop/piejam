@@ -20,7 +20,7 @@
 namespace piejam::runtime::fx
 {
 
-enum class type : unsigned
+enum class internal : unsigned
 {
     gain
 };

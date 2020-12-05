@@ -18,7 +18,7 @@
 #pragma once
 
 #include <piejam/audio/ladspa/plugin_descriptor.h>
-#include <piejam/runtime/fx/type.h>
+#include <piejam/runtime/fx/internal.h>
 
 #include <variant>
 #include <vector>
@@ -28,7 +28,7 @@ namespace piejam::runtime::fx
 
 struct registry
 {
-    using item = std::variant<type, audio::ladspa::plugin_descriptor>;
+    using item = std::variant<internal, audio::ladspa::plugin_descriptor>;
 
     std::vector<item> entries;
 };
@@ -48,7 +48,7 @@ operator!=(registry const& l, registry const& r) noexcept
 inline auto
 make_internal_fx_registry_entries()
 {
-    return std::vector<registry::item>{{type::gain}};
+    return std::vector<registry::item>{{internal::gain}};
 }
 
 inline auto

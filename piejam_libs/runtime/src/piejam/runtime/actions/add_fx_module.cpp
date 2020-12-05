@@ -35,7 +35,7 @@ add_fx_module::reduce(state const& st) const -> state
     BOOST_ASSERT(st.fx_chain_bus != mixer::bus_id{});
     std::visit(
             overload{
-                    [&](fx::type fx_type) {
+                    [&](fx::internal fx_type) {
                         runtime::add_fx_module(
                                 new_st,
                                 st.fx_chain_bus,

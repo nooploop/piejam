@@ -20,7 +20,7 @@
 #include <piejam/container/boxed_string.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/type.h>
+#include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/parameters.h>
 
 #include <boost/container/container_fwd.hpp>
@@ -36,7 +36,7 @@ using module_parameters =
 
 struct module
 {
-    type fx_type;
+    internal fx_type;
     container::boxed_string name;
     container::box<module_parameters> parameters;
 };
