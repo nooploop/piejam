@@ -34,7 +34,7 @@ FxBrowserEntry::FxBrowserEntry(
     , m_registry_item(registry_item)
 {
     static QString s_section_internal{tr("Internal")};
-    static QString s_section_ladspa{tr("LADSPA Plugin")};
+    static QString s_section_ladspa{tr("LADSPA")};
 
     std::visit(
             overload{
@@ -52,10 +52,9 @@ FxBrowserEntry::FxBrowserEntry(
                     [this](audio::ladspa::plugin_descriptor const& pd) {
                         setName(QString::fromStdString(pd.name));
                         setSection(s_section_ladspa);
-                        setDescription(QString::fromStdString(fmt::format(
-                                "Author: {}, Copyright: {}",
-                                pd.author,
-                                pd.copyright)));
+                        setAuthor(QString::fromStdString(pd.author));
+                        setDescription(QString::fromStdString(
+                                fmt::format("Copyright: {}", pd.copyright)));
                     }},
             m_registry_item);
 }

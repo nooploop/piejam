@@ -30,6 +30,7 @@ class FxBrowserEntry : public SubscribableModel
     Q_PROPERTY(QString section READ section NOTIFY sectionChanged FINAL)
     Q_PROPERTY(QString description READ description NOTIFY descriptionChanged
                        FINAL)
+    Q_PROPERTY(QString author READ author NOTIFY authorChanged FINAL)
 
 public:
     using SubscribableModel::SubscribableModel;
@@ -68,6 +69,17 @@ public:
         }
     }
 
+    auto author() const noexcept -> QString const& { return m_author; }
+
+    void setAuthor(QString const& x)
+    {
+        if (m_author != x)
+        {
+            m_author = x;
+            emit authorChanged();
+        }
+    }
+
     Q_INVOKABLE virtual void addModule() = 0;
 
     auto toQString() const -> QString { return m_name; }
@@ -76,11 +88,13 @@ signals:
     void nameChanged();
     void sectionChanged();
     void descriptionChanged();
+    void authorChanged();
 
 private:
     QString m_name;
     QString m_section;
     QString m_description;
+    QString m_author;
 };
 
 } // namespace piejam::gui::model

@@ -87,6 +87,8 @@ TopPane {
                 height: 20
 
                 text: modelData
+
+                wrapMode: Text.WordWrap
             }
         }
 

@@ -46,7 +46,13 @@ Item {
             textFormat: Text.RichText
 
             text: fxList.currentEntry
-                  ? "<b>"+ fxList.currentEntry.name + "</b><br><br>" + fxList.currentEntry.description
+                  ? "<b>" +
+                    fxList.currentEntry.name +
+                    "</b><br><br>" +
+                    (fxList.currentEntry.author !== ""
+                        ? "<i>Author: " + fxList.currentEntry.author + "</i><br><br>"
+                        : "") +
+                    fxList.currentEntry.description
                   : ""
         }
     }
@@ -70,7 +76,7 @@ Item {
             model: root.model.entries
 
             delegate: Button {
-                width: parent.width
+                width: parent ? parent.width : implicitWidth
                 height: 40
 
                 text: model.item.name
@@ -128,10 +134,3 @@ Item {
         value: root.visible
     }
 }
-
-
-/*##^##
-Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
-##^##*/
