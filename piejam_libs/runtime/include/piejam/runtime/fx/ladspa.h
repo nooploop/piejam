@@ -17,13 +17,23 @@
 
 #pragma once
 
+#include <piejam/audio/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/parameters.h>
 
+#include <span>
 #include <string>
 
 namespace piejam::runtime::fx
 {
 
-auto make_ladspa_module(ladspa_instance_id, std::string const& name) -> module;
+auto make_ladspa_module(
+        ladspa_instance_id,
+        std::string const& name,
+        std::span<audio::ladspa::port_descriptor const> control_inputs,
+        parameters_t&,
+        float_parameters&,
+        int_parameters&,
+        bool_parameters&) -> module;
 
 } // namespace piejam::runtime::fx

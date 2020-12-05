@@ -18,6 +18,7 @@
 #include <piejam/runtime/audio_state.h>
 
 #include <piejam/algorithm/contains.h>
+#include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/indexed_access.h>
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/ladspa.h>
@@ -125,24 +126,42 @@ add_ladspa_fx_module(
         audio_state& st,
         mixer::bus_id bus_id,
         fx::ladspa_instance_id instance_id,
-        std::string const& name)
+        std::string const& name,
+        std::span<audio::ladspa::port_descriptor const> const& control_inputs)
 {
-    std::tie(st.mixer_state.buses, st.fx_modules) =
-            [bus_id, instance_id, &name](
+    std::tie(st.mixer_state.buses, st.fx_modules, st.fx_parameters) =
+            [bus_id, instance_id, &name, control_inputs](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
-                    fx::modules_t fx_modules) {
+                    fx::modules_t fx_modules,
+                    fx::parameters_t fx_params,
+                    float_parameters& float_params,
+                    int_parameters& int_params,
+                    bool_parameters& bool_params) {
                 mixer::bus& bus = buses[bus_id];
 
-                fx_chain.emplace_back(fx_modules.add(
-                        fx::make_ladspa_module(instance_id, name)));
+                fx_chain.emplace_back(fx_modules.add(fx::make_ladspa_module(
+                        instance_id,
+                        name,
+                        control_inputs,
+                        fx_params,
+                        float_params,
+                        int_params,
+                        bool_params)));
 
                 bus.fx_chain = std::move(fx_chain);
 
-                return std::tuple(std::move(buses), std::move(fx_modules));
+                return std::tuple(
+                        std::move(buses),
+                        std::move(fx_modules),
+                        std::move(fx_params));
             }(st.mixer_state.buses,
               st.mixer_state.buses.get()[bus_id]->fx_chain,
-              st.fx_modules);
+              st.fx_modules,
+              st.fx_parameters,
+              st.float_params,
+              st.int_params,
+              st.bool_params);
 }
 
 void

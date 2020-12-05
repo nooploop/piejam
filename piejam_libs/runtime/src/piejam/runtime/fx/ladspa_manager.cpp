@@ -48,4 +48,16 @@ ladspa_manager::unload(ladspa_instance_id const& id)
     m_instances.remove(id);
 }
 
+auto
+ladspa_manager::control_inputs(ladspa_instance_id const& id) const
+        -> std::span<audio::ladspa::port_descriptor const>
+{
+    if (auto* port = m_instances[id])
+    {
+        return (*port)->control_inputs();
+    }
+
+    return {};
+}
+
 } // namespace piejam::runtime::fx

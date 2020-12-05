@@ -30,7 +30,12 @@ add_ladspa_fx_module::reduce(state const& st) const -> state
     auto new_st = st;
 
     BOOST_ASSERT(st.fx_chain_bus != mixer::bus_id{});
-    runtime::add_ladspa_fx_module(new_st, st.fx_chain_bus, instance_id, name);
+    runtime::add_ladspa_fx_module(
+            new_st,
+            st.fx_chain_bus,
+            instance_id,
+            name,
+            control_inputs);
 
     return new_st;
 }

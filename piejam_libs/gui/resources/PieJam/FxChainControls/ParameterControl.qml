@@ -41,6 +41,7 @@ Item {
         anchors.topMargin: 4
         anchors.horizontalCenter: parent.horizontalCenter
 
+        clip: true
         padding: 4
         verticalAlignment: Text.AlignVCenter
         background: Rectangle {

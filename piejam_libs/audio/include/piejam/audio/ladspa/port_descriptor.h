@@ -17,25 +17,40 @@
 
 #pragma once
 
-#include <memory>
-#include <span>
+#include <string>
+#include <variant>
 
 namespace piejam::audio::ladspa
 {
 
-struct plugin_descriptor;
-struct port_descriptor;
-
-class plugin
+struct float_port
 {
-public:
-    virtual ~plugin() = default;
-
-    virtual auto descriptor() const -> plugin_descriptor const& = 0;
-
-    virtual auto control_inputs() const -> std::span<port_descriptor const> = 0;
+    float min{};
+    float max{1.f};
+    float default_value{};
+    bool multiply_with_samplerate{};
+    bool logarithmic{};
 };
 
-auto load(plugin_descriptor const&) -> std::unique_ptr<plugin>;
+struct int_port
+{
+    int min{};
+    int max{};
+    int default_value{};
+};
+
+struct bool_port
+{
+    bool default_value{};
+};
+
+using port_type_descriptor = std::variant<float_port, int_port, bool_port>;
+
+struct port_descriptor
+{
+    unsigned long index{};
+    std::string name;
+    port_type_descriptor type_desc;
+};
 
 } // namespace piejam::audio::ladspa

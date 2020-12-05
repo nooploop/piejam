@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/ladspa/fwd.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/types.h>
@@ -34,6 +35,7 @@
 #include <piejam/runtime/selected_device.h>
 
 #include <functional>
+#include <span>
 #include <vector>
 
 namespace piejam::runtime
@@ -98,7 +100,8 @@ void add_ladspa_fx_module(
         audio_state&,
         mixer::bus_id,
         fx::ladspa_instance_id,
-        std::string const& name);
+        std::string const& name,
+        std::span<audio::ladspa::port_descriptor const> const& control_inputs);
 void remove_fx_module(audio_state& st, fx::module_id id);
 
 } // namespace piejam::runtime

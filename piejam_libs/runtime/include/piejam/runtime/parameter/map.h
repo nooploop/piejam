@@ -36,10 +36,7 @@ public:
     template <std::same_as<Parameter> P>
     auto add(P&& p) -> id_t
     {
-        auto value = p.default_value;
-        auto id = m_parameters.add(std::forward<P>(p));
-        m_values.emplace(id, std::move(value));
-        return id;
+        return add(std::forward<P>(p), p.default_value);
     }
 
     template <std::same_as<Parameter> P, std::convertible_to<value_type> V>

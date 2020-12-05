@@ -347,6 +347,8 @@ audio_engine_middleware::process_engine_action(
                     actions::add_ladspa_fx_module next_action;
                     next_action.instance_id = id;
                     next_action.name = a.plugin_desc.name;
+                    next_action.control_inputs =
+                            m_ladspa_fx_manager->control_inputs(id);
 
                     m_next(next_action);
 

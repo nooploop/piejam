@@ -17,12 +17,14 @@
 
 #pragma once
 
+#include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
+#include <span>
 #include <string>
 
 namespace piejam::runtime::actions
@@ -33,6 +35,7 @@ struct add_ladspa_fx_module final
 {
     fx::ladspa_instance_id instance_id;
     std::string name;
+    std::span<audio::ladspa::port_descriptor const> control_inputs;
 
     auto reduce(state const&) const -> state override;
 };

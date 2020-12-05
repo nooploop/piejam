@@ -22,5 +22,6 @@ namespace piejam::audio::ladspa
 
 struct plugin_descriptor;
 class plugin;
+struct port_descriptor;
 
 } // namespace piejam::audio::ladspa

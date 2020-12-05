@@ -18,10 +18,12 @@
 #include <piejam/audio/ladspa/plugin.h>
 
 #include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/system/dll.h>
 
 #include <ladspa.h>
 
+#include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <cmath>
@@ -34,29 +36,6 @@ namespace piejam::audio::ladspa
 
 namespace
 {
-
-struct float_port
-{
-    float min{};
-    float max{1.f};
-    float default_value{};
-    bool multiply_with_samplerate{};
-    bool logarithmic{};
-};
-
-struct int_port
-{
-    int min{};
-    int max{};
-    int default_value{};
-};
-
-struct bool_port
-{
-    bool default_value{};
-};
-
-using port_type_descriptor = std::variant<float_port, int_port, bool_port>;
 
 auto
 to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
@@ -219,13 +198,6 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
     throw std::runtime_error("Could not retrieve port type descriptor.");
 }
 
-struct port_descriptor
-{
-    unsigned long index{};
-    std::string name;
-    port_type_descriptor type_desc;
-};
-
 class plugin_impl final : public plugin
 {
 public:
@@ -250,6 +222,8 @@ public:
             {
                 if (LADSPA_IS_PORT_AUDIO(ladspa_port_desc))
                 {
+                    BOOST_ASSERT(std::holds_alternative<float_port>(
+                            port_desc.type_desc));
                     m_ports.input.audio.push_back(std::move(port_desc));
                 }
                 else if (LADSPA_IS_PORT_CONTROL(ladspa_port_desc))
@@ -261,6 +235,8 @@ public:
             {
                 if (LADSPA_IS_PORT_AUDIO(ladspa_port_desc))
                 {
+                    BOOST_ASSERT(std::holds_alternative<float_port>(
+                            port_desc.type_desc));
                     m_ports.output.audio.push_back(std::move(port_desc));
                 }
                 else if (LADSPA_IS_PORT_CONTROL(ladspa_port_desc))
@@ -274,6 +250,11 @@ public:
     auto descriptor() const -> plugin_descriptor const& override
     {
         return m_pd;
+    }
+
+    auto control_inputs() const -> std::span<port_descriptor const> override
+    {
+        return m_ports.input.control;
     }
 
 private:

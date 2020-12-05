@@ -22,6 +22,7 @@
 #include <piejam/runtime/fx/fwd.h>
 
 #include <memory>
+#include <span>
 
 namespace piejam::runtime::fx
 {
@@ -33,6 +34,9 @@ public:
 
     auto load(audio::ladspa::plugin_descriptor const&) -> ladspa_instance_id;
     void unload(ladspa_instance_id const&);
+
+    auto control_inputs(ladspa_instance_id const&) const
+            -> std::span<audio::ladspa::port_descriptor const>;
 
 private:
     entity_map<std::unique_ptr<audio::ladspa::plugin>, ladspa_instance_id_tag>
