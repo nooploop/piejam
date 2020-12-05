@@ -18,7 +18,8 @@
 #include <piejam/app/gui/model/FxBrowserEntry.h>
 
 #include <piejam/functional/overload.h>
-#include <piejam/runtime/actions/add_fx_module.h>
+#include <piejam/runtime/actions/add_internal_fx_module.h>
+#include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/selectors.h>
 
 #include <fmt/format.h>
@@ -67,9 +68,19 @@ FxBrowserEntry::subscribe_step()
 void
 FxBrowserEntry::addModule()
 {
-    runtime::actions::add_fx_module action;
-    action.reg_item = m_registry_item;
-    dispatch(action);
+    std::visit(
+            overload{
+                    [this](runtime::fx::internal fx_type) {
+                        runtime::actions::add_internal_fx_module action;
+                        action.type = fx_type;
+                        dispatch(action);
+                    },
+                    [this](audio::ladspa::plugin_descriptor const& pd) {
+                        runtime::actions::load_ladspa_fx_plugin action;
+                        action.plugin_desc = pd;
+                        dispatch(action);
+                    }},
+            m_registry_item);
 }
 
 } // namespace piejam::app::gui::model

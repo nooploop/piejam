@@ -15,31 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+#include <piejam/runtime/audio_state.h>
 
 namespace piejam::runtime::actions
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              add_internal_fx_module,
-              delete_fx_module,
-              set_bool_parameter,
-              set_float_parameter,
-              set_input_bus_solo,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info,
-              load_ladspa_fx_plugin>
+auto
+load_ladspa_fx_plugin::reduce(state const& st) const -> state
 {
-};
+    return st;
+}
 
 } // namespace piejam::runtime::actions

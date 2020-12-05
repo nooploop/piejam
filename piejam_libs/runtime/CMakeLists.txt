@@ -1,6 +1,7 @@
 add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_bus.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_fx_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_internal_fx_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_fx_module.h
@@ -11,6 +12,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_ladspa_fx_plugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/renotify.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_info_update.h
@@ -46,6 +48,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/gain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/internal.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/registry.h
@@ -79,12 +83,14 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_fx_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_internal_fx_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/initiate_device_selection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_ladspa_fx_plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/renotify.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_info_update.cpp
@@ -116,6 +122,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/config_access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/gain.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/open_alsa_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/selectors.cpp

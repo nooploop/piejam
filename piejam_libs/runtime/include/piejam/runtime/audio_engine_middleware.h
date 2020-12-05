@@ -22,6 +22,7 @@
 #include <piejam/redux/functors.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
 #include <piejam/thread/configuration.h>
 
 #include <functional>
@@ -81,6 +82,8 @@ private:
     device_factory_f m_device_factory;
     get_state_f m_get_state;
     next_f m_next;
+
+    std::unique_ptr<fx::ladspa_manager> m_ladspa_fx_manager;
 
     std::unique_ptr<audio_engine> m_engine;
     std::unique_ptr<piejam::audio::device> m_device{

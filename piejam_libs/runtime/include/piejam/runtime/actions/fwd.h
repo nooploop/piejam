@@ -47,7 +47,7 @@ struct select_bus_channel;
 struct add_bus;
 struct delete_bus;
 
-struct add_fx_module;
+struct add_internal_fx_module;
 struct delete_fx_module;
 
 template <audio::bus_direction>
@@ -65,6 +65,7 @@ struct set_bool_parameter;
 struct set_float_parameter;
 
 struct finalize_ladspa_fx_plugin_scan;
+struct load_ladspa_fx_plugin;
 
 // visitors
 

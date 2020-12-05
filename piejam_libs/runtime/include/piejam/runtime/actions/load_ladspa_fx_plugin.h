@@ -15,36 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/add_fx_module.h>
+#pragma once
 
-#include <piejam/functional/overload.h>
-#include <piejam/runtime/audio_state.h>
-
-#include <fmt/format.h>
-
-#include <boost/assert.hpp>
+#include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
 
-auto
-add_fx_module::reduce(state const& st) const -> state
+struct load_ladspa_fx_plugin final
+    : ui::cloneable_action<load_ladspa_fx_plugin, action>
+    , visitable_engine_action<load_ladspa_fx_plugin>
 {
-    auto new_st = st;
+    audio::ladspa::plugin_descriptor plugin_desc;
 
-    BOOST_ASSERT(st.fx_chain_bus != mixer::bus_id{});
-    std::visit(
-            overload{
-                    [&](fx::internal fx_type) {
-                        runtime::add_fx_module(
-                                new_st,
-                                st.fx_chain_bus,
-                                fx_type);
-                    },
-                    [](audio::ladspa::plugin_descriptor const&) {}},
-            reg_item);
-
-    return new_st;
-}
+    auto reduce(state const&) const -> state override;
+};
 
 } // namespace piejam::runtime::actions

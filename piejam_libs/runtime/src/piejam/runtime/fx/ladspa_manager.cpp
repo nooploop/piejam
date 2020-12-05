@@ -15,31 +15,37 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/fx/ladspa_manager.h>
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+#include <piejam/audio/ladspa/plugin.h>
 
-namespace piejam::runtime::actions
+#include <spdlog/spdlog.h>
+
+namespace piejam::runtime::fx
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              add_internal_fx_module,
-              delete_fx_module,
-              set_bool_parameter,
-              set_float_parameter,
-              set_input_bus_solo,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info,
-              load_ladspa_fx_plugin>
-{
-};
+ladspa_manager::~ladspa_manager() = default;
 
-} // namespace piejam::runtime::actions
+auto
+ladspa_manager::load(audio::ladspa::plugin_descriptor const& pd)
+        -> ladspa_instance_id
+{
+    try
+    {
+        auto plugin = audio::ladspa::load(pd);
+        return m_instances.add(std::move(plugin));
+    }
+    catch (std::exception const& err)
+    {
+        spdlog::error("Loading LADSPA fx plugin failed: {}", err.what());
+        return {};
+    }
+}
+
+void
+ladspa_manager::unload(ladspa_instance_id const& id)
+{
+    m_instances.remove(id);
+}
+
+} // namespace piejam::runtime::fx

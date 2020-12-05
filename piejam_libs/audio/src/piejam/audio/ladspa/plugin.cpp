@@ -133,8 +133,7 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
                         hint.LowerBound * 0.25f + hint.UpperBound * 0.75f));
             }
 
-            if (default_value < min || max < default_value)
-                throw std::runtime_error("Default value is out of range.");
+            default_value = std::clamp(default_value, min, max);
 
             return int_port{
                     .min = min,
@@ -144,15 +143,13 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
     }
     else
     {
-        if (!LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor))
-            throw std::runtime_error(
-                    "Min bound is not provided for float port.");
-        float const min = hint.LowerBound;
+        float const min = LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor)
+                                  ? hint.LowerBound
+                                  : std::numeric_limits<float>::lowest();
 
-        if (!LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor))
-            throw std::runtime_error(
-                    "Max bound is not provided for float port.");
-        float const max = hint.UpperBound;
+        float const max = LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor)
+                                  ? hint.UpperBound
+                                  : std::numeric_limits<float>::max();
 
         float default_value{};
         if (LADSPA_IS_HINT_HAS_DEFAULT(hint_descriptor))
@@ -183,47 +180,40 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
             }
             else if (LADSPA_IS_HINT_DEFAULT_LOW(hint_descriptor))
             {
-                default_value =
-                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
-                                ? std::exp(
-                                          std::log(hint.LowerBound) * 0.75f +
-                                          std::log(hint.UpperBound) * 0.25f)
-                                : hint.LowerBound * 0.75f +
-                                          hint.UpperBound * 0.25f;
+                default_value = LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
+                                        ? std::exp(
+                                                  std::log(min) * 0.75f +
+                                                  std::log(max) * 0.25f)
+                                        : min * 0.75f + max * 0.25f;
             }
             else if (LADSPA_IS_HINT_DEFAULT_MIDDLE(hint_descriptor))
             {
-                default_value =
-                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
-                                ? std::exp(
-                                          std::log(hint.LowerBound) * 0.5f +
-                                          std::log(hint.UpperBound) * 0.5f)
-                                : hint.LowerBound * 0.5f +
-                                          hint.UpperBound * 0.5f;
+                default_value = LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
+                                        ? std::exp(
+                                                  std::log(min) * 0.5f +
+                                                  std::log(max) * 0.5f)
+                                        : min * 0.5f + max * 0.5f;
             }
             else if (LADSPA_IS_HINT_DEFAULT_HIGH(hint_descriptor))
             {
-                default_value =
-                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
-                                ? std::exp(
-                                          std::log(hint.LowerBound) * 0.25f +
-                                          std::log(hint.UpperBound) * 0.75f)
-                                : hint.LowerBound * 0.25f +
-                                          hint.UpperBound * 0.75f;
+                default_value = LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
+                                        ? std::exp(
+                                                  std::log(min) * 0.25f +
+                                                  std::log(max) * 0.75f)
+                                        : min * 0.25f + max * 0.75f;
             }
-
-            if (default_value < min || max < default_value)
-                throw std::runtime_error("Default value is out of range.");
-
-            return float_port{
-                    .min = min,
-                    .max = max,
-                    .default_value = default_value,
-                    .multiply_with_samplerate = static_cast<bool>(
-                            LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor)),
-                    .logarithmic = static_cast<bool>(
-                            LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor))};
         }
+
+        default_value = std::clamp(default_value, min, max);
+
+        return float_port{
+                .min = min,
+                .max = max,
+                .default_value = default_value,
+                .multiply_with_samplerate = static_cast<bool>(
+                        LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor)),
+                .logarithmic = static_cast<bool>(
+                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor))};
     }
 
     throw std::runtime_error("Could not retrieve port type descriptor.");

@@ -17,39 +17,13 @@
 
 #pragma once
 
-#include <piejam/fwd.h>
-#include <piejam/runtime/parameters.h>
+#include <piejam/runtime/fx/fwd.h>
 
-#include <boost/container/container_fwd.hpp>
-
-#include <variant>
-#include <vector>
+#include <string>
 
 namespace piejam::runtime::fx
 {
 
-enum class internal : unsigned;
-struct ladspa_instance_id_tag;
-using ladspa_instance_id = entity_id<ladspa_instance_id_tag>;
-using type_id = std::variant<internal, ladspa_instance_id>;
-
-class ladspa_manager;
-
-struct parameter;
-struct module;
-struct registry;
-
-enum class parameter_unit : unsigned;
-
-using parameter_id = float_parameter_id;
-using parameter_key = std::size_t;
-using module_parameters =
-        boost::container::flat_map<parameter_key, parameter_id>;
-using parameters_t = boost::container::flat_map<parameter_id, parameter>;
-
-using module_id = entity_id<module>;
-using modules_t = entity_map<module, module>;
-
-using chain_t = std::vector<module_id>;
+auto make_ladspa_module(ladspa_instance_id, std::string const& name) -> module;
 
 } // namespace piejam::runtime::fx

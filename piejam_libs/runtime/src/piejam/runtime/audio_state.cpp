@@ -20,6 +20,7 @@
 #include <piejam/algorithm/contains.h>
 #include <piejam/indexed_access.h>
 #include <piejam/runtime/fx/gain.h>
+#include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
 
 #include <boost/range/algorithm_ext/erase.hpp>
@@ -82,7 +83,10 @@ make_fx_gain(
 }
 
 void
-add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::internal fx_type)
+add_internal_fx_module(
+        audio_state& st,
+        mixer::bus_id bus_id,
+        fx::internal fx_type)
 {
     std::tie(st.mixer_state.buses, st.fx_modules, st.fx_parameters) =
             [bus_id, fx_type](
@@ -114,6 +118,31 @@ add_fx_module(audio_state& st, mixer::bus_id bus_id, fx::internal fx_type)
               st.fx_modules,
               st.fx_parameters,
               st.float_params);
+}
+
+void
+add_ladspa_fx_module(
+        audio_state& st,
+        mixer::bus_id bus_id,
+        fx::ladspa_instance_id instance_id,
+        std::string const& name)
+{
+    std::tie(st.mixer_state.buses, st.fx_modules) =
+            [bus_id, instance_id, &name](
+                    mixer::buses_t buses,
+                    fx::chain_t fx_chain,
+                    fx::modules_t fx_modules) {
+                mixer::bus& bus = buses[bus_id];
+
+                fx_chain.emplace_back(fx_modules.add(
+                        fx::make_ladspa_module(instance_id, name)));
+
+                bus.fx_chain = std::move(fx_chain);
+
+                return std::tuple(std::move(buses), std::move(fx_modules));
+            }(st.mixer_state.buses,
+              st.mixer_state.buses.get()[bus_id]->fx_chain,
+              st.fx_modules);
 }
 
 void

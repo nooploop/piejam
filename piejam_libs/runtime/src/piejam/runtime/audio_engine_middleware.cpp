@@ -20,16 +20,19 @@
 #include <piejam/algorithm/find_or_get_first.h>
 #include <piejam/algorithm/index_of.h>
 #include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/ladspa/plugin.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/runtime/actions/add_bus.h>
-#include <piejam/runtime/actions/add_fx_module.h>
+#include <piejam/runtime/actions/add_internal_fx_module.h>
+#include <piejam/runtime/actions/add_ladspa_fx_module.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/device_action_visitor.h>
 #include <piejam/runtime/actions/engine_action_visitor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/actions/request_levels_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_device.h>
@@ -45,6 +48,7 @@
 #include <piejam/runtime/actions/update_levels.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fx/ladspa_manager.h>
 
 #include <spdlog/spdlog.h>
 
@@ -68,6 +72,7 @@ audio_engine_middleware::audio_engine_middleware(
     , m_device_factory(std::move(device_factory))
     , m_get_state(std::move(get_state))
     , m_next(std::move(next))
+    , m_ladspa_fx_manager(std::make_unique<fx::ladspa_manager>())
 {
     BOOST_ASSERT(m_get_hw_params);
     BOOST_ASSERT(m_device_factory);
@@ -304,17 +309,50 @@ audio_engine_middleware::process_engine_action(
                 if (m_engine)
                     rebuild();
             },
-            [this](actions::add_fx_module const& a) {
+            [this](actions::add_internal_fx_module const& a) {
                 m_next(a);
 
                 if (m_engine)
                     rebuild();
             },
             [this](actions::delete_fx_module const& a) {
-                m_next(a);
+                auto const& st = m_get_state();
 
-                if (m_engine)
-                    rebuild();
+                if (fx::module const* const fx_mod =
+                            st.fx_modules.get()[a.fx_mod_id])
+                {
+                    std::visit(
+                            overload{
+                                    [this, &a](fx::internal) {
+                                        m_next(a);
+
+                                        if (m_engine)
+                                            rebuild();
+                                    },
+                                    [this,
+                                     &a](fx::ladspa_instance_id ladspa_id) {
+                                        m_next(a);
+
+                                        if (m_engine)
+                                            rebuild();
+
+                                        m_ladspa_fx_manager->unload(ladspa_id);
+                                    }},
+                            fx_mod->fx_type_id);
+                }
+            },
+            [this](actions::load_ladspa_fx_plugin const& a) {
+                if (auto id = m_ladspa_fx_manager->load(a.plugin_desc))
+                {
+                    actions::add_ladspa_fx_module next_action;
+                    next_action.instance_id = id;
+                    next_action.name = a.plugin_desc.name;
+
+                    m_next(next_action);
+
+                    if (m_engine)
+                        rebuild();
+                }
             },
             [this](actions::set_bool_parameter const& a) {
                 m_next(a);

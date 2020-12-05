@@ -15,31 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/fx/ladspa.h>
 
-#include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+//#include <piejam/entity_id.h>
+#include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/fx/parameter.h>
+//#include <piejam/runtime/parameter/float_.h>
 
-namespace piejam::runtime::actions
+#include <boost/container/flat_map.hpp>
+
+namespace piejam::runtime::fx
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              add_internal_fx_module,
-              delete_fx_module,
-              set_bool_parameter,
-              set_float_parameter,
-              set_input_bus_solo,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info,
-              load_ladspa_fx_plugin>
+auto
+make_ladspa_module(ladspa_instance_id instance_id, std::string const& name)
+        -> module
 {
-};
+    return module{
+            .fx_type_id = instance_id,
+            .name = name,
+            .parameters = fx::module_parameters{}};
+}
 
-} // namespace piejam::runtime::actions
+} // namespace piejam::runtime::fx

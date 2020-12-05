@@ -34,6 +34,7 @@
 #include <piejam/audio/engine/process.h>
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/audio/engine/value_output_processor.h>
+#include <piejam/functional/overload.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/fx_gain.h>
 #include <piejam/runtime/components/mixer_bus.h>
@@ -183,12 +184,20 @@ make_fx_chains_map(
                 {
                     fx::module const* const fx_mod = fx_modules[fx_mod_id];
                     BOOST_ASSERT(fx_mod);
-                    BOOST_ASSERT(
-                            fx_mod->fx_type_id ==
-                            fx::type_id(fx::internal::gain));
-                    fx_chain_comps.emplace_back(
-                            fx_mod_id,
-                            components::make_fx_gain(param_procs, *fx_mod));
+                    BOOST_ASSERT(fx_mod);
+                    std::visit(
+                            overload{
+                                    [&](fx::internal fx_type) {
+                                        BOOST_ASSERT(
+                                                fx_type == fx::internal::gain);
+                                        fx_chain_comps.emplace_back(
+                                                fx_mod_id,
+                                                components::make_fx_gain(
+                                                        param_procs,
+                                                        *fx_mod));
+                                    },
+                                    [](fx::ladspa_instance_id) {}},
+                            fx_mod->fx_type_id);
                 }
             }
         }
@@ -198,11 +207,18 @@ make_fx_chains_map(
             {
                 fx::module const* const fx_mod = fx_modules[fx_mod_id];
                 BOOST_ASSERT(fx_mod);
-                BOOST_ASSERT(
-                        fx_mod->fx_type_id == fx::type_id(fx::internal::gain));
-                fx_chain_comps.emplace_back(
-                        fx_mod_id,
-                        components::make_fx_gain(param_procs, *fx_mod));
+                std::visit(
+                        overload{
+                                [&](fx::internal fx_type) {
+                                    BOOST_ASSERT(fx_type == fx::internal::gain);
+                                    fx_chain_comps.emplace_back(
+                                            fx_mod_id,
+                                            components::make_fx_gain(
+                                                    param_procs,
+                                                    *fx_mod));
+                                },
+                                [](fx::ladspa_instance_id) {}},
+                        fx_mod->fx_type_id);
             }
         }
     }

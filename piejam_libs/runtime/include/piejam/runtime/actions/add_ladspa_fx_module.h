@@ -17,29 +17,24 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/fwd.h>
+#include <piejam/entity_id.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_visitor.h>
+#include <piejam/runtime/ui/cloneable_action.h>
+
+#include <string>
 
 namespace piejam::runtime::actions
 {
 
-struct engine_action_visitor
-    : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
-              add_internal_fx_module,
-              delete_fx_module,
-              set_bool_parameter,
-              set_float_parameter,
-              set_input_bus_solo,
-              request_levels_update,
-              update_levels,
-              request_info_update,
-              update_info,
-              load_ladspa_fx_plugin>
+struct add_ladspa_fx_module final
+    : ui::cloneable_action<add_ladspa_fx_module, action>
 {
+    fx::ladspa_instance_id instance_id;
+    std::string name;
+
+    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions
