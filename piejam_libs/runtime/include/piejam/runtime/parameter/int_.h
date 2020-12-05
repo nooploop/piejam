@@ -17,24 +17,17 @@
 
 #pragma once
 
-#include <piejam/audio/fwd.h>
-#include <piejam/fwd.h>
-
 namespace piejam::runtime::parameter
 {
 
-template <class Value>
-struct generic_value;
+struct int_
+{
+    using value_type = int;
 
-using bool_ = generic_value<bool>;
-struct float_;
-struct int_;
-using stereo_level = generic_value<audio::pair<float>>;
+    int default_value{};
 
-template <class Parameter>
-class map;
-
-template <class Parameter>
-using id_t = entity_id<Parameter>;
+    int min{};
+    int max{1};
+};
 
 } // namespace piejam::runtime::parameter

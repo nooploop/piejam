@@ -55,6 +55,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_normalize.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/generic_value.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/int_.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h

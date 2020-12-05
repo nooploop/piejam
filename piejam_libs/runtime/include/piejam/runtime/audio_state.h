@@ -28,6 +28,7 @@
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
+#include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/selected_device.h>
@@ -49,6 +50,7 @@ struct audio_state
     audio::period_size_t period_size{};
 
     float_parameters float_params{};
+    int_parameters int_params{};
     bool_parameters bool_params{};
 
     stereo_level_parameters levels{};
