@@ -51,6 +51,10 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/value_output_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/verify_process_context.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/plugin.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/plugin_descriptor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/scan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_peak_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pair.h
@@ -93,6 +97,8 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/process.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/select_processor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/ladspa/plugin.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/ladspa/scan.cpp
 )
 
 target_compile_options(piejam_audio PRIVATE -Wall -Wextra -Werror -pedantic-errors)
