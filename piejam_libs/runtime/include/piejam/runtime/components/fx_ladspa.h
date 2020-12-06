@@ -28,10 +28,12 @@
 namespace piejam::runtime::components
 {
 
+using fx_ladspa_processor_factory =
+        std::function<std::unique_ptr<audio::engine::processor>()>;
+
 auto make_fx_ladspa(
         fx::module const&,
-        std::function<std::unique_ptr<audio::engine::processor>()>
-                ladspa_fx_proc_factory,
+        fx_ladspa_processor_factory,
         parameter_processor_factory&)
         -> std::unique_ptr<audio::engine::component>;
 

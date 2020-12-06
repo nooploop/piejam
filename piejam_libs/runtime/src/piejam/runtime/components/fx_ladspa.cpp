@@ -145,12 +145,11 @@ private:
 auto
 make_fx_ladspa(
         fx::module const& fx_mod,
-        std::function<std::unique_ptr<audio::engine::processor>()>
-                ladspa_fx_proc_factory,
+        fx_ladspa_processor_factory fx_ladspa_proc_factory,
         parameter_processor_factory& param_proc_factory)
         -> std::unique_ptr<audio::engine::component>
 {
-    auto fx_proc = ladspa_fx_proc_factory();
+    auto fx_proc = fx_ladspa_proc_factory();
     if (fx_proc && fx_proc->num_inputs() == 2 && fx_proc->num_outputs() == 2)
     {
         return std::make_unique<fx_ladspa>(
@@ -162,7 +161,7 @@ make_fx_ladspa(
             fx_proc && fx_proc->num_inputs() == 1 &&
             fx_proc->num_outputs() == 1)
     {
-        if (auto fx_second_proc = ladspa_fx_proc_factory())
+        if (auto fx_second_proc = fx_ladspa_proc_factory())
         {
             return std::make_unique<fx_ladspa_from_mono>(
                     fx_mod,
