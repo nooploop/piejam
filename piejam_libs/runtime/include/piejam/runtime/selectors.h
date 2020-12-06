@@ -89,7 +89,7 @@ auto make_fx_module_parameters_selector(fx::module_id)
 auto make_fx_parameter_name_selector(fx::parameter_id)
         -> selector<container::boxed_string>;
 auto make_fx_parameter_id_selector(fx::module_id, fx::parameter_key)
-        -> selector<float_parameter_id>;
+        -> selector<fx::parameter_id>;
 auto make_fx_parameter_unit_selector(fx::parameter_id)
         -> selector<fx::parameter_unit>;
 

@@ -259,9 +259,9 @@ make_fx_parameter_name_selector(fx::parameter_id const fx_param_id)
 auto
 make_fx_parameter_id_selector(
         fx::module_id const fx_mod_id,
-        fx::parameter_key const fx_param_key) -> selector<float_parameter_id>
+        fx::parameter_key const fx_param_key) -> selector<fx::parameter_id>
 {
-    return [fx_mod_id, fx_param_key](state const& st) -> float_parameter_id {
+    return [fx_mod_id, fx_param_key](state const& st) -> fx::parameter_id {
         if (fx::module const* const fx_mod = st.fx_modules.get()[fx_mod_id])
         {
             if (auto it = fx_mod->parameters->find(fx_param_key);

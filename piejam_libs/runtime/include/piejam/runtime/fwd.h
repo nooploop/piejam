@@ -45,7 +45,7 @@ using stereo_level = audio::pair<float>;
 struct locations;
 
 using parameter_processor_factory = processors::parameter_processor_factory<
-        std::tuple<parameter::float_, parameter::bool_>,
+        std::tuple<parameter::float_, parameter::int_, parameter::bool_>,
         std::tuple<parameter::stereo_level>>;
 
 } // namespace piejam::runtime

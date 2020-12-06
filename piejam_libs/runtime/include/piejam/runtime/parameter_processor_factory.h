@@ -20,6 +20,7 @@
 #include <piejam/audio/pair.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
+#include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/processors/parameter_processor_factory.h>
 
@@ -27,7 +28,7 @@ namespace piejam::runtime
 {
 
 using parameter_processor_factory = processors::parameter_processor_factory<
-        std::tuple<parameter::float_, parameter::bool_>,
+        std::tuple<parameter::float_, parameter::int_, parameter::bool_>,
         std::tuple<parameter::stereo_level>>;
 
 } // namespace piejam::runtime
