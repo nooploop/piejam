@@ -28,8 +28,8 @@ namespace piejam::runtime::components
 {
 
 auto make_fx_gain(
-        parameter_processor_factory&,
         fx::module const&,
+        parameter_processor_factory&,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;
 

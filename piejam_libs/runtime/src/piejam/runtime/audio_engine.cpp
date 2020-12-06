@@ -196,8 +196,8 @@ make_fx_chains_map(
                                         fx_chain_comps.emplace_back(
                                                 fx_mod_id,
                                                 components::make_fx_gain(
-                                                        param_procs,
-                                                        *fx_mod));
+                                                        *fx_mod,
+                                                        param_procs));
                                     },
                                     [&](fx::ladspa_instance_id id) {
                                         auto comp = components::make_fx_ladspa(
@@ -231,8 +231,8 @@ make_fx_chains_map(
                                     fx_chain_comps.emplace_back(
                                             fx_mod_id,
                                             components::make_fx_gain(
-                                                    param_procs,
-                                                    *fx_mod));
+                                                    *fx_mod,
+                                                    param_procs));
                                 },
                                 [&](fx::ladspa_instance_id id) {
                                     auto comp = components::make_fx_ladspa(

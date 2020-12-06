@@ -20,7 +20,6 @@
 #include <piejam/audio/components/amplifier.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
-#include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -39,8 +38,8 @@ namespace
 class fx_gain final : public audio::engine::component
 {
 public:
-    fx_gain(parameter_processor_factory& proc_factory,
-            fx::module const& fx_mod,
+    fx_gain(fx::module const& fx_mod,
+            parameter_processor_factory& proc_factory,
             std::string_view const& name)
         : m_gain_input_proc(proc_factory.make_input_processor(
                   fx_mod.parameters->at(static_cast<std::size_t>(
@@ -83,12 +82,12 @@ private:
 
 auto
 make_fx_gain(
-        parameter_processor_factory& proc_factory,
         fx::module const& fx_mod,
+        parameter_processor_factory& proc_factory,
         std::string_view const& name)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<fx_gain>(proc_factory, fx_mod, name);
+    return std::make_unique<fx_gain>(fx_mod, proc_factory, name);
 }
 
 } // namespace piejam::runtime::components

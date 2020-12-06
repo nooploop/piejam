@@ -343,7 +343,7 @@ public:
         m_instance.cleanup();
     }
 
-    auto type_name() const -> std::string_view override { return "LADSPA_fx"; }
+    auto type_name() const -> std::string_view override { return "ladspa_fx"; }
 
     auto name() const -> std::string_view override { return m_name; }
 
