@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/value_input_processor.h>
+#include <piejam/range/indices.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter_processor_factory.h>
@@ -65,7 +66,7 @@ public:
 
     void connect(audio::engine::graph& g) const override
     {
-        for (std::size_t i = 0; i < m_param_input_procs.size(); ++i)
+        for (std::size_t i : range::indices(m_param_input_procs.size()))
         {
             g.add_event_wire({*m_param_input_procs[i], 0}, {*m_fx_proc, i});
         }
@@ -119,7 +120,7 @@ public:
 
     void connect(audio::engine::graph& g) const override
     {
-        for (std::size_t i = 0; i < m_param_input_procs.size(); ++i)
+        for (std::size_t i : range::indices(m_param_input_procs.size()))
         {
             g.add_event_wire(
                     {*m_param_input_procs[i], 0},
