@@ -21,6 +21,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/range/table_view.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/fx/ladspa_processor_factory.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/stereo_level.h>
@@ -57,7 +58,8 @@ public:
     rebuild(mixer::state const&,
             fx::modules_t const&,
             bool_parameters const&,
-            float_parameters const&);
+            float_parameters const&,
+            fx::ladspa_processor_factory const&);
 
     void operator()(
             range::table_view<float const> const& in_audio,

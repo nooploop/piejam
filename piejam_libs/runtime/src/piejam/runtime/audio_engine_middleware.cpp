@@ -20,6 +20,7 @@
 #include <piejam/algorithm/find_or_get_first.h>
 #include <piejam/algorithm/index_of.h>
 #include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
@@ -492,7 +493,10 @@ audio_engine_middleware::rebuild()
             st.mixer_state,
             st.fx_modules,
             st.bool_params,
-            st.float_params);
+            st.float_params,
+            [this, sr = st.samplerate](fx::ladspa_instance_id id) {
+                return m_ladspa_fx_manager->make_processor(id, sr);
+            });
 }
 
 } // namespace piejam::runtime

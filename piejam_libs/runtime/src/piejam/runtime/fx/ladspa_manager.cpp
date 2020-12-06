@@ -17,6 +17,7 @@
 
 #include <piejam/runtime/fx/ladspa_manager.h>
 
+#include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
 
 #include <spdlog/spdlog.h>
@@ -52,9 +53,23 @@ auto
 ladspa_manager::control_inputs(ladspa_instance_id const& id) const
         -> std::span<audio::ladspa::port_descriptor const>
 {
-    if (auto* port = m_instances[id])
+    if (auto* plugin = m_instances[id])
     {
-        return (*port)->control_inputs();
+        return (*plugin)->control_inputs();
+    }
+
+    return {};
+}
+
+auto
+ladspa_manager::make_processor(
+        ladspa_instance_id const& id,
+        audio::samplerate_t samplerate) const
+        -> std::unique_ptr<audio::engine::processor>
+{
+    if (auto* plugin = m_instances[id])
+    {
+        return (*plugin)->make_processor(samplerate);
     }
 
     return {};

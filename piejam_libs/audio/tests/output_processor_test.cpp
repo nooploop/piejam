@@ -36,7 +36,7 @@ TEST(output_processor, input_table_is_propagated_to_outputs)
     output_processor sut(2);
     sut.set_output(data.rows());
 
-    std::array<float, 2> in_buf{23.f, 58.f};
+    std::array<float, 2> in_buf{0.23f, 0.58f};
     std::vector<audio_slice> in_spans{in_buf, {}};
     std::vector<std::reference_wrapper<audio_slice const>> inputs{
             in_spans.begin(),
@@ -44,8 +44,8 @@ TEST(output_processor, input_table_is_propagated_to_outputs)
 
     sut.process({inputs, {}, {}, {}, {}, 2});
 
-    EXPECT_FLOAT_EQ(23.f, data.rows()[0][0]);
-    EXPECT_FLOAT_EQ(58.f, data.rows()[0][1]);
+    EXPECT_FLOAT_EQ(0.23f, data.rows()[0][0]);
+    EXPECT_FLOAT_EQ(0.58f, data.rows()[0][1]);
     EXPECT_FLOAT_EQ(0.f, data.rows()[1][0]);
     EXPECT_FLOAT_EQ(0.f, data.rows()[1][1]);
 }

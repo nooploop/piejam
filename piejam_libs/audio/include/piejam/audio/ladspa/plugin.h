@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <piejam/audio/engine/fwd.h>
+#include <piejam/audio/types.h>
+
 #include <memory>
 #include <span>
 
@@ -34,6 +37,9 @@ public:
     virtual auto descriptor() const -> plugin_descriptor const& = 0;
 
     virtual auto control_inputs() const -> std::span<port_descriptor const> = 0;
+
+    virtual auto make_processor(samplerate_t) const
+            -> std::unique_ptr<engine::processor> = 0;
 };
 
 auto load(plugin_descriptor const&) -> std::unique_ptr<plugin>;

@@ -17,36 +17,22 @@
 
 #pragma once
 
-#include <boost/callable_traits/args.hpp>
+#include <piejam/audio/engine/fwd.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
 
 #include <functional>
-#include <type_traits>
+#include <memory>
+#include <string_view>
 
-namespace piejam::reselect
+namespace piejam::runtime::components
 {
 
-template <class Value, class State>
-class selector
-{
-public:
-    using value_type = Value;
-    using state_type = State;
-    using function_type = std::function<Value(State const&)>;
+auto make_fx_ladspa(
+        fx::module const&,
+        std::function<std::unique_ptr<audio::engine::processor>()>
+                ladspa_fx_proc_factory,
+        parameter_processor_factory&)
+        -> std::unique_ptr<audio::engine::component>;
 
-    template <
-            class F,
-            std::enable_if_t<
-                    !std::is_same_v<std::decay_t<F>, selector<Value, State>>,
-                    bool> = true>
-    selector(F&& f)
-        : m_f(std::forward<F>(f))
-    {
-    }
-
-    auto operator()(State const& st) const -> Value { return m_f(st); }
-
-private:
-    function_type m_f;
-};
-
-} // namespace piejam::reselect
+} // namespace piejam::runtime::components

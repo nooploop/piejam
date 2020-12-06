@@ -78,7 +78,8 @@ struct audio_engine_render_test : public ::testing::Test
                     st.mixer_state,
                     st.fx_modules,
                     st.bool_params,
-                    st.float_params);
+                    st.float_params,
+                    {});
         });
 
         do

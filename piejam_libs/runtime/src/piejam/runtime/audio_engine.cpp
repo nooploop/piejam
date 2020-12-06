@@ -37,6 +37,7 @@
 #include <piejam/functional/overload.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/fx_gain.h>
+#include <piejam/runtime/components/fx_ladspa.h>
 #include <piejam/runtime/components/mixer_bus.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/fx/module.h>
@@ -154,7 +155,9 @@ make_fx_chains_map(
         mixer::buses_t const& buses,
         mixer::bus_list_t const& inputs,
         mixer::bus_list_t const& outputs,
-        parameter_processor_factory& param_procs) -> fx_chains_map
+        parameter_processor_factory& param_procs,
+        fx::ladspa_processor_factory const& ladspa_fx_proc_factory)
+        -> fx_chains_map
 {
     mixer::bus_list_t all_ids;
     all_ids.reserve(inputs.size() + outputs.size());
@@ -196,7 +199,21 @@ make_fx_chains_map(
                                                         param_procs,
                                                         *fx_mod));
                                     },
-                                    [](fx::ladspa_instance_id) {}},
+                                    [&](fx::ladspa_instance_id id) {
+                                        auto comp = components::make_fx_ladspa(
+                                                *fx_mod,
+                                                [&]() {
+                                                    return ladspa_fx_proc_factory(
+                                                            id);
+                                                },
+                                                param_procs);
+                                        if (comp)
+                                        {
+                                            fx_chain_comps.emplace_back(
+                                                    fx_mod_id,
+                                                    std::move(comp));
+                                        }
+                                    }},
                             fx_mod->fx_type_id);
                 }
             }
@@ -217,7 +234,21 @@ make_fx_chains_map(
                                                     param_procs,
                                                     *fx_mod));
                                 },
-                                [](fx::ladspa_instance_id) {}},
+                                [&](fx::ladspa_instance_id id) {
+                                    auto comp = components::make_fx_ladspa(
+                                            *fx_mod,
+                                            [&]() {
+                                                return ladspa_fx_proc_factory(
+                                                        id);
+                                            },
+                                            param_procs);
+                                    if (comp)
+                                    {
+                                        fx_chain_comps.emplace_back(
+                                                fx_mod_id,
+                                                std::move(comp));
+                                    }
+                                }},
                         fx_mod->fx_type_id);
             }
         }
@@ -412,7 +443,8 @@ audio_engine::rebuild(
         mixer::state const& mixer_state,
         fx::modules_t const& fx_modules,
         bool_parameters const& bool_params,
-        float_parameters const& float_params)
+        float_parameters const& float_params,
+        fx::ladspa_processor_factory const& ladspa_fx_proc_factory)
 {
     auto input_buses = make_mixer_bus_vector(
             m_impl->input_buses,
@@ -432,7 +464,8 @@ audio_engine::rebuild(
             mixer_state.buses,
             mixer_state.inputs,
             mixer_state.outputs,
-            m_impl->param_procs);
+            m_impl->param_procs,
+            ladspa_fx_proc_factory);
 
     m_impl->param_procs.initialize(float_params);
     m_impl->param_procs.initialize(bool_params);

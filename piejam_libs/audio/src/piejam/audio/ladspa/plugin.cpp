@@ -17,6 +17,9 @@
 
 #include <piejam/audio/ladspa/plugin.h>
 
+#include <piejam/audio/engine/event_port.h>
+#include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/system/dll.h>
@@ -26,6 +29,7 @@
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <stdexcept>
 #include <variant>
@@ -185,18 +189,255 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
 
         default_value = std::clamp(default_value, min, max);
 
+        bool const multiply_with_samplerate =
+                static_cast<bool>(LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor));
+        bool const logarithmic =
+                static_cast<bool>(LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor));
+
         return float_port{
                 .min = min,
                 .max = max,
                 .default_value = default_value,
-                .multiply_with_samplerate = static_cast<bool>(
-                        LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor)),
-                .logarithmic = static_cast<bool>(
-                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor))};
+                .multiply_with_samplerate = multiply_with_samplerate,
+                .logarithmic = logarithmic};
     }
 
     throw std::runtime_error("Could not retrieve port type descriptor.");
 }
+
+class plugin_instance
+{
+public:
+    plugin_instance(LADSPA_Descriptor const& d, LADSPA_Handle h) noexcept
+        : m_descriptor(d)
+        , m_handle(h)
+    {
+    }
+
+    void activate() const noexcept
+    {
+        if (m_descriptor.activate)
+            m_descriptor.activate(m_handle);
+    }
+
+    void deactivate() const noexcept
+    {
+        if (m_descriptor.deactivate)
+            m_descriptor.deactivate(m_handle);
+    }
+
+    void connect_port(unsigned long port, LADSPA_Data* data) const noexcept
+    {
+        m_descriptor.connect_port(m_handle, port, data);
+    }
+
+    void run(unsigned long num_samples) const noexcept
+    {
+        m_descriptor.run(m_handle, num_samples);
+    }
+
+    void cleanup() const noexcept { m_descriptor.cleanup(m_handle); }
+
+private:
+    LADSPA_Descriptor const& m_descriptor;
+    LADSPA_Handle m_handle;
+};
+
+struct to_event_port
+{
+    std::string_view name;
+
+    auto operator()(audio::ladspa::float_port const&) const
+            -> engine::event_port
+    {
+        return engine::event_port(std::in_place_type<float>, name);
+    }
+
+    auto operator()(audio::ladspa::int_port const&) const -> engine::event_port
+    {
+        return engine::event_port(std::in_place_type<int>, name);
+    }
+
+    auto operator()(audio::ladspa::bool_port const&) const -> engine::event_port
+    {
+        return engine::event_port(std::in_place_type<bool>, name);
+    }
+};
+
+auto
+to_event_ports(std::span<audio::ladspa::port_descriptor const> descs)
+{
+    std::vector<engine::event_port> result;
+    std::ranges::transform(
+            descs,
+            std::back_inserter(result),
+            [](auto const& desc) {
+                return std::visit(to_event_port{desc.name}, desc.type_desc);
+            });
+    return result;
+}
+
+class processor final : public engine::processor
+{
+public:
+    processor(
+            plugin_instance instance,
+            samplerate_t samplerate,
+            std::string_view name,
+            std::span<audio::ladspa::port_descriptor const> audio_inputs,
+            std::span<audio::ladspa::port_descriptor const> audio_outputs,
+            std::span<audio::ladspa::port_descriptor const> control_inputs,
+            std::span<audio::ladspa::port_descriptor const> control_outputs)
+        : m_instance(std::move(instance))
+        , m_samplerate(samplerate)
+        , m_name(name)
+        , m_input_port_indices(audio_inputs.size())
+        , m_output_port_indices(audio_outputs.size())
+        , m_event_inputs(to_event_ports(control_inputs))
+        , m_event_outputs(to_event_ports(control_outputs))
+    {
+        std::ranges::transform(
+                audio_inputs,
+                m_input_port_indices.begin(),
+                &audio::ladspa::port_descriptor::index);
+
+        std::ranges::transform(
+                audio_outputs,
+                m_output_port_indices.begin(),
+                &audio::ladspa::port_descriptor::index);
+
+        m_control_inputs.reserve(control_inputs.size());
+        for (auto const& pd : control_inputs)
+        {
+            if (std::holds_alternative<float_port>(pd.type_desc))
+            {
+                m_instance.connect_port(
+                        pd.index,
+                        &m_control_inputs
+                                 .emplace_back(
+                                         0.f,
+                                         std::get<float_port>(pd.type_desc)
+                                                 .multiply_with_samplerate)
+                                 .value);
+            }
+            else
+            {
+                m_instance.connect_port(
+                        pd.index,
+                        &m_control_inputs.emplace_back().value);
+            }
+        }
+
+        m_control_outputs.reserve(control_outputs.size());
+        for (auto const& pd : control_outputs)
+            m_instance.connect_port(
+                    pd.index,
+                    &m_control_outputs.emplace_back());
+
+        m_instance.activate();
+    }
+
+    ~processor()
+    {
+        m_instance.deactivate();
+        m_instance.cleanup();
+    }
+
+    auto type_name() const -> std::string_view override { return "LADSPA_fx"; }
+
+    auto name() const -> std::string_view override { return m_name; }
+
+    auto num_inputs() const -> std::size_t override
+    {
+        return m_input_port_indices.size();
+    }
+
+    auto num_outputs() const -> std::size_t override
+    {
+        return m_output_port_indices.size();
+    }
+
+    auto event_inputs() const -> event_ports override { return m_event_inputs; }
+
+    auto event_outputs() const -> event_ports override
+    {
+        return m_event_outputs;
+    }
+
+    void process(engine::process_context const& ctx) override
+    {
+        engine::verify_process_context(*this, ctx);
+
+        BOOST_ASSERT(ctx.event_inputs.size() == m_event_inputs.size());
+        for (std::size_t i = 0; i < ctx.event_inputs.size(); ++i)
+        {
+            auto const in_type = m_event_inputs[i].type();
+            if (in_type == typeid(float))
+            {
+                auto const& ev_buf = ctx.event_inputs.get<float>(i);
+                for (auto const& ev : ev_buf)
+                {
+                    m_control_inputs[i].value = ev.value();
+                    if (m_control_inputs[i].multiply_with_samplerate)
+                        m_control_inputs[i].value *= m_samplerate;
+                }
+            }
+            else if (in_type == typeid(int))
+            {
+                auto const& ev_buf = ctx.event_inputs.get<int>(i);
+                for (auto const& ev : ev_buf)
+                {
+                    m_control_inputs[i].value = static_cast<float>(ev.value());
+                }
+            }
+            else if (in_type == typeid(bool))
+            {
+                auto const& ev_buf = ctx.event_inputs.get<bool>(i);
+                for (auto const& ev : ev_buf)
+                {
+                    m_control_inputs[i].value = static_cast<float>(ev.value());
+                }
+            }
+        }
+
+        BOOST_ASSERT(m_input_port_indices.size() == ctx.inputs.size());
+        for (std::size_t i = 0; i < ctx.inputs.size(); ++i)
+        {
+            m_instance.connect_port(
+                    m_input_port_indices[i],
+                    const_cast<LADSPA_Data*>(
+                            ctx.inputs[i].get().buffer().data()));
+        }
+
+        BOOST_ASSERT(m_output_port_indices.size() == ctx.outputs.size());
+        for (std::size_t i = 0; i < ctx.outputs.size(); ++i)
+        {
+            m_instance.connect_port(
+                    m_output_port_indices[i],
+                    ctx.outputs[i].data());
+            ctx.results[i] = ctx.outputs[i];
+        }
+
+        m_instance.run(static_cast<unsigned long>(ctx.buffer_size));
+    }
+
+private:
+    struct control_data
+    {
+        float value{};
+        bool multiply_with_samplerate{};
+    };
+
+    plugin_instance m_instance;
+    samplerate_t m_samplerate;
+    std::string m_name;
+    std::vector<unsigned long> m_input_port_indices{};
+    std::vector<unsigned long> m_output_port_indices{};
+    std::vector<engine::event_port> m_event_inputs;
+    std::vector<engine::event_port> m_event_outputs;
+    std::vector<control_data> m_control_inputs;
+    std::vector<float> m_control_outputs;
+};
 
 class plugin_impl final : public plugin
 {
@@ -257,6 +498,25 @@ public:
         return m_ports.input.control;
     }
 
+    auto make_processor(samplerate_t samplerate) const
+            -> std::unique_ptr<engine::processor> override
+    {
+        if (LADSPA_Handle handle =
+                    m_ladspa_desc->instantiate(m_ladspa_desc, samplerate))
+        {
+            return std::make_unique<processor>(
+                    plugin_instance(*m_ladspa_desc, handle),
+                    samplerate,
+                    m_pd.name,
+                    m_ports.input.audio,
+                    m_ports.output.audio,
+                    m_ports.input.control,
+                    m_ports.output.control);
+        }
+
+        return nullptr;
+    }
+
 private:
     static auto throw_if_null(LADSPA_Descriptor const* d)
             -> LADSPA_Descriptor const*
@@ -264,13 +524,6 @@ private:
         if (!d)
             throw std::runtime_error("Could not get LADSPA descriptor.");
         return d;
-    }
-
-    static auto throw_if_null(LADSPA_Handle h) -> LADSPA_Handle
-    {
-        if (!h)
-            throw std::runtime_error("Could not instantiate LADSPA plugin.");
-        return h;
     }
 
     plugin_descriptor m_pd;
