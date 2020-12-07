@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include <boost/callable_traits/args.hpp>
-
+#include <concepts>
 #include <functional>
 #include <type_traits>
 
@@ -33,17 +32,13 @@ public:
     using state_type = State;
     using function_type = std::function<Value(State const&)>;
 
-    template <
-            class F,
-            std::enable_if_t<
-                    !std::is_same_v<std::decay_t<F>, selector<Value, State>>,
-                    bool> = true>
+    template <std::invocable<State const&> F>
     selector(F&& f)
         : m_f(std::forward<F>(f))
     {
     }
 
-    auto operator()(State const& st) const -> Value { return m_f(st); }
+    auto get(State const& st) const -> Value { return m_f(st); }
 
 private:
     function_type m_f;

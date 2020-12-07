@@ -48,7 +48,7 @@ public:
                             if (!alive)
                                 return;
 
-                            auto current = sel(st);
+                            auto current = sel.get(st);
                             if (!last->has_value() || **last != current)
                             {
                                 h(current);

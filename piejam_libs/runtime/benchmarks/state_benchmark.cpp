@@ -88,7 +88,7 @@ BM_get_bus_name_benchmark(benchmark::State& state)
 
     for (auto _ : state)
     {
-        auto name = get_name(st);
+        auto name = get_name.get(st);
         benchmark::DoNotOptimize(name);
         benchmark::ClobberMemory();
     }
