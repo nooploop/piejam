@@ -191,13 +191,15 @@ make_fx_chains_map(
                     std::visit(
                             overload{
                                     [&](fx::internal fx_type) {
-                                        BOOST_ASSERT(
-                                                fx_type == fx::internal::gain);
-                                        fx_chain_comps.emplace_back(
-                                                fx_mod_id,
-                                                components::make_fx_gain(
-                                                        *fx_mod,
-                                                        param_procs));
+                                        switch (fx_type)
+                                        {
+                                            case fx::internal::gain:
+                                                fx_chain_comps.emplace_back(
+                                                        fx_mod_id,
+                                                        components::make_fx_gain(
+                                                                *fx_mod,
+                                                                param_procs));
+                                        }
                                     },
                                     [&](fx::ladspa_instance_id id) {
                                         auto comp = components::make_fx_ladspa(
@@ -227,12 +229,15 @@ make_fx_chains_map(
                 std::visit(
                         overload{
                                 [&](fx::internal fx_type) {
-                                    BOOST_ASSERT(fx_type == fx::internal::gain);
-                                    fx_chain_comps.emplace_back(
-                                            fx_mod_id,
-                                            components::make_fx_gain(
-                                                    *fx_mod,
-                                                    param_procs));
+                                    switch (fx_type)
+                                    {
+                                        case fx::internal::gain:
+                                            fx_chain_comps.emplace_back(
+                                                    fx_mod_id,
+                                                    components::make_fx_gain(
+                                                            *fx_mod,
+                                                            param_procs));
+                                    }
                                 },
                                 [&](fx::ladspa_instance_id id) {
                                     auto comp = components::make_fx_ladspa(
