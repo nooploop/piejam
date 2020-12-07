@@ -18,6 +18,7 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
+import QtQuick.Layouts 1.13
 
 import "../Controls"
 
@@ -25,10 +26,18 @@ Item {
     id: root
 
     property alias name: nameLabel.text
-    property alias value: valueSlider.value
     property alias valueText: valueLabel.text
+    property alias value: valueSlider.value
+    property alias switchValue: toggleSwitch.checked
+
+    property alias sliderMin: valueSlider.from
+    property alias sliderMax: valueSlider.to
+    property alias sliderStep: valueSlider.stepSize
+
+    property bool isSwitch: false
 
     signal sliderMoved(real newValue)
+    signal switchToggled(bool newValue)
 
     implicitWidth: nameLabel.width
 
@@ -64,7 +73,7 @@ Item {
 
             text: "value"
 
-            width: 64
+            width: 72
 
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
@@ -80,23 +89,30 @@ Item {
             horizontalAlignment: Text.AlignRight
         }
 
-        Slider {
-            id: valueSlider
+        StackLayout {
+            id: controlStack
 
             anchors.top: valueLabel.bottom
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 8
             anchors.topMargin: 8
             anchors.horizontalCenter: parent.horizontalCenter
-            orientation: Qt.Vertical
 
-            onMoved: sliderMoved(valueSlider.value)
+            currentIndex: root.isSwitch ? 1 : 0
+
+            Slider {
+                id: valueSlider
+
+                orientation: Qt.Vertical
+
+                onMoved: sliderMoved(valueSlider.value)
+            }
+
+            Switch {
+                id: toggleSwitch
+
+                onToggled: root.switchToggled(toggleSwitch.checked)
+            }
         }
     }
 }
-
-/*##^##
-Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
-##^##*/

@@ -48,6 +48,7 @@ public:
 
     void set_bool_parameter(bool_parameter_id, bool) const;
     void set_float_parameter(float_parameter_id, float) const;
+    void set_int_parameter(int_parameter_id, int) const;
 
     void set_input_solo(mixer::bus_id const&);
 

@@ -15,26 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include <piejam/audio/engine/fwd.h>
-#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/generic_value.h>
+#include <piejam/runtime/parameter/int_.h>
+#include <piejam/runtime/parameter/map.h>
 
-#include <functional>
-#include <memory>
-#include <string_view>
+#include <gtest/gtest.h>
 
-namespace piejam::runtime::components
+namespace piejam::runtime::fx::test
 {
 
-using fx_ladspa_processor_factory =
-        std::function<std::unique_ptr<audio::engine::processor>()>;
+TEST(fx_parameter_id, less_than)
+{
+    float_parameters float_params;
 
-auto make_fx_ladspa(
-        fx::module const&,
-        fx_ladspa_processor_factory const&,
-        parameter_processor_factory&)
-        -> std::unique_ptr<audio::engine::component>;
+    auto id1 = float_params.add(float_parameter{});
+    auto id2 = float_params.add(float_parameter{});
 
-} // namespace piejam::runtime::components
+    EXPECT_LT(parameter_id(id1), parameter_id(id2));
+}
+
+} // namespace piejam::runtime::fx::test

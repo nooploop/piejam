@@ -33,6 +33,7 @@ struct engine_action_visitor
               delete_fx_module,
               set_bool_parameter,
               set_float_parameter,
+              set_int_parameter,
               set_input_bus_solo,
               request_levels_update,
               update_levels,

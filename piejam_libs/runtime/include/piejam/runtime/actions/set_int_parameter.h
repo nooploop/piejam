@@ -17,24 +17,30 @@
 
 #pragma once
 
-#include <piejam/audio/engine/fwd.h>
+#include <piejam/entity_id.h>
+#include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/parameter/generic_value.h>
+#include <piejam/runtime/parameters.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
-#include <functional>
-#include <memory>
-#include <string_view>
-
-namespace piejam::runtime::components
+namespace piejam::runtime::actions
 {
 
-using fx_ladspa_processor_factory =
-        std::function<std::unique_ptr<audio::engine::processor>()>;
+struct set_int_parameter final
+    : ui::cloneable_action<set_int_parameter, action>
+    , visitable_engine_action<set_int_parameter>
+{
+    set_int_parameter(int_parameter_id id, int value)
+        : id(id)
+        , value(value)
+    {
+    }
 
-auto make_fx_ladspa(
-        fx::module const&,
-        fx_ladspa_processor_factory const&,
-        parameter_processor_factory&)
-        -> std::unique_ptr<audio::engine::component>;
+    int_parameter_id id{};
+    int value{};
 
-} // namespace piejam::runtime::components
+    auto reduce(state const&) const -> state override;
+};
+
+} // namespace piejam::runtime::actions

@@ -83,10 +83,18 @@ Item {
                 name: model.item.name
                 value: model.item.value
                 valueText: model.item.valueString
+                switchValue: model.item.switchValue
+
+                sliderMin: model.item.stepped ? model.item.minValue : 0.0
+                sliderMax: model.item.stepped ? model.item.maxValue : 1.0
+                sliderStep: model.item.stepped ? 1.0 : 0.0
+
+                isSwitch: model.item.isSwitch
 
                 height: parametersList.height
 
                 onSliderMoved: model.item.changeValue(newValue)
+                onSwitchToggled: model.item.changeSwitchValue(newValue)
 
                 Binding {
                     target: model.item

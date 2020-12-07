@@ -37,8 +37,8 @@ make_module_parameters(
         std::span<audio::ladspa::port_descriptor const> control_inputs,
         parameters_t& fx_params,
         float_parameters& float_params,
-        int_parameters& /*int_params*/,
-        bool_parameters& /*bool_params*/) -> fx::module_parameters
+        int_parameters& int_params,
+        bool_parameters& bool_params) -> fx::module_parameters
 {
     fx::module_parameters module_params;
 
@@ -56,6 +56,23 @@ make_module_parameters(
                             &runtime::parameter::from_normalized_linear});
 
             fx_params.emplace(
+                    parameter_id(id),
+                    parameter{
+                            .name = port_desc.name,
+                            .unit = parameter_unit::none});
+
+            module_params.emplace(port_desc.index, id);
+        }
+        else if (
+                auto const* const p = std::get_if<audio::ladspa::int_port>(
+                        &port_desc.type_desc))
+        {
+            auto id = int_params.add(int_parameter{
+                    .default_value = p->default_value,
+                    .min = p->min,
+                    .max = p->max});
+
+            fx_params.emplace(
                     id,
                     parameter{
                             .name = port_desc.name,
@@ -63,13 +80,20 @@ make_module_parameters(
 
             module_params.emplace(port_desc.index, id);
         }
-        else if (std::get_if<audio::ladspa::int_port>(&port_desc.type_desc))
+        else if (
+                auto const* const p = std::get_if<audio::ladspa::bool_port>(
+                        &port_desc.type_desc))
         {
-            BOOST_ASSERT_MSG(false, "int ports not implemented");
-        }
-        else if (std::get_if<audio::ladspa::bool_port>(&port_desc.type_desc))
-        {
-            BOOST_ASSERT_MSG(false, "bool ports not implemented");
+            auto id = bool_params.add(
+                    bool_parameter{.default_value = p->default_value});
+
+            fx_params.emplace(
+                    id,
+                    parameter{
+                            .name = port_desc.name,
+                            .unit = parameter_unit::none});
+
+            module_params.emplace(port_desc.index, id);
         }
     }
 

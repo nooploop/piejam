@@ -21,6 +21,7 @@
 #include <piejam/runtime/processors/parameter_output_processor_factory.h>
 
 #include <tuple>
+#include <variant>
 
 namespace piejam::runtime::processors
 {
@@ -78,5 +79,23 @@ private:
     parameter_input_processor_factory<InParameter...> m_in_factory;
     parameter_output_processor_factory<OutParameter...> m_out_factory;
 };
+
+template <class ProcessorFactory, class... P>
+auto
+make_input_processor(
+        ProcessorFactory& proc_factory,
+        std::variant<P...> const& param,
+        std::string_view const& name = {})
+        -> std::shared_ptr<audio::engine::processor>
+{
+    return std::visit(
+            [&proc_factory,
+             &name](auto&& p) -> std::shared_ptr<audio::engine::processor> {
+                return proc_factory.make_input_processor(
+                        std::forward<decltype(p)>(p),
+                        name);
+            },
+            param);
+}
 
 } // namespace piejam::runtime::processors

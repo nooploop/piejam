@@ -63,6 +63,7 @@ struct set_bus_name;
 
 struct set_bool_parameter;
 struct set_float_parameter;
+struct set_int_parameter;
 
 struct finalize_ladspa_fx_plugin_scan;
 struct load_ladspa_fx_plugin;

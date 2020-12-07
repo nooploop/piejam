@@ -32,6 +32,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_volume.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_float_parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_float_parameter_normalized.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_int_parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_devices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_levels.h
@@ -112,6 +113,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_volume.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_float_parameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_float_parameter_normalized.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_int_parameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_info.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_levels.cpp

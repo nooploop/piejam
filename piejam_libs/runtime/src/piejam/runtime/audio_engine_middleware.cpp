@@ -44,6 +44,7 @@
 #include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/actions/set_float_parameter.h>
+#include <piejam/runtime/actions/set_int_parameter.h>
 #include <piejam/runtime/actions/update_devices.h>
 #include <piejam/runtime/actions/update_info.h>
 #include <piejam/runtime/actions/update_levels.h>
@@ -375,6 +376,16 @@ audio_engine_middleware::process_engine_action(
                     m_engine->set_float_parameter(
                             a.id,
                             *m_get_state().float_params.get(a.id));
+                }
+            },
+            [this](actions::set_int_parameter const& a) {
+                m_next(a);
+
+                if (m_engine)
+                {
+                    m_engine->set_int_parameter(
+                            a.id,
+                            *m_get_state().int_params.get(a.id));
                 }
             },
             [this](actions::set_input_bus_solo const& a) {

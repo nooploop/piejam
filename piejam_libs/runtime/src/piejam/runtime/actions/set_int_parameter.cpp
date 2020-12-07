@@ -15,26 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/set_int_parameter.h>
 
-#include <piejam/audio/engine/fwd.h>
-#include <piejam/runtime/fwd.h>
-#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/audio_state.h>
 
-#include <functional>
-#include <memory>
-#include <string_view>
+#include <boost/assert.hpp>
 
-namespace piejam::runtime::components
+namespace piejam::runtime::actions
 {
 
-using fx_ladspa_processor_factory =
-        std::function<std::unique_ptr<audio::engine::processor>()>;
+auto
+set_int_parameter::reduce(state const& st) const -> state
+{
+    auto new_st = st;
+    BOOST_VERIFY(new_st.int_params.set(id, value));
+    return new_st;
+}
 
-auto make_fx_ladspa(
-        fx::module const&,
-        fx_ladspa_processor_factory const&,
-        parameter_processor_factory&)
-        -> std::unique_ptr<audio::engine::component>;
-
-} // namespace piejam::runtime::components
+} // namespace piejam::runtime::actions

@@ -19,6 +19,7 @@
 
 #include <piejam/algorithm/contains.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
+#include <piejam/functional/overload.h>
 #include <piejam/indexed_access.h>
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/ladspa.h>
@@ -185,7 +186,18 @@ remove_fx_module(audio_state& st, fx::module_id id)
 
         for (auto&& [key, fx_param_id] : *fx_mod->parameters)
         {
-            st.float_params.remove(fx_param_id);
+            std::visit(
+                    overload{
+                            [&st](float_parameter_id id) {
+                                st.float_params.remove(id);
+                            },
+                            [&st](int_parameter_id id) {
+                                st.int_params.remove(id);
+                            },
+                            [&st](bool_parameter_id id) {
+                                st.bool_params.remove(id);
+                            }},
+                    fx_param_id);
             st.fx_parameters = [](fx::parameters_t fx_params,
                                   fx::parameter_id id) {
                 fx_params.erase(id);

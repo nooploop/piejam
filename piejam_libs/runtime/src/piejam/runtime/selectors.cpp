@@ -286,6 +286,19 @@ make_fx_parameter_unit_selector(fx::parameter_id const param_id)
 }
 
 auto
+make_bool_parameter_value_selector(bool_parameter_id const param_id)
+        -> selector<bool>
+{
+    return [param_id](state const& st) -> bool {
+        if (bool const* const value = st.bool_params.get(param_id))
+        {
+            return *value;
+        }
+        return {};
+    };
+}
+
+auto
 make_float_parameter_value_selector(float_parameter_id const param_id)
         -> selector<float>
 {
@@ -313,6 +326,45 @@ make_float_parameter_normalized_value_selector(
             BOOST_ASSERT(value);
             BOOST_ASSERT(param->to_normalized);
             return param->to_normalized(*param, *value);
+        }
+        return {};
+    };
+}
+
+auto
+make_int_parameter_value_selector(int_parameter_id const param_id)
+        -> selector<int>
+{
+    return [param_id](state const& st) -> int {
+        if (int const* const value = st.int_params.get(param_id))
+        {
+            return *value;
+        }
+        return {};
+    };
+}
+
+auto
+make_int_parameter_min_selector(int_parameter_id const param_id)
+        -> selector<int>
+{
+    return [param_id](state const& st) -> int {
+        if (auto const* const param = st.int_params.get_parameter(param_id))
+        {
+            return param->min;
+        }
+        return {};
+    };
+}
+
+auto
+make_int_parameter_max_selector(int_parameter_id const param_id)
+        -> selector<int>
+{
+    return [param_id](state const& st) -> int {
+        if (auto const* const param = st.int_params.get_parameter(param_id))
+        {
+            return param->max;
         }
         return {};
     };

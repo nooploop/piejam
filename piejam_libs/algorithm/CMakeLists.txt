@@ -3,6 +3,7 @@ add_library(piejam_algorithm INTERFACE)
 target_sources(piejam_algorithm INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/contains.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/edit_script.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/escape_html.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/find_or_get_first.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/for_each_adjacent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/index_of.h

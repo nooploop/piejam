@@ -422,6 +422,13 @@ audio_engine::set_float_parameter(
 }
 
 void
+audio_engine::set_int_parameter(int_parameter_id const id, int const value)
+        const
+{
+    m_impl->param_procs.set(id, value);
+}
+
+void
 audio_engine::set_input_solo(mixer::bus_id const& id)
 {
     m_impl->input_solo_index_proc->set(id);

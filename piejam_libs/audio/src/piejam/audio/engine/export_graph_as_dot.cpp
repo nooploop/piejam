@@ -17,6 +17,7 @@
 
 #include <piejam/audio/engine/graph.h>
 
+#include <piejam/algorithm/escape_html.h>
 #include <piejam/algorithm/unique_erase.h>
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/processor.h>
@@ -95,7 +96,8 @@ export_graph_as_dot(graph const& g) -> std::string
                               "<td port=\"ei{}\" bgcolor=\"{}\">{}</td>",
                               i,
                               event_color,
-                              p.event_inputs()[i].name())
+                              algorithm::escape_html(
+                                      p.event_inputs()[i].name()))
                    << std::endl;
             }
             ss << "</tr>" << std::endl;
@@ -108,7 +110,7 @@ export_graph_as_dot(graph const& g) -> std::string
                         p.num_inputs() + num_event_inputs,
                         p.num_outputs() + p.event_outputs().size()),
                 p.type_name(),
-                p.name());
+                algorithm::escape_html(p.name()));
         ss << "</tr>" << std::endl;
 
         if (p.num_outputs() || num_event_outputs)
@@ -129,7 +131,8 @@ export_graph_as_dot(graph const& g) -> std::string
                               "<td port=\"eo{}\" bgcolor=\"{}\">{}</td>",
                               i,
                               event_color,
-                              p.event_outputs()[i].name())
+                              algorithm::escape_html(
+                                      p.event_outputs()[i].name()))
                    << std::endl;
             }
             ss << "</tr>" << std::endl;

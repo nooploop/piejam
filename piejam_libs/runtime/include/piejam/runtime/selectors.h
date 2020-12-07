@@ -93,9 +93,13 @@ auto make_fx_parameter_id_selector(fx::module_id, fx::parameter_key)
 auto make_fx_parameter_unit_selector(fx::parameter_id)
         -> selector<fx::parameter_unit>;
 
+auto make_bool_parameter_value_selector(bool_parameter_id) -> selector<bool>;
 auto make_float_parameter_value_selector(float_parameter_id) -> selector<float>;
 auto make_float_parameter_normalized_value_selector(float_parameter_id)
         -> selector<float>;
+auto make_int_parameter_value_selector(int_parameter_id) -> selector<int>;
+auto make_int_parameter_min_selector(int_parameter_id) -> selector<int>;
+auto make_int_parameter_max_selector(int_parameter_id) -> selector<int>;
 
 extern const selector<fx::registry> select_fx_registry;
 

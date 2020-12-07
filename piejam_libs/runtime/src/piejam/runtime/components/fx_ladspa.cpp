@@ -54,7 +54,7 @@ public:
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
             m_param_input_procs.emplace_back(
-                    param_proc_factory.make_input_processor(id));
+                    processors::make_input_processor(param_proc_factory, id));
         }
     }
 
@@ -108,7 +108,7 @@ public:
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
             m_param_input_procs.emplace_back(
-                    param_proc_factory.make_input_processor(id));
+                    processors::make_input_processor(param_proc_factory, id));
         }
     }
 
@@ -146,7 +146,7 @@ private:
 auto
 make_fx_ladspa(
         fx::module const& fx_mod,
-        fx_ladspa_processor_factory fx_ladspa_proc_factory,
+        fx_ladspa_processor_factory const& fx_ladspa_proc_factory,
         parameter_processor_factory& param_proc_factory)
         -> std::unique_ptr<audio::engine::component>
 {

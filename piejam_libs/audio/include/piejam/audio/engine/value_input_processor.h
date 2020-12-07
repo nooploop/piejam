@@ -24,6 +24,8 @@
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/thread/spsc_slot.h>
 
+#include <boost/core/demangle.hpp>
+
 #include <array>
 
 namespace piejam::audio::engine
@@ -36,7 +38,7 @@ class value_input_processor final : public engine::named_processor
 
 public:
     value_input_processor(std::string_view const& name = {})
-        : named_processor(name)
+        : named_processor(boost::core::demangle(typeid(T).name()))
         , m_event_output_ports{
                   engine::event_port{std::in_place_type<T>, std::string(name)}}
     {
@@ -44,7 +46,7 @@ public:
     }
 
     value_input_processor(T const initial, std::string_view const& name = {})
-        : named_processor(name)
+        : named_processor(boost::core::demangle(typeid(T).name()))
         , m_event_output_ports{
                   engine::event_port(std::in_place_type<T>, std::string(name))}
     {

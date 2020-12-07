@@ -41,7 +41,8 @@ struct registry;
 
 enum class parameter_unit : unsigned;
 
-using parameter_id = float_parameter_id;
+using parameter_id =
+        std::variant<float_parameter_id, int_parameter_id, bool_parameter_id>;
 using parameter_key = std::size_t;
 using module_parameters =
         boost::container::flat_map<parameter_key, parameter_id>;
