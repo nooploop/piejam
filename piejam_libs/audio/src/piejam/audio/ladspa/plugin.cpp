@@ -126,13 +126,19 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
     }
     else
     {
-        float const min = LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor)
-                                  ? hint.LowerBound
-                                  : std::numeric_limits<float>::lowest();
+        bool const bounded_below =
+                LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor);
+        bool const bounded_above =
+                LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor);
 
-        float const max = LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor)
-                                  ? hint.UpperBound
-                                  : std::numeric_limits<float>::max();
+        if (bounded_below != bounded_above)
+            throw std::runtime_error("Only one bound is specified.");
+
+        float const min = bounded_below ? hint.LowerBound
+                                        : std::numeric_limits<float>::lowest();
+
+        float const max = bounded_above ? hint.UpperBound
+                                        : std::numeric_limits<float>::max();
 
         float default_value{};
         if (LADSPA_IS_HINT_HAS_DEFAULT(hint_descriptor))
@@ -471,6 +477,11 @@ public:
                 {
                     m_ports.input.control.push_back(std::move(port_desc));
                 }
+                else
+                {
+                    throw std::runtime_error(
+                            "Port is whether audio nor control.");
+                }
             }
             else if (LADSPA_IS_PORT_OUTPUT(ladspa_port_desc))
             {
@@ -484,6 +495,15 @@ public:
                 {
                     m_ports.output.control.push_back(std::move(port_desc));
                 }
+                else
+                {
+                    throw std::runtime_error(
+                            "Port is whether audio nor control.");
+                }
+            }
+            else
+            {
+                throw std::runtime_error("Port is whether input nor output.");
             }
         }
     }
