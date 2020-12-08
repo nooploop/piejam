@@ -23,6 +23,7 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/processor_job.h>
+#include <piejam/audio/engine/slice.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/functional/address_compare.h>
 

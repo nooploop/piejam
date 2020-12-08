@@ -18,6 +18,7 @@
 #include <piejam/audio/engine/processor_job.h>
 
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/slice.h>
 #include <piejam/audio/engine/thread_context.h>
 
 #include <boost/align/is_aligned.hpp>

@@ -17,10 +17,11 @@
 
 #pragma once
 
-#include <piejam/audio/engine/slice.h>
-
 namespace piejam::audio::engine
 {
+
+template <class T>
+class slice;
 
 using audio_slice = slice<float>;
 
