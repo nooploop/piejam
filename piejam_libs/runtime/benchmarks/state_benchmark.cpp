@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <piejam/audio/ladspa/scan.h>
 #include <piejam/reselect/selector.h>
+#include <piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
 
@@ -48,6 +50,10 @@ BM_copy_state_benchmark(benchmark::State& state)
             "out",
             audio::bus_type::stereo);
     add_internal_fx_module(st, out, fx::internal::gain);
+
+    actions::finalize_ladspa_fx_plugin_scan ladspa_fx_scan;
+    ladspa_fx_scan.plugins = audio::ladspa::scan_directory("/usr/lib/ladspa");
+    st = ladspa_fx_scan.reduce(st);
 
     for (auto _ : state)
     {

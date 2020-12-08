@@ -39,8 +39,8 @@ FxBrowser::subscribe_step()
             [this](runtime::fx::registry const& fx_registry) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
-                                m_fx_registry.entries,
-                                fx_registry.entries),
+                                m_fx_registry.entries.get(),
+                                fx_registry.entries.get()),
                         generic_list_model_edit_script_executor{
                                 *entries(),
                                 [this](runtime::fx::registry::item const&
