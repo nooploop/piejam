@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/set_bus_volume.h>
+#include <piejam/runtime/actions/set_bus_mute.h>
 
-#include <piejam/runtime/actions/set_bool_parameter.h>
+#include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
@@ -31,7 +31,7 @@ set_bus_mute(mixer::bus_id bus_id, bool mute) -> thunk_action
         state const& st = get_state();
         if (mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id])
         {
-            if (st.bool_params.contains(bus->mute))
+            if (st.params.contains(bus->mute))
                 dispatch(set_bool_parameter{bus->mute, mute});
         }
     };

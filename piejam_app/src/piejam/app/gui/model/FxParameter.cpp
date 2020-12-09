@@ -18,10 +18,11 @@
 #include <piejam/app/gui/model/FxParameter.h>
 
 #include <piejam/math.h>
-#include <piejam/runtime/actions/set_bool_parameter.h>
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
-#include <piejam/runtime/actions/set_int_parameter.h>
+#include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/fx/parameter.h>
+#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 

@@ -31,6 +31,8 @@
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/parameter/map.h>
+#include <piejam/runtime/parameter/maps_collection.h>
+#include <piejam/runtime/parameter_maps.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/selected_device.h>
 
@@ -51,11 +53,7 @@ struct audio_state
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
 
-    float_parameters float_params{};
-    int_parameters int_params{};
-    bool_parameters bool_params{};
-
-    stereo_level_parameters levels{};
+    parameter_maps params;
 
     fx::registry fx_registry{fx::make_default_registry()};
 

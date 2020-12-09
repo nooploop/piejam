@@ -28,7 +28,7 @@ update_levels::reduce(state const& st) const -> state
     auto new_st = st;
 
     for (auto&& [id, lvl] : levels)
-        new_st.levels.set(id, lvl);
+        new_st.params.set(id, lvl);
 
     return new_st;
 }

@@ -27,18 +27,20 @@
 namespace piejam::runtime::actions
 {
 
-struct set_int_parameter final
-    : ui::cloneable_action<set_int_parameter, action>
-    , visitable_engine_action<set_int_parameter>
+template <class Parameter>
+struct set_parameter_value final
+    : ui::cloneable_action<set_parameter_value<Parameter>, action>
+    , visitable_engine_action<set_parameter_value<Parameter>>
 {
-    set_int_parameter(int_parameter_id id, int value)
+    template <class V>
+    set_parameter_value(parameter::id_t<Parameter> id, V&& value)
         : id(id)
-        , value(value)
+        , value(std::forward<V>(value))
     {
     }
 
-    int_parameter_id id{};
-    int value{};
+    parameter::id_t<Parameter> id{};
+    typename Parameter::value_type value{};
 
     auto reduce(state const&) const -> state override;
 };

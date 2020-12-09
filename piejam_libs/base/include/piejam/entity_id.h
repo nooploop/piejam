@@ -33,6 +33,8 @@ namespace piejam
 template <class EntityTag>
 struct entity_id
 {
+    using tag = EntityTag;
+
     constexpr entity_id() noexcept = default;
 
     constexpr bool operator==(entity_id const& other) const noexcept

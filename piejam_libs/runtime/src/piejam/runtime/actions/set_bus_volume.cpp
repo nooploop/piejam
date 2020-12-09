@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/set_bus_volume.h>
 
-#include <piejam/runtime/actions/set_float_parameter.h>
+#include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
@@ -31,7 +31,7 @@ set_bus_volume(mixer::bus_id bus_id, float volume) -> thunk_action
         state const& st = get_state();
         if (mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id])
         {
-            if (st.float_params.contains(bus->volume))
+            if (st.params.contains(bus->volume))
                 dispatch(set_float_parameter{bus->volume, volume});
         }
     };

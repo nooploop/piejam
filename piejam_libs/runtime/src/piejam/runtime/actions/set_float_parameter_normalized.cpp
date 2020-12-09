@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
 
-#include <piejam/runtime/actions/set_float_parameter.h>
+#include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
@@ -31,7 +31,7 @@ set_float_parameter_normalized(float_parameter_id param_id, float norm_value)
     return [=](auto const& get_state, auto const& dispatch) {
         state const& st = get_state();
         if (float_parameter const* const param =
-                    st.float_params.get_parameter(param_id))
+                    st.params.get_parameter(param_id))
             dispatch(set_float_parameter{
                     param_id,
                     param->from_normalized(*param, norm_value)});

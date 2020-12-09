@@ -39,12 +39,10 @@
 #include <piejam/runtime/actions/select_device.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
-#include <piejam/runtime/actions/set_bool_parameter.h>
 #include <piejam/runtime/actions/set_bus_mute.h>
 #include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
-#include <piejam/runtime/actions/set_float_parameter.h>
-#include <piejam/runtime/actions/set_int_parameter.h>
+#include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/actions/update_devices.h>
 #include <piejam/runtime/actions/update_info.h>
 #include <piejam/runtime/actions/update_levels.h>
@@ -365,7 +363,7 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->set_bool_parameter(
                             a.id,
-                            *m_get_state().bool_params.get(a.id));
+                            *m_get_state().params.get(a.id));
                 }
             },
             [this](actions::set_float_parameter const& a) {
@@ -375,7 +373,7 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->set_float_parameter(
                             a.id,
-                            *m_get_state().float_params.get(a.id));
+                            *m_get_state().params.get(a.id));
                 }
             },
             [this](actions::set_int_parameter const& a) {
@@ -385,7 +383,7 @@ audio_engine_middleware::process_engine_action(
                 {
                     m_engine->set_int_parameter(
                             a.id,
-                            *m_get_state().int_params.get(a.id));
+                            *m_get_state().params.get(a.id));
                 }
             },
             [this](actions::set_input_bus_solo const& a) {
@@ -503,8 +501,8 @@ audio_engine_middleware::rebuild()
     m_engine->rebuild(
             st.mixer_state,
             st.fx_modules,
-            st.bool_params,
-            st.float_params,
+            st.params.get_map<bool_parameter>(),
+            st.params.get_map<float_parameter>(),
             [this, sr = st.samplerate](fx::ladspa_instance_id id) {
                 return m_ladspa_fx_manager->make_processor(id, sr);
             });

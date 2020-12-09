@@ -15,21 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/set_bool_parameter.h>
+#pragma once
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/parameters.h>
 
-#include <boost/assert.hpp>
-
-namespace piejam::runtime::actions
+namespace piejam::runtime
 {
 
-auto
-set_bool_parameter::reduce(state const& st) const -> state
-{
-    auto new_st = st;
-    BOOST_VERIFY(new_st.bool_params.set(id, value));
-    return new_st;
-}
+using parameter_maps = parameter::maps_collection<
+        parameter::float_,
+        parameter::int_,
+        parameter::bool_,
+        parameter::stereo_level>;
 
-} // namespace piejam::runtime::actions
+} // namespace piejam::runtime

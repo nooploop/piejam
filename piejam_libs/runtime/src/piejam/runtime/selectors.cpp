@@ -139,8 +139,7 @@ make_bus_volume_selector(mixer::bus_id bus_id) -> selector<float>
 {
     return [bus_id](state const& st) -> float {
         mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
-        float const* const volume =
-                bus ? st.float_params.get(bus->volume) : nullptr;
+        float const* const volume = bus ? st.params.get(bus->volume) : nullptr;
         return volume ? *volume : 1.f;
     };
 }
@@ -151,7 +150,7 @@ make_bus_pan_balance_selector(mixer::bus_id bus_id) -> selector<float>
     return [bus_id](state const& st) -> float {
         mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
         float const* const pan_balance =
-                bus ? st.float_params.get(bus->pan_balance) : nullptr;
+                bus ? st.params.get(bus->pan_balance) : nullptr;
         return pan_balance ? *pan_balance : 0.f;
     };
 }
@@ -161,7 +160,7 @@ make_bus_mute_selector(mixer::bus_id const bus_id) -> selector<bool>
 {
     return [bus_id](state const& st) -> bool {
         mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
-        bool const* const mute = bus ? st.bool_params.get(bus->mute) : nullptr;
+        bool const* const mute = bus ? st.params.get(bus->mute) : nullptr;
         return mute && *mute;
     };
 }
@@ -180,7 +179,7 @@ make_bus_level_selector(mixer::bus_id const bus_id) -> selector<stereo_level>
     return [bus_id](state const& st) -> stereo_level {
         mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
         stereo_level const* const level =
-                bus ? st.levels.get(bus->level) : nullptr;
+                bus ? st.params.get(bus->level) : nullptr;
         return level ? *level : stereo_level{};
     };
 }
@@ -206,15 +205,14 @@ const selector<stereo_level>
             mixer::bus const* const bus =
                     st.mixer_state.buses.get()[st.fx_chain_bus];
             stereo_level const* const level =
-                    bus ? st.levels.get(bus->level) : nullptr;
+                    bus ? st.params.get(bus->level) : nullptr;
             return level ? *level : stereo_level();
         });
 
 const selector<float>
 select_current_fx_chain_bus_volume([](state const& st) -> float {
     mixer::bus const* const bus = st.mixer_state.buses.get()[st.fx_chain_bus];
-    float const* const volume =
-            bus ? st.float_params.get(bus->volume) : nullptr;
+    float const* const volume = bus ? st.params.get(bus->volume) : nullptr;
     return volume ? *volume : 0.f;
 });
 
@@ -290,11 +288,8 @@ make_bool_parameter_value_selector(bool_parameter_id const param_id)
         -> selector<bool>
 {
     return [param_id](state const& st) -> bool {
-        if (bool const* const value = st.bool_params.get(param_id))
-        {
-            return *value;
-        }
-        return {};
+        bool const* const value = st.params.get(param_id);
+        return value && *value;
     };
 }
 
@@ -303,14 +298,8 @@ make_float_parameter_value_selector(float_parameter_id const param_id)
         -> selector<float>
 {
     return [param_id](state const& st) -> float {
-        if (float_parameter const* const param =
-                    st.float_params.get_parameter(param_id))
-        {
-            float const* const value = st.float_params.get(param_id);
-            BOOST_ASSERT(value);
-            return *value;
-        }
-        return {};
+        float const* const value = st.params.get(param_id);
+        return value ? *value : 0.f;
     };
 }
 
@@ -320,9 +309,9 @@ make_float_parameter_normalized_value_selector(
 {
     return [param_id](state const& st) -> float {
         if (float_parameter const* const param =
-                    st.float_params.get_parameter(param_id))
+                    st.params.get_parameter(param_id))
         {
-            float const* const value = st.float_params.get(param_id);
+            float const* const value = st.params.get(param_id);
             BOOST_ASSERT(value);
             BOOST_ASSERT(param->to_normalized);
             return param->to_normalized(*param, *value);
@@ -336,11 +325,8 @@ make_int_parameter_value_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        if (int const* const value = st.int_params.get(param_id))
-        {
-            return *value;
-        }
-        return {};
+        int const* const value = st.params.get(param_id);
+        return value ? *value : 0;
     };
 }
 
@@ -349,11 +335,8 @@ make_int_parameter_min_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        if (auto const* const param = st.int_params.get_parameter(param_id))
-        {
-            return param->min;
-        }
-        return {};
+        auto const* const param = st.params.get_parameter(param_id);
+        return param ? param->min : 0;
     };
 }
 
@@ -362,11 +345,8 @@ make_int_parameter_max_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        if (auto const* const param = st.int_params.get_parameter(param_id))
-        {
-            return param->max;
-        }
-        return {};
+        auto const* const param = st.params.get_parameter(param_id);
+        return param ? param->max : 0;
     };
 }
 

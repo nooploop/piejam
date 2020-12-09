@@ -15,32 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/set_parameter_value.h>
 
-#include <piejam/entity_id.h>
-#include <piejam/runtime/actions/engine_action.h>
-#include <piejam/runtime/fwd.h>
-#include <piejam/runtime/parameter/generic_value.h>
-#include <piejam/runtime/parameters.h>
-#include <piejam/runtime/ui/cloneable_action.h>
+#include <piejam/runtime/audio_state.h>
+
+#include <boost/assert.hpp>
 
 namespace piejam::runtime::actions
 {
 
-struct set_bool_parameter final
-    : ui::cloneable_action<set_bool_parameter, action>
-    , visitable_engine_action<set_bool_parameter>
+template <class Parameter>
+auto
+set_parameter_value<Parameter>::reduce(state const& st) const -> state
 {
-    set_bool_parameter(bool_parameter_id id, bool value)
-        : id(id)
-        , value(value)
-    {
-    }
+    auto new_st = st;
+    BOOST_VERIFY(new_st.params.set(id, value));
+    return new_st;
+}
 
-    bool_parameter_id id{};
-    bool value{};
-
-    auto reduce(state const&) const -> state override;
-};
+template struct set_parameter_value<bool_parameter>;
+template struct set_parameter_value<int_parameter>;
+template struct set_parameter_value<float_parameter>;
 
 } // namespace piejam::runtime::actions

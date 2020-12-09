@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/audio/types.h>
+#include <piejam/runtime/parameters.h>
 
 namespace piejam::runtime::actions
 {
@@ -61,9 +62,11 @@ struct update_info;
 
 struct set_bus_name;
 
-struct set_bool_parameter;
-struct set_float_parameter;
-struct set_int_parameter;
+template <class>
+struct set_parameter_value;
+using set_bool_parameter = set_parameter_value<bool_parameter>;
+using set_float_parameter = set_parameter_value<float_parameter>;
+using set_int_parameter = set_parameter_value<int_parameter>;
 
 struct finalize_ladspa_fx_plugin_scan;
 struct load_ladspa_fx_plugin;

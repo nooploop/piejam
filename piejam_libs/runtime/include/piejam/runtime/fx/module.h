@@ -21,7 +21,6 @@
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/internal.h>
-#include <piejam/runtime/parameters.h>
 
 #include <boost/container/container_fwd.hpp>
 
