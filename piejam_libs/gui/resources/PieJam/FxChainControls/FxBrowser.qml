@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.13
-import QtQuick.Layouts 1.13
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 import "../Controls"
 
@@ -75,6 +75,8 @@ Item {
 
             model: root.model.entries
 
+            reuseItems: true
+
             delegate: Button {
                 width: parent ? parent.width : implicitWidth
                 height: 40
@@ -82,6 +84,7 @@ Item {
                 text: model.item.name
                 font.capitalization: Font.MixedCase
                 highlighted: index == fxList.currentIndex
+                flat: true
 
                 onClicked: {
                     fxList.currentIndex = index
