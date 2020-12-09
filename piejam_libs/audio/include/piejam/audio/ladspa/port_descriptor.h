@@ -37,6 +37,7 @@ struct int_port
     int min{};
     int max{};
     int default_value{};
+    bool logarithmic{};
 };
 
 struct bool_port

@@ -47,22 +47,26 @@ public:
     {
         BOOST_ASSERT(
                 fx_mod.parameters->size() == m_fx_proc->event_inputs().size());
-        BOOST_ASSERT_MSG(
-                m_fx_proc->event_outputs().empty(),
-                "ladspa output control not implemented");
 
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
             m_param_input_procs.emplace_back(
                     processors::make_input_processor(param_proc_factory, id));
         }
+
+        std::generate_n(
+                std::back_inserter(m_event_inputs),
+                m_fx_proc->event_inputs().size(),
+                [this, n = std::size_t{}]() mutable {
+                    return audio::engine::graph_endpoint{*m_fx_proc, n++};
+                });
     }
 
     auto inputs() const -> endpoints override { return m_inputs; }
     auto outputs() const -> endpoints override { return m_outputs; }
 
-    auto event_inputs() const -> endpoints override { return {}; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    auto event_inputs() const -> endpoints override { return m_event_inputs; }
+    auto event_outputs() const -> endpoints override { return {}; } //! \todo
 
     void connect(audio::engine::graph& g) const override
     {
@@ -79,6 +83,7 @@ private:
     std::array<audio::engine::graph_endpoint, 2> m_outputs{
             {{*m_fx_proc, 0}, {*m_fx_proc, 1}}};
     std::vector<std::shared_ptr<audio::engine::processor>> m_param_input_procs;
+    std::vector<audio::engine::graph_endpoint> m_event_inputs;
 };
 
 class fx_ladspa_from_mono final : public audio::engine::component
@@ -98,12 +103,6 @@ public:
         BOOST_ASSERT(
                 fx_mod.parameters->size() ==
                 m_fx_right_proc->event_inputs().size());
-        BOOST_ASSERT_MSG(
-                m_fx_left_proc->event_outputs().empty(),
-                "ladspa output control not implemented");
-        BOOST_ASSERT_MSG(
-                m_fx_right_proc->event_outputs().empty(),
-                "ladspa output control not implemented");
 
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
@@ -115,8 +114,8 @@ public:
     auto inputs() const -> endpoints override { return m_inputs; }
     auto outputs() const -> endpoints override { return m_outputs; }
 
-    auto event_inputs() const -> endpoints override { return {}; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    auto event_inputs() const -> endpoints override { return {}; }  //! \todo
+    auto event_outputs() const -> endpoints override { return {}; } //! \todo
 
     void connect(audio::engine::graph& g) const override
     {

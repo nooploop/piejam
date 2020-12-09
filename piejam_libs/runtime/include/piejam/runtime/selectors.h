@@ -90,8 +90,8 @@ auto make_fx_parameter_name_selector(fx::parameter_id)
         -> selector<container::boxed_string>;
 auto make_fx_parameter_id_selector(fx::module_id, fx::parameter_key)
         -> selector<fx::parameter_id>;
-auto make_fx_parameter_unit_selector(fx::parameter_id)
-        -> selector<fx::parameter_unit>;
+auto make_fx_parameter_value_string_selector(fx::parameter_id)
+        -> selector<std::string>;
 
 auto make_bool_parameter_value_selector(bool_parameter_id) -> selector<bool>;
 auto make_float_parameter_value_selector(float_parameter_id) -> selector<float>;

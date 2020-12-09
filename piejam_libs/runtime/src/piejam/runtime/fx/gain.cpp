@@ -23,6 +23,8 @@
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/map.h>
 
+#include <fmt/format.h>
+
 namespace piejam::runtime::fx
 {
 
@@ -42,6 +44,12 @@ struct gain_defaults
     static constexpr float max{std::pow(10.f, dB_ival::max / 20.f)};
 };
 
+auto
+to_dB_string(float x) -> std::string
+{
+    return fmt::format("{:.1f} dB", (std::log(x) / std::log(10)) * 20.f);
+}
+
 } // namespace
 
 auto
@@ -56,7 +64,8 @@ make_gain_module(parameters_t& fx_params, float_parameters& float_params)
                 id,
                 parameter{
                         .name = std::forward<decltype(name)>(name),
-                        .unit = parameter_unit::dB});
+                        .value_to_string =
+                                parameter_value_to_string(&to_dB_string)});
         return id;
     };
 

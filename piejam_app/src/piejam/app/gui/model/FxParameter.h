@@ -39,12 +39,7 @@ public:
 private:
     void subscribe_step() override;
 
-    void updateValueString();
-
     runtime::fx::parameter_id m_fx_param_id;
-
-    float m_value{};
-    runtime::fx::parameter_unit m_unit{};
 };
 
 } // namespace piejam::app::gui::model

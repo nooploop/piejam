@@ -57,12 +57,6 @@ FxParameter::subscribe_step()
         observe(runtime::selectors::
                         make_float_parameter_normalized_value_selector(*id),
                 [this](float const value) { setValue(value); });
-
-        observe(runtime::selectors::make_float_parameter_value_selector(*id),
-                [this](float const value) {
-                    m_value = value;
-                    updateValueString();
-                });
     }
     else if (auto id = std::get_if<runtime::int_parameter_id>(&m_fx_param_id))
     {
@@ -81,10 +75,10 @@ FxParameter::subscribe_step()
                 [this](bool const value) { setSwitchValue(value); });
     }
 
-    observe(runtime::selectors::make_fx_parameter_unit_selector(m_fx_param_id),
-            [this](runtime::fx::parameter_unit const unit) {
-                m_unit = unit;
-                updateValueString();
+    observe(runtime::selectors::make_fx_parameter_value_string_selector(
+                    m_fx_param_id),
+            [this](std::string const& text) {
+                setValueString(QString::fromStdString(text));
             });
 }
 
@@ -115,24 +109,6 @@ FxParameter::changeSwitchValue(bool value)
     if (auto id = std::get_if<runtime::bool_parameter_id>(&m_fx_param_id))
     {
         dispatch(runtime::actions::set_bool_parameter(*id, value));
-    }
-}
-
-void
-FxParameter::updateValueString()
-{
-    switch (m_unit)
-    {
-        case runtime::fx::parameter_unit::none:
-            return setValueString(
-                    QString::fromStdString(fmt::format("{:.2f}", m_value)));
-
-        case runtime::fx::parameter_unit::dB:
-            if (m_value == 0.f)
-                return setValueString("-Inf");
-            else
-                return setValueString(QString::fromStdString(
-                        fmt::format("{:+.1f} dB", math::to_dB(m_value))));
     }
 }
 

@@ -37,11 +37,32 @@ from_normalized_linear(float_ const& p, float const norm_value) -> float
 }
 
 inline constexpr auto
+to_normalized_log(float_ const& p, float const value) -> float
+{
+    constexpr float const one_div_log_10 = 1.f / std::log(10.f);
+    float const max = std::log(p.max) * one_div_log_10;
+    float const min = std::log(p.min) * one_div_log_10;
+    float const value_log = std::log(value) * one_div_log_10;
+    return (value_log - min) / (max - min);
+}
+
+inline constexpr auto
+from_normalized_log(float_ const& p, float const norm_value) -> float
+{
+    constexpr float const one_div_log_10 = 1.f / std::log(10.f);
+    float const max_db = std::log(p.max) * one_div_log_10;
+    float const min_db = std::log(p.min) * one_div_log_10;
+    float const value_log = norm_value * (max_db - min_db) + min_db;
+    return std::pow(10.f, value_log);
+}
+
+inline constexpr auto
 to_normalized_db(float_ const& p, float const value) -> float
 {
-    float const max_db = (std::log(p.max) / std::log(10)) * 20.f;
-    float const min_db = (std::log(p.min) / std::log(10)) * 20.f;
-    float const value_db = (std::log(value) / std::log(10)) * 20.f;
+    constexpr float const one_div_log_10_x_20 = 20.f / std::log(10.f);
+    float const max_db = std::log(p.max) * one_div_log_10_x_20;
+    float const min_db = std::log(p.min) * one_div_log_10_x_20;
+    float const value_db = std::log(value) * one_div_log_10_x_20;
     return (value_db - min_db) / (max_db - min_db);
 }
 
@@ -49,15 +70,17 @@ template <class DbInterval>
 constexpr auto
 to_normalized_db(float_ const&, float const value) -> float
 {
-    float const value_db = std::log(value) * (20.f / std::log(10));
+    constexpr float const one_div_log_10_x_20 = 20.f / std::log(10.f);
+    float const value_db = std::log(value) * one_div_log_10_x_20;
     return (value_db - DbInterval::min) / (DbInterval::max - DbInterval::min);
 }
 
 inline constexpr auto
 from_normalized_db(float_ const& p, float const norm_value) -> float
 {
-    float const max_db = (std::log(p.max) / std::log(10)) * 20.f;
-    float const min_db = (std::log(p.min) / std::log(10)) * 20.f;
+    constexpr float const one_div_log_10_x_20 = 20.f / std::log(10.f);
+    float const max_db = std::log(p.max) * one_div_log_10_x_20;
+    float const min_db = std::log(p.min) * one_div_log_10_x_20;
     float const value_db = norm_value * (max_db - min_db) + min_db;
     return std::pow(10.f, value_db / 20.f);
 }

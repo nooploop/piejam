@@ -273,13 +273,20 @@ make_fx_parameter_id_selector(
 }
 
 auto
-make_fx_parameter_unit_selector(fx::parameter_id const param_id)
-        -> selector<fx::parameter_unit>
+make_fx_parameter_value_string_selector(fx::parameter_id const param_id)
+        -> selector<std::string>
 {
-    return [param_id](state const& st) -> fx::parameter_unit {
-        auto it = st.fx_parameters->find(param_id);
-        return it != st.fx_parameters->end() ? it->second.unit
-                                             : fx::parameter_unit::none;
+    return [param_id](state const& st) -> std::string {
+        if (auto it = st.fx_parameters->find(param_id);
+            it != st.fx_parameters->end())
+        {
+            return std::visit(
+                    [it, &st](auto&& id) {
+                        return it->second.value_to_string(*st.params.get(id));
+                    },
+                    param_id);
+        }
+        return {};
     };
 }
 

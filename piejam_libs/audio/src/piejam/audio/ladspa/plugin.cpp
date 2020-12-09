@@ -26,6 +26,8 @@
 
 #include <ladspa.h>
 
+#include <spdlog/spdlog.h>
+
 #include <boost/assert.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -42,7 +44,7 @@ namespace
 {
 
 auto
-to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
+to_port_type_descriptor(LADSPA_PortRangeHint const& hint, bool control_input)
         -> port_type_descriptor
 {
     auto const hint_descriptor = hint.HintDescriptor;
@@ -59,19 +61,21 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
     }
     else if (LADSPA_IS_HINT_INTEGER(hint_descriptor))
     {
-        if (!LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor))
-            throw std::runtime_error(
-                    "Logarithmic integer ports are not supported.");
+        BOOST_ASSERT(!LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor));
 
-        if (!LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor))
-            throw std::runtime_error(
-                    "Min bound is not provided for integer port.");
-        int const min = boost::numeric_cast<int>(std::round(hint.LowerBound));
+        if (control_input && !LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor))
+            spdlog::error("Lower bound not specified on int control input.");
+        int const min =
+                LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor)
+                        ? boost::numeric_cast<int>(std::round(hint.LowerBound))
+                        : std::numeric_limits<int>::min();
 
-        if (!LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor))
-            throw std::runtime_error(
-                    "Max bound is not provided for integer port.");
-        int const max = boost::numeric_cast<int>(std::round(hint.UpperBound));
+        if (control_input && !LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor))
+            spdlog::error("Upper bound not specified on int control input.");
+        int const max =
+                LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor)
+                        ? boost::numeric_cast<int>(std::round(hint.UpperBound))
+                        : std::numeric_limits<int>::max();
 
         int default_value{};
         if (LADSPA_IS_HINT_HAS_DEFAULT(hint_descriptor))
@@ -102,43 +106,61 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint)
             }
             else if (LADSPA_IS_HINT_DEFAULT_LOW(hint_descriptor))
             {
-                default_value = boost::numeric_cast<int>(std::round(
-                        hint.LowerBound * 0.75f + hint.UpperBound * 0.25f));
+                default_value =
+                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
+                                ? boost::numeric_cast<int>(std::round(std::exp(
+                                          std::log(hint.LowerBound) * 0.75f +
+                                          std::log(hint.UpperBound) * 0.25f)))
+                                : boost::numeric_cast<int>(std::round(
+                                          hint.LowerBound * 0.75f +
+                                          hint.UpperBound * 0.25f));
             }
             else if (LADSPA_IS_HINT_DEFAULT_MIDDLE(hint_descriptor))
             {
-                default_value = boost::numeric_cast<int>(std::round(
-                        hint.LowerBound * 0.5f + hint.UpperBound * 0.5f));
+                default_value =
+                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
+                                ? boost::numeric_cast<int>(std::round(std::exp(
+                                          std::log(hint.LowerBound) * 0.5f +
+                                          std::log(hint.UpperBound) * 0.5f)))
+                                : boost::numeric_cast<int>(std::round(
+                                          hint.LowerBound * 0.5f +
+                                          hint.UpperBound * 0.5f));
             }
             else if (LADSPA_IS_HINT_DEFAULT_HIGH(hint_descriptor))
             {
-                default_value = boost::numeric_cast<int>(std::round(
-                        hint.LowerBound * 0.25f + hint.UpperBound * 0.75f));
+                default_value =
+                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor)
+                                ? boost::numeric_cast<int>(std::round(std::exp(
+                                          std::log(hint.LowerBound) * 0.25f +
+                                          std::log(hint.UpperBound) * 0.75f)))
+                                : boost::numeric_cast<int>(std::round(
+                                          hint.LowerBound * 0.25f +
+                                          hint.UpperBound * 0.75f));
             }
-
-            default_value = std::clamp(default_value, min, max);
-
-            return int_port{
-                    .min = min,
-                    .max = max,
-                    .default_value = default_value};
         }
+
+        default_value = std::clamp(default_value, min, max);
+
+        return int_port{
+                .min = min,
+                .max = max,
+                .default_value = default_value,
+                .logarithmic = static_cast<bool>(
+                        LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor))};
     }
     else
     {
-        bool const bounded_below =
-                LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor);
-        bool const bounded_above =
-                LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor);
+        if (control_input && !LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor))
+            spdlog::error("Lower bound not specified on float control input.");
+        float const min = LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor)
+                                  ? hint.LowerBound
+                                  : std::numeric_limits<float>::lowest();
 
-        if (bounded_below != bounded_above)
-            throw std::runtime_error("Only one bound is specified.");
-
-        float const min = bounded_below ? hint.LowerBound
-                                        : std::numeric_limits<float>::lowest();
-
-        float const max = bounded_above ? hint.UpperBound
-                                        : std::numeric_limits<float>::max();
+        if (control_input && !LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor))
+            spdlog::error("Upper bound not specified on float control input.");
+        float const max = LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor)
+                                  ? hint.UpperBound
+                                  : std::numeric_limits<float>::max();
 
         float default_value{};
         if (LADSPA_IS_HINT_HAS_DEFAULT(hint_descriptor))
@@ -463,7 +485,9 @@ public:
                     .index = port,
                     .name = m_ladspa_desc->PortNames[port],
                     .type_desc = to_port_type_descriptor(
-                            m_ladspa_desc->PortRangeHints[port])};
+                            m_ladspa_desc->PortRangeHints[port],
+                            LADSPA_IS_PORT_INPUT(ladspa_port_desc) &&
+                                    LADSPA_IS_PORT_CONTROL(ladspa_port_desc))};
 
             if (LADSPA_IS_PORT_INPUT(ladspa_port_desc))
             {
