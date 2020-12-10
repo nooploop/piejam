@@ -39,31 +39,20 @@ from_normalized_linear(float_ const& p, float const norm_value) -> float
 inline constexpr auto
 to_normalized_log(float_ const& p, float const value) -> float
 {
-    constexpr float const one_div_log_10 = 1.f / std::log(10.f);
-    float const max = std::log(p.max) * one_div_log_10;
-    float const min = std::log(p.min) * one_div_log_10;
-    float const value_log = std::log(value) * one_div_log_10;
-    return (value_log - min) / (max - min);
+    float const log_min = std::log(p.min);
+    return (log_min - std::log(value)) / (log_min - std::log(p.max));
 }
 
 inline constexpr auto
 from_normalized_log(float_ const& p, float const norm_value) -> float
 {
-    constexpr float const one_div_log_10 = 1.f / std::log(10.f);
-    float const max_db = std::log(p.max) * one_div_log_10;
-    float const min_db = std::log(p.min) * one_div_log_10;
-    float const value_log = norm_value * (max_db - min_db) + min_db;
-    return std::pow(10.f, value_log);
+    return std::pow(p.min, 1.f - norm_value) * std::pow(p.max, norm_value);
 }
 
 inline constexpr auto
 to_normalized_db(float_ const& p, float const value) -> float
 {
-    constexpr float const one_div_log_10_x_20 = 20.f / std::log(10.f);
-    float const max_db = std::log(p.max) * one_div_log_10_x_20;
-    float const min_db = std::log(p.min) * one_div_log_10_x_20;
-    float const value_db = std::log(value) * one_div_log_10_x_20;
-    return (value_db - min_db) / (max_db - min_db);
+    return to_normalized_log(p, value);
 }
 
 template <class DbInterval>
@@ -78,11 +67,7 @@ to_normalized_db(float_ const&, float const value) -> float
 inline constexpr auto
 from_normalized_db(float_ const& p, float const norm_value) -> float
 {
-    constexpr float const one_div_log_10_x_20 = 20.f / std::log(10.f);
-    float const max_db = std::log(p.max) * one_div_log_10_x_20;
-    float const min_db = std::log(p.min) * one_div_log_10_x_20;
-    float const value_db = norm_value * (max_db - min_db) + min_db;
-    return std::pow(10.f, value_db / 20.f);
+    return from_normalized_log(p, norm_value);
 }
 
 template <class DbInterval>

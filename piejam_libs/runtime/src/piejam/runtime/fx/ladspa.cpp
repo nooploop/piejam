@@ -47,16 +47,18 @@ make_module_parameters(
         if (auto const* const p = std::get_if<audio::ladspa::float_port>(
                     &port_desc.type_desc))
         {
+            bool const logarithmic =
+                    p->logarithmic && p->min > 0.f && p->max > 0.f;
             auto id = float_params.add(float_parameter{
                     .default_value = p->default_value,
                     .min = p->min,
                     .max = p->max,
                     .to_normalized =
-                            p->logarithmic
+                            logarithmic
                                     ? &runtime::parameter::to_normalized_log
                                     : &runtime::parameter::to_normalized_linear,
                     .from_normalized =
-                            p->logarithmic
+                            logarithmic
                                     ? &runtime::parameter::from_normalized_log
                                     : &runtime::parameter::
                                               from_normalized_linear});
