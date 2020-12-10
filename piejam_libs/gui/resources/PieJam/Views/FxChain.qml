@@ -101,7 +101,7 @@ TopPane {
         Frame {
             id: levelMeterFrame
 
-            width: 150
+            width: levelMeterFader.width + levelMeterFrame.leftPadding + levelMeterFrame.rightPadding
 
             anchors.right: parent.right
             anchors.top: parent.top
@@ -126,11 +126,9 @@ TopPane {
                 onModelChanged: currentIndex = root.model.buses.focused
             }
 
-            LevelMeterFader {
+            CompactLevelMeterFader {
                 id: levelMeterFader
 
-                anchors.left: parent.left
-                anchors.right: parent.right
                 anchors.top: channelSelector.bottom
                 anchors.bottom: parent.bottom
                 anchors.topMargin: 4

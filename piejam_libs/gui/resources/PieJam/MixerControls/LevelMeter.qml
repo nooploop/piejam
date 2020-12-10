@@ -22,16 +22,21 @@ import QtQuick.Controls.Material 2.13
 import "../Util/DbConvert.js" as DbConvert
 import "../Util/MathExt.js" as MathExt
 
-Rectangle {
+Item {
     id: root
 
     property real levelLeft: 0
     property real levelRight: 0
     property bool muted: false
+    property int indicatorPadding: 6
 
-    width: 64
-    height: 300
-    color: Material.backgroundColor
+    implicitWidth: dbScaleLeft.width + indicatorLeft.width + indicatorRight.width + dbScaleRight.width
+    implicitHeight: 300
+
+    Rectangle {
+        anchors.fill: parent
+        color: Material.backgroundColor
+    }
 
     DbScaleData {
         id: meterScaleData
@@ -41,23 +46,11 @@ Rectangle {
         DbScaleTick { position: privates.maxPos; db: 0 }
     }
 
-    DbScale {
-        id: dbScaleLeft
-        anchors.right: indicator.left
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.top: parent.top
-        horizontalOrientation: DbScale.Orientation.Right
-        backgroundColor: Material.backgroundColor
-
-        scaleData: meterScaleData
-    }
-
     Gradient {
         id: levelGradient
 
         GradientStop { position: 0; color: "#ff0000" }
-        GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-3), privates.minPos, privates.maxPos, 0, 1); color: "#ffa500" }
+        GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-3),  privates.minPos, privates.maxPos, 0, 1); color: "#ffa500" }
         GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-12), privates.minPos, privates.maxPos, 0, 1); color: "#ffff00" }
         GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-20), privates.minPos, privates.maxPos, 0, 1); color: "#7ee00d" }
         GradientStop { position: 0.95; color: "#7ee00d" }
@@ -71,54 +64,78 @@ Rectangle {
         GradientStop { position: 1; color: "#909090" }
     }
 
-    LevelIndicator {
-        id: indicator
-        width: 5
-        anchors.bottomMargin: 6
-        anchors.topMargin: 6
-        anchors.right: indicatorRight.left
-        anchors.bottom: parent.bottom
-        anchors.top: parent.top
+    Row {
+        anchors.fill: parent
 
-        level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelLeft)), privates.minPos, privates.maxPos, 0, 1)
+        DbScale {
+            id: dbScaleLeft
 
-        gradient: root.muted ? mutedLevelGradient : levelGradient
+            height: parent.height
 
-        fillColor: Material.backgroundColor
-    }
+            horizontalOrientation: DbScale.Orientation.Right
+            backgroundColor: Material.backgroundColor
 
-    LevelIndicator {
-        id: indicatorRight
-        width: 5
-        anchors.bottomMargin: 6
-        anchors.topMargin: 6
-        anchors.right: dbScaleRight.left
-        anchors.bottom: parent.bottom
-        anchors.top: parent.top
+            scaleData: meterScaleData
+        }
 
-        level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelRight)), privates.minPos, privates.maxPos, 0, 1)
+        LevelIndicator {
+            id: indicatorLeft
 
-        gradient: root.muted ? mutedLevelGradient : levelGradient
+            width: 6
 
-        fillColor: Material.backgroundColor
-    }
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: root.indicatorPadding
+            anchors.top: parent.top
+            anchors.topMargin: root.indicatorPadding
 
-    DbScale {
-        id: dbScaleRight
-        width: 12
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.top: parent.top
-        backgroundColor: Material.backgroundColor
+            level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelLeft)),
+                                 privates.minPos,
+                                 privates.maxPos,
+                                 0,
+                                 1)
 
-        scaleData: meterScaleData
-        enableText: false
+            gradient: root.muted ? mutedLevelGradient : levelGradient
+
+            fillColor: Material.backgroundColor
+        }
+
+        LevelIndicator {
+            id: indicatorRight
+
+            width: 6
+
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: root.indicatorPadding
+            anchors.top: parent.top
+            anchors.topMargin: root.indicatorPadding
+
+            level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelRight)),
+                                 privates.minPos,
+                                 privates.maxPos,
+                                 0,
+                                 1)
+
+            gradient: root.muted ? mutedLevelGradient : levelGradient
+
+            fillColor: Material.backgroundColor
+        }
+
+        DbScale {
+            id: dbScaleRight
+
+            height: parent.height
+
+            backgroundColor: Material.backgroundColor
+
+            scaleData: meterScaleData
+            enableText: false
+        }
     }
 
     QtObject {
         id: privates
 
-        property real minPos: root.height < 6 ? 0 : 6 / root.height
-        property real maxPos: root.height < 6 ? 1 : (root.height - 6) / root.height
+        property real minPos: root.height < root.indicatorPadding ? 0 : root.indicatorPadding / root.height
+        property real maxPos: root.height < root.indicatorPadding ? 1 : (root.height - root.indicatorPadding) / root.height
     }
 }

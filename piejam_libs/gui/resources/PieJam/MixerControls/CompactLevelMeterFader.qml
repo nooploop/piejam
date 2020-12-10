@@ -26,53 +26,55 @@ import "../Util/MathExt.js" as MathExt
 Item {
     id: root
 
-    property real volume
+    property real volume: 0
+    property alias levelLeft: levelMeter.levelLeft
+    property alias levelRight: levelMeter.levelRight
 
-    signal moved(real newVolume)
+    signal faderMoved(real newVolume)
 
-    implicitWidth: 58
+    implicitWidth: levelMeter.width
     implicitHeight: 300
+
+    DbScaleData {
+        id: scaleData
+
+        DbScaleTick { position: privates.minPos; db: Number.NEGATIVE_INFINITY }
+        DbScaleTick { position: 0.05; db: -48; dbStep: 6 }
+        DbScaleTick { position: privates.maxPos; db: 12 }
+    }
 
     Slider {
         id: slider
 
         anchors.fill: parent
+
         padding: 6
 
-        value: MathExt.mapTo(dbScale.scaleData.dbToPosition(DbConvert.linToDb(root.volume)), privates.minPos, privates.maxPos, 0, 1)
+        value: MathExt.mapTo(scaleData.dbToPosition(DbConvert.linToDb(root.volume)),
+                             privates.minPos,
+                             privates.maxPos,
+                             0,
+                             1)
 
         orientation: Qt.Vertical
 
-        background: DbScale {
-            id: dbScale
-
-            anchors.fill: parent
-
-            horizontalOrientation: DbScale.Orientation.Right
-            backgroundColor: Material.backgroundColor
-
-            scaleData: DbScaleData {
-                DbScaleTick { position: privates.minPos; db: Number.NEGATIVE_INFINITY }
-                DbScaleTick { position: 0.05; db: -60; dbStep: 10 }
-                DbScaleTick { position: 0.35; db: -20; dbStep: 4 }
-                DbScaleTick { position: 0.45; db: -12; dbStep: 3 }
-                DbScaleTick { position: privates.maxPos; db: 12 }
-            }
+        background: LevelMeter {
+            id: levelMeter
         }
 
         handle: Rectangle {
             x: slider.leftPadding + slider.availableWidth / 2 - width / 2
             y: slider.visualPosition * slider.availableHeight + height
 
-            width: root.width
+            width: parent.width
             height: 4
 
             color: ColorUtil.setAlpha(Material.accentColor, 0.6)
         }
 
         onMoved: {
-            var newVolume = dbScale.scaleData.dbAt(MathExt.mapTo(slider.value, 0, 1, privates.minPos, privates.maxPos))
-            root.moved(DbConvert.dbToLin(newVolume))
+            var newVolume = scaleData.dbAt(MathExt.mapTo(slider.value, 0, 1, privates.minPos, privates.maxPos))
+            root.faderMoved(DbConvert.dbToLin(newVolume))
         }
 
         QtObject {
@@ -83,5 +85,3 @@ Item {
         }
     }
 }
-
-

@@ -32,6 +32,8 @@ Canvas {
     property bool enableText: true
     property var backgroundColor: Qt.rgba(0, 0, 0, 1)
 
+    implicitWidth: enableText ? 48 : 12
+
     onPaint: {
         var ctx = getContext("2d");
         ctx.fillStyle = backgroundColor;
@@ -44,7 +46,7 @@ Canvas {
 
         if (root.enableText) {
             ctx.font = "10px sans-serif"
-            ctx.textAlign = horizontalOrientation === DbScale.Orientation.Left ? "left" : "right"
+            ctx.textAlign = "right"
             privates.drawText(ctx)
         }
     }

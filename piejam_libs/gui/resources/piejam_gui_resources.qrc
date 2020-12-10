@@ -37,5 +37,6 @@
         <file>PieJam/Util/DbConvert.js</file>
         <file>PieJam/FxChainControls/FxBrowser.qml</file>
         <file>PieJam/Controls/HeaderLabel.qml</file>
+        <file>PieJam/MixerControls/CompactLevelMeterFader.qml</file>
     </qresource>
 </RCC>
