@@ -37,6 +37,7 @@ Item {
     signal panMoved(real newPan)
     signal muteToggled()
     signal soloToggled()
+    signal fxButtonClicked()
 
     id: root
 
@@ -50,11 +51,11 @@ Item {
 
         HeaderLabel {
             id: title
+            width: 96
 
-            height: 18
+            height: 24
 
             anchors.top: parent.top
-            anchors.right: parent.right
             anchors.left: parent.left
         }
 
@@ -88,6 +89,24 @@ Item {
 
             onMuteToggled: root.muteToggled()
             onSoloToggled: root.soloToggled()
+        }
+
+        Button {
+            id: fxButton
+
+            width: 24
+            height: 36
+
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.top: parent.top
+            anchors.topMargin: -6
+
+            text: qsTr("fx")
+
+            padding: 6
+
+            onClicked: root.fxButtonClicked()
         }
     }
 }

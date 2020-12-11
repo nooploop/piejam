@@ -35,6 +35,7 @@ public:
     void changeVolume(double) override;
     void changePanBalance(double) override;
     void changeMute(bool) override;
+    void focusFxChain() override;
 
 private:
     void subscribe_step() override;

@@ -59,6 +59,8 @@ public:
     auto solo() const noexcept -> bool { return m_solo; }
     void setSolo(bool);
 
+    Q_INVOKABLE virtual void focusFxChain() = 0;
+
     auto toQString() const -> QString { return m_name; }
 
 signals:

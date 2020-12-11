@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.13
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 import "../MixerControls"
 
@@ -25,6 +25,8 @@ TopPane {
     id: root
 
     property var model
+
+    signal fxButtonClicked()
 
     SplitView {
         anchors.fill: parent
@@ -39,8 +41,9 @@ TopPane {
             spacing: 2
             clip: true
             orientation: ListView.Horizontal
-
             boundsBehavior: Flickable.StopAtBounds
+            boundsMovement: Flickable.StopAtBounds
+            reuseItems: true
 
             model: root.model.inputChannels
 
@@ -63,6 +66,10 @@ TopPane {
                 onPanMoved: model.item.changePanBalance(newPan)
                 onMuteToggled: model.item.changeMute(!model.item.mute)
                 onSoloToggled: root.model.setInputSolo(index)
+                onFxButtonClicked: {
+                    model.item.focusFxChain()
+                    root.fxButtonClicked()
+                }
 
                 Binding {
                     target: model.item
@@ -80,8 +87,9 @@ TopPane {
             spacing: 2
             clip: true
             orientation: ListView.Horizontal
-
             boundsBehavior: Flickable.StopAtBounds
+            boundsMovement: Flickable.StopAtBounds
+            reuseItems: true
 
             model: root.model.outputChannels
 
@@ -103,6 +111,10 @@ TopPane {
                 onFaderMoved: model.item.changeVolume(newVolume)
                 onPanMoved: model.item.changePanBalance(newPan)
                 onMuteToggled: model.item.changeMute(!model.item.mute)
+                onFxButtonClicked: {
+                    model.item.focusFxChain()
+                    root.fxButtonClicked()
+                }
 
                 Binding {
                     target: model.item

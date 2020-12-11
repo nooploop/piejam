@@ -43,17 +43,19 @@ TopPane {
 
         ListView {
             id: fxModules
+            x: 8
+            y: 8
+            width: 784
+            height: 416
 
-            anchors.left: parent.left
-            anchors.right: levelMeterFrame.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
             anchors.margins: 8
 
             model: root.model.modules
 
             clip: true
             orientation: ListView.Horizontal
+            boundsBehavior: Flickable.StopAtBounds
+            boundsMovement: Flickable.StopAtBounds
             spacing: 4
 
             delegate: FxChainModule {
@@ -76,16 +78,15 @@ TopPane {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
 
-                implicitWidth: addButton.implicitWidth + 8
+                width: addButton.implicitWidth + 8
 
                 Button {
                     id: addButton
 
-                    implicitWidth: 32
+                    width: 32
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: -1
                     anchors.left: parent.left
                     anchors.leftMargin: 4
 
@@ -97,52 +98,6 @@ TopPane {
                 }
             }
         }
-
-        Frame {
-            id: levelMeterFrame
-
-            width: levelMeterFader.width + levelMeterFrame.leftPadding + levelMeterFrame.rightPadding
-
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.margins: 8
-
-            ComboBox {
-                id: channelSelector
-
-                height: 48
-
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-
-                model: root.model.buses.elements
-                currentIndex: root.model.buses.focused
-
-                displayText: root.model.buses.focused === -1 ? "[Select]" : currentText
-
-                onActivated: root.model.selectBus(index)
-                onModelChanged: currentIndex = root.model.buses.focused
-            }
-
-            CompactLevelMeterFader {
-                id: levelMeterFader
-
-                anchors.top: channelSelector.bottom
-                anchors.bottom: parent.bottom
-                anchors.topMargin: 4
-
-                levelLeft: root.model.levelLeft
-                levelRight: root.model.levelRight
-                volume: root.model.volume
-
-                enabled: root.model.buses.focused !== -1
-
-                onFaderMoved: root.model.changeVolume(newVolume)
-            }
-        }
-
     }
 
     FxBrowser {
@@ -155,13 +110,6 @@ TopPane {
             stack.pop()
             fxModules.positionViewAtEnd()
         }
-    }
-
-    Timer {
-        interval: 16
-        running: levelMeterFader.visible
-        repeat: true
-        onTriggered: root.model.requestLevelsUpdate()
     }
 
     Binding {

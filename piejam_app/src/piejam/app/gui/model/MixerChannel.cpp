@@ -17,6 +17,7 @@
 
 #include <piejam/app/gui/model/MixerChannel.h>
 
+#include <piejam/runtime/actions/select_fx_chain_bus.h>
 #include <piejam/runtime/actions/set_bus_mute.h>
 #include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_volume.h>
@@ -81,6 +82,14 @@ void
 MixerChannel::changeMute(bool mute)
 {
     dispatch(runtime::actions::set_bus_mute(m_bus_id, mute));
+}
+
+void
+MixerChannel::focusFxChain()
+{
+    runtime::actions::select_fx_chain_bus action;
+    action.bus_id = m_bus_id;
+    dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

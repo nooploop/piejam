@@ -54,15 +54,6 @@ ApplicationWindow {
         }
 
         ToolButton {
-            id: btnFxChain
-
-            text: "FX"
-            anchors.left: btnMixer.right
-
-            onClicked: { content.currentIndex = 4 }
-        }
-
-        ToolButton {
             id: btnInfo
 
             anchors.right: btnAudioSettings.left
@@ -108,6 +99,8 @@ ApplicationWindow {
 
         Mixer {
             id: mixerPane
+
+            onFxButtonClicked: content.currentIndex = 4
         }
 
         Info {
