@@ -22,6 +22,7 @@
 
 #include <nod/nod.hpp>
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <utility>
@@ -33,10 +34,18 @@ template <class State>
 class subscriber
 {
 public:
+    using get_state_f = std::function<State const&()>;
+
+    template <std::invocable<> GetState>
+    subscriber(GetState&& get_state)
+        : m_get_state(std::forward<GetState>(get_state))
+    {
+    }
+
     template <class Value, class Handler>
     auto observe(selector<Value, State> sel, Handler&& h) -> subscription
     {
-        m_renotify = true;
+        std::invoke(std::forward<Handler>(h), sel.get(m_get_state()));
         auto token = std::make_shared<subscription::token>();
         return {m_observer.connect(
                         [sel = std::move(sel),
@@ -58,17 +67,10 @@ public:
                 token};
     }
 
-    void notify(State const& st)
-    {
-        do
-        {
-            m_renotify = false;
-            m_observer(st);
-        } while (m_renotify);
-    }
+    void notify(State const& st) { m_observer(st); }
 
 private:
-    bool m_renotify{};
+    get_state_f m_get_state;
     nod::signal<void(State const&)> m_observer;
 };
 

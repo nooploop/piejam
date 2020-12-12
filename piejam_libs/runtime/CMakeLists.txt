@@ -14,7 +14,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_ladspa_fx_plugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/renotify.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_info_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_levels_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_mixer_levels_update.h
@@ -95,7 +94,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/initiate_device_selection.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_ladspa_fx_plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_devices.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/renotify.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_info_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_levels_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_mixer_levels_update.cpp

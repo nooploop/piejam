@@ -19,7 +19,6 @@
 
 #include <piejam/entity_id_hash.h>
 #include <piejam/reselect/subscriptions_manager.h>
-#include <piejam/runtime/actions/renotify.h>
 #include <piejam/runtime/store_dispatch.h>
 #include <piejam/runtime/subscriber.h>
 
@@ -64,13 +63,7 @@ protected:
     virtual void subscribe_step() = 0;
 
 private:
-    void subscribe() override
-    {
-        subscribe_step();
-
-        m_store_dispatch(runtime::actions::renotify{});
-    }
-
+    void subscribe() override { subscribe_step(); }
     void unsubscribe() override { m_subs.erase(m_subs_id); }
 
     runtime::store_dispatch m_store_dispatch;

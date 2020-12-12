@@ -119,7 +119,10 @@ main(int argc, char* argv[]) -> int
                 QMetaObject::invokeMethod(app, std::forward<decltype(f)>(f));
             }));
 
-    runtime::subscriber state_change_subscriber;
+    runtime::subscriber state_change_subscriber(
+            [&store]() -> piejam::runtime::state const& {
+                return store.state();
+            });
 
     store.subscribe([&state_change_subscriber](auto const& state) {
         state_change_subscriber.notify(state);
