@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/thread_context.h>
+#include <piejam/range/indices.h>
 #include <piejam/thread/job_deque.h>
 #include <piejam/thread/worker.h>
 
@@ -157,21 +158,23 @@ public:
             dag::tasks_t const& tasks,
             dag::graph_t const& graph,
             std::size_t const event_memory_size,
-            std::span<thread::configuration const> const& wt_configs)
+            std::span<thread::worker> const& worker_threads)
         : dag_executor_base(tasks, graph)
-        , m_run_queues(1 + wt_configs.size())
+        , m_run_queues(1 + worker_threads.size())
         , m_main_worker(
                   0,
                   event_memory_size,
                   m_nodes_to_process,
                   m_buffer_size,
                   m_run_queues)
+        , m_worker_threads(worker_threads)
         , m_workers(make_workers(
+                  worker_threads.size(),
                   event_memory_size,
-                  wt_configs,
                   m_nodes_to_process,
                   m_buffer_size,
                   m_run_queues))
+        , m_worker_tasks(make_worker_tasks(m_workers))
     {
     }
 
@@ -187,8 +190,11 @@ public:
 
         distribute_initial_tasks();
 
-        for (auto const& wt : m_workers)
-            wt->wakeup();
+        BOOST_ASSERT(m_worker_tasks.size() == m_worker_threads.size());
+        for (std::size_t const w : range::indices(m_worker_threads.size()))
+        {
+            m_worker_threads[w].wakeup(m_worker_tasks[w]);
+        }
 
         m_main_worker();
     }
@@ -212,8 +218,6 @@ private:
         }
     }
 
-    using workers_t = std::vector<std::unique_ptr<thread::worker>>;
-
     struct dag_worker
     {
         dag_worker(
@@ -221,12 +225,12 @@ private:
                 std::size_t const event_memory_size,
                 std::atomic_size_t& nodes_to_process,
                 std::atomic_size_t& buffer_size,
-                std::span<job_deque_t> run_queues)
+                std::span<job_deque_t> const& run_queues)
             : m_worker_index(worker_index)
             , m_event_memory(event_memory_size)
             , m_nodes_to_process(nodes_to_process)
             , m_buffer_size(buffer_size)
-            , m_run_queues(std::move(run_queues))
+            , m_run_queues(run_queues)
         {
         }
 
@@ -304,35 +308,49 @@ private:
         std::span<job_deque_t> m_run_queues;
     };
 
+    using workers_t = std::vector<dag_worker>;
+
     static auto make_workers(
+            std::size_t const num_workers,
             std::size_t const event_memory_size,
-            std::span<thread::configuration const> const& wt_configs,
             std::atomic_size_t& nodes_to_process,
             std::atomic_size_t& buffer_size,
-            std::span<job_deque_t> run_queues) -> workers_t
+            std::span<job_deque_t> const& run_queues) -> workers_t
     {
         workers_t workers;
-        workers.reserve(wt_configs.size());
+        workers.reserve(num_workers);
 
-        for (std::size_t i = 0; i < wt_configs.size(); ++i)
+        for (std::size_t i = 0; i < num_workers; ++i)
         {
-            workers.emplace_back(std::make_unique<thread::worker>(
-                    dag_worker(
-                            i + 1,
-                            event_memory_size,
-                            nodes_to_process,
-                            buffer_size,
-                            run_queues),
-                    wt_configs[i]));
+            workers.emplace_back(
+                    i + 1,
+                    event_memory_size,
+                    nodes_to_process,
+                    buffer_size,
+                    run_queues);
         }
 
         return workers;
     }
 
+    static auto make_worker_tasks(std::span<dag_worker> const& workers)
+            -> std::vector<thread::worker::task_t>
+    {
+        std::vector<thread::worker::task_t> tasks;
+        tasks.reserve(workers.size());
+
+        for (auto& w : workers)
+            tasks.emplace_back([&w]() { w(); });
+
+        return tasks;
+    }
+
     std::atomic_size_t m_nodes_to_process{};
     std::vector<job_deque_t> m_run_queues;
     dag_worker m_main_worker;
+    std::span<thread::worker> m_worker_threads;
     workers_t m_workers;
+    std::vector<thread::worker::task_t> m_worker_tasks;
     std::atomic_size_t m_buffer_size{};
 };
 
@@ -397,10 +415,10 @@ dag::add_child(task_id_t const parent, task_id_t const child)
 
 auto
 dag::make_runnable(
-        std::span<thread::configuration const> const& wt_configs,
+        std::span<thread::worker> const& worker_threads,
         std::size_t const event_memory_size) -> std::unique_ptr<dag_executor>
 {
-    if (wt_configs.empty())
+    if (worker_threads.empty())
         return std::make_unique<dag_executor_st>(
                 m_tasks,
                 m_graph,
@@ -410,7 +428,7 @@ dag::make_runnable(
             m_tasks,
             m_graph,
             event_memory_size,
-            wt_configs);
+            worker_threads);
 }
 
 } // namespace piejam::audio::engine

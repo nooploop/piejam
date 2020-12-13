@@ -90,8 +90,6 @@ TopPane {
                     anchors.left: parent.left
                     anchors.leftMargin: 4
 
-                    visible: root.model.buses.focused !== -1
-
                     text: "+"
 
                     onClicked: stack.push(fxBrowser)

@@ -42,6 +42,7 @@
 #include <piejam/runtime/parameter/maps_collection.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/thread/configuration.h>
+#include <piejam/thread/worker.h>
 
 #include <fmt/format.h>
 
@@ -87,13 +88,16 @@ using mixer_bus_components = std::vector<mixer_bus_component_mapping>;
 
 struct audio_engine::impl
 {
-    impl(unsigned num_device_input_channels,
+    impl(std::span<thread::configuration const> const& wt_configs,
+         unsigned num_device_input_channels,
          unsigned num_device_output_channels)
         : process(num_device_input_channels, num_device_output_channels)
+        , worker_threads(wt_configs.begin(), wt_configs.end())
     {
     }
 
     audio::engine::process process;
+    std::vector<thread::worker> worker_threads;
 
     mixer_bus_components input_buses;
     mixer_bus_components output_buses;
@@ -363,9 +367,9 @@ audio_engine::audio_engine(
         audio::samplerate_t const samplerate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels)
-    : m_wt_configs(wt_configs.begin(), wt_configs.end())
-    , m_samplerate(samplerate)
+    : m_samplerate(samplerate)
     , m_impl(std::make_unique<impl>(
+              wt_configs,
               num_device_input_channels,
               num_device_output_channels))
 {
@@ -462,8 +466,8 @@ audio_engine::rebuild(
 
     audio::engine::bypass_event_identity_processors(new_graph);
 
-    m_impl->process.swap_executor(
-            ns_ae::graph_to_dag(new_graph).make_runnable(m_wt_configs));
+    m_impl->process.swap_executor(ns_ae::graph_to_dag(new_graph).make_runnable(
+            m_impl->worker_threads));
 
     m_impl->graph = std::move(new_graph);
     m_impl->input_buses = std::move(input_buses);

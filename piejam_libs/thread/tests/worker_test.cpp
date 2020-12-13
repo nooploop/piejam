@@ -22,22 +22,14 @@
 namespace piejam::thread::test
 {
 
-TEST(worker, doesnt_execute_if_not_woken_up)
-{
-    std::atomic_bool worked{false};
-
-    worker wt([&]() { worked.store(true, std::memory_order_release); });
-    std::this_thread::sleep_for(std::chrono::microseconds{100});
-
-    EXPECT_FALSE(worked);
-}
-
 TEST(worker, executes_after_wakeup)
 {
     std::atomic_bool worked{false};
 
-    worker wt([&]() { worked.store(true, std::memory_order_release); });
-    wt.wakeup();
+    worker wt;
+    worker::task_t task(
+            [&]() { worked.store(true, std::memory_order_release); });
+    wt.wakeup(task);
     std::this_thread::sleep_for(std::chrono::microseconds{100});
 
     EXPECT_TRUE(worked);

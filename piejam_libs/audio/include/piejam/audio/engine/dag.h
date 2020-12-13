@@ -44,7 +44,7 @@ public:
     dag(dag&&) = default;
 
     auto operator=(dag const&) -> dag& = delete;
-    auto operator=(dag &&) -> dag& = default;
+    auto operator=(dag&&) -> dag& = default;
 
     auto graph() const noexcept -> graph_t const& { return m_graph; }
 
@@ -53,7 +53,7 @@ public:
     void add_child(task_id_t parent, task_id_t child);
 
     auto make_runnable(
-            std::span<thread::configuration const> const& = {},
+            std::span<thread::worker> const& = {},
             std::size_t event_memory_size = (1u << 16))
             -> std::unique_ptr<dag_executor>;
 

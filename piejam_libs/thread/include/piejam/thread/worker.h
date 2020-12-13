@@ -23,6 +23,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 #include <mutex>
 #include <thread>
 
@@ -35,11 +36,10 @@ namespace piejam::thread
 class worker
 {
 public:
-    template <class F>
-    worker(F&& f, thread::configuration conf = {})
-        : m_thread([this,
-                    ff = std::forward<F>(f),
-                    conf = std::move(conf)]() mutable {
+    using task_t = std::function<void()>;
+
+    worker(thread::configuration conf = {})
+        : m_thread([this, conf = std::move(conf)]() mutable {
             if (conf.affinity)
                 this_thread::set_affinity(*conf.affinity);
             if (conf.priority)
@@ -56,7 +56,7 @@ public:
                 if (!m_running.load(std::memory_order_consume))
                     break;
 
-                ff();
+                m_task.get()();
             }
         })
     {
@@ -64,10 +64,11 @@ public:
 
     ~worker() { stop(); }
 
-    void wakeup()
+    void wakeup(std::reference_wrapper<task_t const> task)
     {
         {
             std::lock_guard<std::mutex> lock(m_work_mutex);
+            m_task = task;
             m_work = true;
         }
 
@@ -78,7 +79,7 @@ public:
     {
         m_running.store(false, std::memory_order_release);
 
-        wakeup();
+        wakeup(s_default_task);
 
         m_thread.join();
     }
@@ -88,6 +89,8 @@ private:
     std::mutex m_work_mutex;
     std::condition_variable m_work_cond_var;
     bool m_work{false};
+    inline static task_t const s_default_task{[]() {}};
+    std::reference_wrapper<task_t const> m_task{s_default_task};
     std::thread m_thread;
 };
 

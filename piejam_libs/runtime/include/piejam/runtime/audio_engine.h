@@ -31,7 +31,6 @@
 #include <memory>
 #include <optional>
 #include <span>
-#include <vector>
 
 namespace piejam::runtime
 {
@@ -67,7 +66,6 @@ public:
             range::table_view<float> const& out_audio) noexcept;
 
 private:
-    std::vector<thread::configuration> const m_wt_configs;
     audio::samplerate_t const m_samplerate;
 
     struct impl;
