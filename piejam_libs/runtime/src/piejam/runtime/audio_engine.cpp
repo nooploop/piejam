@@ -18,10 +18,6 @@
 #include <piejam/runtime/audio_engine.h>
 
 #include <piejam/algorithm/for_each_adjacent.h>
-#include <piejam/audio/components/amplifier.h>
-#include <piejam/audio/components/level_meter.h>
-#include <piejam/audio/components/pan.h>
-#include <piejam/audio/components/stereo_balance.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/dag_executor.h>
@@ -36,8 +32,6 @@
 #include <piejam/audio/engine/value_output_processor.h>
 #include <piejam/functional/overload.h>
 #include <piejam/runtime/channel_index_pair.h>
-#include <piejam/runtime/components/fx_gain.h>
-#include <piejam/runtime/components/fx_ladspa.h>
 #include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/components/mixer_bus.h>
 #include <piejam/runtime/components/mute_solo.h>

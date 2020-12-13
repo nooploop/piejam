@@ -30,61 +30,14 @@ class FxChain : public SubscribableModel
     Q_OBJECT
 
     Q_PROPERTY(QAbstractListModel* modules READ modules CONSTANT)
-    Q_PROPERTY(StringList* buses READ buses NOTIFY busesChanged FINAL)
-    Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
-    Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
-    Q_PROPERTY(double volume READ volume NOTIFY volumeChanged FINAL)
 
 public:
     auto modules() noexcept -> FxModulesList* { return &m_modules; }
-    auto buses() noexcept -> StringList* { return &m_buses; }
-
-    Q_INVOKABLE virtual void selectBus(int) = 0;
 
     Q_INVOKABLE virtual void deleteModule(int) = 0;
 
-    auto levelLeft() const noexcept -> double { return m_levelLeft; }
-    auto levelRight() const noexcept -> double { return m_levelRight; }
-    void setLevel(double left, double right)
-    {
-        if (m_levelLeft != left)
-        {
-            m_levelLeft = left;
-            emit levelLeftChanged();
-        }
-
-        if (m_levelRight != right)
-        {
-            m_levelRight = right;
-            emit levelRightChanged();
-        }
-    }
-    Q_INVOKABLE virtual void requestLevelsUpdate() = 0;
-
-    auto volume() const noexcept -> double { return m_volume; }
-    void setVolume(double x)
-    {
-        if (m_volume != x)
-        {
-            m_volume = x;
-            emit volumeChanged();
-        }
-    }
-    Q_INVOKABLE virtual void changeVolume(double) = 0;
-
-signals:
-    void busesChanged();
-    void selectedBusChanged();
-    void levelLeftChanged();
-    void levelRightChanged();
-    void volumeChanged();
-
 private:
     FxModulesList m_modules;
-    StringList m_buses;
-    double m_levelLeft{};
-    double m_levelRight{};
-    double m_volume{1.};
 };
 
 } // namespace piejam::gui::model
