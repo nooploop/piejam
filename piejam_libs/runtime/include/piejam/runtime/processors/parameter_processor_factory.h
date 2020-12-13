@@ -57,6 +57,12 @@ public:
         m_in_factory.template initialize<P>(params);
     }
 
+    template <class... Ps>
+    void initialize(parameter::maps_collection<Ps...> const& params) const
+    {
+        m_in_factory.initialize(params);
+    }
+
     template <class P, std::convertible_to<typename P::value_type> V>
     void set(parameter::id_t<P> id, V&& value) const
     {

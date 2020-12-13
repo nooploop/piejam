@@ -43,6 +43,7 @@ class fx_ladspa final : public audio::engine::component
 public:
     fx_ladspa(
             fx::module const& fx_mod,
+            get_fx_parameter_name const& get_fx_param_name,
             std::unique_ptr<audio::engine::processor> fx_proc,
             parameter_processor_factory& param_proc_factory)
         : m_fx_proc(std::move(fx_proc))
@@ -52,8 +53,10 @@ public:
 
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
-            m_param_input_procs.emplace_back(
-                    processors::make_input_processor(param_proc_factory, id));
+            m_param_input_procs.emplace_back(processors::make_input_processor(
+                    param_proc_factory,
+                    id,
+                    get_fx_param_name(id)));
         }
 
         std::ranges::transform(
@@ -119,6 +122,7 @@ class fx_ladspa_from_mono final : public audio::engine::component
 public:
     fx_ladspa_from_mono(
             fx::module const& fx_mod,
+            get_fx_parameter_name const& get_fx_param_name,
             std::unique_ptr<audio::engine::processor> fx_left_proc,
             std::unique_ptr<audio::engine::processor> fx_right_proc,
             parameter_processor_factory& param_proc_factory)
@@ -134,8 +138,10 @@ public:
 
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
-            m_param_input_procs.emplace_back(
-                    processors::make_input_processor(param_proc_factory, id));
+            m_param_input_procs.emplace_back(processors::make_input_processor(
+                    param_proc_factory,
+                    id,
+                    get_fx_param_name(id)));
 
             m_input_event_identity_procs.emplace_back(
                     make_event_identity_processor(id));
@@ -193,6 +199,7 @@ private:
 auto
 make_fx_ladspa(
         fx::module const& fx_mod,
+        get_fx_parameter_name const& get_fx_param_name,
         fx_ladspa_processor_factory const& fx_ladspa_proc_factory,
         parameter_processor_factory& param_proc_factory)
         -> std::unique_ptr<audio::engine::component>
@@ -202,6 +209,7 @@ make_fx_ladspa(
     {
         return std::make_unique<fx_ladspa>(
                 fx_mod,
+                get_fx_param_name,
                 std::move(fx_proc),
                 param_proc_factory);
     }
@@ -213,6 +221,7 @@ make_fx_ladspa(
         {
             return std::make_unique<fx_ladspa_from_mono>(
                     fx_mod,
+                    get_fx_param_name,
                     std::move(fx_proc),
                     std::move(fx_second_proc),
                     param_proc_factory);

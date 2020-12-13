@@ -77,8 +77,8 @@ struct audio_engine_render_test : public ::testing::Test
             sut.rebuild(
                     st.mixer_state,
                     st.fx_modules,
-                    st.params.get_map<parameter::bool_>(),
-                    st.params.get_map<parameter::float_>(),
+                    st.fx_parameters,
+                    st.params,
                     {});
         });
 

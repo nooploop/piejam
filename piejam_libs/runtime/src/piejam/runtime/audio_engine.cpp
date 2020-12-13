@@ -41,8 +41,10 @@
 #include <piejam/runtime/components/mixer_bus.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/map.h>
+#include <piejam/runtime/parameter/maps_collection.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/thread/configuration.h>
 
@@ -152,6 +154,7 @@ static auto
 make_fx_chains_map(
         fx_chains_map& prev_fx_chains,
         fx::modules_t const& fx_modules,
+        fx::parameters_t const& fx_params,
         mixer::buses_t const& buses,
         mixer::bus_list_t const& inputs,
         mixer::bus_list_t const& outputs,
@@ -204,6 +207,12 @@ make_fx_chains_map(
                                     [&](fx::ladspa_instance_id id) {
                                         auto comp = components::make_fx_ladspa(
                                                 *fx_mod,
+                                                [&fx_params](
+                                                        fx::parameter_id id)
+                                                        -> std::string_view {
+                                                    return *fx_params.at(id)
+                                                                    .name;
+                                                },
                                                 [&]() {
                                                     return ladspa_fx_proc_factory(
                                                             id);
@@ -242,6 +251,10 @@ make_fx_chains_map(
                                 [&](fx::ladspa_instance_id id) {
                                     auto comp = components::make_fx_ladspa(
                                             *fx_mod,
+                                            [&fx_params](fx::parameter_id id)
+                                                    -> std::string_view {
+                                                return *fx_params.at(id).name;
+                                            },
                                             [&]() {
                                                 return ladspa_fx_proc_factory(
                                                         id);
@@ -454,8 +467,8 @@ void
 audio_engine::rebuild(
         mixer::state const& mixer_state,
         fx::modules_t const& fx_modules,
-        bool_parameters const& bool_params,
-        float_parameters const& float_params,
+        fx::parameters_t const& fx_params,
+        parameter_maps const& params,
         fx::ladspa_processor_factory const& ladspa_fx_proc_factory)
 {
     auto input_buses = make_mixer_bus_vector(
@@ -473,14 +486,14 @@ audio_engine::rebuild(
     auto fx_chains = make_fx_chains_map(
             m_impl->fx_chains,
             fx_modules,
+            fx_params,
             mixer_state.buses,
             mixer_state.inputs,
             mixer_state.outputs,
             m_impl->param_procs,
             ladspa_fx_proc_factory);
 
-    m_impl->param_procs.initialize(float_params);
-    m_impl->param_procs.initialize(bool_params);
+    m_impl->param_procs.initialize(params);
 
     auto input_solo_index_proc =
             std::make_unique<ns_ae::value_input_processor<mixer::bus_id>>(

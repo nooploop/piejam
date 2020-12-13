@@ -501,8 +501,8 @@ audio_engine_middleware::rebuild()
     m_engine->rebuild(
             st.mixer_state,
             st.fx_modules,
-            st.params.get_map<bool_parameter>(),
-            st.params.get_map<float_parameter>(),
+            st.fx_parameters,
+            st.params,
             [this, sr = st.samplerate](fx::ladspa_instance_id id) {
                 return m_ladspa_fx_manager->make_processor(id, sr);
             });

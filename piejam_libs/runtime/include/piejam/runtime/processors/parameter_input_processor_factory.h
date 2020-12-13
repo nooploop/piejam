@@ -72,6 +72,12 @@ public:
         }
     }
 
+    template <class... Ps>
+    void initialize(parameter::maps_collection<Ps...> const& params) const
+    {
+        (initialize(params.template get_map<Parameter>()), ...);
+    }
+
     template <class P, std::convertible_to<typename P::value_type> V>
     void set(parameter::id_t<P> id, V&& value) const
     {

@@ -23,7 +23,7 @@
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
 #include <piejam/runtime/mixer_fwd.h>
-#include <piejam/runtime/parameters.h>
+#include <piejam/runtime/parameter_maps.h>
 #include <piejam/runtime/stereo_level.h>
 #include <piejam/thread/fwd.h>
 
@@ -58,8 +58,8 @@ public:
     void
     rebuild(mixer::state const&,
             fx::modules_t const&,
-            bool_parameters const&,
-            float_parameters const&,
+            fx::parameters_t const& fx_params,
+            parameter_maps const&,
             fx::ladspa_processor_factory const&);
 
     void operator()(

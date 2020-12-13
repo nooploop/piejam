@@ -31,8 +31,11 @@ namespace piejam::runtime::components
 using fx_ladspa_processor_factory =
         std::function<std::unique_ptr<audio::engine::processor>()>;
 
+using get_fx_parameter_name = std::function<std::string_view(fx::parameter_id)>;
+
 auto make_fx_ladspa(
         fx::module const&,
+        get_fx_parameter_name const&,
         fx_ladspa_processor_factory const&,
         parameter_processor_factory&)
         -> std::unique_ptr<audio::engine::component>;
