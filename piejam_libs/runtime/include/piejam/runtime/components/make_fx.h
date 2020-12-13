@@ -21,21 +21,20 @@
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/get_parameter_name.h>
+#include <piejam/runtime/fx/ladspa_processor_factory.h>
 
-#include <functional>
 #include <memory>
+#include <string_view>
 
 namespace piejam::runtime::components
 {
 
-using fx_ladspa_processor_factory =
-        std::function<std::unique_ptr<audio::engine::processor>()>;
-
-auto make_fx_ladspa(
+auto make_fx(
         fx::module const&,
         fx::get_parameter_name const&,
-        fx_ladspa_processor_factory const&,
-        parameter_processor_factory&)
+        fx::ladspa_processor_factory const&,
+        parameter_processor_factory&,
+        std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;
 
 } // namespace piejam::runtime::components

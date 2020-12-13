@@ -17,25 +17,15 @@
 
 #pragma once
 
-#include <piejam/audio/engine/fwd.h>
-#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/get_parameter_name.h>
 
 #include <functional>
-#include <memory>
+#include <string_view>
 
-namespace piejam::runtime::components
+namespace piejam::runtime::fx
 {
 
-using fx_ladspa_processor_factory =
-        std::function<std::unique_ptr<audio::engine::processor>()>;
+using get_parameter_name =
+        std::function<std::string_view(fx::parameter_id const&)>;
 
-auto make_fx_ladspa(
-        fx::module const&,
-        fx::get_parameter_name const&,
-        fx_ladspa_processor_factory const&,
-        parameter_processor_factory&)
-        -> std::unique_ptr<audio::engine::component>;
-
-} // namespace piejam::runtime::components
+} // namespace piejam::runtime::fx

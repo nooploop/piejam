@@ -38,6 +38,7 @@
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/fx_gain.h>
 #include <piejam/runtime/components/fx_ladspa.h>
+#include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/components/mixer_bus.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/fx/module.h>
@@ -167,6 +168,11 @@ make_fx_chains_map(
     boost::push_back(all_ids, inputs);
     boost::push_back(all_ids, outputs);
 
+    auto get_fx_param_name =
+            [&fx_params](fx::parameter_id id) -> std::string_view {
+        return *fx_params.at(id).name;
+    };
+
     fx_chains_map fx_chains;
 
     for (mixer::bus_id const bus_id : all_ids)
@@ -190,42 +196,15 @@ make_fx_chains_map(
                 {
                     fx::module const* const fx_mod = fx_modules[fx_mod_id];
                     BOOST_ASSERT(fx_mod);
-                    BOOST_ASSERT(fx_mod);
-                    std::visit(
-                            overload{
-                                    [&](fx::internal fx_type) {
-                                        switch (fx_type)
-                                        {
-                                            case fx::internal::gain:
-                                                fx_chain_comps.emplace_back(
-                                                        fx_mod_id,
-                                                        components::make_fx_gain(
-                                                                *fx_mod,
-                                                                param_procs));
-                                        }
-                                    },
-                                    [&](fx::ladspa_instance_id id) {
-                                        auto comp = components::make_fx_ladspa(
-                                                *fx_mod,
-                                                [&fx_params](
-                                                        fx::parameter_id id)
-                                                        -> std::string_view {
-                                                    return *fx_params.at(id)
-                                                                    .name;
-                                                },
-                                                [&]() {
-                                                    return ladspa_fx_proc_factory(
-                                                            id);
-                                                },
-                                                param_procs);
-                                        if (comp)
-                                        {
-                                            fx_chain_comps.emplace_back(
-                                                    fx_mod_id,
-                                                    std::move(comp));
-                                        }
-                                    }},
-                            fx_mod->fx_type_id);
+                    auto comp = components::make_fx(
+                            *fx_mod,
+                            get_fx_param_name,
+                            ladspa_fx_proc_factory,
+                            param_procs);
+                    if (comp)
+                    {
+                        fx_chain_comps.emplace_back(fx_mod_id, std::move(comp));
+                    }
                 }
             }
         }
@@ -235,39 +214,15 @@ make_fx_chains_map(
             {
                 fx::module const* const fx_mod = fx_modules[fx_mod_id];
                 BOOST_ASSERT(fx_mod);
-                std::visit(
-                        overload{
-                                [&](fx::internal fx_type) {
-                                    switch (fx_type)
-                                    {
-                                        case fx::internal::gain:
-                                            fx_chain_comps.emplace_back(
-                                                    fx_mod_id,
-                                                    components::make_fx_gain(
-                                                            *fx_mod,
-                                                            param_procs));
-                                    }
-                                },
-                                [&](fx::ladspa_instance_id id) {
-                                    auto comp = components::make_fx_ladspa(
-                                            *fx_mod,
-                                            [&fx_params](fx::parameter_id id)
-                                                    -> std::string_view {
-                                                return *fx_params.at(id).name;
-                                            },
-                                            [&]() {
-                                                return ladspa_fx_proc_factory(
-                                                        id);
-                                            },
-                                            param_procs);
-                                    if (comp)
-                                    {
-                                        fx_chain_comps.emplace_back(
-                                                fx_mod_id,
-                                                std::move(comp));
-                                    }
-                                }},
-                        fx_mod->fx_type_id);
+                auto comp = components::make_fx(
+                        *fx_mod,
+                        get_fx_param_name,
+                        ladspa_fx_proc_factory,
+                        param_procs);
+                if (comp)
+                {
+                    fx_chain_comps.emplace_back(fx_mod_id, std::move(comp));
+                }
             }
         }
     }
