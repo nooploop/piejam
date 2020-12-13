@@ -18,6 +18,7 @@
 #include <piejam/audio/engine/graph_algorithms.h>
 
 #include <piejam/audio/engine/component.h>
+#include <piejam/audio/engine/event_identity_processor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/processor.h>
@@ -68,6 +69,21 @@ bool
 has_wire(graph const& g, graph_endpoint const& src, graph_endpoint const& dst)
 {
     auto connected = g.wires().equal_range(src);
+    return connected.first != connected.second &&
+           std::ranges::find(
+                   connected.first,
+                   connected.second,
+                   dst,
+                   &graph::wires_t::value_type::second) != connected.second;
+}
+
+bool
+has_event_wire(
+        graph const& g,
+        graph_endpoint const& src,
+        graph_endpoint const& dst)
+{
+    auto connected = g.event_wires().equal_range(src);
     return connected.first != connected.second &&
            std::ranges::find(
                    connected.first,
@@ -147,6 +163,37 @@ connect_stereo_components(
 {
     connect(g, src.outputs()[0], dst.inputs()[0], mixers);
     connect(g, src.outputs()[1], dst.inputs()[1], mixers);
+}
+
+void
+bypass_event_identity_processors(graph& g)
+{
+    auto starts_in_identity = [](auto const& w) {
+        return is_event_identity_processor(w.first.proc);
+    };
+
+    auto it = std::ranges::find_if(g.event_wires(), starts_in_identity);
+    while (it != g.event_wires().end())
+    {
+        auto it_ends = std::ranges::find_if(
+                g.event_wires(),
+                [p = &it->first.proc.get()](auto const& w) {
+                    return &w.second.proc.get() == p;
+                });
+
+        auto out_wire = *it;
+        g.remove_event_wire(it);
+
+        if (it_ends != g.event_wires().end())
+            g.add_event_wire(it_ends->first, out_wire.second);
+
+        it = std::ranges::find_if(g.event_wires(), starts_in_identity);
+    }
+
+    g.remove_event_wires_if([](auto const& src, auto const& dst) {
+        return is_event_identity_processor(src.proc) ||
+               is_event_identity_processor(dst.proc);
+    });
 }
 
 } // namespace piejam::audio::engine

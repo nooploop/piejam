@@ -32,17 +32,15 @@ struct state
 
 } // namespace
 
-TEST(subscriber, first_notify_will_always_trigger_the_handler)
+TEST(subscriber, observe_will_also_notify)
 {
     auto sel = selector<int, state>(&state::x);
 
-    subscriber<state> sut;
+    state st{5};
+    subscriber<state> sut([&st]() -> state const& { return st; });
 
     int x{};
     auto sub = sut.observe<int>(sel, [&x](int st_x) { x = st_x; });
-
-    state st{5};
-    sut.notify(st);
 
     EXPECT_EQ(5, x);
 }
@@ -52,17 +50,17 @@ TEST(subscriber,
 {
     auto sel = selector<int, state>(&state::x);
 
-    subscriber<state> sut;
+    state st;
+    subscriber<state> sut([&st]() -> state const& { return st; });
 
     int handler_called{};
     auto sub =
             sut.observe<int>(sel, [&handler_called](int) { ++handler_called; });
 
-    state st;
     sut.notify(st);
     sut.notify(st);
 
-    EXPECT_EQ(1, handler_called);
+    EXPECT_EQ(2, handler_called);
 }
 
 TEST(subscriber,
@@ -70,14 +68,13 @@ TEST(subscriber,
 {
     auto sel = selector<int, state>(&state::x);
 
-    subscriber<state> sut;
+    state st;
+    subscriber<state> sut([&st]() -> state const& { return st; });
 
     int handler_called{};
     auto sub =
             sut.observe<int>(sel, [&handler_called](int) { ++handler_called; });
 
-    state st;
-    sut.notify(st);
     st.x = 5;
     sut.notify(st);
 
@@ -88,18 +85,15 @@ TEST(subscriber, handler_not_called_when_unsubscribed)
 {
     auto sel = selector<int, state>(&state::x);
 
-    subscriber<state> sut;
+    state st;
+    subscriber<state> sut([&st]() -> state const& { return st; });
 
     int handler_called{};
-
-    state st;
 
     {
         auto sub = sut.observe<int>(sel, [&handler_called](int) {
             ++handler_called;
         });
-
-        sut.notify(st);
 
         EXPECT_EQ(1, handler_called);
     }
@@ -112,13 +106,13 @@ TEST(subscriber, renotify_when_a_new_observer_connected_while_notifying)
 {
     auto sel = selector<int, state>(&state::x);
 
-    subscriber<state> sut;
+    state st;
+    subscriber<state> sut([&st]() -> state const& { return st; });
 
     int handler1_called{};
     int handler2_called{};
 
     std::unique_ptr<subscription> inner_sub;
-    state st;
     auto sub = sut.observe<int>(sel, [&](int) {
         inner_sub = std::make_unique<subscription>(
                 sut.observe<int>(sel, [&handler2_called](int) {
@@ -126,8 +120,6 @@ TEST(subscriber, renotify_when_a_new_observer_connected_while_notifying)
                 }));
         ++handler1_called;
     });
-
-    sut.notify(st);
 
     EXPECT_EQ(1, handler1_called);
     EXPECT_EQ(1, handler2_called);

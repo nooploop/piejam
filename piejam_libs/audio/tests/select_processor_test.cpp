@@ -23,6 +23,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/slice.h>
 #include <piejam/functional/partial_compare.h>
 
 #include <gtest/gtest.h>

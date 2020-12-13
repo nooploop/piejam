@@ -24,6 +24,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_buffer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_buffer_memory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_converter_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_identity_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_port.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_to_audio_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/fwd.h

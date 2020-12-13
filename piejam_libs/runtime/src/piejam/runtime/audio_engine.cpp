@@ -498,6 +498,8 @@ audio_engine::rebuild(
             *input_solo_index_proc,
             mixers);
 
+    audio::engine::bypass_event_identity_processors(new_graph);
+
     m_impl->process.swap_executor(
             ns_ae::graph_to_dag(new_graph).make_runnable(m_wt_configs));
 

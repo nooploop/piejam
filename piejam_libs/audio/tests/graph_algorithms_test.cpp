@@ -19,8 +19,10 @@
 
 #include "processor_mock.h"
 
+#include <piejam/audio/engine/event_identity_processor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/mix_processor.h>
+#include <piejam/audio/engine/slice.h>
 
 #include <gtest/gtest.h>
 
@@ -84,6 +86,164 @@ TEST(connect,
     EXPECT_TRUE(has_wire(sut, {src2, 0}, {*mixers.front(), 1}));
     EXPECT_TRUE(has_wire(sut, {src3, 0}, {*mixers.front(), 2}));
     EXPECT_TRUE(has_wire(sut, {*mixers.front(), 0}, {dst, 0}));
+}
+
+TEST(bypass_event_identity_processors, identity_without_output)
+{
+    using namespace testing;
+
+    processor_mock src;
+    event_identity_processor ident(std::in_place_type<float>);
+
+    graph g;
+
+    std::array event_outs{event_port(std::in_place_type<float>)};
+    ON_CALL(src, event_outputs())
+            .WillByDefault(Return(processor::event_ports{event_outs}));
+    g.add_event_wire({src, 0}, {ident, 0});
+
+    ASSERT_EQ(1, g.event_wires().size());
+    bypass_event_identity_processors(g);
+    EXPECT_TRUE(g.event_wires().empty());
+}
+
+TEST(bypass_event_identity_processors, identity_without_input)
+{
+    using namespace testing;
+
+    processor_mock dst;
+    event_identity_processor ident(std::in_place_type<float>);
+
+    graph g;
+
+    std::array event_ins{event_port(std::in_place_type<float>)};
+    ON_CALL(dst, event_inputs())
+            .WillByDefault(Return(processor::event_ports{event_ins}));
+    g.add_event_wire({ident, 0}, {dst, 0});
+
+    ASSERT_EQ(1, g.event_wires().size());
+    bypass_event_identity_processors(g);
+    EXPECT_TRUE(g.event_wires().empty());
+}
+
+TEST(bypass_event_identity_processors, identity_between_processors)
+{
+    using namespace testing;
+
+    processor_mock src;
+    processor_mock dst;
+    event_identity_processor ident(std::in_place_type<float>);
+
+    graph g;
+
+    std::array event_outs{event_port(std::in_place_type<float>)};
+    ON_CALL(src, event_outputs())
+            .WillByDefault(Return(processor::event_ports{event_outs}));
+    g.add_event_wire({src, 0}, {ident, 0});
+    std::array event_ins{event_port(std::in_place_type<float>)};
+    ON_CALL(dst, event_inputs())
+            .WillByDefault(Return(processor::event_ports{event_ins}));
+    g.add_event_wire({ident, 0}, {dst, 0});
+
+    ASSERT_EQ(2, g.event_wires().size());
+    bypass_event_identity_processors(g);
+    EXPECT_EQ(1, g.event_wires().size());
+    EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst, 0}));
+}
+
+TEST(bypass_event_identity_processors, identity_in_series_between_processors)
+{
+    using namespace testing;
+
+    processor_mock src;
+    processor_mock dst;
+    event_identity_processor ident1(std::in_place_type<float>);
+    event_identity_processor ident2(std::in_place_type<float>);
+
+    graph g;
+
+    std::array event_outs{event_port(std::in_place_type<float>)};
+    ON_CALL(src, event_outputs())
+            .WillByDefault(Return(processor::event_ports{event_outs}));
+    g.add_event_wire({src, 0}, {ident1, 0});
+    std::array event_ins{event_port(std::in_place_type<float>)};
+    ON_CALL(dst, event_inputs())
+            .WillByDefault(Return(processor::event_ports{event_ins}));
+    g.add_event_wire({ident2, 0}, {dst, 0});
+
+    g.add_event_wire({ident1, 0}, {ident2, 0});
+
+    ASSERT_EQ(3, g.event_wires().size());
+    bypass_event_identity_processors(g);
+    EXPECT_EQ(1, g.event_wires().size());
+    EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst, 0}));
+}
+
+TEST(bypass_event_identity_processors, two_outs_from_identity)
+{
+    using namespace testing;
+
+    processor_mock src;
+    processor_mock dst1;
+    processor_mock dst2;
+    event_identity_processor ident(std::in_place_type<float>);
+
+    graph g;
+
+    std::array event_outs{event_port(std::in_place_type<float>)};
+    ON_CALL(src, event_outputs())
+            .WillByDefault(Return(processor::event_ports{event_outs}));
+    g.add_event_wire({src, 0}, {ident, 0});
+
+    std::array event_ins{event_port(std::in_place_type<float>)};
+    ON_CALL(dst1, event_inputs())
+            .WillByDefault(Return(processor::event_ports{event_ins}));
+    g.add_event_wire({ident, 0}, {dst1, 0});
+
+    ON_CALL(dst2, event_inputs())
+            .WillByDefault(Return(processor::event_ports{event_ins}));
+    g.add_event_wire({ident, 0}, {dst2, 0});
+
+    ASSERT_EQ(3, g.event_wires().size());
+    bypass_event_identity_processors(g);
+    EXPECT_EQ(2, g.event_wires().size());
+    EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst1, 0}));
+    EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst2, 0}));
+}
+
+TEST(bypass_event_identity_processors,
+     two_outs_from_identity_one_goes_to_identity)
+{
+    using namespace testing;
+
+    processor_mock src;
+    processor_mock dst1;
+    processor_mock dst2;
+    event_identity_processor ident1(std::in_place_type<float>);
+    event_identity_processor ident2(std::in_place_type<float>);
+
+    graph g;
+
+    std::array event_outs{event_port(std::in_place_type<float>)};
+    ON_CALL(src, event_outputs())
+            .WillByDefault(Return(processor::event_ports{event_outs}));
+    g.add_event_wire({src, 0}, {ident1, 0});
+
+    std::array event_ins{event_port(std::in_place_type<float>)};
+    ON_CALL(dst1, event_inputs())
+            .WillByDefault(Return(processor::event_ports{event_ins}));
+    g.add_event_wire({ident1, 0}, {ident2, 0});
+    g.add_event_wire({ident2, 0}, {dst1, 0});
+
+    ON_CALL(dst2, event_inputs())
+            .WillByDefault(Return(processor::event_ports{event_ins}));
+    g.add_event_wire({ident1, 0}, {dst2, 0});
+
+    ASSERT_EQ(4, g.event_wires().size());
+    bypass_event_identity_processors(g);
+    EXPECT_EQ(2, g.event_wires().size());
+    EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst1, 0}));
+    EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst2, 0}));
 }
 
 } // namespace piejam::audio::engine::test

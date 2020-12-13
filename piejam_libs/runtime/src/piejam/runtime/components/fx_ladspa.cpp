@@ -18,6 +18,7 @@
 #include <piejam/runtime/components/fx_ladspa.h>
 
 #include <piejam/audio/engine/component.h>
+#include <piejam/audio/engine/event_identity_processor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/range/indices.h>
@@ -95,6 +96,24 @@ private:
     std::vector<audio::engine::graph_endpoint> m_event_outputs;
 };
 
+template <class P>
+auto
+make_event_identity_processor(parameter::id_t<P> const&)
+{
+    return audio::engine::make_event_identity_processor<
+            typename P::value_type>();
+}
+
+auto
+make_event_identity_processor(fx::parameter_id const& id)
+{
+    return std::visit(
+            [](auto&& param_id) {
+                return make_event_identity_processor(param_id);
+            },
+            id);
+}
+
 class fx_ladspa_from_mono final : public audio::engine::component
 {
 public:
@@ -117,6 +136,9 @@ public:
         {
             m_param_input_procs.emplace_back(
                     processors::make_input_processor(param_proc_factory, id));
+
+            m_input_event_identity_procs.emplace_back(
+                    make_event_identity_processor(id));
         }
 
         BOOST_ASSERT(
@@ -142,9 +164,12 @@ public:
         {
             g.add_event_wire(
                     {*m_param_input_procs[i], 0},
+                    {*m_input_event_identity_procs[i], 0});
+            g.add_event_wire(
+                    {*m_input_event_identity_procs[i], 0},
                     {*m_fx_left_proc, i});
             g.add_event_wire(
-                    {*m_param_input_procs[i], 0},
+                    {*m_input_event_identity_procs[i], 0},
                     {*m_fx_right_proc, i});
         }
     }
@@ -157,6 +182,8 @@ private:
     std::array<audio::engine::graph_endpoint, 2> m_outputs{
             {{*m_fx_left_proc, 0}, {*m_fx_right_proc, 0}}};
     std::vector<std::shared_ptr<audio::engine::processor>> m_param_input_procs;
+    std::vector<std::unique_ptr<audio::engine::processor>>
+            m_input_event_identity_procs;
     std::vector<audio::engine::graph_endpoint> m_event_inputs;
     std::vector<audio::engine::graph_endpoint> m_event_outputs;
 };

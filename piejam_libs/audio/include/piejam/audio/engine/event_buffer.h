@@ -22,6 +22,7 @@
 #include <boost/assert.hpp>
 #include <boost/intrusive/set.hpp>
 
+#include <concepts>
 #include <memory_resource>
 #include <typeindex>
 
@@ -58,13 +59,14 @@ public:
     auto begin() const { return m_event_container.begin(); }
     auto end() const { return m_event_container.end(); }
 
-    void insert(std::size_t const offset, T value)
+    template <std::convertible_to<T> V>
+    void insert(std::size_t const offset, V&& value)
     {
         BOOST_ASSERT(m_event_memory);
         std::pmr::polymorphic_allocator<event<T>> allocator(m_event_memory);
         m_event_container.insert(*allocator.template new_object<event<T>>(
                 offset,
-                std::move(value)));
+                std::forward<V>(value)));
     }
 
     auto operator=(event_buffer const&) = delete;

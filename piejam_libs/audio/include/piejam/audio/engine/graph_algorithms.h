@@ -34,6 +34,11 @@ auto connected_event_source(graph const&, graph_endpoint const& dst)
 bool
 has_wire(graph const&, graph_endpoint const& src, graph_endpoint const& dst);
 
+bool has_event_wire(
+        graph const&,
+        graph_endpoint const& src,
+        graph_endpoint const& dst);
+
 //! Smart connect function, which will insert a mixer if connecting to an
 //! already connected destination. The mixer will be stored in the mixers
 //! vector.
@@ -51,5 +56,7 @@ void connect_stereo_components(
         component const& src,
         component const& dst,
         std::vector<std::unique_ptr<processor>>& mixers);
+
+void bypass_event_identity_processors(graph&);
 
 } // namespace piejam::audio::engine

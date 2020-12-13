@@ -19,6 +19,7 @@
 
 #include <piejam/audio/engine/graph_endpoint.h>
 
+#include <concepts>
 #include <map>
 #include <string>
 
@@ -38,7 +39,21 @@ public:
     {
         return m_event_wires;
     }
+
     void add_event_wire(graph_endpoint const& src, graph_endpoint const& dst);
+
+    void remove_event_wire(wires_t::const_iterator const&);
+
+    template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
+    void remove_event_wires_if(P&& p)
+    {
+        for (auto it = m_event_wires.begin(); it != m_event_wires.end();)
+        {
+            it = std::forward<P>(p)(it->first, it->second)
+                         ? m_event_wires.erase(it)
+                         : std::next(it);
+        }
+    }
 
 private:
     wires_t m_wires;

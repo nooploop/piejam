@@ -21,6 +21,7 @@
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
+#include <piejam/audio/engine/slice.h>
 
 #include <piejam/container/table.h>
 
