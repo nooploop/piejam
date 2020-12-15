@@ -36,14 +36,15 @@
 #include <piejam/redux/thunk_middleware.h>
 #include <piejam/reselect/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/runtime/actions/load_app_config.h>
 #include <piejam/runtime/actions/refresh_devices.h>
+#include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
-#include <piejam/runtime/app_config.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/audio_state.h>
-#include <piejam/runtime/config_access.h>
 #include <piejam/runtime/locations.h>
 #include <piejam/runtime/open_alsa_device.h>
+#include <piejam/runtime/session_middleware.h>
 #include <piejam/runtime/store.h>
 #include <piejam/runtime/subscriber.h>
 #include <piejam/runtime/ui/action.h>
@@ -82,6 +83,11 @@ main(int argc, char* argv[]) -> int
                     log_file_directory + "/piejam.log",
                     true));
 
+    runtime::locations locs;
+    locs.config_dir = QStandardPaths::writableLocation(
+                              QStandardPaths::StandardLocation::ConfigLocation)
+                              .toStdString();
+
     QGuiApplication app(argc, argv);
 
     QQuickStyle::setStyle("Material");
@@ -93,18 +99,29 @@ main(int argc, char* argv[]) -> int
             [](auto const& st, auto const& a) { return a.reduce(st); },
             {});
 
-    store.apply_middleware([](auto get_state, auto /*dispatch*/, auto next) {
+    store.apply_middleware([&locs](auto&& get_state,
+                                   auto&& dispatch,
+                                   auto&& next) {
+        return redux::make_middleware<piejam::runtime::session_middleware>(
+                locs,
+                std::forward<decltype(get_state)>(get_state),
+                std::forward<decltype(dispatch)>(dispatch),
+                std::forward<decltype(next)>(next));
+    });
+
+    store.apply_middleware([](auto&& get_state,
+                              auto&& /*dispatch*/,
+                              auto&& next) {
         thread::configuration const audio_thread_config{2, 96};
         std::array const worker_thread_configs{thread::configuration{3, 96}};
-        auto m = std::make_shared<runtime::audio_engine_middleware>(
+        return redux::make_middleware<runtime::audio_engine_middleware>(
                 audio_thread_config,
                 worker_thread_configs,
                 &audio::alsa::get_pcm_io_descriptors,
                 &audio::alsa::get_hw_params,
                 &runtime::open_alsa_device,
-                std::move(get_state),
-                std::move(next));
-        return [m](auto const& a) { (*m)(a); };
+                std::forward<decltype(get_state)>(get_state),
+                std::forward<decltype(next)>(next));
     });
 
     store.apply_middleware(redux::make_thunk_middleware<
@@ -127,6 +144,8 @@ main(int argc, char* argv[]) -> int
     store.subscribe([&state_change_subscriber](auto const& state) {
         state_change_subscriber.notify(state);
     });
+
+    store.dispatch(runtime::actions::scan_ladspa_fx_plugins("/usr/lib/ladspa"));
 
     app::gui::model::AudioDeviceSettings audio_settings(
             store,
@@ -179,18 +198,12 @@ main(int argc, char* argv[]) -> int
             &QGuiApplication::quit);
 
     store.dispatch(runtime::actions::refresh_devices{});
-    store.dispatch(runtime::actions::scan_ladspa_fx_plugins("/usr/lib/ladspa"));
 
-    runtime::locations locs;
-    locs.config_dir = QStandardPaths::writableLocation(
-                              QStandardPaths::StandardLocation::ConfigLocation)
-                              .toStdString();
-
-    runtime::config_access::load(locs, store);
+    store.dispatch(runtime::actions::load_app_config{});
 
     auto const app_exec_result = app.exec();
 
-    runtime::config_access::save(locs, store.state());
+    store.dispatch(runtime::actions::save_app_config{});
 
     return app_exec_result;
 }

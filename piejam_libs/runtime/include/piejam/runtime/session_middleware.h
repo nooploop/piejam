@@ -17,31 +17,25 @@
 
 #pragma once
 
-#include <piejam/redux/functors.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/locations.h>
 
-namespace piejam::runtime::ui
+namespace piejam::runtime
 {
 
-template <class State>
-struct action;
+class session_middleware
+{
+public:
+    session_middleware(locations const&, get_state_f, dispatch_f, next_f);
 
-template <class DerivedAction, class ActionInterface>
-struct cloneable_action;
+    void operator()(action const&);
 
-template <class State>
-using get_state_f = redux::get_state_f<State>;
+private:
+    get_state_f m_get_state;
+    dispatch_f m_dispatch;
+    next_f m_next;
 
-template <class State>
-using dispatch_f = redux::dispatch_f<action<State>>;
+    locations m_locations;
+};
 
-template <class State>
-using next_f = redux::next_f<action<State>>;
-
-template <class State>
-using thunk_f = std::function<
-        void(get_state_f<State> const&, dispatch_f<State> const&)>;
-
-template <class State>
-struct thunk_action;
-
-} // namespace piejam::runtime::ui
+} // namespace piejam::runtime

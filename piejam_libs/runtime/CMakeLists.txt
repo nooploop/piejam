@@ -12,11 +12,13 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_ladspa_fx_plugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_info_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_levels_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_mixer_levels_update.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/save_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/scan_ladspa_fx_plugins.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_bus_channel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_device.h
@@ -75,6 +77,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/session_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/stereo_level.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store_dispatch.h
@@ -93,11 +96,13 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/initiate_device_selection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_ladspa_fx_plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_info_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_levels_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_mixer_levels_update.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/save_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/scan_ladspa_fx_plugins.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_bus_channel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_device.cpp
@@ -131,6 +136,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/open_alsa_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/selectors.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/session_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/store_dispatch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/thunk_action.cpp
 )

@@ -22,7 +22,7 @@
 namespace piejam::runtime::config_access
 {
 
-void load(locations const&, store_dispatch);
+void load(locations const&, dispatch_f const&);
 void save(locations const&, state const&);
 
 } // namespace piejam::runtime::config_access

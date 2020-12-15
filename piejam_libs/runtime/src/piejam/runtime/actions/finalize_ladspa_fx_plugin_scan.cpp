@@ -45,7 +45,7 @@ finalize_ladspa_fx_plugin_scan::reduce(state const& st) const -> state
     auto fxs = fx::make_internal_fx_registry_entries();
     auto ladspa_plugins = plugins;
     filter_fx_plugins(ladspa_plugins);
-    boost::push_back(fxs, ladspa_plugins);
+    boost::push_back(fxs, std::move(ladspa_plugins));
     new_st.fx_registry.entries = std::move(fxs);
 
     return new_st;

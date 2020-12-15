@@ -15,33 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/save_app_config.h>
 
-#include <piejam/redux/functors.h>
+#include <piejam/runtime/audio_state.h>
 
-namespace piejam::runtime::ui
+namespace piejam::runtime::actions
 {
 
-template <class State>
-struct action;
+auto save_app_config::reduce(state const& st) const -> state
+{
+    return st;
+}
 
-template <class DerivedAction, class ActionInterface>
-struct cloneable_action;
-
-template <class State>
-using get_state_f = redux::get_state_f<State>;
-
-template <class State>
-using dispatch_f = redux::dispatch_f<action<State>>;
-
-template <class State>
-using next_f = redux::next_f<action<State>>;
-
-template <class State>
-using thunk_f = std::function<
-        void(get_state_f<State> const&, dispatch_f<State> const&)>;
-
-template <class State>
-struct thunk_action;
-
-} // namespace piejam::runtime::ui
+} // namespace piejam::runtime::actions

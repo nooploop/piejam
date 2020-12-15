@@ -17,31 +17,17 @@
 
 #pragma once
 
-#include <piejam/redux/functors.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
-namespace piejam::runtime::ui
+namespace piejam::runtime::actions
 {
 
-template <class State>
-struct action;
+struct load_app_config final
+    : ui::cloneable_action<load_app_config, action>
+{
+    auto reduce(state const&) const -> state override;
+};
 
-template <class DerivedAction, class ActionInterface>
-struct cloneable_action;
-
-template <class State>
-using get_state_f = redux::get_state_f<State>;
-
-template <class State>
-using dispatch_f = redux::dispatch_f<action<State>>;
-
-template <class State>
-using next_f = redux::next_f<action<State>>;
-
-template <class State>
-using thunk_f = std::function<
-        void(get_state_f<State> const&, dispatch_f<State> const&)>;
-
-template <class State>
-struct thunk_action;
-
-} // namespace piejam::runtime::ui
+} // namespace piejam::runtime::actions

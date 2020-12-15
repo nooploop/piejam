@@ -47,7 +47,7 @@ config_file_path(locations const& locs)
 }
 
 void
-load(locations const& locs, store_dispatch dispatch)
+load(locations const& locs, dispatch_f const& dispatch)
 {
     try
     {
