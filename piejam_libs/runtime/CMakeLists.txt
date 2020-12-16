@@ -81,7 +81,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/session_middleware.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/stereo_level.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store_dispatch.h
@@ -144,7 +144,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/selectors.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/session_middleware.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/store_dispatch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/thunk_action.cpp
 )

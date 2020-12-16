@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/session_middleware.h>
+#include <piejam/runtime/persistence_middleware.h>
 
 #include <piejam/functional/overload.h>
 #include <piejam/runtime/actions/apply_session.h>
@@ -32,7 +32,7 @@
 namespace piejam::runtime
 {
 
-session_middleware::session_middleware(
+persistence_middleware::persistence_middleware(
         locations const& locs,
         get_state_f get_state,
         dispatch_f dispatch,
@@ -82,7 +82,7 @@ export_fx_chains(
 }
 
 void
-session_middleware::operator()(action const& a)
+persistence_middleware::operator()(action const& a)
 {
     if (dynamic_cast<actions::save_app_config const*>(&a))
     {

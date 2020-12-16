@@ -46,7 +46,7 @@
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/locations.h>
 #include <piejam/runtime/open_alsa_device.h>
-#include <piejam/runtime/session_middleware.h>
+#include <piejam/runtime/persistence_middleware.h>
 #include <piejam/runtime/store.h>
 #include <piejam/runtime/subscriber.h>
 #include <piejam/runtime/ui/action.h>
@@ -107,7 +107,7 @@ main(int argc, char* argv[]) -> int
     store.apply_middleware([&locs](auto&& get_state,
                                    auto&& dispatch,
                                    auto&& next) {
-        return redux::make_middleware<piejam::runtime::session_middleware>(
+        return redux::make_middleware<piejam::runtime::persistence_middleware>(
                 locs,
                 std::forward<decltype(get_state)>(get_state),
                 std::forward<decltype(dispatch)>(dispatch),

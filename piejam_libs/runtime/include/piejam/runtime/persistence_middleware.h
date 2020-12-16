@@ -23,10 +23,10 @@
 namespace piejam::runtime
 {
 
-class session_middleware
+class persistence_middleware
 {
 public:
-    session_middleware(locations const&, get_state_f, dispatch_f, next_f);
+    persistence_middleware(locations const&, get_state_f, dispatch_f, next_f);
 
     void operator()(action const&);
 
