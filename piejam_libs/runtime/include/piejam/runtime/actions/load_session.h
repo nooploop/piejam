@@ -28,6 +28,11 @@ namespace piejam::runtime::actions
 
 struct load_session final : ui::cloneable_action<load_session, action>
 {
+    load_session(std::filesystem::path file)
+        : file(std::move(file))
+    {
+    }
+
     std::filesystem::path file;
 
     auto reduce(state const&) const -> state override;

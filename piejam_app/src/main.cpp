@@ -205,24 +205,13 @@ main(int argc, char* argv[]) -> int
     auto session_file = locs.home_dir / "last.pjs";
 
     store.dispatch(runtime::actions::refresh_devices{});
-
     store.dispatch(runtime::actions::load_app_config{});
-
-    {
-        runtime::actions::load_session action;
-        action.file = session_file;
-        store.dispatch(action);
-    }
+    store.dispatch(runtime::actions::load_session(session_file));
 
     auto const app_exec_result = app.exec();
 
     store.dispatch(runtime::actions::save_app_config{});
-
-    {
-        runtime::actions::save_session action;
-        action.file = session_file;
-        store.dispatch(action);
-    }
+    store.dispatch(runtime::actions::save_session(session_file));
 
     return app_exec_result;
 }
