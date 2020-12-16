@@ -17,6 +17,7 @@
 
 #include <piejam/runtime/actions/add_ladspa_fx_module.h>
 
+#include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/runtime/audio_state.h>
 
 #include <boost/assert.hpp>
@@ -34,7 +35,7 @@ add_ladspa_fx_module::reduce(state const& st) const -> state
             new_st,
             st.fx_chain_bus,
             instance_id,
-            name,
+            plugin_desc,
             control_inputs);
 
     return new_st;

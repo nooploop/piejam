@@ -60,7 +60,6 @@ public:
 private:
     void process_device_action(actions::device_action const&);
     void process_engine_action(actions::engine_action const&);
-    void process_save_session_action(actions::save_session const&);
 
     void process_apply_app_config_action(actions::apply_app_config const&);
     void process_refresh_devices_action(actions::refresh_devices const&);

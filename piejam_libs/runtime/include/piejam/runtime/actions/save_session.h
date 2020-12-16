@@ -33,7 +33,6 @@ namespace piejam::runtime::actions
 struct save_session final : ui::cloneable_action<save_session, action>
 {
     std::filesystem::path file;
-    fx::instance_plugin_id_map plugin_ids;
 
     auto reduce(state const&) const -> state override;
 };

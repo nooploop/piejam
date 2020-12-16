@@ -22,7 +22,9 @@
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/types.h>
 #include <piejam/container/box.h>
+#include <piejam/entity_id_hash.h>
 #include <piejam/npos.h>
+#include <piejam/runtime/fx/ladspa_instances.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
@@ -57,8 +59,9 @@ struct audio_state
 
     fx::registry fx_registry{fx::make_default_registry()};
 
-    container::box<fx::modules_t> fx_modules{};
-    container::box<fx::parameters_t> fx_parameters{};
+    container::box<fx::modules_t> fx_modules;
+    container::box<fx::parameters_t> fx_parameters;
+    container::box<fx::ladspa_instances> fx_ladspa_instances;
 
     mixer::state mixer_state{};
 
@@ -98,7 +101,7 @@ void add_ladspa_fx_module(
         audio_state&,
         mixer::bus_id,
         fx::ladspa_instance_id,
-        std::string const& name,
+        audio::ladspa::plugin_descriptor const&,
         std::span<audio::ladspa::port_descriptor const> const& control_inputs);
 void remove_fx_module(audio_state& st, fx::module_id id);
 

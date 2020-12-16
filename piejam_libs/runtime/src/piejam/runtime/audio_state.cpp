@@ -126,21 +126,26 @@ add_ladspa_fx_module(
         audio_state& st,
         mixer::bus_id bus_id,
         fx::ladspa_instance_id instance_id,
-        std::string const& name,
+        audio::ladspa::plugin_descriptor const& plugin_desc,
         std::span<audio::ladspa::port_descriptor const> const& control_inputs)
 {
-    std::tie(st.mixer_state.buses, st.fx_modules, st.fx_parameters) =
-            [bus_id, instance_id, &name, control_inputs](
+    std::tie(
+            st.mixer_state.buses,
+            st.fx_modules,
+            st.fx_parameters,
+            st.fx_ladspa_instances) =
+            [bus_id, instance_id, &plugin_desc, control_inputs](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
                     fx::modules_t fx_modules,
                     fx::parameters_t fx_params,
+                    fx::ladspa_instances fx_ladspa_instances,
                     parameter_maps& params) {
                 mixer::bus& bus = buses[bus_id];
 
                 fx_chain.emplace_back(fx_modules.add(fx::make_ladspa_module(
                         instance_id,
-                        name,
+                        plugin_desc.name,
                         control_inputs,
                         fx_params,
                         params.get_map<float_parameter>(),
@@ -149,14 +154,18 @@ add_ladspa_fx_module(
 
                 bus.fx_chain = std::move(fx_chain);
 
+                fx_ladspa_instances.emplace(instance_id, plugin_desc);
+
                 return std::tuple(
                         std::move(buses),
                         std::move(fx_modules),
-                        std::move(fx_params));
+                        std::move(fx_params),
+                        std::move(fx_ladspa_instances));
             }(st.mixer_state.buses,
               st.mixer_state.buses.get()[bus_id]->fx_chain,
               st.fx_modules,
               st.fx_parameters,
+              st.fx_ladspa_instances,
               st.params);
 }
 
@@ -193,6 +202,18 @@ remove_fx_module(audio_state& st, fx::module_id id)
             fx_modules.remove(id);
             return fx_modules;
         }(st.fx_modules);
+
+        if (std::holds_alternative<fx::ladspa_instance_id>(
+                    fx_mod->fx_instance_id))
+        {
+            st.fx_ladspa_instances =
+                    [](fx::ladspa_instance_id instance_id,
+                       fx::ladspa_instances instances) {
+                        instances.erase(instance_id);
+                        return instances;
+                    }(std::get<fx::ladspa_instance_id>(fx_mod->fx_instance_id),
+                      st.fx_ladspa_instances);
+        }
     }
 }
 

@@ -22,6 +22,7 @@
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
+#include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/runtime/actions/add_bus.h>
@@ -35,7 +36,6 @@
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/actions/request_levels_update.h>
-#include <piejam/runtime/actions/save_session.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_device.h>
 #include <piejam/runtime/actions/select_period_size.h>
@@ -96,12 +96,6 @@ audio_engine_middleware::operator()(action const& action)
                     dynamic_cast<actions::engine_action const*>(&action))
     {
         process_engine_action(*a);
-    }
-    else if (
-            auto const* const a =
-                    dynamic_cast<actions::save_session const*>(&action))
-    {
-        process_save_session_action(*a);
     }
     else
     {
@@ -353,7 +347,7 @@ audio_engine_middleware::process_engine_action(
                 {
                     actions::add_ladspa_fx_module next_action;
                     next_action.instance_id = id;
-                    next_action.name = a.plugin_desc.name;
+                    next_action.plugin_desc = a.plugin_desc;
                     next_action.control_inputs =
                             m_ladspa_fx_manager->control_inputs(id);
 
@@ -513,15 +507,6 @@ audio_engine_middleware::rebuild()
             [this, sr = st.samplerate](fx::ladspa_instance_id id) {
                 return m_ladspa_fx_manager->make_processor(id, sr);
             });
-}
-
-void
-audio_engine_middleware::process_save_session_action(
-        actions::save_session const& a)
-{
-    actions::save_session action(a);
-    action.plugin_ids = m_ladspa_fx_manager->plugin_id_mapping();
-    m_next(action);
 }
 
 } // namespace piejam::runtime

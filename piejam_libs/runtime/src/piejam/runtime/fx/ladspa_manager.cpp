@@ -52,17 +52,6 @@ ladspa_manager::unload(ladspa_instance_id const& id)
 }
 
 auto
-ladspa_manager::plugin_id_mapping() const -> instance_plugin_id_map
-{
-    instance_plugin_id_map result;
-
-    for (auto const& [instance_id, plugin] : m_instances)
-        result.emplace(instance_id, plugin->descriptor().id);
-
-    return result;
-}
-
-auto
 ladspa_manager::control_inputs(ladspa_instance_id const& id) const
         -> std::span<audio::ladspa::port_descriptor const>
 {

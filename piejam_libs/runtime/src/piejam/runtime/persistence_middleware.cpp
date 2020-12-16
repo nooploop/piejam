@@ -57,10 +57,7 @@ persistence_middleware::operator()(action const& a)
     }
     else if (auto action = dynamic_cast<actions::save_session const*>(&a))
     {
-        persistence::save_session(
-                action->file,
-                m_get_state(),
-                action->plugin_ids);
+        persistence::save_session(action->file, m_get_state());
     }
     else if (auto action = dynamic_cast<actions::load_session const*>(&a))
     {

@@ -36,9 +36,6 @@ struct ladspa_instance_id_tag;
 using ladspa_instance_id = entity_id<ladspa_instance_id_tag>;
 using instance_id = std::variant<internal, ladspa_instance_id>;
 
-using instance_plugin_id_map =
-        std::unordered_map<ladspa_instance_id, audio::ladspa::plugin_id_t>;
-
 class ladspa_manager;
 
 struct parameter;

@@ -17,36 +17,16 @@
 
 #pragma once
 
-#include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/ladspa/fwd.h>
-#include <piejam/audio/types.h>
-#include <piejam/entity_map.h>
+#include <piejam/entity_id_hash.h>
 #include <piejam/runtime/fx/fwd.h>
 
-#include <memory>
-#include <span>
 #include <unordered_map>
 
 namespace piejam::runtime::fx
 {
 
-class ladspa_manager
-{
-public:
-    ~ladspa_manager();
-
-    auto load(audio::ladspa::plugin_descriptor const&) -> ladspa_instance_id;
-    void unload(ladspa_instance_id const&);
-
-    auto control_inputs(ladspa_instance_id const&) const
-            -> std::span<audio::ladspa::port_descriptor const>;
-
-    auto make_processor(ladspa_instance_id const&, audio::samplerate_t) const
-            -> std::unique_ptr<audio::engine::processor>;
-
-private:
-    entity_map<std::unique_ptr<audio::ladspa::plugin>, ladspa_instance_id_tag>
-            m_instances;
-};
+using ladspa_instances = std::
+        unordered_map<ladspa_instance_id, audio::ladspa::plugin_descriptor>;
 
 } // namespace piejam::runtime::fx

@@ -117,10 +117,7 @@ save_app_config(locations const& locs, state const& state)
 }
 
 static auto
-export_fx_chains(
-        audio_state const& st,
-        mixer::bus_list_t const& bus_ids,
-        fx::instance_plugin_id_map const& plugin_ids)
+export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
         -> std::vector<persistence::session::fx_chain_data>
 {
     std::vector<persistence::session::fx_chain_data> result;
@@ -139,9 +136,9 @@ export_fx_chains(
                             [](fx::internal id) -> persistence::fx_plugin_id {
                                 return id;
                             },
-                            [&plugin_ids](fx::ladspa_instance_id id)
+                            [&st](fx::ladspa_instance_id id)
                                     -> persistence::fx_plugin_id {
-                                return plugin_ids.at(id);
+                                return st.fx_ladspa_instances->at(id).id;
                             }},
                     fx_mod->fx_instance_id));
         }
@@ -170,10 +167,7 @@ load_session(std::filesystem::path const& file, dispatch_f const& dispatch)
 }
 
 void
-save_session(
-        std::filesystem::path const& file,
-        state const& st,
-        fx::instance_plugin_id_map const& plugin_ids)
+save_session(std::filesystem::path const& file, state const& st)
 {
     try
     {
@@ -183,8 +177,8 @@ save_session(
 
         session ses;
 
-        ses.inputs = export_fx_chains(st, *st.mixer_state.inputs, plugin_ids);
-        ses.outputs = export_fx_chains(st, *st.mixer_state.outputs, plugin_ids);
+        ses.inputs = export_fx_chains(st, *st.mixer_state.inputs);
+        ses.outputs = export_fx_chains(st, *st.mixer_state.outputs);
 
         save_session(out, ses);
     }
