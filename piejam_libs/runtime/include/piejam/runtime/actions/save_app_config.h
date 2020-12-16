@@ -21,12 +21,20 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
+#include <filesystem>
+
 namespace piejam::runtime::actions
 {
 
-struct save_app_config final
-    : ui::cloneable_action<save_app_config, action>
+struct save_app_config final : ui::cloneable_action<save_app_config, action>
 {
+    save_app_config(std::filesystem::path file)
+        : file(std::move(file))
+    {
+    }
+
+    std::filesystem::path file;
+
     auto reduce(state const&) const -> state override;
 };
 

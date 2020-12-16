@@ -30,30 +30,27 @@ namespace piejam::runtime
 {
 
 persistence_middleware::persistence_middleware(
-        locations const& locs,
         get_state_f get_state,
         dispatch_f dispatch,
         next_f next)
     : m_get_state(std::move(get_state))
     , m_dispatch(std::move(dispatch))
     , m_next(std::move(next))
-    , m_locations(locs)
 {
     BOOST_ASSERT(m_get_state);
     BOOST_ASSERT(m_next);
-    BOOST_ASSERT(!m_locations.config_dir.empty());
 }
 
 void
 persistence_middleware::operator()(action const& a)
 {
-    if (dynamic_cast<actions::save_app_config const*>(&a))
+    if (auto action = dynamic_cast<actions::save_app_config const*>(&a))
     {
-        persistence::save_app_config(m_locations, m_get_state());
+        persistence::save_app_config(action->file, m_get_state());
     }
-    else if (dynamic_cast<actions::load_app_config const*>(&a))
+    else if (auto action = dynamic_cast<actions::load_app_config const*>(&a))
     {
-        persistence::load_app_config(m_locations, m_dispatch);
+        persistence::load_app_config(action->file, m_dispatch);
     }
     else if (auto action = dynamic_cast<actions::save_session const*>(&a))
     {

@@ -25,8 +25,8 @@
 namespace piejam::runtime::persistence
 {
 
-void load_app_config(locations const&, dispatch_f const&);
-void save_app_config(locations const&, state const&);
+void load_app_config(std::filesystem::path const&, dispatch_f const&);
+void save_app_config(std::filesystem::path const&, state const&);
 
 void load_session(std::filesystem::path const&, dispatch_f const&);
 void save_session(std::filesystem::path const&, state const&);

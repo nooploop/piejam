@@ -64,6 +64,17 @@
 
 #include <filesystem>
 
+static auto
+config_file_path(piejam::runtime::locations const& locs)
+{
+    BOOST_ASSERT(!locs.config_dir.empty());
+
+    if (!std::filesystem::exists(locs.config_dir))
+        std::filesystem::create_directories(locs.config_dir);
+
+    return locs.config_dir / "piejam.config";
+}
+
 auto
 main(int argc, char* argv[]) -> int
 {
@@ -104,11 +115,8 @@ main(int argc, char* argv[]) -> int
             [](auto const& st, auto const& a) { return a.reduce(st); },
             {});
 
-    store.apply_middleware([&locs](auto&& get_state,
-                                   auto&& dispatch,
-                                   auto&& next) {
+    store.apply_middleware([](auto&& get_state, auto&& dispatch, auto&& next) {
         return redux::make_middleware<piejam::runtime::persistence_middleware>(
-                locs,
                 std::forward<decltype(get_state)>(get_state),
                 std::forward<decltype(dispatch)>(dispatch),
                 std::forward<decltype(next)>(next));
@@ -205,12 +213,12 @@ main(int argc, char* argv[]) -> int
     auto session_file = locs.home_dir / "last.pjs";
 
     store.dispatch(runtime::actions::refresh_devices{});
-    store.dispatch(runtime::actions::load_app_config{});
+    store.dispatch(runtime::actions::load_app_config(config_file_path(locs)));
     store.dispatch(runtime::actions::load_session(session_file));
 
     auto const app_exec_result = app.exec();
 
-    store.dispatch(runtime::actions::save_app_config{});
+    store.dispatch(runtime::actions::save_app_config(config_file_path(locs)));
     store.dispatch(runtime::actions::save_session(session_file));
 
     return app_exec_result;

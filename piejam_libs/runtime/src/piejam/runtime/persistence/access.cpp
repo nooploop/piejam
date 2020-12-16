@@ -36,23 +36,12 @@
 namespace piejam::runtime::persistence
 {
 
-static auto
-config_file_path(locations const& locs)
-{
-    BOOST_ASSERT(!locs.config_dir.empty());
-
-    if (!std::filesystem::exists(locs.config_dir))
-        std::filesystem::create_directories(locs.config_dir);
-
-    return locs.config_dir / "piejam.config";
-}
-
 void
-load_app_config(locations const& locs, dispatch_f const& dispatch)
+load_app_config(std::filesystem::path const& file, dispatch_f const& dispatch)
 {
     try
     {
-        std::ifstream in(config_file_path(locs));
+        std::ifstream in(file);
         if (!in.is_open())
             throw std::runtime_error("could not open config file");
 
@@ -67,11 +56,11 @@ load_app_config(locations const& locs, dispatch_f const& dispatch)
 }
 
 void
-save_app_config(locations const& locs, state const& state)
+save_app_config(std::filesystem::path const& file, state const& state)
 {
     try
     {
-        std::ofstream out(config_file_path(locs));
+        std::ofstream out(file);
         if (!out.is_open())
             throw std::runtime_error("could not open config file");
 

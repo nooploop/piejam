@@ -26,7 +26,7 @@ namespace piejam::runtime
 class persistence_middleware
 {
 public:
-    persistence_middleware(locations const&, get_state_f, dispatch_f, next_f);
+    persistence_middleware(get_state_f, dispatch_f, next_f);
 
     void operator()(action const&);
 
@@ -34,8 +34,6 @@ private:
     get_state_f m_get_state;
     dispatch_f m_dispatch;
     next_f m_next;
-
-    locations m_locations;
 };
 
 } // namespace piejam::runtime
