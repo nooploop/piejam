@@ -18,8 +18,8 @@
 #pragma once
 
 #include <piejam/runtime/actions/device_action.h>
-#include <piejam/runtime/app_config.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/persistence/app_config.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
@@ -29,7 +29,7 @@ struct apply_app_config final
     : ui::cloneable_action<apply_app_config, action>
     , visitable_device_action<apply_app_config>
 {
-    app_config conf;
+    persistence::app_config conf;
 
     auto reduce(state const&) const -> state override;
 };

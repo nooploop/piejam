@@ -18,7 +18,7 @@
 #pragma once
 
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/session.h>
+#include <piejam/runtime/persistence/session.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -27,7 +27,7 @@ namespace piejam::runtime::actions
 
 struct apply_session final : ui::cloneable_action<apply_session, action>
 {
-    session ses;
+    persistence::session ses;
 
     auto reduce(state const&) const -> state override;
 };

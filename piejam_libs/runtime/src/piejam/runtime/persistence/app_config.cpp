@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/app_config.h>
+#include <piejam/runtime/persistence/app_config.h>
 
 #include <nlohmann/json.hpp>
 
@@ -45,7 +45,7 @@ from_json(nlohmann::json const& j, pair<T>& p)
 
 } // namespace piejam::audio
 
-namespace piejam::runtime
+namespace piejam::runtime::persistence
 {
 
 using namespace std::string_literals;
@@ -190,4 +190,4 @@ save_app_config(app_config const& conf, std::filesystem::path const& file)
     out << json_conf.dump(4);
 }
 
-} // namespace piejam::runtime
+} // namespace piejam::runtime::persistence

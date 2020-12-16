@@ -33,7 +33,7 @@ template <audio::bus_direction D>
 static auto
 apply_bus_configs(
         state& st,
-        std::vector<bus_config> const& configs,
+        std::vector<persistence::bus_config> const& configs,
         std::size_t const num_ch)
 {
     clear_mixer_buses<D>(st);

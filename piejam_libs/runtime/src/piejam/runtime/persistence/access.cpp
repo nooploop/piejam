@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/config_access.h>
+#include <piejam/runtime/persistence/access.h>
 
 #include <piejam/algorithm/index_of.h>
 #include <piejam/redux/store.h>
 #include <piejam/runtime/actions/apply_app_config.h>
-#include <piejam/runtime/app_config.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/locations.h>
+#include <piejam/runtime/persistence/app_config.h>
 #include <piejam/runtime/store_dispatch.h>
 
 #include <spdlog/spdlog.h>
@@ -32,7 +32,7 @@
 #include <algorithm>
 #include <filesystem>
 
-namespace piejam::runtime::config_access
+namespace piejam::runtime::persistence
 {
 
 static auto
@@ -47,12 +47,12 @@ config_file_path(locations const& locs)
 }
 
 void
-load(locations const& locs, dispatch_f const& dispatch)
+load_app_config(locations const& locs, dispatch_f const& dispatch)
 {
     try
     {
         actions::apply_app_config action;
-        action.conf = load_app_config(config_file_path(locs));
+        action.conf = persistence::load_app_config(config_file_path(locs));
         dispatch(action);
     }
     catch (std::exception const& err)
@@ -62,11 +62,11 @@ load(locations const& locs, dispatch_f const& dispatch)
 }
 
 void
-save(locations const& locs, state const& state)
+save_app_config(locations const& locs, state const& state)
 {
     try
     {
-        app_config conf;
+        persistence::app_config conf;
 
         conf.input_device_name =
                 state.pcm_devices->inputs[state.input.index].name;
@@ -82,7 +82,8 @@ save(locations const& locs, state const& state)
             std::ranges::transform(
                     ch_ids,
                     std::back_inserter(configs),
-                    [&chs](mixer::bus_id const& ch_id) -> bus_config {
+                    [&chs](mixer::bus_id const& ch_id)
+                            -> persistence::bus_config {
                         mixer::bus const* bus = chs[ch_id];
                         return {bus->name, bus->type, bus->device_channels};
                     });
@@ -98,7 +99,7 @@ save(locations const& locs, state const& state)
                 state.mixer_state.outputs.get(),
                 conf.output_bus_config);
 
-        runtime::save_app_config(conf, config_file_path(locs));
+        persistence::save_app_config(conf, config_file_path(locs));
     }
     catch (std::exception const& err)
     {
@@ -106,4 +107,4 @@ save(locations const& locs, state const& state)
     }
 }
 
-} // namespace piejam::runtime::config_access
+} // namespace piejam::runtime::persistence

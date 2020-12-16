@@ -19,10 +19,10 @@
 
 #include <piejam/runtime/fwd.h>
 
-namespace piejam::runtime::config_access
+namespace piejam::runtime::persistence
 {
 
-void load(locations const&, dispatch_f const&);
-void save(locations const&, state const&);
+void load_app_config(locations const&, dispatch_f const&);
+void save_app_config(locations const&, state const&);
 
-} // namespace piejam::runtime::config_access
+} // namespace piejam::runtime::persistence

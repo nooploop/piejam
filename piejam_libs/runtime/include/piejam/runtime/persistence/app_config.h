@@ -25,7 +25,7 @@
 #include <filesystem>
 #include <string>
 
-namespace piejam::runtime
+namespace piejam::runtime::persistence
 {
 
 inline constexpr unsigned current_app_config_version = 1;
@@ -54,4 +54,4 @@ void from_json(nlohmann::json const&, app_config&);
 auto load_app_config(std::filesystem::path const&) -> app_config;
 void save_app_config(app_config const&, std::filesystem::path const&);
 
-} // namespace piejam::runtime
+} // namespace piejam::runtime::persistence

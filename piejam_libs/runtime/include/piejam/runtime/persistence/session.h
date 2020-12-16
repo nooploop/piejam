@@ -27,7 +27,7 @@
 #include <variant>
 #include <vector>
 
-namespace piejam::runtime
+namespace piejam::runtime::persistence
 {
 
 inline constexpr unsigned current_session_version = 0;
@@ -53,4 +53,4 @@ void from_json(nlohmann::json const&, session&);
 auto load_session(std::filesystem::path const&) -> session;
 void save_session(session const&, std::filesystem::path const&);
 
-} // namespace piejam::runtime
+} // namespace piejam::runtime::persistence

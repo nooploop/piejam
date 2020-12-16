@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/session.h>
+#include <piejam/runtime/persistence/session.h>
 
 #include <piejam/functional/overload.h>
 #include <piejam/runtime/fx/internal.h>
@@ -35,6 +35,9 @@ namespace fx
 NLOHMANN_JSON_SERIALIZE_ENUM(internal, {{internal::gain, "gain"}})
 
 } // namespace fx
+
+namespace persistence
+{
 
 static auto const s_key_version = "version";
 
@@ -175,5 +178,7 @@ save_session(session const& ses, std::filesystem::path const& file)
     std::ofstream out(file);
     out << json_ses.dump(4);
 }
+
+} // namespace persistence
 
 } // namespace piejam::runtime
