@@ -37,8 +37,10 @@
 #include <piejam/reselect/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/load_app_config.h>
+#include <piejam/runtime/actions/load_session.h>
 #include <piejam/runtime/actions/refresh_devices.h>
 #include <piejam/runtime/actions/save_app_config.h>
+#include <piejam/runtime/actions/save_session.h>
 #include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/audio_state.h>
@@ -87,6 +89,9 @@ main(int argc, char* argv[]) -> int
     locs.config_dir = QStandardPaths::writableLocation(
                               QStandardPaths::StandardLocation::ConfigLocation)
                               .toStdString();
+    locs.home_dir = QStandardPaths::writableLocation(
+                            QStandardPaths::StandardLocation::HomeLocation)
+                            .toStdString();
 
     QGuiApplication app(argc, argv);
 
@@ -197,13 +202,27 @@ main(int argc, char* argv[]) -> int
             &QQmlApplicationEngine::quit,
             &QGuiApplication::quit);
 
+    auto session_file = locs.home_dir / "last.pjs";
+
     store.dispatch(runtime::actions::refresh_devices{});
 
     store.dispatch(runtime::actions::load_app_config{});
 
+    {
+        runtime::actions::load_session action;
+        action.file = session_file;
+        store.dispatch(action);
+    }
+
     auto const app_exec_result = app.exec();
 
     store.dispatch(runtime::actions::save_app_config{});
+
+    {
+        runtime::actions::save_session action;
+        action.file = session_file;
+        store.dispatch(action);
+    }
 
     return app_exec_result;
 }

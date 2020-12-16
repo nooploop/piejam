@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <piejam/audio/ladspa/fwd.h>
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -28,7 +30,7 @@ struct plugin_descriptor
 {
     std::filesystem::path file;
     unsigned long index{};
-    unsigned long id{};
+    plugin_id_t id{};
     std::string label;
     std::string name;
     std::string author;

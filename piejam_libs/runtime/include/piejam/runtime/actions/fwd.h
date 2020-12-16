@@ -71,6 +71,11 @@ using set_int_parameter = set_parameter_value<int_parameter>;
 struct finalize_ladspa_fx_plugin_scan;
 struct load_ladspa_fx_plugin;
 
+struct load_app_config;
+struct save_app_config;
+struct load_session;
+struct save_session;
+
 // visitors
 
 struct device_action_visitor;

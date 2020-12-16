@@ -25,6 +25,7 @@ namespace piejam::runtime
 struct locations
 {
     std::filesystem::path config_dir;
+    std::filesystem::path home_dir;
 };
 
 } // namespace piejam::runtime

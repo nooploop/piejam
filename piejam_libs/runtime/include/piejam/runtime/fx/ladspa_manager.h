@@ -25,6 +25,7 @@
 
 #include <memory>
 #include <span>
+#include <unordered_map>
 
 namespace piejam::runtime::fx
 {
@@ -36,6 +37,8 @@ public:
 
     auto load(audio::ladspa::plugin_descriptor const&) -> ladspa_instance_id;
     void unload(ladspa_instance_id const&);
+
+    auto plugin_id_mapping() const -> instance_plugin_id_map;
 
     auto control_inputs(ladspa_instance_id const&) const
             -> std::span<audio::ladspa::port_descriptor const>;

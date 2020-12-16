@@ -19,6 +19,8 @@
 
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
+#include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/entity_id_hash.h>
 
 #include <spdlog/spdlog.h>
 
@@ -47,6 +49,17 @@ void
 ladspa_manager::unload(ladspa_instance_id const& id)
 {
     m_instances.remove(id);
+}
+
+auto
+ladspa_manager::plugin_id_mapping() const -> instance_plugin_id_map
+{
+    instance_plugin_id_map result;
+
+    for (auto const& [instance_id, plugin] : m_instances)
+        result.emplace(instance_id, plugin->descriptor().id);
+
+    return result;
 }
 
 auto

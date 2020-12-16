@@ -35,7 +35,7 @@ using module_parameters =
 
 struct module
 {
-    type_id fx_type_id;
+    instance_id fx_instance_id;
     container::boxed_string name;
     container::box<module_parameters> parameters;
 };

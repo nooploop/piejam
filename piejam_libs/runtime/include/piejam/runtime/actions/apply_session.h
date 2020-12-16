@@ -17,14 +17,19 @@
 
 #pragma once
 
-namespace piejam::audio::ladspa
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/session.h>
+#include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/cloneable_action.h>
+
+namespace piejam::runtime::actions
 {
 
-using plugin_id_t = unsigned long;
+struct apply_session final : ui::cloneable_action<apply_session, action>
+{
+    session ses;
 
-struct plugin_descriptor;
-struct port_descriptor;
+    auto reduce(state const&) const -> state override;
+};
 
-class plugin;
-
-} // namespace piejam::audio::ladspa
+} // namespace piejam::runtime::actions

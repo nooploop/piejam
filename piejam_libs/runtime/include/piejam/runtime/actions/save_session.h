@@ -17,14 +17,26 @@
 
 #pragma once
 
-namespace piejam::audio::ladspa
+#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/entity_id_hash.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/cloneable_action.h>
+
+#include <filesystem>
+#include <unordered_map>
+
+namespace piejam::runtime::actions
 {
 
-using plugin_id_t = unsigned long;
+struct save_session final : ui::cloneable_action<save_session, action>
+{
+    std::filesystem::path file;
+    std::unordered_map<fx::ladspa_instance_id, audio::ladspa::plugin_id_t>
+            plugin_ids;
 
-struct plugin_descriptor;
-struct port_descriptor;
+    auto reduce(state const&) const -> state override;
+};
 
-class plugin;
-
-} // namespace piejam::audio::ladspa
+} // namespace piejam::runtime::actions

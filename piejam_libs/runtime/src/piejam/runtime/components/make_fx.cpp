@@ -64,7 +64,7 @@ make_fx(fx::module const& fx_mod,
                                 },
                                 param_procs);
                     }},
-            fx_mod.fx_type_id);
+            fx_mod.fx_instance_id);
 }
 
 } // namespace piejam::runtime::components

@@ -120,7 +120,7 @@ make_ladspa_module(
         bool_parameters& bool_params) -> module
 {
     return module{
-            .fx_type_id = instance_id,
+            .fx_instance_id = instance_id,
             .name = name,
             .parameters = make_module_parameters(
                     control_inputs,

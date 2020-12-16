@@ -17,41 +17,40 @@
 
 #pragma once
 
-#include <piejam/audio/types.h>
-#include <piejam/runtime/channel_index_pair.h>
+#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 #include <nlohmann/json_fwd.hpp>
 
 #include <filesystem>
-#include <string>
+#include <variant>
+#include <vector>
 
 namespace piejam::runtime
 {
 
-inline constexpr unsigned current_app_config_version = 1;
+inline constexpr unsigned current_session_version = 0;
 
-struct bus_config
+struct fx_plugin_id : std::variant<fx::internal, audio::ladspa::plugin_id_t>
 {
-    std::string name;
-    audio::bus_type bus_type;
-    channel_index_pair channels;
+    using base_t = std::variant<fx::internal, audio::ladspa::plugin_id_t>;
+    using base_t::variant;
+    auto as_variant() const noexcept -> base_t const& { return *this; }
 };
 
-struct app_config
+struct session
 {
-    std::string input_device_name;
-    std::string output_device_name;
-    unsigned samplerate{};
-    unsigned period_size{};
+    using fx_chain_data = std::vector<fx_plugin_id>;
 
-    std::vector<bus_config> input_bus_config;
-    std::vector<bus_config> output_bus_config;
+    std::vector<fx_chain_data> inputs;
+    std::vector<fx_chain_data> outputs;
 };
 
-void to_json(nlohmann::json&, app_config const&);
-void from_json(nlohmann::json const&, app_config&);
+void to_json(nlohmann::json&, session const&);
+void from_json(nlohmann::json const&, session&);
 
-auto load_app_config(std::filesystem::path const&) -> app_config;
-void save_app_config(app_config const&, std::filesystem::path const&);
+auto load_session(std::filesystem::path const&) -> session;
+void save_session(session const&, std::filesystem::path const&);
 
 } // namespace piejam::runtime

@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/load_session.h>
 
-namespace piejam::audio::ladspa
+#include <piejam/runtime/audio_state.h>
+
+namespace piejam::runtime::actions
 {
 
-using plugin_id_t = unsigned long;
+auto load_session::reduce(state const& st) const -> state
+{
+    return st;
+}
 
-struct plugin_descriptor;
-struct port_descriptor;
-
-class plugin;
-
-} // namespace piejam::audio::ladspa
+} // namespace piejam::runtime::actions
