@@ -147,12 +147,8 @@ upgrade_session(nlohmann::json& json_ses)
 }
 
 auto
-load_session(std::filesystem::path const& file) -> session
+load_session(std::istream& in) -> session
 {
-    std::ifstream in(file);
-    if (!in.is_open())
-        throw std::runtime_error("could not open config file");
-
     auto json_ses = nlohmann::json::parse(in);
 
     auto const file_version = get_version(json_ses);
@@ -171,12 +167,9 @@ load_session(std::filesystem::path const& file) -> session
 }
 
 void
-save_session(session const& ses, std::filesystem::path const& file)
+save_session(std::ostream& out, session const& ses)
 {
-    nlohmann::json json_ses(ses);
-
-    std::ofstream out(file);
-    out << json_ses.dump(4);
+    out << nlohmann::json(ses).dump(4) << std::endl;
 }
 
 } // namespace persistence

@@ -52,11 +52,11 @@ load_app_config(locations const& locs, dispatch_f const& dispatch)
 {
     try
     {
-        actions::apply_app_config action;
         std::ifstream in(config_file_path(locs));
         if (!in.is_open())
             throw std::runtime_error("could not open config file");
 
+        actions::apply_app_config action;
         action.conf = persistence::load_app_config(in);
         dispatch(action);
     }
@@ -153,9 +153,20 @@ export_fx_chains(
 void
 load_session(std::filesystem::path const& file, dispatch_f const& dispatch)
 {
-    actions::apply_session action;
-    action.ses = persistence::load_session(file);
-    dispatch(action);
+    try
+    {
+        std::ifstream in(file);
+        if (!in.is_open())
+            throw std::runtime_error("could not open session file");
+
+        actions::apply_session action;
+        action.ses = persistence::load_session(in);
+        dispatch(action);
+    }
+    catch (std::exception const& err)
+    {
+        spdlog::error("load_session: {}", err.what());
+    }
 }
 
 void
@@ -164,12 +175,23 @@ save_session(
         state const& st,
         fx::instance_plugin_id_map const& plugin_ids)
 {
-    session ses;
+    try
+    {
+        std::ofstream out(file);
+        if (!out.is_open())
+            throw std::runtime_error("could not open session file");
 
-    ses.inputs = export_fx_chains(st, *st.mixer_state.inputs, plugin_ids);
-    ses.outputs = export_fx_chains(st, *st.mixer_state.outputs, plugin_ids);
+        session ses;
 
-    save_session(ses, file);
+        ses.inputs = export_fx_chains(st, *st.mixer_state.inputs, plugin_ids);
+        ses.outputs = export_fx_chains(st, *st.mixer_state.outputs, plugin_ids);
+
+        save_session(out, ses);
+    }
+    catch (std::exception const& err)
+    {
+        spdlog::error("save_session: {}", err.what());
+    }
 }
 
 } // namespace piejam::runtime::persistence

@@ -23,7 +23,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include <filesystem>
+#include <iosfwd>
 #include <variant>
 #include <vector>
 
@@ -50,7 +50,7 @@ struct session
 void to_json(nlohmann::json&, session const&);
 void from_json(nlohmann::json const&, session&);
 
-auto load_session(std::filesystem::path const&) -> session;
-void save_session(session const&, std::filesystem::path const&);
+auto load_session(std::istream&) -> session;
+void save_session(std::ostream&, session const&);
 
 } // namespace piejam::runtime::persistence
