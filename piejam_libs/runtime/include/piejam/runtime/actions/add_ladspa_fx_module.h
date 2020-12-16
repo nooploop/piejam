@@ -22,6 +22,7 @@
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -34,6 +35,7 @@ namespace piejam::runtime::actions
 struct add_ladspa_fx_module final
     : ui::cloneable_action<add_ladspa_fx_module, action>
 {
+    mixer::bus_id fx_chain_bus;
     fx::ladspa_instance_id instance_id;
     audio::ladspa::plugin_descriptor plugin_desc;
     std::span<audio::ladspa::port_descriptor const> control_inputs;

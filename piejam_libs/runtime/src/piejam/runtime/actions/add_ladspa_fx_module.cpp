@@ -33,7 +33,7 @@ add_ladspa_fx_module::reduce(state const& st) const -> state
     BOOST_ASSERT(st.fx_chain_bus != mixer::bus_id{});
     runtime::add_ladspa_fx_module(
             new_st,
-            st.fx_chain_bus,
+            fx_chain_bus,
             instance_id,
             plugin_desc,
             control_inputs);
