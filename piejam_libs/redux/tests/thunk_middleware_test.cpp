@@ -19,7 +19,10 @@
 
 #include <gtest/gtest.h>
 
-namespace piejam::redux::test
+namespace piejam::redux
+{
+
+namespace
 {
 
 struct tst_action
@@ -68,4 +71,6 @@ TEST_F(thunk_middleware_test, invoke_thunk)
     EXPECT_EQ(5, from_thunk);
 }
 
-} // namespace piejam::redux::test
+} // namespace
+
+} // namespace piejam::redux

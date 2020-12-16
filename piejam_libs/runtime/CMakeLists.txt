@@ -89,6 +89,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/subscriber.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action_visitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/batch_action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/batch_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/cloneable_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action.h
@@ -130,6 +132,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_state.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/batch_action.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_gain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_ladspa.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/make_fx.cpp

@@ -30,6 +30,7 @@
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/log/generic_log_sink.h>
+#include <piejam/redux/batch_middleware.h>
 #include <piejam/redux/queueing_middleware.h>
 #include <piejam/redux/store.h>
 #include <piejam/redux/thread_delegate_middleware.h>
@@ -50,6 +51,7 @@
 #include <piejam/runtime/store.h>
 #include <piejam/runtime/subscriber.h>
 #include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
 #include <piejam/thread/affinity.h>
 
@@ -141,6 +143,16 @@ main(int argc, char* argv[]) -> int
                            runtime::audio_state,
                            runtime::action>{});
 
+    bool batching{};
+    store.apply_middleware([&batching](
+                                   auto&& /*get_state*/,
+                                   auto&& /*dispatch*/,
+                                   auto&& next) {
+        return redux::make_middleware<redux::batch_middleware<runtime::action>>(
+                batching,
+                std::forward<decltype(next)>(next));
+    });
+
     store.apply_middleware(redux::make_queueing_middleware);
 
     store.apply_middleware(redux::make_thread_delegate_middleware(
@@ -154,8 +166,9 @@ main(int argc, char* argv[]) -> int
                 return store.state();
             });
 
-    store.subscribe([&state_change_subscriber](auto const& state) {
-        state_change_subscriber.notify(state);
+    store.subscribe([&state_change_subscriber, &batching](auto const& state) {
+        if (!batching)
+            state_change_subscriber.notify(state);
     });
 
     store.dispatch(runtime::actions::scan_ladspa_fx_plugins("/usr/lib/ladspa"));
