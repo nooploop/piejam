@@ -322,24 +322,17 @@ audio_engine_middleware::process_engine_action(
                 if (fx::module const* const fx_mod =
                             st.fx_modules.get()[a.fx_mod_id])
                 {
-                    std::visit(
-                            overload{
-                                    [this, &a](fx::internal) {
-                                        m_next(a);
+                    m_next(a);
 
-                                        if (m_engine)
-                                            rebuild();
-                                    },
-                                    [this,
-                                     &a](fx::ladspa_instance_id ladspa_id) {
-                                        m_next(a);
+                    if (m_engine)
+                        rebuild();
 
-                                        if (m_engine)
-                                            rebuild();
-
-                                        m_ladspa_fx_manager->unload(ladspa_id);
-                                    }},
-                            fx_mod->fx_instance_id);
+                    if (fx::ladspa_instance_id const* const instance_id =
+                                std::get_if<fx::ladspa_instance_id>(
+                                        &fx_mod->fx_instance_id))
+                    {
+                        m_ladspa_fx_manager->unload(*instance_id);
+                    }
                 }
             },
             [this](actions::load_ladspa_fx_plugin const& a) {
