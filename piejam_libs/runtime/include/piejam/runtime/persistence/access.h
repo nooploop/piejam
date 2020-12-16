@@ -18,11 +18,20 @@
 #pragma once
 
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
+
+#include <filesystem>
 
 namespace piejam::runtime::persistence
 {
 
 void load_app_config(locations const&, dispatch_f const&);
 void save_app_config(locations const&, state const&);
+
+void load_session(std::filesystem::path const&, dispatch_f const&);
+void save_session(
+        std::filesystem::path const&,
+        state const&,
+        fx::instance_plugin_id_map const&);
 
 } // namespace piejam::runtime::persistence

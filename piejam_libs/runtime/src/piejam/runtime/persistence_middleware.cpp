@@ -17,13 +17,10 @@
 
 #include <piejam/runtime/persistence_middleware.h>
 
-#include <piejam/functional/overload.h>
-#include <piejam/runtime/actions/apply_session.h>
 #include <piejam/runtime/actions/load_app_config.h>
 #include <piejam/runtime/actions/load_session.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/actions/save_session.h>
-#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/persistence/access.h>
 #include <piejam/runtime/persistence/session.h>
 
@@ -47,40 +44,6 @@ persistence_middleware::persistence_middleware(
     BOOST_ASSERT(!m_locations.config_dir.empty());
 }
 
-static auto
-export_fx_chains(
-        audio_state const& st,
-        mixer::bus_list_t const& bus_ids,
-        fx::instance_plugin_id_map const& plugin_ids)
-        -> std::vector<persistence::session::fx_chain_data>
-{
-    std::vector<persistence::session::fx_chain_data> result;
-
-    for (auto const& bus_id : bus_ids)
-    {
-        mixer::bus const* const bus = (*st.mixer_state.buses)[bus_id];
-
-        auto& fx_chain_data = result.emplace_back();
-
-        for (auto const& fx_mod_id : *bus->fx_chain)
-        {
-            fx::module const* const fx_mod = (*st.fx_modules)[fx_mod_id];
-            fx_chain_data.emplace_back(std::visit(
-                    overload{
-                            [](fx::internal id) -> persistence::fx_plugin_id {
-                                return id;
-                            },
-                            [&plugin_ids](fx::ladspa_instance_id id)
-                                    -> persistence::fx_plugin_id {
-                                return plugin_ids.at(id);
-                            }},
-                    fx_mod->fx_instance_id));
-        }
-    }
-
-    return result;
-}
-
 void
 persistence_middleware::operator()(action const& a)
 {
@@ -94,26 +57,14 @@ persistence_middleware::operator()(action const& a)
     }
     else if (auto action = dynamic_cast<actions::save_session const*>(&a))
     {
-        auto const& st = m_get_state();
-
-        persistence::session ses;
-
-        ses.inputs = export_fx_chains(
-                st,
-                *st.mixer_state.inputs,
+        persistence::save_session(
+                action->file,
+                m_get_state(),
                 action->plugin_ids);
-        ses.outputs = export_fx_chains(
-                st,
-                *st.mixer_state.outputs,
-                action->plugin_ids);
-
-        persistence::save_session(ses, action->file);
     }
     else if (auto action = dynamic_cast<actions::load_session const*>(&a))
     {
-        actions::apply_session next_action;
-        next_action.ses = persistence::load_session(action->file);
-        m_dispatch(next_action);
+        persistence::load_session(action->file, m_dispatch);
     }
     else
     {
