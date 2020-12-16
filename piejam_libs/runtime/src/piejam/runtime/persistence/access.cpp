@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <fstream>
 
 namespace piejam::runtime::persistence
 {
@@ -52,7 +53,11 @@ load_app_config(locations const& locs, dispatch_f const& dispatch)
     try
     {
         actions::apply_app_config action;
-        action.conf = persistence::load_app_config(config_file_path(locs));
+        std::ifstream in(config_file_path(locs));
+        if (!in.is_open())
+            throw std::runtime_error("could not open config file");
+
+        action.conf = persistence::load_app_config(in);
         dispatch(action);
     }
     catch (std::exception const& err)
@@ -66,6 +71,10 @@ save_app_config(locations const& locs, state const& state)
 {
     try
     {
+        std::ofstream out(config_file_path(locs));
+        if (!out.is_open())
+            throw std::runtime_error("could not open config file");
+
         persistence::app_config conf;
 
         conf.input_device_name =
@@ -99,7 +108,7 @@ save_app_config(locations const& locs, state const& state)
                 state.mixer_state.outputs.get(),
                 conf.output_bus_config);
 
-        persistence::save_app_config(conf, config_file_path(locs));
+        persistence::save_app_config(out, conf);
     }
     catch (std::exception const& err)
     {

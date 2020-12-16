@@ -19,7 +19,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include <fstream>
+#include <istream>
+#include <ostream>
 
 namespace piejam::audio
 {
@@ -158,12 +159,8 @@ upgrade_app_config(nlohmann::json& conf)
 }
 
 auto
-load_app_config(std::filesystem::path const& file) -> app_config
+load_app_config(std::istream& in) -> app_config
 {
-    std::ifstream in(file);
-    if (!in.is_open())
-        throw std::runtime_error("could not open config file");
-
     auto json_conf = nlohmann::json::parse(in);
 
     auto const file_version = get_version(json_conf);
@@ -182,12 +179,9 @@ load_app_config(std::filesystem::path const& file) -> app_config
 }
 
 void
-save_app_config(app_config const& conf, std::filesystem::path const& file)
+save_app_config(std::ostream& out, app_config const& conf)
 {
-    nlohmann::json json_conf(conf);
-
-    std::ofstream out(file);
-    out << json_conf.dump(4);
+    out << nlohmann::json(conf).dump(4) << std::endl;
 }
 
 } // namespace piejam::runtime::persistence
