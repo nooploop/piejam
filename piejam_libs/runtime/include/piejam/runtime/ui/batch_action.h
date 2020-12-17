@@ -19,50 +19,54 @@
 
 #include <piejam/redux/functors.h>
 #include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/cloneable_action.h>
 
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/iterator/indirect_iterator.hpp>
+
+#include <memory>
+#include <vector>
 
 namespace piejam::runtime::ui
 {
 
 template <class State>
-struct batch_action final : cloneable_action<batch_action<State>, action<State>>
+struct batch_action final : action<State>
 {
+    auto clone() const -> std::unique_ptr<action<State>> override
+    {
+        auto action = std::make_unique<batch_action<State>>();
+
+        for (auto const& a : m_actions)
+            action->push_back(a->clone());
+
+        return action;
+    }
+
     bool empty() const noexcept { return m_actions.empty(); }
-    auto begin() const { return m_actions.begin(); }
-    auto end() const { return m_actions.end(); }
+
+    auto begin() const
+    {
+        return boost::make_indirect_iterator(m_actions.begin());
+    }
+
+    auto end() const { return boost::make_indirect_iterator(m_actions.end()); }
 
     void push_back(std::unique_ptr<action<State>> action)
     {
-        m_actions.push_back(action.release());
+        m_actions.push_back(std::move(action));
     }
 
     template <class Action, class... Args>
     void emplace_back(Args&&... args)
     {
-        m_actions.push_back(new Action{std::forward<Args>(args)...});
+        m_actions.push_back(
+                std::make_unique<Action>(std::forward<Args>(args)...));
     }
 
     auto reduce(State const&) const -> State override;
 
 private:
-    boost::ptr_vector<action<State>> m_actions;
+    std::vector<std::unique_ptr<action<State>>> m_actions;
 };
-
-template <class State>
-auto
-new_clone(action<State> const& a) -> action<State>*
-{
-    return a.clone().release();
-}
-
-template <class State>
-void
-delete_clone(action<State> const* a)
-{
-    delete a;
-}
 
 template <class State>
 auto
