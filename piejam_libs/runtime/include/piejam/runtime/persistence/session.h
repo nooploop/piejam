@@ -24,6 +24,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <iosfwd>
+#include <string>
 #include <variant>
 #include <vector>
 
@@ -32,19 +33,25 @@ namespace piejam::runtime::persistence
 
 inline constexpr unsigned current_session_version = 0;
 
-struct fx_plugin_id : std::variant<fx::internal, audio::ladspa::plugin_id_t>
-{
-    using base_t = std::variant<fx::internal, audio::ladspa::plugin_id_t>;
-    using base_t::variant;
-    auto as_variant() const noexcept -> base_t const& { return *this; }
-};
-
 struct session
 {
-    using fx_chain_data = std::vector<fx_plugin_id>;
+    struct ladspa_plugin
+    {
+        audio::ladspa::plugin_id_t id{};
+        std::string name;
+    };
 
-    std::vector<fx_chain_data> inputs;
-    std::vector<fx_chain_data> outputs;
+    struct fx_plugin : std::variant<fx::internal, ladspa_plugin>
+    {
+        using base_t = std::variant<fx::internal, ladspa_plugin>;
+        using base_t::variant;
+        auto as_variant() const noexcept -> base_t const& { return *this; }
+    };
+
+    using fx_chain = std::vector<fx_plugin>;
+
+    std::vector<fx_chain> inputs;
+    std::vector<fx_chain> outputs;
 };
 
 void to_json(nlohmann::json&, session const&);

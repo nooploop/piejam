@@ -376,9 +376,7 @@ audio_engine_middleware::process_engine_action(
                 }
                 else
                 {
-                    spdlog::warn(
-                            "could not find fx ladspa plugin: {}",
-                            a.plugin_id);
+                    spdlog::warn("could not find fx ladspa plugin: {}", a.name);
                 }
             },
             [this](actions::set_bool_parameter const& a) {

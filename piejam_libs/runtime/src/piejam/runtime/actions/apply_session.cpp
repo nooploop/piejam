@@ -45,12 +45,13 @@ struct make_add_fx_module_action
         return action;
     }
 
-    auto operator()(audio::ladspa::plugin_id_t plugin_id)
+    auto operator()(persistence::session::ladspa_plugin const& ladspa_plug)
             -> std::unique_ptr<action>
     {
         auto action = std::make_unique<actions::load_ladspa_fx_plugin>();
         action->fx_chain_bus = fx_chain_bus;
-        action->plugin_id = plugin_id;
+        action->plugin_id = ladspa_plug.id;
+        action->name = ladspa_plug.name;
         return action;
     }
 };
@@ -59,17 +60,17 @@ void
 make_add_fx_module_actions(
         batch_action& batch,
         mixer::bus_list_t const& bus_ids,
-        std::vector<persistence::session::fx_chain_data> const& fx_chain_data)
+        std::vector<persistence::session::fx_chain> const& fx_chain_data)
 {
     for (std::size_t i :
          range::indices(std::min(fx_chain_data.size(), bus_ids.size())))
     {
         mixer::bus_id fx_chain_bus = bus_ids[i];
-        for (auto const& plugin_id : fx_chain_data[i])
+        for (auto const& fx_plug : fx_chain_data[i])
         {
             batch.push_back(std::visit(
                     make_add_fx_module_action{fx_chain_bus},
-                    plugin_id.as_variant()));
+                    fx_plug.as_variant()));
         }
     }
 }

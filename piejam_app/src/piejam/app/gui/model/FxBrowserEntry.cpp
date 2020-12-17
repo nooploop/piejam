@@ -84,6 +84,7 @@ FxBrowserEntry::addModule()
                         runtime::actions::load_ladspa_fx_plugin action;
                         action.fx_chain_bus = m_fx_chain_bus;
                         action.plugin_id = pd.id;
+                        action.name = pd.name;
                         dispatch(action);
                     }},
             m_registry_item);

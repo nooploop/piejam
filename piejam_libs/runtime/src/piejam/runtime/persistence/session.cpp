@@ -50,34 +50,36 @@ get_version(nlohmann::json const& json_ses) -> unsigned
 static auto const s_key_internal = "internal";
 static auto const s_key_ladspa = "ladspa";
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::ladspa_plugin, id, name)
+
 void
-to_json(nlohmann::json& j, fx_plugin_id const& fx_id)
+to_json(nlohmann::json& j, session::fx_plugin const& fx_plug)
 {
     std::visit(
             overload{
                     [&j](fx::internal id) {
                         j = {{s_key_internal, id}};
                     },
-                    [&j](audio::ladspa::plugin_id_t id) {
-                        j = {{s_key_ladspa, id}};
+                    [&j](session::ladspa_plugin const& ladspa_plug) {
+                        j = {{s_key_ladspa, ladspa_plug}};
                     }},
-            fx_id.as_variant());
+            fx_plug.as_variant());
 }
 
 void
-from_json(nlohmann::json const& j, fx_plugin_id& fx_id)
+from_json(nlohmann::json const& j, session::fx_plugin& fx_plug)
 {
     if (j.contains(s_key_internal))
     {
         fx::internal id;
         j[s_key_internal].get_to<fx::internal>(id);
-        fx_id = id;
+        fx_plug = id;
     }
     else if (j.contains(s_key_ladspa))
     {
-        audio::ladspa::plugin_id_t id;
-        j[s_key_ladspa].get_to<audio::ladspa::plugin_id_t>(id);
-        fx_id = id;
+        session::ladspa_plugin ladspa_plug;
+        j[s_key_ladspa].get_to<session::ladspa_plugin>(ladspa_plug);
+        fx_plug = ladspa_plug;
     }
     else
     {
@@ -101,9 +103,9 @@ void
 from_json(nlohmann::json const& json_ses, session& ses)
 {
     json_ses.at(s_key_inputs)
-            .get_to<std::vector<session::fx_chain_data>>(ses.inputs);
+            .get_to<std::vector<session::fx_chain>>(ses.inputs);
     json_ses.at(s_key_outputs)
-            .get_to<std::vector<session::fx_chain_data>>(ses.outputs);
+            .get_to<std::vector<session::fx_chain>>(ses.outputs);
 }
 
 using upgrade_function = void (*)(nlohmann::json&);
@@ -142,7 +144,7 @@ upgrade_session(nlohmann::json& json_ses)
 
         BOOST_ASSERT(file_version > prev_version);
         if (file_version <= prev_version)
-            throw std::runtime_error("cannot session file");
+            throw std::runtime_error("cannot upgrade session file");
     }
 }
 

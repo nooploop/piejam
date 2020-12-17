@@ -33,6 +33,7 @@ struct load_ladspa_fx_plugin final
 {
     mixer::bus_id fx_chain_bus;
     audio::ladspa::plugin_id_t plugin_id;
+    std::string name;
 
     auto reduce(state const&) const -> state override;
 };

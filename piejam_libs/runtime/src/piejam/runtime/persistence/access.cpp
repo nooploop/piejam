@@ -107,9 +107,9 @@ save_app_config(std::filesystem::path const& file, state const& state)
 
 static auto
 export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
-        -> std::vector<persistence::session::fx_chain_data>
+        -> std::vector<persistence::session::fx_chain>
 {
-    std::vector<persistence::session::fx_chain_data> result;
+    std::vector<persistence::session::fx_chain> result;
 
     for (auto const& bus_id : bus_ids)
     {
@@ -122,12 +122,16 @@ export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
             fx::module const* const fx_mod = (*st.fx_modules)[fx_mod_id];
             fx_chain_data.emplace_back(std::visit(
                     overload{
-                            [](fx::internal id) -> persistence::fx_plugin_id {
+                            [](fx::internal id) -> session::fx_plugin {
                                 return id;
                             },
                             [&st](fx::ladspa_instance_id id)
-                                    -> persistence::fx_plugin_id {
-                                return st.fx_ladspa_instances->at(id).id;
+                                    -> session::fx_plugin {
+                                session::ladspa_plugin plug;
+                                auto const& pd = st.fx_ladspa_instances->at(id);
+                                plug.id = pd.id;
+                                plug.name = pd.name;
+                                return plug;
                             }},
                     fx_mod->fx_instance_id));
         }
