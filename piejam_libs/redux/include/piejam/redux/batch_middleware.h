@@ -19,7 +19,6 @@
 
 #include <piejam/redux/functors.h>
 
-#include <cassert>
 #include <memory>
 
 namespace piejam::redux
@@ -39,8 +38,6 @@ public:
     {
         if (auto* const batch = as_batch_action(a))
         {
-            assert(!std::empty(*batch));
-
             std::unique_ptr<bool, void (*)(bool*)> flag_reset(
                     &m_batching,
                     [](bool* batching) { *batching = false; });

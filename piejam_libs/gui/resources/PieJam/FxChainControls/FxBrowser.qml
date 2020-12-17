@@ -90,6 +90,14 @@ Item {
                     fxList.currentIndex = index
                     fxList.currentEntry = model.item
                 }
+
+
+                Binding {
+                    when: model.item
+                    target: model.item
+                    property: "subscribed"
+                    value: root.visible
+                }
             }
 
             section.property: "item.section"

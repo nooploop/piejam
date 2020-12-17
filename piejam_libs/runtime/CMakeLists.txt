@@ -74,6 +74,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/app_config.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h

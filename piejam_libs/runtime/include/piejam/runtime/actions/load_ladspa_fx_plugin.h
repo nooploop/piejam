@@ -18,8 +18,10 @@
 #pragma once
 
 #include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
@@ -29,7 +31,8 @@ struct load_ladspa_fx_plugin final
     : ui::cloneable_action<load_ladspa_fx_plugin, action>
     , visitable_engine_action<load_ladspa_fx_plugin>
 {
-    audio::ladspa::plugin_descriptor plugin_desc;
+    mixer::bus_id fx_chain_bus;
+    audio::ladspa::plugin_id_t plugin_id;
 
     auto reduce(state const&) const -> state override;
 };

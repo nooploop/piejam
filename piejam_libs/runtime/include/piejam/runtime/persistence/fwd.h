@@ -15,24 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/add_internal_fx_module.h>
+#pragma once
 
-#include <piejam/runtime/audio_state.h>
-
-#include <boost/assert.hpp>
-
-namespace piejam::runtime::actions
+namespace piejam::runtime::persistence
 {
 
-auto
-add_internal_fx_module::reduce(state const& st) const -> state
-{
-    auto new_st = st;
+struct app_config;
+struct session;
 
-    BOOST_ASSERT(fx_chain_bus != mixer::bus_id{});
-    runtime::add_internal_fx_module(new_st, fx_chain_bus, type);
-
-    return new_st;
-}
-
-} // namespace piejam::runtime::actions
+} // namespace piejam::runtime::persistence

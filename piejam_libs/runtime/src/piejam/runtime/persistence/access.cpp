@@ -21,9 +21,9 @@
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
 #include <piejam/runtime/audio_state.h>
-#include <piejam/runtime/locations.h>
 #include <piejam/runtime/persistence/app_config.h>
 #include <piejam/runtime/persistence/session.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 #include <spdlog/spdlog.h>
 
@@ -145,9 +145,7 @@ load_session(std::filesystem::path const& file, dispatch_f const& dispatch)
         if (!in.is_open())
             throw std::runtime_error("could not open session file");
 
-        actions::apply_session action;
-        action.ses = persistence::load_session(in);
-        dispatch(action);
+        dispatch(actions::apply_session(persistence::load_session(in)));
     }
     catch (std::exception const& err)
     {

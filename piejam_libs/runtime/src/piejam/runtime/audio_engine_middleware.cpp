@@ -22,6 +22,7 @@
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
+#include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
@@ -287,6 +288,22 @@ audio_engine_middleware::process_initiate_device_selection_action(
     }
 }
 
+static auto
+find_ladspa_plugin_descriptor(
+        fx::registry const& registry,
+        audio::ladspa::plugin_id_t id)
+        -> audio::ladspa::plugin_descriptor const*
+{
+    for (auto const& item : *registry.entries)
+    {
+        if (auto pd = std::get_if<audio::ladspa::plugin_descriptor>(&item);
+            pd && pd->id == id)
+            return pd;
+    }
+
+    return nullptr;
+}
+
 void
 audio_engine_middleware::process_engine_action(
         actions::engine_action const& action)
@@ -336,19 +353,32 @@ audio_engine_middleware::process_engine_action(
                 }
             },
             [this](actions::load_ladspa_fx_plugin const& a) {
-                if (auto id = m_ladspa_fx_manager->load(a.plugin_desc))
+                auto const& st = m_get_state();
+
+                if (auto plugin_desc = find_ladspa_plugin_descriptor(
+                            st.fx_registry,
+                            a.plugin_id))
                 {
-                    actions::add_ladspa_fx_module next_action;
-                    next_action.fx_chain_bus = m_get_state().fx_chain_bus;
-                    next_action.instance_id = id;
-                    next_action.plugin_desc = a.plugin_desc;
-                    next_action.control_inputs =
-                            m_ladspa_fx_manager->control_inputs(id);
+                    if (auto id = m_ladspa_fx_manager->load(*plugin_desc))
+                    {
+                        actions::add_ladspa_fx_module next_action;
+                        next_action.fx_chain_bus = a.fx_chain_bus;
+                        next_action.instance_id = id;
+                        next_action.plugin_desc = *plugin_desc;
+                        next_action.control_inputs =
+                                m_ladspa_fx_manager->control_inputs(id);
 
-                    m_next(next_action);
+                        m_next(next_action);
 
-                    if (m_engine)
-                        rebuild();
+                        if (m_engine)
+                            rebuild();
+                    }
+                }
+                else
+                {
+                    spdlog::warn(
+                            "could not find fx ladspa plugin: {}",
+                            a.plugin_id);
                 }
             },
             [this](actions::set_bool_parameter const& a) {

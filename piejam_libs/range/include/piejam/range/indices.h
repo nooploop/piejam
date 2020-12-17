@@ -23,9 +23,10 @@ namespace piejam::range
 {
 
 template <std::integral T>
-constexpr auto indices(T&& max) noexcept
+constexpr auto
+indices(T max) noexcept
 {
-    return std::views::iota(T{}, std::forward<T>(max));
+    return std::views::iota(T{}, max);
 }
 
 } // namespace piejam::range

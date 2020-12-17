@@ -17,17 +17,90 @@
 
 #include <piejam/runtime/actions/apply_session.h>
 
+#include <piejam/range/indices.h>
+#include <piejam/runtime/actions/add_internal_fx_module.h>
+#include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/persistence/session.h>
+#include <piejam/runtime/ui/batch_action.h>
+#include <piejam/runtime/ui/thunk_action.h>
+
+#include <functional>
 
 namespace piejam::runtime::actions
 {
 
-auto
-apply_session::reduce(state const& st) const -> state
+namespace
 {
-    auto new_st = st;
 
-    return new_st;
+struct make_add_fx_module_action
+{
+    mixer::bus_id fx_chain_bus;
+
+    auto operator()(fx::internal type) const -> std::unique_ptr<action>
+    {
+        auto action = std::make_unique<actions::add_internal_fx_module>();
+        action->fx_chain_bus = fx_chain_bus;
+        action->type = type;
+        return action;
+    }
+
+    auto operator()(audio::ladspa::plugin_id_t plugin_id)
+            -> std::unique_ptr<action>
+    {
+        auto action = std::make_unique<actions::load_ladspa_fx_plugin>();
+        action->fx_chain_bus = fx_chain_bus;
+        action->plugin_id = plugin_id;
+        return action;
+    }
+};
+
+void
+make_add_fx_module_actions(
+        batch_action& batch,
+        mixer::bus_list_t const& bus_ids,
+        std::vector<persistence::session::fx_chain_data> const& fx_chain_data)
+{
+    for (std::size_t i :
+         range::indices(std::min(fx_chain_data.size(), bus_ids.size())))
+    {
+        mixer::bus_id fx_chain_bus = bus_ids[i];
+        for (auto const& plugin_id : fx_chain_data[i])
+        {
+            batch.push_back(std::visit(
+                    make_add_fx_module_action{fx_chain_bus},
+                    plugin_id.as_variant()));
+        }
+    }
+}
+
+template <class GetState>
+auto
+create_fx_chains(persistence::session const& session, GetState&& get_state)
+        -> batch_action
+{
+    batch_action action;
+
+    state const& st = get_state();
+
+    make_add_fx_module_actions(action, st.mixer_state.inputs, session.inputs);
+    make_add_fx_module_actions(action, st.mixer_state.outputs, session.outputs);
+
+    return action;
+}
+
+} // namespace
+
+auto
+apply_session(persistence::session session) -> thunk_action
+{
+    return [s = std::move(session)](auto&& get_state, auto&& dispatch) {
+        std::invoke(
+                std::forward<decltype(dispatch)>(dispatch),
+                create_fx_chains(
+                        s,
+                        std::forward<decltype(get_state)>(get_state)));
+    };
 }
 
 } // namespace piejam::runtime::actions

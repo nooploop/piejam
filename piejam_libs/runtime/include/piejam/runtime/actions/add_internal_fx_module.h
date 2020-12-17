@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/internal.h>
@@ -29,6 +30,7 @@ struct add_internal_fx_module final
     : ui::cloneable_action<add_internal_fx_module, action>
     , visitable_engine_action<add_internal_fx_module>
 {
+    mixer::bus_id fx_chain_bus;
     fx::internal type;
 
     auto reduce(state const&) const -> state override;

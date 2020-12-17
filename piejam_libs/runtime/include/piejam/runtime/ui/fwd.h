@@ -38,10 +38,9 @@ template <class State>
 using next_f = redux::next_f<action<State>>;
 
 template <class State>
-using thunk_f = std::function<
-        void(get_state_f<State> const&, dispatch_f<State> const&)>;
+struct thunk_action;
 
 template <class State>
-struct thunk_action;
+struct batch_action;
 
 } // namespace piejam::runtime::ui

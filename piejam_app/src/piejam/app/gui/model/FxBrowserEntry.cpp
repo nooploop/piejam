@@ -30,7 +30,7 @@ namespace piejam::app::gui::model
 FxBrowserEntry::FxBrowserEntry(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::fx::registry::item registry_item)
+        runtime::fx::registry::item const& registry_item)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_registry_item(registry_item)
 {
@@ -63,6 +63,10 @@ FxBrowserEntry::FxBrowserEntry(
 void
 FxBrowserEntry::subscribe_step()
 {
+    observe(runtime::selectors::select_fx_chain_bus,
+            [this](runtime::mixer::bus_id fx_chain_bus) {
+                m_fx_chain_bus = fx_chain_bus;
+            });
 }
 
 void
@@ -72,12 +76,14 @@ FxBrowserEntry::addModule()
             overload{
                     [this](runtime::fx::internal fx_type) {
                         runtime::actions::add_internal_fx_module action;
+                        action.fx_chain_bus = m_fx_chain_bus;
                         action.type = fx_type;
                         dispatch(action);
                     },
                     [this](audio::ladspa::plugin_descriptor const& pd) {
                         runtime::actions::load_ladspa_fx_plugin action;
-                        action.plugin_desc = pd;
+                        action.fx_chain_bus = m_fx_chain_bus;
+                        action.plugin_id = pd.id;
                         dispatch(action);
                     }},
             m_registry_item);

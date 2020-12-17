@@ -38,8 +38,8 @@ using action = ui::action<state>;
 using get_state_f = ui::get_state_f<state>;
 using dispatch_f = ui::dispatch_f<state>;
 using next_f = ui::next_f<state>;
-using thunk_f = ui::thunk_f<state>;
 using thunk_action = ui::thunk_action<state>;
+using batch_action = ui::batch_action<state>;
 
 using stereo_level = audio::pair<float>;
 

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
+#include <piejam/entity_id.h>
 #include <piejam/gui/model/FxBrowserEntry.h>
 #include <piejam/runtime/fx/registry.h>
 
@@ -31,7 +32,7 @@ public:
     FxBrowserEntry(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::fx::registry::item);
+            runtime::fx::registry::item const&);
 
     void addModule() override;
 
@@ -39,6 +40,7 @@ private:
     void subscribe_step() override;
 
     runtime::fx::registry::item m_registry_item;
+    runtime::mixer::bus_id m_fx_chain_bus;
 };
 
 } // namespace piejam::app::gui::model
