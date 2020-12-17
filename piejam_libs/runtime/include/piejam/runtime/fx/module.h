@@ -20,18 +20,9 @@
 #include <piejam/container/boxed_string.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/internal.h>
-
-#include <boost/container/container_fwd.hpp>
-
-#include <vector>
 
 namespace piejam::runtime::fx
 {
-
-using parameter_key = std::size_t;
-using module_parameters =
-        boost::container::flat_map<parameter_key, parameter_id>;
 
 struct module
 {
@@ -39,9 +30,5 @@ struct module
     container::boxed_string name;
     container::box<module_parameters> parameters;
 };
-
-using module_id = entity_id<module>;
-using modules_t = entity_map<module, module>;
-using chain_t = std::vector<module_id>;
 
 } // namespace piejam::runtime::fx

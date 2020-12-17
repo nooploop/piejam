@@ -17,6 +17,7 @@
 
 #include <piejam/runtime/fx/gain.h>
 
+#include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_.h>

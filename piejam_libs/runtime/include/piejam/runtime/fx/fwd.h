@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
-#include <piejam/fwd.h>
 #include <piejam/runtime/parameters.h>
 
 #include <boost/container/container_fwd.hpp>
@@ -41,8 +39,6 @@ class ladspa_manager;
 struct parameter;
 struct module;
 struct registry;
-
-enum class parameter_unit : unsigned;
 
 using parameter_id =
         std::variant<float_parameter_id, int_parameter_id, bool_parameter_id>;
