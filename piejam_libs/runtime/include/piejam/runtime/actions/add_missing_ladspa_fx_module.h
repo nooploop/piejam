@@ -17,19 +17,30 @@
 
 #pragma once
 
-#include <piejam/container/boxed_string.h>
+#include <piejam/audio/ladspa/fwd.h>
 #include <piejam/entity_id.h>
+#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/missing_ladspa.h>
+#include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
-namespace piejam::runtime::fx
+#include <span>
+#include <string>
+
+namespace piejam::runtime::actions
 {
 
-struct module
+struct add_missing_ladspa_fx_module final
+    : ui::cloneable_action<add_missing_ladspa_fx_module, action>
 {
-    instance_id fx_instance_id;
-    container::boxed_string name;
-    container::box<module_parameters> parameters;
+    mixer::bus_id fx_chain_bus;
+    fx::missing_ladspa missing_id;
+    std::string name;
+
+    auto reduce(state const&) const -> state override;
 };
 
-} // namespace piejam::runtime::fx
+} // namespace piejam::runtime::actions
+

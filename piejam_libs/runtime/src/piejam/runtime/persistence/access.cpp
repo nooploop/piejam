@@ -21,6 +21,7 @@
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fx/missing_ladspa.h>
 #include <piejam/runtime/persistence/app_config.h>
 #include <piejam/runtime/persistence/session.h>
 #include <piejam/runtime/ui/thunk_action.h>
@@ -131,6 +132,13 @@ export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
                                 auto const& pd = st.fx_ladspa_instances->at(id);
                                 plug.id = pd.id;
                                 plug.name = pd.name;
+                                return plug;
+                            },
+                            [fx_mod](fx::missing_ladspa const& missing)
+                                    -> session::fx_plugin {
+                                session::ladspa_plugin plug;
+                                plug.id = missing.plugin_id;
+                                plug.name = fx_mod->name;
                                 return plug;
                             }},
                     fx_mod->fx_instance_id));

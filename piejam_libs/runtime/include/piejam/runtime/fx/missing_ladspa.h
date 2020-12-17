@@ -17,19 +17,14 @@
 
 #pragma once
 
-#include <piejam/container/boxed_string.h>
-#include <piejam/entity_id.h>
-#include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/missing_ladspa.h>
+#include <piejam/audio/ladspa/fwd.h>
 
 namespace piejam::runtime::fx
 {
 
-struct module
+struct missing_ladspa
 {
-    instance_id fx_instance_id;
-    container::boxed_string name;
-    container::box<module_parameters> parameters;
+    audio::ladspa::plugin_id_t plugin_id;
 };
 
 } // namespace piejam::runtime::fx

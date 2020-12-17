@@ -21,7 +21,6 @@
 
 #include <boost/container/container_fwd.hpp>
 
-#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -32,7 +31,10 @@ enum class internal : unsigned;
 
 struct ladspa_instance_id_tag;
 using ladspa_instance_id = entity_id<ladspa_instance_id_tag>;
-using instance_id = std::variant<internal, ladspa_instance_id>;
+
+struct missing_ladspa;
+
+using instance_id = std::variant<internal, ladspa_instance_id, missing_ladspa>;
 
 class ladspa_manager;
 

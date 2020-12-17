@@ -2,6 +2,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_internal_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_ladspa_fx_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_missing_ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_bus.h
@@ -55,6 +56,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_instances.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_processor_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/missing_ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/registry.h
@@ -99,6 +101,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_internal_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_ladspa_fx_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_missing_ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_bus.cpp

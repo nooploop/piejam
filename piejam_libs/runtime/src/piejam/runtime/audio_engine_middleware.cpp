@@ -29,6 +29,7 @@
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/add_internal_fx_module.h>
 #include <piejam/runtime/actions/add_ladspa_fx_module.h>
+#include <piejam/runtime/actions/add_missing_ladspa_fx_module.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
@@ -373,10 +374,26 @@ audio_engine_middleware::process_engine_action(
                         if (m_engine)
                             rebuild();
                     }
+                    else
+                    {
+                        spdlog::error(
+                                "failed to load ladspa fx plugin: {}",
+                                a.name);
+
+                        actions::add_missing_ladspa_fx_module next_action;
+                        next_action.fx_chain_bus = a.fx_chain_bus;
+                        next_action.missing_id = {a.plugin_id};
+                        next_action.name = a.name;
+                        m_next(next_action);
+                    }
                 }
                 else
                 {
-                    spdlog::warn("could not find fx ladspa plugin: {}", a.name);
+                    actions::add_missing_ladspa_fx_module next_action;
+                    next_action.fx_chain_bus = a.fx_chain_bus;
+                    next_action.missing_id = {a.plugin_id};
+                    next_action.name = a.name;
+                    m_next(next_action);
                 }
             },
             [this](actions::set_bool_parameter const& a) {

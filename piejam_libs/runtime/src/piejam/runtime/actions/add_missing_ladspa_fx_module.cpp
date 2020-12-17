@@ -15,21 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/runtime/actions/add_missing_ladspa_fx_module.h>
 
-#include <piejam/container/boxed_string.h>
-#include <piejam/entity_id.h>
-#include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/missing_ladspa.h>
+#include <piejam/runtime/audio_state.h>
 
-namespace piejam::runtime::fx
+#include <boost/assert.hpp>
+
+namespace piejam::runtime::actions
 {
 
-struct module
+auto
+add_missing_ladspa_fx_module::reduce(state const& st) const -> state
 {
-    instance_id fx_instance_id;
-    container::boxed_string name;
-    container::box<module_parameters> parameters;
-};
+    auto new_st = st;
 
-} // namespace piejam::runtime::fx
+    BOOST_ASSERT(fx_chain_bus != mixer::bus_id{});
+    runtime::add_missing_ladspa_fx_module(
+            new_st,
+            fx_chain_bus,
+            missing_id,
+            name);
+
+    return new_st;
+}
+
+} // namespace piejam::runtime::actions

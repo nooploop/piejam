@@ -170,6 +170,33 @@ add_ladspa_fx_module(
 }
 
 void
+add_missing_ladspa_fx_module(
+        audio_state& st,
+        mixer::bus_id bus_id,
+        fx::missing_ladspa missing_id,
+        std::string_view const& name)
+{
+    std::tie(st.mixer_state.buses, st.fx_modules) =
+            [bus_id, missing_id, name](
+                    mixer::buses_t buses,
+                    fx::chain_t fx_chain,
+                    fx::modules_t fx_modules) {
+                mixer::bus& bus = buses[bus_id];
+
+                fx_chain.emplace_back(fx_modules.add(fx::module{
+                        .fx_instance_id = missing_id,
+                        .name = name,
+                        .parameters = {}}));
+
+                bus.fx_chain = std::move(fx_chain);
+
+                return std::tuple(std::move(buses), std::move(fx_modules));
+            }(st.mixer_state.buses,
+              st.mixer_state.buses.get()[bus_id]->fx_chain,
+              st.fx_modules);
+}
+
+void
 remove_fx_module(audio_state& st, fx::module_id id)
 {
     if (fx::module const* const fx_mod = st.fx_modules.get()[id])
