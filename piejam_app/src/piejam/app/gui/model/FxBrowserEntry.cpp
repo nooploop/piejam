@@ -18,7 +18,8 @@
 #include <piejam/app/gui/model/FxBrowserEntry.h>
 
 #include <piejam/functional/overload.h>
-#include <piejam/runtime/actions/add_internal_fx_module.h>
+#include <piejam/npos.h>
+#include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/selectors.h>
 
@@ -75,8 +76,9 @@ FxBrowserEntry::addModule()
     std::visit(
             overload{
                     [this](runtime::fx::internal fx_type) {
-                        runtime::actions::add_internal_fx_module action;
+                        runtime::actions::insert_internal_fx_module action;
                         action.fx_chain_bus = m_fx_chain_bus;
+                        action.position = npos;
                         action.type = fx_type;
                         dispatch(action);
                     },

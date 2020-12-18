@@ -15,24 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/add_internal_fx_module.h>
+#pragma once
 
-#include <piejam/runtime/audio_state.h>
-
-#include <boost/assert.hpp>
+#include <piejam/entity_id.h>
+#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/internal.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
 
-auto
-add_internal_fx_module::reduce(state const& st) const -> state
+struct insert_internal_fx_module final
+    : ui::cloneable_action<insert_internal_fx_module, action>
+    , visitable_engine_action<insert_internal_fx_module>
 {
-    auto new_st = st;
+    mixer::bus_id fx_chain_bus;
+    std::size_t position{};
+    fx::internal type{};
 
-    BOOST_ASSERT(fx_chain_bus != mixer::bus_id{});
-    runtime::add_internal_fx_module(new_st, fx_chain_bus, type);
-
-    return new_st;
-}
+    auto reduce(state const&) const -> state override;
+};
 
 } // namespace piejam::runtime::actions

@@ -1,6 +1,5 @@
 add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_bus.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_internal_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_missing_ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_app_config.h
@@ -14,6 +13,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/insert_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_ladspa_fx_plugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_session.h
@@ -78,6 +78,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/session.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_input_processor_factory.h
@@ -85,7 +86,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/stereo_level.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store_dispatch.h
@@ -99,7 +99,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_internal_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_missing_ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
@@ -108,6 +107,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/initiate_device_selection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/insert_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_ladspa_fx_plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_session.cpp
@@ -150,9 +150,9 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/session.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/selectors.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/store_dispatch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/thunk_action.cpp
 )

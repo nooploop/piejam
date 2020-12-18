@@ -27,7 +27,6 @@
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/runtime/actions/add_bus.h>
-#include <piejam/runtime/actions/add_internal_fx_module.h>
 #include <piejam/runtime/actions/add_ladspa_fx_module.h>
 #include <piejam/runtime/actions/add_missing_ladspa_fx_module.h>
 #include <piejam/runtime/actions/apply_app_config.h>
@@ -36,6 +35,7 @@
 #include <piejam/runtime/actions/device_action_visitor.h>
 #include <piejam/runtime/actions/engine_action_visitor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/actions/request_levels_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
@@ -328,7 +328,7 @@ audio_engine_middleware::process_engine_action(
                 if (m_engine)
                     rebuild();
             },
-            [this](actions::add_internal_fx_module const& a) {
+            [this](actions::insert_internal_fx_module const& a) {
                 m_next(a);
 
                 if (m_engine)

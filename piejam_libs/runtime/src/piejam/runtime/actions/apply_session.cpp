@@ -18,7 +18,7 @@
 #include <piejam/runtime/actions/apply_session.h>
 
 #include <piejam/range/indices.h>
-#include <piejam/runtime/actions/add_internal_fx_module.h>
+#include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/persistence/session.h>
@@ -39,8 +39,9 @@ struct make_add_fx_module_action
 
     auto operator()(fx::internal type) const -> std::unique_ptr<action>
     {
-        auto action = std::make_unique<actions::add_internal_fx_module>();
+        auto action = std::make_unique<actions::insert_internal_fx_module>();
         action->fx_chain_bus = fx_chain_bus;
+        action->position = npos;
         action->type = type;
         return action;
     }

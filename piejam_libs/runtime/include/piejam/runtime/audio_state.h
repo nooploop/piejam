@@ -96,7 +96,11 @@ void remove_mixer_bus(audio_state&, mixer::bus_id);
 template <audio::bus_direction D>
 void clear_mixer_buses(audio_state&);
 
-void add_internal_fx_module(audio_state&, mixer::bus_id, fx::internal);
+void insert_internal_fx_module(
+        audio_state&,
+        mixer::bus_id,
+        std::size_t position,
+        fx::internal);
 void add_ladspa_fx_module(
         audio_state&,
         mixer::bus_id,

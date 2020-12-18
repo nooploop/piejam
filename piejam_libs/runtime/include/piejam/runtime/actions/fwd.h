@@ -48,9 +48,6 @@ struct select_bus_channel;
 struct add_bus;
 struct delete_bus;
 
-struct add_internal_fx_module;
-struct delete_fx_module;
-
 template <audio::bus_direction>
 struct set_bus_solo;
 using set_input_bus_solo = set_bus_solo<audio::bus_direction::input>;
@@ -68,6 +65,8 @@ using set_bool_parameter = set_parameter_value<bool_parameter>;
 using set_float_parameter = set_parameter_value<float_parameter>;
 using set_int_parameter = set_parameter_value<int_parameter>;
 
+struct delete_fx_module;
+struct insert_internal_fx_module;
 struct finalize_ladspa_fx_plugin_scan;
 struct load_ladspa_fx_plugin;
 

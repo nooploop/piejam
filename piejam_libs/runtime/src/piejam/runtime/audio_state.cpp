@@ -86,13 +86,16 @@ make_fx_gain(
 }
 
 void
-add_internal_fx_module(
+insert_internal_fx_module(
         audio_state& st,
-        mixer::bus_id bus_id,
-        fx::internal fx_type)
+        mixer::bus_id const bus_id,
+        std::size_t const position,
+        fx::internal const fx_type)
 {
+    BOOST_ASSERT(bus_id != mixer::bus_id{});
+
     std::tie(st.mixer_state.buses, st.fx_modules, st.fx_parameters) =
-            [bus_id, fx_type](
+            [bus_id, position, fx_type](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
                     fx::modules_t fx_modules,
@@ -100,10 +103,13 @@ add_internal_fx_module(
                     parameter_maps& params) {
                 mixer::bus& bus = buses[bus_id];
 
+                auto const insert_pos = std::min(position, fx_chain.size());
+
                 switch (fx_type)
                 {
                     case fx::internal::gain:
-                        fx_chain.emplace_back(
+                        fx_chain.emplace(
+                                std::next(fx_chain.begin(), insert_pos),
                                 make_fx_gain(fx_modules, fx_params, params));
                         break;
                 }

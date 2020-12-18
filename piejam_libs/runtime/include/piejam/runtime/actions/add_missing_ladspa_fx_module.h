@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -43,4 +42,3 @@ struct add_missing_ladspa_fx_module final
 };
 
 } // namespace piejam::runtime::actions
-
