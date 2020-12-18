@@ -30,8 +30,6 @@ class FxChain final : public Subscribable<piejam::gui::model::FxChain>
 public:
     FxChain(runtime::store_dispatch, runtime::subscriber&);
 
-    void deleteModule(int) override;
-
 private:
     void subscribe_step() override;
 

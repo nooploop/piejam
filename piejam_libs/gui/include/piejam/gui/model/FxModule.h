@@ -44,6 +44,8 @@ public:
 
     auto parameters() noexcept -> FxParametersList* { return &m_parameters; }
 
+    Q_INVOKABLE virtual void deleteModule() = 0;
+
     auto toQString() const -> QString { return m_name; }
 
 signals:

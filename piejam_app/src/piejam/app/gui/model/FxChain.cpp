@@ -21,7 +21,6 @@
 #include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/FxModule.h>
 #include <piejam/app/gui/model/FxParameter.h>
-#include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
@@ -52,18 +51,6 @@ FxChain::subscribe_step()
 
                 m_fx_chain = fx_chain;
             });
-}
-
-void
-FxChain::deleteModule(int pos)
-{
-    std::size_t const index = static_cast<std::size_t>(pos);
-    if (index < m_fx_chain->size())
-    {
-        runtime::actions::delete_fx_module action;
-        action.fx_mod_id = m_fx_chain.get()[index];
-        dispatch(action);
-    }
 }
 
 } // namespace piejam::app::gui::model

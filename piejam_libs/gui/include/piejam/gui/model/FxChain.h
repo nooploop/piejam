@@ -34,8 +34,6 @@ class FxChain : public SubscribableModel
 public:
     auto modules() noexcept -> FxModulesList* { return &m_modules; }
 
-    Q_INVOKABLE virtual void deleteModule(int) = 0;
-
 private:
     FxModulesList m_modules;
 };

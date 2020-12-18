@@ -20,6 +20,7 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/FxParameter.h>
+#include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/selectors.h>
@@ -94,6 +95,14 @@ FxModule::subscribe_step()
 
                 m_param_ids = param_ids;
             });
+}
+
+void
+FxModule::deleteModule()
+{
+    runtime::actions::delete_fx_module action;
+    action.fx_mod_id = m_fx_mod_id;
+    dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

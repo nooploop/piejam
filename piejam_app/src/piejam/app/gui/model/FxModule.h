@@ -33,6 +33,8 @@ public:
             runtime::subscriber&,
             runtime::fx::module_id);
 
+    void deleteModule() override;
+
 private:
     void subscribe_step() override;
 

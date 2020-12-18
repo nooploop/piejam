@@ -70,7 +70,7 @@ TopPane {
                     fxBrowser.insertPosition = index
                     stack.push(fxBrowser)
                 }
-                onDeleteButtonClicked: root.model.deleteModule(index)
+                onDeleteButtonClicked: model.item.deleteModule()
 
                 Binding {
                     target: model.item
