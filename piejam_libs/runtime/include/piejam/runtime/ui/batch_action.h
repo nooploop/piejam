@@ -54,6 +54,14 @@ struct batch_action final
                 std::make_unique<Action>(std::forward<Args>(args)...));
     }
 
+    void append(batch_action<State> other)
+    {
+        m_actions.insert(
+                m_actions.end(),
+                std::make_move_iterator(other.m_actions.begin()),
+                std::make_move_iterator(other.m_actions.end()));
+    }
+
     auto reduce(State const&) const -> State override;
 
 private:

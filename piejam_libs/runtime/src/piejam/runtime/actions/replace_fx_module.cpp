@@ -30,7 +30,7 @@
 namespace piejam::runtime::actions
 {
 
-static auto
+auto
 make_replace_fx_module_action(
         state const& st,
         mixer::bus_id const fx_chain_bus,
@@ -86,13 +86,13 @@ replace_fx_module(std::size_t const position, fx::internal const fx_type)
     };
 }
 
-static auto
+auto
 make_replace_fx_module_action(
         state const& st,
         mixer::bus_id const fx_chain_bus,
         std::size_t const position,
         audio::ladspa::plugin_id_t const plugin_id,
-        std::string const& name) -> batch_action
+        std::string_view const& name) -> batch_action
 {
     batch_action batch;
 
