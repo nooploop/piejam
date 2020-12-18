@@ -1,7 +1,5 @@
 add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_bus.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_ladspa_fx_module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_missing_ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_bus.h
@@ -15,7 +13,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/insert_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_app_config.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_ladspa_fx_plugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_info_update.h
@@ -99,8 +96,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_ladspa_fx_module.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_missing_ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_bus.cpp
@@ -109,7 +104,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/initiate_device_selection.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/insert_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_app_config.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_ladspa_fx_plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_info_update.cpp

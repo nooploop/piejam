@@ -128,19 +128,22 @@ insert_internal_fx_module(
 }
 
 void
-add_ladspa_fx_module(
+insert_ladspa_fx_module(
         audio_state& st,
-        mixer::bus_id bus_id,
-        fx::ladspa_instance_id instance_id,
+        mixer::bus_id const bus_id,
+        std::size_t const position,
+        fx::ladspa_instance_id const instance_id,
         audio::ladspa::plugin_descriptor const& plugin_desc,
         std::span<audio::ladspa::port_descriptor const> const& control_inputs)
 {
+    BOOST_ASSERT(bus_id != mixer::bus_id{});
+
     std::tie(
             st.mixer_state.buses,
             st.fx_modules,
             st.fx_parameters,
             st.fx_ladspa_instances) =
-            [bus_id, instance_id, &plugin_desc, control_inputs](
+            [bus_id, position, instance_id, &plugin_desc, control_inputs](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
                     fx::modules_t fx_modules,
@@ -149,14 +152,18 @@ add_ladspa_fx_module(
                     parameter_maps& params) {
                 mixer::bus& bus = buses[bus_id];
 
-                fx_chain.emplace_back(fx_modules.add(fx::make_ladspa_module(
-                        instance_id,
-                        plugin_desc.name,
-                        control_inputs,
-                        fx_params,
-                        params.get_map<float_parameter>(),
-                        params.get_map<int_parameter>(),
-                        params.get_map<bool_parameter>())));
+                auto const insert_pos = std::min(position, fx_chain.size());
+
+                fx_chain.emplace(
+                        std::next(fx_chain.begin(), insert_pos),
+                        fx_modules.add(fx::make_ladspa_module(
+                                instance_id,
+                                plugin_desc.name,
+                                control_inputs,
+                                fx_params,
+                                params.get_map<float_parameter>(),
+                                params.get_map<int_parameter>(),
+                                params.get_map<bool_parameter>())));
 
                 bus.fx_chain = std::move(fx_chain);
 
@@ -176,23 +183,30 @@ add_ladspa_fx_module(
 }
 
 void
-add_missing_ladspa_fx_module(
+insert_missing_ladspa_fx_module(
         audio_state& st,
-        mixer::bus_id bus_id,
-        fx::missing_ladspa missing_id,
+        mixer::bus_id const bus_id,
+        std::size_t const position,
+        fx::missing_ladspa const missing_id,
         std::string_view const& name)
 {
+    BOOST_ASSERT(bus_id != mixer::bus_id{});
+
     std::tie(st.mixer_state.buses, st.fx_modules) =
-            [bus_id, missing_id, name](
+            [bus_id, position, missing_id, name](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
                     fx::modules_t fx_modules) {
                 mixer::bus& bus = buses[bus_id];
 
-                fx_chain.emplace_back(fx_modules.add(fx::module{
-                        .fx_instance_id = missing_id,
-                        .name = name,
-                        .parameters = {}}));
+                auto const insert_pos = std::min(position, fx_chain.size());
+
+                fx_chain.emplace(
+                        std::next(fx_chain.begin(), insert_pos),
+                        fx_modules.add(fx::module{
+                                .fx_instance_id = missing_id,
+                                .name = name,
+                                .parameters = {}}));
 
                 bus.fx_chain = std::move(fx_chain);
 

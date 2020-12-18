@@ -101,15 +101,17 @@ void insert_internal_fx_module(
         mixer::bus_id,
         std::size_t position,
         fx::internal);
-void add_ladspa_fx_module(
+void insert_ladspa_fx_module(
         audio_state&,
         mixer::bus_id,
+        std::size_t position,
         fx::ladspa_instance_id,
         audio::ladspa::plugin_descriptor const&,
         std::span<audio::ladspa::port_descriptor const> const& control_inputs);
-void add_missing_ladspa_fx_module(
+void insert_missing_ladspa_fx_module(
         audio_state&,
         mixer::bus_id,
+        std::size_t position,
         fx::missing_ladspa,
         std::string_view const& name);
 void remove_fx_module(audio_state& st, fx::module_id id);

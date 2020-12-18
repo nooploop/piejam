@@ -20,7 +20,6 @@
 #include <piejam/functional/overload.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
-#include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/selectors.h>
 
 #include <fmt/format.h>
@@ -85,6 +84,7 @@ FxBrowserEntry::addModule()
                     [this](audio::ladspa::plugin_descriptor const& pd) {
                         runtime::actions::load_ladspa_fx_plugin action;
                         action.fx_chain_bus = m_fx_chain_bus;
+                        action.position = npos;
                         action.plugin_id = pd.id;
                         action.name = pd.name;
                         dispatch(action);

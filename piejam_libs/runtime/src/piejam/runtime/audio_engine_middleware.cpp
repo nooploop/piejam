@@ -27,8 +27,6 @@
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/runtime/actions/add_bus.h>
-#include <piejam/runtime/actions/add_ladspa_fx_module.h>
-#include <piejam/runtime/actions/add_missing_ladspa_fx_module.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
@@ -36,7 +34,6 @@
 #include <piejam/runtime/actions/engine_action_visitor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
-#include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/actions/request_levels_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_device.h>
@@ -362,8 +359,9 @@ audio_engine_middleware::process_engine_action(
                 {
                     if (auto id = m_ladspa_fx_manager->load(*plugin_desc))
                     {
-                        actions::add_ladspa_fx_module next_action;
+                        actions::insert_ladspa_fx_module next_action;
                         next_action.fx_chain_bus = a.fx_chain_bus;
+                        next_action.position = a.position;
                         next_action.instance_id = id;
                         next_action.plugin_desc = *plugin_desc;
                         next_action.control_inputs =
@@ -380,8 +378,9 @@ audio_engine_middleware::process_engine_action(
                                 "failed to load ladspa fx plugin: {}",
                                 a.name);
 
-                        actions::add_missing_ladspa_fx_module next_action;
+                        actions::insert_missing_ladspa_fx_module next_action;
                         next_action.fx_chain_bus = a.fx_chain_bus;
+                        next_action.position = a.position;
                         next_action.missing_id = {a.plugin_id};
                         next_action.name = a.name;
                         m_next(next_action);
@@ -389,8 +388,9 @@ audio_engine_middleware::process_engine_action(
                 }
                 else
                 {
-                    actions::add_missing_ladspa_fx_module next_action;
+                    actions::insert_missing_ladspa_fx_module next_action;
                     next_action.fx_chain_bus = a.fx_chain_bus;
+                    next_action.position = a.position;
                     next_action.missing_id = {a.plugin_id};
                     next_action.name = a.name;
                     m_next(next_action);

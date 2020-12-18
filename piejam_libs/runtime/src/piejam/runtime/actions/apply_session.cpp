@@ -19,7 +19,6 @@
 
 #include <piejam/range/indices.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
-#include <piejam/runtime/actions/load_ladspa_fx_plugin.h>
 #include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/persistence/session.h>
 #include <piejam/runtime/ui/batch_action.h>
@@ -51,6 +50,7 @@ struct make_add_fx_module_action
     {
         auto action = std::make_unique<actions::load_ladspa_fx_plugin>();
         action->fx_chain_bus = fx_chain_bus;
+        action->position = npos;
         action->plugin_id = ladspa_plug.id;
         action->name = ladspa_plug.name;
         return action;
