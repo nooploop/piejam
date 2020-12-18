@@ -38,7 +38,7 @@ public:
     void addStereoBus() override;
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     void addBus(audio::bus_type);
 

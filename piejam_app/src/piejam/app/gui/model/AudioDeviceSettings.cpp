@@ -68,7 +68,7 @@ AudioDeviceSettings::AudioDeviceSettings(
 }
 
 void
-AudioDeviceSettings::subscribe_step()
+AudioDeviceSettings::onSubscribe()
 {
     namespace selectors = runtime::selectors;
 

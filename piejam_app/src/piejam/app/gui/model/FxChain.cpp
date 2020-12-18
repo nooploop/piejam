@@ -34,7 +34,7 @@ FxChain::FxChain(
 }
 
 void
-FxChain::subscribe_step()
+FxChain::onSubscribe()
 {
     observe(runtime::selectors::select_current_fx_chain,
             [this](container::box<runtime::fx::chain_t> const& fx_chain) {

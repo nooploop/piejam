@@ -37,7 +37,7 @@ MixerChannel::MixerChannel(
 }
 
 void
-MixerChannel::subscribe_step()
+MixerChannel::onSubscribe()
 {
     observe(runtime::selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string const& name) {

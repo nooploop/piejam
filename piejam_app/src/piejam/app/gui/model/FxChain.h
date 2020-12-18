@@ -31,7 +31,7 @@ public:
     FxChain(runtime::store_dispatch, runtime::subscriber&);
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     container::box<runtime::fx::chain_t> m_fx_chain;
 };

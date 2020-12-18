@@ -37,7 +37,7 @@ public:
     void changeSwitchValue(bool) override;
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     runtime::fx::parameter_id m_fx_param_id;
 };

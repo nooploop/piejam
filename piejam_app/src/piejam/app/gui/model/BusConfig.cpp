@@ -35,7 +35,7 @@ BusConfig::BusConfig(
 }
 
 void
-BusConfig::subscribe_step()
+BusConfig::onSubscribe()
 {
     observe(runtime::selectors::make_bus_name_selector(m_bus_id),
             [this](container::boxed_string const& name) {

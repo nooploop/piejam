@@ -38,7 +38,7 @@ public:
     void deleteBus() override;
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     void changeChannel(audio::bus_channel, unsigned);
 

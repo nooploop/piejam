@@ -32,7 +32,7 @@ public:
     void requestLevelsUpdate() override;
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     runtime::mixer::bus_list_t m_inputs;
     runtime::mixer::bus_list_t m_outputs;

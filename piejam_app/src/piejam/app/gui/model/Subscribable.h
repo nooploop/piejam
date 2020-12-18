@@ -60,10 +60,10 @@ protected:
                 std::forward<Handler>(h));
     }
 
-    virtual void subscribe_step() = 0;
+    virtual void onSubscribe() {}
 
 private:
-    void subscribe() override { subscribe_step(); }
+    void subscribe() override { onSubscribe(); }
     void unsubscribe() override { m_subs.erase(m_subs_id); }
 
     runtime::store_dispatch m_store_dispatch;

@@ -39,7 +39,7 @@ AudioInputOutputSettings::AudioInputOutputSettings(
 }
 
 void
-AudioInputOutputSettings::subscribe_step()
+AudioInputOutputSettings::onSubscribe()
 {
     namespace selectors = runtime::selectors;
 

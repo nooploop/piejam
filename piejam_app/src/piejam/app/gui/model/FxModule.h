@@ -36,7 +36,7 @@ public:
     void deleteModule() override;
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     runtime::fx::module_id const m_fx_mod_id;
 

@@ -45,7 +45,7 @@ FxParameter::FxParameter(
 }
 
 void
-FxParameter::subscribe_step()
+FxParameter::onSubscribe()
 {
     observe(runtime::selectors::make_fx_parameter_name_selector(m_fx_param_id),
             [this](container::boxed_string const& name) {

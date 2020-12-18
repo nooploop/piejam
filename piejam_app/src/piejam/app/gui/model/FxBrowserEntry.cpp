@@ -66,7 +66,7 @@ FxBrowserEntry::FxBrowserEntry(
 }
 
 void
-FxBrowserEntry::subscribe_step()
+FxBrowserEntry::onSubscribe()
 {
     observe(runtime::selectors::select_fx_chain_bus,
             [this](runtime::mixer::bus_id fx_chain_bus) {

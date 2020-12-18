@@ -31,7 +31,7 @@ public:
             runtime::mixer::bus_id);
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     runtime::mixer::bus_id m_bus_id;
 };

@@ -70,7 +70,7 @@ FxModule::FxModule(
 }
 
 void
-FxModule::subscribe_step()
+FxModule::onSubscribe()
 {
     observe(runtime::selectors::make_fx_module_name_selector(m_fx_mod_id),
             [this](container::boxed_string const& name) {

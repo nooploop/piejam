@@ -39,7 +39,7 @@ Mixer::Mixer(
 }
 
 void
-Mixer::subscribe_step()
+Mixer::onSubscribe()
 {
     namespace selectors = runtime::selectors;
 

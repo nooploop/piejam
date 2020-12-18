@@ -38,7 +38,7 @@ public:
     void replaceModule(unsigned pos) override;
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     runtime::fx::registry::item m_registry_item;
     runtime::mixer::bus_id m_fx_chain_bus;

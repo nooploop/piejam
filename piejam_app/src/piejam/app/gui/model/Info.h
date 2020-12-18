@@ -31,7 +31,7 @@ public:
     void requestUpdate() override;
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 };
 
 } // namespace piejam::app::gui::model

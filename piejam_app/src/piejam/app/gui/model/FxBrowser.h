@@ -31,7 +31,7 @@ public:
     FxBrowser(runtime::store_dispatch, runtime::subscriber&);
 
 private:
-    void subscribe_step() override;
+    void onSubscribe() override;
 
     runtime::fx::registry m_fx_registry;
 };

@@ -33,7 +33,7 @@ FxBrowser::FxBrowser(
 }
 
 void
-FxBrowser::subscribe_step()
+FxBrowser::onSubscribe()
 {
     observe(runtime::selectors::select_fx_registry,
             [this](runtime::fx::registry const& fx_registry) {

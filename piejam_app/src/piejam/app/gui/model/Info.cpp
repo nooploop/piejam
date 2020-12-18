@@ -33,7 +33,7 @@ Info::Info(
 }
 
 void
-Info::subscribe_step()
+Info::onSubscribe()
 {
     observe(runtime::selectors::select_xruns, [this](std::size_t const xruns) {
         setXRuns(static_cast<unsigned>(xruns));
