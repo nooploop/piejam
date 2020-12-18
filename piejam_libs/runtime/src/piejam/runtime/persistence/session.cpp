@@ -50,7 +50,20 @@ get_version(nlohmann::json const& json_ses) -> unsigned
 static auto const s_key_internal = "internal";
 static auto const s_key_ladspa = "ladspa";
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::ladspa_plugin, id, name)
+// NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::ladspa_plugin, id, name)
+
+void
+to_json(nlohmann::json& j, session::ladspa_plugin const& plug)
+{
+    j = {{"id", plug.id}, {"name", plug.name}};
+}
+
+void
+from_json(nlohmann::json const& j, session::ladspa_plugin& plug)
+{
+    j.at("id").get_to(plug.id);
+    j.at("name").get_to(plug.name);
+}
 
 void
 to_json(nlohmann::json& j, session::fx_plugin const& fx_plug)
@@ -72,13 +85,13 @@ from_json(nlohmann::json const& j, session::fx_plugin& fx_plug)
     if (j.contains(s_key_internal))
     {
         fx::internal id;
-        j[s_key_internal].get_to<fx::internal>(id);
+        j[s_key_internal].get_to(id);
         fx_plug = id;
     }
     else if (j.contains(s_key_ladspa))
     {
         session::ladspa_plugin ladspa_plug;
-        j[s_key_ladspa].get_to<session::ladspa_plugin>(ladspa_plug);
+        j[s_key_ladspa].get_to(ladspa_plug);
         fx_plug = ladspa_plug;
     }
     else
@@ -102,10 +115,8 @@ to_json(nlohmann::json& json_ses, session const& ses)
 void
 from_json(nlohmann::json const& json_ses, session& ses)
 {
-    json_ses.at(s_key_inputs)
-            .get_to<std::vector<session::fx_chain>>(ses.inputs);
-    json_ses.at(s_key_outputs)
-            .get_to<std::vector<session::fx_chain>>(ses.outputs);
+    json_ses.at(s_key_inputs).get_to(ses.inputs);
+    json_ses.at(s_key_outputs).get_to(ses.outputs);
 }
 
 using upgrade_function = void (*)(nlohmann::json&);

@@ -20,7 +20,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/runtime/channel_index_pair.h>
 
-#include <nlohmann/json_fwd.hpp>
+#include <nlohmann/json.hpp>
 
 #include <iosfwd>
 #include <string>
