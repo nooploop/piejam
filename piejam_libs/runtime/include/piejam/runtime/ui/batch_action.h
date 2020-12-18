@@ -19,6 +19,7 @@
 
 #include <piejam/redux/functors.h>
 #include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 #include <boost/iterator/indirect_iterator.hpp>
 
@@ -29,18 +30,9 @@ namespace piejam::runtime::ui
 {
 
 template <class State>
-struct batch_action final : action<State>
+struct batch_action final
+    : ui::cloneable_action<batch_action<State>, action<State>>
 {
-    auto clone() const -> std::unique_ptr<action<State>> override
-    {
-        auto action = std::make_unique<batch_action<State>>();
-
-        for (auto const& a : m_actions)
-            action->push_back(a->clone());
-
-        return action;
-    }
-
     bool empty() const noexcept { return m_actions.empty(); }
 
     auto begin() const
@@ -65,7 +57,7 @@ struct batch_action final : action<State>
     auto reduce(State const&) const -> State override;
 
 private:
-    std::vector<std::unique_ptr<action<State>>> m_actions;
+    std::vector<std::shared_ptr<action<State> const>> m_actions;
 };
 
 template <class State>
