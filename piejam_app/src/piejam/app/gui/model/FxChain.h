@@ -35,7 +35,6 @@ public:
 private:
     void subscribe_step() override;
 
-    runtime::mixer::bus_id m_bus_id;
     container::box<runtime::fx::chain_t> m_fx_chain;
 };
 

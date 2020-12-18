@@ -26,6 +26,14 @@ import "../Controls"
 Item {
     id: root
 
+    enum AddMode
+    {
+        Insert,
+        Replace
+    }
+
+    property int addMode: FxBrowser.AddMode.Insert
+    property int insertPosition: 0
     property var model
 
     signal addClicked()
@@ -115,15 +123,18 @@ Item {
     Button {
         id: addButton
         width: 96
-        text: qsTr("Add")
+        text: root.addMode === FxBrowser.AddMode.Insert ? qsTr("Insert") : qsTr("Replace")
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.margins: 8
 
-        enabled: fxList.currentEntry ? true : false
+        enabled: fxList.currentIndex != -1
 
         onClicked: {
-            fxList.currentEntry.addModule()
+            if (root.addMode === FxBrowser.AddMode.Insert)
+                fxList.currentEntry.insertModule(root.insertPosition)
+            else
+                fxList.currentEntry.replaceModule(root.insertPosition)
             root.addClicked()
         }
     }

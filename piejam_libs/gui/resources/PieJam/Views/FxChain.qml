@@ -65,6 +65,11 @@ TopPane {
                 name: model.item.name
                 parameters: model.item.parameters
 
+                onSwapButtonClicked: {
+                    fxBrowser.addMode = FxBrowser.AddMode.Replace
+                    fxBrowser.insertPosition = index
+                    stack.push(fxBrowser)
+                }
                 onDeleteButtonClicked: root.model.deleteModule(index)
 
                 Binding {
@@ -92,7 +97,11 @@ TopPane {
 
                     text: "+"
 
-                    onClicked: stack.push(fxBrowser)
+                    onClicked:{
+                        fxBrowser.addMode = FxBrowser.AddMode.Insert
+                        fxBrowser.insertPosition = root.model.modules.rowCount()
+                        stack.push(fxBrowser)
+                    }
                 }
             }
         }
@@ -104,10 +113,7 @@ TopPane {
         visible: false
 
         onCancelClicked: stack.pop()
-        onAddClicked: {
-            stack.pop()
-            fxModules.positionViewAtEnd()
-        }
+        onAddClicked: stack.pop()
     }
 
     Binding {

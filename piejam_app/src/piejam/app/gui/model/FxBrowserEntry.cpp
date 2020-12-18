@@ -20,7 +20,9 @@
 #include <piejam/functional/overload.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
+#include <piejam/runtime/actions/replace_fx_module.h>
 #include <piejam/runtime/selectors.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 #include <fmt/format.h>
 
@@ -53,9 +55,12 @@ FxBrowserEntry::FxBrowserEntry(
                     [this](audio::ladspa::plugin_descriptor const& pd) {
                         setName(QString::fromStdString(pd.name));
                         setSection(s_section_ladspa);
-                        setAuthor(QString::fromStdString(pd.author));
-                        setDescription(QString::fromStdString(
-                                fmt::format("Copyright: {}", pd.copyright)));
+                        if (!pd.name.empty())
+                            setAuthor(QString::fromStdString(pd.author));
+                        if (!pd.copyright.empty())
+                            setDescription(QString::fromStdString(fmt::format(
+                                    "Copyright: {}",
+                                    pd.copyright)));
                     }},
             m_registry_item);
 }
@@ -70,24 +75,43 @@ FxBrowserEntry::subscribe_step()
 }
 
 void
-FxBrowserEntry::addModule()
+FxBrowserEntry::insertModule(unsigned pos)
 {
     std::visit(
             overload{
-                    [this](runtime::fx::internal fx_type) {
+                    [this, pos](runtime::fx::internal fx_type) {
                         runtime::actions::insert_internal_fx_module action;
                         action.fx_chain_bus = m_fx_chain_bus;
-                        action.position = npos;
+                        action.position = pos;
                         action.type = fx_type;
                         dispatch(action);
                     },
-                    [this](audio::ladspa::plugin_descriptor const& pd) {
+                    [this, pos](audio::ladspa::plugin_descriptor const& pd) {
                         runtime::actions::load_ladspa_fx_plugin action;
                         action.fx_chain_bus = m_fx_chain_bus;
-                        action.position = npos;
+                        action.position = pos;
                         action.plugin_id = pd.id;
                         action.name = pd.name;
                         dispatch(action);
+                    }},
+            m_registry_item);
+}
+
+void
+FxBrowserEntry::replaceModule(unsigned pos)
+{
+    std::visit(
+            overload{
+                    [this, pos](runtime::fx::internal fx_type) {
+                        dispatch(runtime::actions::replace_fx_module(
+                                pos,
+                                fx_type));
+                    },
+                    [this, pos](audio::ladspa::plugin_descriptor const& pd) {
+                        dispatch(runtime::actions::replace_fx_module(
+                                pos,
+                                pd.id,
+                                pd.name));
                     }},
             m_registry_item);
 }

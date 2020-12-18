@@ -17,31 +17,29 @@
 
 #pragma once
 
-#include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/entity_id.h>
-#include <piejam/gui/model/FxBrowserEntry.h>
-#include <piejam/runtime/fx/registry.h>
+#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
 
-namespace piejam::app::gui::model
+#include <string_view>
+
+namespace piejam::runtime::actions
 {
 
-class FxBrowserEntry final
-    : public Subscribable<piejam::gui::model::FxBrowserEntry>
-{
-public:
-    FxBrowserEntry(
-            runtime::store_dispatch,
-            runtime::subscriber&,
-            runtime::fx::registry::item const&);
+auto replace_fx_module(
+        mixer::bus_id fx_chain_bus,
+        std::size_t position,
+        fx::internal) -> thunk_action;
+auto replace_fx_module(std::size_t position, fx::internal) -> thunk_action;
 
-    void insertModule(unsigned pos) override;
-    void replaceModule(unsigned pos) override;
+auto replace_fx_module(
+        mixer::bus_id fx_chain_bus,
+        std::size_t position,
+        audio::ladspa::plugin_id_t,
+        std::string_view const& name) -> thunk_action;
+auto replace_fx_module(
+        std::size_t position,
+        audio::ladspa::plugin_id_t,
+        std::string_view const& name) -> thunk_action;
 
-private:
-    void subscribe_step() override;
-
-    runtime::fx::registry::item m_registry_item;
-    runtime::mixer::bus_id m_fx_chain_bus;
-};
-
-} // namespace piejam::app::gui::model
+} // namespace piejam::runtime::actions

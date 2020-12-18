@@ -26,6 +26,7 @@ Item {
     property alias name: nameLabel.text
     property alias parameters: parametersList.model
 
+    signal swapButtonClicked()
     signal deleteButtonClicked()
 
     implicitWidth: frame.implicitWidth
@@ -37,7 +38,7 @@ Item {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
 
-        implicitWidth: Math.max(nameLabel.implicitWidth + deleteButton.width + 8, parametersList.implicitWidth) + 2 * frame.padding
+        implicitWidth: Math.max(nameLabel.implicitWidth + swapButton.width + deleteButton.width + 12, parametersList.implicitWidth) + 2 * frame.padding
         implicitHeight: nameLabel.implicitHeight + parametersList.implicitHeight + 2 * frame.padding
 
         Label {
@@ -51,6 +52,23 @@ Item {
             }
             font.bold: true
             font.pixelSize: 12
+        }
+
+        Button {
+            id: swapButton
+            width: 24
+            height: 35
+
+            text: "s"
+            anchors.right: deleteButton.left
+            anchors.top: parent.top
+
+            font.bold: true
+            font.pixelSize: 12
+            anchors.rightMargin: 4
+            anchors.topMargin: -6
+
+            onClicked: swapButtonClicked()
         }
 
         Button {

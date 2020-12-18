@@ -80,7 +80,8 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void addModule() = 0;
+    Q_INVOKABLE virtual void insertModule(unsigned pos) = 0;
+    Q_INVOKABLE virtual void replaceModule(unsigned pos) = 0;
 
     auto toQString() const -> QString { return m_name; }
 

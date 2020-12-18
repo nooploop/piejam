@@ -37,11 +37,6 @@ FxChain::FxChain(
 void
 FxChain::subscribe_step()
 {
-    observe(runtime::selectors::select_fx_chain_bus,
-            [this](runtime::mixer::bus_id const& fx_chain_bus) {
-                m_bus_id = fx_chain_bus;
-            });
-
     observe(runtime::selectors::select_current_fx_chain,
             [this](container::box<runtime::fx::chain_t> const& fx_chain) {
                 algorithm::apply_edit_script(
