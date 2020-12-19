@@ -27,6 +27,7 @@ class Mixer final : public Subscribable<piejam::gui::model::Mixer>
 {
 public:
     Mixer(runtime::store_dispatch, runtime::subscriber&);
+    ~Mixer();
 
     void setInputSolo(unsigned index) override;
     void requestLevelsUpdate() override;
@@ -34,9 +35,8 @@ public:
 private:
     void onSubscribe() override;
 
-    runtime::mixer::bus_list_t m_inputs;
-    runtime::mixer::bus_list_t m_outputs;
-    runtime::mixer::bus_list_t m_all;
+    struct Impl;
+    std::unique_ptr<Impl> const m_impl;
 };
 
 } // namespace piejam::app::gui::model

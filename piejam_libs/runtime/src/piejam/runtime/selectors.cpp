@@ -25,6 +25,7 @@
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
 
+#include <algorithm>
 #include <cassert>
 
 namespace piejam::runtime::selectors
@@ -85,6 +86,51 @@ make_bus_list_selector(audio::bus_direction const bd)
 
         case audio::bus_direction::output:
             return [](state const& st) { return st.mixer_state.outputs; };
+    }
+}
+
+static auto
+make_bus_infos(
+        container::box<mixer::buses_t> const& buses,
+        container::box<mixer::bus_list_t> const& bus_ids)
+        -> container::boxed_vector<mixer_bus_info>
+{
+    std::vector<mixer_bus_info> infos;
+
+    std::ranges::transform(
+            *bus_ids,
+            std::back_inserter(infos),
+            [&buses](auto&& bus_id) {
+                auto bus = (*buses)[bus_id];
+                BOOST_ASSERT(bus);
+                return mixer_bus_info{
+                        .bus_id = bus_id,
+                        .volume = bus->volume,
+                        .pan_balance = bus->pan_balance,
+                        .mute = bus->mute,
+                        .level = bus->level};
+            });
+
+    return infos;
+}
+
+auto
+make_bus_infos_selector(audio::bus_direction const bd)
+        -> selector<container::boxed_vector<mixer_bus_info>>
+{
+    switch (bd)
+    {
+        case audio::bus_direction::input:
+            return [get_infos =
+                            memo(&make_bus_infos)](state const& st) mutable {
+                return get_infos(st.mixer_state.buses, st.mixer_state.inputs);
+            };
+
+        case audio::bus_direction::output:
+            return [get_infos =
+                            memo(&make_bus_infos)](state const& st) mutable {
+                return get_infos(st.mixer_state.buses, st.mixer_state.outputs);
+            };
     }
 }
 
@@ -354,6 +400,16 @@ make_int_parameter_max_selector(int_parameter_id const param_id)
     return [param_id](state const& st) -> int {
         auto const* const param = st.params.get_parameter(param_id);
         return param ? param->max : 0;
+    };
+}
+
+auto
+make_level_parameter_value_selector(stereo_level_parameter_id const param_id)
+        -> selector<stereo_level>
+{
+    return [param_id](state const& st) -> stereo_level {
+        stereo_level const* const value = st.params.get(param_id);
+        return value ? *value : stereo_level{};
     };
 }
 

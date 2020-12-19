@@ -23,6 +23,8 @@
 #include <piejam/audio/types.h>
 #include <piejam/container/box.h>
 #include <piejam/container/boxed_string.h>
+#include <piejam/container/boxed_vector.h>
+#include <piejam/entity_id.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -59,6 +61,28 @@ auto make_num_device_channels_selector(audio::bus_direction)
 
 auto make_bus_list_selector(audio::bus_direction)
         -> selector<container::box<mixer::bus_list_t>>;
+
+struct mixer_bus_info
+{
+    mixer::bus_id bus_id;
+    float_parameter_id volume;
+    float_parameter_id pan_balance;
+    bool_parameter_id mute;
+    stereo_level_parameter_id level;
+
+    constexpr bool operator==(mixer_bus_info const& other) const noexcept
+    {
+        return bus_id == other.bus_id;
+    }
+
+    constexpr bool operator!=(mixer_bus_info const& other) const noexcept
+    {
+        return bus_id != other.bus_id;
+    }
+};
+
+auto make_bus_infos_selector(audio::bus_direction)
+        -> selector<container::boxed_vector<mixer_bus_info>>;
 
 auto make_bus_name_selector(mixer::bus_id) -> selector<container::boxed_string>;
 
@@ -100,6 +124,9 @@ auto make_float_parameter_normalized_value_selector(float_parameter_id)
 auto make_int_parameter_value_selector(int_parameter_id) -> selector<int>;
 auto make_int_parameter_min_selector(int_parameter_id) -> selector<int>;
 auto make_int_parameter_max_selector(int_parameter_id) -> selector<int>;
+
+auto make_level_parameter_value_selector(stereo_level_parameter_id)
+        -> selector<stereo_level>;
 
 extern const selector<fx::registry> select_fx_registry;
 

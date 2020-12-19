@@ -39,8 +39,6 @@
 #include <piejam/runtime/actions/select_device.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
-#include <piejam/runtime/actions/set_bus_mute.h>
-#include <piejam/runtime/actions/set_bus_pan_balance.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/actions/update_devices.h>

@@ -26,58 +26,91 @@
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
-#include <boost/range/algorithm_ext/push_back.hpp>
-
 namespace piejam::app::gui::model
 {
+
+struct Mixer::Impl
+{
+    container::boxed_vector<runtime::selectors::mixer_bus_info> inputs;
+    container::boxed_vector<runtime::selectors::mixer_bus_info> outputs;
+    runtime::mixer::bus_list_t all;
+};
+
+static auto
+append_bus_ids(
+        std::vector<runtime::selectors::mixer_bus_info> const& bus_infos,
+        runtime::mixer::bus_list_t& bus_ids)
+{
+    std::ranges::transform(
+            bus_infos,
+            std::back_inserter(bus_ids),
+            &runtime::selectors::mixer_bus_info::bus_id);
+}
 
 Mixer::Mixer(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
+    , m_impl(std::make_unique<Impl>())
 {
 }
+
+Mixer::~Mixer() = default;
 
 void
 Mixer::onSubscribe()
 {
-    namespace selectors = runtime::selectors;
-
-    observe(selectors::make_bus_list_selector(audio::bus_direction::input),
-            [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+    observe(runtime::selectors::make_bus_infos_selector(
+                    audio::bus_direction::input),
+            [this](container::boxed_vector<
+                    runtime::selectors::mixer_bus_info> const& bus_infos) {
                 algorithm::apply_edit_script(
-                        algorithm::edit_script(m_inputs, *bus_ids),
+                        algorithm::edit_script(*m_impl->inputs, *bus_infos),
                         generic_list_model_edit_script_executor{
                                 *inputChannels(),
-                                [this](runtime::mixer::bus_id bus_id) {
+                                [this](auto const& bus_info) {
                                     return std::make_unique<MixerChannel>(
                                             dispatch(),
                                             state_change_subscriber(),
-                                            bus_id);
+                                            bus_info.bus_id,
+                                            bus_info.volume,
+                                            bus_info.pan_balance,
+                                            bus_info.mute,
+                                            bus_info.level);
                                 }});
 
-                m_all = m_inputs = bus_ids;
-                boost::push_back(m_all, m_outputs);
+                m_impl->inputs = bus_infos;
+                m_impl->all.clear();
+                append_bus_ids(*m_impl->inputs, m_impl->all);
+                append_bus_ids(*m_impl->outputs, m_impl->all);
             });
 
-    observe(selectors::make_bus_list_selector(audio::bus_direction::output),
-            [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+    observe(runtime::selectors::make_bus_infos_selector(
+                    audio::bus_direction::output),
+            [this](container::boxed_vector<
+                    runtime::selectors::mixer_bus_info> const& bus_infos) {
                 algorithm::apply_edit_script(
-                        algorithm::edit_script(m_outputs, *bus_ids),
+                        algorithm::edit_script(*m_impl->outputs, *bus_infos),
                         generic_list_model_edit_script_executor{
                                 *outputChannels(),
-                                [this](runtime::mixer::bus_id bus_id) {
+                                [this](auto const& bus_info) {
                                     return std::make_unique<MixerChannel>(
                                             dispatch(),
                                             state_change_subscriber(),
-                                            bus_id);
+                                            bus_info.bus_id,
+                                            bus_info.volume,
+                                            bus_info.pan_balance,
+                                            bus_info.mute,
+                                            bus_info.level);
                                 }});
 
-                m_all = m_outputs = bus_ids;
-                boost::push_back(m_all, m_inputs);
+                m_impl->outputs = bus_infos;
+                m_impl->all.clear();
+                append_bus_ids(*m_impl->inputs, m_impl->all);
+                append_bus_ids(*m_impl->outputs, m_impl->all);
             });
 
-    observe(selectors::select_input_solo_active,
+    observe(runtime::selectors::select_input_solo_active,
             [this](bool const input_solo_active) {
                 setInputSoloActive(input_solo_active);
             });
@@ -94,7 +127,7 @@ Mixer::setInputSolo(unsigned const index)
 void
 Mixer::requestLevelsUpdate()
 {
-    dispatch(runtime::actions::request_mixer_levels_update(m_all));
+    dispatch(runtime::actions::request_mixer_levels_update(m_impl->all));
 }
 
 } // namespace piejam::app::gui::model
