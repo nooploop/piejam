@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <memory>
 
 namespace piejam::container
@@ -51,28 +52,32 @@ public:
         return *this;
     }
 
-    template <class U>
-    friend bool operator==(box<U> const& l, box<U> const& r) noexcept;
+    bool operator==(box<T> const& r) const noexcept
+            requires std::equality_comparable<T>
+    {
+        return m_value.get() == r.m_value.get() || get() == r.get();
+    }
 
-    template <class U>
-    friend bool operator!=(box<U> const& l, box<U> const& r) noexcept;
+    bool operator==(box<T> const& r) const noexcept
+            requires(!std::equality_comparable<T>)
+    {
+        return m_value.get() == r.m_value.get();
+    }
+
+    bool operator!=(box<T> const& r) const noexcept
+            requires std::equality_comparable<T>
+    {
+        return m_value.get() != r.m_value.get() && get() != r.get();
+    }
+
+    bool operator!=(box<T> const& r) const noexcept
+            requires(!std::equality_comparable<T>)
+    {
+        return m_value.get() != r.m_value.get();
+    }
 
 private:
     std::shared_ptr<T const> m_value;
 };
-
-template <class T>
-bool
-operator==(box<T> const& l, box<T> const& r) noexcept
-{
-    return l.m_value.get() == r.m_value.get() || l.get() == r.get();
-}
-
-template <class T>
-bool
-operator!=(box<T> const& l, box<T> const& r) noexcept
-{
-    return l.m_value.get() == r.m_value.get() ? false : l.get() != r.get();
-}
 
 } // namespace piejam::container

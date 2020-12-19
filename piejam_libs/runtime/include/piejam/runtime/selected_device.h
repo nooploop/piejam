@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/audio/fwd.h>
+#include <piejam/audio/pcm_hw_params.h>
 #include <piejam/container/box.h>
 
 namespace piejam::runtime
