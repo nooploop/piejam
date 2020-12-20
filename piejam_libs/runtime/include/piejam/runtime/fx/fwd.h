@@ -48,8 +48,9 @@ struct registry;
 
 using parameter_id =
         std::variant<float_parameter_id, int_parameter_id, bool_parameter_id>;
-using parameter_value = std::variant<float, int, bool>;
 using parameter_key = std::size_t;
+using parameter_value = std::variant<float, int, bool>;
+struct parameter_assignment;
 using module_parameters =
         boost::container::flat_map<parameter_key, parameter_id>;
 using parameters_t = boost::container::flat_map<parameter_id, parameter>;

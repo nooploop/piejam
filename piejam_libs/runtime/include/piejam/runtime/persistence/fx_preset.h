@@ -17,18 +17,23 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+
+#include <nlohmann/json.hpp>
 
 #include <vector>
 
 namespace piejam::runtime::fx
 {
 
-struct unavailable_ladspa
-{
-    audio::ladspa::plugin_id_t plugin_id;
-    std::vector<fx::parameter_assignment> parameter_assignments;
-};
+void to_json(nlohmann::json&, parameter_assignment const&);
+void from_json(nlohmann::json const&, parameter_assignment&);
 
 } // namespace piejam::runtime::fx
+
+namespace piejam::runtime::persistence
+{
+
+using fx_preset = std::vector<fx::parameter_assignment>;
+
+} // namespace piejam::runtime::persistence

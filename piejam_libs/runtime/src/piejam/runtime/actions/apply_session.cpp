@@ -20,6 +20,7 @@
 #include <piejam/range/indices.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/persistence/session.h>
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
@@ -36,12 +37,14 @@ struct make_add_fx_module_action
 {
     mixer::bus_id fx_chain_bus;
 
-    auto operator()(fx::internal type) const -> std::unique_ptr<action>
+    auto operator()(persistence::session::internal_fx const& fx) const
+            -> std::unique_ptr<action>
     {
         auto action = std::make_unique<actions::insert_internal_fx_module>();
         action->fx_chain_bus = fx_chain_bus;
         action->position = npos;
-        action->type = type;
+        action->type = fx.type;
+        action->initial_assignments = fx.preset;
         return action;
     }
 
@@ -53,6 +56,7 @@ struct make_add_fx_module_action
         action->position = npos;
         action->plugin_id = ladspa_plug.id;
         action->name = ladspa_plug.name;
+        action->initial_assignments = ladspa_plug.preset;
         return action;
     }
 };

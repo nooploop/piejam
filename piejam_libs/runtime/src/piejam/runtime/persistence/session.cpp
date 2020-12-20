@@ -19,6 +19,7 @@
 
 #include <piejam/functional/overload.h>
 #include <piejam/runtime/fx/internal.h>
+#include <piejam/runtime/fx/parameter_assignment.h>
 
 #include <nlohmann/json.hpp>
 
@@ -50,12 +51,23 @@ get_version(nlohmann::json const& json_ses) -> unsigned
 static auto const s_key_internal = "internal";
 static auto const s_key_ladspa = "ladspa";
 
-// NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::ladspa_plugin, id, name)
+void
+to_json(nlohmann::json& j, session::internal_fx const& fx)
+{
+    j = {{"type", fx.type}, {"preset", fx.preset}};
+}
+
+void
+from_json(nlohmann::json const& j, session::internal_fx& fx)
+{
+    j.at("type").get_to(fx.type);
+    j.at("preset").get_to(fx.preset);
+}
 
 void
 to_json(nlohmann::json& j, session::ladspa_plugin const& plug)
 {
-    j = {{"id", plug.id}, {"name", plug.name}};
+    j = {{"id", plug.id}, {"name", plug.name}, {"preset", plug.preset}};
 }
 
 void
@@ -63,6 +75,7 @@ from_json(nlohmann::json const& j, session::ladspa_plugin& plug)
 {
     j.at("id").get_to(plug.id);
     j.at("name").get_to(plug.name);
+    j.at("preset").get_to(plug.preset);
 }
 
 void
@@ -70,8 +83,8 @@ to_json(nlohmann::json& j, session::fx_plugin const& fx_plug)
 {
     std::visit(
             overload{
-                    [&j](fx::internal id) {
-                        j = {{s_key_internal, id}};
+                    [&j](session::internal_fx const& fx) {
+                        j = {{s_key_internal, fx}};
                     },
                     [&j](session::ladspa_plugin const& ladspa_plug) {
                         j = {{s_key_ladspa, ladspa_plug}};
@@ -84,9 +97,9 @@ from_json(nlohmann::json const& j, session::fx_plugin& fx_plug)
 {
     if (j.contains(s_key_internal))
     {
-        fx::internal id;
-        j[s_key_internal].get_to(id);
-        fx_plug = id;
+        session::internal_fx fx;
+        j[s_key_internal].get_to(fx);
+        fx_plug = fx;
     }
     else if (j.contains(s_key_ladspa))
     {

@@ -18,6 +18,7 @@
 #include <piejam/runtime/actions/insert_fx_module.h>
 
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fx/parameter_assignment.h>
 
 #include <boost/assert.hpp>
 
@@ -29,7 +30,12 @@ insert_internal_fx_module::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    runtime::insert_internal_fx_module(new_st, fx_chain_bus, position, type);
+    runtime::insert_internal_fx_module(
+            new_st,
+            fx_chain_bus,
+            position,
+            type,
+            initial_assignments);
 
     return new_st;
 }
@@ -51,7 +57,8 @@ insert_ladspa_fx_module::reduce(state const& st) const -> state
             position,
             instance_id,
             plugin_desc,
-            control_inputs);
+            control_inputs,
+            initial_assignments);
 
     return new_st;
 }

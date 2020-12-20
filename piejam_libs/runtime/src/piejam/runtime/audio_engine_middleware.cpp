@@ -364,6 +364,7 @@ audio_engine_middleware::process_engine_action(
                         next_action.plugin_desc = *plugin_desc;
                         next_action.control_inputs =
                                 m_ladspa_fx_manager->control_inputs(id);
+                        next_action.initial_assignments = a.initial_assignments;
 
                         m_next(next_action);
 
@@ -379,7 +380,9 @@ audio_engine_middleware::process_engine_action(
                         actions::insert_missing_ladspa_fx_module next_action;
                         next_action.fx_chain_bus = a.fx_chain_bus;
                         next_action.position = a.position;
-                        next_action.unavailable_ladspa = {a.plugin_id};
+                        next_action.unavailable_ladspa = {
+                                a.plugin_id,
+                                a.initial_assignments};
                         next_action.name = a.name;
                         m_next(next_action);
                     }
@@ -389,7 +392,9 @@ audio_engine_middleware::process_engine_action(
                     actions::insert_missing_ladspa_fx_module next_action;
                     next_action.fx_chain_bus = a.fx_chain_bus;
                     next_action.position = a.position;
-                    next_action.unavailable_ladspa = {a.plugin_id};
+                    next_action.unavailable_ladspa = {
+                            a.plugin_id,
+                            a.initial_assignments};
                     next_action.name = a.name;
                     m_next(next_action);
                 }

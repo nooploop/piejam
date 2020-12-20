@@ -107,6 +107,27 @@ save_app_config(std::filesystem::path const& file, state const& state)
 }
 
 static auto
+export_parameter_assignments(
+        fx::module const& fx_mod,
+        parameter_maps const& params) -> std::vector<fx::parameter_assignment>
+{
+    std::vector<fx::parameter_assignment> result;
+
+    for (auto&& [key, fx_param_id] : *fx_mod.parameters)
+    {
+        std::visit(
+                [&](auto&& param) {
+                    auto const* const value = params.get(param);
+                    BOOST_ASSERT(value);
+                    result.emplace_back(fx::parameter_assignment{key, *value});
+                },
+                fx_param_id);
+    }
+
+    return result;
+}
+
+static auto
 export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
         -> std::vector<persistence::session::fx_chain>
 {
@@ -123,18 +144,27 @@ export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
             fx::module const* const fx_mod = (*st.fx_modules)[fx_mod_id];
             fx_chain_data.emplace_back(std::visit(
                     overload{
-                            [](fx::internal id) -> session::fx_plugin {
-                                return id;
+                            [&st, fx_mod](fx::internal const fx_type)
+                                    -> session::fx_plugin {
+                                session::internal_fx fx;
+                                fx.type = fx_type;
+                                fx.preset = export_parameter_assignments(
+                                        *fx_mod,
+                                        st.params);
+                                return fx;
                             },
-                            [&st](fx::ladspa_instance_id id)
+                            [&st, fx_mod](fx::ladspa_instance_id const id)
                                     -> session::fx_plugin {
                                 session::ladspa_plugin plug;
                                 auto const& pd = st.fx_ladspa_instances->at(id);
                                 plug.id = pd.id;
                                 plug.name = pd.name;
+                                plug.preset = export_parameter_assignments(
+                                        *fx_mod,
+                                        st.params);
                                 return plug;
                             },
-                            [&st, fx_mod](fx::unavailable_ladspa_id const& id)
+                            [&st, fx_mod](fx::unavailable_ladspa_id const id)
                                     -> session::fx_plugin {
                                 auto unavail =
                                         (*st.fx_unavailable_ladspa_plugins)[id];
@@ -142,6 +172,7 @@ export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
                                 session::ladspa_plugin plug;
                                 plug.id = unavail->plugin_id;
                                 plug.name = fx_mod->name;
+                                plug.preset = unavail->parameter_assignments;
                                 return plug;
                             }},
                     fx_mod->fx_instance_id));

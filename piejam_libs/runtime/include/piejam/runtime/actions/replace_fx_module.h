@@ -43,7 +43,9 @@ auto make_replace_fx_module_action(
         mixer::bus_id fx_chain_bus,
         std::size_t position,
         audio::ladspa::plugin_id_t,
-        std::string_view const& name) -> batch_action;
+        std::string_view const& name,
+        std::vector<fx::parameter_assignment> const& initial_assignments)
+        -> batch_action;
 
 auto replace_fx_module(
         mixer::bus_id fx_chain_bus,

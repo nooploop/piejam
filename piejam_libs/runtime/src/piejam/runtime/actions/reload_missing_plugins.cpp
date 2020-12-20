@@ -54,7 +54,8 @@ reload_missing_plugins() -> thunk_action
                             bus_id,
                             fx_pos,
                             unavail->plugin_id,
-                            *fx_mod->name));
+                            *fx_mod->name,
+                            unavail->parameter_assignments));
                 }
             }
         }

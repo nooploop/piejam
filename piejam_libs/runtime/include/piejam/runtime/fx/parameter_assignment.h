@@ -17,18 +17,15 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
-
-#include <vector>
 
 namespace piejam::runtime::fx
 {
 
-struct unavailable_ladspa
+struct parameter_assignment
 {
-    audio::ladspa::plugin_id_t plugin_id;
-    std::vector<fx::parameter_assignment> parameter_assignments;
+    parameter_key key;
+    parameter_value value;
 };
 
 } // namespace piejam::runtime::fx

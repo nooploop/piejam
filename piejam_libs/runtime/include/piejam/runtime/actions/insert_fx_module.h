@@ -28,6 +28,7 @@
 #include <piejam/runtime/ui/cloneable_action.h>
 
 #include <span>
+#include <vector>
 
 namespace piejam::runtime::actions
 {
@@ -39,6 +40,7 @@ struct insert_internal_fx_module final
     mixer::bus_id fx_chain_bus;
     std::size_t position{};
     fx::internal type{};
+    std::vector<fx::parameter_assignment> initial_assignments;
 
     auto reduce(state const&) const -> state override;
 };
@@ -51,6 +53,7 @@ struct load_ladspa_fx_plugin final
     std::size_t position{};
     audio::ladspa::plugin_id_t plugin_id;
     std::string name;
+    std::vector<fx::parameter_assignment> initial_assignments;
 
     auto reduce(state const&) const -> state override;
 };
@@ -63,6 +66,7 @@ struct insert_ladspa_fx_module final
     fx::ladspa_instance_id instance_id;
     audio::ladspa::plugin_descriptor plugin_desc;
     std::span<audio::ladspa::port_descriptor const> control_inputs;
+    std::vector<fx::parameter_assignment> initial_assignments;
 
     auto reduce(state const&) const -> state override;
 };

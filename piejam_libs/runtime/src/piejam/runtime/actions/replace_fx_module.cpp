@@ -21,6 +21,7 @@
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
@@ -92,7 +93,9 @@ make_replace_fx_module_action(
         mixer::bus_id const fx_chain_bus,
         std::size_t const position,
         audio::ladspa::plugin_id_t const plugin_id,
-        std::string_view const& name) -> batch_action
+        std::string_view const& name,
+        std::vector<fx::parameter_assignment> const& initial_assignments)
+        -> batch_action
 {
     batch_action batch;
 
@@ -111,6 +114,7 @@ make_replace_fx_module_action(
     insert_action->position = position;
     insert_action->plugin_id = plugin_id;
     insert_action->name = name;
+    insert_action->initial_assignments = initial_assignments;
     batch.push_back(std::move(insert_action));
 
     return batch;
@@ -129,7 +133,8 @@ replace_fx_module(
                 fx_chain_bus,
                 position,
                 plugin_id,
-                name));
+                name,
+                {}));
     };
 }
 
@@ -145,7 +150,8 @@ replace_fx_module(
                 get_state().fx_chain_bus,
                 position,
                 plugin_id,
-                name));
+                name,
+                {}));
     };
 }
 

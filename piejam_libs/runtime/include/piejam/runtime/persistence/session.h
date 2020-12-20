@@ -20,6 +20,7 @@
 #include <piejam/audio/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/persistence/fx_preset.h>
 
 #include <nlohmann/json.hpp>
 
@@ -35,15 +36,22 @@ inline constexpr unsigned current_session_version = 0;
 
 struct session
 {
+    struct internal_fx
+    {
+        fx::internal type;
+        fx_preset preset;
+    };
+
     struct ladspa_plugin
     {
         audio::ladspa::plugin_id_t id{};
         std::string name;
+        fx_preset preset;
     };
 
-    struct fx_plugin : std::variant<fx::internal, ladspa_plugin>
+    struct fx_plugin : std::variant<internal_fx, ladspa_plugin>
     {
-        using base_t = std::variant<fx::internal, ladspa_plugin>;
+        using base_t = std::variant<internal_fx, ladspa_plugin>;
         using base_t::variant;
         auto as_variant() const noexcept -> base_t const& { return *this; }
     };

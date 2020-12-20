@@ -85,17 +85,48 @@ make_fx_gain(
             fx::make_gain_module(fx_params, params.get_map<float_parameter>()));
 }
 
+static void
+apply_parameter_assignments(
+        std::vector<fx::parameter_assignment> const& assignments,
+        fx::module const& fx_mod,
+        parameter_maps& params)
+{
+    for (auto&& [key, value] : assignments)
+    {
+        if (auto it = fx_mod.parameters->find(key);
+            it != fx_mod.parameters->end())
+        {
+            auto const& fx_param_id = it->second;
+            std::visit(
+                    overload{
+                            [&params](float_parameter_id id, float v) {
+                                params.set(id, v);
+                            },
+                            [&params](int_parameter_id id, int v) {
+                                params.set(id, v);
+                            },
+                            [&params](bool_parameter_id id, bool v) {
+                                params.set(id, v);
+                            },
+                            [](auto&&, auto&&) { BOOST_ASSERT(false); }},
+                    fx_param_id,
+                    value);
+        }
+    }
+}
+
 void
 insert_internal_fx_module(
         audio_state& st,
         mixer::bus_id const bus_id,
         std::size_t const position,
-        fx::internal const fx_type)
+        fx::internal const fx_type,
+        std::vector<fx::parameter_assignment> const& initial_assignments)
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
     std::tie(st.mixer_state.buses, st.fx_modules, st.fx_parameters) =
-            [bus_id, position, fx_type](
+            [bus_id, position, fx_type, &initial_assignments](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
                     fx::modules_t fx_modules,
@@ -113,6 +144,11 @@ insert_internal_fx_module(
                                 make_fx_gain(fx_modules, fx_params, params));
                         break;
                 }
+
+                apply_parameter_assignments(
+                        initial_assignments,
+                        *std::as_const(fx_modules)[fx_chain[insert_pos]],
+                        params);
 
                 bus.fx_chain = std::move(fx_chain);
 
@@ -134,7 +170,8 @@ insert_ladspa_fx_module(
         std::size_t const position,
         fx::ladspa_instance_id const instance_id,
         audio::ladspa::plugin_descriptor const& plugin_desc,
-        std::span<audio::ladspa::port_descriptor const> const& control_inputs)
+        std::span<audio::ladspa::port_descriptor const> const& control_inputs,
+        std::vector<fx::parameter_assignment> const& initial_assignments)
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
@@ -143,7 +180,12 @@ insert_ladspa_fx_module(
             st.fx_modules,
             st.fx_parameters,
             st.fx_ladspa_instances) =
-            [bus_id, position, instance_id, &plugin_desc, control_inputs](
+            [bus_id,
+             position,
+             instance_id,
+             &plugin_desc,
+             control_inputs,
+             &initial_assignments](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
                     fx::modules_t fx_modules,
@@ -164,6 +206,11 @@ insert_ladspa_fx_module(
                                 params.get_map<float_parameter>(),
                                 params.get_map<int_parameter>(),
                                 params.get_map<bool_parameter>())));
+
+                apply_parameter_assignments(
+                        initial_assignments,
+                        *std::as_const(fx_modules)[fx_chain[insert_pos]],
+                        params);
 
                 bus.fx_chain = std::move(fx_chain);
 
