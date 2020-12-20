@@ -136,8 +136,8 @@ audio_engine_middleware::process_device_action(
 
 static auto
 next_samplerate_and_period_size(
-        container::box<audio::pcm_hw_params> input_hw_params,
-        container::box<audio::pcm_hw_params> output_hw_params,
+        box<audio::pcm_hw_params> input_hw_params,
+        box<audio::pcm_hw_params> output_hw_params,
         audio::samplerate_t const current_samplerate,
         audio::period_size_t const current_period_size)
         -> std::pair<audio::samplerate_t, audio::period_size_t>

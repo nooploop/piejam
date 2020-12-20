@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/container/box.h>
+#include <piejam/box.h>
 
 #include <boost/callable_traits/args.hpp>
 #include <boost/callable_traits/return_type.hpp>

@@ -18,7 +18,7 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
-#include <piejam/container/box.h>
+#include <piejam/box.h>
 #include <piejam/runtime/actions/device_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/selected_device.h>
@@ -31,7 +31,7 @@ struct update_devices final
     : ui::cloneable_action<update_devices, action>
     , visitable_device_action<update_devices>
 {
-    container::box<piejam::audio::pcm_io_descriptors> pcm_devices;
+    box<piejam::audio::pcm_io_descriptors> pcm_devices;
 
     selected_device input;
     selected_device output;

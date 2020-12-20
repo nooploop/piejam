@@ -54,7 +54,7 @@ AudioInputOutputSettings::onSubscribe()
             });
 
     observe(selectors::make_bus_list_selector(m_settings_type),
-            [this](container::box<runtime::mixer::bus_list_t> const& bus_ids) {
+            [this](box<runtime::mixer::bus_list_t> const& bus_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_bus_ids, *bus_ids),
                         generic_list_model_edit_script_executor{

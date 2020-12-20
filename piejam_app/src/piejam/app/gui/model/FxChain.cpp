@@ -37,7 +37,7 @@ void
 FxChain::onSubscribe()
 {
     observe(runtime::selectors::select_current_fx_chain,
-            [this](container::box<runtime::fx::chain_t> const& fx_chain) {
+            [this](box<runtime::fx::chain_t> const& fx_chain) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_fx_chain, *fx_chain),
                         generic_list_model_edit_script_executor{

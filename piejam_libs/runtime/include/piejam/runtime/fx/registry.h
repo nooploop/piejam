@@ -18,7 +18,7 @@
 #pragma once
 
 #include <piejam/audio/ladspa/plugin_descriptor.h>
-#include <piejam/container/boxed_vector.h>
+#include <piejam/boxed_vector.h>
 #include <piejam/runtime/fx/internal.h>
 
 #include <variant>
@@ -30,7 +30,7 @@ struct registry
 {
     using item = std::variant<internal, audio::ladspa::plugin_descriptor>;
 
-    container::boxed_vector<item> entries;
+    boxed_vector<item> entries;
 };
 
 inline bool

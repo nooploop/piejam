@@ -4,6 +4,8 @@ endif()
 
 find_package(GTest REQUIRED)
 add_executable(piejam_base_test
+    ${CMAKE_CURRENT_SOURCE_DIR}/box_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/boxify_result_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/decay_tuple_elements_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/entity_map_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/type_traits_test.cpp

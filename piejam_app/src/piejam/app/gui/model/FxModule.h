@@ -18,7 +18,7 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/container/box.h>
+#include <piejam/box.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/runtime/fx/fwd.h>
 
@@ -40,7 +40,7 @@ private:
 
     runtime::fx::module_id const m_fx_mod_id;
 
-    container::box<runtime::fx::module_parameters> m_param_ids;
+    box<runtime::fx::module_parameters> m_param_ids;
 };
 
 } // namespace piejam::app::gui::model

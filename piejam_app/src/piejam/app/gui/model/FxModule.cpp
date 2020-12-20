@@ -73,12 +73,12 @@ void
 FxModule::onSubscribe()
 {
     observe(runtime::selectors::make_fx_module_name_selector(m_fx_mod_id),
-            [this](container::boxed_string const& name) {
+            [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
 
     observe(runtime::selectors::make_fx_module_parameters_selector(m_fx_mod_id),
-            [this](container::box<runtime::fx::module_parameters> const&
+            [this](box<runtime::fx::module_parameters> const&
                            param_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(

@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include <piejam/container/box.h>
+#include <piejam/box.h>
 
 #include <string>
 
-namespace piejam::container
+namespace piejam
 {
 
 using boxed_string = box<std::string>;
 
-} // namespace piejam::container
+} // namespace piejam

@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/selectors.h>
 
-#include <piejam/container/boxify_result.h>
+#include <piejam/boxify_result.h>
 #include <piejam/functional/memo.h>
 #include <piejam/npos.h>
 #include <piejam/reselect/selector.h>
@@ -77,7 +77,7 @@ make_num_device_channels_selector(audio::bus_direction const bd)
 
 auto
 make_bus_list_selector(audio::bus_direction const bd)
-        -> selector<container::box<mixer::bus_list_t>>
+        -> selector<box<mixer::bus_list_t>>
 {
     switch (bd)
     {
@@ -91,9 +91,9 @@ make_bus_list_selector(audio::bus_direction const bd)
 
 static auto
 make_bus_infos(
-        container::box<mixer::buses_t> const& buses,
-        container::box<mixer::bus_list_t> const& bus_ids)
-        -> container::boxed_vector<mixer_bus_info>
+        box<mixer::buses_t> const& buses,
+        box<mixer::bus_list_t> const& bus_ids)
+        -> boxed_vector<mixer_bus_info>
 {
     std::vector<mixer_bus_info> infos;
 
@@ -116,7 +116,7 @@ make_bus_infos(
 
 auto
 make_bus_infos_selector(audio::bus_direction const bd)
-        -> selector<container::boxed_vector<mixer_bus_info>>
+        -> selector<boxed_vector<mixer_bus_info>>
 {
     switch (bd)
     {
@@ -136,11 +136,11 @@ make_bus_infos_selector(audio::bus_direction const bd)
 
 auto
 make_bus_name_selector(mixer::bus_id bus_id)
-        -> selector<container::boxed_string>
+        -> selector<boxed_string>
 {
-    return [bus_id](state const& st) mutable -> container::boxed_string {
+    return [bus_id](state const& st) mutable -> boxed_string {
         mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
-        return bus ? bus->name : container::boxed_string();
+        return bus ? bus->name : boxed_string();
     };
 }
 
@@ -238,9 +238,9 @@ const selector<mixer::bus_id> select_fx_chain_bus([](state const& st) {
     return st.fx_chain_bus;
 });
 
-const selector<container::box<fx::chain_t>>
+const selector<box<fx::chain_t>>
         select_current_fx_chain([](state const& st) {
-            static container::box<fx::chain_t> s_empty_fx_chain;
+            static box<fx::chain_t> s_empty_fx_chain;
             mixer::bus const* const bus =
                     st.mixer_state.buses.get()[st.fx_chain_bus];
             return bus ? bus->fx_chain : s_empty_fx_chain;
@@ -264,10 +264,10 @@ select_current_fx_chain_bus_volume([](state const& st) -> float {
 
 auto
 make_fx_module_name_selector(fx::module_id fx_mod_id)
-        -> selector<container::boxed_string>
+        -> selector<boxed_string>
 {
-    return [fx_mod_id](state const& st) -> container::boxed_string {
-        static container::boxed_string s_empty_name;
+    return [fx_mod_id](state const& st) -> boxed_string {
+        static boxed_string s_empty_name;
         fx::module const* const fx_mod = st.fx_modules.get()[fx_mod_id];
         return fx_mod ? fx_mod->name : s_empty_name;
     };
@@ -275,11 +275,11 @@ make_fx_module_name_selector(fx::module_id fx_mod_id)
 
 auto
 make_fx_module_parameters_selector(fx::module_id fx_mod_id)
-        -> selector<container::box<fx::module_parameters>>
+        -> selector<box<fx::module_parameters>>
 {
     return [fx_mod_id](
-                   state const& st) -> container::box<fx::module_parameters> {
-        static container::box<fx::module_parameters> s_empty;
+                   state const& st) -> box<fx::module_parameters> {
+        static box<fx::module_parameters> s_empty;
         fx::module const* const fx_mod = st.fx_modules.get()[fx_mod_id];
         return fx_mod ? fx_mod->parameters : s_empty;
     };
@@ -287,10 +287,10 @@ make_fx_module_parameters_selector(fx::module_id fx_mod_id)
 
 auto
 make_fx_parameter_name_selector(fx::parameter_id const fx_param_id)
-        -> selector<container::boxed_string>
+        -> selector<boxed_string>
 {
-    return [fx_param_id](state const& st) -> container::boxed_string {
-        static container::boxed_string s_empty;
+    return [fx_param_id](state const& st) -> boxed_string {
+        static boxed_string s_empty;
         if (auto it = st.fx_parameters->find(fx_param_id);
             it != st.fx_parameters->end())
         {

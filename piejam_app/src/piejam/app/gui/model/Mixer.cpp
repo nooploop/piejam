@@ -31,8 +31,8 @@ namespace piejam::app::gui::model
 
 struct Mixer::Impl
 {
-    container::boxed_vector<runtime::selectors::mixer_bus_info> inputs;
-    container::boxed_vector<runtime::selectors::mixer_bus_info> outputs;
+    boxed_vector<runtime::selectors::mixer_bus_info> inputs;
+    boxed_vector<runtime::selectors::mixer_bus_info> outputs;
     runtime::mixer::bus_list_t all;
 };
 
@@ -62,7 +62,7 @@ Mixer::onSubscribe()
 {
     observe(runtime::selectors::make_bus_infos_selector(
                     audio::bus_direction::input),
-            [this](container::boxed_vector<
+            [this](boxed_vector<
                     runtime::selectors::mixer_bus_info> const& bus_infos) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->inputs, *bus_infos),
@@ -87,7 +87,7 @@ Mixer::onSubscribe()
 
     observe(runtime::selectors::make_bus_infos_selector(
                     audio::bus_direction::output),
-            [this](container::boxed_vector<
+            [this](boxed_vector<
                     runtime::selectors::mixer_bus_info> const& bus_infos) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->outputs, *bus_infos),

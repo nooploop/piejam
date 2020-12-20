@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/container/boxed_string.h>
+#include <piejam/boxed_string.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
@@ -28,8 +28,8 @@ namespace piejam::runtime::fx
 struct module
 {
     instance_id fx_instance_id;
-    container::boxed_string name;
-    container::box<module_parameters> parameters;
+    boxed_string name;
+    box<module_parameters> parameters;
 };
 
 } // namespace piejam::runtime::fx

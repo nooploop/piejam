@@ -21,7 +21,7 @@
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/types.h>
-#include <piejam/container/box.h>
+#include <piejam/box.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/fx/ladspa_instances.h>
@@ -48,7 +48,7 @@ namespace piejam::runtime
 
 struct audio_state
 {
-    container::box<audio::pcm_io_descriptors> pcm_devices;
+    box<audio::pcm_io_descriptors> pcm_devices;
 
     selected_device input;
     selected_device output;
@@ -60,10 +60,10 @@ struct audio_state
 
     fx::registry fx_registry{fx::make_default_registry()};
 
-    container::box<fx::modules_t> fx_modules;
-    container::box<fx::parameters_t> fx_parameters;
-    container::box<fx::ladspa_instances> fx_ladspa_instances;
-    container::box<fx::unavailable_ladspa_plugins>
+    box<fx::modules_t> fx_modules;
+    box<fx::parameters_t> fx_parameters;
+    box<fx::ladspa_instances> fx_ladspa_instances;
+    box<fx::unavailable_ladspa_plugins>
             fx_unavailable_ladspa_plugins;
 
     mixer::state mixer_state{};
@@ -75,14 +75,14 @@ struct audio_state
 };
 
 auto samplerates(
-        container::box<audio::pcm_hw_params> input_hw_params,
-        container::box<audio::pcm_hw_params> output_hw_params)
+        box<audio::pcm_hw_params> input_hw_params,
+        box<audio::pcm_hw_params> output_hw_params)
         -> audio::samplerates_t;
 auto samplerates_from_state(audio_state const&) -> audio::samplerates_t;
 
 auto period_sizes(
-        container::box<audio::pcm_hw_params> input_hw_params,
-        container::box<audio::pcm_hw_params> output_hw_params)
+        box<audio::pcm_hw_params> input_hw_params,
+        box<audio::pcm_hw_params> output_hw_params)
         -> audio::period_sizes_t;
 auto period_sizes_from_state(audio_state const&) -> audio::period_sizes_t;
 

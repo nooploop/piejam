@@ -48,7 +48,7 @@ void
 FxParameter::onSubscribe()
 {
     observe(runtime::selectors::make_fx_parameter_name_selector(m_fx_param_id),
-            [this](container::boxed_string const& name) {
+            [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
 

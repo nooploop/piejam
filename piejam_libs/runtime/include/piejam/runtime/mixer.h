@@ -19,7 +19,7 @@
 
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
-#include <piejam/container/boxed_string.h>
+#include <piejam/boxed_string.h>
 #include <piejam/entity_map.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
@@ -41,7 +41,7 @@ using channel_type = audio::bus_type;
 
 struct bus
 {
-    container::boxed_string name;
+    boxed_string name;
     float_parameter_id volume;
     float_parameter_id pan_balance;
     bool_parameter_id mute;
@@ -51,15 +51,15 @@ struct bus
     //! mono channels hold same device channel in the pair
     channel_index_pair device_channels{npos};
 
-    container::box<fx::chain_t> fx_chain{};
+    box<fx::chain_t> fx_chain{};
 };
 
 struct state
 {
-    container::box<buses_t> buses;
+    box<buses_t> buses;
 
-    container::box<bus_list_t> inputs;
-    container::box<bus_list_t> outputs;
+    box<bus_list_t> inputs;
+    box<bus_list_t> outputs;
     bus_id input_solo_id;
 };
 
@@ -72,7 +72,7 @@ bus_ids(state const& st) -> bus_list_t const&
 
 template <audio::bus_direction D>
 auto
-bus_ids(state& st) -> container::box<bus_list_t>&
+bus_ids(state& st) -> box<bus_list_t>&
 {
     return D == audio::bus_direction::input ? st.inputs : st.outputs;
 }

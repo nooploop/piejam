@@ -4,8 +4,6 @@ endif()
 
 find_package(GTest REQUIRED)
 add_executable(piejam_container_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/box_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/boxify_result_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/table_test.cpp
 )
 target_link_libraries(piejam_container_test gtest gtest_main piejam_container)

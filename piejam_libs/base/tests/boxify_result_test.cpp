@@ -15,16 +15,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+#include <piejam/boxify_result.h>
 
-#include <piejam/container/box.h>
-
-#include <vector>
+#include <gtest/gtest.h>
 
 namespace piejam::container
 {
 
-template <class T>
-using boxed_vector = box<std::vector<T>>;
+TEST(boxify_result, can_get_args)
+{
+    auto f = boxify_result([](int const& x, int& y) -> int { return x + y; });
+    static_assert(std::is_same_v<
+                  std::tuple<int const&, int&>,
+                  boost::callable_traits::args_t<decltype(f)>>);
+    static_assert(std::is_same_v<
+                  box<int>,
+                  boost::callable_traits::return_type_t<decltype(f)>>);
+}
 
 } // namespace piejam::container

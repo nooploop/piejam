@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/container/boxed_string.h>
+#include <piejam/boxed_string.h>
 
 #include <variant>
 
@@ -47,7 +47,7 @@ private:
 
 struct parameter
 {
-    container::boxed_string name;
+    boxed_string name;
     parameter_value_to_string value_to_string;
 };
 

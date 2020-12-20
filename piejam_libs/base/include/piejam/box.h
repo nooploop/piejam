@@ -20,7 +20,7 @@
 #include <concepts>
 #include <memory>
 
-namespace piejam::container
+namespace piejam
 {
 
 template <class T>
@@ -89,4 +89,4 @@ private:
     std::shared_ptr<T const> m_value;
 };
 
-} // namespace piejam::container
+} // namespace piejam

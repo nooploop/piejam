@@ -43,8 +43,8 @@ set_intersection(Vector const& in, Vector const& out)
 
 auto
 samplerates(
-        container::box<audio::pcm_hw_params> input_hw_params,
-        container::box<audio::pcm_hw_params> output_hw_params)
+        box<audio::pcm_hw_params> input_hw_params,
+        box<audio::pcm_hw_params> output_hw_params)
         -> audio::samplerates_t
 {
     return set_intersection(
@@ -60,8 +60,8 @@ samplerates_from_state(audio_state const& state) -> audio::samplerates_t
 
 auto
 period_sizes(
-        container::box<audio::pcm_hw_params> input_hw_params,
-        container::box<audio::pcm_hw_params> output_hw_params)
+        box<audio::pcm_hw_params> input_hw_params,
+        box<audio::pcm_hw_params> output_hw_params)
         -> audio::period_sizes_t
 {
     return set_intersection(

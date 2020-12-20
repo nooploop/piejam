@@ -18,7 +18,7 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/container/box.h>
+#include <piejam/box.h>
 #include <piejam/gui/model/FxChain.h>
 #include <piejam/runtime/fx/fwd.h>
 
@@ -33,7 +33,7 @@ public:
 private:
     void onSubscribe() override;
 
-    container::box<runtime::fx::chain_t> m_fx_chain;
+    box<runtime::fx::chain_t> m_fx_chain;
 };
 
 } // namespace piejam::app::gui::model

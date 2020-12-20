@@ -18,7 +18,7 @@
 #pragma once
 
 #include <piejam/audio/pcm_hw_params.h>
-#include <piejam/container/box.h>
+#include <piejam/box.h>
 
 namespace piejam::runtime
 {
@@ -26,7 +26,7 @@ namespace piejam::runtime
 struct selected_device
 {
     std::size_t index{};
-    container::box<audio::pcm_hw_params> hw_params;
+    box<audio::pcm_hw_params> hw_params;
 };
 
 inline bool

@@ -21,9 +21,9 @@
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
 #include <piejam/audio/types.h>
-#include <piejam/container/box.h>
-#include <piejam/container/boxed_string.h>
-#include <piejam/container/boxed_vector.h>
+#include <piejam/box.h>
+#include <piejam/boxed_string.h>
+#include <piejam/boxed_vector.h>
 #include <piejam/entity_id.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
@@ -40,27 +40,27 @@ namespace piejam::runtime::selectors
 template <class Value>
 using selector = reselect::selector<Value, state>;
 
-using samplerate = std::pair<container::box<audio::samplerates_t>, unsigned>;
+using samplerate = std::pair<box<audio::samplerates_t>, unsigned>;
 extern const selector<samplerate> select_samplerate;
 
-using period_size = std::pair<container::box<audio::period_sizes_t>, unsigned>;
+using period_size = std::pair<box<audio::period_sizes_t>, unsigned>;
 extern const selector<period_size> select_period_size;
 
 //! \todo input_devices/output_devices could get a reduced value, not the whole
 //! pcm_io_descriptors
 using input_devices =
-        std::pair<container::box<audio::pcm_io_descriptors>, std::size_t>;
+        std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
 extern const selector<input_devices> select_input_devices;
 
 using output_devices =
-        std::pair<container::box<audio::pcm_io_descriptors>, std::size_t>;
+        std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
 extern const selector<output_devices> select_output_devices;
 
 auto make_num_device_channels_selector(audio::bus_direction)
         -> selector<std::size_t>;
 
 auto make_bus_list_selector(audio::bus_direction)
-        -> selector<container::box<mixer::bus_list_t>>;
+        -> selector<box<mixer::bus_list_t>>;
 
 struct mixer_bus_info
 {
@@ -82,9 +82,9 @@ struct mixer_bus_info
 };
 
 auto make_bus_infos_selector(audio::bus_direction)
-        -> selector<container::boxed_vector<mixer_bus_info>>;
+        -> selector<boxed_vector<mixer_bus_info>>;
 
-auto make_bus_name_selector(mixer::bus_id) -> selector<container::boxed_string>;
+auto make_bus_name_selector(mixer::bus_id) -> selector<boxed_string>;
 
 auto make_bus_type_selector(mixer::bus_id) -> selector<audio::bus_type>;
 
@@ -102,16 +102,16 @@ extern const selector<bool> select_input_solo_active;
 
 extern const selector<mixer::bus_id> select_fx_chain_bus;
 
-extern const selector<container::box<fx::chain_t>> select_current_fx_chain;
+extern const selector<box<fx::chain_t>> select_current_fx_chain;
 extern const selector<stereo_level> select_current_fx_chain_bus_level;
 extern const selector<float> select_current_fx_chain_bus_volume;
 
 auto make_fx_module_name_selector(fx::module_id)
-        -> selector<container::boxed_string>;
+        -> selector<boxed_string>;
 auto make_fx_module_parameters_selector(fx::module_id)
-        -> selector<container::box<fx::module_parameters>>;
+        -> selector<box<fx::module_parameters>>;
 auto make_fx_parameter_name_selector(fx::parameter_id)
-        -> selector<container::boxed_string>;
+        -> selector<boxed_string>;
 auto make_fx_parameter_id_selector(fx::module_id, fx::parameter_key)
         -> selector<fx::parameter_id>;
 auto make_fx_parameter_value_string_selector(fx::parameter_id)
