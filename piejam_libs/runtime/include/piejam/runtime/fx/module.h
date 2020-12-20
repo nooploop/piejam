@@ -20,7 +20,7 @@
 #include <piejam/container/boxed_string.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/missing_ladspa.h>
+#include <piejam/runtime/fx/unavailable_ladspa.h>
 
 namespace piejam::runtime::fx
 {

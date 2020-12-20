@@ -32,9 +32,13 @@ enum class internal : unsigned;
 struct ladspa_instance_id_tag;
 using ladspa_instance_id = entity_id<ladspa_instance_id_tag>;
 
-struct missing_ladspa;
+struct unavailable_ladspa;
+using unavailable_ladspa_id = entity_id<unavailable_ladspa>;
+using unavailable_ladspa_plugins =
+        entity_map<unavailable_ladspa, unavailable_ladspa>;
 
-using instance_id = std::variant<internal, ladspa_instance_id, missing_ladspa>;
+using instance_id =
+        std::variant<internal, ladspa_instance_id, unavailable_ladspa_id>;
 
 class ladspa_manager;
 
@@ -44,6 +48,7 @@ struct registry;
 
 using parameter_id =
         std::variant<float_parameter_id, int_parameter_id, bool_parameter_id>;
+using parameter_value = std::variant<float, int, bool>;
 using parameter_key = std::size_t;
 using module_parameters =
         boost::container::flat_map<parameter_key, parameter_id>;

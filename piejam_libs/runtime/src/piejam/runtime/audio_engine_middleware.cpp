@@ -379,7 +379,7 @@ audio_engine_middleware::process_engine_action(
                         actions::insert_missing_ladspa_fx_module next_action;
                         next_action.fx_chain_bus = a.fx_chain_bus;
                         next_action.position = a.position;
-                        next_action.missing_id = {a.plugin_id};
+                        next_action.unavailable_ladspa = {a.plugin_id};
                         next_action.name = a.name;
                         m_next(next_action);
                     }
@@ -389,7 +389,7 @@ audio_engine_middleware::process_engine_action(
                     actions::insert_missing_ladspa_fx_module next_action;
                     next_action.fx_chain_bus = a.fx_chain_bus;
                     next_action.position = a.position;
-                    next_action.missing_id = {a.plugin_id};
+                    next_action.unavailable_ladspa = {a.plugin_id};
                     next_action.name = a.name;
                     m_next(next_action);
                 }

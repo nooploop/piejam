@@ -62,6 +62,8 @@ struct audio_state
     container::box<fx::modules_t> fx_modules;
     container::box<fx::parameters_t> fx_parameters;
     container::box<fx::ladspa_instances> fx_ladspa_instances;
+    container::box<fx::unavailable_ladspa_plugins>
+            fx_unavailable_ladspa_plugins;
 
     mixer::state mixer_state{};
 
@@ -112,7 +114,7 @@ void insert_missing_ladspa_fx_module(
         audio_state&,
         mixer::bus_id,
         std::size_t position,
-        fx::missing_ladspa,
+        fx::unavailable_ladspa const&,
         std::string_view const& name);
 void remove_fx_module(audio_state& st, fx::module_id id);
 

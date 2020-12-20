@@ -24,7 +24,7 @@
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/internal.h>
-#include <piejam/runtime/fx/missing_ladspa.h>
+#include <piejam/runtime/fx/unavailable_ladspa.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 #include <span>
@@ -72,7 +72,7 @@ struct insert_missing_ladspa_fx_module final
 {
     mixer::bus_id fx_chain_bus;
     std::size_t position{};
-    fx::missing_ladspa missing_id;
+    fx::unavailable_ladspa unavailable_ladspa;
     std::string name;
 
     auto reduce(state const&) const -> state override;

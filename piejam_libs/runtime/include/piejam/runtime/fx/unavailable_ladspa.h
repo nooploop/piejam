@@ -22,7 +22,7 @@
 namespace piejam::runtime::fx
 {
 
-struct missing_ladspa
+struct unavailable_ladspa
 {
     audio::ladspa::plugin_id_t plugin_id;
 };

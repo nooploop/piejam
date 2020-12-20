@@ -64,7 +64,7 @@ make_fx(fx::module const& fx_mod,
                                 },
                                 param_procs);
                     },
-                    [](fx::missing_ladspa const&)
+                    [](fx::unavailable_ladspa_id const&)
                             -> std::unique_ptr<audio::engine::component> {
                         return nullptr;
                     }},

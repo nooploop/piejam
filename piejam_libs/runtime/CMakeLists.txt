@@ -52,10 +52,10 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_instances.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_processor_factory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/missing_ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/registry.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/unavailable_ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h

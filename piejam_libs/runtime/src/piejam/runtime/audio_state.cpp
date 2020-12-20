@@ -187,33 +187,43 @@ insert_missing_ladspa_fx_module(
         audio_state& st,
         mixer::bus_id const bus_id,
         std::size_t const position,
-        fx::missing_ladspa const missing_id,
+        fx::unavailable_ladspa const& unavail,
         std::string_view const& name)
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
-    std::tie(st.mixer_state.buses, st.fx_modules) =
-            [bus_id, position, missing_id, name](
+    std::tie(
+            st.mixer_state.buses,
+            st.fx_modules,
+            st.fx_unavailable_ladspa_plugins) =
+            [bus_id, position, &unavail, name](
                     mixer::buses_t buses,
                     fx::chain_t fx_chain,
-                    fx::modules_t fx_modules) {
+                    fx::modules_t fx_modules,
+                    fx::unavailable_ladspa_plugins unavail_plugs) {
                 mixer::bus& bus = buses[bus_id];
 
                 auto const insert_pos = std::min(position, fx_chain.size());
 
+                auto id = unavail_plugs.add(unavail);
+
                 fx_chain.emplace(
                         std::next(fx_chain.begin(), insert_pos),
                         fx_modules.add(fx::module{
-                                .fx_instance_id = missing_id,
+                                .fx_instance_id = id,
                                 .name = name,
                                 .parameters = {}}));
 
                 bus.fx_chain = std::move(fx_chain);
 
-                return std::tuple(std::move(buses), std::move(fx_modules));
+                return std::tuple(
+                        std::move(buses),
+                        std::move(fx_modules),
+                        std::move(unavail_plugs));
             }(st.mixer_state.buses,
               st.mixer_state.buses.get()[bus_id]->fx_chain,
-              st.fx_modules);
+              st.fx_modules,
+              st.fx_unavailable_ladspa_plugins);
 }
 
 void
@@ -250,16 +260,23 @@ remove_fx_module(audio_state& st, fx::module_id id)
             return fx_modules;
         }(st.fx_modules);
 
-        if (std::holds_alternative<fx::ladspa_instance_id>(
-                    fx_mod->fx_instance_id))
+        if (auto id = std::get_if<fx::ladspa_instance_id>(
+                    &fx_mod->fx_instance_id))
         {
-            st.fx_ladspa_instances =
-                    [](fx::ladspa_instance_id instance_id,
-                       fx::ladspa_instances instances) {
-                        instances.erase(instance_id);
-                        return instances;
-                    }(std::get<fx::ladspa_instance_id>(fx_mod->fx_instance_id),
-                      st.fx_ladspa_instances);
+            st.fx_ladspa_instances = [id](fx::ladspa_instances instances) {
+                instances.erase(*id);
+                return instances;
+            }(st.fx_ladspa_instances);
+        }
+        else if (
+                auto id = std::get_if<fx::unavailable_ladspa_id>(
+                        &fx_mod->fx_instance_id))
+        {
+            st.fx_unavailable_ladspa_plugins =
+                    [id](fx::unavailable_ladspa_plugins unavail_plugs) {
+                        unavail_plugs.remove(*id);
+                        return unavail_plugs;
+                    }(st.fx_unavailable_ladspa_plugins);
         }
     }
 }

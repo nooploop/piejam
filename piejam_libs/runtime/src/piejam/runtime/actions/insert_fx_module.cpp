@@ -65,7 +65,7 @@ insert_missing_ladspa_fx_module::reduce(state const& st) const -> state
             new_st,
             fx_chain_bus,
             position,
-            missing_id,
+            unavailable_ladspa,
             name);
 
     return new_st;
