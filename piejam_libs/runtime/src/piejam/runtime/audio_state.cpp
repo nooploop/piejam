@@ -336,28 +336,26 @@ add_mixer_bus(
         audio::bus_type type,
         channel_index_pair const& chs) -> mixer::bus_id
 {
-    mixer::bus_id bus_id;
-    std::tie(st.mixer_state.buses, bus_id) = [&name, type, chs](
-                                                     mixer::buses_t buses,
-                                                     parameter_maps& params) {
-        auto bus_id = buses.add(mixer::bus{
-                .name = std::move(name),
-                .volume = params.add(parameter::float_{
-                        .default_value = 1.f,
-                        .min = 0.f,
-                        .max = 4.f}),
-                .pan_balance = params.add(parameter::float_{
-                        .default_value = 0.f,
-                        .min = -1.f,
-                        .max = 1.f}),
-                .mute = params.add(parameter::bool_{.default_value = false}),
-                .level = params.add(parameter::stereo_level{}),
-                .type = type,
-                .device_channels = chs,
-                .fx_chain = {}});
-
-        return std::pair(std::move(buses), bus_id);
-    }(st.mixer_state.buses, st.params);
+    auto& params = st.params;
+    mixer::bus_id const bus_id = st.mixer_state.buses.update(
+            [&params, &name, type, chs](mixer::buses_t& buses) {
+                return buses.add(mixer::bus{
+                        .name = std::move(name),
+                        .volume = params.add(parameter::float_{
+                                .default_value = 1.f,
+                                .min = 0.f,
+                                .max = 4.f}),
+                        .pan_balance = params.add(parameter::float_{
+                                .default_value = 0.f,
+                                .min = -1.f,
+                                .max = 1.f}),
+                        .mute = params.add(
+                                parameter::bool_{.default_value = false}),
+                        .level = params.add(parameter::stereo_level{}),
+                        .type = type,
+                        .device_channels = chs,
+                        .fx_chain = {}});
+            });
 
     mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
     bus_ids.emplace_back(bus_id);
@@ -410,10 +408,8 @@ remove_mixer_bus(audio_state& st, mixer::bus_id const bus_id)
         st.mixer_state.outputs = std::move(bus_ids);
     }
 
-    st.mixer_state.buses = [bus_id](mixer::buses_t buses) {
-        buses.remove(bus_id);
-        return buses;
-    }(st.mixer_state.buses);
+    st.mixer_state.buses.update(
+            [bus_id](mixer::buses_t& buses) { buses.remove(bus_id); });
 }
 
 template <audio::bus_direction D>

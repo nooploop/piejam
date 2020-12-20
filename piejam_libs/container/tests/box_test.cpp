@@ -124,4 +124,27 @@ TEST(box, assign_rvalue)
     EXPECT_EQ(5, y.get());
 }
 
+TEST(box, update_without_return_value)
+{
+    box<int> sut(5);
+
+    sut.update([](int& x) { x = 7; });
+
+    EXPECT_EQ(7, sut.get());
+}
+
+TEST(box, update_with_return_value)
+{
+    box<int> sut(5);
+
+    auto res = sut.update([](int& x) {
+        auto y = x;
+        x = 7;
+        return y;
+    });
+
+    EXPECT_EQ(7, sut.get());
+    EXPECT_EQ(5, res);
+}
+
 } // namespace piejam::container::test

@@ -52,6 +52,15 @@ public:
         return *this;
     }
 
+    template <std::invocable<T&> U>
+    auto update(U&& u)
+    {
+        T value = *m_value;
+        auto on_exit = [this](T* value) { *this = std::move(*value); };
+        std::unique_ptr<T, decltype(on_exit)> scope_guard(&value, on_exit);
+        return u(value);
+    }
+
     bool operator==(box<T> const& r) const noexcept
             requires std::equality_comparable<T>
     {
