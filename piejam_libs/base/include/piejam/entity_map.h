@@ -51,19 +51,20 @@ public:
         return it != m_map.end() ? &(it->second) : nullptr;
     }
 
-    auto operator[](id_t id) noexcept -> Entity&
-    {
-        auto it = m_map.find(id);
-        BOOST_ASSERT(it != m_map.end());
-        return it->second;
-    }
-
     template <std::convertible_to<Entity> V>
     auto add(V&& v) -> id_t
     {
         auto id = id_t::generate();
         m_map.emplace_hint(m_map.end(), id, std::forward<V>(v));
         return id;
+    }
+
+    template <std::invocable<Entity&> U>
+    auto update(id_t id, U&& u)
+    {
+        auto it = m_map.find(id);
+        BOOST_ASSERT(it != m_map.end());
+        return u(it->second);
     }
 
     auto remove(id_t id) { return m_map.erase(id); }

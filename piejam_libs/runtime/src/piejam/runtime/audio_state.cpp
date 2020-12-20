@@ -132,8 +132,6 @@ insert_internal_fx_module(
                     fx::modules_t fx_modules,
                     fx::parameters_t fx_params,
                     parameter_maps& params) {
-                mixer::bus& bus = buses[bus_id];
-
                 auto const insert_pos = std::min(position, fx_chain.size());
 
                 switch (fx_type)
@@ -150,7 +148,9 @@ insert_internal_fx_module(
                         *std::as_const(fx_modules)[fx_chain[insert_pos]],
                         params);
 
-                bus.fx_chain = std::move(fx_chain);
+                buses.update(bus_id, [&](mixer::bus& bus) {
+                    bus.fx_chain = std::move(fx_chain);
+                });
 
                 return std::tuple(
                         std::move(buses),
@@ -192,8 +192,6 @@ insert_ladspa_fx_module(
                     fx::parameters_t fx_params,
                     fx::ladspa_instances fx_ladspa_instances,
                     parameter_maps& params) {
-                mixer::bus& bus = buses[bus_id];
-
                 auto const insert_pos = std::min(position, fx_chain.size());
 
                 fx_chain.emplace(
@@ -212,7 +210,9 @@ insert_ladspa_fx_module(
                         *std::as_const(fx_modules)[fx_chain[insert_pos]],
                         params);
 
-                bus.fx_chain = std::move(fx_chain);
+                buses.update(bus_id, [&](mixer::bus& bus) {
+                    bus.fx_chain = std::move(fx_chain);
+                });
 
                 fx_ladspa_instances.emplace(instance_id, plugin_desc);
 
@@ -248,8 +248,6 @@ insert_missing_ladspa_fx_module(
                     fx::chain_t fx_chain,
                     fx::modules_t fx_modules,
                     fx::unavailable_ladspa_plugins unavail_plugs) {
-                mixer::bus& bus = buses[bus_id];
-
                 auto const insert_pos = std::min(position, fx_chain.size());
 
                 auto id = unavail_plugs.add(unavail);
@@ -261,7 +259,9 @@ insert_missing_ladspa_fx_module(
                                 .name = name,
                                 .parameters = {}}));
 
-                bus.fx_chain = std::move(fx_chain);
+                buses.update(bus_id, [&](mixer::bus& bus) {
+                    bus.fx_chain = std::move(fx_chain);
+                });
 
                 return std::tuple(
                         std::move(buses),
