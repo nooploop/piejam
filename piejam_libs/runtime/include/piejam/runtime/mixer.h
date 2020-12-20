@@ -56,7 +56,7 @@ struct bus
 
 struct state
 {
-    box<buses_t> buses;
+    buses_t buses;
 
     box<bus_list_t> inputs;
     box<bus_list_t> outputs;
@@ -82,7 +82,7 @@ auto
 get_bus(state const& st, std::size_t index) -> bus const&
 {
     BOOST_ASSERT(index < bus_ids<D>(st).size());
-    return *st.buses.get()[bus_ids<D>(st)[index]];
+    return *st.buses[bus_ids<D>(st)[index]];
 }
 
 } // namespace piejam::runtime::mixer

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/box.h>
 #include <piejam/entity_id.h>
 
 #include <boost/assert.hpp>
@@ -34,43 +35,60 @@ public:
     using id_t = entity_id<EntityTag>;
     using map_t = boost::container::flat_map<id_t, Entity>;
 
-    auto empty() const noexcept { return m_map.empty(); }
-    auto size() const noexcept { return m_map.size(); }
+    auto empty() const noexcept { return m_map->empty(); }
+    auto size() const noexcept { return m_map->size(); }
 
-    auto begin() const noexcept { return m_map.begin(); }
-    auto end() const noexcept { return m_map.end(); }
+    auto begin() const noexcept { return m_map->begin(); }
+    auto end() const noexcept { return m_map->end(); }
 
-    auto begin() noexcept { return m_map.begin(); }
-    auto end() noexcept { return m_map.end(); }
+    auto begin() noexcept { return m_map->begin(); }
+    auto end() noexcept { return m_map->end(); }
 
-    auto contains(id_t id) const noexcept { return m_map.contains(id); }
+    auto contains(id_t id) const noexcept { return m_map->contains(id); }
 
     auto operator[](id_t id) const noexcept -> Entity const*
     {
-        auto it = m_map.find(id);
-        return it != m_map.end() ? &(it->second) : nullptr;
+        auto it = m_map->find(id);
+        return it != m_map->end() ? &(it->second) : nullptr;
     }
 
     template <std::convertible_to<Entity> V>
     auto add(V&& v) -> id_t
     {
         auto id = id_t::generate();
-        m_map.emplace_hint(m_map.end(), id, std::forward<V>(v));
+        m_map.update([id, &v](map_t& m) {
+            m.emplace_hint(m.end(), id, std::forward<V>(v));
+        });
         return id;
     }
 
     template <std::invocable<Entity&> U>
     auto update(id_t id, U&& u)
     {
-        auto it = m_map.find(id);
-        BOOST_ASSERT(it != m_map.end());
-        return u(it->second);
+        return m_map.update([id, &u](map_t& m) {
+            auto it = m.find(id);
+            BOOST_ASSERT(it != m.end());
+            return u(it->second);
+        });
     }
 
-    auto remove(id_t id) { return m_map.erase(id); }
+    auto remove(id_t id) -> typename map_t::size_type
+    {
+        return m_map.update([id](map_t& m) { return m.erase(id); });
+    }
+
+    bool operator==(entity_map const& other) const noexcept
+    {
+        return m_map.eq(other.m_map);
+    }
+
+    bool operator!=(entity_map const& other) const noexcept
+    {
+        return m_map.neq(other.m_map);
+    }
 
 private:
-    map_t m_map;
+    box<map_t> m_map;
 };
 
 } // namespace piejam

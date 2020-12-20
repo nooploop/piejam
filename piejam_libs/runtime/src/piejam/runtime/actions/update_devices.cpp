@@ -42,26 +42,28 @@ update_devices::reduce(state const& st) const -> state
 
     auto const& in_ids = *st.mixer_state.inputs;
     auto const& out_ids = *st.mixer_state.outputs;
-    new_st.mixer_state.buses.update([this, &in_ids, &out_ids](
-                                            mixer::buses_t& buses) {
-        std::size_t const num_in_channels = input.hw_params->num_channels;
-        for (auto const& in_id : in_ids)
-        {
-            buses.update(in_id, [num_in_channels](mixer::bus& bus) {
-                update_channel(bus.device_channels.left, num_in_channels);
-                update_channel(bus.device_channels.right, num_in_channels);
-            });
-        }
 
-        std::size_t const num_out_channels = output.hw_params->num_channels;
-        for (auto const& out_id : out_ids)
-        {
-            buses.update(out_id, [num_out_channels](mixer::bus& bus) {
-                update_channel(bus.device_channels.left, num_out_channels);
-                update_channel(bus.device_channels.right, num_out_channels);
-            });
-        }
-    });
+    std::size_t const num_in_channels = input.hw_params->num_channels;
+    for (auto const& in_id : in_ids)
+    {
+        new_st.mixer_state.buses.update(
+                in_id,
+                [num_in_channels](mixer::bus& bus) {
+                    update_channel(bus.device_channels.left, num_in_channels);
+                    update_channel(bus.device_channels.right, num_in_channels);
+                });
+    }
+
+    std::size_t const num_out_channels = output.hw_params->num_channels;
+    for (auto const& out_id : out_ids)
+    {
+        new_st.mixer_state.buses.update(
+                out_id,
+                [num_out_channels](mixer::bus& bus) {
+                    update_channel(bus.device_channels.left, num_out_channels);
+                    update_channel(bus.device_channels.right, num_out_channels);
+                });
+    }
 
     return new_st;
 }

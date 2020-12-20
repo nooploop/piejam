@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <piejam/scope_guard.h>
+
 #include <concepts>
 #include <memory>
 
@@ -55,34 +57,43 @@ public:
     template <std::invocable<T&> U>
     auto update(U&& u)
     {
-        T value = *m_value;
-        auto on_exit = [this](T* value) { *this = std::move(*value); };
-        std::unique_ptr<T, decltype(on_exit)> scope_guard(&value, on_exit);
-        return u(value);
+        auto value = std::make_shared<T>(*m_value);
+        on_scope_exit on_exit([this, value]() { m_value = value; });
+        return u(*value);
     }
 
-    bool operator==(box<T> const& r) const noexcept
+    bool operator==(box const& r) const noexcept
             requires std::equality_comparable<T>
     {
         return m_value.get() == r.m_value.get() || get() == r.get();
     }
 
-    bool operator==(box<T> const& r) const noexcept
+    bool operator==(box const& r) const noexcept
             requires(!std::equality_comparable<T>)
     {
         return m_value.get() == r.m_value.get();
     }
 
-    bool operator!=(box<T> const& r) const noexcept
+    bool operator!=(box const& r) const noexcept
             requires std::equality_comparable<T>
     {
         return m_value.get() != r.m_value.get() && get() != r.get();
     }
 
-    bool operator!=(box<T> const& r) const noexcept
+    bool operator!=(box const& r) const noexcept
             requires(!std::equality_comparable<T>)
     {
         return m_value.get() != r.m_value.get();
+    }
+
+    bool eq(box const& other) const noexcept
+    {
+        return m_value.get() == other.m_value.get();
+    }
+
+    bool neq(box const& other) const noexcept
+    {
+        return m_value.get() == other.m_value.get();
     }
 
 private:

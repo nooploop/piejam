@@ -91,9 +91,8 @@ make_bus_list_selector(audio::bus_direction const bd)
 
 static auto
 make_bus_infos(
-        box<mixer::buses_t> const& buses,
-        box<mixer::bus_list_t> const& bus_ids)
-        -> boxed_vector<mixer_bus_info>
+        mixer::buses_t const& buses,
+        box<mixer::bus_list_t> const& bus_ids) -> boxed_vector<mixer_bus_info>
 {
     std::vector<mixer_bus_info> infos;
 
@@ -101,7 +100,7 @@ make_bus_infos(
             *bus_ids,
             std::back_inserter(infos),
             [&buses](auto&& bus_id) {
-                auto bus = (*buses)[bus_id];
+                auto bus = buses[bus_id];
                 BOOST_ASSERT(bus);
                 return mixer_bus_info{
                         .bus_id = bus_id,
@@ -135,11 +134,10 @@ make_bus_infos_selector(audio::bus_direction const bd)
 }
 
 auto
-make_bus_name_selector(mixer::bus_id bus_id)
-        -> selector<boxed_string>
+make_bus_name_selector(mixer::bus_id bus_id) -> selector<boxed_string>
 {
     return [bus_id](state const& st) mutable -> boxed_string {
-        mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
+        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         return bus ? bus->name : boxed_string();
     };
 }
@@ -148,7 +146,7 @@ auto
 make_bus_type_selector(mixer::bus_id const bus_id) -> selector<audio::bus_type>
 {
     return [bus_id](state const& st) -> audio::bus_type {
-        mixer::bus const* bus = st.mixer_state.buses.get()[bus_id];
+        mixer::bus const* bus = st.mixer_state.buses[bus_id];
         return bus ? bus->type : audio::bus_type::mono;
     };
 }
@@ -163,15 +161,13 @@ make_bus_channel_selector(
         case audio::bus_channel::mono:
         case audio::bus_channel::left:
             return [bus_id](state const& st) -> std::size_t {
-                mixer::bus const* const bus =
-                        st.mixer_state.buses.get()[bus_id];
+                mixer::bus const* const bus = st.mixer_state.buses[bus_id];
                 return bus ? bus->device_channels.left : piejam::npos;
             };
 
         case audio::bus_channel::right:
             return [bus_id](state const& st) -> std::size_t {
-                mixer::bus const* const bus =
-                        st.mixer_state.buses.get()[bus_id];
+                mixer::bus const* const bus = st.mixer_state.buses[bus_id];
                 return bus ? bus->device_channels.right : piejam::npos;
             };
     }
@@ -184,7 +180,7 @@ auto
 make_bus_volume_selector(mixer::bus_id bus_id) -> selector<float>
 {
     return [bus_id](state const& st) -> float {
-        mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
+        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         float const* const volume = bus ? st.params.get(bus->volume) : nullptr;
         return volume ? *volume : 1.f;
     };
@@ -194,7 +190,7 @@ auto
 make_bus_pan_balance_selector(mixer::bus_id bus_id) -> selector<float>
 {
     return [bus_id](state const& st) -> float {
-        mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
+        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         float const* const pan_balance =
                 bus ? st.params.get(bus->pan_balance) : nullptr;
         return pan_balance ? *pan_balance : 0.f;
@@ -205,7 +201,7 @@ auto
 make_bus_mute_selector(mixer::bus_id const bus_id) -> selector<bool>
 {
     return [bus_id](state const& st) -> bool {
-        mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
+        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         bool const* const mute = bus ? st.params.get(bus->mute) : nullptr;
         return mute && *mute;
     };
@@ -223,7 +219,7 @@ auto
 make_bus_level_selector(mixer::bus_id const bus_id) -> selector<stereo_level>
 {
     return [bus_id](state const& st) -> stereo_level {
-        mixer::bus const* const bus = st.mixer_state.buses.get()[bus_id];
+        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         stereo_level const* const level =
                 bus ? st.params.get(bus->level) : nullptr;
         return level ? *level : stereo_level{};
@@ -238,18 +234,15 @@ const selector<mixer::bus_id> select_fx_chain_bus([](state const& st) {
     return st.fx_chain_bus;
 });
 
-const selector<box<fx::chain_t>>
-        select_current_fx_chain([](state const& st) {
-            static box<fx::chain_t> s_empty_fx_chain;
-            mixer::bus const* const bus =
-                    st.mixer_state.buses.get()[st.fx_chain_bus];
-            return bus ? bus->fx_chain : s_empty_fx_chain;
-        });
+const selector<box<fx::chain_t>> select_current_fx_chain([](state const& st) {
+    static box<fx::chain_t> s_empty_fx_chain;
+    mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+    return bus ? bus->fx_chain : s_empty_fx_chain;
+});
 
 const selector<stereo_level>
         select_current_fx_chain_bus_level([](state const& st) -> stereo_level {
-            mixer::bus const* const bus =
-                    st.mixer_state.buses.get()[st.fx_chain_bus];
+            mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
             stereo_level const* const level =
                     bus ? st.params.get(bus->level) : nullptr;
             return level ? *level : stereo_level();
@@ -257,14 +250,13 @@ const selector<stereo_level>
 
 const selector<float>
 select_current_fx_chain_bus_volume([](state const& st) -> float {
-    mixer::bus const* const bus = st.mixer_state.buses.get()[st.fx_chain_bus];
+    mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
     float const* const volume = bus ? st.params.get(bus->volume) : nullptr;
     return volume ? *volume : 0.f;
 });
 
 auto
-make_fx_module_name_selector(fx::module_id fx_mod_id)
-        -> selector<boxed_string>
+make_fx_module_name_selector(fx::module_id fx_mod_id) -> selector<boxed_string>
 {
     return [fx_mod_id](state const& st) -> boxed_string {
         static boxed_string s_empty_name;
@@ -277,8 +269,7 @@ auto
 make_fx_module_parameters_selector(fx::module_id fx_mod_id)
         -> selector<box<fx::module_parameters>>
 {
-    return [fx_mod_id](
-                   state const& st) -> box<fx::module_parameters> {
+    return [fx_mod_id](state const& st) -> box<fx::module_parameters> {
         static box<fx::module_parameters> s_empty;
         fx::module const* const fx_mod = st.fx_modules.get()[fx_mod_id];
         return fx_mod ? fx_mod->parameters : s_empty;

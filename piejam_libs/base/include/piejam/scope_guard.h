@@ -15,23 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/actions/set_bus_name.h>
+#pragma once
 
-#include <piejam/runtime/audio_state.h>
+#include <concepts>
+#include <type_traits>
+#include <utility>
 
-namespace piejam::runtime::actions
+namespace piejam
 {
 
-auto
-set_bus_name::reduce(state const& st) const -> state
+template <class F>
+struct on_scope_exit
 {
-    auto new_st = st;
+    on_scope_exit(F&& f) noexcept(std::is_nothrow_move_constructible_v<F>)
+        : m_f(std::move(f))
+    {
+    }
 
-    new_st.mixer_state.buses.update(bus_id, [this](mixer::bus& bus) {
-        bus.name = name;
-    });
+    ~on_scope_exit() { m_f(); }
 
-    return new_st;
-}
+    on_scope_exit(on_scope_exit const&) = delete;
+    on_scope_exit(on_scope_exit&&) = delete;
 
-} // namespace piejam::runtime::actions
+    auto operator=(on_scope_exit const&) -> on_scope_exit& = delete;
+    auto operator=(on_scope_exit&&) -> on_scope_exit& = delete;
+
+private:
+    F m_f;
+};
+
+template <class F>
+on_scope_exit(F&&) -> on_scope_exit<F>;
+
+} // namespace piejam

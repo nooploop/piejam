@@ -83,18 +83,18 @@ save_app_config(std::filesystem::path const& file, state const& state)
                     std::back_inserter(configs),
                     [&chs](mixer::bus_id const& ch_id)
                             -> persistence::bus_config {
-                        mixer::bus const* bus = chs[ch_id];
+                        mixer::bus const* const bus = chs[ch_id];
                         return {bus->name, bus->type, bus->device_channels};
                     });
         };
 
         buses_to_bus_configs(
-                state.mixer_state.buses.get(),
+                state.mixer_state.buses,
                 state.mixer_state.inputs.get(),
                 conf.input_bus_config);
 
         buses_to_bus_configs(
-                state.mixer_state.buses.get(),
+                state.mixer_state.buses,
                 state.mixer_state.outputs.get(),
                 conf.output_bus_config);
 
@@ -135,7 +135,7 @@ export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
 
     for (auto const& bus_id : bus_ids)
     {
-        mixer::bus const* const bus = (*st.mixer_state.buses)[bus_id];
+        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
 
         auto& fx_chain_data = result.emplace_back();
 

@@ -40,7 +40,7 @@ make_replace_fx_module_action(
 {
     batch_action batch;
 
-    mixer::bus const* const bus = (*st.mixer_state.buses)[fx_chain_bus];
+    mixer::bus const* const bus = st.mixer_state.buses[fx_chain_bus];
     BOOST_ASSERT(bus);
 
     if (position < bus->fx_chain->size())
@@ -99,7 +99,7 @@ make_replace_fx_module_action(
 {
     batch_action batch;
 
-    mixer::bus const* const bus = (*st.mixer_state.buses)[fx_chain_bus];
+    mixer::bus const* const bus = st.mixer_state.buses[fx_chain_bus];
     BOOST_ASSERT(bus);
 
     if (position < bus->fx_chain->size())

@@ -20,12 +20,11 @@
 #include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/ladspa/fwd.h>
 #include <piejam/audio/types.h>
-#include <piejam/entity_map.h>
 #include <piejam/runtime/fx/fwd.h>
 
+#include <map>
 #include <memory>
 #include <span>
-#include <unordered_map>
 
 namespace piejam::runtime::fx
 {
@@ -45,7 +44,7 @@ public:
             -> std::unique_ptr<audio::engine::processor>;
 
 private:
-    entity_map<std::unique_ptr<audio::ladspa::plugin>, ladspa_instance_id_tag>
+    std::map<ladspa_instance_id, std::unique_ptr<audio::ladspa::plugin>>
             m_instances;
 };
 

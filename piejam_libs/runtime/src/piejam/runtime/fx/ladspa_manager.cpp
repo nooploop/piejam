@@ -36,7 +36,9 @@ ladspa_manager::load(audio::ladspa::plugin_descriptor const& pd)
     try
     {
         auto plugin = audio::ladspa::load(pd);
-        return m_instances.add(std::move(plugin));
+        auto id = entity_id<ladspa_instance_id_tag>::generate();
+        m_instances.emplace(id, std::move(plugin));
+        return id;
     }
     catch (std::exception const& err)
     {
@@ -48,16 +50,16 @@ ladspa_manager::load(audio::ladspa::plugin_descriptor const& pd)
 void
 ladspa_manager::unload(ladspa_instance_id const& id)
 {
-    m_instances.remove(id);
+    m_instances.erase(id);
 }
 
 auto
 ladspa_manager::control_inputs(ladspa_instance_id const& id) const
         -> std::span<audio::ladspa::port_descriptor const>
 {
-    if (auto* plugin = m_instances[id])
+    if (auto it = m_instances.find(id); it != m_instances.end())
     {
-        return (*plugin)->control_inputs();
+        return it->second->control_inputs();
     }
 
     return {};
@@ -69,9 +71,9 @@ ladspa_manager::make_processor(
         audio::samplerate_t samplerate) const
         -> std::unique_ptr<audio::engine::processor>
 {
-    if (auto* plugin = m_instances[id])
+    if (auto it = m_instances.find(id); it != m_instances.end())
     {
-        return (*plugin)->make_processor(samplerate);
+        return it->second->make_processor(samplerate);
     }
 
     return {};
