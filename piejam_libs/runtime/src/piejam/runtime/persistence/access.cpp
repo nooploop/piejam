@@ -141,7 +141,7 @@ export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
 
         for (auto const& fx_mod_id : *bus->fx_chain)
         {
-            fx::module const* const fx_mod = (*st.fx_modules)[fx_mod_id];
+            fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
             fx_chain_data.emplace_back(std::visit(
                     overload{
                             [&st, fx_mod](fx::internal const fx_type)

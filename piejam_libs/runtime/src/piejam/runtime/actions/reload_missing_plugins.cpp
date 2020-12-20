@@ -41,7 +41,7 @@ reload_missing_plugins() -> thunk_action
             for (std::size_t fx_pos : range::indices(bus.fx_chain->size()))
             {
                 auto&& fx_mod_id = (*bus.fx_chain)[fx_pos];
-                auto fx_mod = (*st.fx_modules)[fx_mod_id];
+                auto fx_mod = st.fx_modules[fx_mod_id];
                 BOOST_ASSERT(fx_mod);
 
                 if (auto id = std::get_if<fx::unavailable_ladspa_id>(

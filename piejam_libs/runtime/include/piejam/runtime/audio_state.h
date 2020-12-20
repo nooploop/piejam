@@ -60,11 +60,10 @@ struct audio_state
 
     fx::registry fx_registry{fx::make_default_registry()};
 
-    box<fx::modules_t> fx_modules;
+    fx::modules_t fx_modules;
     box<fx::parameters_t> fx_parameters;
     box<fx::ladspa_instances> fx_ladspa_instances;
-    box<fx::unavailable_ladspa_plugins>
-            fx_unavailable_ladspa_plugins;
+    box<fx::unavailable_ladspa_plugins> fx_unavailable_ladspa_plugins;
 
     mixer::state mixer_state{};
 
@@ -76,14 +75,12 @@ struct audio_state
 
 auto samplerates(
         box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params)
-        -> audio::samplerates_t;
+        box<audio::pcm_hw_params> output_hw_params) -> audio::samplerates_t;
 auto samplerates_from_state(audio_state const&) -> audio::samplerates_t;
 
 auto period_sizes(
         box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params)
-        -> audio::period_sizes_t;
+        box<audio::pcm_hw_params> output_hw_params) -> audio::period_sizes_t;
 auto period_sizes_from_state(audio_state const&) -> audio::period_sizes_t;
 
 template <audio::bus_direction D>

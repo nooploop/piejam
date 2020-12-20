@@ -332,8 +332,7 @@ audio_engine_middleware::process_engine_action(
             [this](actions::delete_fx_module const& a) {
                 auto const& st = m_get_state();
 
-                if (fx::module const* const fx_mod =
-                            st.fx_modules.get()[a.fx_mod_id])
+                if (fx::module const* const fx_mod = st.fx_modules[a.fx_mod_id])
                 {
                     m_next(a);
 

@@ -260,7 +260,7 @@ make_fx_module_name_selector(fx::module_id fx_mod_id) -> selector<boxed_string>
 {
     return [fx_mod_id](state const& st) -> boxed_string {
         static boxed_string s_empty_name;
-        fx::module const* const fx_mod = st.fx_modules.get()[fx_mod_id];
+        fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
         return fx_mod ? fx_mod->name : s_empty_name;
     };
 }
@@ -271,7 +271,7 @@ make_fx_module_parameters_selector(fx::module_id fx_mod_id)
 {
     return [fx_mod_id](state const& st) -> box<fx::module_parameters> {
         static box<fx::module_parameters> s_empty;
-        fx::module const* const fx_mod = st.fx_modules.get()[fx_mod_id];
+        fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
         return fx_mod ? fx_mod->parameters : s_empty;
     };
 }
@@ -297,7 +297,7 @@ make_fx_parameter_id_selector(
         fx::parameter_key const fx_param_key) -> selector<fx::parameter_id>
 {
     return [fx_mod_id, fx_param_key](state const& st) -> fx::parameter_id {
-        if (fx::module const* const fx_mod = st.fx_modules.get()[fx_mod_id])
+        if (fx::module const* const fx_mod = st.fx_modules[fx_mod_id])
         {
             if (auto it = fx_mod->parameters->find(fx_param_key);
                 it != fx_mod->parameters->end())

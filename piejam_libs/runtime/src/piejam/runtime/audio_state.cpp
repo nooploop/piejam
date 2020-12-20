@@ -274,7 +274,7 @@ insert_missing_ladspa_fx_module(
 void
 remove_fx_module(audio_state& st, fx::module_id id)
 {
-    if (fx::module const* const fx_mod = st.fx_modules.get()[id])
+    if (fx::module const* const fx_mod = st.fx_modules[id])
     {
         for (auto&& [bus_id, bus] : st.mixer_state.buses)
         {
