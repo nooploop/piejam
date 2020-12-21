@@ -33,6 +33,9 @@ public:
     using id_t = typename entity_map<Parameter>::id_t;
     using value_type = typename Parameter::value_type;
 
+    bool empty() const noexcept { return m_parameters.empty(); }
+    auto size() const noexcept -> std::size_t { return m_parameters.size(); }
+
     template <std::same_as<Parameter> P>
     auto add(P&& p) -> id_t
     {

@@ -96,12 +96,13 @@ void remove_mixer_bus(state&, mixer::bus_id);
 template <audio::bus_direction D>
 void clear_mixer_buses(state&);
 
-void insert_internal_fx_module(
+auto insert_internal_fx_module(
         state&,
         mixer::bus_id,
         std::size_t position,
         fx::internal,
-        std::vector<fx::parameter_assignment> const& initial_assignments);
+        std::vector<fx::parameter_assignment> const& initial_assignments)
+        -> fx::module_id;
 void insert_ladspa_fx_module(
         state&,
         mixer::bus_id,

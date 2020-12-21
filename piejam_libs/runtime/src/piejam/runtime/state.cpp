@@ -113,13 +113,14 @@ apply_parameter_assignments(
     }
 }
 
-void
+auto
 insert_internal_fx_module(
         state& st,
         mixer::bus_id const bus_id,
         std::size_t const position,
         fx::internal const fx_type,
         std::vector<fx::parameter_assignment> const& initial_assignments)
+        -> fx::module_id
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
@@ -128,12 +129,14 @@ insert_internal_fx_module(
 
     fx::parameters_t fx_params = st.fx_parameters;
 
+    fx::module_id fx_mod_id;
     switch (fx_type)
     {
         case fx::internal::gain:
+            fx_mod_id = make_fx_gain(st.fx_modules, fx_params, st.params);
             fx_chain.emplace(
                     std::next(fx_chain.begin(), insert_pos),
-                    make_fx_gain(st.fx_modules, fx_params, st.params));
+                    fx_mod_id);
             break;
     }
 
@@ -147,6 +150,8 @@ insert_internal_fx_module(
     st.mixer_state.buses.update(bus_id, [&](mixer::bus& bus) {
         bus.fx_chain = std::move(fx_chain);
     });
+
+    return fx_mod_id;
 }
 
 void
@@ -290,9 +295,10 @@ add_mixer_bus(
             .device_channels = chs,
             .fx_chain = {}});
 
-    mixer::bus_list_t bus_ids = mixer::bus_ids<D>(st.mixer_state);
-    bus_ids.emplace_back(bus_id);
-    mixer::bus_ids<D>(st.mixer_state) = std::move(bus_ids);
+    mixer::bus_ids<D>(st.mixer_state)
+            .update([bus_id](mixer::bus_list_t& bus_ids) {
+                bus_ids.emplace_back(bus_id);
+            });
 
     return bus_id;
 }
