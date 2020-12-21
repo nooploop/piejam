@@ -34,6 +34,11 @@ TopPane {
         anchors.fill: parent
 
         initialItem: fxChain
+
+        onVisibleChanged: {
+            if (!stack.visible)
+                stack.pop(fxChain)
+        }
     }
 
     Item {
