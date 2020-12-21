@@ -18,27 +18,30 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/gui/model/FxBrowser.h>
-#include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/registry.h>
+#include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/entity_id.h>
+#include <piejam/gui/model/FxBrowserEntry.h>
 
 namespace piejam::app::gui::model
 {
 
-class FxBrowser final : public Subscribable<piejam::gui::model::FxBrowser>
+class FxBrowserEntryLADSPA final
+    : public Subscribable<piejam::gui::model::FxBrowserEntry>
 {
 public:
-    FxBrowser(runtime::store_dispatch, runtime::subscriber&);
+    FxBrowserEntryLADSPA(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            audio::ladspa::plugin_descriptor const&);
+
+    void insertModule(unsigned pos) override;
+    void replaceModule(unsigned pos) override;
 
 private:
     void onSubscribe() override;
 
-    auto makeBrowserEntry(runtime::fx::internal)
-            -> std::unique_ptr<piejam::gui::model::FxBrowserEntry>;
-    auto makeBrowserEntry(audio::ladspa::plugin_descriptor const&)
-            -> std::unique_ptr<piejam::gui::model::FxBrowserEntry>;
-
-    runtime::fx::registry m_fx_registry;
+    audio::ladspa::plugin_descriptor m_pd;
+    runtime::mixer::bus_id m_fx_chain_bus;
 };
 
 } // namespace piejam::app::gui::model

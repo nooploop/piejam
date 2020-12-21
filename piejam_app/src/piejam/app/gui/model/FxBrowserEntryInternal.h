@@ -20,19 +20,19 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/entity_id.h>
 #include <piejam/gui/model/FxBrowserEntry.h>
-#include <piejam/runtime/fx/registry.h>
+#include <piejam/runtime/fx/fwd.h>
 
 namespace piejam::app::gui::model
 {
 
-class FxBrowserEntry final
+class FxBrowserEntryInternal final
     : public Subscribable<piejam::gui::model::FxBrowserEntry>
 {
 public:
-    FxBrowserEntry(
+    FxBrowserEntryInternal(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::fx::registry::item const&);
+            runtime::fx::internal);
 
     void insertModule(unsigned pos) override;
     void replaceModule(unsigned pos) override;
@@ -40,7 +40,7 @@ public:
 private:
     void onSubscribe() override;
 
-    runtime::fx::registry::item m_registry_item;
+    runtime::fx::internal m_fx_type;
     runtime::mixer::bus_id m_fx_chain_bus;
 };
 

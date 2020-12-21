@@ -19,7 +19,9 @@
 
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/app/gui/generic_list_model_edit_script_executor.h>
-#include <piejam/app/gui/model/FxBrowserEntry.h>
+#include <piejam/app/gui/model/FxBrowserEntryInternal.h>
+#include <piejam/app/gui/model/FxBrowserEntryLADSPA.h>
+#include <piejam/functional/overload.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
@@ -43,15 +45,35 @@ FxBrowser::onSubscribe()
                                 fx_registry.entries.get()),
                         generic_list_model_edit_script_executor{
                                 *entries(),
-                                [this](runtime::fx::registry::item const&
-                                               item) {
-                                    return std::make_unique<FxBrowserEntry>(
-                                            dispatch(),
-                                            state_change_subscriber(),
+                                [this](auto const& item) {
+                                    return std::visit(
+                                            [this](auto&& x) {
+                                                return makeBrowserEntry(x);
+                                            },
                                             item);
                                 }});
                 m_fx_registry = fx_registry;
             });
+}
+
+auto
+FxBrowser::makeBrowserEntry(runtime::fx::internal const fx_type)
+        -> std::unique_ptr<piejam::gui::model::FxBrowserEntry>
+{
+    return std::make_unique<FxBrowserEntryInternal>(
+            dispatch(),
+            state_change_subscriber(),
+            fx_type);
+}
+
+auto
+FxBrowser::makeBrowserEntry(audio::ladspa::plugin_descriptor const& pd)
+        -> std::unique_ptr<piejam::gui::model::FxBrowserEntry>
+{
+    return std::make_unique<FxBrowserEntryLADSPA>(
+            dispatch(),
+            state_change_subscriber(),
+            pd);
 }
 
 } // namespace piejam::app::gui::model
