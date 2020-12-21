@@ -21,9 +21,9 @@
 #include <piejam/functional/memo.h>
 #include <piejam/npos.h>
 #include <piejam/reselect/selector.h>
-#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
+#include <piejam/runtime/state.h>
 
 #include <algorithm>
 #include <cassert>
@@ -174,37 +174,6 @@ make_bus_channel_selector(
 
     BOOST_ASSERT(false);
     __builtin_unreachable();
-}
-
-auto
-make_bus_volume_selector(mixer::bus_id bus_id) -> selector<float>
-{
-    return [bus_id](state const& st) -> float {
-        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-        float const* const volume = bus ? st.params.get(bus->volume) : nullptr;
-        return volume ? *volume : 1.f;
-    };
-}
-
-auto
-make_bus_pan_balance_selector(mixer::bus_id bus_id) -> selector<float>
-{
-    return [bus_id](state const& st) -> float {
-        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-        float const* const pan_balance =
-                bus ? st.params.get(bus->pan_balance) : nullptr;
-        return pan_balance ? *pan_balance : 0.f;
-    };
-}
-
-auto
-make_bus_mute_selector(mixer::bus_id const bus_id) -> selector<bool>
-{
-    return [bus_id](state const& st) -> bool {
-        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-        bool const* const mute = bus ? st.params.get(bus->mute) : nullptr;
-        return mute && *mute;
-    };
 }
 
 auto

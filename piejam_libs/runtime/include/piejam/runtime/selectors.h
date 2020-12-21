@@ -48,12 +48,10 @@ extern const selector<period_size> select_period_size;
 
 //! \todo input_devices/output_devices could get a reduced value, not the whole
 //! pcm_io_descriptors
-using input_devices =
-        std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
+using input_devices = std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
 extern const selector<input_devices> select_input_devices;
 
-using output_devices =
-        std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
+using output_devices = std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
 extern const selector<output_devices> select_output_devices;
 
 auto make_num_device_channels_selector(audio::bus_direction)
@@ -91,9 +89,6 @@ auto make_bus_type_selector(mixer::bus_id) -> selector<audio::bus_type>;
 auto make_bus_channel_selector(mixer::bus_id, audio::bus_channel)
         -> selector<std::size_t>;
 
-auto make_bus_volume_selector(mixer::bus_id) -> selector<float>;
-auto make_bus_pan_balance_selector(mixer::bus_id) -> selector<float>;
-auto make_bus_mute_selector(mixer::bus_id) -> selector<bool>;
 auto make_bus_level_selector(mixer::bus_id) -> selector<stereo_level>;
 
 auto make_input_solo_selector(mixer::bus_id) -> selector<bool>;
@@ -106,8 +101,7 @@ extern const selector<box<fx::chain_t>> select_current_fx_chain;
 extern const selector<stereo_level> select_current_fx_chain_bus_level;
 extern const selector<float> select_current_fx_chain_bus_volume;
 
-auto make_fx_module_name_selector(fx::module_id)
-        -> selector<boxed_string>;
+auto make_fx_module_name_selector(fx::module_id) -> selector<boxed_string>;
 auto make_fx_module_parameters_selector(fx::module_id)
         -> selector<box<fx::module_parameters>>;
 auto make_fx_parameter_name_selector(fx::parameter_id)
