@@ -44,7 +44,7 @@
 #include <piejam/runtime/actions/save_session.h>
 #include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
 #include <piejam/runtime/audio_engine_middleware.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/locations.h>
 #include <piejam/runtime/open_alsa_device.h>
 #include <piejam/runtime/persistence_middleware.h>
@@ -140,7 +140,7 @@ main(int argc, char* argv[]) -> int
     });
 
     store.apply_middleware(redux::make_thunk_middleware<
-                           runtime::audio_state,
+                           runtime::state,
                            runtime::action>{});
 
     bool batching{};

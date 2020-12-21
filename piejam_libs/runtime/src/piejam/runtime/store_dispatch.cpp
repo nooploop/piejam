@@ -18,7 +18,7 @@
 #include <piejam/runtime/store_dispatch.h>
 
 #include <piejam/redux/store.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 namespace piejam::runtime
 {

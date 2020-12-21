@@ -37,7 +37,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_levels.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine_middleware.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_state.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/channel_index_pair.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_gain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_ladspa.h
@@ -84,6 +83,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/state.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/stereo_level.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store_dispatch.h
@@ -129,7 +129,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_levels.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_state.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/batch_action.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_gain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_ladspa.cpp
@@ -148,6 +147,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/selectors.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/state.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/store_dispatch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/thunk_action.cpp
 )

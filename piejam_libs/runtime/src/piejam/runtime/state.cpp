@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 #include <piejam/algorithm/contains.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
@@ -52,7 +52,7 @@ samplerates(
 }
 
 auto
-samplerates_from_state(audio_state const& state) -> audio::samplerates_t
+samplerates_from_state(state const& state) -> audio::samplerates_t
 {
     return samplerates(state.input.hw_params, state.output.hw_params);
 }
@@ -68,7 +68,7 @@ period_sizes(
 }
 
 auto
-period_sizes_from_state(audio_state const& state) -> audio::period_sizes_t
+period_sizes_from_state(state const& state) -> audio::period_sizes_t
 {
     return period_sizes(state.input.hw_params, state.output.hw_params);
 }
@@ -115,7 +115,7 @@ apply_parameter_assignments(
 
 void
 insert_internal_fx_module(
-        audio_state& st,
+        state& st,
         mixer::bus_id const bus_id,
         std::size_t const position,
         fx::internal const fx_type,
@@ -151,7 +151,7 @@ insert_internal_fx_module(
 
 void
 insert_ladspa_fx_module(
-        audio_state& st,
+        state& st,
         mixer::bus_id const bus_id,
         std::size_t const position,
         fx::ladspa_instance_id const instance_id,
@@ -196,7 +196,7 @@ insert_ladspa_fx_module(
 
 void
 insert_missing_ladspa_fx_module(
-        audio_state& st,
+        state& st,
         mixer::bus_id const bus_id,
         std::size_t const position,
         fx::unavailable_ladspa const& unavail,
@@ -222,7 +222,7 @@ insert_missing_ladspa_fx_module(
 }
 
 void
-remove_fx_module(audio_state& st, fx::module_id id)
+remove_fx_module(state& st, fx::module_id id)
 {
     if (fx::module const* const fx_mod = st.fx_modules[id])
     {
@@ -268,7 +268,7 @@ remove_fx_module(audio_state& st, fx::module_id id)
 template <audio::bus_direction D>
 auto
 add_mixer_bus(
-        audio_state& st,
+        state& st,
         std::string name,
         audio::bus_type type,
         channel_index_pair const& chs) -> mixer::bus_id
@@ -298,18 +298,18 @@ add_mixer_bus(
 }
 
 template auto add_mixer_bus<audio::bus_direction::input>(
-        audio_state&,
+        state&,
         std::string,
         audio::bus_type,
         channel_index_pair const&) -> mixer::bus_id;
 template auto add_mixer_bus<audio::bus_direction::output>(
-        audio_state&,
+        state&,
         std::string,
         audio::bus_type,
         channel_index_pair const&) -> mixer::bus_id;
 
 void
-remove_mixer_bus(audio_state& st, mixer::bus_id const bus_id)
+remove_mixer_bus(state& st, mixer::bus_id const bus_id)
 {
     if (st.mixer_state.input_solo_id == bus_id)
         st.mixer_state.input_solo_id = mixer::bus_id{};
@@ -346,14 +346,14 @@ remove_mixer_bus(audio_state& st, mixer::bus_id const bus_id)
 
 template <audio::bus_direction D>
 void
-clear_mixer_buses(audio_state& st)
+clear_mixer_buses(state& st)
 {
     auto const bus_ids = mixer::bus_ids<D>(st.mixer_state);
     for (auto const bus_id : *bus_ids)
         remove_mixer_bus(st, bus_id);
 }
 
-template void clear_mixer_buses<audio::bus_direction::input>(audio_state&);
-template void clear_mixer_buses<audio::bus_direction::output>(audio_state&);
+template void clear_mixer_buses<audio::bus_direction::input>(state&);
+template void clear_mixer_buses<audio::bus_direction::output>(state&);
 
 } // namespace piejam::runtime

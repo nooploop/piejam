@@ -18,7 +18,7 @@
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 
 #include <piejam/runtime/actions/request_levels_update.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
 #include <vector>

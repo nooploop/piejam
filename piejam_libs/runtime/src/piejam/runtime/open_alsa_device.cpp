@@ -18,7 +18,7 @@
 #include <piejam/runtime/open_alsa_device.h>
 
 #include <piejam/audio/alsa/pcm_io.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 namespace piejam::runtime
 {

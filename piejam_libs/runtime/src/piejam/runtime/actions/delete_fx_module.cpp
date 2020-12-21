@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/delete_fx_module.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 namespace piejam::runtime::actions
 {

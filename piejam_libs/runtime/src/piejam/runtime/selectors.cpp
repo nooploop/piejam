@@ -21,7 +21,7 @@
 #include <piejam/functional/memo.h>
 #include <piejam/npos.h>
 #include <piejam/reselect/selector.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
 

@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/set_bus_solo.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 #include <boost/assert.hpp>
 

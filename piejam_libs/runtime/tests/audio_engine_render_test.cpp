@@ -18,7 +18,7 @@
 #include <piejam/audio/table.h>
 #include <piejam/audio/types.h>
 #include <piejam/runtime/audio_engine.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/fwd.h>
 
 #include <gtest/gtest.h>

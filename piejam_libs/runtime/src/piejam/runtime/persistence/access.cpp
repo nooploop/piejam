@@ -20,7 +20,7 @@
 #include <piejam/entity_id_hash.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
 #include <piejam/runtime/persistence/app_config.h>
 #include <piejam/runtime/persistence/session.h>
@@ -128,7 +128,7 @@ export_parameter_assignments(
 }
 
 static auto
-export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
+export_fx_chains(state const& st, mixer::bus_list_t const& bus_ids)
         -> std::vector<persistence::session::fx_chain>
 {
     std::vector<persistence::session::fx_chain> result;

@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/insert_fx_module.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 
 #include <boost/assert.hpp>

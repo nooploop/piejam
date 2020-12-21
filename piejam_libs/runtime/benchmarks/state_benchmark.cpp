@@ -18,8 +18,8 @@
 #include <piejam/audio/ladspa/scan.h>
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h>
-#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/selectors.h>
+#include <piejam/runtime/state.h>
 
 #include <benchmark/benchmark.h>
 
@@ -27,9 +27,9 @@ namespace piejam::runtime
 {
 
 static void
-BM_copy_state_benchmark(benchmark::State& state)
+BM_copy_state_benchmark(benchmark::State& bench_state)
 {
-    audio_state st;
+    state st;
     auto in1 = add_mixer_bus<audio::bus_direction::input>(
             st,
             "In1yohohofoobarbaz",
@@ -55,7 +55,7 @@ BM_copy_state_benchmark(benchmark::State& state)
     ladspa_fx_scan.plugins = audio::ladspa::scan_directory("/usr/lib/ladspa");
     st = ladspa_fx_scan.reduce(st);
 
-    for (auto _ : state)
+    for (auto _ : bench_state)
     {
         auto new_st = st;
         benchmark::DoNotOptimize(new_st);
@@ -66,9 +66,9 @@ BM_copy_state_benchmark(benchmark::State& state)
 BENCHMARK(BM_copy_state_benchmark);
 
 static void
-BM_get_bus_name_benchmark(benchmark::State& state)
+BM_get_bus_name_benchmark(benchmark::State& bench_state)
 {
-    audio_state st;
+    state st;
     auto in1 = add_mixer_bus<audio::bus_direction::input>(
             st,
             "In1",
@@ -92,7 +92,7 @@ BM_get_bus_name_benchmark(benchmark::State& state)
 
     auto const get_name = selectors::make_bus_name_selector(in1);
 
-    for (auto _ : state)
+    for (auto _ : bench_state)
     {
         auto name = get_name.get(st);
         benchmark::DoNotOptimize(name);

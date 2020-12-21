@@ -19,7 +19,7 @@
 
 #include <piejam/range/indices.h>
 #include <piejam/runtime/actions/replace_fx_module.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
 

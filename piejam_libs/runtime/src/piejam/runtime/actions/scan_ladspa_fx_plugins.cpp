@@ -20,7 +20,7 @@
 #include <piejam/audio/ladspa/scan.h>
 #include <piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h>
 #include <piejam/runtime/actions/reload_missing_plugins.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
 #include <thread>

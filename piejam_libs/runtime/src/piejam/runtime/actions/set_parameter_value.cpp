@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/set_parameter_value.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 #include <boost/assert.hpp>
 

@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/request_levels_update.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 namespace piejam::runtime::actions
 {

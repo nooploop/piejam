@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/registry.h>
 
 #include <boost/range/algorithm_ext/erase.hpp>

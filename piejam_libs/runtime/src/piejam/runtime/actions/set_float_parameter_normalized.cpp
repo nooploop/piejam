@@ -18,7 +18,7 @@
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
 
 #include <piejam/runtime/actions/set_parameter_value.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::runtime::actions

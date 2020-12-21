@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/select_device.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 #include <fmt/format.h>
 

@@ -46,7 +46,7 @@
 namespace piejam::runtime
 {
 
-struct audio_state
+struct state
 {
     box<audio::pcm_io_descriptors> pcm_devices;
 
@@ -76,34 +76,34 @@ struct audio_state
 auto samplerates(
         box<audio::pcm_hw_params> input_hw_params,
         box<audio::pcm_hw_params> output_hw_params) -> audio::samplerates_t;
-auto samplerates_from_state(audio_state const&) -> audio::samplerates_t;
+auto samplerates_from_state(state const&) -> audio::samplerates_t;
 
 auto period_sizes(
         box<audio::pcm_hw_params> input_hw_params,
         box<audio::pcm_hw_params> output_hw_params) -> audio::period_sizes_t;
-auto period_sizes_from_state(audio_state const&) -> audio::period_sizes_t;
+auto period_sizes_from_state(state const&) -> audio::period_sizes_t;
 
 template <audio::bus_direction D>
 auto add_mixer_bus(
-        audio_state&,
+        state&,
         std::string name,
         audio::bus_type type,
         channel_index_pair const& chs = channel_index_pair{npos})
         -> mixer::bus_id;
 
-void remove_mixer_bus(audio_state&, mixer::bus_id);
+void remove_mixer_bus(state&, mixer::bus_id);
 
 template <audio::bus_direction D>
-void clear_mixer_buses(audio_state&);
+void clear_mixer_buses(state&);
 
 void insert_internal_fx_module(
-        audio_state&,
+        state&,
         mixer::bus_id,
         std::size_t position,
         fx::internal,
         std::vector<fx::parameter_assignment> const& initial_assignments);
 void insert_ladspa_fx_module(
-        audio_state&,
+        state&,
         mixer::bus_id,
         std::size_t position,
         fx::ladspa_instance_id,
@@ -111,11 +111,11 @@ void insert_ladspa_fx_module(
         std::span<audio::ladspa::port_descriptor const> const& control_inputs,
         std::vector<fx::parameter_assignment> const& initial_assignments);
 void insert_missing_ladspa_fx_module(
-        audio_state&,
+        state&,
         mixer::bus_id,
         std::size_t position,
         fx::unavailable_ladspa const&,
         std::string_view const& name);
-void remove_fx_module(audio_state& st, fx::module_id id);
+void remove_fx_module(state& st, fx::module_id id);
 
 } // namespace piejam::runtime

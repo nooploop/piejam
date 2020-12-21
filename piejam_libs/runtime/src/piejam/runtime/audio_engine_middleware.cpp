@@ -45,7 +45,7 @@
 #include <piejam/runtime/actions/update_info.h>
 #include <piejam/runtime/actions/update_levels.h>
 #include <piejam/runtime/audio_engine.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/ladspa_manager.h>
 
 #include <spdlog/spdlog.h>

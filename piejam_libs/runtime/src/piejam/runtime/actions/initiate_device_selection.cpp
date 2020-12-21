@@ -17,7 +17,7 @@
 
 #include <piejam/runtime/actions/initiate_device_selection.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 namespace piejam::runtime::actions
 {

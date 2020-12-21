@@ -17,14 +17,14 @@
 
 #include <piejam/runtime/ui/thunk_action_impl.h>
 
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 
 namespace piejam::runtime
 {
 
 namespace ui {
 
-template struct thunk_action<audio_state>;
+template struct thunk_action<state>;
 
 } // namespace ui
 

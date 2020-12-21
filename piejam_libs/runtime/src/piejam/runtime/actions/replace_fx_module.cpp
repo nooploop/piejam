@@ -20,7 +20,7 @@
 #include <piejam/entity_id.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/ui/batch_action.h>

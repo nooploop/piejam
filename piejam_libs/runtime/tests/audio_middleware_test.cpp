@@ -20,7 +20,7 @@
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/audio_engine_middleware.h>
-#include <piejam/runtime/audio_state.h>
+#include <piejam/runtime/state.h>
 #include <piejam/thread/configuration.h>
 
 #include <gmock/gmock.h>
