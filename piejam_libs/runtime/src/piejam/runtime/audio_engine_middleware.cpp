@@ -36,17 +36,15 @@
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/request_levels_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
-#include <piejam/runtime/actions/select_device.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
-#include <piejam/runtime/actions/update_devices.h>
 #include <piejam/runtime/actions/update_info.h>
 #include <piejam/runtime/actions/update_levels.h>
 #include <piejam/runtime/audio_engine.h>
-#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/ladspa_manager.h>
+#include <piejam/runtime/state.h>
 
 #include <spdlog/spdlog.h>
 
@@ -54,6 +52,141 @@
 
 namespace piejam::runtime
 {
+
+namespace
+{
+
+constexpr void
+update_channel(std::size_t& ch, std::size_t const num_chs)
+{
+    if (ch >= num_chs)
+        ch = npos;
+}
+
+struct update_devices final : ui::cloneable_action<update_devices, action>
+{
+    box<piejam::audio::pcm_io_descriptors> pcm_devices;
+
+    selected_device input;
+    selected_device output;
+
+    audio::samplerate_t samplerate{};
+    audio::period_size_t period_size{};
+
+    auto reduce(state const& st) const -> state override
+    {
+        auto new_st = st;
+
+        new_st.pcm_devices = pcm_devices;
+        new_st.input = input;
+        new_st.output = output;
+        new_st.samplerate = samplerate;
+        new_st.period_size = period_size;
+
+        auto const& in_ids = *st.mixer_state.inputs;
+        auto const& out_ids = *st.mixer_state.outputs;
+
+        std::size_t const num_in_channels = input.hw_params->num_channels;
+        for (auto const& in_id : in_ids)
+        {
+            new_st.mixer_state.buses.update(
+                    in_id,
+                    [num_in_channels](mixer::bus& bus) {
+                        update_channel(
+                                bus.device_channels.left,
+                                num_in_channels);
+                        update_channel(
+                                bus.device_channels.right,
+                                num_in_channels);
+                    });
+        }
+
+        std::size_t const num_out_channels = output.hw_params->num_channels;
+        for (auto const& out_id : out_ids)
+        {
+            new_st.mixer_state.buses.update(
+                    out_id,
+                    [num_out_channels](mixer::bus& bus) {
+                        update_channel(
+                                bus.device_channels.left,
+                                num_out_channels);
+                        update_channel(
+                                bus.device_channels.right,
+                                num_out_channels);
+                    });
+        }
+
+        return new_st;
+    }
+};
+
+template <audio::bus_direction D>
+struct select_device final : ui::cloneable_action<select_device<D>, action>
+{
+    selected_device device;
+    unsigned samplerate{};
+    unsigned period_size{};
+
+    auto reduce(state const&) const -> state override;
+};
+
+template <>
+auto
+select_device<audio::bus_direction::input>::reduce(state const& st) const
+        -> state
+{
+    auto new_st = st;
+
+    new_st.input = device;
+    new_st.samplerate = samplerate;
+    new_st.period_size = period_size;
+
+    clear_mixer_buses<audio::bus_direction::input>(new_st);
+
+    std::size_t const num_channels = device.hw_params->num_channels;
+    for (std::size_t index = 0; index < num_channels; ++index)
+    {
+        add_mixer_bus<audio::bus_direction::input>(
+                new_st,
+                fmt::format("In {}", index + 1),
+                audio::bus_type::mono,
+                channel_index_pair(index));
+    }
+
+    return new_st;
+}
+
+template <>
+auto
+select_device<audio::bus_direction::output>::reduce(state const& st) const
+        -> state
+{
+    auto new_st = st;
+
+    new_st.output = device;
+    new_st.samplerate = samplerate;
+    new_st.period_size = period_size;
+
+    clear_mixer_buses<audio::bus_direction::output>(new_st);
+
+    if (auto const num_channels = device.hw_params->num_channels)
+    {
+        add_mixer_bus<audio::bus_direction::output>(
+                new_st,
+                "Main",
+                audio::bus_type::stereo,
+                channel_index_pair(
+                        num_channels > 0 ? 0 : npos,
+                        num_channels > 1 ? 1 : npos));
+    }
+
+    return new_st;
+}
+
+using select_input_device = select_device<audio::bus_direction::input>;
+using select_output_device = select_device<audio::bus_direction::output>;
+
+} // namespace
 
 audio_engine_middleware::audio_engine_middleware(
         thread::configuration const& audio_thread_config,
@@ -83,14 +216,19 @@ audio_engine_middleware::~audio_engine_middleware() = default;
 void
 audio_engine_middleware::operator()(action const& action)
 {
-    if (auto const* const a =
-                dynamic_cast<actions::device_action const*>(&action))
+    if (auto a = dynamic_cast<actions::device_action const*>(&action))
     {
-        process_device_action(*a);
+        close_device();
+
+        auto v = ui::make_action_visitor<actions::device_action_visitor>(
+                [this](auto&& a) { process_device_action(a); });
+
+        a->visit(v);
+
+        open_device();
+        start_engine();
     }
-    else if (
-            auto const* const a =
-                    dynamic_cast<actions::engine_action const*>(&action))
+    else if (auto a = dynamic_cast<actions::engine_action const*>(&action))
     {
         process_engine_action(*a);
     }
@@ -98,40 +236,6 @@ audio_engine_middleware::operator()(action const& action)
     {
         m_next(action);
     }
-}
-
-void
-audio_engine_middleware::process_device_action(
-        actions::device_action const& action)
-{
-    close_device();
-
-    auto v = ui::make_action_visitor<actions::device_action_visitor>(
-            [this](actions::apply_app_config const& a) {
-                process_apply_app_config_action(a);
-            },
-            [this](actions::refresh_devices const& a) {
-                process_refresh_devices_action(a);
-            },
-            [](actions::update_devices const&) {
-                BOOST_ASSERT_MSG(false, "should not be sent by user");
-            },
-            [this](actions::initiate_device_selection const& a) {
-                process_initiate_device_selection_action(a);
-            },
-            [](actions::select_input_device const&) {
-                BOOST_ASSERT_MSG(false, "should not be sent by user");
-            },
-            [](actions::select_output_device const&) {
-                BOOST_ASSERT_MSG(false, "should not be sent by user");
-            },
-            [this](actions::select_samplerate const& a) { m_next(a); },
-            [this](actions::select_period_size const& a) { m_next(a); });
-
-    action.visit(v);
-
-    open_device();
-    start_engine();
 }
 
 static auto
@@ -153,12 +257,12 @@ next_samplerate_and_period_size(
 }
 
 void
-audio_engine_middleware::process_apply_app_config_action(
+audio_engine_middleware::process_device_action(
         actions::apply_app_config const& a)
 {
     state const& current_state = m_get_state();
 
-    actions::update_devices prep_action;
+    update_devices prep_action;
     prep_action.pcm_devices = current_state.pcm_devices;
 
     if (auto index = algorithm::index_of_if(
@@ -206,12 +310,11 @@ audio_engine_middleware::process_apply_app_config_action(
 }
 
 void
-audio_engine_middleware::process_refresh_devices_action(
-        actions::refresh_devices const&)
+audio_engine_middleware::process_device_action(actions::refresh_devices const&)
 {
     state const& current_state = m_get_state();
 
-    actions::update_devices next_action;
+    update_devices next_action;
     next_action.pcm_devices = m_get_pcm_io_descriptors();
 
     auto next_device = [this](auto const& new_devices,
@@ -245,7 +348,7 @@ audio_engine_middleware::process_refresh_devices_action(
 }
 
 void
-audio_engine_middleware::process_initiate_device_selection_action(
+audio_engine_middleware::process_device_action(
         actions::initiate_device_selection const& action)
 {
     state const& current_state = m_get_state();
@@ -254,7 +357,7 @@ audio_engine_middleware::process_initiate_device_selection_action(
 
     if (action.input)
     {
-        actions::select_input_device next_action;
+        select_input_device next_action;
         auto const& descriptors = current_state.pcm_devices->inputs;
         next_action.device = {index, m_get_hw_params(descriptors[index])};
 
@@ -269,7 +372,7 @@ audio_engine_middleware::process_initiate_device_selection_action(
     }
     else
     {
-        actions::select_output_device next_action;
+        select_output_device next_action;
         auto const& descriptors = current_state.pcm_devices->outputs;
         next_action.device = {index, m_get_hw_params(descriptors[index])};
 
@@ -282,6 +385,20 @@ audio_engine_middleware::process_initiate_device_selection_action(
 
         m_next(next_action);
     }
+}
+
+void
+audio_engine_middleware::process_device_action(
+        actions::select_samplerate const& a)
+{
+    m_next(a);
+}
+
+void
+audio_engine_middleware::process_device_action(
+        actions::select_period_size const& a)
+{
+    m_next(a);
 }
 
 static auto

@@ -26,7 +26,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/save_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/scan_ladspa_fx_plugins.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_bus_channel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_fx_chain_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_period_size.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_samplerate.h
@@ -34,7 +33,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_float_parameter_normalized.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_parameter_value.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_devices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_levels.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine.h
@@ -118,7 +116,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/save_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/scan_ladspa_fx_plugins.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_bus_channel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_fx_chain_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_period_size.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_samplerate.cpp
@@ -126,7 +123,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_float_parameter_normalized.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_parameter_value.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_info.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_levels.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp

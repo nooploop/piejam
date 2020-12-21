@@ -33,13 +33,7 @@ struct engine_action;
 struct apply_app_config;
 
 struct refresh_devices;
-struct update_devices;
 struct initiate_device_selection;
-
-template <audio::bus_direction>
-struct select_device;
-using select_input_device = select_device<audio::bus_direction::input>;
-using select_output_device = select_device<audio::bus_direction::output>;
 
 struct select_samplerate;
 struct select_period_size;

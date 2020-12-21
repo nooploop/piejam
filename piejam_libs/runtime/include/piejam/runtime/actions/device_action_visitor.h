@@ -28,10 +28,7 @@ struct device_action_visitor
     : ui::action_visitor_interface<
               apply_app_config,
               refresh_devices,
-              update_devices,
               initiate_device_selection,
-              select_input_device,
-              select_output_device,
               select_samplerate,
               select_period_size>
 {

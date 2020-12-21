@@ -58,11 +58,14 @@ public:
     void operator()(action const&);
 
 private:
-    void process_device_action(actions::device_action const&);
+    void process_device_action(actions::apply_app_config const&);
+    void process_device_action(actions::refresh_devices const&);
+    void process_device_action(actions::initiate_device_selection const&);
+    void process_device_action(actions::select_samplerate const&);
+    void process_device_action(actions::select_period_size const&);
+
     void process_engine_action(actions::engine_action const&);
 
-    void process_apply_app_config_action(actions::apply_app_config const&);
-    void process_refresh_devices_action(actions::refresh_devices const&);
     void process_initiate_device_selection_action(
             actions::initiate_device_selection const&);
 
