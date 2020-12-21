@@ -71,6 +71,11 @@ TopPane {
                     stack.push(fxBrowser)
                 }
                 onDeleteButtonClicked: model.item.deleteModule()
+                onAddButtonClicked: {
+                    fxBrowser.addMode = FxBrowser.AddMode.Insert
+                    fxBrowser.insertPosition = index + 1
+                    stack.push(fxBrowser)
+                }
 
                 Binding {
                     target: model.item
@@ -79,11 +84,11 @@ TopPane {
                 }
             }
 
-            footer: Item {
+            header: Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
 
-                width: addButton.implicitWidth + 8
+                width: addButton.width + 4
 
                 Button {
                     id: addButton
@@ -92,14 +97,12 @@ TopPane {
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.leftMargin: 4
 
                     text: "+"
 
                     onClicked:{
                         fxBrowser.addMode = FxBrowser.AddMode.Insert
-                        fxBrowser.insertPosition = root.model.modules.rowCount()
+                        fxBrowser.insertPosition = 0
                         stack.push(fxBrowser)
                     }
                 }

@@ -28,9 +28,10 @@ Item {
 
     signal swapButtonClicked()
     signal deleteButtonClicked()
+    signal addButtonClicked()
 
-    implicitWidth: frame.implicitWidth
-    implicitHeight: frame.implicitHeight
+    implicitWidth: frame.width + addButton.width + 4
+    implicitHeight: frame.height
 
     Frame {
         id: frame
@@ -122,4 +123,24 @@ Item {
             }
         }
     }
+
+    Button {
+        id: addButton
+
+        width: 32
+
+        text: "+"
+        anchors.left: frame.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 4
+
+        onClicked: root.addButtonClicked()
+    }
 }
+
+/*##^##
+Designer {
+    D{i:0;formeditorColor:"#000000";height:300;width:400}
+}
+##^##*/
