@@ -18,9 +18,9 @@
 #include <piejam/app/gui/model/FxChain.h>
 
 #include <piejam/algorithm/edit_script.h>
-#include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/FxModule.h>
 #include <piejam/app/gui/model/FxParameter.h>
+#include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
@@ -40,7 +40,7 @@ FxChain::onSubscribe()
             [this](box<runtime::fx::chain_t> const& fx_chain) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_fx_chain, *fx_chain),
-                        generic_list_model_edit_script_executor{
+                        piejam::gui::generic_list_model_edit_script_executor{
                                 *modules(),
                                 [this](runtime::fx::module_id fx_mod_id) {
                                     return std::make_unique<FxModule>(

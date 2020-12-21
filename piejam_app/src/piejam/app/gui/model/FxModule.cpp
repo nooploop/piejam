@@ -18,8 +18,8 @@
 #include <piejam/app/gui/model/FxModule.h>
 
 #include <piejam/algorithm/edit_script.h>
-#include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/FxParameter.h>
+#include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -78,13 +78,12 @@ FxModule::onSubscribe()
             });
 
     observe(runtime::selectors::make_fx_module_parameters_selector(m_fx_mod_id),
-            [this](box<runtime::fx::module_parameters> const&
-                           param_ids) {
+            [this](box<runtime::fx::module_parameters> const& param_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
                                 parameter_key_ids(*m_param_ids),
                                 parameter_key_ids(*param_ids)),
-                        generic_list_model_edit_script_executor{
+                        piejam::gui::generic_list_model_edit_script_executor{
                                 *parameters(),
                                 [this](parameter_key_id const& param_key_id) {
                                     return std::make_unique<FxParameter>(

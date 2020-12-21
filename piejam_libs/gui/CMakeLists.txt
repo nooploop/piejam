@@ -19,6 +19,7 @@ set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)
 
 add_library(piejam_gui STATIC
     ${RESOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/generic_list_model_edit_script_executor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioDeviceSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioInputOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusConfig.h

@@ -18,9 +18,9 @@
 #include <piejam/app/gui/model/Mixer.h>
 
 #include <piejam/algorithm/edit_script.h>
-#include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/MixerChannel.h>
 #include <piejam/audio/types.h>
+#include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/selectors.h>
@@ -62,11 +62,11 @@ Mixer::onSubscribe()
 {
     observe(runtime::selectors::make_bus_infos_selector(
                     audio::bus_direction::input),
-            [this](boxed_vector<
-                    runtime::selectors::mixer_bus_info> const& bus_infos) {
+            [this](boxed_vector<runtime::selectors::mixer_bus_info> const&
+                           bus_infos) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->inputs, *bus_infos),
-                        generic_list_model_edit_script_executor{
+                        piejam::gui::generic_list_model_edit_script_executor{
                                 *inputChannels(),
                                 [this](auto const& bus_info) {
                                     return std::make_unique<MixerChannel>(
@@ -87,11 +87,11 @@ Mixer::onSubscribe()
 
     observe(runtime::selectors::make_bus_infos_selector(
                     audio::bus_direction::output),
-            [this](boxed_vector<
-                    runtime::selectors::mixer_bus_info> const& bus_infos) {
+            [this](boxed_vector<runtime::selectors::mixer_bus_info> const&
+                           bus_infos) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->outputs, *bus_infos),
-                        generic_list_model_edit_script_executor{
+                        piejam::gui::generic_list_model_edit_script_executor{
                                 *outputChannels(),
                                 [this](auto const& bus_info) {
                                     return std::make_unique<MixerChannel>(

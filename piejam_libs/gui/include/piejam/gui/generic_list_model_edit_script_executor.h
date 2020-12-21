@@ -22,7 +22,7 @@
 #include <piejam/runtime/store_dispatch.h>
 #include <piejam/runtime/subscriber.h>
 
-namespace piejam::app::gui
+namespace piejam::gui
 {
 
 template <class ListItem, class ListItemFactory>
@@ -50,4 +50,4 @@ generic_list_model_edit_script_executor(
         ListItemFactory&&)
         -> generic_list_model_edit_script_executor<ListItem, ListItemFactory>;
 
-} // namespace piejam::app::gui
+} // namespace piejam::gui

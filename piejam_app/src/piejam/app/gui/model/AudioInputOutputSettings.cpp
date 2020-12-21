@@ -18,8 +18,8 @@
 #include <piejam/app/gui/model/AudioInputOutputSettings.h>
 
 #include <piejam/algorithm/edit_script.h>
-#include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/BusConfig.h>
+#include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/selectors.h>
@@ -57,7 +57,7 @@ AudioInputOutputSettings::onSubscribe()
             [this](box<runtime::mixer::bus_list_t> const& bus_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_bus_ids, *bus_ids),
-                        generic_list_model_edit_script_executor{
+                        piejam::gui::generic_list_model_edit_script_executor{
                                 *busConfigs(),
                                 [this](runtime::mixer::bus_id bus_id) {
                                     return std::make_unique<BusConfig>(

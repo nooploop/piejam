@@ -18,10 +18,10 @@
 #include <piejam/app/gui/model/FxBrowser.h>
 
 #include <piejam/algorithm/edit_script.h>
-#include <piejam/app/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/app/gui/model/FxBrowserEntryInternal.h>
 #include <piejam/app/gui/model/FxBrowserEntryLADSPA.h>
 #include <piejam/functional/overload.h>
+#include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
@@ -43,7 +43,7 @@ FxBrowser::onSubscribe()
                         algorithm::edit_script(
                                 m_fx_registry.entries.get(),
                                 fx_registry.entries.get()),
-                        generic_list_model_edit_script_executor{
+                        piejam::gui::generic_list_model_edit_script_executor{
                                 *entries(),
                                 [this](auto const& item) {
                                     return std::visit(
