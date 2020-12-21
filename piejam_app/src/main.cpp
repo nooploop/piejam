@@ -29,7 +29,6 @@
 #include <piejam/gui/model/FxParameter.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/qt_log.h>
-#include <piejam/log/generic_log_sink.h>
 #include <piejam/redux/batch_middleware.h>
 #include <piejam/redux/queueing_middleware.h>
 #include <piejam/redux/store.h>
@@ -44,10 +43,10 @@
 #include <piejam/runtime/actions/save_session.h>
 #include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
 #include <piejam/runtime/audio_engine_middleware.h>
-#include <piejam/runtime/state.h>
 #include <piejam/runtime/locations.h>
 #include <piejam/runtime/open_alsa_device.h>
 #include <piejam/runtime/persistence_middleware.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/store.h>
 #include <piejam/runtime/subscriber.h>
 #include <piejam/runtime/ui/action.h>
@@ -139,9 +138,8 @@ main(int argc, char* argv[]) -> int
                 std::forward<decltype(next)>(next));
     });
 
-    store.apply_middleware(redux::make_thunk_middleware<
-                           runtime::state,
-                           runtime::action>{});
+    store.apply_middleware(
+            redux::make_thunk_middleware<runtime::state, runtime::action>{});
 
     bool batching{};
     store.apply_middleware([&batching](
@@ -186,17 +184,6 @@ main(int argc, char* argv[]) -> int
     app::gui::model::Info info_model(store, state_change_subscriber);
     app::gui::model::FxChain fx_chain(store, state_change_subscriber);
     app::gui::model::FxBrowser fx_browser(store, state_change_subscriber);
-
-    spdlog::default_logger()->sinks().push_back(
-            std::make_shared<core::generic_log_sink_mt>(
-                    [&info_model](spdlog::details::log_msg const& msg) {
-                        info_model.addLogMessage(
-                                QString::fromStdString(fmt::format(
-                                        "[{}] {}",
-                                        static_cast<int>(msg.level),
-                                        msg.payload)));
-                    },
-                    []() {}));
 
     QQmlApplicationEngine engine;
     engine.addImportPath("qrc:/");

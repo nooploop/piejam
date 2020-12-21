@@ -23,7 +23,7 @@
 #include <functional>
 #include <mutex>
 
-namespace piejam::core
+namespace piejam::log
 {
 
 template <typename Mutex>
@@ -54,4 +54,4 @@ private:
 using generic_log_sink_mt = generic_log_sink<std::mutex>;
 using generic_log_sink_st = generic_log_sink<spdlog::details::null_mutex>;
 
-} // namespace piejam::core
+} // namespace piejam::log
