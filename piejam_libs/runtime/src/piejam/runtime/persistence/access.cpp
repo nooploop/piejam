@@ -167,7 +167,7 @@ export_fx_chains(audio_state const& st, mixer::bus_list_t const& bus_ids)
                             [&st, fx_mod](fx::unavailable_ladspa_id const id)
                                     -> session::fx_plugin {
                                 auto unavail =
-                                        (*st.fx_unavailable_ladspa_plugins)[id];
+                                        st.fx_unavailable_ladspa_plugins[id];
                                 BOOST_ASSERT(unavail);
                                 session::ladspa_plugin plug;
                                 plug.id = unavail->plugin_id;

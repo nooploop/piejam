@@ -63,7 +63,7 @@ struct audio_state
     fx::modules_t fx_modules;
     box<fx::parameters_t> fx_parameters;
     box<fx::ladspa_instances> fx_ladspa_instances;
-    box<fx::unavailable_ladspa_plugins> fx_unavailable_ladspa_plugins;
+    fx::unavailable_ladspa_plugins fx_unavailable_ladspa_plugins;
 
     mixer::state mixer_state{};
 

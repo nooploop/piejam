@@ -47,7 +47,7 @@ reload_missing_plugins() -> thunk_action
                 if (auto id = std::get_if<fx::unavailable_ladspa_id>(
                             &fx_mod->fx_instance_id))
                 {
-                    auto unavail = (*st.fx_unavailable_ladspa_plugins)[*id];
+                    auto unavail = st.fx_unavailable_ladspa_plugins[*id];
                     BOOST_ASSERT(unavail);
                     batch.append(actions::make_replace_fx_module_action(
                             st,

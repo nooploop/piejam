@@ -123,42 +123,30 @@ insert_internal_fx_module(
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
-    std::tie(st.mixer_state.buses, st.fx_modules, st.fx_parameters) =
-            [bus_id, position, fx_type, &initial_assignments](
-                    mixer::buses_t buses,
-                    fx::chain_t fx_chain,
-                    fx::modules_t fx_modules,
-                    fx::parameters_t fx_params,
-                    parameter_maps& params) {
-                auto const insert_pos = std::min(position, fx_chain.size());
+    fx::chain_t fx_chain = st.mixer_state.buses[bus_id]->fx_chain;
+    auto const insert_pos = std::min(position, fx_chain.size());
 
-                switch (fx_type)
-                {
-                    case fx::internal::gain:
-                        fx_chain.emplace(
-                                std::next(fx_chain.begin(), insert_pos),
-                                make_fx_gain(fx_modules, fx_params, params));
-                        break;
-                }
+    fx::parameters_t fx_params = st.fx_parameters;
 
-                apply_parameter_assignments(
-                        initial_assignments,
-                        *std::as_const(fx_modules)[fx_chain[insert_pos]],
-                        params);
+    switch (fx_type)
+    {
+        case fx::internal::gain:
+            fx_chain.emplace(
+                    std::next(fx_chain.begin(), insert_pos),
+                    make_fx_gain(st.fx_modules, fx_params, st.params));
+            break;
+    }
 
-                buses.update(bus_id, [&](mixer::bus& bus) {
-                    bus.fx_chain = std::move(fx_chain);
-                });
+    st.fx_parameters = std::move(fx_params);
 
-                return std::tuple(
-                        std::move(buses),
-                        std::move(fx_modules),
-                        std::move(fx_params));
-            }(st.mixer_state.buses,
-              st.mixer_state.buses[bus_id]->fx_chain,
-              st.fx_modules,
-              st.fx_parameters,
-              st.params);
+    apply_parameter_assignments(
+            initial_assignments,
+            *st.fx_modules[fx_chain[insert_pos]],
+            st.params);
+
+    st.mixer_state.buses.update(bus_id, [&](mixer::bus& bus) {
+        bus.fx_chain = std::move(fx_chain);
+    });
 }
 
 void
@@ -173,58 +161,37 @@ insert_ladspa_fx_module(
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
-    std::tie(
-            st.mixer_state.buses,
-            st.fx_modules,
-            st.fx_parameters,
-            st.fx_ladspa_instances) =
-            [bus_id,
-             position,
-             instance_id,
-             &plugin_desc,
-             control_inputs,
-             &initial_assignments](
-                    mixer::buses_t buses,
-                    fx::chain_t fx_chain,
-                    fx::modules_t fx_modules,
-                    fx::parameters_t fx_params,
-                    fx::ladspa_instances fx_ladspa_instances,
-                    parameter_maps& params) {
-                auto const insert_pos = std::min(position, fx_chain.size());
+    fx::chain_t fx_chain = st.mixer_state.buses[bus_id]->fx_chain;
+    auto const insert_pos = std::min(position, fx_chain.size());
 
-                fx_chain.emplace(
-                        std::next(fx_chain.begin(), insert_pos),
-                        fx_modules.add(fx::make_ladspa_module(
-                                instance_id,
-                                plugin_desc.name,
-                                control_inputs,
-                                fx_params,
-                                params.get_map<float_parameter>(),
-                                params.get_map<int_parameter>(),
-                                params.get_map<bool_parameter>())));
+    fx::parameters_t fx_params = st.fx_parameters;
 
-                apply_parameter_assignments(
-                        initial_assignments,
-                        *std::as_const(fx_modules)[fx_chain[insert_pos]],
-                        params);
+    fx_chain.emplace(
+            std::next(fx_chain.begin(), insert_pos),
+            st.fx_modules.add(fx::make_ladspa_module(
+                    instance_id,
+                    plugin_desc.name,
+                    control_inputs,
+                    fx_params,
+                    st.params.get_map<float_parameter>(),
+                    st.params.get_map<int_parameter>(),
+                    st.params.get_map<bool_parameter>())));
 
-                buses.update(bus_id, [&](mixer::bus& bus) {
-                    bus.fx_chain = std::move(fx_chain);
-                });
+    st.fx_parameters = std::move(fx_params);
 
+    apply_parameter_assignments(
+            initial_assignments,
+            *st.fx_modules[fx_chain[insert_pos]],
+            st.params);
+
+    st.mixer_state.buses.update(bus_id, [&](mixer::bus& bus) {
+        bus.fx_chain = std::move(fx_chain);
+    });
+
+    st.fx_ladspa_instances.update(
+            [&](fx::ladspa_instances& fx_ladspa_instances) {
                 fx_ladspa_instances.emplace(instance_id, plugin_desc);
-
-                return std::tuple(
-                        std::move(buses),
-                        std::move(fx_modules),
-                        std::move(fx_params),
-                        std::move(fx_ladspa_instances));
-            }(st.mixer_state.buses,
-              st.mixer_state.buses[bus_id]->fx_chain,
-              st.fx_modules,
-              st.fx_parameters,
-              st.fx_ladspa_instances,
-              st.params);
+            });
 }
 
 void
@@ -237,38 +204,21 @@ insert_missing_ladspa_fx_module(
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
-    std::tie(
-            st.mixer_state.buses,
-            st.fx_modules,
-            st.fx_unavailable_ladspa_plugins) =
-            [bus_id, position, &unavail, name](
-                    mixer::buses_t buses,
-                    fx::chain_t fx_chain,
-                    fx::modules_t fx_modules,
-                    fx::unavailable_ladspa_plugins unavail_plugs) {
-                auto const insert_pos = std::min(position, fx_chain.size());
+    auto id = st.fx_unavailable_ladspa_plugins.add(unavail);
 
-                auto id = unavail_plugs.add(unavail);
+    fx::chain_t fx_chain = st.mixer_state.buses[bus_id]->fx_chain;
+    auto const insert_pos = std::min(position, fx_chain.size());
 
-                fx_chain.emplace(
-                        std::next(fx_chain.begin(), insert_pos),
-                        fx_modules.add(fx::module{
-                                .fx_instance_id = id,
-                                .name = name,
-                                .parameters = {}}));
+    fx_chain.emplace(
+            std::next(fx_chain.begin(), insert_pos),
+            st.fx_modules.add(fx::module{
+                    .fx_instance_id = id,
+                    .name = name,
+                    .parameters = {}}));
 
-                buses.update(bus_id, [&](mixer::bus& bus) {
-                    bus.fx_chain = std::move(fx_chain);
-                });
-
-                return std::tuple(
-                        std::move(buses),
-                        std::move(fx_modules),
-                        std::move(unavail_plugs));
-            }(st.mixer_state.buses,
-              st.mixer_state.buses[bus_id]->fx_chain,
-              st.fx_modules,
-              st.fx_unavailable_ladspa_plugins);
+    st.mixer_state.buses.update(bus_id, [&](mixer::bus& bus) {
+        bus.fx_chain = std::move(fx_chain);
+    });
 }
 
 void
@@ -288,20 +238,15 @@ remove_fx_module(audio_state& st, fx::module_id id)
             }
         }
 
+        fx::parameters_t fx_params = st.fx_parameters;
         for (auto&& [key, fx_param_id] : *fx_mod->parameters)
         {
             std::visit([&st](auto&& id) { st.params.remove(id); }, fx_param_id);
-            st.fx_parameters = [](fx::parameters_t fx_params,
-                                  fx::parameter_id id) {
-                fx_params.erase(id);
-                return fx_params;
-            }(st.fx_parameters, fx_param_id);
+            fx_params.erase(fx_param_id);
         }
+        st.fx_parameters = std::move(fx_params);
 
-        st.fx_modules = [id](fx::modules_t fx_modules) {
-            fx_modules.remove(id);
-            return fx_modules;
-        }(st.fx_modules);
+        st.fx_modules.remove(id);
 
         if (auto id = std::get_if<fx::ladspa_instance_id>(
                     &fx_mod->fx_instance_id))
@@ -315,11 +260,7 @@ remove_fx_module(audio_state& st, fx::module_id id)
                 auto id = std::get_if<fx::unavailable_ladspa_id>(
                         &fx_mod->fx_instance_id))
         {
-            st.fx_unavailable_ladspa_plugins =
-                    [id](fx::unavailable_ladspa_plugins unavail_plugs) {
-                        unavail_plugs.remove(*id);
-                        return unavail_plugs;
-                    }(st.fx_unavailable_ladspa_plugins);
+            st.fx_unavailable_ladspa_plugins.remove(*id);
         }
     }
 }
@@ -380,7 +321,7 @@ remove_mixer_bus(audio_state& st, mixer::bus_id const bus_id)
     st.params.remove(bus->mute);
     st.params.remove(bus->level);
 
-    auto const fx_chain = *bus->fx_chain;
+    fx::chain_t const fx_chain = *bus->fx_chain;
     for (auto&& fx_mod_id : fx_chain)
         remove_fx_module(st, fx_mod_id);
 
