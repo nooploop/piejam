@@ -31,6 +31,11 @@ public:
     void operator()(action const&);
 
 private:
+    void process_persistence_action(actions::load_app_config const&);
+    void process_persistence_action(actions::save_app_config const&);
+    void process_persistence_action(actions::load_session const&);
+    void process_persistence_action(actions::save_session const&);
+
     get_state_f m_get_state;
     dispatch_f m_dispatch;
     next_f m_next;

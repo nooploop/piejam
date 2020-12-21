@@ -44,26 +44,45 @@ persistence_middleware::persistence_middleware(
 void
 persistence_middleware::operator()(action const& a)
 {
-    if (auto action = dynamic_cast<actions::save_app_config const*>(&a))
+    if (auto action = dynamic_cast<actions::persistence_action const*>(&a))
     {
-        persistence::save_app_config(action->file, m_get_state());
-    }
-    else if (auto action = dynamic_cast<actions::load_app_config const*>(&a))
-    {
-        persistence::load_app_config(action->file, m_dispatch);
-    }
-    else if (auto action = dynamic_cast<actions::save_session const*>(&a))
-    {
-        persistence::save_session(action->file, m_get_state());
-    }
-    else if (auto action = dynamic_cast<actions::load_session const*>(&a))
-    {
-        persistence::load_session(action->file, m_dispatch);
+        auto v = ui::make_action_visitor<actions::persistence_action_visitor>(
+                [this](auto&& a) { process_persistence_action(a); });
+
+        action->visit(v);
     }
     else
     {
         m_next(a);
     }
+}
+
+void
+persistence_middleware::process_persistence_action(
+        actions::load_app_config const& a)
+{
+    persistence::load_app_config(a.file, m_dispatch);
+}
+
+void
+persistence_middleware::process_persistence_action(
+        actions::save_app_config const& a)
+{
+    persistence::save_app_config(a.file, m_get_state());
+}
+
+void
+persistence_middleware::process_persistence_action(
+        actions::load_session const& a)
+{
+    persistence::load_session(a.file, m_dispatch);
+}
+
+void
+persistence_middleware::process_persistence_action(
+        actions::save_session const& a)
+{
+    persistence::save_session(a.file, m_get_state());
 }
 
 } // namespace piejam::runtime

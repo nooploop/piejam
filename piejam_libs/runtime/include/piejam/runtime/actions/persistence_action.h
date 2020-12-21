@@ -17,28 +17,17 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/persistence_action.h>
-#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/actions/persistence_action_visitor.h>
 #include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/cloneable_action.h>
-
-#include <filesystem>
 
 namespace piejam::runtime::actions
 {
 
-struct load_session final
-    : ui::cloneable_action<load_session, action>
-    , visitable_persistence_action<load_session>
+struct persistence_action : ui::visitable_action_interface<persistence_action_visitor>
 {
-    load_session(std::filesystem::path file)
-        : file(std::move(file))
-    {
-    }
-
-    std::filesystem::path file;
-
-    auto reduce(state const&) const -> state override;
 };
+
+template <class Action>
+using visitable_persistence_action = ui::visitable_action<Action, persistence_action>;
 
 } // namespace piejam::runtime::actions
