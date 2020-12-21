@@ -40,8 +40,6 @@
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
-#include <piejam/runtime/actions/update_info.h>
-#include <piejam/runtime/actions/update_levels.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fx/ladspa_manager.h>
 #include <piejam/runtime/state.h>
@@ -185,6 +183,35 @@ select_device<audio::bus_direction::output>::reduce(state const& st) const
 
 using select_input_device = select_device<audio::bus_direction::input>;
 using select_output_device = select_device<audio::bus_direction::output>;
+
+struct update_levels final : ui::cloneable_action<update_levels, action>
+{
+    std::vector<std::pair<stereo_level_parameter_id, stereo_level>> levels;
+
+    auto reduce(state const& st) const -> state override
+    {
+        auto new_st = st;
+
+        for (auto&& [id, lvl] : levels)
+            new_st.params.set(id, lvl);
+
+        return new_st;
+    }
+};
+
+struct update_info final : ui::cloneable_action<update_info, action>
+{
+    std::size_t xruns{};
+    float cpu_load{};
+
+    auto reduce(state const& st) const -> state override
+    {
+        auto new_st = st;
+        new_st.xruns = xruns;
+        new_st.cpu_load = cpu_load;
+        return new_st;
+    }
+};
 
 } // namespace
 
@@ -401,22 +428,6 @@ audio_engine_middleware::process_device_action(
     m_next(a);
 }
 
-static auto
-find_ladspa_plugin_descriptor(
-        fx::registry const& registry,
-        audio::ladspa::plugin_id_t id)
-        -> audio::ladspa::plugin_descriptor const*
-{
-    for (auto const& item : *registry.entries)
-    {
-        if (auto pd = std::get_if<audio::ladspa::plugin_descriptor>(&item);
-            pd && pd->id == id)
-            return pd;
-    }
-
-    return nullptr;
-}
-
 void
 audio_engine_middleware::process_engine_action(
         actions::engine_action const& action)
@@ -557,7 +568,7 @@ audio_engine_middleware::process_engine_action(
             [this](actions::request_levels_update const& a) {
                 if (m_engine)
                 {
-                    actions::update_levels next_action;
+                    update_levels next_action;
 
                     for (auto&& id : a.level_ids)
                     {
@@ -568,15 +579,13 @@ audio_engine_middleware::process_engine_action(
                     m_next(next_action);
                 }
             },
-            [](actions::update_levels const&) {},
             [this](actions::request_info_update const&) {
-                actions::update_info next_action;
+                update_info next_action;
                 next_action.xruns = m_device->xruns();
                 next_action.cpu_load = m_device->cpu_load();
 
                 m_next(next_action);
-            },
-            [](actions::update_info const&) {});
+            });
 
     action.visit(v);
 }

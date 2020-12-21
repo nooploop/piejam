@@ -47,9 +47,7 @@ struct set_bus_solo;
 using set_input_bus_solo = set_bus_solo<audio::bus_direction::input>;
 
 struct request_levels_update;
-struct update_levels;
 struct request_info_update;
-struct update_info;
 
 struct set_bus_name;
 

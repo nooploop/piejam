@@ -36,9 +36,7 @@ struct engine_action_visitor
               set_int_parameter,
               set_input_bus_solo,
               request_levels_update,
-              update_levels,
               request_info_update,
-              update_info,
               load_ladspa_fx_plugin>
 {
 };

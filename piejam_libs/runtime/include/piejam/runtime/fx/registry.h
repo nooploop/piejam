@@ -57,4 +57,20 @@ make_default_registry() -> registry
     return {.entries = make_internal_fx_registry_entries()};
 }
 
+inline auto
+find_ladspa_plugin_descriptor(
+        fx::registry const& registry,
+        audio::ladspa::plugin_id_t id)
+        -> audio::ladspa::plugin_descriptor const*
+{
+    for (auto const& item : *registry.entries)
+    {
+        if (auto pd = std::get_if<audio::ladspa::plugin_descriptor>(&item);
+            pd && pd->id == id)
+            return pd;
+    }
+
+    return nullptr;
+}
+
 } // namespace piejam::runtime::fx
