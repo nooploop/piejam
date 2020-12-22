@@ -41,9 +41,6 @@ public:
     auto begin() const noexcept { return m_map->begin(); }
     auto end() const noexcept { return m_map->end(); }
 
-    auto begin() noexcept { return m_map->begin(); }
-    auto end() noexcept { return m_map->end(); }
-
     auto contains(id_t id) const noexcept { return m_map->contains(id); }
 
     auto operator[](id_t id) const noexcept -> Entity const*
