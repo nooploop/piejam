@@ -34,6 +34,7 @@
 #include <piejam/runtime/actions/engine_action_visitor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
+#include <piejam/runtime/actions/move_fx_module.h>
 #include <piejam/runtime/actions/request_levels_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_period_size.h>
@@ -525,6 +526,18 @@ audio_engine_middleware::process_engine_action(
                     next_action.name = a.name;
                     m_next(next_action);
                 }
+            },
+            [this](actions::move_fx_module_left const& a) {
+                m_next(a);
+
+                if (m_engine)
+                    rebuild();
+            },
+            [this](actions::move_fx_module_right const& a) {
+                m_next(a);
+
+                if (m_engine)
+                    rebuild();
             },
             [this](actions::set_bool_parameter const& a) {
                 m_next(a);

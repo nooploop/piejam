@@ -14,6 +14,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/insert_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_session.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/move_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/persistence_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/persistence_action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h
@@ -104,6 +105,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/insert_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_session.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/move_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/reload_missing_plugins.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/replace_fx_module.cpp

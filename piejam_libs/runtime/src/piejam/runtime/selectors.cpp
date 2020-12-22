@@ -246,6 +246,27 @@ make_fx_module_parameters_selector(fx::module_id fx_mod_id)
 }
 
 auto
+make_fx_module_can_move_left_selector(fx::module_id fx_mod_id) -> selector<bool>
+{
+    return [fx_mod_id](state const& st) -> bool {
+        mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+        return bus && !bus->fx_chain->empty() &&
+               bus->fx_chain->front() != fx_mod_id;
+    };
+}
+
+auto
+make_fx_module_can_move_right_selector(fx::module_id fx_mod_id)
+        -> selector<bool>
+{
+    return [fx_mod_id](state const& st) -> bool {
+        mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+        return bus && !bus->fx_chain->empty() &&
+               bus->fx_chain->back() != fx_mod_id;
+    };
+}
+
+auto
 make_fx_parameter_name_selector(fx::parameter_id const fx_param_id)
         -> selector<boxed_string>
 {

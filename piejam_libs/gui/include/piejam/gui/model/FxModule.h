@@ -30,6 +30,10 @@ class FxModule : public SubscribableModel
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(QAbstractListModel* parameters READ parameters CONSTANT)
+    Q_PROPERTY(
+            bool canMoveLeft READ canMoveLeft NOTIFY canMoveLeftChanged FINAL)
+    Q_PROPERTY(bool canMoveRight READ canMoveRight NOTIFY canMoveRightChanged
+                       FINAL)
 
 public:
     auto name() const noexcept -> QString const& { return m_name; }
@@ -42,18 +46,44 @@ public:
         }
     }
 
+    auto canMoveLeft() const noexcept -> bool { return m_canMoveLeft; }
+    void setCanMoveLeft(bool x)
+    {
+        if (m_canMoveLeft != x)
+        {
+            m_canMoveLeft = x;
+            emit canMoveLeftChanged();
+        }
+    }
+
+    auto canMoveRight() const noexcept -> bool { return m_canMoveRight; }
+    void setCanMoveRight(bool x)
+    {
+        if (m_canMoveRight != x)
+        {
+            m_canMoveRight = x;
+            emit canMoveRightChanged();
+        }
+    }
+
     auto parameters() noexcept -> FxParametersList* { return &m_parameters; }
 
     Q_INVOKABLE virtual void deleteModule() = 0;
+    Q_INVOKABLE virtual void moveLeft() = 0;
+    Q_INVOKABLE virtual void moveRight() = 0;
 
     auto toQString() const -> QString { return m_name; }
 
 signals:
     void nameChanged();
+    void canMoveLeftChanged();
+    void canMoveRightChanged();
 
 private:
     QString m_name;
     FxParametersList m_parameters;
+    bool m_canMoveLeft{};
+    bool m_canMoveRight{};
 };
 
 } // namespace piejam::gui::model

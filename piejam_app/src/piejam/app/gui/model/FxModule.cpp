@@ -21,10 +21,12 @@
 #include <piejam/app/gui/model/FxParameter.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
+#include <piejam/runtime/actions/move_fx_module.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/selectors.h>
 
+#include <boost/assert.hpp>
 #include <boost/container/flat_map.hpp>
 
 namespace piejam::app::gui::model
@@ -77,6 +79,14 @@ FxModule::onSubscribe()
                 setName(QString::fromStdString(*name));
             });
 
+    observe(runtime::selectors::make_fx_module_can_move_left_selector(
+                    m_fx_mod_id),
+            [this](bool const x) { setCanMoveLeft(x); });
+
+    observe(runtime::selectors::make_fx_module_can_move_right_selector(
+                    m_fx_mod_id),
+            [this](bool const x) { setCanMoveRight(x); });
+
     observe(runtime::selectors::make_fx_module_parameters_selector(m_fx_mod_id),
             [this](box<runtime::fx::module_parameters> const& param_ids) {
                 algorithm::apply_edit_script(
@@ -100,6 +110,26 @@ void
 FxModule::deleteModule()
 {
     runtime::actions::delete_fx_module action;
+    action.fx_mod_id = m_fx_mod_id;
+    dispatch(action);
+}
+
+void
+FxModule::moveLeft()
+{
+    BOOST_ASSERT(canMoveLeft());
+
+    runtime::actions::move_fx_module_left action;
+    action.fx_mod_id = m_fx_mod_id;
+    dispatch(action);
+}
+
+void
+FxModule::moveRight()
+{
+    BOOST_ASSERT(canMoveRight());
+
+    runtime::actions::move_fx_module_right action;
     action.fx_mod_id = m_fx_mod_id;
     dispatch(action);
 }

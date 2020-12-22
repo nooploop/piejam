@@ -104,6 +104,8 @@ extern const selector<float> select_current_fx_chain_bus_volume;
 auto make_fx_module_name_selector(fx::module_id) -> selector<boxed_string>;
 auto make_fx_module_parameters_selector(fx::module_id)
         -> selector<box<fx::module_parameters>>;
+auto make_fx_module_can_move_left_selector(fx::module_id) -> selector<bool>;
+auto make_fx_module_can_move_right_selector(fx::module_id) -> selector<bool>;
 auto make_fx_parameter_name_selector(fx::parameter_id)
         -> selector<boxed_string>;
 auto make_fx_parameter_id_selector(fx::module_id, fx::parameter_key)

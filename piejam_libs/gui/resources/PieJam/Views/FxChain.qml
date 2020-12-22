@@ -69,6 +69,8 @@ TopPane {
 
                 name: model.item.name
                 parameters: model.item.parameters
+                moveLeftEnabled: model.item.canMoveLeft
+                moveRightEnabled: model.item.canMoveRight
 
                 onSwapButtonClicked: {
                     fxBrowser.addMode = FxBrowser.AddMode.Replace
@@ -81,6 +83,8 @@ TopPane {
                     fxBrowser.insertPosition = index + 1
                     stack.push(fxBrowser)
                 }
+                onMoveLeftButtonClicked: model.item.moveLeft()
+                onMoveRightButtonClicked: model.item.moveRight()
 
                 Binding {
                     target: model.item

@@ -34,6 +34,8 @@ public:
             runtime::fx::module_id);
 
     void deleteModule() override;
+    void moveLeft() override;
+    void moveRight() override;
 
 private:
     void onSubscribe() override;

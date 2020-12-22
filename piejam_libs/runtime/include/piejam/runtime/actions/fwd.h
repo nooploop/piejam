@@ -61,6 +61,8 @@ struct delete_fx_module;
 struct insert_internal_fx_module;
 struct finalize_ladspa_fx_plugin_scan;
 struct load_ladspa_fx_plugin;
+struct move_fx_module_left;
+struct move_fx_module_right;
 
 struct load_app_config;
 struct save_app_config;
