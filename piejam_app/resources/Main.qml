@@ -23,11 +23,5 @@ import PieJam.Views 1.0
 MainWindow {
     id: root
 
-    audioSettingsPage.deviceModel: g_audioSettings
-    audioSettingsPage.inputModel: g_audioInputSettings
-    audioSettingsPage.outputModel: g_audioOutputSettings
-    mixerPage.model: g_mixer
-    infoPage.model: g_info
-    fxChainPage.model: g_fx_chain
-    fxChainPage.browser: g_fx_browser
+    modelFactory: g_modelFactory
 }

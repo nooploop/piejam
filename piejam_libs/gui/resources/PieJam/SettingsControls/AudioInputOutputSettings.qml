@@ -20,13 +20,11 @@ import QtQuick.Controls 2.13
 import QtQuick.Layouts 1.13
 
 Item {
+    id: root
 
-    property variant model
-
+    property var model
     property bool showAddMono: true
     property bool showAddStereo: true
-
-    id: root
 
     ListView {
         id: busConfigsList

@@ -25,10 +25,7 @@ import QtQuick.VirtualKeyboard.Settings 2.13
 ApplicationWindow {
     id: root
 
-    property alias audioSettingsPage: audioSettingsPane
-    property alias mixerPage: mixerPane
-    property alias infoPage: infoPane
-    property alias fxChainPage: fxChainPane
+    property var modelFactory
 
     width: 800
     height: 480
@@ -95,20 +92,31 @@ ApplicationWindow {
 
         AudioSettings {
             id: audioSettingsPane
+
+            deviceModel: root.modelFactory.audioDeviceSettings
+            inputModel: root.modelFactory.audioInputSettings
+            outputModel: root.modelFactory.audioOutputSettings
         }
 
         Mixer {
             id: mixerPane
+
+            model: root.modelFactory.mixer
 
             onFxButtonClicked: content.currentIndex = 4
         }
 
         Info {
             id: infoPane
+
+            model: root.modelFactory.info
         }
 
         FxChain {
             id: fxChainPane
+
+            model: root.modelFactory.fxChain
+            browser: root.modelFactory.fxBrowser
         }
     }
 

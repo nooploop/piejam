@@ -23,9 +23,14 @@ namespace piejam::gui::model
 template <class ListItem>
 class GenericListModel;
 
+class AudioDeviceSettings;
+class AudioInputOutputSettings;
+
 class FxChain;
 class FxModule;
 using FxModulesList = GenericListModel<FxModule>;
+
+class Info;
 
 class Mixer;
 class MixerChannel;
