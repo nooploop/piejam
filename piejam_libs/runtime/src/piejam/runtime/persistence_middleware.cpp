@@ -57,6 +57,7 @@ persistence_middleware::operator()(action const& a)
     }
 }
 
+template <>
 void
 persistence_middleware::process_persistence_action(
         actions::load_app_config const& a)
@@ -64,6 +65,7 @@ persistence_middleware::process_persistence_action(
     persistence::load_app_config(a.file, m_dispatch);
 }
 
+template <>
 void
 persistence_middleware::process_persistence_action(
         actions::save_app_config const& a)
@@ -71,6 +73,7 @@ persistence_middleware::process_persistence_action(
     persistence::save_app_config(a.file, m_get_state());
 }
 
+template <>
 void
 persistence_middleware::process_persistence_action(
         actions::load_session const& a)
@@ -78,6 +81,7 @@ persistence_middleware::process_persistence_action(
     persistence::load_session(a.file, m_dispatch);
 }
 
+template <>
 void
 persistence_middleware::process_persistence_action(
         actions::save_session const& a)

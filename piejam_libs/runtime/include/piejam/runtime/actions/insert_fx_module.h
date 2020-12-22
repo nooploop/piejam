@@ -58,28 +58,4 @@ struct load_ladspa_fx_plugin final
     auto reduce(state const&) const -> state override;
 };
 
-struct insert_ladspa_fx_module final
-    : ui::cloneable_action<insert_ladspa_fx_module, action>
-{
-    mixer::bus_id fx_chain_bus;
-    std::size_t position{};
-    fx::ladspa_instance_id instance_id;
-    audio::ladspa::plugin_descriptor plugin_desc;
-    std::span<audio::ladspa::port_descriptor const> control_inputs;
-    std::vector<fx::parameter_assignment> initial_assignments;
-
-    auto reduce(state const&) const -> state override;
-};
-
-struct insert_missing_ladspa_fx_module final
-    : ui::cloneable_action<insert_missing_ladspa_fx_module, action>
-{
-    mixer::bus_id fx_chain_bus;
-    std::size_t position{};
-    fx::unavailable_ladspa unavailable_ladspa;
-    std::string name;
-
-    auto reduce(state const&) const -> state override;
-};
-
 } // namespace piejam::runtime::actions

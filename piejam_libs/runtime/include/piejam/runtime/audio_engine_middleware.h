@@ -58,16 +58,14 @@ public:
     void operator()(action const&);
 
 private:
-    void process_device_action(actions::apply_app_config const&);
-    void process_device_action(actions::refresh_devices const&);
-    void process_device_action(actions::initiate_device_selection const&);
-    void process_device_action(actions::select_samplerate const&);
-    void process_device_action(actions::select_period_size const&);
+    template <class Action>
+    void process_device_action(Action const&);
 
-    void process_engine_action(actions::engine_action const&);
+    template <class Action>
+    void process_engine_action(Action const&);
 
-    void process_initiate_device_selection_action(
-            actions::initiate_device_selection const&);
+    template <class Parameter>
+    void process_engine_action(actions::set_parameter_value<Parameter> const&);
 
     void close_device();
     void open_device();

@@ -378,23 +378,20 @@ audio_engine::audio_engine(
 audio_engine::~audio_engine() = default;
 
 void
-audio_engine::set_bool_parameter(bool_parameter_id const id, bool const value)
+audio_engine::set_parameter(bool_parameter_id const id, bool const value) const
+{
+    m_impl->param_procs.set(id, value);
+}
+
+void
+audio_engine::set_parameter(float_parameter_id const id, float const value)
         const
 {
     m_impl->param_procs.set(id, value);
 }
 
 void
-audio_engine::set_float_parameter(
-        float_parameter_id const id,
-        float const value) const
-{
-    m_impl->param_procs.set(id, value);
-}
-
-void
-audio_engine::set_int_parameter(int_parameter_id const id, int const value)
-        const
+audio_engine::set_parameter(int_parameter_id const id, int const value) const
 {
     m_impl->param_procs.set(id, value);
 }

@@ -214,6 +214,56 @@ struct update_info final : ui::cloneable_action<update_info, action>
     }
 };
 
+struct insert_ladspa_fx_module_action final
+    : ui::cloneable_action<insert_ladspa_fx_module_action, action>
+{
+    mixer::bus_id fx_chain_bus;
+    std::size_t position{};
+    fx::ladspa_instance_id instance_id;
+    audio::ladspa::plugin_descriptor plugin_desc;
+    std::span<audio::ladspa::port_descriptor const> control_inputs;
+    std::vector<fx::parameter_assignment> initial_assignments;
+
+    auto reduce(state const& st) const -> state override
+    {
+        auto new_st = st;
+
+        runtime::insert_ladspa_fx_module(
+                new_st,
+                fx_chain_bus,
+                position,
+                instance_id,
+                plugin_desc,
+                control_inputs,
+                initial_assignments);
+
+        return new_st;
+    }
+};
+
+struct insert_missing_ladspa_fx_module_action final
+    : ui::cloneable_action<insert_missing_ladspa_fx_module_action, action>
+{
+    mixer::bus_id fx_chain_bus;
+    std::size_t position{};
+    fx::unavailable_ladspa unavailable_ladspa;
+    std::string name;
+
+    auto reduce(state const& st) const -> state override
+    {
+        auto new_st = st;
+
+        runtime::insert_missing_ladspa_fx_module(
+                new_st,
+                fx_chain_bus,
+                position,
+                unavailable_ladspa,
+                name);
+
+        return new_st;
+    }
+};
+
 } // namespace
 
 audio_engine_middleware::audio_engine_middleware(
@@ -258,12 +308,22 @@ audio_engine_middleware::operator()(action const& action)
     }
     else if (auto a = dynamic_cast<actions::engine_action const*>(&action))
     {
-        process_engine_action(*a);
+        auto v = ui::make_action_visitor<actions::engine_action_visitor>(
+                [this](auto&& a) { process_engine_action(a); });
+
+        a->visit(v);
     }
     else
     {
         m_next(action);
     }
+}
+
+template <class Action>
+void
+audio_engine_middleware::process_device_action(Action const& a)
+{
+    m_next(a);
 }
 
 static auto
@@ -284,6 +344,7 @@ next_samplerate_and_period_size(
             next_value(&period_sizes, current_period_size)};
 }
 
+template <>
 void
 audio_engine_middleware::process_device_action(
         actions::apply_app_config const& a)
@@ -337,6 +398,7 @@ audio_engine_middleware::process_device_action(
     m_next(a);
 }
 
+template <>
 void
 audio_engine_middleware::process_device_action(actions::refresh_devices const&)
 {
@@ -375,6 +437,7 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
     m_next(next_action);
 }
 
+template <>
 void
 audio_engine_middleware::process_device_action(
         actions::initiate_device_selection const& action)
@@ -415,192 +478,133 @@ audio_engine_middleware::process_device_action(
     }
 }
 
+template <class Action>
 void
-audio_engine_middleware::process_device_action(
-        actions::select_samplerate const& a)
+audio_engine_middleware::process_engine_action(Action const& a)
 {
     m_next(a);
+    rebuild();
 }
 
-void
-audio_engine_middleware::process_device_action(
-        actions::select_period_size const& a)
-{
-    m_next(a);
-}
-
+template <>
 void
 audio_engine_middleware::process_engine_action(
-        actions::engine_action const& action)
+        actions::delete_fx_module const& a)
 {
-    auto v = ui::make_action_visitor<actions::engine_action_visitor>(
-            [this](actions::select_bus_channel const& a) {
-                m_next(a);
+    auto const& st = m_get_state();
 
-                if (m_engine)
-                    rebuild();
-            },
-            [this](actions::add_bus const& a) {
-                m_next(a);
+    if (fx::module const* const fx_mod = st.fx_modules[a.fx_mod_id])
+    {
+        auto const fx_instance_id = fx_mod->fx_instance_id;
 
-                if (m_engine)
-                    rebuild();
-            },
-            [this](actions::delete_bus const& a) {
-                m_next(a);
+        m_next(a);
 
-                if (m_engine)
-                    rebuild();
-            },
-            [this](actions::insert_internal_fx_module const& a) {
-                m_next(a);
+        rebuild();
 
-                if (m_engine)
-                    rebuild();
-            },
-            [this](actions::delete_fx_module const& a) {
-                auto const& st = m_get_state();
+        if (fx::ladspa_instance_id const* const instance_id =
+                    std::get_if<fx::ladspa_instance_id>(&fx_instance_id))
+        {
+            m_ladspa_fx_manager->unload(*instance_id);
+        }
+    }
+}
 
-                if (fx::module const* const fx_mod = st.fx_modules[a.fx_mod_id])
-                {
-                    m_next(a);
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        actions::load_ladspa_fx_plugin const& a)
+{
+    auto const& st = m_get_state();
 
-                    if (m_engine)
-                        rebuild();
+    if (auto plugin_desc =
+                find_ladspa_plugin_descriptor(st.fx_registry, a.plugin_id))
+    {
+        if (auto id = m_ladspa_fx_manager->load(*plugin_desc))
+        {
+            insert_ladspa_fx_module_action next_action;
+            next_action.fx_chain_bus = a.fx_chain_bus;
+            next_action.position = a.position;
+            next_action.instance_id = id;
+            next_action.plugin_desc = *plugin_desc;
+            next_action.control_inputs =
+                    m_ladspa_fx_manager->control_inputs(id);
+            next_action.initial_assignments = a.initial_assignments;
 
-                    if (fx::ladspa_instance_id const* const instance_id =
-                                std::get_if<fx::ladspa_instance_id>(
-                                        &fx_mod->fx_instance_id))
-                    {
-                        m_ladspa_fx_manager->unload(*instance_id);
-                    }
-                }
-            },
-            [this](actions::load_ladspa_fx_plugin const& a) {
-                auto const& st = m_get_state();
+            m_next(next_action);
 
-                if (auto plugin_desc = find_ladspa_plugin_descriptor(
-                            st.fx_registry,
-                            a.plugin_id))
-                {
-                    if (auto id = m_ladspa_fx_manager->load(*plugin_desc))
-                    {
-                        actions::insert_ladspa_fx_module next_action;
-                        next_action.fx_chain_bus = a.fx_chain_bus;
-                        next_action.position = a.position;
-                        next_action.instance_id = id;
-                        next_action.plugin_desc = *plugin_desc;
-                        next_action.control_inputs =
-                                m_ladspa_fx_manager->control_inputs(id);
-                        next_action.initial_assignments = a.initial_assignments;
+            rebuild();
 
-                        m_next(next_action);
+            return;
+        }
+        else
+        {
+            spdlog::error("failed to load ladspa fx plugin: {}", a.name);
+        }
+    }
 
-                        if (m_engine)
-                            rebuild();
-                    }
-                    else
-                    {
-                        spdlog::error(
-                                "failed to load ladspa fx plugin: {}",
-                                a.name);
+    insert_missing_ladspa_fx_module_action next_action;
+    next_action.fx_chain_bus = a.fx_chain_bus;
+    next_action.position = a.position;
+    next_action.unavailable_ladspa = {a.plugin_id, a.initial_assignments};
+    next_action.name = a.name;
+    m_next(next_action);
+}
 
-                        actions::insert_missing_ladspa_fx_module next_action;
-                        next_action.fx_chain_bus = a.fx_chain_bus;
-                        next_action.position = a.position;
-                        next_action.unavailable_ladspa = {
-                                a.plugin_id,
-                                a.initial_assignments};
-                        next_action.name = a.name;
-                        m_next(next_action);
-                    }
-                }
-                else
-                {
-                    actions::insert_missing_ladspa_fx_module next_action;
-                    next_action.fx_chain_bus = a.fx_chain_bus;
-                    next_action.position = a.position;
-                    next_action.unavailable_ladspa = {
-                            a.plugin_id,
-                            a.initial_assignments};
-                    next_action.name = a.name;
-                    m_next(next_action);
-                }
-            },
-            [this](actions::move_fx_module_left const& a) {
-                m_next(a);
+template <class Parameter>
+void
+audio_engine_middleware::process_engine_action(
+        actions::set_parameter_value<Parameter> const& a)
+{
+    m_next(a);
 
-                if (m_engine)
-                    rebuild();
-            },
-            [this](actions::move_fx_module_right const& a) {
-                m_next(a);
+    if (m_engine)
+    {
+        m_engine->set_parameter(a.id, *m_get_state().params.get(a.id));
+    }
+}
 
-                if (m_engine)
-                    rebuild();
-            },
-            [this](actions::set_bool_parameter const& a) {
-                m_next(a);
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        actions::set_input_bus_solo const& a)
+{
+    m_next(a);
 
-                if (m_engine)
-                {
-                    m_engine->set_bool_parameter(
-                            a.id,
-                            *m_get_state().params.get(a.id));
-                }
-            },
-            [this](actions::set_float_parameter const& a) {
-                m_next(a);
+    if (m_engine)
+    {
+        m_engine->set_input_solo(m_get_state().mixer_state.input_solo_id);
+    }
+}
 
-                if (m_engine)
-                {
-                    m_engine->set_float_parameter(
-                            a.id,
-                            *m_get_state().params.get(a.id));
-                }
-            },
-            [this](actions::set_int_parameter const& a) {
-                m_next(a);
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        actions::request_levels_update const& a)
+{
+    if (m_engine)
+    {
+        update_levels next_action;
 
-                if (m_engine)
-                {
-                    m_engine->set_int_parameter(
-                            a.id,
-                            *m_get_state().params.get(a.id));
-                }
-            },
-            [this](actions::set_input_bus_solo const& a) {
-                m_next(a);
+        for (auto&& id : a.level_ids)
+        {
+            if (auto lvl = m_engine->get_level(id))
+                next_action.levels.emplace_back(id, *lvl);
+        }
 
-                if (m_engine)
-                {
-                    m_engine->set_input_solo(
-                            m_get_state().mixer_state.input_solo_id);
-                }
-            },
-            [this](actions::request_levels_update const& a) {
-                if (m_engine)
-                {
-                    update_levels next_action;
+        m_next(next_action);
+    }
+}
 
-                    for (auto&& id : a.level_ids)
-                    {
-                        if (auto lvl = m_engine->get_level(id))
-                            next_action.levels.emplace_back(id, *lvl);
-                    }
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        actions::request_info_update const&)
+{
+    update_info next_action;
+    next_action.xruns = m_device->xruns();
+    next_action.cpu_load = m_device->cpu_load();
 
-                    m_next(next_action);
-                }
-            },
-            [this](actions::request_info_update const&) {
-                update_info next_action;
-                next_action.xruns = m_device->xruns();
-                next_action.cpu_load = m_device->cpu_load();
-
-                m_next(next_action);
-            });
-
-    action.visit(v);
+    m_next(next_action);
 }
 
 void
@@ -677,7 +681,9 @@ audio_engine_middleware::start_engine()
 void
 audio_engine_middleware::rebuild()
 {
-    BOOST_ASSERT(m_engine);
+    if (!m_engine)
+        return;
+
     auto const& st = m_get_state();
     m_engine->rebuild(
             st.mixer_state,

@@ -17,8 +17,8 @@
 
 #include <piejam/runtime/actions/insert_fx_module.h>
 
-#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
+#include <piejam/runtime/state.h>
 
 #include <boost/assert.hpp>
 
@@ -44,38 +44,6 @@ auto
 load_ladspa_fx_plugin::reduce(state const& st) const -> state
 {
     return st;
-}
-
-auto
-insert_ladspa_fx_module::reduce(state const& st) const -> state
-{
-    auto new_st = st;
-
-    runtime::insert_ladspa_fx_module(
-            new_st,
-            fx_chain_bus,
-            position,
-            instance_id,
-            plugin_desc,
-            control_inputs,
-            initial_assignments);
-
-    return new_st;
-}
-
-auto
-insert_missing_ladspa_fx_module::reduce(state const& st) const -> state
-{
-    auto new_st = st;
-
-    runtime::insert_missing_ladspa_fx_module(
-            new_st,
-            fx_chain_bus,
-            position,
-            unavailable_ladspa,
-            name);
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

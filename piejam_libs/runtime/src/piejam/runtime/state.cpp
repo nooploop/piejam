@@ -256,10 +256,10 @@ remove_fx_module(state& st, fx::module_id id)
         if (auto id = std::get_if<fx::ladspa_instance_id>(
                     &fx_mod->fx_instance_id))
         {
-            st.fx_ladspa_instances = [id](fx::ladspa_instances instances) {
-                instances.erase(*id);
-                return instances;
-            }(st.fx_ladspa_instances);
+            st.fx_ladspa_instances.update(
+                    [id](fx::ladspa_instances& instances) {
+                        instances.erase(*id);
+                    });
         }
         else if (
                 auto id = std::get_if<fx::unavailable_ladspa_id>(
