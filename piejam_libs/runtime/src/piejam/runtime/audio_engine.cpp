@@ -17,6 +17,7 @@
 
 #include <piejam/runtime/audio_engine.h>
 
+#include <piejam/algorithm/concat.h>
 #include <piejam/algorithm/for_each_adjacent.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/dag.h>
@@ -45,8 +46,6 @@
 #include <piejam/thread/worker.h>
 
 #include <fmt/format.h>
-
-#include <boost/range/algorithm_ext/push_back.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -155,17 +154,11 @@ make_fx_chains_map(
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
         mixer::buses_t const& buses,
-        mixer::bus_list_t const& inputs,
-        mixer::bus_list_t const& outputs,
+        mixer::bus_list_t const& all_ids,
         parameter_processor_factory& param_procs,
         fx::ladspa_processor_factory const& ladspa_fx_proc_factory)
         -> fx_chains_map
 {
-    mixer::bus_list_t all_ids;
-    all_ids.reserve(inputs.size() + outputs.size());
-    boost::push_back(all_ids, inputs);
-    boost::push_back(all_ids, outputs);
-
     auto get_fx_param_name =
             [&fx_params](fx::parameter_id id) -> std::string_view {
         return *fx_params.at(id).name;
@@ -437,8 +430,9 @@ audio_engine::rebuild(
             fx_modules,
             fx_params,
             mixer_state.buses,
-            mixer_state.inputs,
-            mixer_state.outputs,
+            algorithm::concat<mixer::bus_list_t>(
+                    mixer_state.inputs.get(),
+                    mixer_state.outputs.get()),
             m_impl->param_procs,
             ladspa_fx_proc_factory);
 
