@@ -17,6 +17,7 @@
 
 #include <piejam/runtime/selectors.h>
 
+#include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/boxify_result.h>
 #include <piejam/functional/memo.h>
 #include <piejam/npos.h>
@@ -25,7 +26,6 @@
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/state.h>
 
-#include <algorithm>
 #include <cassert>
 
 namespace piejam::runtime::selectors
@@ -92,23 +92,16 @@ make_bus_infos(
         mixer::buses_t const& buses,
         box<mixer::bus_list_t> const& bus_ids) -> boxed_vector<mixer_bus_info>
 {
-    std::vector<mixer_bus_info> infos;
-
-    std::ranges::transform(
-            *bus_ids,
-            std::back_inserter(infos),
-            [&buses](auto&& bus_id) {
-                auto bus = buses[bus_id];
-                BOOST_ASSERT(bus);
-                return mixer_bus_info{
-                        .bus_id = bus_id,
-                        .volume = bus->volume,
-                        .pan_balance = bus->pan_balance,
-                        .mute = bus->mute,
-                        .level = bus->level};
-            });
-
-    return infos;
+    return algorithm::transform_to_vector(*bus_ids, [&buses](auto&& bus_id) {
+        auto bus = buses[bus_id];
+        BOOST_ASSERT(bus);
+        return mixer_bus_info{
+                .bus_id = bus_id,
+                .volume = bus->volume,
+                .pan_balance = bus->pan_balance,
+                .mute = bus->mute,
+                .level = bus->level};
+    });
 }
 
 auto
