@@ -42,15 +42,10 @@ public:
     auto operator*() const noexcept -> T const& { return *m_value; }
     auto operator->() const noexcept -> T const* { return m_value.get(); }
 
-    auto operator=(T const& value) -> box<T>&
+    template <std::convertible_to<T> U>
+    auto operator=(U&& value) -> box<T>&
     {
-        m_value = std::make_shared<T const>(value);
-        return *this;
-    }
-
-    auto operator=(T&& value) -> box<T>&
-    {
-        m_value = std::make_shared<T const>(std::move(value));
+        m_value = std::make_shared<T const>(std::forward<U>(value));
         return *this;
     }
 
@@ -58,7 +53,7 @@ public:
     auto update(U&& u)
     {
         auto value = std::make_shared<T>(*m_value);
-        on_scope_exit on_exit([this, value]() { m_value = value; });
+        on_scope_exit on_exit([this, value]() { m_value = std::move(value); });
         return u(*value);
     }
 
