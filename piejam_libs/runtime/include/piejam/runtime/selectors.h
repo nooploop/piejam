@@ -25,6 +25,7 @@
 #include <piejam/boxed_string.h>
 #include <piejam/boxed_vector.h>
 #include <piejam/entity_id.h>
+#include <piejam/io_direction.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -54,11 +55,9 @@ extern const selector<input_devices> select_input_devices;
 using output_devices = std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
 extern const selector<output_devices> select_output_devices;
 
-auto make_num_device_channels_selector(audio::bus_direction)
-        -> selector<std::size_t>;
+auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 
-auto make_bus_list_selector(audio::bus_direction)
-        -> selector<box<mixer::bus_list_t>>;
+auto make_bus_list_selector(io_direction) -> selector<box<mixer::bus_list_t>>;
 
 struct mixer_bus_info
 {
@@ -79,7 +78,7 @@ struct mixer_bus_info
     }
 };
 
-auto make_bus_infos_selector(audio::bus_direction)
+auto make_bus_infos_selector(io_direction)
         -> selector<boxed_vector<mixer_bus_info>>;
 
 auto make_bus_name_selector(mixer::bus_id) -> selector<boxed_string>;

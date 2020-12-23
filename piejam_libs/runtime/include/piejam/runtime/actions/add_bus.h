@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <piejam/audio/types.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -28,7 +29,7 @@ struct add_bus final
     : ui::cloneable_action<add_bus, action>
     , visitable_engine_action<add_bus>
 {
-    audio::bus_direction direction{};
+    io_direction direction{};
     audio::bus_type type{};
 
     auto reduce(state const&) const -> state override;

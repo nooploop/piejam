@@ -25,7 +25,7 @@
 namespace piejam::runtime::actions
 {
 
-template <audio::bus_direction D>
+template <io_direction D>
 struct set_bus_solo final
     : ui::cloneable_action<set_bus_solo<D>, action>
     , visitable_engine_action<set_bus_solo<D>>

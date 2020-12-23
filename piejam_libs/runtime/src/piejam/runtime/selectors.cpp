@@ -56,17 +56,17 @@ const selector<output_devices>
         });
 
 auto
-make_num_device_channels_selector(audio::bus_direction const bd)
+make_num_device_channels_selector(io_direction const bd)
         -> selector<std::size_t>
 {
     switch (bd)
     {
-        case audio::bus_direction::input:
+        case io_direction::input:
             return selector<std::size_t>([](state const& st) -> std::size_t {
                 return st.input.hw_params->num_channels;
             });
 
-        case audio::bus_direction::output:
+        case io_direction::output:
             return selector<std::size_t>([](state const& st) -> std::size_t {
                 return st.output.hw_params->num_channels;
             });
@@ -74,15 +74,15 @@ make_num_device_channels_selector(audio::bus_direction const bd)
 }
 
 auto
-make_bus_list_selector(audio::bus_direction const bd)
+make_bus_list_selector(io_direction const bd)
         -> selector<box<mixer::bus_list_t>>
 {
     switch (bd)
     {
-        case audio::bus_direction::input:
+        case io_direction::input:
             return [](state const& st) { return st.mixer_state.inputs; };
 
-        case audio::bus_direction::output:
+        case io_direction::output:
             return [](state const& st) { return st.mixer_state.outputs; };
     }
 }
@@ -105,18 +105,18 @@ make_bus_infos(
 }
 
 auto
-make_bus_infos_selector(audio::bus_direction const bd)
+make_bus_infos_selector(io_direction const bd)
         -> selector<boxed_vector<mixer_bus_info>>
 {
     switch (bd)
     {
-        case audio::bus_direction::input:
+        case io_direction::input:
             return [get_infos =
                             memo(&make_bus_infos)](state const& st) mutable {
                 return get_infos(st.mixer_state.buses, st.mixer_state.inputs);
             };
 
-        case audio::bus_direction::output:
+        case io_direction::output:
             return [get_infos =
                             memo(&make_bus_infos)](state const& st) mutable {
                 return get_infos(st.mixer_state.buses, st.mixer_state.outputs);

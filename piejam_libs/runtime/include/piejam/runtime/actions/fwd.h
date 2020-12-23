@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <piejam/audio/types.h>
+#include <piejam/io_direction.h>
 #include <piejam/runtime/parameters.h>
 
 namespace piejam::runtime::actions
@@ -42,9 +42,9 @@ struct select_bus_channel;
 struct add_bus;
 struct delete_bus;
 
-template <audio::bus_direction>
+template <io_direction>
 struct set_bus_solo;
-using set_input_bus_solo = set_bus_solo<audio::bus_direction::input>;
+using set_input_bus_solo = set_bus_solo<io_direction::input>;
 
 struct request_levels_update;
 struct request_info_update;

@@ -20,6 +20,7 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
+#include <piejam/io_direction.h>
 
 namespace piejam::app::gui::model
 {
@@ -31,7 +32,7 @@ protected:
     AudioInputOutputSettings(
             runtime::store_dispatch,
             runtime::subscriber&,
-            audio::bus_direction);
+            io_direction);
 
 public:
     void addMonoBus() override;
@@ -42,7 +43,7 @@ private:
 
     void addBus(audio::bus_type);
 
-    audio::bus_direction m_settings_type;
+    io_direction m_settings_type;
 
     runtime::mixer::bus_list_t m_bus_ids;
 };
@@ -51,7 +52,7 @@ class AudioInputSettings final : public AudioInputOutputSettings
 {
 public:
     AudioInputSettings(runtime::store_dispatch st, runtime::subscriber& subs)
-        : AudioInputOutputSettings(st, subs, audio::bus_direction::input)
+        : AudioInputOutputSettings(st, subs, io_direction::input)
     {
     }
 };
@@ -60,7 +61,7 @@ class AudioOutputSettings final : public AudioInputOutputSettings
 {
 public:
     AudioOutputSettings(runtime::store_dispatch st, runtime::subscriber& subs)
-        : AudioInputOutputSettings(st, subs, audio::bus_direction::output)
+        : AudioInputOutputSettings(st, subs, io_direction::output)
     {
     }
 };

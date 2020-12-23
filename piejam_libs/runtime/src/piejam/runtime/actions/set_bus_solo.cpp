@@ -24,12 +24,10 @@
 namespace piejam::runtime::actions
 {
 
-template <audio::bus_direction D>
+template <>
 auto
-set_bus_solo<D>::reduce(state const& st) const -> state
+set_bus_solo<io_direction::input>::reduce(state const& st) const -> state
 {
-    static_assert(D == audio::bus_direction::input);
-
     auto new_st = st;
 
     BOOST_ASSERT(index < new_st.mixer_state.inputs->size());
@@ -40,7 +38,5 @@ set_bus_solo<D>::reduce(state const& st) const -> state
 
     return new_st;
 }
-
-template struct set_bus_solo<audio::bus_direction::input>;
 
 } // namespace piejam::runtime::actions

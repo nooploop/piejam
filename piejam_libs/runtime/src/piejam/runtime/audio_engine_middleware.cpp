@@ -119,7 +119,7 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
     }
 };
 
-template <audio::bus_direction D>
+template <io_direction D>
 struct select_device final : ui::cloneable_action<select_device<D>, action>
 {
     selected_device device;
@@ -131,8 +131,7 @@ struct select_device final : ui::cloneable_action<select_device<D>, action>
 
 template <>
 auto
-select_device<audio::bus_direction::input>::reduce(state const& st) const
-        -> state
+select_device<io_direction::input>::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
@@ -140,12 +139,12 @@ select_device<audio::bus_direction::input>::reduce(state const& st) const
     new_st.samplerate = samplerate;
     new_st.period_size = period_size;
 
-    clear_mixer_buses<audio::bus_direction::input>(new_st);
+    clear_mixer_buses<io_direction::input>(new_st);
 
     std::size_t const num_channels = device.hw_params->num_channels;
     for (std::size_t index = 0; index < num_channels; ++index)
     {
-        add_mixer_bus<audio::bus_direction::input>(
+        add_mixer_bus<io_direction::input>(
                 new_st,
                 fmt::format("In {}", index + 1),
                 audio::bus_type::mono,
@@ -157,8 +156,7 @@ select_device<audio::bus_direction::input>::reduce(state const& st) const
 
 template <>
 auto
-select_device<audio::bus_direction::output>::reduce(state const& st) const
-        -> state
+select_device<io_direction::output>::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
@@ -166,11 +164,11 @@ select_device<audio::bus_direction::output>::reduce(state const& st) const
     new_st.samplerate = samplerate;
     new_st.period_size = period_size;
 
-    clear_mixer_buses<audio::bus_direction::output>(new_st);
+    clear_mixer_buses<io_direction::output>(new_st);
 
     if (auto const num_channels = device.hw_params->num_channels)
     {
-        add_mixer_bus<audio::bus_direction::output>(
+        add_mixer_bus<io_direction::output>(
                 new_st,
                 "Main",
                 audio::bus_type::stereo,
@@ -182,8 +180,8 @@ select_device<audio::bus_direction::output>::reduce(state const& st) const
     return new_st;
 }
 
-using select_input_device = select_device<audio::bus_direction::input>;
-using select_output_device = select_device<audio::bus_direction::output>;
+using select_input_device = select_device<io_direction::input>;
+using select_output_device = select_device<io_direction::output>;
 
 struct update_levels final : ui::cloneable_action<update_levels, action>
 {

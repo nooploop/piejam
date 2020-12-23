@@ -25,7 +25,7 @@ namespace piejam::runtime::test
 struct state_with_one_mixer_input : testing::Test
 {
     state_with_one_mixer_input()
-        : bus_id(add_mixer_bus<audio::bus_direction::input>(
+        : bus_id(add_mixer_bus<io_direction::input>(
                   sut,
                   "foo",
                   audio::bus_type::mono,
@@ -107,7 +107,7 @@ TEST_F(state_with_one_mixer_input, clear_mixer_buses)
     ASSERT_EQ(1u, sut.params.get_map<bool_parameter>().size());
     ASSERT_EQ(1u, sut.params.get_map<stereo_level_parameter>().size());
 
-    clear_mixer_buses<audio::bus_direction::input>(sut);
+    clear_mixer_buses<io_direction::input>(sut);
 
     EXPECT_TRUE(sut.mixer_state.inputs->empty());
     EXPECT_EQ(nullptr, sut.mixer_state.buses[bus_id]);
@@ -124,7 +124,7 @@ TEST_F(state_with_one_mixer_input, clear_mixer_buses_other_direction)
     ASSERT_EQ(1u, sut.params.get_map<bool_parameter>().size());
     ASSERT_EQ(1u, sut.params.get_map<stereo_level_parameter>().size());
 
-    clear_mixer_buses<audio::bus_direction::output>(sut);
+    clear_mixer_buses<io_direction::output>(sut);
 
     EXPECT_EQ(1u, sut.mixer_state.inputs->size());
     EXPECT_NE(nullptr, sut.mixer_state.buses[bus_id]);
@@ -137,7 +137,7 @@ TEST_F(state_with_one_mixer_input, clear_mixer_buses_other_direction)
 struct state_with_one_fx : testing::Test
 {
     state_with_one_fx()
-        : bus_id(add_mixer_bus<audio::bus_direction::input>(
+        : bus_id(add_mixer_bus<io_direction::input>(
                   sut,
                   "foo",
                   audio::bus_type::mono,
@@ -189,7 +189,7 @@ TEST_F(state_with_one_fx, clear_mixer_buses)
     EXPECT_EQ(1u, sut.fx_modules.size());
     ASSERT_NE(nullptr, sut.fx_modules[fx_mod_id]);
 
-    clear_mixer_buses<audio::bus_direction::input>(sut);
+    clear_mixer_buses<io_direction::input>(sut);
 
     EXPECT_TRUE(sut.fx_modules.empty());
     EXPECT_EQ(nullptr, sut.fx_modules[fx_mod_id]);
@@ -200,7 +200,7 @@ TEST_F(state_with_one_fx, clear_mixer_buses_other_direction)
     EXPECT_EQ(1u, sut.fx_modules.size());
     ASSERT_NE(nullptr, sut.fx_modules[fx_mod_id]);
 
-    clear_mixer_buses<audio::bus_direction::output>(sut);
+    clear_mixer_buses<io_direction::output>(sut);
 
     EXPECT_EQ(1u, sut.fx_modules.size());
     EXPECT_NE(nullptr, sut.fx_modules[fx_mod_id]);

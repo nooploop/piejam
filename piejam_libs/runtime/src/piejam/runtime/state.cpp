@@ -270,7 +270,7 @@ remove_fx_module(state& st, fx::module_id id)
     }
 }
 
-template <audio::bus_direction D>
+template <io_direction D>
 auto
 add_mixer_bus(
         state& st,
@@ -303,12 +303,12 @@ add_mixer_bus(
     return bus_id;
 }
 
-template auto add_mixer_bus<audio::bus_direction::input>(
+template auto add_mixer_bus<io_direction::input>(
         state&,
         std::string,
         audio::bus_type,
         channel_index_pair const&) -> mixer::bus_id;
-template auto add_mixer_bus<audio::bus_direction::output>(
+template auto add_mixer_bus<io_direction::output>(
         state&,
         std::string,
         audio::bus_type,
@@ -350,7 +350,7 @@ remove_mixer_bus(state& st, mixer::bus_id const bus_id)
     st.mixer_state.buses.remove(bus_id);
 }
 
-template <audio::bus_direction D>
+template <io_direction D>
 void
 clear_mixer_buses(state& st)
 {
@@ -359,7 +359,7 @@ clear_mixer_buses(state& st)
         remove_mixer_bus(st, bus_id);
 }
 
-template void clear_mixer_buses<audio::bus_direction::input>(state&);
-template void clear_mixer_buses<audio::bus_direction::output>(state&);
+template void clear_mixer_buses<io_direction::input>(state&);
+template void clear_mixer_buses<io_direction::output>(state&);
 
 } // namespace piejam::runtime

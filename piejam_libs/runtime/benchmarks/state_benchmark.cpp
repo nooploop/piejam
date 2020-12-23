@@ -30,22 +30,22 @@ static void
 BM_copy_state_benchmark(benchmark::State& bench_state)
 {
     state st;
-    auto in1 = add_mixer_bus<audio::bus_direction::input>(
+    auto in1 = add_mixer_bus<io_direction::input>(
             st,
             "In1yohohofoobarbaz",
             audio::bus_type::mono);
     insert_internal_fx_module(st, in1, npos, fx::internal::gain, {});
-    auto in2 = add_mixer_bus<audio::bus_direction::input>(
+    auto in2 = add_mixer_bus<io_direction::input>(
             st,
             "In2",
             audio::bus_type::mono);
     insert_internal_fx_module(st, in2, npos, fx::internal::gain, {});
-    auto in3 = add_mixer_bus<audio::bus_direction::input>(
+    auto in3 = add_mixer_bus<io_direction::input>(
             st,
             "In3",
             audio::bus_type::mono);
     insert_internal_fx_module(st, in3, npos, fx::internal::gain, {});
-    auto out = add_mixer_bus<audio::bus_direction::output>(
+    auto out = add_mixer_bus<io_direction::output>(
             st,
             "out",
             audio::bus_type::stereo);
@@ -69,22 +69,22 @@ static void
 BM_get_bus_name_benchmark(benchmark::State& bench_state)
 {
     state st;
-    auto in1 = add_mixer_bus<audio::bus_direction::input>(
+    auto in1 = add_mixer_bus<io_direction::input>(
             st,
             "In1",
             audio::bus_type::mono);
     insert_internal_fx_module(st, in1, npos, fx::internal::gain, {});
-    auto in2 = add_mixer_bus<audio::bus_direction::input>(
+    auto in2 = add_mixer_bus<io_direction::input>(
             st,
             "In2",
             audio::bus_type::mono);
     insert_internal_fx_module(st, in2, npos, fx::internal::gain, {});
-    auto in3 = add_mixer_bus<audio::bus_direction::input>(
+    auto in3 = add_mixer_bus<io_direction::input>(
             st,
             "In3",
             audio::bus_type::mono);
     insert_internal_fx_module(st, in3, npos, fx::internal::gain, {});
-    auto out = add_mixer_bus<audio::bus_direction::output>(
+    auto out = add_mixer_bus<io_direction::output>(
             st,
             "out",
             audio::bus_type::stereo);

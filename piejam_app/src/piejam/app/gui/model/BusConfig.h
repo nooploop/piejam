@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
+#include <piejam/audio/types.h>
 #include <piejam/gui/model/BusConfig.h>
 
 namespace piejam::app::gui::model

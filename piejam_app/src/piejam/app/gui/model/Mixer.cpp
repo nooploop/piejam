@@ -60,8 +60,7 @@ Mixer::~Mixer() = default;
 void
 Mixer::onSubscribe()
 {
-    observe(runtime::selectors::make_bus_infos_selector(
-                    audio::bus_direction::input),
+    observe(runtime::selectors::make_bus_infos_selector(io_direction::input),
             [this](boxed_vector<runtime::selectors::mixer_bus_info> const&
                            bus_infos) {
                 algorithm::apply_edit_script(
@@ -85,8 +84,7 @@ Mixer::onSubscribe()
                 append_bus_ids(*m_impl->outputs, m_impl->all);
             });
 
-    observe(runtime::selectors::make_bus_infos_selector(
-                    audio::bus_direction::output),
+    observe(runtime::selectors::make_bus_infos_selector(io_direction::output),
             [this](boxed_vector<runtime::selectors::mixer_bus_info> const&
                            bus_infos) {
                 algorithm::apply_edit_script(

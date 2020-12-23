@@ -31,17 +31,17 @@ add_bus::reduce(state const& st) const -> state
 
     switch (direction)
     {
-        case audio::bus_direction::input:
-            add_mixer_bus<audio::bus_direction::input>(
+        case io_direction::input:
+            add_mixer_bus<io_direction::input>(
                     new_st,
                     fmt::format("In {}", new_st.mixer_state.inputs->size() + 1),
                     type);
             break;
 
-        case audio::bus_direction::output:
+        case io_direction::output:
         {
             auto const bus_ids_size = new_st.mixer_state.outputs->size();
-            add_mixer_bus<audio::bus_direction::output>(
+            add_mixer_bus<io_direction::output>(
                     new_st,
                     (bus_ids_size == 0 ? std::string("Main")
                                        : fmt::format("Aux {}", bus_ids_size)),

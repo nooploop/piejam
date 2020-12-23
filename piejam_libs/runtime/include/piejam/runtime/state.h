@@ -23,6 +23,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/box.h>
 #include <piejam/entity_id_hash.h>
+#include <piejam/io_direction.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/fx/ladspa_instances.h>
 #include <piejam/runtime/fx/module.h>
@@ -83,7 +84,7 @@ auto period_sizes(
         box<audio::pcm_hw_params> output_hw_params) -> audio::period_sizes_t;
 auto period_sizes_from_state(state const&) -> audio::period_sizes_t;
 
-template <audio::bus_direction D>
+template <io_direction D>
 auto add_mixer_bus(
         state&,
         std::string name,
@@ -93,7 +94,7 @@ auto add_mixer_bus(
 
 void remove_mixer_bus(state&, mixer::bus_id);
 
-template <audio::bus_direction D>
+template <io_direction D>
 void clear_mixer_buses(state&);
 
 auto insert_internal_fx_module(

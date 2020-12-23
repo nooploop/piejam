@@ -18,8 +18,8 @@
 #include <piejam/audio/table.h>
 #include <piejam/audio/types.h>
 #include <piejam/runtime/audio_engine.h>
-#include <piejam/runtime/state.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/state.h>
 
 #include <gtest/gtest.h>
 
@@ -101,7 +101,7 @@ TEST_F(audio_engine_render_test, add_input_channel)
 {
     state st;
 
-    add_mixer_bus<audio::bus_direction::input>(
+    add_mixer_bus<io_direction::input>(
             st,
             "in1",
             mixer::channel_type::mono,
@@ -110,7 +110,7 @@ TEST_F(audio_engine_render_test, add_input_channel)
     mixer::bus out_ch;
     out_ch.type = mixer::channel_type::stereo;
     out_ch.device_channels = channel_index_pair(0, 1);
-    add_mixer_bus<audio::bus_direction::output>(
+    add_mixer_bus<io_direction::output>(
             st,
             "out",
             mixer::channel_type::stereo,
@@ -119,7 +119,7 @@ TEST_F(audio_engine_render_test, add_input_channel)
     rebuild(st);
     render(200);
 
-    add_mixer_bus<audio::bus_direction::input>(
+    add_mixer_bus<io_direction::input>(
             st,
             "in2",
             mixer::channel_type::mono,

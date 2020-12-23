@@ -21,6 +21,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/boxed_string.h>
 #include <piejam/entity_map.h>
+#include <piejam/io_direction.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -63,21 +64,21 @@ struct state
     bus_id input_solo_id;
 };
 
-template <audio::bus_direction D>
+template <io_direction D>
 auto
 bus_ids(state const& st) -> bus_list_t const&
 {
-    return D == audio::bus_direction::input ? st.inputs : st.outputs;
+    return D == io_direction::input ? st.inputs : st.outputs;
 }
 
-template <audio::bus_direction D>
+template <io_direction D>
 auto
 bus_ids(state& st) -> box<bus_list_t>&
 {
-    return D == audio::bus_direction::input ? st.inputs : st.outputs;
+    return D == io_direction::input ? st.inputs : st.outputs;
 }
 
-template <audio::bus_direction D>
+template <io_direction D>
 auto
 get_bus(state const& st, std::size_t index) -> bus const&
 {

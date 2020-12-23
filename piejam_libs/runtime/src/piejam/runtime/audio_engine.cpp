@@ -294,8 +294,7 @@ make_graph(
     BOOST_ASSERT(mixer_state.inputs->size() == input_buses.size());
     for (std::size_t idx = 0; idx < mixer_state.inputs->size(); ++idx)
     {
-        auto const& bus =
-                mixer::get_bus<audio::bus_direction::input>(mixer_state, idx);
+        auto const& bus = mixer::get_bus<io_direction::input>(mixer_state, idx);
         auto const& [id, mb_in, mb_out] = input_buses[idx];
 
         mb_in->connect(g);
@@ -325,7 +324,7 @@ make_graph(
     for (std::size_t idx = 0; idx < mixer_state.outputs->size(); ++idx)
     {
         auto const& bus =
-                mixer::get_bus<audio::bus_direction::output>(mixer_state, idx);
+                mixer::get_bus<io_direction::output>(mixer_state, idx);
         auto const& [id, mb_in, mb_out] = output_buses[idx];
 
         mb_in->connect(g);
