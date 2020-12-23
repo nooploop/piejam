@@ -25,7 +25,7 @@
 #include <functional>
 #include <tuple>
 
-namespace piejam::container
+namespace piejam
 {
 
 namespace detail
@@ -56,4 +56,4 @@ boxify_result(F&& f)
     return detail::with_boxed_result<F, R, Args>{std::forward<F>(f)};
 }
 
-} // namespace piejam::container
+} // namespace piejam

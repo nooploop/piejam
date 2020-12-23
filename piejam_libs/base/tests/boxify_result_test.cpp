@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 
-namespace piejam::container
+namespace piejam
 {
 
 TEST(boxify_result, can_get_args)
@@ -33,4 +33,4 @@ TEST(boxify_result, can_get_args)
                   boost::callable_traits::return_type_t<decltype(f)>>);
 }
 
-} // namespace piejam::container
+} // namespace piejam
