@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 
-namespace piejam::container::test
+namespace piejam::test
 {
 
 TEST(box, default_ctor_and_get)
@@ -147,4 +147,4 @@ TEST(box, update_with_return_value)
     EXPECT_EQ(5, res);
 }
 
-} // namespace piejam::container::test
+} // namespace piejam::test
