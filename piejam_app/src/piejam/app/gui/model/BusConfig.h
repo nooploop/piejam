@@ -20,6 +20,7 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/BusConfig.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 namespace piejam::app::gui::model
 {

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 #include <vector>
 

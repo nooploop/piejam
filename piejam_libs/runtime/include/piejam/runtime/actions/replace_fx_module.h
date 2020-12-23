@@ -20,6 +20,7 @@
 #include <piejam/audio/ladspa/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 #include <string_view>
 

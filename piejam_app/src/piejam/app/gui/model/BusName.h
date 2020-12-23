@@ -19,6 +19,7 @@
 
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/gui/model/BusName.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 namespace piejam::app::gui::model
 {

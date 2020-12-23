@@ -19,6 +19,7 @@
 
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 

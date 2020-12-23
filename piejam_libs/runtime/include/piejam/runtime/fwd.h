@@ -18,7 +18,6 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
-#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameter/fwd.h>
 #include <piejam/runtime/processors/fwd.h>
 #include <piejam/runtime/ui/fwd.h>

@@ -23,8 +23,8 @@
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
+#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 #include <span>

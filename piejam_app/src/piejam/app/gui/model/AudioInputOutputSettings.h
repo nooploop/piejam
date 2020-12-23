@@ -21,6 +21,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
 #include <piejam/io_direction.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 namespace piejam::app::gui::model
 {
