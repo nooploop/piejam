@@ -17,11 +17,16 @@
 
 #include <piejam/audio/ladspa/plugin.h>
 
+#include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
+#include <piejam/npos.h>
+#include <piejam/range/indices.h>
 #include <piejam/system/dll.h>
 
 #include <ladspa.h>
@@ -61,7 +66,9 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint, bool control_input)
     }
     else if (LADSPA_IS_HINT_INTEGER(hint_descriptor))
     {
-        BOOST_ASSERT(!LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor));
+        BOOST_ASSERT_MSG(
+                !LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor),
+                "not supported");
 
         if (control_input && !LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor))
             spdlog::error("Lower bound not specified on int control input.");
@@ -150,6 +157,10 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint, bool control_input)
     }
     else
     {
+        BOOST_ASSERT_MSG(
+                !LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor),
+                "not supported");
+
         if (control_input && !LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor))
             spdlog::error("Lower bound not specified on float control input.");
         float const min = LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor)
@@ -217,8 +228,6 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint, bool control_input)
 
         default_value = std::clamp(default_value, min, max);
 
-        bool const multiply_with_samplerate =
-                static_cast<bool>(LADSPA_IS_HINT_SAMPLE_RATE(hint_descriptor));
         bool const logarithmic =
                 static_cast<bool>(LADSPA_IS_HINT_LOGARITHMIC(hint_descriptor));
 
@@ -226,7 +235,6 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint, bool control_input)
                 .min = min,
                 .max = max,
                 .default_value = default_value,
-                .multiply_with_samplerate = multiply_with_samplerate,
                 .logarithmic = logarithmic};
     }
 
@@ -295,29 +303,101 @@ struct to_event_port
 auto
 to_event_ports(std::span<audio::ladspa::port_descriptor const> descs)
 {
-    std::vector<engine::event_port> result;
-    std::ranges::transform(
+    return algorithm::transform_to_vector(
             descs,
-            std::back_inserter(result),
-            [](auto const& desc) {
+            [](auto const& desc) -> engine::event_port {
                 return std::visit(to_event_port{desc.name}, desc.type_desc);
             });
-    return result;
 }
+
+struct control_input
+{
+    template <class T>
+    control_input(std::in_place_type_t<T>)
+        : m_initialize(&initialize<T>)
+        , m_advance(&advance<T>)
+    {
+    }
+
+    auto offset() const -> std::size_t { return m_offset; }
+    auto data() const -> float const& { return m_data; }
+
+    void initialize(
+            engine::event_input_buffers const& ev_in_bufs,
+            std::size_t buf_index)
+    {
+        m_initialize(*this, ev_in_bufs, buf_index);
+    }
+
+    void advance() { m_advance(*this); }
+
+private:
+    template <class T>
+    using ev_it_t = typename engine::event_buffer<T>::const_iterator;
+
+    template <class T>
+    using ev_it_pair_t = std::pair<ev_it_t<T>, ev_it_t<T>>;
+
+    template <class T>
+    static void initialize(
+            control_input& ci,
+            engine::event_input_buffers const& ev_bufs,
+            std::size_t buf_index)
+    {
+        auto const& ev_buf = ev_bufs.get<T>(buf_index);
+
+        using ev_it_pair_t = ev_it_pair_t<T>;
+        static_assert(sizeof(ev_it_pair_t) < sizeof(m_iterators));
+
+        ev_it_pair_t& its = *std::construct_at<ev_it_pair_t>(
+                reinterpret_cast<ev_it_pair_t*>(&ci.m_iterators),
+                ev_buf.begin(),
+                ev_buf.end());
+
+        ci.m_offset = its.first == its.second ? npos : its.first->offset();
+    }
+
+    template <class T>
+    static void advance(control_input& ci)
+    {
+        using ev_it_pair_t = ev_it_pair_t<T>;
+        static_assert(sizeof(ev_it_pair_t) < sizeof(m_iterators));
+
+        ev_it_pair_t& its = *reinterpret_cast<ev_it_pair_t*>(&ci.m_iterators);
+
+        BOOST_ASSERT(its.first != its.second);
+        ci.m_data = static_cast<float>(its.first->value());
+        std::advance(its.first, 1);
+
+        ci.m_offset = its.first == its.second ? npos : its.first->offset();
+    }
+
+    std::size_t m_offset{};
+    float m_data{};
+
+    std::aligned_storage_t<32> m_iterators;
+
+    using initialize_t = void (*)(
+            control_input&,
+            engine::event_input_buffers const&,
+            std::size_t);
+    using advance_t = void (*)(control_input&);
+
+    initialize_t m_initialize{};
+    advance_t m_advance{};
+};
 
 class processor final : public engine::processor
 {
 public:
     processor(
             plugin_instance instance,
-            samplerate_t samplerate,
             std::string_view name,
             std::span<audio::ladspa::port_descriptor const> audio_inputs,
             std::span<audio::ladspa::port_descriptor const> audio_outputs,
             std::span<audio::ladspa::port_descriptor const> control_inputs,
             std::span<audio::ladspa::port_descriptor const> control_outputs)
         : m_instance(std::move(instance))
-        , m_samplerate(samplerate)
         , m_name(name)
         , m_input_port_indices(audio_inputs.size())
         , m_output_port_indices(audio_outputs.size())
@@ -337,23 +417,16 @@ public:
         m_control_inputs.reserve(control_inputs.size());
         for (auto const& pd : control_inputs)
         {
-            if (std::holds_alternative<float_port>(pd.type_desc))
-            {
-                m_instance.connect_port(
-                        pd.index,
-                        &m_control_inputs
-                                 .emplace_back(
-                                         0.f,
-                                         std::get<float_port>(pd.type_desc)
-                                                 .multiply_with_samplerate)
-                                 .value);
-            }
-            else
-            {
-                m_instance.connect_port(
-                        pd.index,
-                        &m_control_inputs.emplace_back().value);
-            }
+            std::visit(
+                    [this](auto const& port) {
+                        using value_type = decltype(port.default_value);
+                        m_control_inputs.emplace_back(
+                                std::in_place_type<value_type>);
+                    },
+                    pd.type_desc);
+            m_instance.connect_port(
+                    pd.index,
+                    const_cast<LADSPA_Data*>(&m_control_inputs.back().data()));
         }
 
         m_control_outputs.reserve(control_outputs.size());
@@ -396,49 +469,8 @@ public:
     {
         engine::verify_process_context(*this, ctx);
 
-        BOOST_ASSERT(ctx.event_inputs.size() == m_event_inputs.size());
-        for (std::size_t i = 0; i < ctx.event_inputs.size(); ++i)
-        {
-            auto const in_type = m_event_inputs[i].type();
-            if (in_type == typeid(float))
-            {
-                auto const& ev_buf = ctx.event_inputs.get<float>(i);
-                for (auto const& ev : ev_buf)
-                {
-                    m_control_inputs[i].value = ev.value();
-                    if (m_control_inputs[i].multiply_with_samplerate)
-                        m_control_inputs[i].value *= m_samplerate;
-                }
-            }
-            else if (in_type == typeid(int))
-            {
-                auto const& ev_buf = ctx.event_inputs.get<int>(i);
-                for (auto const& ev : ev_buf)
-                {
-                    m_control_inputs[i].value = static_cast<float>(ev.value());
-                }
-            }
-            else if (in_type == typeid(bool))
-            {
-                auto const& ev_buf = ctx.event_inputs.get<bool>(i);
-                for (auto const& ev : ev_buf)
-                {
-                    m_control_inputs[i].value = static_cast<float>(ev.value());
-                }
-            }
-        }
-
-        BOOST_ASSERT(m_input_port_indices.size() == ctx.inputs.size());
-        for (std::size_t i = 0; i < ctx.inputs.size(); ++i)
-        {
-            m_instance.connect_port(
-                    m_input_port_indices[i],
-                    const_cast<LADSPA_Data*>(
-                            ctx.inputs[i].get().buffer().data()));
-        }
-
         BOOST_ASSERT(m_output_port_indices.size() == ctx.outputs.size());
-        for (std::size_t i = 0; i < ctx.outputs.size(); ++i)
+        for (std::size_t i : range::indices(ctx.outputs.size()))
         {
             m_instance.connect_port(
                     m_output_port_indices[i],
@@ -446,24 +478,58 @@ public:
             ctx.results[i] = ctx.outputs[i];
         }
 
-        m_instance.run(static_cast<unsigned long>(ctx.buffer_size));
+        BOOST_ASSERT(ctx.event_inputs.size() == m_event_inputs.size());
+        for (std::size_t i : range::indices(ctx.event_inputs.size()))
+            m_control_inputs[i].initialize(ctx.event_inputs, i);
+
+        BOOST_ASSERT(m_input_port_indices.size() == ctx.inputs.size());
+
+        std::size_t offset{};
+        while (offset < ctx.buffer_size)
+        {
+            std::size_t const min_offset = std::min(
+                    std::ranges::min(
+                            m_control_inputs,
+                            std::less<>{},
+                            &control_input::offset)
+                            .offset(),
+                    ctx.buffer_size);
+
+            if (offset < min_offset)
+            {
+                for (std::size_t i : range::indices(ctx.inputs.size()))
+                {
+                    auto sub = audio::engine::subslice(
+                            ctx.inputs[i].get(),
+                            offset,
+                            min_offset - offset);
+
+                    m_instance.connect_port(
+                            m_input_port_indices[i],
+                            const_cast<LADSPA_Data*>(sub.buffer().data()));
+                }
+
+                m_instance.run(static_cast<unsigned long>(min_offset - offset));
+            }
+
+            for (control_input& ci : m_control_inputs)
+            {
+                while (min_offset == ci.offset())
+                    ci.advance();
+            }
+
+            offset = min_offset;
+        }
     }
 
 private:
-    struct control_data
-    {
-        float value{};
-        bool multiply_with_samplerate{};
-    };
-
     plugin_instance m_instance;
-    samplerate_t m_samplerate;
     std::string m_name;
     std::vector<unsigned long> m_input_port_indices{};
     std::vector<unsigned long> m_output_port_indices{};
     std::vector<engine::event_port> m_event_inputs;
     std::vector<engine::event_port> m_event_outputs;
-    std::vector<control_data> m_control_inputs;
+    std::vector<control_input> m_control_inputs;
     std::vector<float> m_control_outputs;
 };
 
@@ -477,9 +543,9 @@ public:
                   throw_if_null(m_plugin_dll.symbol<LADSPA_Descriptor_Function>(
                           "ladspa_descriptor")(pd.index)))
     {
-        for (unsigned long port = 0; port < m_ladspa_desc->PortCount; ++port)
+        for (unsigned long port : range::indices(m_ladspa_desc->PortCount))
         {
-            auto const ladspa_port_desc = m_ladspa_desc->PortDescriptors[port];
+            int const ladspa_port_desc = m_ladspa_desc->PortDescriptors[port];
 
             auto port_desc = port_descriptor{
                     .index = port,
@@ -550,7 +616,6 @@ public:
         {
             return std::make_unique<processor>(
                     plugin_instance(*m_ladspa_desc, handle),
-                    samplerate,
                     m_pd.name,
                     m_ports.input.audio,
                     m_ports.output.audio,

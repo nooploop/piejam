@@ -28,7 +28,6 @@ struct float_port
     float min{};
     float max{1.f};
     float default_value{};
-    bool multiply_with_samplerate{};
     bool logarithmic{};
 };
 

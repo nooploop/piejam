@@ -41,7 +41,22 @@ public:
 template <class T>
 class event_buffer final : public abstract_event_buffer
 {
+    struct event_offset
+    {
+        using type = std::size_t;
+
+        auto operator()(event<T> const& ev) const noexcept -> std::size_t
+        {
+            return ev.offset();
+        }
+    };
+
+    using event_container_t = boost::intrusive::
+            multiset<event<T>, boost::intrusive::key_of_value<event_offset>>;
+
 public:
+    using const_iterator = typename event_container_t::const_iterator;
+
     event_buffer(std::pmr::memory_resource*& event_memory)
         : m_event_memory(event_memory)
     {
@@ -56,8 +71,15 @@ public:
     bool empty() const noexcept { return m_event_container.empty(); }
     auto size() const noexcept { return m_event_container.size(); }
 
-    auto begin() const { return m_event_container.begin(); }
-    auto end() const { return m_event_container.end(); }
+    auto begin() const noexcept -> const_iterator
+    {
+        return m_event_container.begin();
+    }
+
+    auto end() const noexcept -> const_iterator
+    {
+        return m_event_container.end();
+    }
 
     template <std::convertible_to<T> V>
     void insert(std::size_t const offset, V&& value)
@@ -75,20 +97,8 @@ public:
     void clear() override { m_event_container.clear(); }
 
 private:
-    struct event_offset
-    {
-        using type = std::size_t;
-
-        auto operator()(event<T> const& ev) const noexcept -> std::size_t
-        {
-            return ev.offset();
-        }
-    };
-
     std::pmr::memory_resource*& m_event_memory;
-    boost::intrusive::
-            multiset<event<T>, boost::intrusive::key_of_value<event_offset>>
-                    m_event_container;
+    event_container_t m_event_container;
 };
 
 } // namespace piejam::audio::engine
