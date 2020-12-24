@@ -47,8 +47,6 @@ ApplicationWindow {
             display: AbstractButton.IconOnly
             anchors.left: parent.left
 
-            enabled: mixerPane.status == Loader.Ready && fxChainPane.status == Loader.Ready
-
             onClicked: { content.currentIndex = 2 }
         }
 
@@ -58,8 +56,6 @@ ApplicationWindow {
             anchors.right: btnAudioSettings.left
             icon.source: "qrc:///images/icons/ic_info_outline_white_18dp.png"
             display: AbstractButton.IconOnly
-
-            enabled: infoPane.status == Loader.Ready
 
             onClicked: { content.currentIndex = 3 }
         }
@@ -102,33 +98,25 @@ ApplicationWindow {
             outputModel: root.modelFactory.audioOutputSettings
         }
 
-        Loader {
+        Mixer {
             id: mixerPane
-            asynchronous: true
-            sourceComponent: Mixer {
 
-                model: root.modelFactory.mixer
+            model: root.modelFactory.mixer
 
-                onFxButtonClicked: content.currentIndex = 4
-            }
+            onFxButtonClicked: content.currentIndex = 4
         }
 
-        Loader {
+        Info {
             id: infoPane
-            asynchronous: true
-            sourceComponent: Info {
-                model: root.modelFactory.info
-            }
+
+            model: root.modelFactory.info
         }
 
-        Loader {
+        FxChain {
             id: fxChainPane
-            asynchronous: true
-            sourceComponent: FxChain {
 
-                model: root.modelFactory.fxChain
-                browser: root.modelFactory.fxBrowser
-            }
+            model: root.modelFactory.fxChain
+            browser: root.modelFactory.fxBrowser
         }
     }
 
