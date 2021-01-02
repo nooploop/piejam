@@ -20,7 +20,7 @@
 #include <piejam/audio/device.h>
 #include <piejam/audio/fwd.h>
 #include <piejam/audio/pcm_io_config.h>
-#include <piejam/system/ioctl_device.h>
+#include <piejam/system/device.h>
 
 #include <atomic>
 #include <memory>
@@ -54,8 +54,8 @@ public:
     }
 
 private:
-    system::ioctl_device m_input_fd;
-    system::ioctl_device m_output_fd;
+    system::device m_input_fd;
+    system::device m_output_fd;
     pcm_io_config m_io_config;
 
     std::atomic<float> m_cpu_load{};

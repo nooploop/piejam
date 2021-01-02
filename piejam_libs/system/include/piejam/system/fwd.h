@@ -21,6 +21,6 @@ namespace piejam::system
 {
 
 class dll;
-class ioctl_device;
+class device;
 
 } // namespace piejam::system

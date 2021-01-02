@@ -35,8 +35,8 @@ class process_step
 {
 public:
     process_step(
-            system::ioctl_device& input_fd,
-            system::ioctl_device& output_fd,
+            system::device& input_fd,
+            system::device& output_fd,
             pcm_io_config const&,
             std::atomic<float>& cpu_load,
             std::atomic_size_t& xruns,
@@ -47,8 +47,8 @@ public:
     void operator()();
 
 private:
-    system::ioctl_device& m_input_fd;
-    system::ioctl_device& m_output_fd;
+    system::device& m_input_fd;
+    system::device& m_output_fd;
     pcm_io_config m_io_config;
     std::atomic<float>& m_cpu_load;
     std::atomic_size_t& m_xruns;

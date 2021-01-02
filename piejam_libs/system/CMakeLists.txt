@@ -1,9 +1,9 @@
 add_library(piejam_system STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/dll.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/ioctl_device.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/dll.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/ioctl_device.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/device.cpp
 )
 
 target_include_directories(piejam_system PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -26,7 +26,7 @@ namespace piejam::audio::alsa
 auto get_hw_params(pcm_descriptor const&) -> pcm_hw_params;
 
 void set_hw_params(
-        system::ioctl_device&,
+        system::device&,
         pcm_device_config const&,
         pcm_process_config const&);
 

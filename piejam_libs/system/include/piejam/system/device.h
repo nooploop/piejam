@@ -22,18 +22,18 @@
 namespace piejam::system
 {
 
-class ioctl_device
+class device
 {
 public:
-    ioctl_device() noexcept = default;
-    ioctl_device(std::filesystem::path const& pathname);
-    ioctl_device(ioctl_device const&) = delete;
-    ioctl_device(ioctl_device&& other) noexcept;
+    device() noexcept = default;
+    device(std::filesystem::path const& pathname);
+    device(device const&) = delete;
+    device(device&& other) noexcept;
 
-    ~ioctl_device();
+    ~device();
 
-    auto operator=(ioctl_device const&) -> ioctl_device& = delete;
-    auto operator=(ioctl_device&& other) -> ioctl_device&;
+    auto operator=(device const&) -> device& = delete;
+    auto operator=(device&& other) -> device&;
 
     explicit operator bool() const noexcept { return m_fd != invalid; }
 
@@ -54,10 +54,9 @@ private:
 };
 
 template <>
-void ioctl_device::ioctl(unsigned long request, ioctl_device&) const = delete;
+void device::ioctl(unsigned long request, device&) const = delete;
 
 template <>
-void
-ioctl_device::ioctl(unsigned long request, ioctl_device const& other) const;
+void device::ioctl(unsigned long request, device const& other) const;
 
 } // namespace piejam::system

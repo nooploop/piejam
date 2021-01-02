@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <piejam/system/ioctl_device.h>
+#include <piejam/system/device.h>
 
 #include <boost/assert.hpp>
 #include <boost/core/ignore_unused.hpp>
@@ -30,26 +30,26 @@
 namespace piejam::system
 {
 
-ioctl_device::ioctl_device(std::filesystem::path const& pathname)
+device::device(std::filesystem::path const& pathname)
     : m_fd(::open(pathname.c_str(), O_RDONLY))
 {
     if (m_fd < 0)
         throw std::system_error(errno, std::generic_category());
 }
 
-ioctl_device::ioctl_device(ioctl_device&& other) noexcept
+device::device(device&& other) noexcept
     : m_fd(std::exchange(other.m_fd, invalid))
 {
 }
 
-ioctl_device::~ioctl_device()
+device::~device()
 {
     if (m_fd != invalid)
         ::close(m_fd);
 }
 
 auto
-ioctl_device::operator=(ioctl_device&& other) -> ioctl_device&
+device::operator=(device&& other) -> device&
 {
     if (m_fd != invalid)
     {
@@ -62,7 +62,7 @@ ioctl_device::operator=(ioctl_device&& other) -> ioctl_device&
 }
 
 void
-ioctl_device::ioctl(unsigned long const request) const
+device::ioctl(unsigned long const request) const
 {
     BOOST_ASSERT(m_fd != invalid);
     if (-1 == ::ioctl(m_fd, request))
@@ -70,7 +70,7 @@ ioctl_device::ioctl(unsigned long const request) const
 }
 
 void
-ioctl_device::ioctl(
+device::ioctl(
         unsigned long const request,
         void* const p,
         std::size_t const size) const
@@ -85,7 +85,7 @@ ioctl_device::ioctl(
 
 template <>
 void
-ioctl_device::ioctl(unsigned long request, ioctl_device const& other) const
+device::ioctl(unsigned long request, device const& other) const
 {
     ioctl(request, reinterpret_cast<void*>(other.m_fd), sizeof(other.m_fd));
 }
