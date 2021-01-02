@@ -21,6 +21,8 @@
 
 #include <fmt/format.h>
 
+#include <spdlog/spdlog.h>
+
 #include <sound/asound.h>
 #include <sys/ioctl.h>
 
@@ -57,10 +59,17 @@ soundcards() -> std::vector<soundcard>
                              &card))
             {
                 system::ioctl_device fd(entry.path());
-                cards.push_back(
-                        {entry.path(),
-                         fd.ioctl<snd_ctl_card_info>(
-                                 SNDRV_CTL_IOCTL_CARD_INFO)});
+                snd_ctl_card_info card_info{};
+
+                try
+                {
+                    fd.ioctl(SNDRV_CTL_IOCTL_CARD_INFO, card_info);
+                    cards.emplace_back(entry.path(), card_info);
+                }
+                catch (std::exception const& err)
+                {
+                    spdlog::error("{}", err.what());
+                }
             }
         }
     }

@@ -40,14 +40,6 @@ public:
     void ioctl(unsigned long request) const;
 
     template <class T>
-    auto ioctl(unsigned long request) const -> T
-    {
-        T x{};
-        ioctl(request, &x, sizeof(T));
-        return x;
-    }
-
-    template <class T>
     void ioctl(unsigned long request, T& x) const
     {
         ioctl(request, &x, sizeof(T));
