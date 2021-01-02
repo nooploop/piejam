@@ -17,10 +17,11 @@
 
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
-#include <piejam/runtime/actions/device_actions.h>
+#include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/audio_engine_middleware.h>
-#include <piejam/runtime/audio_state.h>
 #include <piejam/runtime/open_alsa_device.h>
+#include <piejam/runtime/state.h>
+#include <piejam/thread/configuration.h>
 
 #include <fmt/format.h>
 
@@ -46,20 +47,23 @@ main(int argc, char* argv[]) -> int
 
     try
     {
-        piejam::runtime::audio_state audio_state;
+        piejam::runtime::state audio_state;
         audio_state.pcm_devices = piejam::audio::alsa::get_pcm_io_descriptors();
         audio_state.samplerate = boost::lexical_cast<unsigned>(argv[3]);
         audio_state.period_size = boost::lexical_cast<unsigned>(argv[4]);
         piejam::runtime::audio_engine_middleware audio_engine(
-                boost::lexical_cast<int>(argv[5]), // audio_thread_cpu_affinity
+                piejam::thread::configuration{
+                        .affinity = boost::lexical_cast<int>(argv[5]),
+                        .priority = 96},
+                {},
                 &piejam::audio::alsa::get_pcm_io_descriptors,
                 &piejam::audio::alsa::get_hw_params,
                 &piejam::runtime::open_alsa_device,
-                [&audio_state]() -> piejam::runtime::audio_state const& {
+                [&audio_state]() -> piejam::runtime::state const& {
                     return audio_state;
                 },
-                [&audio_state](auto const& action) {
-                    audio_state = action(audio_state);
+                [&audio_state](piejam::runtime::action const& action) {
+                    audio_state = action.reduce(audio_state);
                 });
 
         {
