@@ -32,6 +32,8 @@ public:
     virtual auto buffer() const noexcept -> range::table_view<float const> = 0;
 
     [[nodiscard]] virtual auto read() noexcept -> std::error_code = 0;
+
+    virtual void clear_buffer() noexcept = 0;
 };
 
 } // namespace piejam::audio::alsa

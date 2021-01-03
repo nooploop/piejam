@@ -105,6 +105,8 @@ struct dummy_reader final : pcm_reader
     }
 
     auto read() noexcept -> std::error_code override { return {}; }
+
+    void clear_buffer() noexcept override {}
 };
 
 template <pcm_format F>
@@ -148,6 +150,8 @@ struct interleaved_reader final : pcm_reader
 
         return {};
     }
+
+    void clear_buffer() noexcept override { fill(m_buffer.rows(), 0.f); }
 
 private:
     system::device& m_fd;
@@ -359,6 +363,8 @@ process_step::operator()() -> std::error_condition
             if (auto err = m_input_fd.ioctl(SNDRV_PCM_IOCTL_START))
                 return err.default_error_condition();
         }
+
+        m_reader->clear_buffer();
 
         m_starting = false;
     }
