@@ -38,7 +38,7 @@ public:
     auto input() noexcept -> processor& { return m_input_proc; }
     auto output() noexcept -> processor& { return m_output_proc; }
 
-    void swap_executor(std::unique_ptr<dag_executor>);
+    [[nodiscard]] bool swap_executor(std::unique_ptr<dag_executor>);
 
     void operator()(
             range::table_view<float const> const& in_audio,

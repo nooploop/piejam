@@ -74,7 +74,7 @@ struct audio_engine_render_test : public ::testing::Test
     void rebuild(state const& st)
     {
         auto engine_swap = std::async(std::launch::async, [&]() {
-            sut.rebuild(
+            return sut.rebuild(
                     st.mixer_state,
                     st.fx_modules,
                     st.fx_parameters,

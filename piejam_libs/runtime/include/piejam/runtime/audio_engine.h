@@ -54,7 +54,7 @@ public:
     auto get_level(stereo_level_parameter_id) const
             -> std::optional<stereo_level>;
 
-    void
+    [[nodiscard]] bool
     rebuild(mixer::state const&,
             fx::modules_t const&,
             fx::parameters_t const& fx_params,

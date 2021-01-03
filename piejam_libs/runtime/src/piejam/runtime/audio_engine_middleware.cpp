@@ -661,14 +661,17 @@ audio_engine_middleware::rebuild()
         return;
 
     auto const& st = m_get_state();
-    m_engine->rebuild(
-            st.mixer_state,
-            st.fx_modules,
-            st.fx_parameters,
-            st.params,
-            [this, sr = st.samplerate](fx::ladspa_instance_id id) {
-                return m_ladspa_fx_manager->make_processor(id, sr);
-            });
+    if (!m_engine->rebuild(
+                st.mixer_state,
+                st.fx_modules,
+                st.fx_parameters,
+                st.params,
+                [this, sr = st.samplerate](fx::ladspa_instance_id id) {
+                    return m_ladspa_fx_manager->make_processor(id, sr);
+                }))
+    {
+        spdlog::error("audio_engine_middleware: graph rebuilding failed");
+    }
 }
 
 } // namespace piejam::runtime

@@ -405,7 +405,7 @@ audio_engine::get_level(stereo_level_parameter_id const id) const
     return result;
 }
 
-void
+bool
 audio_engine::rebuild(
         mixer::state const& mixer_state,
         fx::modules_t const& fx_modules,
@@ -456,8 +456,10 @@ audio_engine::rebuild(
 
     audio::engine::bypass_event_identity_processors(new_graph);
 
-    m_impl->process.swap_executor(ns_ae::graph_to_dag(new_graph).make_runnable(
-            m_impl->worker_threads));
+    if (!m_impl->process.swap_executor(
+                ns_ae::graph_to_dag(new_graph).make_runnable(
+                        m_impl->worker_threads)))
+        return false;
 
     m_impl->graph = std::move(new_graph);
     m_impl->input_buses = std::move(input_buses);
@@ -470,6 +472,8 @@ audio_engine::rebuild(
 
     std::ofstream("graph.dot")
             << audio::engine::export_graph_as_dot(m_impl->graph) << std::endl;
+
+    return true;
 }
 
 void

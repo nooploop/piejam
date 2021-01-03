@@ -50,7 +50,7 @@ process::~process()
     delete m_next_executor.load();
 }
 
-void
+bool
 process::swap_executor(std::unique_ptr<dag_executor> next_dag_executor)
 {
     if (!next_dag_executor)
@@ -63,7 +63,19 @@ process::swap_executor(std::unique_ptr<dag_executor> next_dag_executor)
             next_dag_executor.release(),
             std::memory_order_release);
 
-    prev_executor_future.get();
+    auto const status =
+            prev_executor_future.wait_for(std::chrono::milliseconds(200));
+
+    if (status == std::future_status::ready)
+    {
+        prev_executor_future.get();
+        return true;
+    }
+    else
+    {
+        delete m_next_executor.exchange(nullptr, std::memory_order_acq_rel);
+        return false;
+    }
 }
 
 void
