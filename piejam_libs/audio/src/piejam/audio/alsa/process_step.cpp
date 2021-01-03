@@ -40,13 +40,13 @@ namespace
 {
 
 template <class T>
-void
+auto
 transferi(
         system::device& fd,
         unsigned long const request,
         T* const buffer,
         std::size_t const frames,
-        std::size_t const channels_per_frame)
+        std::size_t const channels_per_frame) -> std::error_code
 {
     BOOST_ASSERT(buffer);
 
@@ -58,20 +58,23 @@ transferi(
         arg.frames = frames - frames_transferred;
         arg.result = 0;
 
-        fd.ioctl(request, arg);
+        if (auto err = fd.ioctl(request, arg))
+            return err;
 
         frames_transferred += static_cast<std::size_t>(arg.result);
     }
+
+    return {};
 }
 
 template <class T>
-void
+auto
 readi(system::device& fd,
       T* const buffer,
       std::size_t const frames,
-      std::size_t const channels_per_frame)
+      std::size_t const channels_per_frame) -> std::error_code
 {
-    transferi(
+    return transferi(
             fd,
             SNDRV_PCM_IOCTL_READI_FRAMES,
             buffer,
@@ -80,13 +83,13 @@ readi(system::device& fd,
 }
 
 template <class T>
-void
+auto
 writei(system::device& fd,
        T* const buffer,
        std::size_t const frames,
-       std::size_t const channels_per_frame)
+       std::size_t const channels_per_frame) -> std::error_code
 {
-    transferi(
+    return transferi(
             fd,
             SNDRV_PCM_IOCTL_WRITEI_FRAMES,
             buffer,
@@ -101,7 +104,7 @@ struct dummy_reader final : pcm_reader
         return {};
     }
 
-    void read() override {}
+    auto read() noexcept -> std::error_code override { return {}; }
 };
 
 template <pcm_format F>
@@ -125,16 +128,25 @@ struct interleaved_reader final : pcm_reader
         return m_buffer.rows();
     }
 
-    void read() override
+    auto read() noexcept -> std::error_code override
     {
-        readi(m_fd, m_read_buffer.data(), m_period_size, m_num_channels);
+        if (auto err =
+                    readi(m_fd,
+                          m_read_buffer.data(),
+                          m_period_size,
+                          m_num_channels))
+            return err;
+
         range::table_view<pcm_sample_t<F>> non_interleaved(
                 m_read_buffer.data(),
                 m_num_channels,
                 m_period_size,
                 1,
                 m_num_channels);
+
         transform(non_interleaved, m_buffer.rows(), &pcm_convert::from<F>);
+
+        return {};
     }
 
 private:
@@ -198,7 +210,7 @@ struct dummy_writer final : pcm_writer
 {
     auto buffer() noexcept -> range::table_view<float> override { return {}; }
 
-    void write() override {}
+    auto write() noexcept -> std::error_code override { return {}; }
 };
 
 template <pcm_format F>
@@ -222,7 +234,7 @@ struct interleaved_writer final : pcm_writer
         return m_buffer.rows();
     }
 
-    void write() override
+    auto write() noexcept -> std::error_code override
     {
         range::table_view<pcm_sample_t<F>> non_interleaved(
                 m_write_buffer.data(),
@@ -231,7 +243,11 @@ struct interleaved_writer final : pcm_writer
                 1,
                 m_num_channels);
         transform(m_buffer.rows(), non_interleaved, &pcm_convert::to<F>);
-        writei(m_fd, m_write_buffer.data(), m_period_size, m_num_channels);
+        return writei(
+                m_fd,
+                m_write_buffer.data(),
+                m_period_size,
+                m_num_channels);
     }
 
 private:
@@ -322,8 +338,8 @@ process_step::process_step(process_step&&) = default;
 
 process_step::~process_step() = default;
 
-void
-process_step::operator()()
+auto
+process_step::operator()() -> std::error_condition
 {
     if (m_starting)
     {
@@ -333,44 +349,52 @@ process_step::operator()()
 
             for (unsigned i = 0; i < m_io_config.process_config.period_count;
                  ++i)
-                m_writer->write();
+            {
+                if (auto err = m_writer->write())
+                    return err.default_error_condition();
+            }
         }
         else if (m_input_fd)
         {
-            m_input_fd.ioctl(SNDRV_PCM_IOCTL_START);
+            if (auto err = m_input_fd.ioctl(SNDRV_PCM_IOCTL_START))
+                return err.default_error_condition();
         }
 
         m_starting = false;
     }
 
-    try
+    auto err = m_reader->read();
+
+    cpu_load_meter cpu_load_meter(
+            std::max(
+                    m_reader->buffer().minor_size(),
+                    m_writer->buffer().minor_size()),
+            m_io_config.process_config.samplerate);
+
+    m_process_function(m_reader->buffer(), m_writer->buffer());
+
+    m_cpu_load.store(cpu_load_meter.stop(), std::memory_order_relaxed);
+
+    if (!err)
+        err = m_writer->write();
+
+    if (err)
     {
-        m_reader->read();
-
-        cpu_load_meter cpu_load_meter(
-                std::max(
-                        m_reader->buffer().minor_size(),
-                        m_writer->buffer().minor_size()),
-                m_io_config.process_config.samplerate);
-
-        m_process_function(m_reader->buffer(), m_writer->buffer());
-
-        m_cpu_load.store(cpu_load_meter.stop(), std::memory_order_relaxed);
-
-        m_writer->write();
-    }
-    catch (std::system_error const& err)
-    {
-        if (err.code() == std::make_error_code(std::errc::broken_pipe))
+        if (err == std::make_error_code(std::errc::broken_pipe))
         {
             system::device& fd = m_input_fd ? m_input_fd : m_output_fd;
-            fd.ioctl(SNDRV_PCM_IOCTL_PREPARE);
+
+            if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_PREPARE))
+                return err.default_error_condition();
+
             m_starting = true;
             ++m_xruns;
         }
         else
-            throw;
+            return err.default_error_condition();
     }
+
+    return {};
 }
 
 } // namespace piejam::audio::alsa

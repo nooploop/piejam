@@ -24,9 +24,9 @@
 
 #include <spdlog/spdlog.h>
 
+#include <boost/assert.hpp>
+
 #include <atomic>
-#include <cassert>
-#include <cstring>
 #include <thread>
 #include <type_traits>
 
@@ -51,7 +51,7 @@ public:
     template <class Process>
     void start(thread::configuration const& conf, Process&& process)
     {
-        assert(!m_running);
+        BOOST_ASSERT(!m_running);
 
         m_running = true;
         m_thread = std::thread(
@@ -63,16 +63,13 @@ public:
                     if (conf.priority)
                         this_thread::set_priority(*conf.priority);
 
-                    try
+                    while (m_running.load(std::memory_order_relaxed))
                     {
-                        while (m_running.load(std::memory_order_relaxed))
+                        if (std::error_condition err = fprocess())
                         {
-                            fprocess();
+                            spdlog::error("process_thread: {}", err.message());
+                            m_running.store(false, std::memory_order_relaxed);
                         }
-                    }
-                    catch (std::exception const& err)
-                    {
-                        spdlog::error(err.what());
                     }
                 });
     }

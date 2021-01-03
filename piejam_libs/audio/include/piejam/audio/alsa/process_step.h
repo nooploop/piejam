@@ -23,6 +23,7 @@
 
 #include <atomic>
 #include <memory>
+#include <system_error>
 #include <vector>
 
 namespace piejam::audio::alsa
@@ -44,7 +45,7 @@ public:
     process_step(process_step&&);
     ~process_step();
 
-    void operator()();
+    [[nodiscard]] auto operator()() -> std::error_condition;
 
 private:
     system::device& m_input_fd;

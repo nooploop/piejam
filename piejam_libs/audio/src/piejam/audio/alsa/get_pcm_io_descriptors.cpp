@@ -61,14 +61,13 @@ soundcards() -> std::vector<soundcard>
                 system::device fd(entry.path());
                 snd_ctl_card_info card_info{};
 
-                try
+                if (auto err = fd.ioctl(SNDRV_CTL_IOCTL_CARD_INFO, card_info))
                 {
-                    fd.ioctl(SNDRV_CTL_IOCTL_CARD_INFO, card_info);
-                    cards.emplace_back(entry.path(), card_info);
+                    spdlog::error("soundcards: {}", err.message());
                 }
-                catch (std::exception const& err)
+                else
                 {
-                    spdlog::error("{}", err.what());
+                    cards.emplace_back(entry.path(), card_info);
                 }
             }
         }
@@ -88,7 +87,11 @@ get_devices(soundcard const& scard, int stream_type)
     int device{-1};
     do
     {
-        fd.ioctl(SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE, device);
+        if (auto err = fd.ioctl(SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE, device))
+        {
+            spdlog::error("get_devices: {}", err.message());
+            break;
+        }
 
         if (device == -1)
             break;
@@ -99,17 +102,16 @@ get_devices(soundcard const& scard, int stream_type)
         info.subdevice = 0;
         info.stream = stream_type;
 
-        try
-        {
-            fd.ioctl(SNDRV_CTL_IOCTL_PCM_INFO, info);
-            devices.push_back(std::move(info));
-        }
-        catch (std::system_error const& err)
+        if (auto err = fd.ioctl(SNDRV_CTL_IOCTL_PCM_INFO, info))
         {
             static const auto error_to_ignore =
                     std::make_error_code(std::errc::no_such_file_or_directory);
-            if (err.code() != error_to_ignore)
-                throw;
+            if (err != error_to_ignore)
+                spdlog::error("get_devices: {}", err.message());
+        }
+        else
+        {
+            devices.push_back(std::move(info));
         }
     } while (device != -1);
 

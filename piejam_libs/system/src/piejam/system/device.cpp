@@ -58,12 +58,14 @@ device::operator=(device&& other) noexcept -> device&
     return *this;
 }
 
-void
-device::ioctl(unsigned long const request)
+auto
+device::ioctl(unsigned long const request) noexcept -> std::error_code
 {
     BOOST_ASSERT(m_fd != invalid);
     if (-1 == ::ioctl(m_fd, request))
-        throw std::system_error(errno, std::generic_category());
+        return std::error_code(errno, std::generic_category());
+
+    return {};
 }
 
 auto
@@ -83,14 +85,14 @@ device::ioctl(
 }
 
 template <>
-void
-device::ioctl(unsigned long request, device const& other)
+auto
+device::ioctl(unsigned long request, device const& other) noexcept
+        -> std::error_code
 {
-    if (auto err =
-                ioctl(request,
-                      reinterpret_cast<void*>(other.m_fd),
-                      sizeof(other.m_fd)))
-        throw std::system_error(err);
+    return ioctl(
+            request,
+            reinterpret_cast<void*>(other.m_fd),
+            sizeof(other.m_fd));
 }
 
 } // namespace piejam::system

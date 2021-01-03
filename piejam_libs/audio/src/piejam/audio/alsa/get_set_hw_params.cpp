@@ -25,6 +25,8 @@
 #include <piejam/audio/samplerates.h>
 #include <piejam/system/device.h>
 
+#include <spdlog/spdlog.h>
+
 #include <sound/asound.h>
 #include <sys/ioctl.h>
 
@@ -41,21 +43,22 @@ test_interval_value(
         unsigned ival_index,
         unsigned value) -> bool
 {
-    try
+    params.rmask = (1u << ival_index);
+    params.cmask = 0u;
+
+    auto& ival =
+            params.intervals[ival_index - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
+    ival.min = value;
+    ival.max = value;
+    ival.integer = 1;
+
+    if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, params))
     {
-        params.rmask = (1u << ival_index);
-        params.cmask = 0u;
-        auto& ival = params.intervals
-                             [ival_index - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
-        ival.min = value;
-        ival.max = value;
-        ival.integer = 1;
-        fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, params);
-    }
-    catch (std::system_error const& err)
-    {
-        if (err.code() != std::make_error_code(std::errc::invalid_argument))
-            throw;
+        if (err != std::make_error_code(std::errc::invalid_argument))
+            spdlog::error(
+                    "get_hw_params/test_interval_value: {}",
+                    err.message());
+
         return false;
     }
 
@@ -252,7 +255,8 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
     auto hw_params = make_snd_pcm_hw_params_for_refine_any();
 
     system::device fd(pcm.path);
-    fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, hw_params);
+    if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, hw_params))
+        throw std::system_error(err);
 
     result.interleaved =
             test_mask_bit(
@@ -260,13 +264,13 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
                     SNDRV_PCM_HW_PARAM_ACCESS,
                     SNDRV_PCM_ACCESS_RW_NONINTERLEAVED)
                     ? false
-                    : test_mask_bit(
-                              hw_params,
-                              SNDRV_PCM_HW_PARAM_ACCESS,
-                              SNDRV_PCM_ACCESS_RW_INTERLEAVED)
-                              ? true
-                              : throw std::runtime_error(
-                                        "rw access not supported, only mmap?");
+            : test_mask_bit(
+                      hw_params,
+                      SNDRV_PCM_HW_PARAM_ACCESS,
+                      SNDRV_PCM_ACCESS_RW_INTERLEAVED)
+                    ? true
+                    : throw std::runtime_error(
+                              "rw access not supported, only mmap?");
 
     static constexpr std::array preferred_formats{
             SNDRV_PCM_FORMAT_S32_LE,
@@ -323,7 +327,10 @@ set_hw_params(
         pcm_process_config const& process_config)
 {
     auto hw_params = make_snd_pcm_hw_params_for_refine_any();
-    fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, hw_params);
+
+    if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, hw_params))
+        throw std::system_error(err);
+
     hw_params.cmask = 0;
 
     unsigned const interleaved_bit =
@@ -351,7 +358,8 @@ set_hw_params(
             SNDRV_PCM_HW_PARAM_PERIODS,
             process_config.period_count);
 
-    fd.ioctl(SNDRV_PCM_IOCTL_HW_PARAMS, hw_params);
+    if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_PARAMS, hw_params))
+        throw std::system_error(err);
 }
 
 } // namespace piejam::audio::alsa

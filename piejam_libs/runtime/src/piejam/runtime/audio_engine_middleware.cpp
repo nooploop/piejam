@@ -608,28 +608,6 @@ audio_engine_middleware::process_engine_action(
 void
 audio_engine_middleware::close_device()
 {
-    // We handle all the exceptions here, because stopping/closing might fail,
-    // e.g. device was removed, but we still want to continue to proceed after
-    // that.
-    try
-    {
-        if (m_device->is_running())
-            m_device->stop();
-    }
-    catch (std::exception const& err)
-    {
-        spdlog::error("stopping device failed: {}", err.what());
-    }
-
-    try
-    {
-        m_device->close();
-    }
-    catch (std::exception const& err)
-    {
-        spdlog::error("closing device failed: {}", err.what());
-    }
-
     m_device = std::make_unique<piejam::audio::dummy_device>();
 
     // The engine is executed by a device, we can safely destroy it after device

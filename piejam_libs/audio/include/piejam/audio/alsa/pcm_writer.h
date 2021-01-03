@@ -19,6 +19,8 @@
 
 #include <piejam/range/fwd.h>
 
+#include <system_error>
+
 namespace piejam::audio::alsa
 {
 
@@ -29,7 +31,7 @@ public:
 
     virtual auto buffer() noexcept -> range::table_view<float> = 0;
 
-    virtual void write() = 0;
+    [[nodiscard]] virtual auto write() noexcept -> std::error_code = 0;
 };
 
 } // namespace piejam::audio::alsa

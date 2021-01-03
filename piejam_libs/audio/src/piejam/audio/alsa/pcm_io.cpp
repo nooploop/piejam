@@ -23,9 +23,13 @@
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/process_thread.h>
 
+#include <spdlog/spdlog.h>
+
 #include <fcntl.h>
 #include <sound/asound.h>
 #include <sys/ioctl.h>
+
+#include <boost/assert.hpp>
 
 namespace piejam::audio::alsa
 {
@@ -61,9 +65,12 @@ open_pcm(
                        std::numeric_limits<long>::max() - buffer_size))
             sw_params.boundary *= 2;
         sw_params.silence_size = sw_params.boundary;
-        fd.ioctl(SNDRV_PCM_IOCTL_SW_PARAMS, sw_params);
 
-        fd.ioctl(SNDRV_PCM_IOCTL_PREPARE);
+        if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_SW_PARAMS, sw_params))
+            throw std::system_error(err);
+
+        if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_PREPARE))
+            throw std::system_error(err);
 
         return fd;
     }
@@ -86,7 +93,12 @@ pcm_io::pcm_io(
     , m_io_config(io_config)
 {
     if (m_input_fd && m_output_fd)
-        m_input_fd.ioctl(SNDRV_PCM_IOCTL_LINK, std::as_const(m_output_fd));
+    {
+        if (auto err = m_input_fd.ioctl(
+                    SNDRV_PCM_IOCTL_LINK,
+                    std::as_const(m_output_fd)))
+            throw std::system_error(err);
+    }
 }
 
 pcm_io::~pcm_io()
@@ -107,13 +119,16 @@ pcm_io::is_open() const noexcept
 void
 pcm_io::close()
 {
-    assert(!is_running());
+    BOOST_ASSERT(!is_running());
 
     auto input_fd = std::move(m_input_fd);
     auto output_fd = std::move(m_output_fd);
 
     if (input_fd && output_fd)
-        output_fd.ioctl(SNDRV_PCM_IOCTL_UNLINK);
+    {
+        if (auto err = output_fd.ioctl(SNDRV_PCM_IOCTL_UNLINK))
+            spdlog::error("pcm_io::close: {}", err.message());
+    }
 }
 
 bool
@@ -127,8 +142,8 @@ pcm_io::start(
         thread::configuration const& thread_config,
         process_function process_function)
 {
-    assert(is_open());
-    assert(!m_process_thread);
+    BOOST_ASSERT(is_open());
+    BOOST_ASSERT(!m_process_thread);
 
     m_xruns.store(0, std::memory_order_relaxed);
 
@@ -143,21 +158,22 @@ pcm_io::start(
                     m_xruns,
                     std::move(process_function)));
 
-    assert(m_process_thread->is_running());
+    BOOST_ASSERT(m_process_thread->is_running());
 }
 
 void
 pcm_io::stop()
 {
-    assert(is_open());
-    assert(m_process_thread);
-    assert(m_process_thread->is_running());
+    BOOST_ASSERT(is_open());
+    BOOST_ASSERT(m_process_thread);
+    BOOST_ASSERT(m_process_thread->is_running());
 
     m_process_thread->stop();
     m_process_thread.reset();
 
     system::device& fd = m_input_fd ? m_input_fd : m_output_fd;
-    fd.ioctl(SNDRV_PCM_IOCTL_DROP);
+    if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_DROP))
+        spdlog::error("pcm_io::stop: {}", err.message());
 }
 
 } // namespace piejam::audio::alsa
