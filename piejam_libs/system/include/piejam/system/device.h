@@ -18,6 +18,7 @@
 #pragma once
 
 #include <filesystem>
+#include <system_error>
 
 namespace piejam::system
 {
@@ -42,11 +43,14 @@ public:
     template <class T>
     void ioctl(unsigned long request, T& x) const
     {
-        ioctl(request, &x, sizeof(T));
+        if (auto err = ioctl(request, &x, sizeof(T)))
+            throw std::system_error(err);
     }
 
 private:
-    void ioctl(unsigned long request, void* p, std::size_t size) const;
+    [[nodiscard]] auto
+    ioctl(unsigned long request, void* p, std::size_t size) const noexcept
+            -> std::error_code;
 
     static constexpr int invalid = -1;
 
