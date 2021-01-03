@@ -657,7 +657,7 @@ audio_engine_middleware::start_engine()
 void
 audio_engine_middleware::rebuild()
 {
-    if (!m_engine)
+    if (!m_engine || !m_device->is_running())
         return;
 
     auto const& st = m_get_state();
