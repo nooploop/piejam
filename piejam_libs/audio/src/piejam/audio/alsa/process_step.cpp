@@ -48,27 +48,19 @@ transferi(
         std::size_t const frames,
         std::size_t const channels_per_frame)
 {
-    assert(buffer);
-
-    auto step =
-            [&fd,
-             request](void* const buffer, std::size_t frames) -> std::size_t {
-        snd_xferi arg;
-        arg.buf = buffer;
-        arg.frames = frames;
-        arg.result = 0;
-
-        fd.ioctl(request, arg);
-
-        return static_cast<std::size_t>(arg.result);
-    };
+    BOOST_ASSERT(buffer);
 
     std::size_t frames_transferred = 0;
     while (frames_transferred < frames)
     {
-        T* const place = buffer + frames_transferred * channels_per_frame;
-        std::size_t const frames_left = frames - frames_transferred;
-        frames_transferred += step(place, frames_left);
+        snd_xferi arg;
+        arg.buf = buffer + frames_transferred * channels_per_frame;
+        arg.frames = frames - frames_transferred;
+        arg.result = 0;
+
+        fd.ioctl(request, arg);
+
+        frames_transferred += static_cast<std::size_t>(arg.result);
     }
 }
 
