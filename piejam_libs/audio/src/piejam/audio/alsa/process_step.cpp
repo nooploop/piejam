@@ -94,7 +94,7 @@ writei(system::device& fd,
             channels_per_frame);
 }
 
-struct dummy_reader : pcm_reader
+struct dummy_reader final : pcm_reader
 {
     auto buffer() const noexcept -> range::table_view<float const> override
     {
@@ -105,7 +105,7 @@ struct dummy_reader : pcm_reader
 };
 
 template <pcm_format F>
-struct interleaved_reader : pcm_reader
+struct interleaved_reader final : pcm_reader
 {
     interleaved_reader(
             system::device& fd,
@@ -194,7 +194,7 @@ make_reader(
     }
 }
 
-struct dummy_writer : pcm_writer
+struct dummy_writer final : pcm_writer
 {
     auto buffer() noexcept -> range::table_view<float> override { return {}; }
 
@@ -202,7 +202,7 @@ struct dummy_writer : pcm_writer
 };
 
 template <pcm_format F>
-struct interleaved_writer : pcm_writer
+struct interleaved_writer final : pcm_writer
 {
     interleaved_writer(
             system::device& fd,
