@@ -49,13 +49,10 @@ device::~device()
 }
 
 auto
-device::operator=(device&& other) -> device&
+device::operator=(device&& other) noexcept -> device&
 {
     if (m_fd != invalid)
-    {
-        if (-1 == ::close(m_fd))
-            throw std::system_error(errno, std::generic_category());
-    }
+        BOOST_VERIFY(!::close(m_fd));
 
     m_fd = std::exchange(other.m_fd, invalid);
     return *this;
