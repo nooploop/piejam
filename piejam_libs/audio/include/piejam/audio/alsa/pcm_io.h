@@ -28,7 +28,7 @@
 namespace piejam::audio::alsa
 {
 
-class pcm_io : public piejam::audio::device
+class pcm_io final : public piejam::audio::device
 {
 public:
     pcm_io() noexcept;
@@ -48,6 +48,7 @@ public:
     {
         return m_cpu_load.load(std::memory_order_relaxed);
     }
+
     auto xruns() const noexcept -> std::size_t override
     {
         return m_xruns.load(std::memory_order_relaxed);

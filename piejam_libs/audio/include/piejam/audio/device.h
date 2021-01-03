@@ -39,7 +39,7 @@ public:
     virtual auto xruns() const noexcept -> std::size_t = 0;
 };
 
-class dummy_device : public device
+class dummy_device final : public device
 {
 public:
     bool is_open() const noexcept override { return false; }
