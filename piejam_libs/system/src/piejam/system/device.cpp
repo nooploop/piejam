@@ -59,7 +59,7 @@ device::operator=(device&& other) noexcept -> device&
 }
 
 void
-device::ioctl(unsigned long const request) const
+device::ioctl(unsigned long const request)
 {
     BOOST_ASSERT(m_fd != invalid);
     if (-1 == ::ioctl(m_fd, request))
@@ -70,7 +70,7 @@ auto
 device::ioctl(
         unsigned long const request,
         void* const p,
-        std::size_t const size) const noexcept -> std::error_code
+        std::size_t const size) noexcept -> std::error_code
 {
     BOOST_ASSERT(m_fd != invalid);
     BOOST_ASSERT(_IOC_SIZE(request) == size);
@@ -84,7 +84,7 @@ device::ioctl(
 
 template <>
 void
-device::ioctl(unsigned long request, device const& other) const
+device::ioctl(unsigned long request, device const& other)
 {
     if (auto err =
                 ioctl(request,

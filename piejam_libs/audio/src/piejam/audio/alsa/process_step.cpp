@@ -42,7 +42,7 @@ namespace
 template <class T>
 void
 transferi(
-        system::device const& fd,
+        system::device& fd,
         unsigned long const request,
         T* const buffer,
         std::size_t const frames,
@@ -74,7 +74,7 @@ transferi(
 
 template <class T>
 void
-readi(system::device const& fd,
+readi(system::device& fd,
       T* const buffer,
       std::size_t const frames,
       std::size_t const channels_per_frame)
@@ -89,7 +89,7 @@ readi(system::device const& fd,
 
 template <class T>
 void
-writei(system::device const& fd,
+writei(system::device& fd,
        T* const buffer,
        std::size_t const frames,
        std::size_t const channels_per_frame)

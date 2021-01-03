@@ -38,10 +38,10 @@ public:
 
     explicit operator bool() const noexcept { return m_fd != invalid; }
 
-    void ioctl(unsigned long request) const;
+    void ioctl(unsigned long request);
 
     template <class T>
-    void ioctl(unsigned long request, T& x) const
+    void ioctl(unsigned long request, T& x)
     {
         if (auto err = ioctl(request, &x, sizeof(T)))
             throw std::system_error(err);
@@ -49,7 +49,7 @@ public:
 
 private:
     [[nodiscard]] auto
-    ioctl(unsigned long request, void* p, std::size_t size) const noexcept
+    ioctl(unsigned long request, void* p, std::size_t size) noexcept
             -> std::error_code;
 
     static constexpr int invalid = -1;
@@ -58,9 +58,9 @@ private:
 };
 
 template <>
-void device::ioctl(unsigned long request, device&) const = delete;
+void device::ioctl(unsigned long request, device&) = delete;
 
 template <>
-void device::ioctl(unsigned long request, device const& other) const;
+void device::ioctl(unsigned long request, device const& other);
 
 } // namespace piejam::system
