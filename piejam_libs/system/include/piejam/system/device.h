@@ -4,8 +4,13 @@
 
 #pragma once
 
+#include <boost/outcome/std_result.hpp>
+
 #include <filesystem>
+#include <span>
 #include <system_error>
+
+namespace outcome = boost::outcome_v2;
 
 namespace piejam::system
 {
@@ -33,6 +38,9 @@ public:
     {
         return ioctl(request, &x, sizeof(T));
     }
+
+    [[nodiscard]] auto read(std::span<std::byte> const& buffer) noexcept
+            -> outcome::std_result<std::size_t>;
 
 private:
     [[nodiscard]] auto

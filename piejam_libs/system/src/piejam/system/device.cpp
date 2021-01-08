@@ -82,4 +82,15 @@ device::ioctl(unsigned long request, device const& other) noexcept
             sizeof(other.m_fd));
 }
 
+auto
+device::read(std::span<std::byte> const& buffer) noexcept
+        -> outcome::std_result<std::size_t>
+{
+    auto const res = ::read(m_fd, buffer.data(), buffer.size());
+    if (res < 0)
+        return std::error_code(errno, std::generic_category());
+
+    return static_cast<std::size_t>(res);
+}
+
 } // namespace piejam::system
