@@ -31,7 +31,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <file>PieJam/Util/MathExt.js</file>
         <file>PieJam/MixerControls/ChannelStrip.qml</file>
         <file>PieJam/Controls/BipolarSlider.qml</file>
-        <file>PieJam/Views/AudioSettings.qml</file>
         <file>PieJam/SettingsControls/BusConfig.qml</file>
         <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
         <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
@@ -44,5 +43,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <file>PieJam/FxChainControls/FxBrowser.qml</file>
         <file>PieJam/Controls/HeaderLabel.qml</file>
         <file>PieJam/MixerControls/CompactLevelMeterFader.qml</file>
+        <file>PieJam/Views/Settings.qml</file>
+        <file>PieJam/SettingsControls/AudioSettings.qml</file>
+        <file>PieJam/SettingsControls/MidiSettings.qml</file>
+        <file>PieJam/SettingsControls/MidiDeviceConfig.qml</file>
     </qresource>
 </RCC>

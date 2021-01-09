@@ -4,11 +4,12 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
+import QtQuick.Layouts 1.13
 
 import "../Controls"
 import "../SettingsControls"
 
-TopPane {
+Item {
 
     property alias deviceModel: deviceSettings.model
     property alias inputModel: audioInputSettings.model
@@ -18,10 +19,12 @@ TopPane {
 
     TabBar {
         id: tabs
+
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.top: parent.top
-        currentIndex: swipeView.currentIndex
+
+        currentIndex: 0
 
         TabButton {
             text: "Device"
@@ -36,8 +39,9 @@ TopPane {
         }
     }
 
-    SwipeView {
-        id: swipeView
+    StackLayout {
+        id: stackView
+
         anchors.top: tabs.bottom
         anchors.right: parent.right
         anchors.bottom: parent.bottom

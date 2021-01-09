@@ -69,10 +69,9 @@ Item {
         Button {
             id: addMono
 
-            text: "Add Mono"
+            text: "+Mono"
             Layout.fillWidth: true
             Layout.minimumWidth: addButtons.width / 2
-            font.capitalization: Font.MixedCase
             visible: root.showAddMono
 
             onClicked: root.model.addMonoBus()
@@ -81,10 +80,9 @@ Item {
         Button {
             id: addStereo
 
-            text: "Add Stereo"
+            text: "+Stereo"
             Layout.fillWidth: true
             Layout.minimumWidth: addButtons.width / 2
-            font.capitalization: Font.MixedCase
             visible: root.showAddStereo
 
             onClicked: root.model.addStereoBus()

@@ -24,9 +24,10 @@ Item {
 
     id: root
 
-    Frame {
+    Item {
 
         anchors.fill: parent
+        anchors.margins: 4
 
         TextField {
             id: nameTextField

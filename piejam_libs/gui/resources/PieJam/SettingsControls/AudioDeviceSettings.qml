@@ -25,10 +25,14 @@ Item {
     ComboBoxSetting {
         id: inputSetting
 
-        x: 8
-        y: 8
-        width: 644
         height: 64
+
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.right: reloadButtonFrame.left
+        anchors.rightMargin: 8
+        anchors.top: parent.top
+        anchors.topMargin: 8
 
         model: root.model.inputDevices.elements
         currentIndex: root.model.inputDevices.focused
@@ -41,10 +45,14 @@ Item {
     ComboBoxSetting {
         id: outputSetting
 
-        x: 8
-        y: 78
-        width: 644
         height: 64
+
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.right: reloadButtonFrame.left
+        anchors.rightMargin: 8
+        anchors.top: inputSetting.bottom
+        anchors.topMargin: 6
 
         model: root.model.outputDevices.elements
         currentIndex: root.model.outputDevices.focused
@@ -57,10 +65,14 @@ Item {
     ComboBoxSetting {
         id: samplerateSetting
 
-        x: 8
-        y: 148
-        width: 784
         height: 64
+
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.top: outputSetting.bottom
+        anchors.topMargin: 6
 
         model: root.model.samplerates.elements
         currentIndex: root.model.samplerates.focused
@@ -73,17 +85,23 @@ Item {
     Frame {
         id: periodSizeFrame
 
-        x: 8
-        y: 218
-        width: 784
         height: 110
+
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.top: samplerateSetting.bottom
+        anchors.topMargin: 6
 
         Label {
             id: periodSizeLabel
+
             x: 0
             y: 0
             width: 120
             height: 40
+
             text: qsTr("Period Size:")
             font.pixelSize: 18
             verticalAlignment: Text.AlignVCenter
@@ -94,9 +112,11 @@ Item {
 
             visible: root.model && root.model.periodSizes.elements.length > 0
 
-            x: 126
+            anchors.left: periodSizeLabel.right
+            anchors.leftMargin: 8
+            anchors.right: parent.right
+
             y: 0
-            width: 634
             height: 40
 
             stepSize: 1
@@ -112,10 +132,12 @@ Item {
 
             visible: root.model && root.model.periodSizes.elements.length > 0
 
-            x: 126
             y: 46
-            width: 634
             height: 40
+
+            anchors.left: periodSizeLabel.right
+            anchors.leftMargin: 8
+            anchors.right: parent.right
 
             text: root.model.periodSizes.elements[root.model.periodSizes.focused] + qsTr(" Samples")
             leftPadding: 6
@@ -140,17 +162,25 @@ Item {
     }
 
     Frame {
+        id: reloadButtonFrame
+
         x: 658
-        y: 8
         width: 134
         height: 134
 
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.top: parent.top
+        anchors.topMargin: 8
+
         RoundButton {
             id: reloadBtn
+
             x: 19
             y: 19
             width: 72
             height: 72
+
             icon.source: "qrc:///images/icons/ic_refresh_white_48dp.png"
             display: AbstractButton.IconOnly
 

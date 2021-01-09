@@ -77,12 +77,12 @@ ApplicationWindow {
             id: powerPane
         }
 
-        AudioSettings {
+        Settings {
             id: audioSettingsPane
 
-            deviceModel: root.modelFactory.audioDeviceSettings
-            inputModel: root.modelFactory.audioInputSettings
-            outputModel: root.modelFactory.audioOutputSettings
+            audioDeviceModel: root.modelFactory.audioDeviceSettings
+            audioInputModel: root.modelFactory.audioInputSettings
+            audioOutputModel: root.modelFactory.audioOutputSettings
         }
 
         Mixer {
