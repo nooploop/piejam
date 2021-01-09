@@ -1,2 +1,6 @@
+# SPDX-FileCopyrightText: 2020 Dimitrij Kotrev
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 module PieJam.Views
 MainWindow 1.0 MainWindow.qml

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Dimitrij Kotrev
+#
+# SPDX-License-Identifier: CC0-1.0
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 

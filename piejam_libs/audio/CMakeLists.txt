@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Dimitrij Kotrev
+#
+# SPDX-License-Identifier: CC0-1.0
+
 check_include_file("ladspa.h" LADSPA_HEADER)
 if(NOT LADSPA_HEADER)
     message(FATAL_ERROR "LADSPA header not found")

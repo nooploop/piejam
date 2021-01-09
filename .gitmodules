@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Dimitrij Kotrev
+#
+# SPDX-License-Identifier: CC0-1.0
+
 [submodule "libs/nod"]
 	path = libs/nod
 	url = https://github.com/fr00b0/nod.git

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2020 Dimitrij Kotrev
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # PieJam
 PieJam is a simple audio mixer. The user interface was designed to perfectly fit the 7" Raspberry Pi
 touchscreen. The initial idea was to run it as a standalone application on a Raspberry Pi

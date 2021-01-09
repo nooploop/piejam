@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Dimitrij Kotrev
+#
+# SPDX-License-Identifier: CC0-1.0
+
 add_library(piejam_reselect INTERFACE)
 
 target_sources(piejam_reselect INTERFACE

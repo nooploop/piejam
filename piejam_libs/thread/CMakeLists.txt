@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Dimitrij Kotrev
+#
+# SPDX-License-Identifier: CC0-1.0
+
 add_library(piejam_thread STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/affinity.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/configuration.h
