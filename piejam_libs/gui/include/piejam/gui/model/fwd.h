@@ -36,4 +36,9 @@ class FxBrowser;
 class FxBrowserEntry;
 using FxBrowserList = GenericListModel<FxBrowserEntry>;
 
+class MidiDeviceConfig;
+using MidiDeviceList = GenericListModel<MidiDeviceConfig>;
+
+class MidiInputSettings;
+
 } // namespace piejam::gui::model

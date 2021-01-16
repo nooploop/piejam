@@ -40,6 +40,12 @@ public:
         return m_audioOutputSettings.get();
     }
 
+    auto midiInputSettings() const
+            -> piejam::gui::model::MidiInputSettings* override
+    {
+        return m_midiInputSettings.get();
+    }
+
     auto mixer() const -> piejam::gui::model::Mixer* override
     {
         return m_mixer.get();
@@ -70,6 +76,7 @@ private:
             m_audioInputSettings;
     std::unique_ptr<piejam::gui::model::AudioInputOutputSettings>
             m_audioOutputSettings;
+    std::unique_ptr<piejam::gui::model::MidiInputSettings> m_midiInputSettings;
     std::unique_ptr<piejam::gui::model::Mixer> m_mixer;
     std::unique_ptr<piejam::gui::model::Info> m_info;
     std::unique_ptr<piejam::gui::model::FxChain> m_fxChain;

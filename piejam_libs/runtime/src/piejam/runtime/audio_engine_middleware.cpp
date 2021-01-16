@@ -14,8 +14,10 @@
 #include <piejam/audio/midi_manager.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
+#include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/apply_app_config.h>
+#include <piejam/runtime/actions/deactivate_midi_device.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/device_action_visitor.h>
@@ -519,6 +521,24 @@ audio_engine_middleware::process_device_action(
 
         m_next(next_action);
     }
+}
+
+template <>
+void
+audio_engine_middleware::process_device_action(
+        actions::activate_midi_device const& action)
+{
+    if (m_midi_manager->activate_input_device(action.device_id))
+        m_next(action);
+}
+
+template <>
+void
+audio_engine_middleware::process_device_action(
+        actions::deactivate_midi_device const& action)
+{
+    m_midi_manager->deactivate_input_device(action.device_id);
+    m_next(action);
 }
 
 template <class Action>

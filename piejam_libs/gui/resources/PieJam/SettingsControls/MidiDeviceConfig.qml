@@ -12,6 +12,8 @@ Item {
     property alias name: nameLabel.text
     property alias deviceEnabled: enableSwitch.checked
 
+    signal enabledToggled(bool newEnabled)
+
     implicitWidth: 192
     implicitHeight: 48
 
@@ -27,6 +29,8 @@ Item {
         anchors.topMargin: 8
 
         verticalAlignment: Text.AlignVCenter
+        font.bold: true
+        font.pixelSize: 16
     }
 
     Switch {
@@ -39,6 +43,7 @@ Item {
         anchors.rightMargin: 8
         anchors.top: parent.top
         anchors.topMargin: 8
-    }
 
+        onClicked: enabledToggled(enableSwitch.checked)
+    }
 }

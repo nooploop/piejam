@@ -83,6 +83,7 @@ ApplicationWindow {
             audioDeviceModel: root.modelFactory.audioDeviceSettings
             audioInputModel: root.modelFactory.audioInputSettings
             audioOutputModel: root.modelFactory.audioOutputSettings
+            midiInputModel: root.modelFactory.midiInputSettings
         }
 
         Mixer {

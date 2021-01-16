@@ -35,8 +35,8 @@ public:
     midi_manager();
     ~midi_manager();
 
-    bool enable_input_device(midi_device_id_t const&);
-    void disable_input_device(midi_device_id_t const&);
+    bool activate_input_device(midi_device_id_t const&);
+    void deactivate_input_device(midi_device_id_t const&);
 
     auto update_devices() -> std::vector<midi_device_update>;
 

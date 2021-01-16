@@ -24,6 +24,9 @@ class Factory : public QObject
     Q_PROPERTY(piejam::gui::model::AudioInputOutputSettings* audioOutputSettings
                        READ audioOutputSettings CONSTANT)
 
+    Q_PROPERTY(piejam::gui::model::MidiInputSettings* midiInputSettings READ
+                       midiInputSettings CONSTANT)
+
     Q_PROPERTY(piejam::gui::model::Mixer* mixer READ mixer CONSTANT)
     Q_PROPERTY(piejam::gui::model::Info* info READ info CONSTANT)
     Q_PROPERTY(piejam::gui::model::FxChain* fxChain READ fxChain CONSTANT)
@@ -33,6 +36,8 @@ public:
     virtual auto audioDeviceSettings() const -> AudioDeviceSettings* = 0;
     virtual auto audioInputSettings() const -> AudioInputOutputSettings* = 0;
     virtual auto audioOutputSettings() const -> AudioInputOutputSettings* = 0;
+
+    virtual auto midiInputSettings() const -> MidiInputSettings* = 0;
 
     virtual auto mixer() const -> Mixer* = 0;
     virtual auto info() const -> Info* = 0;

@@ -9,10 +9,12 @@
 #include <piejam/app/gui/model/FxBrowser.h>
 #include <piejam/app/gui/model/FxChain.h>
 #include <piejam/app/gui/model/Info.h>
+#include <piejam/app/gui/model/MidiInputSettings.h>
 #include <piejam/app/gui/model/Mixer.h>
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/MidiDeviceConfig.h>
 #include <piejam/gui/model/MixerChannel.h>
 
 namespace piejam::app::gui::model
@@ -32,6 +34,9 @@ Factory::Factory(
     , m_audioOutputSettings(std::make_unique<AudioOutputSettings>(
               dispatch,
               state_change_subscriber))
+    , m_midiInputSettings(std::make_unique<MidiInputSettings>(
+              dispatch,
+              state_change_subscriber))
     , m_mixer(std::make_unique<Mixer>(dispatch, state_change_subscriber))
     , m_info(std::make_unique<Info>(dispatch, state_change_subscriber))
     , m_fxChain(std::make_unique<FxChain>(dispatch, state_change_subscriber))
@@ -44,6 +49,7 @@ Factory::Factory(
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::FxChain*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
+    qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
 }
 
 Factory::~Factory() = default;

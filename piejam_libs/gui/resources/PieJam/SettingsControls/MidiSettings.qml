@@ -10,7 +10,7 @@ import QtQuick.Layouts 1.15
 Item {
     id: root
 
-    property alias midiInputModel: midiDevicesList.model
+    property var model
 
     TabBar {
         id: tabs
@@ -41,10 +41,30 @@ Item {
 
             orientation: ListView.Vertical
 
+            model: root.model.devices
+
             delegate: MidiDeviceConfig {
                 name: model.item.name
                 deviceEnabled: model.item.enabled
+
+                anchors.left: if (parent) parent.left
+                anchors.right: if (parent) parent.right
+
+                onEnabledToggled: model.item.changeEnabled(newEnabled)
+
+                Binding {
+                    target: model.item
+                    property: "subscribed"
+                    value: visible
+                }
             }
         }
+    }
+
+    Binding {
+        when: root.model
+        target: root.model
+        property: "subscribed"
+        value: root.visible
     }
 }

@@ -63,7 +63,7 @@ midi_manager::midi_manager()
 midi_manager::~midi_manager() = default;
 
 bool
-midi_manager::enable_input_device(midi_device_id_t const& device_id)
+midi_manager::activate_input_device(midi_device_id_t const& device_id)
 {
     if (auto it = m_impl->alsa_midi_input_devices.find(device_id);
         it != m_impl->alsa_midi_input_devices.end())
@@ -77,7 +77,7 @@ midi_manager::enable_input_device(midi_device_id_t const& device_id)
 }
 
 void
-midi_manager::disable_input_device(midi_device_id_t const& device_id)
+midi_manager::deactivate_input_device(midi_device_id_t const& device_id)
 {
     if (auto it = m_impl->alsa_midi_input_devices.find(device_id);
         it != m_impl->alsa_midi_input_devices.end())

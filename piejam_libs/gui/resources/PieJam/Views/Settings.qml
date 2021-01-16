@@ -17,6 +17,7 @@ TopPane {
     property alias audioDeviceModel: audioSettings.deviceModel
     property alias audioInputModel: audioSettings.inputModel
     property alias audioOutputModel: audioSettings.outputModel
+    property alias midiInputModel: midiSettings.model
 
     property int currentIndex: 0
 
