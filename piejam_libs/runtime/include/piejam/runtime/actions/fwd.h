@@ -21,6 +21,7 @@ struct apply_app_config;
 
 struct refresh_devices;
 struct initiate_device_selection;
+struct refresh_midi_devices;
 
 struct select_samplerate;
 struct select_period_size;

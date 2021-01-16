@@ -16,6 +16,7 @@
 #include <piejam/runtime/actions/load_app_config.h>
 #include <piejam/runtime/actions/load_session.h>
 #include <piejam/runtime/actions/refresh_devices.h>
+#include <piejam/runtime/actions/refresh_midi_devices.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/actions/save_session.h>
 #include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
@@ -33,6 +34,7 @@
 
 #include <QQuickStyle>
 #include <QStandardPaths>
+#include <QTimer>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
@@ -168,8 +170,15 @@ main(int argc, char* argv[]) -> int
     auto session_file = locs.home_dir / "last.pjs";
 
     store.dispatch(runtime::actions::refresh_devices{});
+    store.dispatch(runtime::actions::refresh_midi_devices{});
     store.dispatch(runtime::actions::load_app_config(config_file_path(locs)));
     store.dispatch(runtime::actions::load_session(session_file));
+
+    auto timer = new QTimer(&app);
+    QObject::connect(timer, &QTimer::timeout, [&store]() {
+        store.dispatch(runtime::actions::refresh_midi_devices{});
+    });
+    timer->start(std::chrono::seconds(1));
 
     auto const app_exec_result = app.exec();
 

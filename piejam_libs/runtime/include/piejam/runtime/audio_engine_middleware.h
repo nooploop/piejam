@@ -54,6 +54,8 @@ private:
     template <class Parameter>
     void process_engine_action(actions::set_parameter_value<Parameter> const&);
 
+    void refresh_midi_devices();
+
     void close_device();
     void open_device();
     void start_engine();
@@ -69,6 +71,7 @@ private:
     get_state_f m_get_state;
     next_f m_next;
 
+    std::unique_ptr<audio::midi_manager> m_midi_manager;
     std::unique_ptr<fx::ladspa_manager> m_ladspa_fx_manager;
 
     std::unique_ptr<audio_engine> m_engine;
