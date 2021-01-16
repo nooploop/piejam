@@ -63,6 +63,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/scan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_peak_meter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/midi_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pair.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_convert.h
@@ -106,6 +107,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/select_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/ladspa/plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/ladspa/scan.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/midi_manager.cpp
 )
 
 target_compile_options(piejam_audio PRIVATE -Wall -Wextra -Werror -pedantic-errors)
