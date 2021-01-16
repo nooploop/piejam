@@ -44,28 +44,28 @@ public:
         return u(*value);
     }
 
-    bool operator==(box const& r) const noexcept
+    bool operator==(box const& other) const noexcept
             requires std::equality_comparable<T>
     {
-        return m_value.get() == r.m_value.get() || get() == r.get();
+        return m_value.get() == other.m_value.get() || get() == other.get();
     }
 
-    bool operator==(box const& r) const noexcept
+    bool operator==(box const& other) const noexcept
             requires(!std::equality_comparable<T>)
     {
-        return m_value.get() == r.m_value.get();
+        return m_value.get() == other.m_value.get();
     }
 
-    bool operator!=(box const& r) const noexcept
+    bool operator!=(box const& other) const noexcept
             requires std::equality_comparable<T>
     {
-        return m_value.get() != r.m_value.get() && get() != r.get();
+        return m_value.get() != other.m_value.get() && get() != other.get();
     }
 
-    bool operator!=(box const& r) const noexcept
+    bool operator!=(box const& other) const noexcept
             requires(!std::equality_comparable<T>)
     {
-        return m_value.get() != r.m_value.get();
+        return m_value.get() != other.m_value.get();
     }
 
     bool eq(box const& other) const noexcept
@@ -75,7 +75,7 @@ public:
 
     bool neq(box const& other) const noexcept
     {
-        return m_value.get() == other.m_value.get();
+        return m_value.get() != other.m_value.get();
     }
 
 private:
