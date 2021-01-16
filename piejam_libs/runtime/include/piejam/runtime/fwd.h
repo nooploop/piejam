@@ -32,4 +32,6 @@ using parameter_processor_factory = processors::parameter_processor_factory<
         std::tuple<parameter::float_, parameter::int_, parameter::bool_>,
         std::tuple<parameter::stereo_level>>;
 
+struct midi_device_config;
+
 } // namespace piejam::runtime

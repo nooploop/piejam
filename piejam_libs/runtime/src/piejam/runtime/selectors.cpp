@@ -154,6 +154,51 @@ make_bus_channel_selector(
     __builtin_unreachable();
 }
 
+const selector<boxed_vector<audio::midi_device_id_t>> select_midi_input_devices(
+        [](state const& st) -> boxed_vector<audio::midi_device_id_t> {
+            return st.midi_inputs;
+        });
+
+static auto
+midi_device_name(
+        box<std::unordered_map<
+                audio::midi_device_id_t,
+                midi_device_config>> const& midi_devices,
+        audio::midi_device_id_t const device_id) -> boxed_string
+{
+    auto it = midi_devices->find(device_id);
+    return it != midi_devices->end() ? it->second.name : boxed_string();
+}
+
+auto
+make_midi_device_name_selector(audio::midi_device_id_t const device_id)
+        -> selector<boxed_string>
+{
+    return [device_id](state const& st) {
+        return midi_device_name(st.midi_devices, device_id);
+    };
+}
+
+static bool
+is_midi_device_enabled(
+        box<std::unordered_map<
+                audio::midi_device_id_t,
+                midi_device_config>> const& midi_devices,
+        audio::midi_device_id_t const device_id)
+{
+    auto it = midi_devices->find(device_id);
+    return it != midi_devices->end() && it->second.enabled;
+}
+
+auto
+make_midi_device_enabled_selector(audio::midi_device_id_t const device_id)
+        -> selector<bool>
+{
+    return [device_id](state const& st) {
+        return is_midi_device_enabled(st.midi_devices, device_id);
+    };
+}
+
 auto
 make_input_solo_selector(mixer::bus_id const bus_id) -> selector<bool>
 {

@@ -9,6 +9,7 @@
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/types.h>
 #include <piejam/box.h>
+#include <piejam/boxed_vector.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/io_direction.h>
 #include <piejam/npos.h>
@@ -17,6 +18,7 @@
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/fx/registry.h>
+#include <piejam/runtime/midi.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
@@ -29,10 +31,14 @@
 
 #include <functional>
 #include <span>
+#include <unordered_map>
 #include <vector>
 
 namespace piejam::runtime
 {
+
+using midi_devices_t =
+        std::unordered_map<audio::midi_device_id_t, midi_device_config>;
 
 struct state
 {
@@ -43,6 +49,9 @@ struct state
 
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
+
+    boxed_vector<audio::midi_device_id_t> midi_inputs;
+    box<midi_devices_t> midi_devices;
 
     parameter_maps params;
 
