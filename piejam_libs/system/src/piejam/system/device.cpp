@@ -93,4 +93,22 @@ device::read(std::span<std::byte> const& buffer) noexcept
     return static_cast<std::size_t>(res);
 }
 
+auto
+device::set_nonblock(bool const set) -> std::error_code
+{
+    int flags = ::fcntl(m_fd, F_GETFL);
+    if (-1 == flags)
+        return std::error_code(errno, std::generic_category());
+
+    if (set)
+        flags |= O_NONBLOCK;
+    else
+        flags &= ~O_NONBLOCK;
+
+    if (-1 == ::fcntl(m_fd, F_SETFL, flags))
+        return std::error_code(errno, std::generic_category());
+
+    return {};
+}
+
 } // namespace piejam::system

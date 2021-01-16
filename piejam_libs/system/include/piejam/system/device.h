@@ -42,6 +42,8 @@ public:
     [[nodiscard]] auto read(std::span<std::byte> const& buffer) noexcept
             -> outcome::std_result<std::size_t>;
 
+    [[nodiscard]] auto set_nonblock(bool set = true) -> std::error_code;
+
 private:
     [[nodiscard]] auto
     ioctl(unsigned long request, void* p, std::size_t size) noexcept
