@@ -117,8 +117,6 @@ public:
 
     Q_INVOKABLE virtual void changeSwitchValue(bool) = 0;
 
-    auto toQString() const -> QString { return m_name; }
-
 signals:
     void nameChanged();
     void valueChanged();

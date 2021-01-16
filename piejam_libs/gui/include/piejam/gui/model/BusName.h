@@ -28,8 +28,6 @@ public:
         }
     }
 
-    auto toQString() const -> QString { return m_name; }
-
 signals:
     void nameChanged();
 

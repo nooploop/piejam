@@ -37,8 +37,6 @@ public:
     {
         switch (role)
         {
-            case Qt::DisplayRole:
-                return QVariant::fromValue(m_list[index.row()]->toQString());
             case ItemRole:
                 return QVariant::fromValue(m_list[index.row()].get());
             default:

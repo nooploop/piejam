@@ -51,8 +51,6 @@ public:
 
     Q_INVOKABLE virtual void deleteBus() = 0;
 
-    auto toQString() const -> QString { return m_name; }
-
 signals:
 
     void nameChanged();

@@ -59,8 +59,6 @@ public:
     Q_INVOKABLE virtual void moveLeft() = 0;
     Q_INVOKABLE virtual void moveRight() = 0;
 
-    auto toQString() const -> QString { return m_name; }
-
 signals:
     void nameChanged();
     void canMoveLeftChanged();
