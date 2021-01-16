@@ -10,6 +10,7 @@ endif()
 add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/get_pcm_io_descriptors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/get_set_hw_params.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/midi.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_io.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_reader.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/alsa/pcm_writer.h
@@ -79,6 +80,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/types.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_pcm_io_descriptors.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_set_hw_params.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/midi.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/pcm_io.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/process_step.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/amplifier.cpp
