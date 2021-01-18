@@ -8,31 +8,36 @@ import QtQuick.Controls.Material 2.13
 import QtQuick.Layouts 1.13
 import QtQuick.VirtualKeyboard 2.13
 import QtQuick.VirtualKeyboard.Settings 2.13
+import QtQuick.Window 2
 
-ApplicationWindow {
+Window {
     id: root
 
     property var modelFactory
 
     width: 800
     height: 480
-    color: "#000000"
+    color: "#00000000"
     visible: true
 
     Material.theme: Material.Dark
     Material.primary: Material.Pink
     Material.accent: Material.Pink
 
-    header: ToolBar {
-        width: 800
-        height: 48
+    ToolBar {
+        id: toolBar
+
+        width: 48
+
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
         ToolButton {
             id: btnMixer
 
             icon.source: "qrc:///images/icons/mixer.png"
             display: AbstractButton.IconOnly
-            anchors.left: parent.left
 
             onClicked: { content.currentIndex = 2 }
         }
@@ -40,7 +45,8 @@ ApplicationWindow {
         ToolButton {
             id: btnInfo
 
-            anchors.right: btnAudioSettings.left
+            anchors.bottom: btnSettings.top
+
             icon.source: "qrc:///images/icons/ic_info_outline_white_18dp.png"
             display: AbstractButton.IconOnly
 
@@ -48,11 +54,12 @@ ApplicationWindow {
         }
 
         ToolButton {
-            id: btnAudioSettings
+            id: btnSettings
+
+            anchors.bottom: btnPower.top
 
             icon.source: "qrc:///images/icons/settings.png"
             display: AbstractButton.IconOnly
-            anchors.right: btnPower.left
 
             onClicked: { content.currentIndex = 1 }
         }
@@ -60,9 +67,10 @@ ApplicationWindow {
         ToolButton {
             id: btnPower
 
+            anchors.bottom: parent.bottom
+
             icon.source: "qrc:///images/icons/power.png"
             display: AbstractButton.IconOnly
-            anchors.right: parent.right
 
             onClicked: { content.currentIndex = 0 }
         }
@@ -70,6 +78,11 @@ ApplicationWindow {
 
     StackLayout {
         id: content
+
+        anchors.left: toolBar.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: statusBar.top
 
         currentIndex: 1
 
@@ -108,9 +121,38 @@ ApplicationWindow {
         }
     }
 
+    Item {
+        id: statusBar
+
+        height: 48
+
+        anchors.left: toolBar.right
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        Rectangle {
+            id: statusBarBackground
+
+            anchors.fill: parent
+
+            color: Material.color(Material.Grey, Material.Shade800)
+
+            Rectangle {
+                id: statusBarSeparator
+                height: 2
+                color: "#000000"
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+            }
+        }
+    }
+
     InputPanel {
         id: inputPanel
+
         y: Qt.inputMethod.visible ? parent.height - inputPanel.height : parent.height
+
         anchors.left: parent.left
         anchors.right: parent.right
     }

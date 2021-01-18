@@ -53,17 +53,25 @@ TopPane {
     }
 
     Frame {
-        x: 8
-        y: 56
-        width: 784
-        height: 366
+        id: frame
+
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.top: parent.top
+        anchors.topMargin: 56
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
 
         ListView {
             id: lstLog
-            x: 0
-            y: 24
-            width: 760
-            height: 318
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.topMargin: 24
+            anchors.bottom: parent.bottom
 
             clip: true
 

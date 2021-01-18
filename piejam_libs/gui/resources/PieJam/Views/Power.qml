@@ -9,8 +9,9 @@ TopPane {
     id: root
 
     Button {
-        x: 350
-        y: 170
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+
         text: "Shutdown"
 
         onClicked: Qt.quit()

@@ -35,11 +35,8 @@ TopPane {
 
         ListView {
             id: fxModules
-            x: 8
-            y: 8
-            width: 784
-            height: 416
 
+            anchors.fill: parent
             anchors.margins: 8
 
             model: root.model.modules

@@ -8,7 +8,7 @@ import QtQuick.Controls 2.13
 Pane {
     id: root
 
-    width: 800
+    width: 752
     height: 432
     padding: 0
 }
