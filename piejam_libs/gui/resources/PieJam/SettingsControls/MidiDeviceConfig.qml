@@ -15,35 +15,31 @@ Item {
     signal enabledToggled(bool newEnabled)
 
     implicitWidth: 192
-    implicitHeight: 48
+    implicitHeight: 64
+
+    Switch {
+        id: enableSwitch
+
+        width: 64
+        height: 32
+
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+
+        onClicked: enabledToggled(enableSwitch.checked)
+    }
 
     Label {
         id: nameLabel
 
         height: 32
 
-        anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.right: enableSwitch.left
-        anchors.top: parent.top
-        anchors.topMargin: 8
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: enableSwitch.right
+        anchors.right: parent.right
 
         verticalAlignment: Text.AlignVCenter
         font.bold: true
         font.pixelSize: 16
-    }
-
-    Switch {
-        id: enableSwitch
-
-        width: 72
-        height: 32
-
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        anchors.top: parent.top
-        anchors.topMargin: 8
-
-        onClicked: enabledToggled(enableSwitch.checked)
     }
 }
