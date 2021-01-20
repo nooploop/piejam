@@ -22,16 +22,46 @@ class Info : public SubscribableModel
     Q_PROPERTY(double audioLoad READ audioLoad NOTIFY audioLoadChanged FINAL)
     Q_PROPERTY(unsigned xruns READ xruns NOTIFY xrunsChanged FINAL)
     Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
+    Q_PROPERTY(QString infoMessage READ infoMessage WRITE setInfoMessage NOTIFY
+                       infoMessageChanged FINAL)
 
 public:
     auto audioLoad() const noexcept -> double { return m_audioLoad; }
-    void setAudioLoad(double);
+    void setAudioLoad(double audioLoad)
+    {
+        if (std::abs(m_audioLoad - audioLoad) > 1.e-3)
+        {
+            m_audioLoad = audioLoad;
+            emit audioLoadChanged();
+        }
+    }
 
     auto xruns() const noexcept -> unsigned { return m_xruns; }
-    void setXRuns(unsigned xruns);
+    void setXRuns(unsigned xruns)
+    {
+        if (m_xruns != xruns)
+        {
+            m_xruns = xruns;
+            emit xrunsChanged();
+        }
+    }
 
-    auto logData() const noexcept -> QStringList { return m_logData; }
-    void addLogMessage(QString const&);
+    auto logData() const -> QStringList { return m_logData; }
+    void addLogMessage(QString const& msg)
+    {
+        m_logData.push_back(msg);
+        emit logDataChanged();
+    }
+
+    auto infoMessage() const -> QString { return m_infoMessage; }
+    void setInfoMessage(QString const& msg)
+    {
+        if (m_infoMessage != msg)
+        {
+            m_infoMessage = msg;
+            emit infoMessageChanged();
+        }
+    }
 
     virtual Q_INVOKABLE void requestUpdate() = 0;
 
@@ -40,11 +70,13 @@ signals:
     void audioLoadChanged();
     void xrunsChanged();
     void logDataChanged();
+    void infoMessageChanged();
 
 private:
     double m_audioLoad{};
     unsigned m_xruns{};
     QStringList m_logData;
+    QString m_infoMessage;
 };
 
 } // namespace piejam::gui::model

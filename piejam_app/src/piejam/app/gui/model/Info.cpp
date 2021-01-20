@@ -23,10 +23,12 @@ Info::Info(
     spdlog::default_logger()->sinks().push_back(
             std::make_shared<log::generic_log_sink_mt>(
                     [this](spdlog::details::log_msg const& msg) {
-                        addLogMessage(QString::fromStdString(fmt::format(
+                        auto qtMsg = QString::fromStdString(fmt::format(
                                 "[{}] {}",
                                 spdlog::level::to_string_view(msg.level),
-                                msg.payload)));
+                                msg.payload));
+                        addLogMessage(qtMsg);
+                        setInfoMessage(qtMsg);
                     },
                     []() {}));
 }
