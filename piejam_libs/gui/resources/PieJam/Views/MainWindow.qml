@@ -43,17 +43,6 @@ Window {
         }
 
         ToolButton {
-            id: btnInfo
-
-            anchors.bottom: btnSettings.top
-
-            icon.source: "qrc:///images/icons/ic_info_outline_white_18dp.png"
-            display: AbstractButton.IconOnly
-
-            onClicked: { content.currentIndex = 3 }
-        }
-
-        ToolButton {
             id: btnSettings
 
             anchors.bottom: btnPower.top
@@ -81,8 +70,8 @@ Window {
 
         anchors.left: toolBar.right
         anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: statusBar.top
+        anchors.top: statusBar.bottom
+        anchors.bottom: parent.bottom
 
         currentIndex: 1
 
@@ -104,13 +93,7 @@ Window {
 
             model: root.modelFactory.mixer
 
-            onFxButtonClicked: content.currentIndex = 4
-        }
-
-        Info {
-            id: infoPane
-
-            model: root.modelFactory.info
+            onFxButtonClicked: content.currentIndex = 3
         }
 
         FxChain {
@@ -121,30 +104,24 @@ Window {
         }
     }
 
-    Item {
+    StatusBar {
         id: statusBar
-
-        height: 48
 
         anchors.left: toolBar.right
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.top: parent.top
+
+        model: root.modelFactory.info
 
         Rectangle {
-            id: statusBarBackground
+            id: statusBarSeparator
 
-            anchors.fill: parent
+            height: 2
+            color: "#000000"
 
-            color: Material.color(Material.Grey, Material.Shade800)
-
-            Rectangle {
-                id: statusBarSeparator
-                height: 2
-                color: "#000000"
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-            }
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
         }
     }
 

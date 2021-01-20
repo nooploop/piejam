@@ -47,5 +47,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <file>PieJam/SettingsControls/AudioSettings.qml</file>
         <file>PieJam/SettingsControls/MidiSettings.qml</file>
         <file>PieJam/SettingsControls/MidiDeviceConfig.qml</file>
+        <file>PieJam/Views/StatusBar.qml</file>
     </qresource>
 </RCC>
