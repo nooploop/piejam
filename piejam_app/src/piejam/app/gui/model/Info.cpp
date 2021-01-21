@@ -28,7 +28,6 @@ Info::Info(
                                 spdlog::level::to_string_view(msg.level),
                                 msg.payload));
                         addLogMessage(qtMsg);
-                        setInfoMessage(qtMsg);
                     },
                     []() {}));
 }

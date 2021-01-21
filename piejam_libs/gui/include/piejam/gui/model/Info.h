@@ -22,8 +22,8 @@ class Info : public SubscribableModel
     Q_PROPERTY(double audioLoad READ audioLoad NOTIFY audioLoadChanged FINAL)
     Q_PROPERTY(unsigned xruns READ xruns NOTIFY xrunsChanged FINAL)
     Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
-    Q_PROPERTY(QString infoMessage READ infoMessage WRITE setInfoMessage NOTIFY
-                       infoMessageChanged FINAL)
+    Q_PROPERTY(
+            QString logMessage READ logMessage NOTIFY logMessageChanged FINAL)
 
 public:
     auto audioLoad() const noexcept -> double { return m_audioLoad; }
@@ -51,17 +51,15 @@ public:
     {
         m_logData.push_back(msg);
         emit logDataChanged();
-    }
 
-    auto infoMessage() const -> QString { return m_infoMessage; }
-    void setInfoMessage(QString const& msg)
-    {
-        if (m_infoMessage != msg)
+        if (m_logMessage != msg)
         {
-            m_infoMessage = msg;
-            emit infoMessageChanged();
+            m_logMessage = msg;
+            emit logMessageChanged();
         }
     }
+
+    auto logMessage() const -> QString { return m_logMessage; }
 
     virtual Q_INVOKABLE void requestUpdate() = 0;
 
@@ -70,13 +68,13 @@ signals:
     void audioLoadChanged();
     void xrunsChanged();
     void logDataChanged();
-    void infoMessageChanged();
+    void logMessageChanged();
 
 private:
     double m_audioLoad{};
     unsigned m_xruns{};
     QStringList m_logData;
-    QString m_infoMessage;
+    QString m_logMessage;
 };
 
 } // namespace piejam::gui::model

@@ -40,6 +40,7 @@ TopPane {
                 anchors.top: if (parent) parent.top
                 anchors.bottom: if (parent) parent.bottom
 
+                mono: model.item.mono
                 levelLeft: model.item.levelLeft
                 levelRight: model.item.levelRight
                 meterMuted: (model.item.mute && !model.item.solo) || (root.model.inputSoloActive && !model.item.solo)

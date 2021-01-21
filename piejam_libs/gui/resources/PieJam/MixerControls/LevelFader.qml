@@ -6,6 +6,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 
+import ".."
 import "../Controls/Color.js" as ColorUtil
 import "../Util/DbConvert.js" as DbConvert
 import "../Util/MathExt.js" as MathExt
@@ -60,6 +61,7 @@ Item {
         onMoved: {
             var newVolume = dbScale.scaleData.dbAt(MathExt.mapTo(slider.value, 0, 1, privates.minPos, privates.maxPos))
             root.moved(DbConvert.dbToLin(newVolume))
+            Info.quickTip = "<b>Volume:</b> " + newVolume.toFixed(1) + " dB"
         }
 
         QtObject {

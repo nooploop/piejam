@@ -14,6 +14,7 @@ class MixerChannel : public SubscribableModel
     Q_OBJECT
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
+    Q_PROPERTY(bool mono READ mono NOTIFY monoChanged FINAL)
     Q_PROPERTY(double volume READ volume NOTIFY volumeChanged FINAL)
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
@@ -26,6 +27,16 @@ public:
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const&);
+
+    auto mono() const noexcept -> bool { return m_mono; }
+    void setMono(bool x)
+    {
+        if (m_mono != x)
+        {
+            m_mono = x;
+            emit monoChanged();
+        }
+    }
 
     auto volume() const noexcept -> double { return m_volume; }
     void setVolume(double);
@@ -51,6 +62,7 @@ public:
 signals:
 
     void nameChanged();
+    void monoChanged();
     void volumeChanged();
     void levelLeftChanged();
     void levelRightChanged();
@@ -60,6 +72,7 @@ signals:
 
 private:
     QString m_name;
+    bool m_mono{};
     double m_volume{1.};
     double m_levelLeft{};
     double m_levelRight{};

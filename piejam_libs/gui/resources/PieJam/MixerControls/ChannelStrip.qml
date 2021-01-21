@@ -7,10 +7,12 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 import QtQuick.Layouts 1.13
 
+import ".."
 import "../Controls"
 
 Item {
     property alias name: title.text
+    property bool mono: false
     property alias levelLeft: levelMeterFader.levelLeft
     property alias levelRight: levelMeterFader.levelRight
     property alias meterMuted: levelMeterFader.muted
@@ -54,7 +56,11 @@ Item {
             anchors.left: parent.left
             anchors.top: title.bottom
 
-            onMoved: root.panMoved(panControls.value)
+            onMoved: {
+                root.panMoved(panControls.value)
+                Info.quickTip =
+                        (root.mono ? "<b>Pan:</b> " : "<b>Balance:</b> ") + panControls.value.toFixed(2)
+            }
         }
 
         LevelMeterFader {

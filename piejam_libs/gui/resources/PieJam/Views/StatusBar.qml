@@ -6,6 +6,8 @@ import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 
+import ".."
+
 Item {
     id: root
 
@@ -22,7 +24,7 @@ Item {
         color: Material.color(Material.Grey, Material.Shade800)
 
         Label {
-            id: logLabel
+            id: infoMessageLabel
 
             anchors.left: parent.left
             anchors.right: audioLoadLabel.left
@@ -31,12 +33,13 @@ Item {
             anchors.margins: 6
 
             wrapMode: Text.WordWrap
+            textFormat: Text.RichText
             clip: true
 
             padding: 2
             leftPadding: 4
             rightPadding: 4
-            text: root.model.infoMessage
+            text: Info.message
 
             background: Rectangle {
                 color: Material.background
@@ -97,5 +100,12 @@ Item {
         target: root.model
         property: "subscribed"
         value: root.visible
+    }
+
+    Binding {
+        when: root.model
+        target: Info
+        property: "logMessage"
+        value: root.model.logMessage
     }
 }

@@ -7,6 +7,7 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 import QtQuick.Layouts 1.13
 
+import ".."
 import "../Controls"
 
 Item {
@@ -92,13 +93,19 @@ Item {
 
                 orientation: Qt.Vertical
 
-                onMoved: sliderMoved(valueSlider.value)
+                onMoved: {
+                    sliderMoved(valueSlider.value)
+                    Info.quickTip = "<b>" + root.name + "</b>: " + root.valueText
+                }
             }
 
             Switch {
                 id: toggleSwitch
 
-                onToggled: root.switchToggled(toggleSwitch.checked)
+                onToggled: {
+                    root.switchToggled(toggleSwitch.checked)
+                    Info.quickTip = "<b>" + root.name + "</b>: " + (root.switchValue ? "on" : "off")
+                }
             }
         }
     }
