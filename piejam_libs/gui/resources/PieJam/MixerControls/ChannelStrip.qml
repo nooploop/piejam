@@ -61,6 +61,14 @@ Item {
                 Info.quickTip =
                         (root.mono ? "<b>Pan:</b> " : "<b>Balance:</b> ") + panControls.value.toFixed(2)
             }
+
+            MidiAssignArea {
+                id: midiAssignPan
+
+                anchors.fill: parent
+                anchors.topMargin: 1
+                anchors.bottomMargin: 1
+            }
         }
 
         LevelMeterFader {

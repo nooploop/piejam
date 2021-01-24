@@ -4,3 +4,4 @@
 
 module PieJam
 singleton Info 1.0 Info.qml
+singleton MidiLearn 1.0 MidiLearn.qml

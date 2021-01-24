@@ -27,7 +27,7 @@ Item {
             id: infoMessageLabel
 
             anchors.left: parent.left
-            anchors.right: audioLoadLabel.left
+            anchors.right: midiLearn.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.margins: 6
@@ -44,6 +44,24 @@ Item {
             background: Rectangle {
                 color: Material.background
                 radius: 4
+            }
+        }
+
+        Button {
+            id: midiLearn
+
+            width: 38
+
+            anchors.right: audioLoadLabel.left
+            checkable: true
+            anchors.rightMargin: 6
+
+            text: qsTr("M")
+
+            Binding {
+                target: MidiLearn
+                property: "active"
+                value: midiLearn.checked
             }
         }
 
@@ -86,6 +104,7 @@ Item {
                 text: root.model.xruns
             }
         }
+
     }
 
     Timer {

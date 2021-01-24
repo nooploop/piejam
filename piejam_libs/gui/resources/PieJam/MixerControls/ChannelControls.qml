@@ -7,6 +7,8 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 import QtQuick.Layouts 1.12
 
+import "../Controls"
+
 Item {
     id: root
 
@@ -30,6 +32,14 @@ Item {
         Material.accent: Material.Yellow
 
         onToggled: root.soloToggled()
+
+        MidiAssignArea {
+            id: midiAssignSolo
+
+            anchors.fill: parent
+            anchors.topMargin: 1
+            anchors.bottomMargin: 1
+        }
     }
 
     Button {
@@ -42,5 +52,13 @@ Item {
         checkable: true
 
         onToggled: root.muteToggled()
+
+        MidiAssignArea {
+            id: midiAssignMute
+
+            anchors.fill: parent
+            anchors.topMargin: 1
+            anchors.bottomMargin: 1
+        }
     }
 }

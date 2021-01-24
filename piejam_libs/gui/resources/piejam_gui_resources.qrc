@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2020 Dimitrij Kotrev
-
-SPDX-License-Identifier: GPL-3.0-or-later
--->
-
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
@@ -49,5 +43,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <file>PieJam/Views/StatusBar.qml</file>
         <file>PieJam/Info.qml</file>
         <file>PieJam/qmldir</file>
+        <file>PieJam/MidiLearn.qml</file>
+        <file>PieJam/Controls/MidiAssignArea.qml</file>
+        <file>PieJam/MidiAssignable.qml</file>
     </qresource>
 </RCC>
