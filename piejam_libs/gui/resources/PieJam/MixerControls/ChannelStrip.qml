@@ -22,6 +22,8 @@ Item {
     property alias solo: channelControls.solo
     property alias soloEnabled: channelControls.soloEnabled
 
+    property alias volumeMidi: levelMeterFader.volumeMidi
+
     signal faderMoved(real newVolume)
     signal panMoved(real newPan)
     signal muteToggled()

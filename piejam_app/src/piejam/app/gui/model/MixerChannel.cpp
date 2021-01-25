@@ -4,6 +4,7 @@
 
 #include <piejam/app/gui/model/MixerChannel.h>
 
+#include <piejam/app/gui/model/MidiAssignable.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
@@ -29,8 +30,14 @@ MixerChannel::MixerChannel(
     , m_pan_balance(pan_balance)
     , m_mute(mute)
     , m_level(level)
+    , m_volumeMidi(std::make_unique<MidiAssignable>(
+              store_dispatch,
+              state_change_subscriber,
+              volume))
 {
 }
+
+MixerChannel::~MixerChannel() = default;
 
 void
 MixerChannel::onSubscribe()
@@ -92,6 +99,12 @@ MixerChannel::focusFxChain()
     runtime::actions::select_fx_chain_bus action;
     action.bus_id = m_bus_id;
     dispatch(action);
+}
+
+auto
+MixerChannel::volumeMidi() const -> piejam::gui::model::MidiAssignable*
+{
+    return m_volumeMidi.get();
 }
 
 } // namespace piejam::app::gui::model

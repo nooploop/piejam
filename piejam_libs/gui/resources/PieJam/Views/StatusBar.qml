@@ -127,4 +127,13 @@ Item {
         property: "logMessage"
         value: root.model.logMessage
     }
+
+    Connections {
+        target: root.model
+
+        function onMidiLearnChanged() {
+            if (!root.model.midiLearn)
+                MidiLearn.stop()
+        }
+    }
 }

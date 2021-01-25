@@ -16,6 +16,8 @@ Item {
     property alias volume: fader.volume
     property alias muted: meter.muted
 
+    property alias volumeMidi: midiAssign
+
     signal faderMoved(real newVolume)
 
     width: 142

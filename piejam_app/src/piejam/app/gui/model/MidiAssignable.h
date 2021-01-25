@@ -6,26 +6,28 @@
 
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/audio/midi_device_id.h>
-#include <piejam/gui/model/MidiDeviceConfig.h>
+#include <piejam/gui/model/MidiAssignable.h>
+#include <piejam/runtime/midi_assignment_id.h>
 
 namespace piejam::app::gui::model
 {
 
-class MidiDeviceConfig final
-    : public Subscribable<piejam::gui::model::MidiDeviceConfig>
+class MidiAssignable final
+    : public Subscribable<piejam::gui::model::MidiAssignable>
 {
 public:
-    MidiDeviceConfig(
+    MidiAssignable(
             runtime::store_dispatch,
             runtime::subscriber&,
-            audio::midi_device_id_t device_id);
+            runtime::midi_assignment_id const&);
 
-    void changeEnabled(bool x) override;
+    void startLearn() override;
+    void stopLearn() override;
 
 private:
     void onSubscribe() override;
 
-    audio::midi_device_id_t m_device_id;
+    runtime::midi_assignment_id m_assignment_id;
 };
 
 } // namespace piejam::app::gui::model

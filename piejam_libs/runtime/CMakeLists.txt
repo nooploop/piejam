@@ -7,6 +7,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_session.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/control_midi_assignment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/deactivate_midi_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_fx_module.h
@@ -64,6 +65,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/unavailable_ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi_assignment.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi_assignment_id.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/open_alsa_device.h
@@ -107,6 +110,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_session.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/control_midi_assignment.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/deactivate_midi_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_fx_module.cpp
@@ -146,6 +150,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/parameter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_assignment_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/open_alsa_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp

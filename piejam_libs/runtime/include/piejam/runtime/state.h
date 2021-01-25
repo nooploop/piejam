@@ -19,6 +19,7 @@
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/midi.h>
+#include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
@@ -30,6 +31,7 @@
 #include <piejam/runtime/selected_device.h>
 
 #include <functional>
+#include <optional>
 #include <span>
 #include <unordered_map>
 #include <vector>
@@ -65,6 +67,9 @@ struct state
     mixer::state mixer_state{};
 
     mixer::bus_id fx_chain_bus{};
+
+    box<midi_assignments_map> midi_assignments;
+    std::optional<midi_assignment_id> midi_learning{};
 
     std::size_t xruns{};
     float cpu_load{};

@@ -26,7 +26,9 @@ struct engine_action_visitor
               request_info_update,
               load_ladspa_fx_plugin,
               move_fx_module_left,
-              move_fx_module_right>
+              move_fx_module_right,
+              start_midi_learning,
+              stop_midi_learning>
 {
 };
 

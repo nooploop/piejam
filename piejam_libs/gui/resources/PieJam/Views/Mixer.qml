@@ -6,6 +6,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
+import ".."
 import "../MixerControls"
 
 TopPane {
@@ -50,6 +51,10 @@ TopPane {
                 solo: model.item.solo
                 name: model.item.name
 
+                volumeMidi.assignment: model.item.volumeMidi.assignment
+                volumeMidi.onMidiLearnStarted: model.item.volumeMidi.startLearn()
+                volumeMidi.onMidiLearnStopped: model.item.volumeMidi.stopLearn()
+
                 onFaderMoved: model.item.changeVolume(newVolume)
                 onPanMoved: model.item.changePanBalance(newPan)
                 onMuteToggled: model.item.changeMute(!model.item.mute)
@@ -63,6 +68,12 @@ TopPane {
                     target: model.item
                     property: "subscribed"
                     value: visible
+                }
+
+                Binding {
+                    target: model.item.volumeMidi
+                    property: "subscribed"
+                    value: visible && MidiLearn.active
                 }
             }
         }

@@ -17,11 +17,13 @@
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/midi_assignment_id.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/stereo_level.h>
 
 #include <cstddef>
+#include <optional>
 
 namespace piejam::runtime::selectors
 {
@@ -119,6 +121,9 @@ auto make_int_parameter_max_selector(int_parameter_id) -> selector<int>;
 
 auto make_level_parameter_value_selector(stereo_level_parameter_id)
         -> selector<stereo_level>;
+
+auto make_midi_assignment_selector(midi_assignment_id)
+        -> selector<std::optional<midi_assignment>>;
 
 extern const selector<fx::registry> select_fx_registry;
 

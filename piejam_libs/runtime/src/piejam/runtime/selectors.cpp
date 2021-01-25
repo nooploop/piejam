@@ -417,6 +417,18 @@ make_level_parameter_value_selector(stereo_level_parameter_id const param_id)
     };
 }
 
+auto
+make_midi_assignment_selector(midi_assignment_id const id)
+        -> selector<std::optional<midi_assignment>>
+{
+    return [id](state const& st) -> std::optional<midi_assignment> {
+        auto it = st.midi_assignments->find(id);
+        return it != st.midi_assignments->end()
+                       ? it->second
+                       : std::optional<midi_assignment>{};
+    };
+}
+
 const selector<fx::registry> select_fx_registry([](state const& st) {
     return st.fx_registry;
 });

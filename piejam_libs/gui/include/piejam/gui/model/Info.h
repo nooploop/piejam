@@ -21,6 +21,7 @@ class Info : public SubscribableModel
 
     Q_PROPERTY(double audioLoad READ audioLoad NOTIFY audioLoadChanged FINAL)
     Q_PROPERTY(unsigned xruns READ xruns NOTIFY xrunsChanged FINAL)
+    Q_PROPERTY(bool midiLearn READ midiLearn NOTIFY midiLearnChanged FINAL)
     Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
     Q_PROPERTY(
             QString logMessage READ logMessage NOTIFY logMessageChanged FINAL)
@@ -46,6 +47,16 @@ public:
         }
     }
 
+    auto midiLearn() const noexcept -> bool { return m_midiLearn; }
+    void setMidiLearn(bool x)
+    {
+        if (m_midiLearn != x)
+        {
+            m_midiLearn = x;
+            emit midiLearnChanged();
+        }
+    }
+
     auto logData() const -> QStringList { return m_logData; }
     void addLogMessage(QString const& msg)
     {
@@ -67,12 +78,14 @@ signals:
 
     void audioLoadChanged();
     void xrunsChanged();
+    void midiLearnChanged();
     void logDataChanged();
     void logMessageChanged();
 
 private:
     double m_audioLoad{};
     unsigned m_xruns{};
+    bool m_midiLearn{};
     QStringList m_logData;
     QString m_logMessage;
 };

@@ -17,6 +17,7 @@
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/apply_app_config.h>
+#include <piejam/runtime/actions/control_midi_assignment.h>
 #include <piejam/runtime/actions/deactivate_midi_device.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>

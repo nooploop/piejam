@@ -9,8 +9,12 @@
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 
+#include <memory>
+
 namespace piejam::app::gui::model
 {
+
+class MidiAssignable;
 
 class MixerChannel final : public Subscribable<piejam::gui::model::MixerChannel>
 {
@@ -23,11 +27,14 @@ public:
             runtime::float_parameter_id pan_balance,
             runtime::bool_parameter_id mute,
             runtime::stereo_level_parameter_id level);
+    ~MixerChannel();
 
     void changeVolume(double) override;
     void changePanBalance(double) override;
     void changeMute(bool) override;
     void focusFxChain() override;
+
+    auto volumeMidi() const -> piejam::gui::model::MidiAssignable* override;
 
 private:
     void onSubscribe() override;
@@ -37,6 +44,8 @@ private:
     runtime::float_parameter_id m_pan_balance;
     runtime::bool_parameter_id m_mute;
     runtime::stereo_level_parameter_id m_level;
+
+    std::unique_ptr<MidiAssignable> m_volumeMidi;
 };
 
 } // namespace piejam::app::gui::model

@@ -36,6 +36,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/GenericListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Info.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MidiAssignable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MidiDeviceConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MidiInputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Mixer.h

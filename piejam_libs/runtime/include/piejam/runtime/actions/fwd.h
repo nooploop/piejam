@@ -55,6 +55,9 @@ struct load_ladspa_fx_plugin;
 struct move_fx_module_left;
 struct move_fx_module_right;
 
+struct start_midi_learning;
+struct stop_midi_learning;
+
 struct load_app_config;
 struct save_app_config;
 struct load_session;

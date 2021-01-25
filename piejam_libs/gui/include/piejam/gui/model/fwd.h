@@ -41,4 +41,6 @@ using MidiDeviceList = GenericListModel<MidiDeviceConfig>;
 
 class MidiInputSettings;
 
+class MidiAssignable;
+
 } // namespace piejam::gui::model

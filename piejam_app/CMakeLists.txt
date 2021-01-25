@@ -43,6 +43,8 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MidiAssignable.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MidiAssignable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MidiDeviceConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MidiDeviceConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MidiInputSettings.cpp
