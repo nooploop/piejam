@@ -5,10 +5,10 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/audio/midi_device_id.h>
 #include <piejam/audio/types.h>
 #include <piejam/boxed_vector.h>
 #include <piejam/gui/model/MidiInputSettings.h>
+#include <piejam/midi/device_id.h>
 
 namespace piejam::app::gui::model
 {
@@ -22,7 +22,7 @@ public:
 private:
     void onSubscribe() override;
 
-    boxed_vector<audio::midi_device_id_t> m_devices;
+    boxed_vector<midi::device_id_t> m_devices;
 };
 
 } // namespace piejam::app::gui::model

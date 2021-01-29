@@ -40,7 +40,7 @@ namespace piejam::runtime
 {
 
 using midi_devices_t =
-        std::unordered_map<audio::midi_device_id_t, midi_device_config>;
+        std::unordered_map<midi::device_id_t, midi_device_config>;
 
 struct state
 {
@@ -52,7 +52,7 @@ struct state
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
 
-    boxed_vector<audio::midi_device_id_t> midi_inputs;
+    boxed_vector<midi::device_id_t> midi_inputs;
     box<midi_devices_t> midi_devices;
 
     parameter_maps params;

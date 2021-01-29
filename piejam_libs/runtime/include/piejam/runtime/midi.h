@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <piejam/audio/midi_device_id.h>
 #include <piejam/boxed_string.h>
 #include <piejam/entity_id.h>
+#include <piejam/midi/device_id.h>
 
 namespace piejam::runtime
 {

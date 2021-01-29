@@ -17,4 +17,12 @@ contains(Range const& rng, T&& value) -> bool
     return std::ranges::find(rng, std::forward<T>(value)) != std::end(rng);
 }
 
+template <class Range, class Predicate>
+auto
+contains_if(Range const& rng, Predicate&& p) -> bool
+{
+    return std::ranges::find_if(rng, std::forward<Predicate>(p)) !=
+           std::end(rng);
+}
+
 } // namespace piejam::algorithm

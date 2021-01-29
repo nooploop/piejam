@@ -14,7 +14,7 @@ namespace piejam::app::gui::model
 MidiDeviceConfig::MidiDeviceConfig(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        audio::midi_device_id_t device_id)
+        midi::device_id_t device_id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_device_id(device_id)
 {

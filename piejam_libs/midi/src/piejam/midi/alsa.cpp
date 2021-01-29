@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/alsa/midi.h>
+#include "alsa.h"
 
 #include <spdlog/spdlog.h>
 
@@ -12,7 +12,7 @@
 
 #include <algorithm>
 
-namespace piejam::audio::alsa
+namespace piejam::midi::alsa
 {
 
 namespace
@@ -291,4 +291,4 @@ midi_devices::update() -> std::vector<midi_device_update>
     return result;
 }
 
-} // namespace piejam::audio::alsa
+} // namespace piejam::midi::alsa

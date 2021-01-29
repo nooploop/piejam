@@ -6,8 +6,9 @@
 
 #include <piejam/fwd.h>
 
-namespace piejam::audio {
+namespace piejam::midi
+{
 
-using midi_device_id_t = entity_id<struct midi_device_id_tag>;
+using device_id_t = entity_id<struct device_id_tag>;
 
-} // namespace piejam::audio
+} // namespace piejam::midi

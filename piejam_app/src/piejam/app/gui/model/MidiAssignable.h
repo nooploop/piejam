@@ -5,7 +5,6 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/audio/midi_device_id.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/runtime/midi_assignment_id.h>
 

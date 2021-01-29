@@ -6,6 +6,7 @@
 
 #include <piejam/audio/device.h>
 #include <piejam/audio/fwd.h>
+#include <piejam/midi/fwd.h>
 #include <piejam/redux/functors.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
@@ -71,7 +72,7 @@ private:
     get_state_f m_get_state;
     next_f m_next;
 
-    std::unique_ptr<audio::midi_manager> m_midi_manager;
+    std::unique_ptr<midi::midi_manager> m_midi_manager;
     std::unique_ptr<fx::ladspa_manager> m_ladspa_fx_manager;
 
     std::unique_ptr<audio_engine> m_engine;

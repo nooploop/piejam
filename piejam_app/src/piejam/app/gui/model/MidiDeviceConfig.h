@@ -5,8 +5,8 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/audio/midi_device_id.h>
 #include <piejam/gui/model/MidiDeviceConfig.h>
+#include <piejam/midi/device_id.h>
 
 namespace piejam::app::gui::model
 {
@@ -18,14 +18,14 @@ public:
     MidiDeviceConfig(
             runtime::store_dispatch,
             runtime::subscriber&,
-            audio::midi_device_id_t device_id);
+            midi::device_id_t device_id);
 
     void changeEnabled(bool x) override;
 
 private:
     void onSubscribe() override;
 
-    audio::midi_device_id_t m_device_id;
+    midi::device_id_t m_device_id;
 };
 
 } // namespace piejam::app::gui::model

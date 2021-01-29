@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/audio/midi_device_id.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
@@ -14,6 +13,7 @@
 #include <piejam/boxed_vector.h>
 #include <piejam/entity_id.h>
 #include <piejam/io_direction.h>
+#include <piejam/midi/device_id.h>
 #include <piejam/reselect/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -78,13 +78,13 @@ auto make_bus_type_selector(mixer::bus_id) -> selector<audio::bus_type>;
 auto make_bus_channel_selector(mixer::bus_id, audio::bus_channel)
         -> selector<std::size_t>;
 
-extern const selector<boxed_vector<audio::midi_device_id_t>>
+extern const selector<boxed_vector<midi::device_id_t>>
         select_midi_input_devices;
 
-auto make_midi_device_name_selector(audio::midi_device_id_t)
+auto make_midi_device_name_selector(midi::device_id_t)
         -> selector<boxed_string>;
 
-auto make_midi_device_enabled_selector(audio::midi_device_id_t)
+auto make_midi_device_enabled_selector(midi::device_id_t)
         -> selector<bool>;
 
 auto make_bus_level_selector(mixer::bus_id) -> selector<stereo_level>;

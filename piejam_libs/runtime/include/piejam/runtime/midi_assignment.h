@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/entity_id.h>
+#include <piejam/midi/device_id.h>
 #include <piejam/runtime/midi_assignment_id.h>
 #include <piejam/runtime/parameters.h>
 
@@ -14,6 +16,10 @@ namespace piejam::runtime
 
 struct midi_assignment
 {
+    midi::device_id_t device_id;
+
+    std::size_t channel{};
+
     enum class type
     {
         cc,
@@ -24,7 +30,8 @@ struct midi_assignment
 
     constexpr bool operator==(midi_assignment const& other) const noexcept
     {
-        return control_type == other.control_type &&
+        return device_id == other.device_id && channel == other.channel &&
+               control_type == other.control_type &&
                control_id == other.control_id;
     }
 

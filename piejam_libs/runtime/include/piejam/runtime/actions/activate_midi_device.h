@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <piejam/audio/midi_device_id.h>
 #include <piejam/entity_id.h>
+#include <piejam/midi/device_id.h>
 #include <piejam/runtime/actions/device_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -17,7 +17,7 @@ struct activate_midi_device final
     : ui::cloneable_action<activate_midi_device, action>
     , visitable_device_action<activate_midi_device>
 {
-    audio::midi_device_id_t device_id;
+    midi::device_id_t device_id;
 
     auto reduce(state const&) const -> state override;
 };

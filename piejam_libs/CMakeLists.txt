@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: CC0-1.0
 
 add_subdirectory(algorithm)
+add_subdirectory(system)
 add_subdirectory(audio)
+add_subdirectory(midi)
 add_subdirectory(base)
 add_subdirectory(container)
 add_subdirectory(functional)
 add_subdirectory(gui)
-add_subdirectory(system)
 add_subdirectory(log)
 add_subdirectory(numeric)
 add_subdirectory(range)

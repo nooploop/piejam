@@ -10,7 +10,7 @@
 #include <variant>
 #include <vector>
 
-namespace piejam::audio::alsa
+namespace piejam::midi::alsa
 {
 
 using midi_client_id_t = int;
@@ -99,4 +99,4 @@ private:
     std::vector<midi_device_update> m_initial_updates;
 };
 
-} // namespace piejam::audio::alsa
+} // namespace piejam::midi::alsa

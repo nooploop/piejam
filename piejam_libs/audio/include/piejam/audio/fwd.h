@@ -21,6 +21,4 @@ struct pcm_process_config;
 template <class T>
 struct pair;
 
-class midi_manager;
-
 } // namespace piejam::audio

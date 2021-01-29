@@ -11,9 +11,9 @@
 #include <piejam/audio/ladspa/plugin.h>
 #include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
-#include <piejam/audio/midi_manager.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
+#include <piejam/midi/manager.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/apply_app_config.h>
@@ -179,16 +179,16 @@ using select_output_device = select_device<io_direction::output>;
 struct update_midi_devices final
     : ui::cloneable_action<update_midi_devices, action>
 {
-    std::vector<audio::midi_device_update> updates;
+    std::vector<midi::device_update> updates;
 
     struct midi_device_update_handler
     {
         midi_devices_t& midi_devices;
-        std::vector<audio::midi_device_id_t>& midi_inputs;
+        std::vector<midi::device_id_t>& midi_inputs;
 
         void operator()(std::nullptr_t) const {}
 
-        void operator()(audio::midi_device_added const& op) const
+        void operator()(midi::device_added const& op) const
         {
             midi_devices.emplace(
                     op.device_id,
@@ -196,7 +196,7 @@ struct update_midi_devices final
             midi_inputs.emplace_back(op.device_id);
         }
 
-        void operator()(audio::midi_device_removed const& op) const
+        void operator()(midi::device_removed const& op) const
         {
             midi_devices.erase(op.device_id);
             boost::remove_erase(midi_inputs, op.device_id);
@@ -322,7 +322,7 @@ audio_engine_middleware::audio_engine_middleware(
     , m_device_factory(std::move(device_factory))
     , m_get_state(std::move(get_state))
     , m_next(std::move(next))
-    , m_midi_manager(std::make_unique<audio::midi_manager>())
+    , m_midi_manager(std::make_unique<midi::midi_manager>())
     , m_ladspa_fx_manager(std::make_unique<fx::ladspa_manager>())
 {
     BOOST_ASSERT(m_get_hw_params);
