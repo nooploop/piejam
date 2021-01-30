@@ -16,17 +16,17 @@ namespace piejam::midi::alsa
 using midi_client_id_t = int;
 using midi_port_t = int;
 
-class midi_message_handler
+class event_handler
 {
 public:
-    virtual ~midi_message_handler() = default;
+    virtual ~event_handler() = default;
 
-    virtual void on_controller_event(
+    virtual void process_cc_event(
             midi_client_id_t,
             midi_port_t,
             std::size_t channel,
             std::size_t cc_id,
-            std::size_t value);
+            std::size_t value) = 0;
 };
 
 class midi_io
@@ -37,7 +37,7 @@ public:
     auto client_id() const noexcept -> midi_client_id_t { return m_client_id; }
     auto in_port() const noexcept -> midi_port_t { return m_in_port; }
 
-    void process_input(midi_message_handler&);
+    void process_input(event_handler&);
 
 private:
     system::device m_seq;

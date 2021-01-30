@@ -18,7 +18,10 @@
 #include <piejam/audio/engine/process.h>
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/audio/engine/value_output_processor.h>
+#include <piejam/audio/engine/value_sink_processor.h>
 #include <piejam/functional/overload.h>
+#include <piejam/midi/event.h>
+#include <piejam/midi/input_processor.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/components/mixer_bus.h>
@@ -29,6 +32,8 @@
 #include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameter/maps_collection.h>
 #include <piejam/runtime/parameter_processor_factory.h>
+#include <piejam/runtime/processors/midi_input_processor.h>
+#include <piejam/runtime/processors/midi_learn_processor.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/worker.h>
 
@@ -50,6 +55,14 @@ namespace ns_ae = audio::engine;
 
 using processor_ptr = std::unique_ptr<audio::engine::processor>;
 using component_ptr = std::unique_ptr<audio::engine::component>;
+
+template <class T>
+using value_input_processor_ptr =
+        std::unique_ptr<audio::engine::value_input_processor<T>>;
+
+template <class T>
+using value_output_processor_ptr =
+        std::unique_ptr<audio::engine::value_output_processor<T>>;
 
 struct fx_module_component_mapping
 {
@@ -88,9 +101,14 @@ struct audio_engine::impl
     mixer_bus_components input_buses;
     mixer_bus_components output_buses;
     fx_chains_map fx_chains;
-    std::unique_ptr<audio::engine::value_input_processor<mixer::bus_id>>
-            input_solo_index_proc;
+    value_input_processor_ptr<mixer::bus_id> input_solo_index_proc;
     std::vector<processor_ptr> mixer_procs;
+
+    processor_ptr midi_in_proc;
+    processor_ptr midi_learn_proc;
+    value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
+    audio::engine::value_sink_processor<midi::external_event> midi_sink{
+            "ext_midi_sink"};
 
     parameter_processor_factory param_procs;
 
@@ -267,9 +285,27 @@ make_graph(
         mixer_bus_components const& output_buses,
         fx_chains_map const& fx_chains,
         ns_ae::processor& input_solo_index,
-        std::vector<processor_ptr>& mixer_procs)
+        std::vector<processor_ptr>& mixer_procs,
+        audio::engine::processor& midi_in_proc,
+        audio::engine::processor& midi_sink,
+        audio::engine::processor* midi_learn_proc,
+        audio::engine::processor* midi_learn_output_proc)
 {
     ns_ae::graph g;
+
+    // midi
+
+    if (midi_learn_proc && midi_learn_output_proc)
+    {
+        g.add_event_wire({midi_in_proc, 0}, {*midi_learn_proc, 0});
+        g.add_event_wire({*midi_learn_proc, 0}, {*midi_learn_output_proc, 0});
+    }
+    else
+    {
+        g.add_event_wire({midi_in_proc, 0}, {midi_sink, 0});
+    }
+
+    // audio
 
     BOOST_ASSERT(mixer_state.inputs->size() == input_buses.size());
     for (std::size_t idx = 0; idx < mixer_state.inputs->size(); ++idx)
@@ -392,13 +428,29 @@ audio_engine::get_level(stereo_level_parameter_id const id) const
     return result;
 }
 
+auto
+audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
+{
+    std::optional<midi::external_event> result;
+
+    if (m_impl->midi_learn_output_proc)
+    {
+        m_impl->midi_learn_output_proc->consume(
+                [&result](midi::external_event const& ev) { result = ev; });
+    }
+
+    return result;
+}
+
 bool
 audio_engine::rebuild(
         mixer::state const& mixer_state,
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
         parameter_maps const& params,
-        fx::ladspa_processor_factory const& ladspa_fx_proc_factory)
+        fx::ladspa_processor_factory const& ladspa_fx_proc_factory,
+        std::unique_ptr<midi::input_processor> midi_in,
+        bool midi_learn)
 {
     auto input_buses = make_mixer_bus_vector(
             m_impl->input_buses,
@@ -429,6 +481,15 @@ audio_engine::rebuild(
             std::make_unique<ns_ae::value_input_processor<mixer::bus_id>>(
                     mixer_state.input_solo_id,
                     "input_solo_index");
+
+    auto midi_in_proc =
+            processors::make_midi_input_processor(std::move(midi_in));
+    auto midi_learn_proc =
+            midi_learn ? processors::make_midi_learn_processor() : nullptr;
+    auto midi_learn_output_proc =
+            midi_learn ? std::make_unique<audio::engine::value_output_processor<
+                                 midi::external_event>>()
+                       : nullptr;
     std::vector<processor_ptr> mixers;
 
     auto new_graph = make_graph(
@@ -439,7 +500,11 @@ audio_engine::rebuild(
             output_buses,
             fx_chains,
             *input_solo_index_proc,
-            mixers);
+            mixers,
+            *midi_in_proc,
+            m_impl->midi_sink,
+            midi_learn_proc.get(),
+            midi_learn_output_proc.get());
 
     audio::engine::bypass_event_identity_processors(new_graph);
 
@@ -453,6 +518,9 @@ audio_engine::rebuild(
     m_impl->output_buses = std::move(output_buses);
     m_impl->fx_chains = std::move(fx_chains);
     m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
+    m_impl->midi_in_proc = std::move(midi_in_proc);
+    m_impl->midi_learn_proc = std::move(midi_learn_proc);
+    m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
     m_impl->mixer_procs = std::move(mixers);
 
     m_impl->param_procs.clear_expired();

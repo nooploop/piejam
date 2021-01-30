@@ -6,6 +6,7 @@
 
 #include <piejam/entity_id.h>
 #include <piejam/midi/device_id.h>
+#include <piejam/midi/fwd.h>
 
 #include <memory>
 #include <string>
@@ -38,6 +39,8 @@ public:
     void deactivate_input_device(device_id_t const&);
 
     auto update_devices() -> std::vector<device_update>;
+
+    auto make_input_processor() const -> std::unique_ptr<input_processor>;
 
 private:
     struct impl;

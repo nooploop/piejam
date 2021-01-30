@@ -427,6 +427,10 @@ make_midi_assignment_selector(midi_assignment_id const id)
     };
 }
 
+const selector<bool> select_midi_learning([](state const& st) {
+    return st.midi_learning.has_value();
+});
+
 const selector<fx::registry> select_fx_registry([](state const& st) {
     return st.fx_registry;
 });

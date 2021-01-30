@@ -8,10 +8,14 @@
 
 #include <piejam/algorithm/contains.h>
 #include <piejam/entity_id_hash.h>
+#include <piejam/midi/event.h>
+#include <piejam/midi/event_handler.h>
+#include <piejam/midi/input_processor.h>
 
 #include <fmt/format.h>
 
 #include <boost/assert.hpp>
+#include <boost/container/flat_map.hpp>
 
 #include <algorithm>
 #include <unordered_map>
@@ -126,6 +130,86 @@ midi_manager::update_devices() -> std::vector<device_update>
     }
 
     return result;
+}
+
+namespace
+{
+
+using alsa_midi_devices_t = boost::container::flat_map<
+        std::pair<alsa::midi_client_id_t, alsa::midi_port_t>,
+        device_id_t>;
+
+struct alsa_event_handler final : alsa::event_handler
+{
+    alsa_event_handler(
+            midi::event_handler& ev_handler,
+            alsa_midi_devices_t const& devices)
+        : m_ev_handler(ev_handler)
+        , m_devices(devices)
+    {
+    }
+
+    void process_cc_event(
+            alsa::midi_client_id_t const client_id,
+            alsa::midi_port_t const port,
+            std::size_t const channel,
+            std::size_t const cc_id,
+            std::size_t const value) override
+    {
+        if (auto it = m_devices.find(std::pair{client_id, port});
+            it != m_devices.end())
+        {
+            m_ev_handler.process(midi::external_event{
+                    .device_id = it->second,
+                    .event = midi::channel_cc_event{
+                            .channel = channel,
+                            .event = cc_event{.cc = cc_id, .value = value}}});
+        }
+    }
+
+private:
+    midi::event_handler& m_ev_handler;
+    alsa_midi_devices_t const& m_devices;
+};
+
+struct alsa_input_processor final : input_processor
+{
+    alsa_input_processor(
+            alsa::midi_io& mio,
+            std::unordered_map<device_id_t, alsa::midi_device> const& devices)
+        : m_midi_io(mio)
+    {
+        m_devices.reserve(devices.size());
+
+        std::ranges::transform(
+                devices,
+                std::inserter(m_devices, m_devices.end()),
+                [](auto const& d) {
+                    return std::pair{
+                            std::pair{d.second.client_id, d.second.port},
+                            d.first};
+                });
+    }
+
+    void process(event_handler& ev_handler)
+    {
+        alsa_event_handler alsa_ev_handler(ev_handler, m_devices);
+        m_midi_io.process_input(alsa_ev_handler);
+    }
+
+private:
+    alsa::midi_io& m_midi_io;
+    alsa_midi_devices_t m_devices;
+};
+
+} // namespace
+
+auto
+midi_manager::make_input_processor() const -> std::unique_ptr<input_processor>
+{
+    return std::make_unique<alsa_input_processor>(
+            m_impl->midi_io,
+            m_impl->alsa_midi_input_devices);
 }
 
 } // namespace piejam::midi

@@ -40,6 +40,9 @@ Info::onSubscribe()
 
     observe(runtime::selectors::select_cpu_load,
             [this](float const cpu_load) { setAudioLoad(cpu_load); });
+
+    observe(runtime::selectors::select_midi_learning,
+            [this](bool const midi_learning) { setMidiLearn(midi_learning); });
 }
 
 void

@@ -6,6 +6,7 @@
 
 #include <piejam/audio/pair.h>
 #include <piejam/audio/types.h>
+#include <piejam/midi/fwd.h>
 #include <piejam/range/table_view.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
@@ -41,12 +42,16 @@ public:
     auto get_level(stereo_level_parameter_id) const
             -> std::optional<stereo_level>;
 
+    auto get_learned_midi() const -> std::optional<midi::external_event>;
+
     [[nodiscard]] bool
     rebuild(mixer::state const&,
             fx::modules_t const&,
             fx::parameters_t const& fx_params,
             parameter_maps const&,
-            fx::ladspa_processor_factory const&);
+            fx::ladspa_processor_factory const&,
+            std::unique_ptr<midi::input_processor>,
+            bool midi_learn);
 
     void operator()(
             range::table_view<float const> const& in_audio,

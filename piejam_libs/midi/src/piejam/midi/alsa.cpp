@@ -127,7 +127,7 @@ midi_io::midi_io()
 }
 
 void
-midi_io::process_input(midi_message_handler& handler)
+midi_io::process_input(event_handler& handler)
 {
     auto read_result = m_seq.read(m_input_buffer);
     if (!read_result)
@@ -135,14 +135,14 @@ midi_io::process_input(midi_message_handler& handler)
 
     std::span<snd_seq_event const> events(
             reinterpret_cast<snd_seq_event const*>(m_input_buffer.data()),
-            read_result.value() % sizeof(snd_seq_event));
+            read_result.value() / sizeof(snd_seq_event));
 
     for (snd_seq_event const& ev : events)
     {
         switch (ev.type)
         {
             case SNDRV_SEQ_EVENT_CONTROLLER:
-                handler.on_controller_event(
+                handler.process_cc_event(
                         ev.source.client,
                         ev.source.port,
                         ev.data.control.channel,

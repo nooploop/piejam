@@ -4,24 +4,36 @@
 
 #pragma once
 
+#include <piejam/entity_id.h>
+#include <piejam/midi/device_id.h>
+
+#include <cstddef>
 #include <variant>
 
 namespace piejam::midi
 {
 
-class event_handler;
-class input_processor;
-class midi_manager;
-
-struct cc_event;
+struct cc_event
+{
+    std::size_t cc{};
+    std::size_t value{};
+};
 
 template <class E>
-struct channel_event;
+struct channel_event
+{
+    std::size_t channel{};
+    E event{};
+};
 
 using channel_cc_event = channel_event<cc_event>;
 
 using event_t = std::variant<channel_cc_event>;
 
-struct external_event;
+struct external_event
+{
+    device_id_t device_id;
+    event_t event{};
+};
 
 } // namespace piejam::midi

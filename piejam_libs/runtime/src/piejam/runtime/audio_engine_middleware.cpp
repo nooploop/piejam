@@ -13,6 +13,8 @@
 #include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
+#include <piejam/midi/event.h>
+#include <piejam/midi/input_processor.h>
 #include <piejam/midi/manager.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/add_bus.h>
@@ -36,6 +38,7 @@
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fx/ladspa_manager.h>
 #include <piejam/runtime/state.h>
+#include <piejam/tuple_element_compare.h>
 
 #include <spdlog/spdlog.h>
 
@@ -251,6 +254,33 @@ struct update_info final : ui::cloneable_action<update_info, action>
         auto new_st = st;
         new_st.xruns = xruns;
         new_st.cpu_load = cpu_load;
+        return new_st;
+    }
+};
+
+struct learn_midi_assignment final
+    : ui::cloneable_action<learn_midi_assignment, action>
+{
+    midi_assignment assignment;
+
+    auto reduce(state const& st) const -> state override
+    {
+        auto new_st = st;
+
+        BOOST_ASSERT(new_st.midi_learning);
+
+        new_st.midi_assignments.update(
+                [this, id = *new_st.midi_learning](
+                        midi_assignments_map& midi_assigns) {
+                    std::erase_if(
+                            midi_assigns,
+                            tuple::element<1>.equal_to(assignment));
+
+                    midi_assigns.insert_or_assign(id, assignment);
+                });
+
+        new_st.midi_learning.reset();
+
         return new_st;
     }
 };
@@ -664,11 +694,52 @@ void
 audio_engine_middleware::process_engine_action(
         actions::request_info_update const&)
 {
-    update_info next_action;
-    next_action.xruns = m_device->xruns();
-    next_action.cpu_load = m_device->cpu_load();
+    {
+        update_info next_action;
+        next_action.xruns = m_device->xruns();
+        next_action.cpu_load = m_device->cpu_load();
 
-    m_next(next_action);
+        m_next(next_action);
+    }
+
+    if (m_engine)
+    {
+        if (auto learned_midi = m_engine->get_learned_midi())
+        {
+            if (std::holds_alternative<midi::channel_cc_event>(
+                        learned_midi->event))
+            {
+                learn_midi_assignment next_action;
+                midi::channel_cc_event const& cc_event =
+                        std::get<midi::channel_cc_event>(learned_midi->event);
+                next_action.assignment = midi_assignment{
+                        .device_id = learned_midi->device_id,
+                        .channel = cc_event.channel,
+                        .control_type = midi_assignment::type::cc,
+                        .control_id = cc_event.event.cc};
+
+                m_next(next_action);
+            }
+        }
+    }
+}
+
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        actions::start_midi_learning const& a)
+{
+    m_next(a);
+    rebuild();
+}
+
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        actions::stop_midi_learning const& a)
+{
+    m_next(a);
+    rebuild();
 }
 
 void
@@ -744,7 +815,9 @@ audio_engine_middleware::rebuild()
                 st.params,
                 [this, sr = st.samplerate](fx::ladspa_instance_id id) {
                     return m_ladspa_fx_manager->make_processor(id, sr);
-                }))
+                },
+                m_midi_manager->make_input_processor(),
+                static_cast<bool>(st.midi_learning)))
     {
         spdlog::error("audio_engine_middleware: graph rebuilding failed");
     }

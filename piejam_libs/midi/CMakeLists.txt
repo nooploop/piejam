@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: CC0-1.0
 
 add_library(piejam_midi STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/event.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/event_handler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/device_id.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/manager.h

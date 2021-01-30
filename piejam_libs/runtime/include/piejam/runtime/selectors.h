@@ -84,8 +84,7 @@ extern const selector<boxed_vector<midi::device_id_t>>
 auto make_midi_device_name_selector(midi::device_id_t)
         -> selector<boxed_string>;
 
-auto make_midi_device_enabled_selector(midi::device_id_t)
-        -> selector<bool>;
+auto make_midi_device_enabled_selector(midi::device_id_t) -> selector<bool>;
 
 auto make_bus_level_selector(mixer::bus_id) -> selector<stereo_level>;
 
@@ -124,6 +123,8 @@ auto make_level_parameter_value_selector(stereo_level_parameter_id)
 
 auto make_midi_assignment_selector(midi_assignment_id)
         -> selector<std::optional<midi_assignment>>;
+
+extern const selector<bool> select_midi_learning;
 
 extern const selector<fx::registry> select_fx_registry;
 

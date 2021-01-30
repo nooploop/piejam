@@ -52,7 +52,6 @@ Item {
             SequentialAnimation on color {
                 running: midiAssign.learning
                 loops: Animation.Infinite
-                alwaysRunToEnd: true
 
                 ColorAnimation {
                     target: background
@@ -69,6 +68,8 @@ Item {
                     to: assignmentLabel.backgroundColor
                     duration: 500
                 }
+
+                onStopped: background.color = Qt.binding(function() { return assignmentLabel.backgroundColor })
             }
         }
     }
@@ -78,9 +79,11 @@ Item {
 
         anchors.fill: parent
 
-        onClicked: midiAssign.learning
+        onClicked: {
+            midiAssign.learning
                    ? MidiLearn.stop()
                    : MidiLearn.start(midiAssign)
+        }
     }
 
     MidiAssignable {
