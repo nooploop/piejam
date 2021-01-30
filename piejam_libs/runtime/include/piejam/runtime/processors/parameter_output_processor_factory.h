@@ -62,14 +62,9 @@ private:
     template <class P>
     void clear_expired()
     {
-        auto& proc_map = std::get<processor_map<P>>(m_procs);
-        for (auto it = proc_map.begin(); it != proc_map.end();)
-        {
-            if (it->second.expired())
-                it = proc_map.erase(it);
-            else
-                ++it;
-        }
+        std::erase_if(std::get<processor_map<P>>(m_procs), [](auto const& p) {
+            return p.second.expired();
+        });
     }
 
     std::tuple<processor_map<Parameter>...> m_procs;

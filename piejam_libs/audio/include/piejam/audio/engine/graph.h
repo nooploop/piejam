@@ -6,6 +6,8 @@
 
 #include <piejam/audio/engine/graph_endpoint.h>
 
+#include <boost/hof/unpack.hpp>
+
 #include <concepts>
 #include <map>
 #include <string>
@@ -34,12 +36,7 @@ public:
     template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
     void remove_event_wires_if(P&& p)
     {
-        for (auto it = m_event_wires.begin(); it != m_event_wires.end();)
-        {
-            it = std::forward<P>(p)(it->first, it->second)
-                         ? m_event_wires.erase(it)
-                         : std::next(it);
-        }
+        std::erase_if(m_event_wires, boost::hof::unpack(std::forward<P>(p)));
     }
 
 private:
