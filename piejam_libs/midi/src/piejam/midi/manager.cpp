@@ -11,6 +11,7 @@
 #include <piejam/midi/event.h>
 #include <piejam/midi/event_handler.h>
 #include <piejam/midi/input_processor.h>
+#include <piejam/tuple_element_compare.h>
 
 #include <fmt/format.h>
 
@@ -34,7 +35,7 @@ struct midi_manager::impl
     {
         return algorithm::contains_if(
                 alsa_midi_input_devices,
-                [&op](auto const& d) { return d.second == op.device; });
+                tuple::element<1>.equal_to(std::cref(op.device)));
     }
 
     bool is_update_relevant(alsa::midi_device_update const& op) const
@@ -59,7 +60,7 @@ struct midi_manager::impl
     {
         auto it = std::ranges::find_if(
                 alsa_midi_input_devices,
-                [&op](auto const& d) { return d.second == op.device; });
+                tuple::element<1>.equal_to(std::cref(op.device)));
 
         BOOST_ASSERT(it != alsa_midi_input_devices.end());
 

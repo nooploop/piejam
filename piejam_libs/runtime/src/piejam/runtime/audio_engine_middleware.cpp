@@ -274,7 +274,7 @@ struct learn_midi_assignment final
                         midi_assignments_map& midi_assigns) {
                     std::erase_if(
                             midi_assigns,
-                            tuple::element<1>.equal_to(assignment));
+                            tuple::element<1>.equal_to(std::cref(assignment)));
 
                     midi_assigns.insert_or_assign(id, assignment);
                 });
