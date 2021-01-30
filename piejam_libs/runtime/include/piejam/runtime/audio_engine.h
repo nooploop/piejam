@@ -10,6 +10,7 @@
 #include <piejam/range/table_view.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
+#include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameter_maps.h>
 #include <piejam/runtime/stereo_level.h>
@@ -51,7 +52,8 @@ public:
             parameter_maps const&,
             fx::ladspa_processor_factory const&,
             std::unique_ptr<midi::input_processor>,
-            bool midi_learn);
+            bool midi_learn,
+            midi_assignments_map const&);
 
     void operator()(
             range::table_view<float const> const& in_audio,

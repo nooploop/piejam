@@ -817,7 +817,8 @@ audio_engine_middleware::rebuild()
                     return m_ladspa_fx_manager->make_processor(id, sr);
                 },
                 m_midi_manager->make_input_processor(),
-                static_cast<bool>(st.midi_learning)))
+                static_cast<bool>(st.midi_learning),
+                st.midi_assignments))
     {
         spdlog::error("audio_engine_middleware: graph rebuilding failed");
     }

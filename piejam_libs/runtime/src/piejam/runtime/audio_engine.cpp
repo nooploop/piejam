@@ -32,6 +32,7 @@
 #include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameter/maps_collection.h>
 #include <piejam/runtime/parameter_processor_factory.h>
+#include <piejam/runtime/processors/midi_assignment_processor.h>
 #include <piejam/runtime/processors/midi_input_processor.h>
 #include <piejam/runtime/processors/midi_learn_processor.h>
 #include <piejam/thread/configuration.h>
@@ -109,6 +110,7 @@ struct audio_engine::impl
     value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
     audio::engine::value_sink_processor<midi::external_event> midi_sink{
             "ext_midi_sink"};
+    processor_ptr midi_assign_proc;
 
     parameter_processor_factory param_procs;
 
@@ -289,7 +291,8 @@ make_graph(
         audio::engine::processor& midi_in_proc,
         audio::engine::processor& midi_sink,
         audio::engine::processor* midi_learn_proc,
-        audio::engine::processor* midi_learn_output_proc)
+        audio::engine::processor* midi_learn_output_proc,
+        audio::engine::processor* midi_assign_proc)
 {
     ns_ae::graph g;
 
@@ -299,6 +302,13 @@ make_graph(
     {
         g.add_event_wire({midi_in_proc, 0}, {*midi_learn_proc, 0});
         g.add_event_wire({*midi_learn_proc, 0}, {*midi_learn_output_proc, 0});
+
+        if (midi_assign_proc)
+            g.add_event_wire({*midi_learn_proc, 1}, {*midi_assign_proc, 0});
+    }
+    else if (midi_assign_proc)
+    {
+        g.add_event_wire({midi_in_proc, 0}, {*midi_assign_proc, 0});
     }
     else
     {
@@ -450,7 +460,8 @@ audio_engine::rebuild(
         parameter_maps const& params,
         fx::ladspa_processor_factory const& ladspa_fx_proc_factory,
         std::unique_ptr<midi::input_processor> midi_in,
-        bool midi_learn)
+        bool midi_learn,
+        midi_assignments_map const& assignments)
 {
     auto input_buses = make_mixer_bus_vector(
             m_impl->input_buses,
@@ -490,6 +501,11 @@ audio_engine::rebuild(
             midi_learn ? std::make_unique<audio::engine::value_output_processor<
                                  midi::external_event>>()
                        : nullptr;
+    auto midi_assign_proc =
+            !assignments.empty()
+                    ? processors::make_midi_assignment_processor(assignments)
+                    : nullptr;
+
     std::vector<processor_ptr> mixers;
 
     auto new_graph = make_graph(
@@ -504,7 +520,8 @@ audio_engine::rebuild(
             *midi_in_proc,
             m_impl->midi_sink,
             midi_learn_proc.get(),
-            midi_learn_output_proc.get());
+            midi_learn_output_proc.get(),
+            midi_assign_proc.get());
 
     audio::engine::bypass_event_identity_processors(new_graph);
 
@@ -521,6 +538,7 @@ audio_engine::rebuild(
     m_impl->midi_in_proc = std::move(midi_in_proc);
     m_impl->midi_learn_proc = std::move(midi_learn_proc);
     m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
+    m_impl->midi_assign_proc = std::move(midi_assign_proc);
     m_impl->mixer_procs = std::move(mixers);
 
     m_impl->param_procs.clear_expired();
