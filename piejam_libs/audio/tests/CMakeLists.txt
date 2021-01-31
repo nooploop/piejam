@@ -28,6 +28,7 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/pcm_convert_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/process_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/processor_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/processor_map_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/select_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/slice_algorithms_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/smoother_test.cpp

@@ -4,6 +4,7 @@
 
 #include <piejam/audio/table.h>
 #include <piejam/audio/types.h>
+#include <piejam/midi/input_processor.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/state.h>
@@ -66,6 +67,9 @@ struct audio_engine_render_test : public ::testing::Test
                     st.fx_modules,
                     st.fx_parameters,
                     st.params,
+                    {},
+                    nullptr,
+                    false,
                     {});
         });
 
