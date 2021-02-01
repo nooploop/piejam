@@ -19,12 +19,6 @@ namespace piejam::runtime::processors
 namespace
 {
 
-bool
-is_control_event(midi::external_event const& ev)
-{
-    return std::holds_alternative<midi::channel_cc_event>(ev.event);
-}
-
 class midi_learn_processor final : public audio::engine::named_processor
 {
 public:
@@ -70,7 +64,7 @@ public:
 
             for (auto const& ev : in)
             {
-                if (m_learning && is_control_event(ev.value()))
+                if (m_learning)
                 {
                     learned.insert(ev.offset(), ev.value());
                     m_learning = false;

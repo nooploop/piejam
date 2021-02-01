@@ -16,6 +16,7 @@
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/output_processor.h>
 #include <piejam/audio/engine/process.h>
+#include <piejam/audio/engine/processor_map.h>
 #include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/audio/engine/value_output_processor.h>
 #include <piejam/audio/engine/value_sink_processor.h>
@@ -35,6 +36,7 @@
 #include <piejam/runtime/processors/midi_assignment_processor.h>
 #include <piejam/runtime/processors/midi_input_processor.h>
 #include <piejam/runtime/processors/midi_learn_processor.h>
+#include <piejam/runtime/processors/midi_to_parameter_processor.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/worker.h>
 
@@ -52,7 +54,13 @@ namespace piejam::runtime
 namespace
 {
 
-namespace ns_ae = audio::engine;
+enum class engine_processors
+{
+    midi_input,
+    midi_sink,
+    midi_learn,
+    midi_assign
+};
 
 using processor_ptr = std::unique_ptr<audio::engine::processor>;
 using component_ptr = std::unique_ptr<audio::engine::component>;
@@ -84,40 +92,7 @@ struct mixer_bus_component_mapping
 
 using mixer_bus_components = std::vector<mixer_bus_component_mapping>;
 
-} // namespace
-
-struct audio_engine::impl
-{
-    impl(std::span<thread::configuration const> const& wt_configs,
-         unsigned num_device_input_channels,
-         unsigned num_device_output_channels)
-        : process(num_device_input_channels, num_device_output_channels)
-        , worker_threads(wt_configs.begin(), wt_configs.end())
-    {
-    }
-
-    audio::engine::process process;
-    std::vector<thread::worker> worker_threads;
-
-    mixer_bus_components input_buses;
-    mixer_bus_components output_buses;
-    fx_chains_map fx_chains;
-    value_input_processor_ptr<mixer::bus_id> input_solo_index_proc;
-    std::vector<processor_ptr> mixer_procs;
-
-    processor_ptr midi_in_proc;
-    processor_ptr midi_learn_proc;
-    value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
-    audio::engine::value_sink_processor<midi::external_event> midi_sink{
-            "ext_midi_sink"};
-    processor_ptr midi_assign_proc;
-
-    parameter_processor_factory param_procs;
-
-    audio::engine::graph graph;
-};
-
-static auto
+auto
 make_mixer_bus_vector(
         mixer_bus_components& prev_buses,
         unsigned const samplerate,
@@ -155,7 +130,7 @@ make_mixer_bus_vector(
     return result;
 }
 
-static auto
+auto
 make_fx_chains_map(
         fx_chains_map& prev_fx_chains,
         fx::modules_t const& fx_modules,
@@ -228,9 +203,75 @@ make_fx_chains_map(
     return fx_chains;
 }
 
-static auto
+auto
+make_midi_processors(
+        std::unique_ptr<midi::input_processor> midi_in,
+        bool const midi_learning,
+        audio::engine::processor_map& procs)
+{
+    if (midi_in)
+    {
+        procs.insert(
+                engine_processors::midi_input,
+                processors::make_midi_input_processor(std::move(midi_in)));
+
+        if (midi_learning)
+        {
+            procs.insert(
+                    engine_processors::midi_learn,
+                    processors::make_midi_learn_processor());
+        }
+        else
+        {
+            procs.insert(
+                    engine_processors::midi_sink,
+                    std::make_unique<audio::engine::value_sink_processor<
+                            midi::external_event>>("ext_midi_sink"));
+        }
+    }
+}
+
+auto
+make_midi_assignment_processors(
+        midi_assignments_map const& assignments,
+        parameter_maps const& params,
+        audio::engine::processor_map& procs,
+        audio::engine::processor_map& prev_procs)
+{
+    if (assignments.empty())
+        return;
+
+    procs.insert(
+            engine_processors::midi_assign,
+            processors::make_midi_assignment_processor(assignments));
+
+    for (auto const& [id, ass] : assignments)
+    {
+        std::visit(
+                [&](auto const& param_id) {
+                    auto const* param = params.get_parameter(param_id);
+                    BOOST_ASSERT(param);
+
+                    std::tuple const proc_id{param_id, ass};
+                    if (auto proc = prev_procs.remove(proc_id))
+                    {
+                        procs.insert(proc_id, std::move(proc));
+                    }
+                    else
+                    {
+                        procs.insert(
+                                proc_id,
+                                processors::make_midi_cc_to_parameter_processor(
+                                        *param));
+                    }
+                },
+                id);
+    }
+}
+
+auto
 connect_fx_chain(
-        ns_ae::graph& g,
+        audio::engine::graph& g,
         fx_chain_components const& fx_chain,
         std::vector<processor_ptr>& mixer_procs)
 {
@@ -250,12 +291,12 @@ connect_fx_chain(
             });
 }
 
-static auto
+auto
 connect_mixer_bus_with_fx_chain(
-        ns_ae::graph& g,
-        ns_ae::component& mb_in,
+        audio::engine::graph& g,
+        audio::engine::component& mb_in,
         fx_chain_components const& fx_chain,
-        ns_ae::component& mb_out,
+        audio::engine::component& mb_out,
         std::vector<processor_ptr>& mixer_procs)
 {
     if (fx_chain.empty())
@@ -278,44 +319,18 @@ connect_mixer_bus_with_fx_chain(
     }
 }
 
-static auto
+auto
 make_graph(
         mixer::state const& mixer_state,
-        ns_ae::processor& input_proc,
-        ns_ae::processor& output_proc,
+        audio::engine::processor& input_proc,
+        audio::engine::processor& output_proc,
         mixer_bus_components const& input_buses,
         mixer_bus_components const& output_buses,
         fx_chains_map const& fx_chains,
-        ns_ae::processor& input_solo_index,
-        std::vector<processor_ptr>& mixer_procs,
-        audio::engine::processor& midi_in_proc,
-        audio::engine::processor& midi_sink,
-        audio::engine::processor* midi_learn_proc,
-        audio::engine::processor* midi_learn_output_proc,
-        audio::engine::processor* midi_assign_proc)
+        audio::engine::processor& input_solo_index,
+        std::vector<processor_ptr>& mixer_procs)
 {
-    ns_ae::graph g;
-
-    // midi
-
-    if (midi_learn_proc && midi_learn_output_proc)
-    {
-        g.add_event_wire({midi_in_proc, 0}, {*midi_learn_proc, 0});
-        g.add_event_wire({*midi_learn_proc, 0}, {*midi_learn_output_proc, 0});
-
-        if (midi_assign_proc)
-            g.add_event_wire({*midi_learn_proc, 1}, {*midi_assign_proc, 0});
-    }
-    else if (midi_assign_proc)
-    {
-        g.add_event_wire({midi_in_proc, 0}, {*midi_assign_proc, 0});
-    }
-    else
-    {
-        g.add_event_wire({midi_in_proc, 0}, {midi_sink, 0});
-    }
-
-    // audio
+    audio::engine::graph g;
 
     BOOST_ASSERT(mixer_state.inputs->size() == input_buses.size());
     for (std::size_t idx = 0; idx < mixer_state.inputs->size(); ++idx)
@@ -386,6 +401,95 @@ make_graph(
 
     return g;
 }
+
+void
+connect_midi(
+        audio::engine::graph& g,
+        audio::engine::processor_map const& procs,
+        audio::engine::processor* midi_learn_output_proc,
+        parameter_maps const& params,
+        midi_assignments_map const& assignments)
+{
+    auto* const midi_in_proc = procs.find(engine_processors::midi_input);
+    if (midi_in_proc)
+        return;
+
+    if (auto* const midi_learn_proc = procs.find(engine_processors::midi_learn))
+    {
+        BOOST_ASSERT(midi_learn_output_proc);
+
+        g.add_event_wire({*midi_in_proc, 0}, {*midi_learn_proc, 0});
+        g.add_event_wire({*midi_learn_proc, 0}, {*midi_learn_output_proc, 0});
+
+        if (auto* const midi_assign_proc =
+                    procs.find(engine_processors::midi_assign))
+            g.add_event_wire({*midi_learn_proc, 1}, {*midi_assign_proc, 0});
+    }
+    else if (
+            auto* const midi_assign_proc =
+                    procs.find(engine_processors::midi_assign))
+    {
+        g.add_event_wire({*midi_in_proc, 0}, {*midi_assign_proc, 0});
+    }
+    else
+    {
+        auto* const midi_sink = procs.find(engine_processors::midi_sink);
+        BOOST_ASSERT(midi_sink);
+        g.add_event_wire({*midi_in_proc, 0}, {*midi_sink, 0});
+    }
+
+    if (auto* const midi_assign_proc =
+                procs.find(engine_processors::midi_assign))
+    {
+        std::size_t out_index{};
+        for (auto const& [id, ass] : assignments)
+        {
+            std::visit(
+                    [&](auto const& param_id) {
+                        auto const* param = params.get_parameter(param_id);
+                        BOOST_ASSERT(param);
+
+                        std::tuple const proc_id{param_id, ass};
+                        auto proc = procs.find(proc_id);
+                        BOOST_ASSERT(proc);
+
+                        g.add_event_wire(
+                                {*midi_assign_proc, out_index++},
+                                {*proc, 0});
+                    },
+                    id);
+        }
+    }
+}
+
+} // namespace
+
+struct audio_engine::impl
+{
+    impl(std::span<thread::configuration const> const& wt_configs,
+         unsigned num_device_input_channels,
+         unsigned num_device_output_channels)
+        : process(num_device_input_channels, num_device_output_channels)
+        , worker_threads(wt_configs.begin(), wt_configs.end())
+    {
+    }
+
+    audio::engine::process process;
+    std::vector<thread::worker> worker_threads;
+
+    mixer_bus_components input_buses;
+    mixer_bus_components output_buses;
+    fx_chains_map fx_chains;
+    value_input_processor_ptr<mixer::bus_id> input_solo_index_proc;
+    std::vector<processor_ptr> mixer_procs;
+    value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
+
+    audio::engine::processor_map procs;
+
+    parameter_processor_factory param_procs;
+
+    audio::engine::graph graph;
+};
 
 audio_engine::audio_engine(
         std::span<thread::configuration const> const& wt_configs,
@@ -488,23 +592,19 @@ audio_engine::rebuild(
 
     m_impl->param_procs.initialize(params);
 
-    auto input_solo_index_proc =
-            std::make_unique<ns_ae::value_input_processor<mixer::bus_id>>(
-                    mixer_state.input_solo_id,
-                    "input_solo_index");
+    audio::engine::processor_map procs;
 
-    auto midi_in_proc =
-            processors::make_midi_input_processor(std::move(midi_in));
-    auto midi_learn_proc =
-            midi_learn ? processors::make_midi_learn_processor() : nullptr;
+    auto input_solo_index_proc = std::make_unique<
+            audio::engine::value_input_processor<mixer::bus_id>>(
+            mixer_state.input_solo_id,
+            "input_solo_index");
+
+    make_midi_processors(std::move(midi_in), midi_learn, procs);
+    make_midi_assignment_processors(assignments, params, procs, m_impl->procs);
     auto midi_learn_output_proc =
             midi_learn ? std::make_unique<audio::engine::value_output_processor<
-                                 midi::external_event>>()
+                                 midi::external_event>>("midi_learned")
                        : nullptr;
-    auto midi_assign_proc =
-            !assignments.empty()
-                    ? processors::make_midi_assignment_processor(assignments)
-                    : nullptr;
 
     std::vector<processor_ptr> mixers;
 
@@ -516,17 +616,19 @@ audio_engine::rebuild(
             output_buses,
             fx_chains,
             *input_solo_index_proc,
-            mixers,
-            *midi_in_proc,
-            m_impl->midi_sink,
-            midi_learn_proc.get(),
+            mixers);
+
+    connect_midi(
+            new_graph,
+            procs,
             midi_learn_output_proc.get(),
-            midi_assign_proc.get());
+            params,
+            assignments);
 
     audio::engine::bypass_event_identity_processors(new_graph);
 
     if (!m_impl->process.swap_executor(
-                ns_ae::graph_to_dag(new_graph).make_runnable(
+                audio::engine::graph_to_dag(new_graph).make_runnable(
                         m_impl->worker_threads)))
         return false;
 
@@ -535,11 +637,9 @@ audio_engine::rebuild(
     m_impl->output_buses = std::move(output_buses);
     m_impl->fx_chains = std::move(fx_chains);
     m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
-    m_impl->midi_in_proc = std::move(midi_in_proc);
-    m_impl->midi_learn_proc = std::move(midi_learn_proc);
-    m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
-    m_impl->midi_assign_proc = std::move(midi_assign_proc);
     m_impl->mixer_procs = std::move(mixers);
+    m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
+    m_impl->procs = std::move(procs);
 
     m_impl->param_procs.clear_expired();
 

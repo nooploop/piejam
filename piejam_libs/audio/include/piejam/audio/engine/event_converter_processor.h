@@ -124,7 +124,7 @@ private:
 };
 
 template <class F>
-event_converter_processor(F &&) -> event_converter_processor<F>;
+event_converter_processor(F&&) -> event_converter_processor<F>;
 
 template <class F>
 event_converter_processor(F&&, std::span<std::string_view const> const&)
@@ -142,5 +142,20 @@ event_converter_processor(
         std::span<std::string_view const> const&,
         std::string_view const&,
         std::string_view const&) -> event_converter_processor<F>;
+
+template <class F>
+auto
+make_event_converter_processor(
+        F&& f,
+        std::span<std::string_view const> const& input_names = {},
+        std::string_view const& output_name = {},
+        std::string_view const& name = {}) -> std::unique_ptr<processor>
+{
+    return std::make_unique<event_converter_processor<F>>(
+            std::forward<F>(f),
+            input_names,
+            output_name,
+            name);
+}
 
 } // namespace piejam::audio::engine

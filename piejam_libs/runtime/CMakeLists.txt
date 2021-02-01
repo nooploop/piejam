@@ -90,6 +90,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/midi_assignment_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/midi_input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/midi_learn_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/midi_to_parameter_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_input_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_output_processor_factory.h
@@ -163,6 +164,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/midi_assignment_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/midi_input_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/midi_learn_processor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/midi_to_parameter_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/selectors.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/state.cpp

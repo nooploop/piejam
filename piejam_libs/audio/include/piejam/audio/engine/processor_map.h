@@ -23,7 +23,7 @@ class processor_map
 
 public:
     template <class Id>
-    auto find(Id const& id) -> processor*
+    auto find(Id const& id) const -> processor*
     {
         auto it = find_it(id);
         return it != m_map.end() ? it->second.get() : nullptr;
@@ -50,6 +50,19 @@ public:
     }
 
 private:
+    template <class Id>
+    auto find_it(Id const& id) const
+    {
+        return std::ranges::find_if(
+                m_map,
+                [&id](std::any const& any_id) {
+                    Id const* const typed_id = std::any_cast<std::decay_t<Id>>(
+                            std::addressof(any_id));
+                    return typed_id && *typed_id == id;
+                },
+                &mapping_pair::first);
+    }
+
     template <class Id>
     auto find_it(Id const& id)
     {

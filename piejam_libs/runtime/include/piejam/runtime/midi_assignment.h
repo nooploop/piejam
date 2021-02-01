@@ -7,7 +7,6 @@
 #include <piejam/entity_id.h>
 #include <piejam/midi/device_id.h>
 #include <piejam/runtime/midi_assignment_id.h>
-#include <piejam/runtime/parameters.h>
 
 #include <map>
 
