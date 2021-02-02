@@ -7,7 +7,7 @@
 namespace piejam::runtime::processors
 {
 
-template <class, class>
+template <class...>
 class parameter_processor_factory;
 
 } // namespace piejam::runtime::processors

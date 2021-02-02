@@ -28,7 +28,7 @@ public:
     mixer_bus_input(
             mixer::bus const& bus,
             parameter_processor_factory& param_procs)
-        : m_pan_balance_input_proc(param_procs.make_input_processor(
+        : m_pan_balance_input_proc(param_procs.make_processor(
                   bus.pan_balance,
                   bus.type == audio::bus_type::mono ? "pan" : "balance"))
         , m_pan_balance(
@@ -60,7 +60,7 @@ public:
     }
 
 private:
-    std::shared_ptr<audio::engine::value_input_processor<float>>
+    std::shared_ptr<audio::engine::value_io_processor<float>>
             m_pan_balance_input_proc;
     std::unique_ptr<audio::engine::component> m_pan_balance;
 };
@@ -73,14 +73,13 @@ public:
             mixer::bus_id bus_id,
             mixer::bus const& bus,
             parameter_processor_factory& param_procs)
-        : m_volume_input_proc(
-                  param_procs.make_input_processor(bus.volume, "volume"))
-        , m_mute_input_proc(param_procs.make_input_processor(bus.mute, "mute"))
+        : m_volume_input_proc(param_procs.make_processor(bus.volume, "volume"))
+        , m_mute_input_proc(param_procs.make_processor(bus.mute, "mute"))
         , m_volume_amp(audio::components::make_stereo_amplifier("volume"))
         , m_mute_solo(components::make_mute_solo(bus_id))
         , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
         , m_peak_level_proc(
-                  param_procs.make_output_processor(bus.level, "stereo_level"))
+                  param_procs.make_processor(bus.level, "stereo_level"))
     {
     }
 
@@ -121,14 +120,13 @@ public:
     }
 
 private:
-    std::shared_ptr<audio::engine::value_input_processor<float>>
+    std::shared_ptr<audio::engine::value_io_processor<float>>
             m_volume_input_proc;
-    std::shared_ptr<audio::engine::value_input_processor<bool>>
-            m_mute_input_proc;
+    std::shared_ptr<audio::engine::value_io_processor<bool>> m_mute_input_proc;
     std::unique_ptr<audio::engine::component> m_volume_amp;
     std::unique_ptr<audio::engine::component> m_mute_solo;
     std::unique_ptr<audio::engine::component> m_level_meter;
-    std::shared_ptr<audio::engine::value_output_processor<stereo_level>>
+    std::shared_ptr<audio::engine::value_io_processor<stereo_level>>
             m_peak_level_proc;
 
     std::array<audio::engine::graph_endpoint, 1> m_event_inputs{

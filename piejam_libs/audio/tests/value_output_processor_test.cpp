@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/engine/value_output_processor.h>
+#include <piejam/audio/engine/value_io_processor.h>
 
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -27,13 +27,14 @@ struct value_output_processor_test : ::testing::Test
     event_buffer<int> ev_buf{ev_mem};
     event_input_buffers ev_in_bufs;
     event_output_buffers ev_out_bufs;
-    value_output_processor<int> sut;
+    value_io_processor<int> sut;
     process_context ctx{{}, {}, {}, ev_in_bufs, ev_out_bufs, 128};
 
     value_output_processor_test()
     {
         ev_in_bufs.add(event_port(std::in_place_type<int>));
         ev_in_bufs.set(0, ev_buf);
+        ev_out_bufs.add(event_port(std::in_place_type<int>));
     }
 
     ~value_output_processor_test() { ev_buf.clear(); }

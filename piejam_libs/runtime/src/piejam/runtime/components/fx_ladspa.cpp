@@ -7,7 +7,6 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/event_identity_processor.h>
 #include <piejam/audio/engine/graph.h>
-#include <piejam/audio/engine/value_input_processor.h>
 #include <piejam/range/indices.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -40,10 +39,11 @@ public:
 
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
-            m_param_input_procs.emplace_back(processors::make_input_processor(
-                    param_proc_factory,
-                    id,
-                    get_fx_param_name(id)));
+            m_param_input_procs.emplace_back(
+                    processors::make_parameter_processor(
+                            param_proc_factory,
+                            id,
+                            get_fx_param_name(id)));
         }
 
         std::ranges::transform(
@@ -125,10 +125,11 @@ public:
 
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
-            m_param_input_procs.emplace_back(processors::make_input_processor(
-                    param_proc_factory,
-                    id,
-                    get_fx_param_name(id)));
+            m_param_input_procs.emplace_back(
+                    processors::make_parameter_processor(
+                            param_proc_factory,
+                            id,
+                            get_fx_param_name(id)));
 
             m_input_event_identity_procs.emplace_back(
                     make_event_identity_processor(id));

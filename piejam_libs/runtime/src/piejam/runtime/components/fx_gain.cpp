@@ -28,7 +28,7 @@ public:
     fx_gain(fx::module const& fx_mod,
             parameter_processor_factory& proc_factory,
             std::string_view const& name)
-        : m_gain_input_proc(processors::make_input_processor(
+        : m_gain_input_proc(processors::make_parameter_processor(
                   proc_factory,
                   fx_mod.parameters->at(static_cast<std::size_t>(
                           fx::gain_parameter_key::gain)),

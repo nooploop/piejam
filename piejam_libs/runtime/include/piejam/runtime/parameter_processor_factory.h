@@ -15,7 +15,9 @@ namespace piejam::runtime
 {
 
 using parameter_processor_factory = processors::parameter_processor_factory<
-        std::tuple<parameter::float_, parameter::int_, parameter::bool_>,
-        std::tuple<parameter::stereo_level>>;
+        parameter::float_,
+        parameter::int_,
+        parameter::bool_,
+        parameter::stereo_level>;
 
 } // namespace piejam::runtime

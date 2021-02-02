@@ -17,8 +17,7 @@
 #include <piejam/audio/engine/output_processor.h>
 #include <piejam/audio/engine/process.h>
 #include <piejam/audio/engine/processor_map.h>
-#include <piejam/audio/engine/value_input_processor.h>
-#include <piejam/audio/engine/value_output_processor.h>
+#include <piejam/audio/engine/value_io_processor.h>
 #include <piejam/audio/engine/value_sink_processor.h>
 #include <piejam/functional/overload.h>
 #include <piejam/midi/event.h>
@@ -67,11 +66,11 @@ using component_ptr = std::unique_ptr<audio::engine::component>;
 
 template <class T>
 using value_input_processor_ptr =
-        std::unique_ptr<audio::engine::value_input_processor<T>>;
+        std::unique_ptr<audio::engine::value_io_processor<T>>;
 
 template <class T>
 using value_output_processor_ptr =
-        std::unique_ptr<audio::engine::value_output_processor<T>>;
+        std::unique_ptr<audio::engine::value_io_processor<T>>;
 
 struct fx_module_component_mapping
 {
@@ -594,15 +593,15 @@ audio_engine::rebuild(
 
     audio::engine::processor_map procs;
 
-    auto input_solo_index_proc = std::make_unique<
-            audio::engine::value_input_processor<mixer::bus_id>>(
-            mixer_state.input_solo_id,
-            "input_solo_index");
+    auto input_solo_index_proc =
+            std::make_unique<audio::engine::value_io_processor<mixer::bus_id>>(
+                    mixer_state.input_solo_id,
+                    "input_solo_index");
 
     make_midi_processors(std::move(midi_in), midi_learn, procs);
     make_midi_assignment_processors(assignments, params, procs, m_impl->procs);
     auto midi_learn_output_proc =
-            midi_learn ? std::make_unique<audio::engine::value_output_processor<
+            midi_learn ? std::make_unique<audio::engine::value_io_processor<
                                  midi::external_event>>("midi_learned")
                        : nullptr;
 

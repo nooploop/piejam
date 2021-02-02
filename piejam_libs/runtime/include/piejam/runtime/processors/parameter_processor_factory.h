@@ -4,78 +4,110 @@
 
 #pragma once
 
-#include <piejam/runtime/processors/parameter_input_processor_factory.h>
-#include <piejam/runtime/processors/parameter_output_processor_factory.h>
+#include <piejam/audio/engine/value_io_processor.h>
+#include <piejam/entity_id_hash.h>
+#include <piejam/runtime/parameter/fwd.h>
+#include <piejam/runtime/parameter/map.h>
 
+#include <boost/assert.hpp>
+
+#include <concepts>
+#include <memory>
+#include <string_view>
 #include <tuple>
-#include <variant>
+#include <unordered_map>
 
 namespace piejam::runtime::processors
 {
 
-template <class, class>
-class parameter_processor_factory;
-
-template <class... InParameter, class... OutParameter>
-class parameter_processor_factory<
-        std::tuple<InParameter...>,
-        std::tuple<OutParameter...>>
+template <class... Parameter>
+class parameter_processor_factory
 {
 public:
     template <class P>
-    auto make_input_processor(
-            parameter::id_t<P> id,
-            std::string_view const& name = {})
-    {
-        return m_in_factory.template make_processor<P>(id, name);
-    }
+    using parameter_processor =
+            audio::engine::value_io_processor<typename P::value_type>;
 
     template <class P>
-    auto make_output_processor(
-            parameter::id_t<P> id,
-            std::string_view const& name = {})
+    using processor_map = std::unordered_map<
+            parameter::id_t<P>,
+            std::weak_ptr<parameter_processor<P>>>;
+
+    template <class P>
+    auto
+    make_processor(parameter::id_t<P> id, std::string_view const& name = {})
+            -> std::shared_ptr<parameter_processor<P>>
     {
-        return m_out_factory.template make_processor<P>(id, name);
+        auto proc = std::make_shared<parameter_processor<P>>(name);
+        BOOST_VERIFY(
+                std::get<processor_map<P>>(m_procs).emplace(id, proc).second);
+        return proc;
     }
 
     template <class P>
     void initialize(parameter::map<P> const& params) const
     {
-        m_in_factory.template initialize<P>(params);
+        for (auto&& [id, weak_proc] : std::get<processor_map<P>>(m_procs))
+        {
+            if (auto proc = weak_proc.lock())
+            {
+                if (auto const* value = params.get(id))
+                {
+                    proc->set(*value);
+                }
+            }
+        }
     }
 
     template <class... Ps>
     void initialize(parameter::maps_collection<Ps...> const& params) const
     {
-        m_in_factory.initialize(params);
+        (initialize(params.template get_map<Parameter>()), ...);
     }
 
     template <class P, std::convertible_to<typename P::value_type> V>
     void set(parameter::id_t<P> id, V&& value) const
     {
-        m_in_factory.template set<P>(id, std::forward<V>(value));
+        auto const& proc_map = std::get<processor_map<P>>(m_procs);
+        auto it = proc_map.find(id);
+        if (it != proc_map.end())
+        {
+            if (auto proc = it->second.lock())
+            {
+                proc->set(std::forward<V>(value));
+            }
+        }
     }
 
     template <class P, class F>
     auto consume(parameter::id_t<P> id, F&& f) const
     {
-        m_out_factory.template consume<P, F>(id, std::forward<F>(f));
+        auto& proc_map = std::get<processor_map<P>>(m_procs);
+        auto it = proc_map.find(id);
+        if (it != proc_map.end())
+        {
+            if (auto proc = it->second.lock())
+                proc->consume(std::forward<F>(f));
+        }
     }
 
-    void clear_expired()
-    {
-        m_in_factory.clear_expired();
-        m_out_factory.clear_expired();
-    }
+    void clear_expired() { (..., clear_expired<Parameter>()); }
 
 private:
-    parameter_input_processor_factory<InParameter...> m_in_factory;
-    parameter_output_processor_factory<OutParameter...> m_out_factory;
+    template <class P>
+    void clear_expired()
+    {
+        std::erase_if(std::get<processor_map<P>>(m_procs), [](auto const& p) {
+            return p.second.expired();
+        });
+    }
+
+    std::tuple<processor_map<Parameter>...> m_procs;
 };
 
 template <class ProcessorFactory, class... P>
 auto
-make_input_processor(
+make_parameter_processor(
         ProcessorFactory& proc_factory,
         std::variant<P...> const& param,
         std::string_view const& name = {})
@@ -84,7 +116,7 @@ make_input_processor(
     return std::visit(
             [&proc_factory,
              &name](auto&& p) -> std::shared_ptr<audio::engine::processor> {
-                return proc_factory.make_input_processor(
+                return proc_factory.make_processor(
                         std::forward<decltype(p)>(p),
                         name);
             },
