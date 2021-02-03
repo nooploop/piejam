@@ -18,7 +18,7 @@
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/fx/registry.h>
-#include <piejam/runtime/midi.h>
+#include <piejam/runtime/midi_device_config.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/float_.h>

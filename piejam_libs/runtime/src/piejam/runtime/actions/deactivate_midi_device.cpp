@@ -4,7 +4,7 @@
 
 #include <piejam/runtime/actions/deactivate_midi_device.h>
 
-#include <piejam/runtime/midi.h>
+#include <piejam/runtime/midi_device_config.h>
 #include <piejam/runtime/state.h>
 
 namespace piejam::runtime::actions
