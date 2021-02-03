@@ -11,6 +11,7 @@
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
+#include <piejam/runtime/parameter/float_normalize.h>
 
 #include <boost/range/algorithm_ext/erase.hpp>
 
@@ -18,6 +19,53 @@
 
 namespace piejam::runtime
 {
+
+namespace
+{
+
+struct volume_low_db_interval
+{
+    static constexpr float min = -60.f;
+    static constexpr float max = -12.f;
+};
+
+struct volume_high_db_interval
+{
+    static constexpr float min = -12.f;
+    static constexpr float max = 12.f;
+};
+
+constexpr auto
+to_normalized_volume(float_parameter const& p, float const value)
+{
+    if (value == 0.f)
+        return 0.f;
+    else if (0.f < value && value < 0.0625f)
+        return parameter::to_normalized_db<volume_low_db_interval>(p, value) /
+               4.f;
+    else
+        return (parameter::to_normalized_db<volume_high_db_interval>(p, value) *
+                0.75f) +
+               0.25f;
+}
+
+constexpr auto
+from_normalized_volume(float_parameter const& p, float const norm_value)
+        -> float
+{
+    if (norm_value == 0.f)
+        return 0.f;
+    else if (0.f < norm_value && norm_value < 0.25f)
+        return parameter::from_normalized_db<volume_low_db_interval>(
+                p,
+                4.f * norm_value);
+    else
+        return parameter::from_normalized_db<volume_high_db_interval>(
+                p,
+                (norm_value - 0.25f) / 0.75f);
+}
+
+} // namespace
 
 template <class Vector>
 static auto
@@ -271,7 +319,9 @@ add_mixer_bus(
             .volume = params.add(parameter::float_{
                     .default_value = 1.f,
                     .min = 0.f,
-                    .max = 4.f}),
+                    .max = 4.f,
+                    .to_normalized = &to_normalized_volume,
+                    .from_normalized = &from_normalized_volume}),
             .pan_balance = params.add(parameter::float_{
                     .default_value = 0.f,
                     .min = -1.f,
