@@ -325,7 +325,9 @@ add_mixer_bus(
             .pan_balance = params.add(parameter::float_{
                     .default_value = 0.f,
                     .min = -1.f,
-                    .max = 1.f}),
+                    .max = 1.f,
+                    .to_normalized = &parameter::to_normalized_linear,
+                    .from_normalized = &parameter::from_normalized_linear}),
             .mute = params.add(parameter::bool_{.default_value = false}),
             .level = params.add(parameter::stereo_level{}),
             .type = type,

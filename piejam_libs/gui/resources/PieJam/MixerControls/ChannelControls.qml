@@ -16,6 +16,9 @@ Item {
     property alias solo: soloButton.checked
     property alias mute: muteButton.checked
 
+    property alias soloMidi: midiAssignSolo
+    property alias muteMidi: midiAssignMute
+
     signal soloToggled()
     signal muteToggled()
 
@@ -39,6 +42,20 @@ Item {
             anchors.fill: parent
             anchors.topMargin: 1
             anchors.bottomMargin: 1
+        }
+
+        Binding {
+            when: !root.soloEnabled
+            target: midiAssignSolo
+            property: "visible"
+            value: false
+        }
+
+        Binding {
+            when: !root.soloEnabled
+            target: midiAssignSolo
+            property: "enabled"
+            value: false
         }
     }
 

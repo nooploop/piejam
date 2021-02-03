@@ -11,10 +11,7 @@ import ".."
 Item {
     id: root
 
-    property string assignment: ""
-
-    signal midiLearnStarted()
-    signal midiLearnStopped()
+    property var model
 
     implicitWidth: 100
     implicitHeight: 100
@@ -29,7 +26,7 @@ Item {
         readonly property color assignedLearnColor: "#306bea04"
         readonly property color assignedBorderColor: "#6bea04"
 
-        readonly property bool assigned: root.assignment !== ""
+        readonly property bool assigned: root.model ? root.model.assignment !== "" : false
         readonly property color backgroundColor: assigned ? assignedColor : unassignedColor
         readonly property color backgroundLearnColor: assigned ? assignedLearnColor : unassignedLearnColor
         readonly property color borderColor: assigned ? assignedBorderColor : unassignedBorderColor
@@ -40,7 +37,7 @@ Item {
         font.bold: true
         padding: 2
         color: assigned ? assignedBorderColor : unassignedBorderColor
-        text: root.assignment
+        text: root.model ? root.model.assignment : ""
 
         background: Rectangle {
             id: background
@@ -93,15 +90,22 @@ Item {
 
         onLearningStarted: {
             midiAssign.learning = true;
-            root.midiLearnStarted()
+            if (root.model)
+                root.model.startLearn()
         }
 
         onLearningStopped: {
             midiAssign.learning = false
-            root.midiLearnStopped()
+            if (root.model)
+                root.model.stopLearn()
         }
     }
 
     enabled: MidiLearn.active
     visible: MidiLearn.active
+
+    onModelChanged: {
+        if (root.model)
+            root.model.subscribed = Qt.binding(function() { return root.visible && MidiLearn.active })
+    }
 }

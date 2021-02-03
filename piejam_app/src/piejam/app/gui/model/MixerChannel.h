@@ -35,6 +35,8 @@ public:
     void focusFxChain() override;
 
     auto volumeMidi() const -> piejam::gui::model::MidiAssignable* override;
+    auto panMidi() const -> piejam::gui::model::MidiAssignable* override;
+    auto muteMidi() const -> piejam::gui::model::MidiAssignable* override;
 
 private:
     void onSubscribe() override;
@@ -46,6 +48,8 @@ private:
     runtime::stereo_level_parameter_id m_level;
 
     std::unique_ptr<MidiAssignable> m_volumeMidi;
+    std::unique_ptr<MidiAssignable> m_panMidi;
+    std::unique_ptr<MidiAssignable> m_muteMidi;
 };
 
 } // namespace piejam::app::gui::model

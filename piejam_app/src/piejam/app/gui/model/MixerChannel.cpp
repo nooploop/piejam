@@ -34,6 +34,14 @@ MixerChannel::MixerChannel(
               store_dispatch,
               state_change_subscriber,
               volume))
+    , m_panMidi(std::make_unique<MidiAssignable>(
+              store_dispatch,
+              state_change_subscriber,
+              pan_balance))
+    , m_muteMidi(std::make_unique<MidiAssignable>(
+              store_dispatch,
+              state_change_subscriber,
+              mute))
 {
 }
 
@@ -105,6 +113,18 @@ auto
 MixerChannel::volumeMidi() const -> piejam::gui::model::MidiAssignable*
 {
     return m_volumeMidi.get();
+}
+
+auto
+MixerChannel::panMidi() const -> piejam::gui::model::MidiAssignable*
+{
+    return m_panMidi.get();
+}
+
+auto
+MixerChannel::muteMidi() const -> piejam::gui::model::MidiAssignable*
+{
+    return m_muteMidi.get();
 }
 
 } // namespace piejam::app::gui::model

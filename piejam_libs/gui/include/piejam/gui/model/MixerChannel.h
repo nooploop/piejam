@@ -26,6 +26,10 @@ class MixerChannel : public SubscribableModel
 
     Q_PROPERTY(piejam::gui::model::MidiAssignable* volumeMidi READ volumeMidi
                        CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::MidiAssignable* panMidi READ panMidi CONSTANT
+                       FINAL)
+    Q_PROPERTY(piejam::gui::model::MidiAssignable* muteMidi READ muteMidi
+                       CONSTANT FINAL)
 
 public:
     using SubscribableModel::SubscribableModel;
@@ -65,6 +69,8 @@ public:
     Q_INVOKABLE virtual void focusFxChain() = 0;
 
     virtual auto volumeMidi() const -> MidiAssignable* = 0;
+    virtual auto panMidi() const -> MidiAssignable* = 0;
+    virtual auto muteMidi() const -> MidiAssignable* = 0;
 
 signals:
 
