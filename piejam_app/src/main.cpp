@@ -102,9 +102,7 @@ main(int argc, char* argv[]) -> int
                 std::forward<decltype(next)>(next));
     });
 
-    store.apply_middleware([](auto&& get_state,
-                              auto&& /*dispatch*/,
-                              auto&& next) {
+    store.apply_middleware([](auto&& get_state, auto&& dispatch, auto&& next) {
         thread::configuration const audio_thread_config{2, 96};
         std::array const worker_thread_configs{thread::configuration{3, 96}};
         return redux::make_middleware<runtime::audio_engine_middleware>(
@@ -114,6 +112,7 @@ main(int argc, char* argv[]) -> int
                 &audio::alsa::get_hw_params,
                 &runtime::open_alsa_device,
                 std::forward<decltype(get_state)>(get_state),
+                std::forward<decltype(dispatch)>(dispatch),
                 std::forward<decltype(next)>(next));
     });
 

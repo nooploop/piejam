@@ -36,8 +36,10 @@
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/audio_engine.h>
+#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/ladspa_manager.h>
 #include <piejam/runtime/state.h>
+#include <piejam/runtime/ui/batch_action.h>
 #include <piejam/tuple_element_compare.h>
 
 #include <spdlog/spdlog.h>
@@ -344,6 +346,7 @@ audio_engine_middleware::audio_engine_middleware(
         get_hw_params_f get_hw_params,
         device_factory_f device_factory,
         get_state_f get_state,
+        dispatch_f dispatch,
         next_f next)
     : m_audio_thread_config(audio_thread_config)
     , m_wt_configs(wt_configs.begin(), wt_configs.end())
@@ -351,6 +354,7 @@ audio_engine_middleware::audio_engine_middleware(
     , m_get_hw_params(std::move(get_hw_params))
     , m_device_factory(std::move(device_factory))
     , m_get_state(std::move(get_state))
+    , m_dispatch(std::move(dispatch))
     , m_next(std::move(next))
     , m_midi_manager(std::make_unique<midi::midi_manager>())
     , m_ladspa_fx_manager(std::make_unique<fx::ladspa_manager>())
@@ -653,7 +657,7 @@ audio_engine_middleware::process_engine_action(
 
     if (m_engine)
     {
-        m_engine->set_parameter(a.id, *m_get_state().params.get(a.id));
+        m_engine->set_parameter_value(a.id, *m_get_state().params.get(a.id));
     }
 }
 
@@ -681,7 +685,7 @@ audio_engine_middleware::process_engine_action(
 
         for (auto&& id : a.level_ids)
         {
-            if (auto lvl = m_engine->get_level(id))
+            if (auto lvl = m_engine->get_parameter_update(id))
                 next_action.levels.emplace_back(id, *lvl);
         }
 
@@ -720,7 +724,35 @@ audio_engine_middleware::process_engine_action(
 
                 m_next(next_action);
             }
+
+            rebuild();
         }
+
+        auto const& st = m_get_state();
+        batch_action param_update;
+        for (auto const& [id, ass] : st.midi_assignments.get())
+        {
+            std::visit(
+                    [this, &st, &param_update]<class P>(
+                            parameter::id_t<P> const& param_id) {
+                        if (auto value =
+                                    m_engine->get_parameter_update(param_id))
+                        {
+                            auto current_value = st.params.get(param_id);
+                            if (*value != *current_value)
+                            {
+                                param_update.emplace_back<
+                                        actions::set_parameter_value<P>>(
+                                        param_id,
+                                        *value);
+                            }
+                        }
+                    },
+                    id);
+        }
+
+        if (!param_update.empty())
+            m_dispatch(param_update);
     }
 }
 

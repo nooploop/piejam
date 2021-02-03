@@ -406,11 +406,11 @@ connect_midi(
         audio::engine::graph& g,
         audio::engine::processor_map const& procs,
         audio::engine::processor* midi_learn_output_proc,
-        parameter_maps const& params,
+        parameter_processor_factory const& param_procs,
         midi_assignments_map const& assignments)
 {
     auto* const midi_in_proc = procs.find(engine_processors::midi_input);
-    if (midi_in_proc)
+    if (!midi_in_proc)
         return;
 
     if (auto* const midi_learn_proc = procs.find(engine_processors::midi_learn))
@@ -445,9 +445,6 @@ connect_midi(
         {
             std::visit(
                     [&](auto const& param_id) {
-                        auto const* param = params.get_parameter(param_id);
-                        BOOST_ASSERT(param);
-
                         std::tuple const proc_id{param_id, ass};
                         auto proc = procs.find(proc_id);
                         BOOST_ASSERT(proc);
@@ -455,6 +452,10 @@ connect_midi(
                         g.add_event_wire(
                                 {*midi_assign_proc, out_index++},
                                 {*proc, 0});
+
+                        if (auto param_proc =
+                                    param_procs.find_processor(param_id))
+                            g.add_event_wire({*proc, 0}, {*param_proc, 0});
                     },
                     id);
         }
@@ -505,40 +506,54 @@ audio_engine::audio_engine(
 
 audio_engine::~audio_engine() = default;
 
+template <class P>
 void
-audio_engine::set_parameter(bool_parameter_id const id, bool const value) const
+audio_engine::set_parameter_value(
+        parameter::id_t<P> const id,
+        typename P::value_type const& value) const
 {
     m_impl->param_procs.set(id, value);
 }
 
-void
-audio_engine::set_parameter(float_parameter_id const id, float const value)
-        const
+template void
+audio_engine::set_parameter_value(bool_parameter_id, bool const&) const;
+
+template void
+audio_engine::set_parameter_value(float_parameter_id, float const&) const;
+
+template void
+audio_engine::set_parameter_value(int_parameter_id, int const&) const;
+
+template <class P>
+auto
+audio_engine::get_parameter_update(parameter::id_t<P> const id) const
+        -> std::optional<typename P::value_type>
 {
-    m_impl->param_procs.set(id, value);
+    using value_type = typename P::value_type;
+    std::optional<typename P::value_type> result;
+    m_impl->param_procs.consume(id, [&result](value_type const& lvl) {
+        result = lvl;
+    });
+    return result;
 }
 
-void
-audio_engine::set_parameter(int_parameter_id const id, int const value) const
-{
-    m_impl->param_procs.set(id, value);
-}
+template auto audio_engine::get_parameter_update(bool_parameter_id) const
+        -> std::optional<bool>;
+
+template auto audio_engine::get_parameter_update(float_parameter_id) const
+        -> std::optional<float>;
+
+template auto audio_engine::get_parameter_update(int_parameter_id) const
+        -> std::optional<int>;
+
+template auto
+        audio_engine::get_parameter_update(stereo_level_parameter_id) const
+        -> std::optional<stereo_level>;
 
 void
 audio_engine::set_input_solo(mixer::bus_id const& id)
 {
     m_impl->input_solo_index_proc->set(id);
-}
-
-auto
-audio_engine::get_level(stereo_level_parameter_id const id) const
-        -> std::optional<stereo_level>
-{
-    std::optional<stereo_level> result;
-    m_impl->param_procs.consume(id, [&result](stereo_level const& lvl) {
-        result = lvl;
-    });
-    return result;
 }
 
 auto
@@ -621,7 +636,7 @@ audio_engine::rebuild(
             new_graph,
             procs,
             midi_learn_output_proc.get(),
-            params,
+            m_impl->param_procs,
             assignments);
 
     audio::engine::bypass_event_identity_processors(new_graph);

@@ -45,6 +45,15 @@ public:
     }
 
     template <class P>
+    auto find_processor(parameter::id_t<P> id) const
+            -> std::shared_ptr<parameter_processor<P>>
+    {
+        auto const& map = std::get<processor_map<P>>(m_procs);
+        auto it = map.find(id);
+        return it != map.end() ? it->second.lock() : nullptr;
+    }
+
+    template <class P>
     void initialize(parameter::map<P> const& params) const
     {
         for (auto&& [id, weak_proc] : std::get<processor_map<P>>(m_procs))

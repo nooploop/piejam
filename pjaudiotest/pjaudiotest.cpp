@@ -51,6 +51,9 @@ main(int argc, char* argv[]) -> int
                 },
                 [&audio_state](piejam::runtime::action const& action) {
                     audio_state = action.reduce(audio_state);
+                },
+                [&audio_state](piejam::runtime::action const& action) {
+                    audio_state = action.reduce(audio_state);
                 });
 
         {

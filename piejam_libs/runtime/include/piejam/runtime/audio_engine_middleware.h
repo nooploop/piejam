@@ -39,6 +39,7 @@ public:
             get_hw_params_f,
             device_factory_f,
             get_state_f,
+            dispatch_f,
             next_f);
     audio_engine_middleware(audio_engine_middleware&&) noexcept = default;
     ~audio_engine_middleware();
@@ -70,6 +71,7 @@ private:
     get_hw_params_f m_get_hw_params;
     device_factory_f m_device_factory;
     get_state_f m_get_state;
+    dispatch_f m_dispatch;
     next_f m_next;
 
     std::unique_ptr<midi::midi_manager> m_midi_manager;

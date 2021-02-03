@@ -34,14 +34,15 @@ public:
             unsigned num_device_output_channels);
     ~audio_engine();
 
-    void set_parameter(bool_parameter_id, bool) const;
-    void set_parameter(float_parameter_id, float) const;
-    void set_parameter(int_parameter_id, int) const;
+    template <class P>
+    void set_parameter_value(parameter::id_t<P>, typename P::value_type const&)
+            const;
+
+    template <class P>
+    auto get_parameter_update(parameter::id_t<P>) const
+            -> std::optional<typename P::value_type>;
 
     void set_input_solo(mixer::bus_id const&);
-
-    auto get_level(stereo_level_parameter_id) const
-            -> std::optional<stereo_level>;
 
     auto get_learned_midi() const -> std::optional<midi::external_event>;
 

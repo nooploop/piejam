@@ -27,6 +27,7 @@ struct audio_engine_middleware_test : ::testing::Test
                 create_device,
                 std::unique_ptr<audio::device>(state const&));
         MOCK_CONST_METHOD0(get_state, state const&());
+        MOCK_CONST_METHOD1(dispatch, void(action const&));
         MOCK_CONST_METHOD1(next, void(action const&));
     };
 
@@ -47,6 +48,7 @@ struct audio_engine_middleware_test : ::testing::Test
                     return m_ctrl.create_device(st);
                 },
                 [this]() -> state const& { return m_ctrl.get_state(); },
+                [this](action const& a) { m_ctrl.dispatch(a); },
                 [this](action const& a) { m_ctrl.next(a); });
     }
 };
