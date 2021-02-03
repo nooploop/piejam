@@ -24,6 +24,8 @@ Item {
 
     property bool isSwitch: false
 
+    property alias midi: midiAssign
+
     signal sliderMoved(real newValue)
     signal switchToggled(bool newValue)
 
@@ -80,11 +82,11 @@ Item {
         StackLayout {
             id: controlStack
 
+            anchors.left: parent.left
+            anchors.right: parent.right
             anchors.top: valueLabel.bottom
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 8
-            anchors.topMargin: 8
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.margins: 8
 
             currentIndex: root.isSwitch ? 1 : 0
 
@@ -107,6 +109,12 @@ Item {
                     Info.quickTip = "<b>" + root.name + "</b>: " + (root.switchValue ? "on" : "off")
                 }
             }
+        }
+
+        MidiAssignArea {
+            id: midiAssign
+
+            anchors.fill: controlStack
         }
     }
 }

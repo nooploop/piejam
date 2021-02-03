@@ -19,14 +19,19 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::fx::parameter_id);
+    ~FxParameter();
 
     void changeValue(double) override;
     void changeSwitchValue(bool) override;
+
+    auto midi() const -> piejam::gui::model::MidiAssignable* override;
 
 private:
     void onSubscribe() override;
 
     runtime::fx::parameter_id m_fx_param_id;
+
+    std::unique_ptr<piejam::gui::model::MidiAssignable> m_midi;
 };
 
 } // namespace piejam::app::gui::model

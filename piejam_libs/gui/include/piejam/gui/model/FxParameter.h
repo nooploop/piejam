@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/gui/model/fwd.h>
 
 namespace piejam::gui::model
 {
@@ -25,6 +26,9 @@ class FxParameter : public SubscribableModel
     Q_PROPERTY(bool isSwitch READ isSwitch NOTIFY isSwitchChanged FINAL)
     Q_PROPERTY(
             bool switchValue READ switchValue NOTIFY switchValueChanged FINAL)
+
+    Q_PROPERTY(
+            piejam::gui::model::MidiAssignable* midi READ midi CONSTANT FINAL)
 
 public:
     using SubscribableModel::SubscribableModel;
@@ -116,6 +120,8 @@ public:
     }
 
     Q_INVOKABLE virtual void changeSwitchValue(bool) = 0;
+
+    virtual auto midi() const -> MidiAssignable* = 0;
 
 signals:
     void nameChanged();

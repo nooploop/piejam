@@ -4,6 +4,7 @@
 
 #include <piejam/app/gui/model/FxParameter.h>
 
+#include <piejam/app/gui/model/MidiAssignable.h>
 #include <piejam/math.h>
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
@@ -24,12 +25,18 @@ FxParameter::FxParameter(
         runtime::fx::parameter_id fx_param_id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_fx_param_id(fx_param_id)
+    , m_midi(std::make_unique<piejam::app::gui::model::MidiAssignable>(
+              store_dispatch,
+              state_change_subscriber,
+              fx_param_id))
 {
     setStepped(
             std::holds_alternative<runtime::int_parameter_id>(m_fx_param_id));
     setIsSwitch(
             std::holds_alternative<runtime::bool_parameter_id>(m_fx_param_id));
 }
+
+FxParameter::~FxParameter() = default;
 
 void
 FxParameter::onSubscribe()
@@ -97,6 +104,12 @@ FxParameter::changeSwitchValue(bool value)
     {
         dispatch(runtime::actions::set_bool_parameter(*id, value));
     }
+}
+
+auto
+FxParameter::midi() const -> piejam::gui::model::MidiAssignable*
+{
+    return m_midi.get();
 }
 
 } // namespace piejam::app::gui::model

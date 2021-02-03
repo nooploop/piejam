@@ -5,11 +5,10 @@
 #pragma once
 
 #include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/gui/model/fwd.h>
 
 namespace piejam::gui::model
 {
-
-class MidiAssignable;
 
 class MixerChannel : public SubscribableModel
 {

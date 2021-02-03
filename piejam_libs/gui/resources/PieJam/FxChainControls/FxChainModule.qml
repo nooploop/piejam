@@ -147,6 +147,8 @@ Item {
 
                 isSwitch: model.item.isSwitch
 
+                midi.model: model.item.midi
+
                 height: parametersList.height
 
                 onSliderMoved: model.item.changeValue(newValue)
