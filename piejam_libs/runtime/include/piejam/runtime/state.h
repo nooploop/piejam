@@ -18,8 +18,8 @@
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/fx/registry.h>
-#include <piejam/runtime/midi_device_config.h>
 #include <piejam/runtime/midi_assignment.h>
+#include <piejam/runtime/midi_device_config.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
@@ -103,7 +103,7 @@ auto insert_internal_fx_module(
         mixer::bus_id,
         std::size_t position,
         fx::internal,
-        std::vector<fx::parameter_assignment> const& initial_assignments)
+        std::vector<fx::parameter_value_assignment> const& initial_values)
         -> fx::module_id;
 void insert_ladspa_fx_module(
         state&,
@@ -112,7 +112,7 @@ void insert_ladspa_fx_module(
         fx::ladspa_instance_id,
         audio::ladspa::plugin_descriptor const&,
         std::span<audio::ladspa::port_descriptor const> const& control_inputs,
-        std::vector<fx::parameter_assignment> const& initial_assignments);
+        std::vector<fx::parameter_value_assignment> const& initial_values);
 void insert_missing_ladspa_fx_module(
         state&,
         mixer::bus_id,

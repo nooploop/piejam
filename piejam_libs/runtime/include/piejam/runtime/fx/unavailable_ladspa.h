@@ -15,7 +15,7 @@ namespace piejam::runtime::fx
 struct unavailable_ladspa
 {
     audio::ladspa::plugin_id_t plugin_id;
-    std::vector<fx::parameter_assignment> parameter_assignments;
+    std::vector<parameter_value_assignment> parameter_values;
 };
 
 } // namespace piejam::runtime::fx

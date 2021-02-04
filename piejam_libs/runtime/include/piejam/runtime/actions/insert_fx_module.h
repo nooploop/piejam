@@ -27,7 +27,7 @@ struct insert_internal_fx_module final
     mixer::bus_id fx_chain_bus;
     std::size_t position{};
     fx::internal type{};
-    std::vector<fx::parameter_assignment> initial_assignments;
+    std::vector<fx::parameter_value_assignment> initial_values;
 
     auto reduce(state const&) const -> state override;
 };
@@ -40,7 +40,7 @@ struct load_ladspa_fx_plugin final
     std::size_t position{};
     audio::ladspa::plugin_id_t plugin_id;
     std::string name;
-    std::vector<fx::parameter_assignment> initial_assignments;
+    std::vector<fx::parameter_value_assignment> initial_values;
 
     auto reduce(state const&) const -> state override;
 };

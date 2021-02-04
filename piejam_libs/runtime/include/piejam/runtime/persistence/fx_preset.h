@@ -13,14 +13,14 @@
 namespace piejam::runtime::fx
 {
 
-void to_json(nlohmann::json&, parameter_assignment const&);
-void from_json(nlohmann::json const&, parameter_assignment&);
+void to_json(nlohmann::json&, parameter_value_assignment const&);
+void from_json(nlohmann::json const&, parameter_value_assignment&);
 
 } // namespace piejam::runtime::fx
 
 namespace piejam::runtime::persistence
 {
 
-using fx_preset = std::vector<fx::parameter_assignment>;
+using fx_preset = std::vector<fx::parameter_value_assignment>;
 
 } // namespace piejam::runtime::persistence

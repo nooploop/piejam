@@ -10,7 +10,7 @@ namespace piejam::runtime::fx
 {
 
 void
-to_json(nlohmann::json& j, parameter_assignment const& p)
+to_json(nlohmann::json& j, parameter_value_assignment const& p)
 {
     struct fx_parameter_value_to_json
     {
@@ -24,7 +24,7 @@ to_json(nlohmann::json& j, parameter_assignment const& p)
 }
 
 void
-from_json(nlohmann::json const& j, parameter_assignment& p)
+from_json(nlohmann::json const& j, parameter_value_assignment& p)
 {
     j.at("key").get_to(p.key);
 

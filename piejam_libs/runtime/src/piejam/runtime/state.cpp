@@ -119,12 +119,12 @@ make_fx_gain(
 }
 
 static void
-apply_parameter_assignments(
-        std::vector<fx::parameter_assignment> const& assignments,
+apply_parameter_values(
+        std::vector<fx::parameter_value_assignment> const& values,
         fx::module const& fx_mod,
         parameter_maps& params)
 {
-    for (auto&& [key, value] : assignments)
+    for (auto&& [key, value] : values)
     {
         if (auto it = fx_mod.parameters->find(key);
             it != fx_mod.parameters->end())
@@ -154,7 +154,7 @@ insert_internal_fx_module(
         mixer::bus_id const bus_id,
         std::size_t const position,
         fx::internal const fx_type,
-        std::vector<fx::parameter_assignment> const& initial_assignments)
+        std::vector<fx::parameter_value_assignment> const& initial_assignments)
         -> fx::module_id
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
@@ -177,7 +177,7 @@ insert_internal_fx_module(
 
     st.fx_parameters = std::move(fx_params);
 
-    apply_parameter_assignments(
+    apply_parameter_values(
             initial_assignments,
             *st.fx_modules[fx_chain[insert_pos]],
             st.params);
@@ -197,7 +197,7 @@ insert_ladspa_fx_module(
         fx::ladspa_instance_id const instance_id,
         audio::ladspa::plugin_descriptor const& plugin_desc,
         std::span<audio::ladspa::port_descriptor const> const& control_inputs,
-        std::vector<fx::parameter_assignment> const& initial_assignments)
+        std::vector<fx::parameter_value_assignment> const& initial_values)
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
@@ -219,8 +219,8 @@ insert_ladspa_fx_module(
 
     st.fx_parameters = std::move(fx_params);
 
-    apply_parameter_assignments(
-            initial_assignments,
+    apply_parameter_values(
+            initial_values,
             *st.fx_modules[fx_chain[insert_pos]],
             st.params);
 

@@ -96,9 +96,10 @@ save_app_config(std::filesystem::path const& file, state const& state)
 static auto
 export_parameter_assignments(
         fx::module const& fx_mod,
-        parameter_maps const& params) -> std::vector<fx::parameter_assignment>
+        parameter_maps const& params)
+        -> std::vector<fx::parameter_value_assignment>
 {
-    std::vector<fx::parameter_assignment> result;
+    std::vector<fx::parameter_value_assignment> result;
 
     for (auto&& [key, fx_param_id] : *fx_mod.parameters)
     {
@@ -106,7 +107,8 @@ export_parameter_assignments(
                 [&](auto&& param) {
                     auto const* const value = params.get(param);
                     BOOST_ASSERT(value);
-                    result.emplace_back(fx::parameter_assignment{key, *value});
+                    result.emplace_back(
+                            fx::parameter_value_assignment{key, *value});
                 },
                 fx_param_id);
     }
@@ -158,7 +160,7 @@ export_fx_plugin(
     session::ladspa_plugin plug;
     plug.id = unavail->plugin_id;
     plug.name = fx_mod.name;
-    plug.preset = unavail->parameter_assignments;
+    plug.preset = unavail->parameter_values;
     return plug;
 }
 

@@ -295,7 +295,7 @@ struct insert_ladspa_fx_module_action final
     fx::ladspa_instance_id instance_id;
     audio::ladspa::plugin_descriptor plugin_desc;
     std::span<audio::ladspa::port_descriptor const> control_inputs;
-    std::vector<fx::parameter_assignment> initial_assignments;
+    std::vector<fx::parameter_value_assignment> initial_values;
 
     auto reduce(state const& st) const -> state override
     {
@@ -308,7 +308,7 @@ struct insert_ladspa_fx_module_action final
                 instance_id,
                 plugin_desc,
                 control_inputs,
-                initial_assignments);
+                initial_values);
 
         return new_st;
     }
@@ -626,7 +626,7 @@ audio_engine_middleware::process_engine_action(
             next_action.plugin_desc = *plugin_desc;
             next_action.control_inputs =
                     m_ladspa_fx_manager->control_inputs(id);
-            next_action.initial_assignments = a.initial_assignments;
+            next_action.initial_values = a.initial_values;
 
             m_next(next_action);
 
@@ -643,7 +643,7 @@ audio_engine_middleware::process_engine_action(
     insert_missing_ladspa_fx_module_action next_action;
     next_action.fx_chain_bus = a.fx_chain_bus;
     next_action.position = a.position;
-    next_action.unavailable_ladspa = {a.plugin_id, a.initial_assignments};
+    next_action.unavailable_ladspa = {a.plugin_id, a.initial_values};
     next_action.name = a.name;
     m_next(next_action);
 }

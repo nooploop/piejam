@@ -42,7 +42,7 @@ reload_missing_plugins() -> thunk_action
                             fx_pos,
                             unavail->plugin_id,
                             *fx_mod->name,
-                            unavail->parameter_assignments));
+                            unavail->parameter_values));
                 }
             }
         }

@@ -9,10 +9,11 @@
 namespace piejam::runtime::fx
 {
 
+template <class Value>
 struct parameter_assignment
 {
     parameter_key key;
-    parameter_value value;
+    Value value;
 };
 
 } // namespace piejam::runtime::fx
