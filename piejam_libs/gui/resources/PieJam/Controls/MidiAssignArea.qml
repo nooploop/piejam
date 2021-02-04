@@ -34,9 +34,10 @@ Item {
         anchors.fill: parent
 
         font.pixelSize: 11
+        wrapMode: Text.WordWrap
         font.bold: true
         padding: 2
-        color: assigned ? assignedBorderColor : unassignedBorderColor
+        color: "#ffffff"
         text: root.model ? root.model.assignment : ""
 
         background: Rectangle {
