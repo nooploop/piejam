@@ -7,10 +7,10 @@
 #include <piejam/entity_id_hash.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
-#include <piejam/runtime/state.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
 #include <piejam/runtime/persistence/app_config.h>
 #include <piejam/runtime/persistence/session.h>
+#include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
 #include <spdlog/spdlog.h>
@@ -115,6 +115,54 @@ export_parameter_assignments(
 }
 
 static auto
+export_fx_plugin(
+        state const& st,
+        fx::module const& fx_mod,
+        fx::internal const fx_type) -> session::fx_plugin
+{
+    BOOST_ASSERT(std::get<fx::internal>(fx_mod.fx_instance_id) == fx_type);
+
+    session::internal_fx fx;
+    fx.type = fx_type;
+    fx.preset = export_parameter_assignments(fx_mod, st.params);
+    return fx;
+}
+
+static auto
+export_fx_plugin(
+        state const& st,
+        fx::module const& fx_mod,
+        fx::ladspa_instance_id const id) -> session::fx_plugin
+{
+    BOOST_ASSERT(std::get<fx::ladspa_instance_id>(fx_mod.fx_instance_id) == id);
+
+    session::ladspa_plugin plug;
+    auto const& pd = st.fx_ladspa_instances->at(id);
+    plug.id = pd.id;
+    plug.name = pd.name;
+    plug.preset = export_parameter_assignments(fx_mod, st.params);
+    return plug;
+}
+
+static auto
+export_fx_plugin(
+        state const& st,
+        fx::module const& fx_mod,
+        fx::unavailable_ladspa_id const id) -> session::fx_plugin
+{
+    BOOST_ASSERT(
+            std::get<fx::unavailable_ladspa_id>(fx_mod.fx_instance_id) == id);
+
+    auto unavail = st.fx_unavailable_ladspa_plugins[id];
+    BOOST_ASSERT(unavail);
+    session::ladspa_plugin plug;
+    plug.id = unavail->plugin_id;
+    plug.name = fx_mod.name;
+    plug.preset = unavail->parameter_assignments;
+    return plug;
+}
+
+static auto
 export_fx_chains(state const& st, mixer::bus_list_t const& bus_ids)
         -> std::vector<persistence::session::fx_chain>
 {
@@ -130,38 +178,9 @@ export_fx_chains(state const& st, mixer::bus_list_t const& bus_ids)
         {
             fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
             fx_chain_data.emplace_back(std::visit(
-                    overload{
-                            [&st, fx_mod](fx::internal const fx_type)
-                                    -> session::fx_plugin {
-                                session::internal_fx fx;
-                                fx.type = fx_type;
-                                fx.preset = export_parameter_assignments(
-                                        *fx_mod,
-                                        st.params);
-                                return fx;
-                            },
-                            [&st, fx_mod](fx::ladspa_instance_id const id)
-                                    -> session::fx_plugin {
-                                session::ladspa_plugin plug;
-                                auto const& pd = st.fx_ladspa_instances->at(id);
-                                plug.id = pd.id;
-                                plug.name = pd.name;
-                                plug.preset = export_parameter_assignments(
-                                        *fx_mod,
-                                        st.params);
-                                return plug;
-                            },
-                            [&st, fx_mod](fx::unavailable_ladspa_id const id)
-                                    -> session::fx_plugin {
-                                auto unavail =
-                                        st.fx_unavailable_ladspa_plugins[id];
-                                BOOST_ASSERT(unavail);
-                                session::ladspa_plugin plug;
-                                plug.id = unavail->plugin_id;
-                                plug.name = fx_mod->name;
-                                plug.preset = unavail->parameter_assignments;
-                                return plug;
-                            }},
+                    [&st, fx_mod](auto const& id) {
+                        return export_fx_plugin(st, *fx_mod, id);
+                    },
                     fx_mod->fx_instance_id));
         }
     }
