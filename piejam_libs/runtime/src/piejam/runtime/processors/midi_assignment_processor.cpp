@@ -77,11 +77,8 @@ public:
         for (auto const& ev : ctx.event_inputs.get<midi::external_event>(0))
         {
             std::visit(
-                    [this,
-                     &ctx,
-                     offset = ev.offset(),
-                     dev_id = ev.value().device_id](auto const& midi_ev) {
-                        process_event(ctx, offset, dev_id, midi_ev);
+                    [this, &ctx, offset = ev.offset()](auto const& midi_ev) {
+                        process_event(ctx, offset, midi_ev);
                     },
                     ev.value().event);
         }
@@ -90,13 +87,11 @@ public:
     void process_event(
             audio::engine::process_context const& ctx,
             std::size_t const offset,
-            midi::device_id_t const dev_id,
             midi::channel_cc_event const& ev)
     {
         auto const out_index = algorithm::index_of(
                 m_midi_assignments,
                 midi_assignment{
-                        .device_id = dev_id,
                         .channel = ev.channel,
                         .control_type = midi_assignment::type::cc,
                         .control_id = ev.event.cc});

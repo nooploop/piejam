@@ -15,8 +15,6 @@ namespace piejam::runtime
 
 struct midi_assignment
 {
-    midi::device_id_t device_id;
-
     std::size_t channel{};
 
     enum class type
@@ -29,8 +27,7 @@ struct midi_assignment
 
     constexpr bool operator==(midi_assignment const& other) const noexcept
     {
-        return device_id == other.device_id && channel == other.channel &&
-               control_type == other.control_type &&
+        return channel == other.channel && control_type == other.control_type &&
                control_id == other.control_id;
     }
 

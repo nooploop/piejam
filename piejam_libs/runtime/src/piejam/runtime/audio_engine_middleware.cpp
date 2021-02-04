@@ -717,7 +717,6 @@ audio_engine_middleware::process_engine_action(
                 midi::channel_cc_event const& cc_event =
                         std::get<midi::channel_cc_event>(learned_midi->event);
                 next_action.assignment = midi_assignment{
-                        .device_id = learned_midi->device_id,
                         .channel = cc_event.channel,
                         .control_type = midi_assignment::type::cc,
                         .control_id = cc_event.event.cc};
