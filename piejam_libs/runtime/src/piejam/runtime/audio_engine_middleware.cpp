@@ -260,33 +260,6 @@ struct update_info final : ui::cloneable_action<update_info, action>
     }
 };
 
-struct learn_midi_assignment final
-    : ui::cloneable_action<learn_midi_assignment, action>
-{
-    midi_assignment assignment;
-
-    auto reduce(state const& st) const -> state override
-    {
-        auto new_st = st;
-
-        BOOST_ASSERT(new_st.midi_learning);
-
-        new_st.midi_assignments.update(
-                [this, id = *new_st.midi_learning](
-                        midi_assignments_map& midi_assigns) {
-                    std::erase_if(
-                            midi_assigns,
-                            tuple::element<1>.equal_to(std::cref(assignment)));
-
-                    midi_assigns.insert_or_assign(id, assignment);
-                });
-
-        new_st.midi_learning.reset();
-
-        return new_st;
-    }
-};
-
 struct insert_ladspa_fx_module_action final
     : ui::cloneable_action<insert_ladspa_fx_module_action, action>
 {
@@ -296,6 +269,7 @@ struct insert_ladspa_fx_module_action final
     audio::ladspa::plugin_descriptor plugin_desc;
     std::span<audio::ladspa::port_descriptor const> control_inputs;
     std::vector<fx::parameter_value_assignment> initial_values;
+    std::vector<fx::parameter_midi_assignment> midi_assigns;
 
     auto reduce(state const& st) const -> state override
     {
@@ -308,7 +282,8 @@ struct insert_ladspa_fx_module_action final
                 instance_id,
                 plugin_desc,
                 control_inputs,
-                initial_values);
+                initial_values,
+                midi_assigns);
 
         return new_st;
     }
@@ -627,6 +602,7 @@ audio_engine_middleware::process_engine_action(
             next_action.control_inputs =
                     m_ladspa_fx_manager->control_inputs(id);
             next_action.initial_values = a.initial_values;
+            next_action.midi_assigns = a.midi_assigns;
 
             m_next(next_action);
 
@@ -643,7 +619,10 @@ audio_engine_middleware::process_engine_action(
     insert_missing_ladspa_fx_module_action next_action;
     next_action.fx_chain_bus = a.fx_chain_bus;
     next_action.position = a.position;
-    next_action.unavailable_ladspa = {a.plugin_id, a.initial_values};
+    next_action.unavailable_ladspa = fx::unavailable_ladspa{
+            .plugin_id = a.plugin_id,
+            .parameter_values = a.initial_values,
+            .midi_assigns = a.midi_assigns};
     next_action.name = a.name;
     m_next(next_action);
 }
@@ -710,19 +689,22 @@ audio_engine_middleware::process_engine_action(
     {
         if (auto learned_midi = m_engine->get_learned_midi())
         {
-            if (std::holds_alternative<midi::channel_cc_event>(
-                        learned_midi->event))
+            if (auto const* const cc_event =
+                        std::get_if<midi::channel_cc_event>(
+                                &learned_midi->event))
             {
-                learn_midi_assignment next_action;
-                midi::channel_cc_event const& cc_event =
-                        std::get<midi::channel_cc_event>(learned_midi->event);
-                next_action.assignment = midi_assignment{
-                        .channel = cc_event.channel,
-                        .control_type = midi_assignment::type::cc,
-                        .control_id = cc_event.event.cc};
+                actions::update_midi_assignments next_action;
+                next_action.assignments.emplace(
+                        *m_get_state().midi_learning,
+                        midi_assignment{
+                                .channel = cc_event->channel,
+                                .control_type = midi_assignment::type::cc,
+                                .control_id = cc_event->event.cc});
 
                 m_next(next_action);
             }
+
+            m_next(actions::stop_midi_learning{});
 
             rebuild();
         }
@@ -753,24 +735,6 @@ audio_engine_middleware::process_engine_action(
         if (!param_update.empty())
             m_dispatch(param_update);
     }
-}
-
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        actions::start_midi_learning const& a)
-{
-    m_next(a);
-    rebuild();
-}
-
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        actions::stop_midi_learning const& a)
-{
-    m_next(a);
-    rebuild();
 }
 
 void

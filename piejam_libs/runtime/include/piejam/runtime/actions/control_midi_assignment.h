@@ -29,4 +29,13 @@ struct stop_midi_learning final
     auto reduce(state const&) const -> state override;
 };
 
+struct update_midi_assignments final
+    : ui::cloneable_action<update_midi_assignments, action>
+    , visitable_engine_action<update_midi_assignments>
+{
+    midi_assignments_map assignments;
+
+    auto reduce(state const&) const -> state override;
+};
+
 } // namespace piejam::runtime::actions

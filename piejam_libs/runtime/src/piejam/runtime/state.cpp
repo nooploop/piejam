@@ -12,6 +12,7 @@
 #include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_normalize.h>
+#include <piejam/tuple_element_compare.h>
 
 #include <boost/range/algorithm_ext/erase.hpp>
 
@@ -148,13 +149,50 @@ apply_parameter_values(
     }
 }
 
+static void
+update_midi_assignments(
+        box<midi_assignments_map>& midi_assigns,
+        midi_assignments_map const& new_assignments)
+{
+    midi_assigns.update([&](midi_assignments_map& midi_assigns) {
+        for (auto&& [id, ass] : new_assignments)
+        {
+            std::erase_if(
+                    midi_assigns,
+                    tuple::element<1>.equal_to(std::cref(ass)));
+
+            midi_assigns.insert_or_assign(id, ass);
+        }
+    });
+}
+
+static void
+apply_fx_midi_assignments(
+        std::vector<fx::parameter_midi_assignment> const& fx_midi_assigns,
+        fx::module const& fx_mod,
+        box<midi_assignments_map>& midi_assigns)
+{
+    midi_assignments_map new_assignments;
+    for (auto&& [key, value] : fx_midi_assigns)
+    {
+        if (auto it = fx_mod.parameters->find(key);
+            it != fx_mod.parameters->end())
+        {
+            new_assignments.emplace(it->second, value);
+        }
+    }
+
+    update_midi_assignments(midi_assigns, new_assignments);
+}
+
 auto
 insert_internal_fx_module(
         state& st,
         mixer::bus_id const bus_id,
         std::size_t const position,
         fx::internal const fx_type,
-        std::vector<fx::parameter_value_assignment> const& initial_assignments)
+        std::vector<fx::parameter_value_assignment> const& initial_assignments,
+        std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> fx::module_id
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
@@ -177,10 +215,10 @@ insert_internal_fx_module(
 
     st.fx_parameters = std::move(fx_params);
 
-    apply_parameter_values(
-            initial_assignments,
-            *st.fx_modules[fx_chain[insert_pos]],
-            st.params);
+    auto const& fx_mod = *st.fx_modules[fx_chain[insert_pos]];
+
+    apply_parameter_values(initial_assignments, fx_mod, st.params);
+    apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
 
     st.mixer_state.buses.update(bus_id, [&](mixer::bus& bus) {
         bus.fx_chain = std::move(fx_chain);
@@ -197,7 +235,8 @@ insert_ladspa_fx_module(
         fx::ladspa_instance_id const instance_id,
         audio::ladspa::plugin_descriptor const& plugin_desc,
         std::span<audio::ladspa::port_descriptor const> const& control_inputs,
-        std::vector<fx::parameter_value_assignment> const& initial_values)
+        std::vector<fx::parameter_value_assignment> const& initial_values,
+        std::vector<fx::parameter_midi_assignment> const& midi_assigns)
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
@@ -219,10 +258,9 @@ insert_ladspa_fx_module(
 
     st.fx_parameters = std::move(fx_params);
 
-    apply_parameter_values(
-            initial_values,
-            *st.fx_modules[fx_chain[insert_pos]],
-            st.params);
+    auto const& fx_mod = *st.fx_modules[fx_chain[insert_pos]];
+    apply_parameter_values(initial_values, fx_mod, st.params);
+    apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
 
     st.mixer_state.buses.update(bus_id, [&](mixer::bus& bus) {
         bus.fx_chain = std::move(fx_chain);
@@ -400,5 +438,11 @@ clear_mixer_buses(state& st)
 
 template void clear_mixer_buses<io_direction::input>(state&);
 template void clear_mixer_buses<io_direction::output>(state&);
+
+void
+update_midi_assignments(state& st, midi_assignments_map const& assignments)
+{
+    update_midi_assignments(st.midi_assignments, assignments);
+}
 
 } // namespace piejam::runtime

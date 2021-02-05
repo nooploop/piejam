@@ -94,9 +94,7 @@ save_app_config(std::filesystem::path const& file, state const& state)
 }
 
 static auto
-export_parameter_assignments(
-        fx::module const& fx_mod,
-        parameter_maps const& params)
+export_parameter_values(fx::module const& fx_mod, parameter_maps const& params)
         -> std::vector<fx::parameter_value_assignment>
 {
     std::vector<fx::parameter_value_assignment> result;
@@ -117,6 +115,31 @@ export_parameter_assignments(
 }
 
 static auto
+export_fx_midi_assignments(
+        fx::module const& fx_mod,
+        midi_assignments_map const& midi_assigns)
+        -> std::vector<fx::parameter_midi_assignment>
+{
+    std::vector<fx::parameter_midi_assignment> result;
+
+    for (auto&& [key, fx_param_id] : *fx_mod.parameters)
+    {
+        std::visit(
+                [&](auto&& param) {
+                    if (auto it = midi_assigns.find(param);
+                        it != midi_assigns.end())
+                    {
+                        result.emplace_back(
+                                fx::parameter_midi_assignment{key, it->second});
+                    }
+                },
+                fx_param_id);
+    }
+
+    return result;
+}
+
+static auto
 export_fx_plugin(
         state const& st,
         fx::module const& fx_mod,
@@ -126,7 +149,8 @@ export_fx_plugin(
 
     session::internal_fx fx;
     fx.type = fx_type;
-    fx.preset = export_parameter_assignments(fx_mod, st.params);
+    fx.preset = export_parameter_values(fx_mod, st.params);
+    fx.midi = export_fx_midi_assignments(fx_mod, st.midi_assignments);
     return fx;
 }
 
@@ -142,7 +166,8 @@ export_fx_plugin(
     auto const& pd = st.fx_ladspa_instances->at(id);
     plug.id = pd.id;
     plug.name = pd.name;
-    plug.preset = export_parameter_assignments(fx_mod, st.params);
+    plug.preset = export_parameter_values(fx_mod, st.params);
+    plug.midi = export_fx_midi_assignments(fx_mod, st.midi_assignments);
     return plug;
 }
 
@@ -161,30 +186,62 @@ export_fx_plugin(
     plug.id = unavail->plugin_id;
     plug.name = fx_mod.name;
     plug.preset = unavail->parameter_values;
+    plug.midi = unavail->midi_assigns;
     return plug;
 }
 
 static auto
-export_fx_chains(state const& st, mixer::bus_list_t const& bus_ids)
-        -> std::vector<persistence::session::fx_chain>
+export_fx_chain(state const& st, fx::chain_t const& fx_chain)
+        -> persistence::session::fx_chain_t
 {
-    std::vector<persistence::session::fx_chain> result;
+    persistence::session::fx_chain_t result;
+
+    for (auto const& fx_mod_id : fx_chain)
+    {
+        fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
+        result.emplace_back(std::visit(
+                [&st, fx_mod](auto const& id) {
+                    return export_fx_plugin(st, *fx_mod, id);
+                },
+                fx_mod->fx_instance_id));
+    }
+
+    return result;
+}
+
+static auto
+export_mixer_midi(state const& st, mixer::bus const& bus)
+        -> persistence::session::mixer_midi
+{
+    persistence::session::mixer_midi result;
+
+    if (auto it = st.midi_assignments->find(bus.volume);
+        it != st.midi_assignments->end())
+        result.volume = it->second;
+
+    if (auto it = st.midi_assignments->find(bus.pan_balance);
+        it != st.midi_assignments->end())
+        result.pan = it->second;
+
+    if (auto it = st.midi_assignments->find(bus.mute);
+        it != st.midi_assignments->end())
+        result.mute = it->second;
+
+    return result;
+}
+
+static auto
+export_mixer_buses(state const& st, mixer::bus_list_t const& bus_ids)
+{
+    std::vector<persistence::session::mixer_bus> result;
 
     for (auto const& bus_id : bus_ids)
     {
         mixer::bus const* const bus = st.mixer_state.buses[bus_id];
 
-        auto& fx_chain_data = result.emplace_back();
-
-        for (auto const& fx_mod_id : *bus->fx_chain)
-        {
-            fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
-            fx_chain_data.emplace_back(std::visit(
-                    [&st, fx_mod](auto const& id) {
-                        return export_fx_plugin(st, *fx_mod, id);
-                    },
-                    fx_mod->fx_instance_id));
-        }
+        auto& mb_data = result.emplace_back();
+        mb_data.fx_chain = export_fx_chain(st, *bus->fx_chain);
+        mb_data.midi = export_mixer_midi(st, *bus);
     }
 
     return result;
@@ -218,8 +275,8 @@ save_session(std::filesystem::path const& file, state const& st)
 
         session ses;
 
-        ses.inputs = export_fx_chains(st, *st.mixer_state.inputs);
-        ses.outputs = export_fx_chains(st, *st.mixer_state.outputs);
+        ses.inputs = export_mixer_buses(st, *st.mixer_state.inputs);
+        ses.outputs = export_mixer_buses(st, *st.mixer_state.outputs);
 
         save_session(out, ses);
     }

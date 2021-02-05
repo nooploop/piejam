@@ -134,6 +134,7 @@ struct state_with_one_fx : testing::Test
                   bus_id,
                   0,
                   fx::internal::gain,
+                  {},
                   {}))
     {
     }

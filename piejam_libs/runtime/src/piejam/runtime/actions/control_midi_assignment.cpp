@@ -30,4 +30,14 @@ stop_midi_learning::reduce(state const& st) const -> state
     return new_st;
 }
 
+auto
+update_midi_assignments::reduce(state const& st) const -> state
+{
+    auto new_st = st;
+
+    runtime::update_midi_assignments(new_st, assignments);
+
+    return new_st;
+}
+
 } // namespace piejam::runtime::actions

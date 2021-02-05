@@ -7,6 +7,7 @@
 #include <piejam/functional/overload.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
+#include <piejam/runtime/persistence/midi_assignment.h>
 
 #include <nlohmann/json.hpp>
 
@@ -41,7 +42,7 @@ static auto const s_key_ladspa = "ladspa";
 void
 to_json(nlohmann::json& j, session::internal_fx const& fx)
 {
-    j = {{"type", fx.type}, {"preset", fx.preset}};
+    j = {{"type", fx.type}, {"preset", fx.preset}, {"midi", fx.midi}};
 }
 
 void
@@ -49,6 +50,7 @@ from_json(nlohmann::json const& j, session::internal_fx& fx)
 {
     j.at("type").get_to(fx.type);
     j.at("preset").get_to(fx.preset);
+    j.at("midi").get_to(fx.midi);
 }
 
 void
@@ -98,6 +100,45 @@ from_json(nlohmann::json const& j, session::fx_plugin& fx_plug)
     {
         throw std::runtime_error("unknown fx_plugin_id");
     }
+}
+
+void
+to_json(nlohmann::json& j, session::mixer_midi const& midi)
+{
+    if (midi.volume)
+        j["volume"] = *midi.volume;
+
+    if (midi.pan)
+        j["pan"] = *midi.pan;
+
+    if (midi.mute)
+        j["mute"] = *midi.mute;
+}
+
+void
+from_json(nlohmann::json const& j, session::mixer_midi& midi)
+{
+    if (j.contains("volume"))
+        midi.volume = j.at("volume").get<midi_assignment>();
+
+    if (j.contains("pan"))
+        midi.pan = j.at("pan").get<midi_assignment>();
+
+    if (j.contains("mute"))
+        midi.mute = j.at("mute").get<midi_assignment>();
+}
+
+void
+to_json(nlohmann::json& j, session::mixer_bus const& mb)
+{
+    j = {{"midi", mb.midi}, {"fx_chain", mb.fx_chain}};
+}
+
+void
+from_json(nlohmann::json const& j, session::mixer_bus& mb)
+{
+    j.at("midi").get_to(mb.midi);
+    j.at("fx_chain").get_to(mb.fx_chain);
 }
 
 static auto const s_key_inputs = "inputs";

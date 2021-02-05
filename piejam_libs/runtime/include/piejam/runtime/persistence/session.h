@@ -6,12 +6,15 @@
 
 #include <piejam/audio/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/persistence/fx_midi_assignments.h>
 #include <piejam/runtime/persistence/fx_preset.h>
 
 #include <nlohmann/json.hpp>
 
 #include <iosfwd>
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -27,6 +30,7 @@ struct session
     {
         fx::internal type;
         fx_preset preset;
+        fx_midi_assignments midi;
     };
 
     struct ladspa_plugin
@@ -34,6 +38,7 @@ struct session
         audio::ladspa::plugin_id_t id{};
         std::string name;
         fx_preset preset;
+        fx_midi_assignments midi;
     };
 
     struct fx_plugin : std::variant<internal_fx, ladspa_plugin>
@@ -43,10 +48,23 @@ struct session
         auto as_variant() const noexcept -> base_t const& { return *this; }
     };
 
-    using fx_chain = std::vector<fx_plugin>;
+    struct mixer_midi
+    {
+        std::optional<midi_assignment> volume;
+        std::optional<midi_assignment> pan;
+        std::optional<midi_assignment> mute;
+    };
 
-    std::vector<fx_chain> inputs;
-    std::vector<fx_chain> outputs;
+    using fx_chain_t = std::vector<fx_plugin>;
+
+    struct mixer_bus
+    {
+        mixer_midi midi;
+        fx_chain_t fx_chain;
+    };
+
+    std::vector<mixer_bus> inputs;
+    std::vector<mixer_bus> outputs;
 };
 
 void to_json(nlohmann::json&, session const&);

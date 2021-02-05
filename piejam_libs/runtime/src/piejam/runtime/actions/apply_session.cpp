@@ -5,6 +5,7 @@
 #include <piejam/runtime/actions/apply_session.h>
 
 #include <piejam/range/indices.h>
+#include <piejam/runtime/actions/control_midi_assignment.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/persistence/session.h>
@@ -32,6 +33,7 @@ struct make_add_fx_module_action
         action->position = npos;
         action->type = fx.type;
         action->initial_values = fx.preset;
+        action->midi_assigns = fx.midi;
         return action;
     }
 
@@ -44,6 +46,7 @@ struct make_add_fx_module_action
         action->plugin_id = ladspa_plug.id;
         action->name = ladspa_plug.name;
         action->initial_values = ladspa_plug.preset;
+        action->midi_assigns = ladspa_plug.midi;
         return action;
     }
 };
@@ -52,13 +55,13 @@ void
 make_add_fx_module_actions(
         batch_action& batch,
         mixer::bus_list_t const& bus_ids,
-        std::vector<persistence::session::fx_chain> const& fx_chain_data)
+        std::vector<persistence::session::mixer_bus> const& mb_data)
 {
     for (std::size_t i :
-         range::indices(std::min(fx_chain_data.size(), bus_ids.size())))
+         range::indices(std::min(mb_data.size(), bus_ids.size())))
     {
         mixer::bus_id fx_chain_bus = bus_ids[i];
-        for (auto const& fx_plug : fx_chain_data[i])
+        for (auto const& fx_plug : mb_data[i].fx_chain)
         {
             batch.push_back(std::visit(
                     make_add_fx_module_action{fx_chain_bus},
@@ -67,9 +70,39 @@ make_add_fx_module_actions(
     }
 }
 
+void
+apply_mixer_midi(
+        batch_action& batch,
+        mixer::bus_list_t const& bus_ids,
+        mixer::buses_t const& buses,
+        std::vector<persistence::session::mixer_bus> const& mb_data)
+{
+    auto action = std::make_unique<actions::update_midi_assignments>();
+
+    for (std::size_t i :
+         range::indices(std::min(mb_data.size(), bus_ids.size())))
+    {
+        if (mixer::bus const* const bus = buses[bus_ids[i]])
+        {
+            auto const& mxr_midi = mb_data[i].midi;
+            if (mxr_midi.volume)
+                action->assignments.emplace(bus->volume, *mxr_midi.volume);
+
+            if (mxr_midi.pan)
+                action->assignments.emplace(bus->pan_balance, *mxr_midi.pan);
+
+            if (mxr_midi.mute)
+                action->assignments.emplace(bus->mute, *mxr_midi.mute);
+        }
+    }
+
+    if (!action->assignments.empty())
+        batch.push_back(std::move(action));
+}
+
 template <class GetState>
 auto
-create_fx_chains(persistence::session const& session, GetState&& get_state)
+configure_mixer_buses(persistence::session const& session, GetState&& get_state)
         -> batch_action
 {
     batch_action action;
@@ -78,6 +111,16 @@ create_fx_chains(persistence::session const& session, GetState&& get_state)
 
     make_add_fx_module_actions(action, st.mixer_state.inputs, session.inputs);
     make_add_fx_module_actions(action, st.mixer_state.outputs, session.outputs);
+    apply_mixer_midi(
+            action,
+            st.mixer_state.inputs,
+            st.mixer_state.buses,
+            session.inputs);
+    apply_mixer_midi(
+            action,
+            st.mixer_state.outputs,
+            st.mixer_state.buses,
+            session.outputs);
 
     return action;
 }
@@ -90,7 +133,7 @@ apply_session(persistence::session session) -> thunk_action
     return [s = std::move(session)](auto&& get_state, auto&& dispatch) {
         std::invoke(
                 std::forward<decltype(dispatch)>(dispatch),
-                create_fx_chains(
+                configure_mixer_buses(
                         s,
                         std::forward<decltype(get_state)>(get_state)));
     };

@@ -11,6 +11,13 @@
 #include <variant>
 #include <vector>
 
+namespace piejam::runtime
+{
+
+struct midi_assignment;
+
+} // namespace piejam::runtime
+
 namespace piejam::runtime::fx
 {
 
@@ -42,6 +49,7 @@ template <class Value>
 struct parameter_assignment;
 
 using parameter_value_assignment = parameter_assignment<parameter_value>;
+using parameter_midi_assignment = parameter_assignment<midi_assignment>;
 
 using module_parameters =
         boost::container::flat_map<parameter_key, parameter_id>;

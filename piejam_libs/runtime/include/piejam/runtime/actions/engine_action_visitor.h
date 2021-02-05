@@ -28,7 +28,8 @@ struct engine_action_visitor
               move_fx_module_left,
               move_fx_module_right,
               start_midi_learning,
-              stop_midi_learning>
+              stop_midi_learning,
+              update_midi_assignments>
 {
 };
 

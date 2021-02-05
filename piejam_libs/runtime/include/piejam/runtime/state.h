@@ -103,7 +103,8 @@ auto insert_internal_fx_module(
         mixer::bus_id,
         std::size_t position,
         fx::internal,
-        std::vector<fx::parameter_value_assignment> const& initial_values)
+        std::vector<fx::parameter_value_assignment> const& initial_values,
+        std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> fx::module_id;
 void insert_ladspa_fx_module(
         state&,
@@ -112,13 +113,16 @@ void insert_ladspa_fx_module(
         fx::ladspa_instance_id,
         audio::ladspa::plugin_descriptor const&,
         std::span<audio::ladspa::port_descriptor const> const& control_inputs,
-        std::vector<fx::parameter_value_assignment> const& initial_values);
+        std::vector<fx::parameter_value_assignment> const& initial_values,
+        std::vector<fx::parameter_midi_assignment> const& midi_assigns);
 void insert_missing_ladspa_fx_module(
         state&,
         mixer::bus_id,
         std::size_t position,
         fx::unavailable_ladspa const&,
         std::string_view const& name);
-void remove_fx_module(state& st, fx::module_id id);
+void remove_fx_module(state&, fx::module_id id);
+
+void update_midi_assignments(state&, midi_assignments_map const&);
 
 } // namespace piejam::runtime

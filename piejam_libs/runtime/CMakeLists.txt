@@ -83,7 +83,9 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fx_midi_assignments.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fx_preset.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/midi_assignment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/fwd.h
@@ -156,7 +158,9 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/open_alsa_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_midi_assignments.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_preset.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/midi_assignment.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/midi_assignment_processor.cpp

@@ -22,7 +22,8 @@ insert_internal_fx_module::reduce(state const& st) const -> state
             fx_chain_bus,
             position,
             type,
-            initial_values);
+            initial_values,
+            midi_assigns);
 
     return new_st;
 }
