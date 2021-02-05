@@ -5,8 +5,6 @@
 #pragma once
 
 #include <piejam/boxed_string.h>
-#include <piejam/entity_id.h>
-#include <piejam/midi/device_id.h>
 
 namespace piejam::runtime
 {
