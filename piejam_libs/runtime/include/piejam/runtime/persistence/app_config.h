@@ -15,7 +15,7 @@
 namespace piejam::runtime::persistence
 {
 
-inline constexpr unsigned current_app_config_version = 1;
+inline constexpr unsigned current_app_config_version = 0;
 
 struct bus_config
 {

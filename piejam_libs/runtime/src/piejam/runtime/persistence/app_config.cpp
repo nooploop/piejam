@@ -102,16 +102,6 @@ using upgrade_functions_array =
 template <size_t Version>
 static void upgrade(nlohmann::json&);
 
-template <>
-void
-upgrade<0>(nlohmann::json& conf)
-{
-    conf[s_key_version] = 1;
-    conf[s_key_audio_settings][s_key_input_configs] = std::vector<bus_config>();
-    conf[s_key_audio_settings][s_key_output_configs] =
-            std::vector<bus_config>();
-}
-
 template <size_t... I>
 static auto make_upgrade_functions_array(std::index_sequence<I...>)
         -> upgrade_functions_array
