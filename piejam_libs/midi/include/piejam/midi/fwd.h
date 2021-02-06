@@ -11,7 +11,7 @@ namespace piejam::midi
 
 class event_handler;
 class input_processor;
-class midi_manager;
+class device_manager;
 
 struct cc_event;
 

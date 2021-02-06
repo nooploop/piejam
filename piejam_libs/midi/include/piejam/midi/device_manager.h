@@ -29,11 +29,11 @@ struct device_removed
 
 using device_update = std::variant<device_added, device_removed>;
 
-class midi_manager
+class device_manager
 {
 public:
-    midi_manager();
-    ~midi_manager();
+    device_manager();
+    ~device_manager();
 
     bool activate_input_device(device_id_t const&);
     void deactivate_input_device(device_id_t const&);

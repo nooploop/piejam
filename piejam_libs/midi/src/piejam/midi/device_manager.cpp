@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/midi/manager.h>
+#include <piejam/midi/device_manager.h>
 
 #include "alsa.h"
 
@@ -24,7 +24,7 @@
 namespace piejam::midi
 {
 
-struct midi_manager::impl
+struct device_manager::impl
 {
     bool is_update_relevant(alsa::midi_device_added const&) const
     {
@@ -86,15 +86,15 @@ struct midi_manager::impl
     std::unordered_map<device_id_t, alsa::midi_device> alsa_midi_input_devices;
 };
 
-midi_manager::midi_manager()
+device_manager::device_manager()
     : m_impl(std::make_unique<impl>())
 {
 }
 
-midi_manager::~midi_manager() = default;
+device_manager::~device_manager() = default;
 
 bool
-midi_manager::activate_input_device(device_id_t const& device_id)
+device_manager::activate_input_device(device_id_t const& device_id)
 {
     if (auto it = m_impl->alsa_midi_input_devices.find(device_id);
         it != m_impl->alsa_midi_input_devices.end())
@@ -108,7 +108,7 @@ midi_manager::activate_input_device(device_id_t const& device_id)
 }
 
 void
-midi_manager::deactivate_input_device(device_id_t const& device_id)
+device_manager::deactivate_input_device(device_id_t const& device_id)
 {
     if (auto it = m_impl->alsa_midi_input_devices.find(device_id);
         it != m_impl->alsa_midi_input_devices.end())
@@ -120,7 +120,7 @@ midi_manager::deactivate_input_device(device_id_t const& device_id)
 }
 
 auto
-midi_manager::update_devices() -> std::vector<device_update>
+device_manager::update_devices() -> std::vector<device_update>
 {
     std::vector<device_update> result;
 
@@ -206,7 +206,7 @@ private:
 } // namespace
 
 auto
-midi_manager::make_input_processor() const -> std::unique_ptr<input_processor>
+device_manager::make_input_processor() const -> std::unique_ptr<input_processor>
 {
     return std::make_unique<alsa_input_processor>(
             m_impl->midi_io,

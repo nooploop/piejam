@@ -74,7 +74,7 @@ private:
     dispatch_f m_dispatch;
     next_f m_next;
 
-    std::unique_ptr<midi::midi_manager> m_midi_manager;
+    std::unique_ptr<midi::device_manager> m_midi_manager;
     std::unique_ptr<fx::ladspa_manager> m_ladspa_fx_manager;
 
     std::unique_ptr<audio_engine> m_engine;
