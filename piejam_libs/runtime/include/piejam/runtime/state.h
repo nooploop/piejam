@@ -20,6 +20,7 @@
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/midi_device_config.h>
+#include <piejam/runtime/midi_devices.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
@@ -33,14 +34,10 @@
 #include <functional>
 #include <optional>
 #include <span>
-#include <unordered_map>
 #include <vector>
 
 namespace piejam::runtime
 {
-
-using midi_devices_t =
-        std::unordered_map<midi::device_id_t, midi_device_config>;
 
 struct state
 {
