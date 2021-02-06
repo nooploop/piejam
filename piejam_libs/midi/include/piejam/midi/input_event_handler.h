@@ -9,10 +9,10 @@
 namespace piejam::midi
 {
 
-class input_processor
+class input_event_handler
 {
 public:
-    virtual ~input_processor() = default;
+    virtual ~input_event_handler() = default;
 
     //! RT-safe
     virtual void process(event_handler&) = 0;

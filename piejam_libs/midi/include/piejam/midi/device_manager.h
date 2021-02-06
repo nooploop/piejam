@@ -32,19 +32,16 @@ using device_update = std::variant<device_added, device_removed>;
 class device_manager
 {
 public:
-    device_manager();
-    ~device_manager();
+    virtual ~device_manager() = default;
 
-    bool activate_input_device(device_id_t const&);
-    void deactivate_input_device(device_id_t const&);
+    virtual bool activate_input_device(device_id_t const&) = 0;
+    virtual void deactivate_input_device(device_id_t const&) = 0;
 
-    auto update_devices() -> std::vector<device_update>;
+    virtual auto update_devices() -> std::vector<device_update> = 0;
 
-    auto make_input_processor() const -> std::unique_ptr<input_processor>;
-
-private:
-    struct impl;
-    std::unique_ptr<impl> const m_impl;
+    virtual auto make_input_processor() -> std::unique_ptr<input_event_handler> = 0;
 };
+
+auto make_device_manager() -> std::unique_ptr<device_manager>;
 
 } // namespace piejam::midi

@@ -21,7 +21,7 @@
 #include <piejam/audio/engine/value_sink_processor.h>
 #include <piejam/functional/overload.h>
 #include <piejam/midi/event.h>
-#include <piejam/midi/input_processor.h>
+#include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/components/mixer_bus.h>
@@ -204,7 +204,7 @@ make_fx_chains_map(
 
 auto
 make_midi_processors(
-        std::unique_ptr<midi::input_processor> midi_in,
+        std::unique_ptr<midi::input_event_handler> midi_in,
         bool const midi_learning,
         audio::engine::processor_map& procs)
 {
@@ -577,7 +577,7 @@ audio_engine::rebuild(
         fx::parameters_t const& fx_params,
         parameter_maps const& params,
         fx::ladspa_processor_factory const& ladspa_fx_proc_factory,
-        std::unique_ptr<midi::input_processor> midi_in,
+        std::unique_ptr<midi::input_event_handler> midi_in,
         bool midi_learn,
         midi_assignments_map const& assignments)
 {

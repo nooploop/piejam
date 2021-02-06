@@ -8,6 +8,7 @@ add_library(piejam_midi STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/event.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/event_handler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/midi/input_event_handler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/midi/alsa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/midi/alsa.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/midi/device_manager.cpp

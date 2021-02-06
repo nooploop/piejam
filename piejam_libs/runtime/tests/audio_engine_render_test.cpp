@@ -4,7 +4,7 @@
 
 #include <piejam/audio/table.h>
 #include <piejam/audio/types.h>
-#include <piejam/midi/input_processor.h>
+#include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/state.h>

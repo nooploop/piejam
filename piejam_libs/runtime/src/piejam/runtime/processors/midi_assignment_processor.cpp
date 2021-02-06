@@ -94,12 +94,12 @@ public:
                 midi_assignment{
                         .channel = ev.channel,
                         .control_type = midi_assignment::type::cc,
-                        .control_id = ev.event.cc});
+                        .control_id = ev.data.cc});
 
         if (out_index != npos)
         {
             auto& out = ctx.event_outputs.get<midi::cc_event>(out_index);
-            out.insert(offset, ev.event);
+            out.insert(offset, ev.data);
         }
     }
 

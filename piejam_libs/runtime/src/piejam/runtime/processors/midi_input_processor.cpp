@@ -8,7 +8,7 @@
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/event_handler.h>
-#include <piejam/midi/input_processor.h>
+#include <piejam/midi/input_event_handler.h>
 
 namespace piejam::runtime::processors
 {
@@ -38,7 +38,7 @@ public:
         external_midi_event_buffer& m_event_out_buffer;
     };
 
-    midi_input_processor(std::unique_ptr<midi::input_processor> midi_in)
+    midi_input_processor(std::unique_ptr<midi::input_event_handler> midi_in)
         : m_midi_in(std::move(midi_in))
     {
         BOOST_ASSERT(m_midi_in);
@@ -70,13 +70,13 @@ public:
     }
 
 private:
-    std::unique_ptr<midi::input_processor> m_midi_in;
+    std::unique_ptr<midi::input_event_handler> m_midi_in;
 };
 
 } // namespace
 
 auto
-make_midi_input_processor(std::unique_ptr<midi::input_processor> midi_in)
+make_midi_input_processor(std::unique_ptr<midi::input_event_handler> midi_in)
         -> std::unique_ptr<audio::engine::processor>
 {
     return std::make_unique<midi_input_processor>(std::move(midi_in));

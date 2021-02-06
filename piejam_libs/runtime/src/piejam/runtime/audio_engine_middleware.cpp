@@ -15,7 +15,7 @@
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/event.h>
-#include <piejam/midi/input_processor.h>
+#include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/apply_app_config.h>
@@ -331,7 +331,7 @@ audio_engine_middleware::audio_engine_middleware(
     , m_get_state(std::move(get_state))
     , m_dispatch(std::move(dispatch))
     , m_next(std::move(next))
-    , m_midi_manager(std::make_unique<midi::device_manager>())
+    , m_midi_manager(midi::make_device_manager())
     , m_ladspa_fx_manager(std::make_unique<fx::ladspa_manager>())
 {
     BOOST_ASSERT(m_get_hw_params);
@@ -699,7 +699,7 @@ audio_engine_middleware::process_engine_action(
                         midi_assignment{
                                 .channel = cc_event->channel,
                                 .control_type = midi_assignment::type::cc,
-                                .control_id = cc_event->event.cc});
+                                .control_id = cc_event->data.cc});
 
                 m_next(next_action);
             }

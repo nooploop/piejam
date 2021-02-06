@@ -6,6 +6,7 @@
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
 #include <piejam/gui/qt_log.h>
+#include <piejam/midi/device_manager.h>
 #include <piejam/redux/batch_middleware.h>
 #include <piejam/redux/queueing_middleware.h>
 #include <piejam/redux/store.h>
@@ -101,6 +102,8 @@ main(int argc, char* argv[]) -> int
                 std::forward<decltype(dispatch)>(dispatch),
                 std::forward<decltype(next)>(next));
     });
+
+    auto midi_device_manager = midi::make_device_manager();
 
     store.apply_middleware([](auto&& get_state, auto&& dispatch, auto&& next) {
         thread::configuration const audio_thread_config{2, 96};

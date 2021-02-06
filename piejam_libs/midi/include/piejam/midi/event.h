@@ -23,7 +23,7 @@ template <class E>
 struct channel_event
 {
     std::size_t channel{};
-    E event{};
+    E data{};
 };
 
 using channel_cc_event = channel_event<cc_event>;
