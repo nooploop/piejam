@@ -14,14 +14,16 @@ namespace piejam::runtime
 class midi_control_middleware final : private middleware_functors
 {
 public:
-    midi_control_middleware(middleware_functors, midi::device_manager&);
+    using device_updates_f = std::function<std::vector<midi::device_update>()>;
+
+    midi_control_middleware(middleware_functors, device_updates_f);
 
     void operator()(action const&);
 
 private:
     void refresh_midi_devices();
 
-    midi::device_manager& m_midi_device_manager;
+    device_updates_f m_device_updates;
 };
 
 } // namespace piejam::runtime

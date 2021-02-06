@@ -13,7 +13,6 @@
 #include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
-#include <piejam/midi/device_manager.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/activate_midi_device.h>

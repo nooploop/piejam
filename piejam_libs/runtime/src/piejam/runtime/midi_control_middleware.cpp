@@ -4,7 +4,7 @@
 
 #include <piejam/runtime/midi_control_middleware.h>
 
-#include <piejam/midi/device_manager.h>
+#include <piejam/midi/device_update.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
 #include <piejam/runtime/state.h>
 
@@ -66,13 +66,20 @@ struct update_midi_devices final
     }
 };
 
+auto
+no_device_updates() -> midi_control_middleware::device_updates_f
+{
+    return []() { return std::vector<midi::device_update>(); };
+}
+
 } // namespace
 
 midi_control_middleware::midi_control_middleware(
         middleware_functors mw_functors,
-        midi::device_manager& midi_device_manager)
+        device_updates_f device_updates)
     : middleware_functors(std::move(mw_functors))
-    , m_midi_device_manager(midi_device_manager)
+    , m_device_updates(
+              device_updates ? std::move(device_updates) : no_device_updates())
 {
 }
 
@@ -91,7 +98,7 @@ void
 midi_control_middleware::refresh_midi_devices()
 {
     update_midi_devices next_action;
-    next_action.updates = m_midi_device_manager.update_devices();
+    next_action.updates = m_device_updates();
 
     if (!next_action.updates.empty())
         next(next_action);

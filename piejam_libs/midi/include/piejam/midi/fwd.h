@@ -9,6 +9,10 @@
 namespace piejam::midi
 {
 
+struct device_added;
+struct device_removed;
+using device_update = std::variant<device_added, device_removed>;
+
 class event_handler;
 class input_event_handler;
 class device_manager;

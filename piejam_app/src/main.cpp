@@ -7,6 +7,7 @@
 #include <piejam/audio/alsa/get_set_hw_params.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/midi/device_manager.h>
+#include <piejam/midi/device_update.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/redux/batch_middleware.h>
 #include <piejam/redux/queueing_middleware.h>
@@ -135,7 +136,9 @@ main(int argc, char* argv[]) -> int
                         std::forward<decltype(get_state)>(get_state),
                         std::forward<decltype(dispatch)>(dispatch),
                         std::forward<decltype(next)>(next)),
-                *midi_device_manager);
+                [midi_device_manager]() {
+                    return midi_device_manager->update_devices();
+                });
     });
 
     store.apply_middleware(
