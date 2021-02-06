@@ -43,6 +43,16 @@ main(int argc, char* argv[]) -> int
         audio_state.samplerate = boost::lexical_cast<unsigned>(argv[3]);
         audio_state.period_size = boost::lexical_cast<unsigned>(argv[4]);
         piejam::runtime::audio_engine_middleware audio_engine(
+                piejam::runtime::middleware_functors(
+                        [&audio_state]() -> piejam::runtime::state const& {
+                            return audio_state;
+                        },
+                        [&audio_state](piejam::runtime::action const& action) {
+                            audio_state = action.reduce(audio_state);
+                        },
+                        [&audio_state](piejam::runtime::action const& action) {
+                            audio_state = action.reduce(audio_state);
+                        }),
                 piejam::thread::configuration{
                         .affinity = boost::lexical_cast<int>(argv[5]),
                         .priority = 96},
@@ -50,16 +60,7 @@ main(int argc, char* argv[]) -> int
                 &piejam::audio::alsa::get_pcm_io_descriptors,
                 &piejam::audio::alsa::get_hw_params,
                 &piejam::runtime::open_alsa_device,
-                nullptr,
-                [&audio_state]() -> piejam::runtime::state const& {
-                    return audio_state;
-                },
-                [&audio_state](piejam::runtime::action const& action) {
-                    audio_state = action.reduce(audio_state);
-                },
-                [&audio_state](piejam::runtime::action const& action) {
-                    audio_state = action.reduce(audio_state);
-                });
+                nullptr);
 
         {
             piejam::runtime::actions::initiate_device_selection select_input;

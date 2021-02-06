@@ -116,15 +116,16 @@ main(int argc, char* argv[]) -> int
         thread::configuration const audio_thread_config{2, 96};
         std::array const worker_thread_configs{thread::configuration{3, 96}};
         return redux::make_middleware<runtime::audio_engine_middleware>(
+                runtime::middleware_functors(
+                        std::forward<decltype(get_state)>(get_state),
+                        std::forward<decltype(dispatch)>(dispatch),
+                        std::forward<decltype(next)>(next)),
                 audio_thread_config,
                 worker_thread_configs,
                 &audio::alsa::get_pcm_io_descriptors,
                 &audio::alsa::get_hw_params,
                 &runtime::open_alsa_device,
-                runtime::make_midi_input_controller(*midi_device_manager),
-                std::forward<decltype(get_state)>(get_state),
-                std::forward<decltype(dispatch)>(dispatch),
-                std::forward<decltype(next)>(next));
+                runtime::make_midi_input_controller(*midi_device_manager));
     });
 
     store.apply_middleware([midi_device_manager = midi_device_manager.get()](

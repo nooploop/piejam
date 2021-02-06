@@ -12,6 +12,7 @@
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/middleware_functors.h>
 #include <piejam/thread/configuration.h>
 
 #include <functional>
@@ -22,7 +23,7 @@
 namespace piejam::runtime
 {
 
-class audio_engine_middleware
+class audio_engine_middleware final : private middleware_functors
 {
 public:
     using get_pcm_io_descriptors_f =
@@ -33,15 +34,13 @@ public:
             std::function<std::unique_ptr<piejam::audio::device>(state const&)>;
 
     audio_engine_middleware(
+            middleware_functors,
             thread::configuration const& audio_thread_config,
             std::span<thread::configuration const> const& wt_configs,
             get_pcm_io_descriptors_f,
             get_hw_params_f,
             device_factory_f,
-            std::unique_ptr<midi_input_controller>,
-            get_state_f,
-            dispatch_f,
-            next_f);
+            std::unique_ptr<midi_input_controller>);
     audio_engine_middleware(audio_engine_middleware&&) noexcept = default;
     ~audio_engine_middleware();
 
@@ -69,10 +68,6 @@ private:
     get_pcm_io_descriptors_f m_get_pcm_io_descriptors;
     get_hw_params_f m_get_hw_params;
     device_factory_f m_device_factory;
-
-    get_state_f m_get_state;
-    dispatch_f m_dispatch;
-    next_f m_next;
 
     std::unique_ptr<midi_input_controller> m_midi_controller;
     std::unique_ptr<fx::ladspa_manager> m_ladspa_fx_manager;

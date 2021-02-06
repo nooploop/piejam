@@ -264,23 +264,19 @@ struct insert_missing_ladspa_fx_module_action final
 } // namespace
 
 audio_engine_middleware::audio_engine_middleware(
+        middleware_functors mw_fs,
         thread::configuration const& audio_thread_config,
         std::span<thread::configuration const> const& wt_configs,
         get_pcm_io_descriptors_f get_pcm_io_descriptors,
         get_hw_params_f get_hw_params,
         device_factory_f device_factory,
-        std::unique_ptr<midi_input_controller> midi_controller,
-        get_state_f get_state,
-        dispatch_f dispatch,
-        next_f next)
-    : m_audio_thread_config(audio_thread_config)
+        std::unique_ptr<midi_input_controller> midi_controller)
+    : middleware_functors(std::move(mw_fs))
+    , m_audio_thread_config(audio_thread_config)
     , m_wt_configs(wt_configs.begin(), wt_configs.end())
     , m_get_pcm_io_descriptors(std::move(get_pcm_io_descriptors))
     , m_get_hw_params(std::move(get_hw_params))
     , m_device_factory(std::move(device_factory))
-    , m_get_state(std::move(get_state))
-    , m_dispatch(std::move(dispatch))
-    , m_next(std::move(next))
     , m_midi_controller(
               midi_controller ? std::move(midi_controller)
                               : make_dummy_midi_input_controller())
@@ -288,8 +284,6 @@ audio_engine_middleware::audio_engine_middleware(
 {
     BOOST_ASSERT(m_get_hw_params);
     BOOST_ASSERT(m_device_factory);
-    BOOST_ASSERT(m_get_state);
-    BOOST_ASSERT(m_next);
 }
 
 audio_engine_middleware::~audio_engine_middleware() = default;
@@ -318,7 +312,7 @@ audio_engine_middleware::operator()(action const& action)
     }
     else
     {
-        m_next(action);
+        next(action);
     }
 }
 
@@ -326,7 +320,7 @@ template <class Action>
 void
 audio_engine_middleware::process_device_action(Action const& a)
 {
-    m_next(a);
+    next(a);
 }
 
 static auto
@@ -352,7 +346,7 @@ void
 audio_engine_middleware::process_device_action(
         actions::apply_app_config const& a)
 {
-    state const& current_state = m_get_state();
+    state const& current_state = get_state();
 
     update_devices prep_action;
     prep_action.pcm_devices = current_state.pcm_devices;
@@ -396,16 +390,16 @@ audio_engine_middleware::process_device_action(
                     a.conf.samplerate,
                     a.conf.period_size);
 
-    m_next(prep_action);
+    next(prep_action);
 
-    m_next(a);
+    next(a);
 }
 
 template <>
 void
 audio_engine_middleware::process_device_action(actions::refresh_devices const&)
 {
-    state const& current_state = m_get_state();
+    state const& current_state = get_state();
 
     update_devices next_action;
     next_action.pcm_devices = m_get_pcm_io_descriptors();
@@ -437,7 +431,7 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
                     current_state.samplerate,
                     current_state.period_size);
 
-    m_next(next_action);
+    next(next_action);
 }
 
 template <>
@@ -445,7 +439,7 @@ void
 audio_engine_middleware::process_device_action(
         actions::initiate_device_selection const& action)
 {
-    state const& current_state = m_get_state();
+    state const& current_state = get_state();
 
     std::size_t const index = action.index;
 
@@ -462,7 +456,7 @@ audio_engine_middleware::process_device_action(
                         current_state.samplerate,
                         current_state.period_size);
 
-        m_next(next_action);
+        next(next_action);
     }
     else
     {
@@ -477,7 +471,7 @@ audio_engine_middleware::process_device_action(
                         current_state.samplerate,
                         current_state.period_size);
 
-        m_next(next_action);
+        next(next_action);
     }
 }
 
@@ -487,7 +481,7 @@ audio_engine_middleware::process_device_action(
         actions::activate_midi_device const& action)
 {
     if (m_midi_controller->activate_input_device(action.device_id))
-        m_next(action);
+        next(action);
 }
 
 template <>
@@ -496,14 +490,14 @@ audio_engine_middleware::process_device_action(
         actions::deactivate_midi_device const& action)
 {
     m_midi_controller->deactivate_input_device(action.device_id);
-    m_next(action);
+    next(action);
 }
 
 template <class Action>
 void
 audio_engine_middleware::process_engine_action(Action const& a)
 {
-    m_next(a);
+    next(a);
     rebuild();
 }
 
@@ -512,13 +506,13 @@ void
 audio_engine_middleware::process_engine_action(
         actions::delete_fx_module const& a)
 {
-    auto const& st = m_get_state();
+    auto const& st = get_state();
 
     if (fx::module const* const fx_mod = st.fx_modules[a.fx_mod_id])
     {
         auto const fx_instance_id = fx_mod->fx_instance_id;
 
-        m_next(a);
+        next(a);
 
         rebuild();
 
@@ -535,7 +529,7 @@ void
 audio_engine_middleware::process_engine_action(
         actions::load_ladspa_fx_plugin const& a)
 {
-    auto const& st = m_get_state();
+    auto const& st = get_state();
 
     if (auto plugin_desc =
                 find_ladspa_plugin_descriptor(st.fx_registry, a.plugin_id))
@@ -552,7 +546,7 @@ audio_engine_middleware::process_engine_action(
             next_action.initial_values = a.initial_values;
             next_action.midi_assigns = a.midi_assigns;
 
-            m_next(next_action);
+            next(next_action);
 
             rebuild();
 
@@ -572,7 +566,7 @@ audio_engine_middleware::process_engine_action(
             .parameter_values = a.initial_values,
             .midi_assigns = a.midi_assigns};
     next_action.name = a.name;
-    m_next(next_action);
+    next(next_action);
 }
 
 template <class Parameter>
@@ -580,11 +574,11 @@ void
 audio_engine_middleware::process_engine_action(
         actions::set_parameter_value<Parameter> const& a)
 {
-    m_next(a);
+    next(a);
 
     if (m_engine)
     {
-        m_engine->set_parameter_value(a.id, *m_get_state().params.get(a.id));
+        m_engine->set_parameter_value(a.id, *get_state().params.get(a.id));
     }
 }
 
@@ -593,11 +587,11 @@ void
 audio_engine_middleware::process_engine_action(
         actions::set_input_bus_solo const& a)
 {
-    m_next(a);
+    next(a);
 
     if (m_engine)
     {
-        m_engine->set_input_solo(m_get_state().mixer_state.input_solo_id);
+        m_engine->set_input_solo(get_state().mixer_state.input_solo_id);
     }
 }
 
@@ -616,7 +610,7 @@ audio_engine_middleware::process_engine_action(
                 next_action.levels.emplace_back(id, *lvl);
         }
 
-        m_next(next_action);
+        next(next_action);
     }
 }
 
@@ -630,7 +624,7 @@ audio_engine_middleware::process_engine_action(
         next_action.xruns = m_device->xruns();
         next_action.cpu_load = m_device->cpu_load();
 
-        m_next(next_action);
+        next(next_action);
     }
 
     if (m_engine)
@@ -643,21 +637,21 @@ audio_engine_middleware::process_engine_action(
             {
                 actions::update_midi_assignments next_action;
                 next_action.assignments.emplace(
-                        *m_get_state().midi_learning,
+                        *get_state().midi_learning,
                         midi_assignment{
                                 .channel = cc_event->channel,
                                 .control_type = midi_assignment::type::cc,
                                 .control_id = cc_event->data.cc});
 
-                m_next(next_action);
+                next(next_action);
             }
 
-            m_next(actions::stop_midi_learning{});
+            next(actions::stop_midi_learning{});
 
             rebuild();
         }
 
-        auto const& st = m_get_state();
+        auto const& st = get_state();
         batch_action param_update;
         for (auto const& [id, ass] : st.midi_assignments.get())
         {
@@ -681,7 +675,7 @@ audio_engine_middleware::process_engine_action(
         }
 
         if (!param_update.empty())
-            m_dispatch(param_update);
+            dispatch(param_update);
     }
 }
 
@@ -700,7 +694,7 @@ audio_engine_middleware::open_device()
 {
     try
     {
-        auto device = m_device_factory(m_get_state());
+        auto device = m_device_factory(get_state());
         m_device.swap(device);
     }
     catch (std::exception const& err)
@@ -716,7 +710,7 @@ audio_engine_middleware::start_engine()
 
     if (m_device->is_open())
     {
-        auto const& state = m_get_state();
+        auto const& state = get_state();
 
         m_engine = std::make_unique<audio_engine>(
                 m_wt_configs,
@@ -740,7 +734,7 @@ audio_engine_middleware::rebuild()
     if (!m_engine || !m_device->is_running())
         return;
 
-    auto const& st = m_get_state();
+    auto const& st = get_state();
     if (!m_engine->rebuild(
                 st.mixer_state,
                 st.fx_modules,

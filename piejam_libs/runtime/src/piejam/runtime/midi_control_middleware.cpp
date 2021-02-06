@@ -73,9 +73,9 @@ no_device_updates() -> midi_control_middleware::device_updates_f
 } // namespace
 
 midi_control_middleware::midi_control_middleware(
-        middleware_functors mw_functors,
+        middleware_functors mw_fs,
         device_updates_f device_updates)
-    : middleware_functors(std::move(mw_functors))
+    : middleware_functors(std::move(mw_fs))
     , m_device_updates(
               device_updates ? std::move(device_updates) : no_device_updates())
 {

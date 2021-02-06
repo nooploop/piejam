@@ -37,6 +37,10 @@ struct audio_engine_middleware_test : ::testing::Test
     auto make_sut()
     {
         return audio_engine_middleware(
+                middleware_functors(
+                        [this]() -> state const& { return m_ctrl.get_state(); },
+                        [this](action const& a) { m_ctrl.dispatch(a); },
+                        [this](action const& a) { m_ctrl.next(a); }),
                 {},
                 {},
                 [this]() -> audio::pcm_io_descriptors {
@@ -48,10 +52,7 @@ struct audio_engine_middleware_test : ::testing::Test
                 [this](state const& st) -> std::unique_ptr<audio::device> {
                     return m_ctrl.create_device(st);
                 },
-                nullptr,
-                [this]() -> state const& { return m_ctrl.get_state(); },
-                [this](action const& a) { m_ctrl.dispatch(a); },
-                [this](action const& a) { m_ctrl.next(a); });
+                nullptr);
     }
 };
 
