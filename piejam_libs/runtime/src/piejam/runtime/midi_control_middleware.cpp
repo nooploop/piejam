@@ -26,8 +26,6 @@ struct update_midi_devices final
         midi_devices_t& midi_devices;
         std::vector<midi::device_id_t>& midi_inputs;
 
-        void operator()(std::nullptr_t) const {}
-
         void operator()(midi::device_added const& op) const
         {
             midi_devices.emplace(
@@ -90,8 +88,10 @@ midi_control_middleware::operator()(action const& a)
     {
         refresh_midi_devices();
     }
-
-    next(a);
+    else
+    {
+        next(a);
+    }
 }
 
 void
