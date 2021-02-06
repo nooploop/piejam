@@ -6,6 +6,7 @@
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/audio_engine_middleware.h>
+#include <piejam/runtime/midi_input_controller.h>
 #include <piejam/runtime/state.h>
 #include <piejam/thread/configuration.h>
 
@@ -47,6 +48,7 @@ struct audio_engine_middleware_test : ::testing::Test
                 [this](state const& st) -> std::unique_ptr<audio::device> {
                     return m_ctrl.create_device(st);
                 },
+                nullptr,
                 [this]() -> state const& { return m_ctrl.get_state(); },
                 [this](action const& a) { m_ctrl.dispatch(a); },
                 [this](action const& a) { m_ctrl.next(a); });

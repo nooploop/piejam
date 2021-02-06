@@ -102,7 +102,7 @@ public:
 
     auto update_devices() -> std::vector<device_update> override;
 
-    auto make_input_processor() -> std::unique_ptr<input_event_handler> override;
+    auto make_input_event_handler() -> std::unique_ptr<input_event_handler> override;
 
 private:
     bool is_update_relevant(alsa::midi_device_added const&) const
@@ -206,7 +206,7 @@ alsa_device_manager::update_devices() -> std::vector<device_update>
 }
 
 auto
-alsa_device_manager::make_input_processor() -> std::unique_ptr<input_event_handler>
+alsa_device_manager::make_input_event_handler() -> std::unique_ptr<input_event_handler>
 {
     return std::make_unique<alsa_input_processor>(
             m_midi_io,

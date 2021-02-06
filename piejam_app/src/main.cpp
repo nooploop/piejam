@@ -7,6 +7,7 @@
 #include <piejam/audio/alsa/get_set_hw_params.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/midi/device_manager.h>
+#include <piejam/midi/input_event_handler.h>
 #include <piejam/redux/batch_middleware.h>
 #include <piejam/redux/queueing_middleware.h>
 #include <piejam/redux/store.h>
@@ -23,6 +24,8 @@
 #include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/locations.h>
+#include <piejam/runtime/midi_control_middleware.h>
+#include <piejam/runtime/midi_input_controller.h>
 #include <piejam/runtime/open_alsa_device.h>
 #include <piejam/runtime/persistence_middleware.h>
 #include <piejam/runtime/state.h>
@@ -105,7 +108,10 @@ main(int argc, char* argv[]) -> int
 
     auto midi_device_manager = midi::make_device_manager();
 
-    store.apply_middleware([](auto&& get_state, auto&& dispatch, auto&& next) {
+    store.apply_middleware([midi_device_manager = midi_device_manager.get()](
+                                   auto&& get_state,
+                                   auto&& dispatch,
+                                   auto&& next) {
         thread::configuration const audio_thread_config{2, 96};
         std::array const worker_thread_configs{thread::configuration{3, 96}};
         return redux::make_middleware<runtime::audio_engine_middleware>(
@@ -114,9 +120,22 @@ main(int argc, char* argv[]) -> int
                 &audio::alsa::get_pcm_io_descriptors,
                 &audio::alsa::get_hw_params,
                 &runtime::open_alsa_device,
+                runtime::make_midi_input_controller(*midi_device_manager),
                 std::forward<decltype(get_state)>(get_state),
                 std::forward<decltype(dispatch)>(dispatch),
                 std::forward<decltype(next)>(next));
+    });
+
+    store.apply_middleware([midi_device_manager = midi_device_manager.get()](
+                                   auto&& get_state,
+                                   auto&& dispatch,
+                                   auto&& next) {
+        return redux::make_middleware<runtime::midi_control_middleware>(
+                runtime::middleware_functors(
+                        std::forward<decltype(get_state)>(get_state),
+                        std::forward<decltype(dispatch)>(dispatch),
+                        std::forward<decltype(next)>(next)),
+                *midi_device_manager);
     });
 
     store.apply_middleware(

@@ -28,7 +28,6 @@
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/move_fx_module.h>
-#include <piejam/runtime/actions/refresh_midi_devices.h>
 #include <piejam/runtime/actions/request_levels_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_period_size.h>
@@ -38,6 +37,7 @@
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/ladspa_manager.h>
+#include <piejam/runtime/midi_input_controller.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/tuple_element_compare.h>
@@ -181,56 +181,6 @@ select_device<io_direction::output>::reduce(state const& st) const -> state
 using select_input_device = select_device<io_direction::input>;
 using select_output_device = select_device<io_direction::output>;
 
-struct update_midi_devices final
-    : ui::cloneable_action<update_midi_devices, action>
-{
-    std::vector<midi::device_update> updates;
-
-    struct midi_device_update_handler
-    {
-        midi_devices_t& midi_devices;
-        std::vector<midi::device_id_t>& midi_inputs;
-
-        void operator()(std::nullptr_t) const {}
-
-        void operator()(midi::device_added const& op) const
-        {
-            midi_devices.emplace(
-                    op.device_id,
-                    midi_device_config{.name = op.name, .enabled = false});
-            midi_inputs.emplace_back(op.device_id);
-        }
-
-        void operator()(midi::device_removed const& op) const
-        {
-            midi_devices.erase(op.device_id);
-            boost::remove_erase(midi_inputs, op.device_id);
-        }
-    };
-
-    auto reduce(state const& st) const -> state override
-    {
-        auto new_st = st;
-
-        auto midi_devices = *new_st.midi_devices;
-        auto midi_inputs = *new_st.midi_inputs;
-
-        for (auto const& update : updates)
-        {
-            std::visit(
-                    midi_device_update_handler{
-                            .midi_devices = midi_devices,
-                            .midi_inputs = midi_inputs},
-                    update);
-        }
-
-        new_st.midi_devices = std::move(midi_devices);
-        new_st.midi_inputs = std::move(midi_inputs);
-
-        return new_st;
-    }
-};
-
 struct update_levels final : ui::cloneable_action<update_levels, action>
 {
     std::vector<std::pair<stereo_level_parameter_id, stereo_level>> levels;
@@ -320,6 +270,7 @@ audio_engine_middleware::audio_engine_middleware(
         get_pcm_io_descriptors_f get_pcm_io_descriptors,
         get_hw_params_f get_hw_params,
         device_factory_f device_factory,
+        std::unique_ptr<midi_input_controller> midi_controller,
         get_state_f get_state,
         dispatch_f dispatch,
         next_f next)
@@ -331,7 +282,9 @@ audio_engine_middleware::audio_engine_middleware(
     , m_get_state(std::move(get_state))
     , m_dispatch(std::move(dispatch))
     , m_next(std::move(next))
-    , m_midi_manager(midi::make_device_manager())
+    , m_midi_controller(
+              midi_controller ? std::move(midi_controller)
+                              : make_dummy_midi_input_controller())
     , m_ladspa_fx_manager(std::make_unique<fx::ladspa_manager>())
 {
     BOOST_ASSERT(m_get_hw_params);
@@ -363,10 +316,6 @@ audio_engine_middleware::operator()(action const& action)
                 [this](auto&& a) { process_engine_action(a); });
 
         a->visit(v);
-    }
-    else if (dynamic_cast<actions::refresh_midi_devices const*>(&action))
-    {
-        refresh_midi_devices();
     }
     else
     {
@@ -538,7 +487,7 @@ void
 audio_engine_middleware::process_device_action(
         actions::activate_midi_device const& action)
 {
-    if (m_midi_manager->activate_input_device(action.device_id))
+    if (m_midi_controller->activate_input_device(action.device_id))
         m_next(action);
 }
 
@@ -547,7 +496,7 @@ void
 audio_engine_middleware::process_device_action(
         actions::deactivate_midi_device const& action)
 {
-    m_midi_manager->deactivate_input_device(action.device_id);
+    m_midi_controller->deactivate_input_device(action.device_id);
     m_next(action);
 }
 
@@ -738,16 +687,6 @@ audio_engine_middleware::process_engine_action(
 }
 
 void
-audio_engine_middleware::refresh_midi_devices()
-{
-    update_midi_devices next_action;
-    next_action.updates = m_midi_manager->update_devices();
-
-    if (!next_action.updates.empty())
-        m_next(next_action);
-}
-
-void
 audio_engine_middleware::close_device()
 {
     m_device = std::make_unique<piejam::audio::dummy_device>();
@@ -811,7 +750,7 @@ audio_engine_middleware::rebuild()
                 [this, sr = st.samplerate](fx::ladspa_instance_id id) {
                     return m_ladspa_fx_manager->make_processor(id, sr);
                 },
-                m_midi_manager->make_input_processor(),
+                m_midi_controller->make_input_event_handler(),
                 static_cast<bool>(st.midi_learning),
                 st.midi_assignments))
     {

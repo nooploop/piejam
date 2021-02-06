@@ -37,5 +37,6 @@ using parameter_processor_factory = processors::parameter_processor_factory<
 struct midi_device_config;
 
 struct midi_assignment;
+class midi_input_controller;
 
 } // namespace piejam::runtime
