@@ -4,10 +4,14 @@
 
 #include <piejam/runtime/midi_control_middleware.h>
 
+#include <piejam/algorithm/contains.h>
+#include <piejam/algorithm/for_each_visit.h>
 #include <piejam/midi/device_update.h>
+#include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
 #include <piejam/runtime/state.h>
 
+#include <boost/assert.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 
 namespace piejam::runtime
@@ -95,13 +99,46 @@ midi_control_middleware::operator()(action const& a)
 }
 
 void
+midi_control_middleware::process_device_update(midi::device_added const& up)
+{
+    if (auto it = std::ranges::find(m_enabled_devices, up.name);
+        it != m_enabled_devices.end())
+    {
+        actions::activate_midi_device action;
+        action.device_id = up.device_id;
+        dispatch(action);
+
+        m_enabled_devices.erase(it);
+        BOOST_ASSERT(!algorithm::contains(m_enabled_devices, up.name));
+    }
+}
+
+void
+midi_control_middleware::process_device_update(midi::device_removed const& up)
+{
+    auto const& st = get_state();
+    if (auto it = st.midi_devices->find(up.device_id);
+        it != st.midi_devices->end() && it->second.enabled)
+    {
+        BOOST_ASSERT(!algorithm::contains(m_enabled_devices, *it->second.name));
+        m_enabled_devices.emplace_back(it->second.name);
+    }
+}
+
+void
 midi_control_middleware::refresh_midi_devices()
 {
     update_midi_devices next_action;
     next_action.updates = m_device_updates();
 
     if (!next_action.updates.empty())
+    {
+        algorithm::for_each_visit(next_action.updates, [this](auto const& up) {
+            process_device_update(up);
+        });
+
         next(next_action);
+    }
 }
 
 } // namespace piejam::runtime

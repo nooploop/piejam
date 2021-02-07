@@ -8,6 +8,9 @@
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/middleware_functors.h>
 
+#include <string>
+#include <vector>
+
 namespace piejam::runtime
 {
 
@@ -21,9 +24,13 @@ public:
     void operator()(action const&);
 
 private:
+    void process_device_update(midi::device_added const&);
+    void process_device_update(midi::device_removed const&);
+
     void refresh_midi_devices();
 
     device_updates_f m_device_updates;
+    std::vector<std::string> m_enabled_devices;
 };
 
 } // namespace piejam::runtime
