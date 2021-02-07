@@ -22,8 +22,6 @@
 #include <piejam/runtime/actions/deactivate_midi_device.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
-#include <piejam/runtime/actions/device_action_visitor.h>
-#include <piejam/runtime/actions/engine_action_visitor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/move_fx_module.h>

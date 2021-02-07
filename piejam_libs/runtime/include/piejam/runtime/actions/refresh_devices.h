@@ -6,6 +6,7 @@
 
 #include <piejam/runtime/actions/device_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions

@@ -12,9 +12,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/device_action.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/device_action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/engine_action.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/engine_action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
