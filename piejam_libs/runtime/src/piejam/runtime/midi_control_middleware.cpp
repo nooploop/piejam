@@ -8,6 +8,7 @@
 #include <piejam/algorithm/for_each_visit.h>
 #include <piejam/midi/device_update.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
+#include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/state.h>
@@ -164,6 +165,14 @@ midi_control_middleware::process_midi_control_action(
     }
 
     next(next_action);
+}
+
+template <>
+void
+midi_control_middleware::process_midi_control_action(
+        actions::apply_app_config const& action)
+{
+    next(action);
 }
 
 } // namespace piejam::runtime

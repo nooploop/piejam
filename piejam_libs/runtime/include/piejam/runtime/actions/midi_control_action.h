@@ -11,7 +11,10 @@ namespace piejam::runtime::actions
 {
 
 struct midi_control_action_visitor
-    : ui::action_visitor_interface<refresh_midi_devices, save_app_config>
+    : ui::action_visitor_interface<
+              refresh_midi_devices,
+              save_app_config,
+              apply_app_config>
 {
 };
 
