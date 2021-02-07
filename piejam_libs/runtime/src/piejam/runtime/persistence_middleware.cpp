@@ -57,7 +57,7 @@ void
 persistence_middleware::process_persistence_action(
         actions::save_app_config const& a)
 {
-    persistence::save_app_config(a.file, m_get_state());
+    persistence::save_app_config(a.file, a.enabled_midi_devices, m_get_state());
 }
 
 template <>

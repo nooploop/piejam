@@ -11,6 +11,7 @@
 
 #include <iosfwd>
 #include <string>
+#include <vector>
 
 namespace piejam::runtime::persistence
 {
@@ -33,6 +34,8 @@ struct app_config
 
     std::vector<bus_config> input_bus_config;
     std::vector<bus_config> output_bus_config;
+
+    std::vector<std::string> enabled_midi_input_devices;
 };
 
 void to_json(nlohmann::json&, app_config const&);

@@ -9,6 +9,7 @@
 #include <piejam/midi/device_update.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
+#include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/state.h>
 
 #include <boost/assert.hpp>
@@ -145,6 +146,24 @@ midi_control_middleware::process_midi_control_action(
 
         next(next_action);
     }
+}
+
+template <>
+void
+midi_control_middleware::process_midi_control_action(
+        actions::save_app_config const& action)
+{
+    auto next_action = action;
+
+    next_action.enabled_midi_devices = m_enabled_devices;
+
+    for (auto const& [id, config] : *get_state().midi_devices)
+    {
+        if (config.enabled)
+            next_action.enabled_midi_devices.emplace_back(config.name);
+    }
+
+    next(next_action);
 }
 
 } // namespace piejam::runtime

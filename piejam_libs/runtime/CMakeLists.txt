@@ -19,6 +19,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/insert_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_session.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/midi_control_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/move_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/persistence_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h

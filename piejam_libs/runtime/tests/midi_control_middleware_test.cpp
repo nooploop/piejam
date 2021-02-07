@@ -7,6 +7,7 @@
 #include <piejam/midi/device_update.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
+#include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/midi_control_middleware.h>
 #include <piejam/runtime/ui/action.h>
 
@@ -221,6 +222,89 @@ TEST_F(midi_control_middleware_test, remove_eanabled_and_add_new_device)
                     {next_dev_id,
                      midi_device_config{.name = "test2", .enabled = false}}}),
             *st.midi_devices);
+}
+
+TEST_F(midi_control_middleware_test,
+       save_app_config_is_populated_with_currently_enabled_devices)
+{
+    using testing::_;
+    using testing::ReturnRef;
+    using testing::WhenDynamicCastTo;
+
+    midi_control_middleware sut(
+            make_middleware_functors(mf_mock),
+            [=]() -> std::vector<midi::device_update> { return {}; });
+
+    state st;
+
+    st.midi_devices = midi_devices_t{
+            {midi::device_id_t::generate(),
+             midi_device_config{.name = "test", .enabled = true}}};
+
+    actions::save_app_config action("save_file");
+    ASSERT_TRUE(action.enabled_midi_devices.empty());
+
+    actions::save_app_config expected_action("save_file");
+    expected_action.enabled_midi_devices = {"test"};
+
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
+    EXPECT_CALL(
+            mf_mock,
+            next(WhenDynamicCastTo<actions::save_app_config const&>(
+                    expected_action)));
+
+    sut(action);
+}
+
+TEST_F(midi_control_middleware_test,
+       save_app_config_is_populated_with_previously_enabled_devices)
+{
+    using testing::_;
+    using testing::ReturnRef;
+    using testing::WhenDynamicCastTo;
+
+    auto dev_id = midi::device_id_t::generate();
+
+    midi_control_middleware sut(
+            make_middleware_functors(mf_mock),
+            [=]() -> std::vector<midi::device_update> {
+                return {midi::device_removed{.device_id = dev_id}};
+            });
+
+    state st;
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
+
+    st.midi_inputs = std::vector<midi::device_id_t>({dev_id});
+    st.midi_devices = midi_devices_t{
+            {dev_id, midi_device_config{.name = "test", .enabled = true}}};
+
+    // setup, we need to remove the enabled device first
+    {
+        EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
+            st = a.reduce(st);
+        });
+
+        actions::refresh_midi_devices action;
+        sut(action);
+    }
+
+    ASSERT_TRUE(st.midi_inputs->empty());
+    ASSERT_TRUE(st.midi_devices->empty());
+
+    {
+        actions::save_app_config action("save_file");
+        ASSERT_TRUE(action.enabled_midi_devices.empty());
+
+        actions::save_app_config expected_action("save_file");
+        expected_action.enabled_midi_devices = {"test"};
+
+        EXPECT_CALL(
+                mf_mock,
+                next(WhenDynamicCastTo<actions::save_app_config const&>(
+                        expected_action)));
+
+        sut(action);
+    }
 }
 
 } // namespace piejam::runtime::test

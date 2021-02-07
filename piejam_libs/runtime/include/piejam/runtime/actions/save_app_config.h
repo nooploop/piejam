@@ -4,12 +4,15 @@
 
 #pragma once
 
+#include <piejam/runtime/actions/midi_control_action.h>
 #include <piejam/runtime/actions/persistence_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 #include <filesystem>
+#include <string>
+#include <vector>
 
 namespace piejam::runtime::actions
 {
@@ -17,6 +20,7 @@ namespace piejam::runtime::actions
 struct save_app_config final
     : ui::cloneable_action<save_app_config, action>
     , visitable_persistence_action<save_app_config>
+    , visitable_midi_control_action<save_app_config>
 {
     save_app_config(std::filesystem::path file)
         : file(std::move(file))
@@ -24,8 +28,11 @@ struct save_app_config final
     }
 
     std::filesystem::path file;
+    std::vector<std::string> enabled_midi_devices;
 
     auto reduce(state const&) const -> state override;
+
+    bool operator==(save_app_config const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime::actions

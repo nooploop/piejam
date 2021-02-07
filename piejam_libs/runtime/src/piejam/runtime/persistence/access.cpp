@@ -44,7 +44,10 @@ load_app_config(std::filesystem::path const& file, dispatch_f const& dispatch)
 }
 
 void
-save_app_config(std::filesystem::path const& file, state const& state)
+save_app_config(
+        std::filesystem::path const& file,
+        std::vector<std::string> const& enabled_midi_input_devices,
+        state const& state)
 {
     try
     {
@@ -84,6 +87,8 @@ save_app_config(std::filesystem::path const& file, state const& state)
                 state.mixer_state.buses,
                 state.mixer_state.outputs.get(),
                 conf.output_bus_config);
+
+        conf.enabled_midi_input_devices = enabled_midi_input_devices;
 
         persistence::save_app_config(out, conf);
     }
