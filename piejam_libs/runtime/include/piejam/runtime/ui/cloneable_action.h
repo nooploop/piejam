@@ -14,8 +14,11 @@ struct cloneable_action : public ActionInterface
 {
     auto clone() const -> std::unique_ptr<ActionInterface> override
     {
-        return std::make_unique<DerivedAction>(static_cast<DerivedAction const&>(*this));
+        return std::make_unique<DerivedAction>(
+                static_cast<DerivedAction const&>(*this));
     }
+
+    bool operator==(cloneable_action const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime::ui

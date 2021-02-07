@@ -20,6 +20,8 @@ struct visitable_action_interface
     virtual ~visitable_action_interface() = default;
 
     virtual void visit(visitor_t&) const = 0;
+
+    bool operator==(visitable_action_interface const&) const noexcept = default;
 };
 
 template <class Action, class Base>
@@ -29,6 +31,8 @@ struct visitable_action : virtual Base
     {
         v(static_cast<Action const&>(*this));
     }
+
+    bool operator==(visitable_action const&) const noexcept = default;
 };
 
 template <class Action>

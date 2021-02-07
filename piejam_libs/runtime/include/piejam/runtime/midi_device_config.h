@@ -13,6 +13,8 @@ struct midi_device_config
 {
     boxed_string name;
     bool enabled{};
+
+    bool operator==(midi_device_config const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime
