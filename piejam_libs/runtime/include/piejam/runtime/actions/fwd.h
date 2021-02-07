@@ -68,5 +68,6 @@ struct save_session;
 
 struct device_action_visitor;
 struct engine_action_visitor;
+struct persistence_action_visitor;
 
 } // namespace piejam::runtime::actions
