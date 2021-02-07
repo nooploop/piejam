@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/runtime/actions/midi_control_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -13,6 +14,7 @@ namespace piejam::runtime::actions
 
 struct refresh_midi_devices final
     : ui::cloneable_action<refresh_midi_devices, action>
+    , visitable_midi_control_action<refresh_midi_devices>
 {
     auto reduce(state const&) const -> state override;
 };

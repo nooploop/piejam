@@ -27,7 +27,8 @@ private:
     void process_device_update(midi::device_added const&);
     void process_device_update(midi::device_removed const&);
 
-    void refresh_midi_devices();
+    template <class Action>
+    void process_midi_control_action(Action const&);
 
     device_updates_f m_device_updates;
     std::vector<std::string> m_enabled_devices;

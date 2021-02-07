@@ -12,10 +12,12 @@ namespace piejam::runtime::actions
 
 // actions
 
-struct renotify;
-
 struct device_action;
 struct engine_action;
+struct midi_control_action;
+struct persistence_action;
+
+struct renotify;
 
 struct apply_app_config;
 
@@ -68,6 +70,7 @@ struct save_session;
 
 struct device_action_visitor;
 struct engine_action_visitor;
+struct midi_control_action_visitor;
 struct persistence_action_visitor;
 
 } // namespace piejam::runtime::actions

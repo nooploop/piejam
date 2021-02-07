@@ -86,15 +86,19 @@ midi_control_middleware::midi_control_middleware(
 }
 
 void
-midi_control_middleware::operator()(action const& a)
+midi_control_middleware::operator()(action const& action)
 {
-    if (typeid(a) == typeid(actions::refresh_midi_devices))
+    if (auto const* const a =
+                dynamic_cast<actions::midi_control_action const*>(&action))
     {
-        refresh_midi_devices();
+        auto v = ui::make_action_visitor<actions::midi_control_action_visitor>(
+                [this](auto const& a) { process_midi_control_action(a); });
+
+        a->visit(v);
     }
     else
     {
-        next(a);
+        next(action);
     }
 }
 
@@ -125,8 +129,10 @@ midi_control_middleware::process_device_update(midi::device_removed const& up)
     }
 }
 
+template <>
 void
-midi_control_middleware::refresh_midi_devices()
+midi_control_middleware::process_midi_control_action(
+        actions::refresh_midi_devices const&)
 {
     update_midi_devices next_action;
     next_action.updates = m_device_updates();
