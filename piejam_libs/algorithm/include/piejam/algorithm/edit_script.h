@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/algorithm/for_each_visit.h>
+
 #include <algorithm>
 #include <ranges>
 #include <type_traits>
@@ -203,9 +205,7 @@ prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> ops)
         auto operator()(edit_script_insertion<T>&) { --deletion_offset; }
     } visitor;
 
-    std::ranges::for_each(ops, [&visitor](auto& op) {
-        return std::visit(visitor, op);
-    });
+    for_each_visit(ops, visitor);
 
     return ops;
 }
@@ -216,9 +216,10 @@ template <class T, class Visitor>
 auto
 apply_edit_script(edit_script_ops<T> ops, Visitor&& v)
 {
-    for (auto const& op :
-         detail::prepare_edit_script_ops_for_linear_execution(std::move(ops)))
-        std::visit(std::forward<Visitor>(v), op);
+    for_each_visit(
+            detail::prepare_edit_script_ops_for_linear_execution(
+                    std::move(ops)),
+            std::forward<Visitor>(v));
 }
 
 } // namespace piejam::algorithm

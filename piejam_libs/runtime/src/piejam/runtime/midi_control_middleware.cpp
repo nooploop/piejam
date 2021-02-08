@@ -55,14 +55,11 @@ struct update_midi_devices final
         auto midi_devices = *new_st.midi_devices;
         auto midi_inputs = *new_st.midi_inputs;
 
-        for (auto const& update : updates)
-        {
-            std::visit(
-                    midi_device_update_handler{
-                            .midi_devices = midi_devices,
-                            .midi_inputs = midi_inputs},
-                    update);
-        }
+        algorithm::for_each_visit(
+                updates,
+                midi_device_update_handler{
+                        .midi_devices = midi_devices,
+                        .midi_inputs = midi_inputs});
 
         new_st.midi_devices = std::move(midi_devices);
         new_st.midi_inputs = std::move(midi_inputs);
