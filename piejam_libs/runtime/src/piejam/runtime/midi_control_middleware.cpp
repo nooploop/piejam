@@ -6,6 +6,7 @@
 
 #include <piejam/algorithm/contains.h>
 #include <piejam/algorithm/for_each_visit.h>
+#include <piejam/algorithm/unique_erase.h>
 #include <piejam/midi/device_update.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/apply_app_config.h>
@@ -172,6 +173,33 @@ void
 midi_control_middleware::process_midi_control_action(
         actions::apply_app_config const& action)
 {
+    auto const& st = get_state();
+    for (std::string const& dev_name : action.conf.enabled_midi_input_devices)
+    {
+        auto it = std::ranges::find_if(
+                *st.midi_devices,
+                [&](auto const& id_config) {
+                    return std::get<1>(id_config).name == dev_name;
+                });
+
+        if (it != st.midi_devices->end())
+        {
+            if (!it->second.enabled)
+            {
+                actions::activate_midi_device activate_action;
+                activate_action.device_id = it->first;
+                dispatch(activate_action);
+            }
+        }
+        else
+        {
+            m_enabled_devices.emplace_back(dev_name);
+        }
+    }
+
+    std::ranges::sort(m_enabled_devices);
+    algorithm::unique_erase(m_enabled_devices);
+
     next(action);
 }
 
