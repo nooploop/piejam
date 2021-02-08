@@ -178,7 +178,7 @@ public:
         distribute_initial_tasks();
 
         BOOST_ASSERT(m_worker_tasks.size() == m_worker_threads.size());
-        for (std::size_t const w : range::indices(m_worker_threads.size()))
+        for (std::size_t const w : range::indices(m_worker_threads))
         {
             m_worker_threads[w].wakeup(m_worker_tasks[w]);
         }

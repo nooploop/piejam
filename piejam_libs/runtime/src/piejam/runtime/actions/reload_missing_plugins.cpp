@@ -25,7 +25,7 @@ reload_missing_plugins() -> thunk_action
 
         for (auto&& [bus_id, bus] : st.mixer_state.buses)
         {
-            for (std::size_t fx_pos : range::indices(bus.fx_chain->size()))
+            for (std::size_t fx_pos : range::indices(*bus.fx_chain))
             {
                 auto&& fx_mod_id = (*bus.fx_chain)[fx_pos];
                 auto fx_mod = st.fx_modules[fx_mod_id];

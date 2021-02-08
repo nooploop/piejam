@@ -14,6 +14,7 @@
 #include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/npos.h>
 #include <piejam/range/indices.h>
+#include <piejam/range/iota.h>
 #include <piejam/system/dll.h>
 
 #include <ladspa.h>
@@ -457,7 +458,7 @@ public:
         engine::verify_process_context(*this, ctx);
 
         BOOST_ASSERT(m_output_port_indices.size() == ctx.outputs.size());
-        for (std::size_t i : range::indices(ctx.outputs.size()))
+        for (std::size_t i : range::indices(ctx.outputs))
         {
             m_instance.connect_port(
                     m_output_port_indices[i],
@@ -466,7 +467,7 @@ public:
         }
 
         BOOST_ASSERT(ctx.event_inputs.size() == m_event_inputs.size());
-        for (std::size_t i : range::indices(ctx.event_inputs.size()))
+        for (std::size_t i : range::indices(ctx.event_inputs))
             m_control_inputs[i].initialize(ctx.event_inputs, i);
 
         BOOST_ASSERT(m_input_port_indices.size() == ctx.inputs.size());
@@ -484,7 +485,7 @@ public:
 
             if (offset < min_offset)
             {
-                for (std::size_t i : range::indices(ctx.inputs.size()))
+                for (std::size_t i : range::indices(ctx.inputs))
                 {
                     auto sub = audio::engine::subslice(
                             ctx.inputs[i].get(),
@@ -530,7 +531,7 @@ public:
                   throw_if_null(m_plugin_dll.symbol<LADSPA_Descriptor_Function>(
                           "ladspa_descriptor")(pd.index)))
     {
-        for (unsigned long port : range::indices(m_ladspa_desc->PortCount))
+        for (unsigned long port : range::iota(m_ladspa_desc->PortCount))
         {
             int const ladspa_port_desc = m_ladspa_desc->PortDescriptors[port];
 

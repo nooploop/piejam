@@ -4,7 +4,7 @@
 
 #include <piejam/runtime/actions/apply_session.h>
 
-#include <piejam/range/indices.h>
+#include <piejam/range/iota.h>
 #include <piejam/runtime/actions/control_midi_assignment.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
@@ -57,8 +57,7 @@ make_add_fx_module_actions(
         mixer::bus_list_t const& bus_ids,
         std::vector<persistence::session::mixer_bus> const& mb_data)
 {
-    for (std::size_t i :
-         range::indices(std::min(mb_data.size(), bus_ids.size())))
+    for (std::size_t i : range::iota(std::min(mb_data.size(), bus_ids.size())))
     {
         mixer::bus_id fx_chain_bus = bus_ids[i];
         for (auto const& fx_plug : mb_data[i].fx_chain)
@@ -79,8 +78,7 @@ apply_mixer_midi(
 {
     auto action = std::make_unique<actions::update_midi_assignments>();
 
-    for (std::size_t i :
-         range::indices(std::min(mb_data.size(), bus_ids.size())))
+    for (std::size_t i : range::iota(std::min(mb_data.size(), bus_ids.size())))
     {
         if (mixer::bus const* const bus = buses[bus_ids[i]])
         {

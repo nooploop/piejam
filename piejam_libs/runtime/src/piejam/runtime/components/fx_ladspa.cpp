@@ -47,14 +47,14 @@ public:
         }
 
         std::ranges::transform(
-                range::indices(m_fx_proc->event_inputs().size()),
+                range::indices(m_fx_proc->event_inputs()),
                 std::back_inserter(m_event_inputs),
                 [this](std::size_t n) {
                     return audio::engine::graph_endpoint{*m_fx_proc, n};
                 });
 
         std::ranges::transform(
-                range::indices(m_fx_proc->event_outputs().size()),
+                range::indices(m_fx_proc->event_outputs()),
                 std::back_inserter(m_event_outputs),
                 [this](std::size_t n) {
                     return audio::engine::graph_endpoint{*m_fx_proc, n};
@@ -69,7 +69,7 @@ public:
 
     void connect(audio::engine::graph& g) const override
     {
-        for (std::size_t i : range::indices(m_param_input_procs.size()))
+        for (std::size_t i : range::indices(m_param_input_procs))
         {
             g.add_event_wire({*m_param_input_procs[i], 0}, {*m_fx_proc, i});
         }
@@ -138,8 +138,7 @@ public:
         BOOST_ASSERT(
                 m_fx_left_proc->event_outputs().size() ==
                 m_fx_right_proc->event_outputs().size());
-        for (std::size_t n :
-             range::indices(m_fx_left_proc->event_outputs().size()))
+        for (std::size_t n : range::indices(m_fx_left_proc->event_outputs()))
         {
             m_event_outputs.emplace_back(*m_fx_left_proc, n);
             m_event_outputs.emplace_back(*m_fx_right_proc, n);
@@ -154,7 +153,7 @@ public:
 
     void connect(audio::engine::graph& g) const override
     {
-        for (std::size_t i : range::indices(m_param_input_procs.size()))
+        for (std::size_t i : range::indices(m_param_input_procs))
         {
             g.add_event_wire(
                     {*m_param_input_procs[i], 0},
