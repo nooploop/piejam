@@ -40,6 +40,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_bus_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_float_parameter_normalized.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_parameter_value.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_parameter_values.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/channel_index_pair.h
@@ -144,6 +145,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_bus_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_float_parameter_normalized.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_parameter_value.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_parameter_values.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/batch_action.cpp

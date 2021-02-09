@@ -9,10 +9,7 @@
 namespace piejam::runtime
 {
 
-using parameter_maps = parameter::maps_collection<
-        parameter::float_,
-        parameter::int_,
-        parameter::bool_,
-        parameter::stereo_level>;
+using parameter_maps =
+        boost::mp11::mp_rename<parameters_t, parameter::maps_collection>;
 
 } // namespace piejam::runtime

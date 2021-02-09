@@ -5,9 +5,11 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
-#include <piejam/runtime/parameter/fwd.h>
+#include <piejam/runtime/parameters.h>
 #include <piejam/runtime/processors/fwd.h>
 #include <piejam/runtime/ui/fwd.h>
+
+#include <boost/mp11/list.hpp>
 
 namespace piejam::runtime
 {
@@ -28,11 +30,8 @@ using stereo_level = audio::pair<float>;
 
 struct locations;
 
-using parameter_processor_factory = processors::parameter_processor_factory<
-        parameter::float_,
-        parameter::int_,
-        parameter::bool_,
-        parameter::stereo_level>;
+using parameter_processor_factory = boost::mp11::
+        mp_rename<parameters_t, processors::parameter_processor_factory>;
 
 struct midi_device_config;
 

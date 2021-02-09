@@ -31,6 +31,7 @@
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
+#include <piejam/runtime/actions/update_parameter_values.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/ladspa_manager.h>
@@ -177,21 +178,6 @@ select_device<io_direction::output>::reduce(state const& st) const -> state
 
 using select_input_device = select_device<io_direction::input>;
 using select_output_device = select_device<io_direction::output>;
-
-struct update_levels final : ui::cloneable_action<update_levels, action>
-{
-    std::vector<std::pair<stereo_level_parameter_id, stereo_level>> levels;
-
-    auto reduce(state const& st) const -> state override
-    {
-        auto new_st = st;
-
-        for (auto&& [id, lvl] : levels)
-            new_st.params.set(id, lvl);
-
-        return new_st;
-    }
-};
 
 struct update_info final : ui::cloneable_action<update_info, action>
 {
@@ -600,12 +586,12 @@ audio_engine_middleware::process_engine_action(
 {
     if (m_engine)
     {
-        update_levels next_action;
+        actions::update_parameter_values next_action;
 
         for (auto&& id : a.level_ids)
         {
             if (auto lvl = m_engine->get_parameter_update(id))
-                next_action.levels.emplace_back(id, *lvl);
+                next_action.values.emplace_back(std::pair(id, *lvl));
         }
 
         next(next_action);

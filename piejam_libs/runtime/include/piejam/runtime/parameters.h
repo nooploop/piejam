@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/parameter/fwd.h>
 
+#include <boost/mp11/list.hpp>
+
 namespace piejam::runtime
 {
 
@@ -24,5 +26,11 @@ using int_parameter_id = parameter::id_t<int_parameter>;
 using stereo_level_parameter = parameter::stereo_level;
 using stereo_level_parameters = parameter::map<stereo_level_parameter>;
 using stereo_level_parameter_id = parameter::id_t<stereo_level_parameter>;
+
+using parameters_t = boost::mp11::mp_list<
+        float_parameter,
+        bool_parameter,
+        int_parameter,
+        stereo_level_parameter>;
 
 } // namespace piejam::runtime

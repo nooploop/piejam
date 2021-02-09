@@ -14,10 +14,7 @@
 namespace piejam::runtime
 {
 
-using parameter_processor_factory = processors::parameter_processor_factory<
-        parameter::float_,
-        parameter::int_,
-        parameter::bool_,
-        parameter::stereo_level>;
+using parameter_processor_factory = boost::mp11::
+        mp_rename<parameters_t, processors::parameter_processor_factory>;
 
 } // namespace piejam::runtime

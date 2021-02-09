@@ -6,7 +6,6 @@
 
 #include <piejam/audio/fwd.h>
 #include <piejam/fwd.h>
-#include <piejam/midi/fwd.h>
 
 namespace piejam::runtime::parameter
 {
