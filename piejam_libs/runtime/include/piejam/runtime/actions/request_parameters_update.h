@@ -10,16 +10,23 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
+#include <boost/mp11/algorithm.hpp>
+
+#include <variant>
 #include <vector>
 
 namespace piejam::runtime::actions
 {
 
-struct request_levels_update final
-    : ui::cloneable_action<request_levels_update, action>
-    , visitable_engine_action<request_levels_update>
+struct request_parameters_update final
+    : ui::cloneable_action<request_parameters_update, action>
+    , visitable_engine_action<request_parameters_update>
 {
-    std::vector<stereo_level_parameter_id> level_ids;
+    using parameter_id_t = boost::mp11::mp_rename<
+            boost::mp11::mp_transform<parameter::id_t, parameters_t>,
+            std::variant>;
+
+    std::vector<parameter_id_t> param_ids;
 
     auto reduce(state const&) const -> state override;
 };

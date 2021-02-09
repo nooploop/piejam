@@ -21,7 +21,7 @@ struct engine_action_visitor
               set_float_parameter,
               set_int_parameter,
               set_input_bus_solo,
-              request_levels_update,
+              request_parameters_update,
               request_info_update,
               load_ladspa_fx_plugin,
               move_fx_module_left,

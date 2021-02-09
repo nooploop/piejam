@@ -39,7 +39,7 @@ template <io_direction>
 struct set_bus_solo;
 using set_input_bus_solo = set_bus_solo<io_direction::input>;
 
-struct request_levels_update;
+struct request_parameters_update;
 struct request_info_update;
 
 struct set_bus_name;

@@ -27,8 +27,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/reload_missing_plugins.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/replace_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_info_update.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_levels_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_mixer_levels_update.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_parameters_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/save_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/save_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/scan_ladspa_fx_plugins.h
@@ -132,8 +132,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/reload_missing_plugins.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/replace_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_info_update.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_levels_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_mixer_levels_update.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_parameters_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/save_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/save_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/scan_ladspa_fx_plugins.cpp

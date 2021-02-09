@@ -5,6 +5,7 @@
 #include <piejam/runtime/audio_engine_middleware.h>
 
 #include <piejam/algorithm/find_or_get_first.h>
+#include <piejam/algorithm/for_each_visit.h>
 #include <piejam/algorithm/index_of.h>
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/processor.h>
@@ -25,7 +26,7 @@
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/move_fx_module.h>
-#include <piejam/runtime/actions/request_levels_update.h>
+#include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
@@ -582,17 +583,16 @@ audio_engine_middleware::process_engine_action(
 template <>
 void
 audio_engine_middleware::process_engine_action(
-        actions::request_levels_update const& a)
+        actions::request_parameters_update const& a)
 {
     if (m_engine)
     {
         actions::update_parameter_values next_action;
 
-        for (auto&& id : a.level_ids)
-        {
-            if (auto lvl = m_engine->get_parameter_update(id))
-                next_action.values.emplace_back(std::pair(id, *lvl));
-        }
+        algorithm::for_each_visit(a.param_ids, [this, &next_action](auto&& id) {
+            if (auto value = m_engine->get_parameter_update(id))
+                next_action.values.emplace_back(std::pair(id, *value));
+        });
 
         next(next_action);
     }
