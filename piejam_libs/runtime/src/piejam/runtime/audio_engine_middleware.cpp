@@ -594,7 +594,8 @@ audio_engine_middleware::process_engine_action(
                 next_action.values.emplace_back(std::pair(id, *value));
         });
 
-        next(next_action);
+        if (!next_action.values.empty())
+            next(next_action);
     }
 }
 
@@ -634,32 +635,6 @@ audio_engine_middleware::process_engine_action(
 
             rebuild();
         }
-
-        auto const& st = get_state();
-        batch_action param_update;
-        for (auto const& [id, ass] : st.midi_assignments.get())
-        {
-            std::visit(
-                    [this, &st, &param_update]<class P>(
-                            parameter::id_t<P> const& param_id) {
-                        if (auto value =
-                                    m_engine->get_parameter_update(param_id))
-                        {
-                            auto current_value = st.params.get(param_id);
-                            if (*value != *current_value)
-                            {
-                                param_update.emplace_back<
-                                        actions::set_parameter_value<P>>(
-                                        param_id,
-                                        *value);
-                            }
-                        }
-                    },
-                    id);
-        }
-
-        if (!param_update.empty())
-            dispatch(param_update);
     }
 }
 

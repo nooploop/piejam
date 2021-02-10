@@ -11,6 +11,8 @@
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
+#include <piejam/runtime/actions/request_info_update.h>
+#include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/state.h>
 
@@ -198,6 +200,26 @@ midi_control_middleware::process_midi_control_action(
     algorithm::unique_erase(m_enabled_devices);
 
     next(action);
+}
+
+template <>
+void
+midi_control_middleware::process_midi_control_action(
+        actions::request_info_update const& action)
+{
+    next(action);
+
+    auto const& st = get_state();
+    actions::request_parameters_update param_update;
+
+    algorithm::for_each_visit(
+            st.midi_assignments.get() | std::views::keys,
+            [&param_update](auto const& id) {
+                param_update.param_ids.emplace_back(id);
+            });
+
+    if (!param_update.param_ids.empty())
+        next(param_update);
 }
 
 } // namespace piejam::runtime
