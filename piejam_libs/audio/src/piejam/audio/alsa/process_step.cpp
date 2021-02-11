@@ -2,10 +2,11 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/alsa/process_step.h>
+#include "process_step.h"
 
-#include <piejam/audio/alsa/pcm_reader.h>
-#include <piejam/audio/alsa/pcm_writer.h>
+#include "pcm_reader.h"
+#include "pcm_writer.h"
+
 #include <piejam/audio/cpu_load_meter.h>
 #include <piejam/audio/pcm_convert.h>
 #include <piejam/audio/pcm_format.h>

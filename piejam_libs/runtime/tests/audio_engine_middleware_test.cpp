@@ -2,6 +2,10 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "audio_device_manager_mock.h"
+#include "middleware_functors_mock.h"
+
+#include <piejam/audio/device.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/select_period_size.h>
@@ -19,40 +23,16 @@ namespace piejam::runtime::test
 
 struct audio_engine_middleware_test : ::testing::Test
 {
-    struct controller
-    {
-        MOCK_CONST_METHOD0(get_pcm_io_descriptors, audio::pcm_io_descriptors());
-        MOCK_CONST_METHOD1(
-                get_hw_params,
-                audio::pcm_hw_params(audio::pcm_descriptor const&));
-        MOCK_CONST_METHOD1(
-                create_device,
-                std::unique_ptr<audio::device>(state const&));
-        MOCK_CONST_METHOD0(get_state, state const&());
-        MOCK_CONST_METHOD1(dispatch, void(action const&));
-        MOCK_CONST_METHOD1(next, void(action const&));
-    };
-
-    ::testing::StrictMock<controller> m_ctrl;
+    testing::StrictMock<middleware_functors_mock> mf_mock;
+    testing::StrictMock<audio_device_manager_mock> audio_device_manager;
 
     auto make_sut()
     {
         return audio_engine_middleware(
-                middleware_functors(
-                        [this]() -> state const& { return m_ctrl.get_state(); },
-                        [this](action const& a) { m_ctrl.dispatch(a); },
-                        [this](action const& a) { m_ctrl.next(a); }),
+                make_middleware_functors(mf_mock),
                 {},
                 {},
-                [this]() -> audio::pcm_io_descriptors {
-                    return m_ctrl.get_pcm_io_descriptors();
-                },
-                [this](audio::pcm_descriptor const& d) -> audio::pcm_hw_params {
-                    return m_ctrl.get_hw_params(d);
-                },
-                [this](state const& st) -> std::unique_ptr<audio::device> {
-                    return m_ctrl.create_device(st);
-                },
+                audio_device_manager,
                 [](auto&&...) { return nullptr; },
                 nullptr);
     }
@@ -70,20 +50,19 @@ TEST_F(audio_engine_middleware_test,
 
         auto reduce(state const& st) const -> state override { return st; }
     } action;
-    EXPECT_CALL(m_ctrl, next(::testing::Ref(action)));
+    EXPECT_CALL(mf_mock, next(::testing::Ref(action)));
     make_sut()(action);
 }
 
 TEST_F(audio_engine_middleware_test, select_samplerate_is_passed_to_next)
 {
     using namespace testing;
-    EXPECT_CALL(m_ctrl, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
-    EXPECT_CALL(m_ctrl, create_device(_))
-            .WillOnce(Return(
-                    ByMove(std::make_unique<piejam::audio::dummy_device>())));
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
+    EXPECT_CALL(audio_device_manager, make_device(_, _, _))
+            .WillOnce(Return(ByMove(std::make_unique<audio::dummy_device>())));
 
     actions::select_samplerate action;
-    EXPECT_CALL(m_ctrl, next(Ref(action)));
+    EXPECT_CALL(mf_mock, next(Ref(action)));
 
     make_sut()(action);
 }
@@ -91,13 +70,12 @@ TEST_F(audio_engine_middleware_test, select_samplerate_is_passed_to_next)
 TEST_F(audio_engine_middleware_test, select_period_size_is_passed_to_next)
 {
     using namespace testing;
-    EXPECT_CALL(m_ctrl, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
-    EXPECT_CALL(m_ctrl, create_device(_))
-            .WillOnce(Return(
-                    ByMove(std::make_unique<piejam::audio::dummy_device>())));
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
+    EXPECT_CALL(audio_device_manager, make_device(_, _, _))
+            .WillOnce(Return(ByMove(std::make_unique<audio::dummy_device>())));
 
     actions::select_period_size action;
-    EXPECT_CALL(m_ctrl, next(Ref(action)));
+    EXPECT_CALL(mf_mock, next(Ref(action)));
 
     make_sut()(action);
 }
@@ -119,18 +97,17 @@ TEST_F(audio_engine_middleware_test,
     descs.inputs.resize(2);
     st.pcm_devices = std::move(descs);
 
-    EXPECT_CALL(m_ctrl, get_state()).WillRepeatedly(ReturnRef(st));
-    EXPECT_CALL(m_ctrl, create_device(_))
-            .WillOnce(Return(
-                    ByMove(std::make_unique<piejam::audio::dummy_device>())));
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
+    EXPECT_CALL(audio_device_manager, make_device(_, _, _))
+            .WillOnce(Return(ByMove(std::make_unique<audio::dummy_device>())));
 
     actions::initiate_device_selection in_action;
     in_action.input = true;
     in_action.index = 1; // select another device
 
-    EXPECT_CALL(m_ctrl, get_hw_params(Ref(st.pcm_devices->inputs[1])))
+    EXPECT_CALL(audio_device_manager, hw_params(Ref(st.pcm_devices->inputs[1])))
             .WillOnce(Return(hw_params));
-    EXPECT_CALL(m_ctrl, next(_));
+    EXPECT_CALL(mf_mock, next(_));
 
     make_sut()(in_action);
 }

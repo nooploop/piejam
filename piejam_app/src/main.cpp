@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <piejam/app/gui/model/Factory.h>
-#include <piejam/audio/alsa/get_pcm_io_descriptors.h>
-#include <piejam/audio/alsa/get_set_hw_params.h>
+#include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
 #include <piejam/gui/qt_log.h>
@@ -31,7 +30,6 @@
 #include <piejam/runtime/locations.h>
 #include <piejam/runtime/midi_control_middleware.h>
 #include <piejam/runtime/midi_input_controller.h>
-#include <piejam/runtime/open_alsa_device.h>
 #include <piejam/runtime/persistence_middleware.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/store.h>
@@ -100,6 +98,7 @@ main(int argc, char* argv[]) -> int
     Q_INIT_RESOURCE(piejam_gui_resources);
     Q_INIT_RESOURCE(piejam_app_resources);
 
+    auto audio_device_manager = audio::make_device_manager();
     auto midi_device_manager = midi::make_device_manager();
     runtime::fx::ladspa_manager ladspa_manager;
 
@@ -114,7 +113,8 @@ main(int argc, char* argv[]) -> int
                 std::forward<decltype(next)>(next));
     });
 
-    store.apply_middleware([midi_device_manager = midi_device_manager.get(),
+    store.apply_middleware([audio_device_manager = audio_device_manager.get(),
+                            midi_device_manager = midi_device_manager.get(),
                             &ladspa_manager](
                                    auto&& get_state,
                                    auto&& dispatch,
@@ -128,9 +128,7 @@ main(int argc, char* argv[]) -> int
                         std::forward<decltype(next)>(next)),
                 audio_thread_config,
                 worker_thread_configs,
-                &audio::alsa::get_pcm_io_descriptors,
-                &audio::alsa::get_hw_params,
-                &runtime::open_alsa_device,
+                *audio_device_manager,
                 [&ladspa_manager](auto&& id, auto&& sr) {
                     return ladspa_manager.make_processor(id, sr);
                 },

@@ -2,15 +2,13 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/alsa/get_pcm_io_descriptors.h>
-#include <piejam/audio/alsa/get_set_hw_params.h>
+#include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/midi_input_controller.h>
-#include <piejam/runtime/open_alsa_device.h>
 #include <piejam/runtime/state.h>
 #include <piejam/thread/configuration.h>
 
@@ -39,8 +37,10 @@ main(int argc, char* argv[]) -> int
 
     try
     {
+        auto audio_device_manager = piejam::audio::make_device_manager();
+
         piejam::runtime::state audio_state;
-        audio_state.pcm_devices = piejam::audio::alsa::get_pcm_io_descriptors();
+        audio_state.pcm_devices = audio_device_manager->io_descriptors();
         audio_state.samplerate = boost::lexical_cast<unsigned>(argv[3]);
         audio_state.period_size = boost::lexical_cast<unsigned>(argv[4]);
         piejam::runtime::audio_engine_middleware audio_engine(
@@ -58,9 +58,7 @@ main(int argc, char* argv[]) -> int
                         .affinity = boost::lexical_cast<int>(argv[5]),
                         .priority = 96},
                 {},
-                &piejam::audio::alsa::get_pcm_io_descriptors,
-                &piejam::audio::alsa::get_hw_params,
-                &piejam::runtime::open_alsa_device,
+                *audio_device_manager,
                 [](auto&&...) { return nullptr; },
                 nullptr);
 

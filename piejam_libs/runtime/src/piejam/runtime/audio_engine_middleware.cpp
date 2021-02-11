@@ -8,12 +8,15 @@
 #include <piejam/algorithm/for_each_visit.h>
 #include <piejam/algorithm/index_of.h>
 #include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/device.h>
+#include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
 #include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
+#include <piejam/audio/pcm_io_config.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
@@ -194,30 +197,55 @@ struct update_info final : ui::cloneable_action<update_info, action>
     }
 };
 
+static auto
+period_count(state const& state) -> unsigned
+{
+    constexpr unsigned default_period_count = 2u;
+    unsigned min_period_count{};
+    unsigned max_period_count{};
+
+    if (state.input.index && state.output.index)
+    {
+        min_period_count = std::max(
+                state.input.hw_params->period_count_min,
+                state.output.hw_params->period_count_min);
+        max_period_count = std::min(
+                state.input.hw_params->period_count_max,
+                state.output.hw_params->period_count_max);
+    }
+    else if (state.input.index)
+    {
+        min_period_count = state.input.hw_params->period_count_min;
+        max_period_count = state.input.hw_params->period_count_max;
+    }
+    else
+    {
+        min_period_count = state.output.hw_params->period_count_min;
+        max_period_count = state.output.hw_params->period_count_max;
+    }
+
+    return std::clamp(default_period_count, min_period_count, max_period_count);
+}
+
 } // namespace
 
 audio_engine_middleware::audio_engine_middleware(
         middleware_functors mw_fs,
         thread::configuration const& audio_thread_config,
         std::span<thread::configuration const> const& wt_configs,
-        get_pcm_io_descriptors_f get_pcm_io_descriptors,
-        get_hw_params_f get_hw_params,
-        device_factory_f device_factory,
+        audio::device_manager& device_manager,
         fx::ladspa_processor_factory ladspa_fx_processor_factory,
         std::unique_ptr<midi_input_controller> midi_controller)
     : middleware_functors(std::move(mw_fs))
     , m_audio_thread_config(audio_thread_config)
     , m_wt_configs(wt_configs.begin(), wt_configs.end())
-    , m_get_pcm_io_descriptors(std::move(get_pcm_io_descriptors))
-    , m_get_hw_params(std::move(get_hw_params))
-    , m_device_factory(std::move(device_factory))
+    , m_device_manager(device_manager)
     , m_ladspa_fx_processor_factory(std::move(ladspa_fx_processor_factory))
     , m_midi_controller(
               midi_controller ? std::move(midi_controller)
                               : make_dummy_midi_input_controller())
+    , m_device(std::make_unique<audio::dummy_device>())
 {
-    BOOST_ASSERT(m_get_hw_params);
-    BOOST_ASSERT(m_device_factory);
 }
 
 audio_engine_middleware::~audio_engine_middleware() = default;
@@ -294,7 +322,8 @@ audio_engine_middleware::process_device_action(
     {
         prep_action.input = {
                 index,
-                m_get_hw_params(prep_action.pcm_devices->inputs[index])};
+                m_device_manager.hw_params(
+                        prep_action.pcm_devices->inputs[index])};
     }
     else
     {
@@ -310,7 +339,8 @@ audio_engine_middleware::process_device_action(
     {
         prep_action.output = {
                 index,
-                m_get_hw_params(prep_action.pcm_devices->outputs[index])};
+                m_device_manager.hw_params(
+                        prep_action.pcm_devices->outputs[index])};
     }
     else
     {
@@ -336,7 +366,7 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
     state const& current_state = get_state();
 
     update_devices next_action;
-    next_action.pcm_devices = m_get_pcm_io_descriptors();
+    next_action.pcm_devices = m_device_manager.io_descriptors();
 
     auto next_device = [this](auto const& new_devices,
                               auto const& current_devices,
@@ -345,7 +375,8 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
                 new_devices,
                 current_devices[current_index]);
         auto const next_index = found_index == npos ? 0 : found_index;
-        return {next_index, m_get_hw_params(new_devices[next_index])};
+        return {next_index,
+                m_device_manager.hw_params(new_devices[next_index])};
     };
 
     next_action.input = next_device(
@@ -381,7 +412,9 @@ audio_engine_middleware::process_device_action(
     {
         select_input_device next_action;
         auto const& descriptors = current_state.pcm_devices->inputs;
-        next_action.device = {index, m_get_hw_params(descriptors[index])};
+        next_action.device = {
+                index,
+                m_device_manager.hw_params(descriptors[index])};
 
         std::tie(next_action.samplerate, next_action.period_size) =
                 next_samplerate_and_period_size(
@@ -396,7 +429,9 @@ audio_engine_middleware::process_device_action(
     {
         select_output_device next_action;
         auto const& descriptors = current_state.pcm_devices->outputs;
-        next_action.device = {index, m_get_hw_params(descriptors[index])};
+        next_action.device = {
+                index,
+                m_device_manager.hw_params(descriptors[index])};
 
         std::tie(next_action.samplerate, next_action.period_size) =
                 next_samplerate_and_period_size(
@@ -534,7 +569,23 @@ audio_engine_middleware::open_device()
 {
     try
     {
-        auto device = m_device_factory(get_state());
+        auto const& st = get_state();
+        auto device = m_device_manager.make_device(
+                st.pcm_devices->inputs[st.input.index],
+                st.pcm_devices->outputs[st.output.index],
+                audio::pcm_io_config{
+                        audio::pcm_device_config{
+                                st.input.hw_params->interleaved,
+                                st.input.hw_params->format,
+                                st.input.hw_params->num_channels},
+                        audio::pcm_device_config{
+                                st.output.hw_params->interleaved,
+                                st.output.hw_params->format,
+                                st.output.hw_params->num_channels},
+                        audio::pcm_process_config{
+                                st.samplerate,
+                                st.period_size,
+                                period_count(st)}});
         m_device.swap(device);
     }
     catch (std::exception const& err)

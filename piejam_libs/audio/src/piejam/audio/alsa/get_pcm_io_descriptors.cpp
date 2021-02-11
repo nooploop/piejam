@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/alsa/get_pcm_io_descriptors.h>
+#include "get_pcm_io_descriptors.h"
 
 #include <piejam/system/device.h>
 
