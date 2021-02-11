@@ -132,17 +132,13 @@ make_snd_pcm_hw_params_for_refine_any() -> snd_pcm_hw_params
     snd_pcm_hw_params hw_params{};
 
     hw_params.rmask = ~0u;
-    std::for_each(
-            std::begin(hw_params.masks),
-            std::end(hw_params.masks),
-            [](snd_mask& m) { std::ranges::fill(m.bits, ~0u); });
-    std::for_each(
-            std::begin(hw_params.intervals),
-            std::end(hw_params.intervals),
-            [](snd_interval& i) {
-                i.min = 0;
-                i.max = ~0u;
-            });
+    std::ranges::for_each(hw_params.masks, [](snd_mask& m) {
+        std::ranges::fill(m.bits, ~0u);
+    });
+    std::ranges::for_each(hw_params.intervals, [](snd_interval& i) {
+        i.min = 0;
+        i.max = ~0u;
+    });
 
     return hw_params;
 }
