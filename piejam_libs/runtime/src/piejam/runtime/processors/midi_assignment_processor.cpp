@@ -40,9 +40,6 @@ public:
                                     ass.channel,
                                     ass.control_id));
                     break;
-
-                case midi_assignment::type::pc:
-                    break;
             }
         }
     }

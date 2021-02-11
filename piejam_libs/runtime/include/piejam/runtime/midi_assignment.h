@@ -20,21 +20,12 @@ struct midi_assignment
     enum class type
     {
         cc,
-        pc
     } control_type;
 
     std::size_t control_id{};
 
-    constexpr bool operator==(midi_assignment const& other) const noexcept
-    {
-        return channel == other.channel && control_type == other.control_type &&
-               control_id == other.control_id;
-    }
-
-    constexpr bool operator!=(midi_assignment const& other) const noexcept
-    {
-        return !(*this == other);
-    }
+    constexpr bool
+    operator==(midi_assignment const& other) const noexcept = default;
 };
 
 using midi_assignments_map = std::map<midi_assignment_id, midi_assignment>;

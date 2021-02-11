@@ -15,17 +15,12 @@ namespace piejam::app::gui::model
 {
 
 static auto
-toQString(runtime::midi_assignment const& ass)
+toQString(runtime::midi_assignment const& ass) -> QString
 {
     switch (ass.control_type)
     {
         case runtime::midi_assignment::type::cc:
             return QString("CC %1 @%2")
-                    .arg(ass.control_id)
-                    .arg(ass.channel + 1);
-
-        case runtime::midi_assignment::type::pc:
-            return QString("PC %1 @%2")
                     .arg(ass.control_id)
                     .arg(ass.channel + 1);
     }

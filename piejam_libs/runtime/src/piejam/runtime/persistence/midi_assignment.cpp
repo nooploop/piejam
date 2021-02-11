@@ -11,7 +11,7 @@ namespace piejam::runtime
 
 NLOHMANN_JSON_SERIALIZE_ENUM(
         midi_assignment::type,
-        {{midi_assignment::type::cc, "cc"}, {midi_assignment::type::pc, "pc"}})
+        {{midi_assignment::type::cc, "cc"}})
 
 void
 to_json(nlohmann::json& j, midi_assignment const& ass)
