@@ -17,7 +17,7 @@ struct middleware_functors_mock
     MOCK_METHOD(void, next, (action const&));
 };
 
-auto
+inline auto
 make_middleware_functors(middleware_functors_mock& mock) -> middleware_functors
 {
     return {[&mock]() -> state const& { return mock.get_state(); },

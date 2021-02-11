@@ -53,9 +53,9 @@ scan_file(std::filesystem::path const& file) -> std::vector<plugin_descriptor>
             }
 
             result.push_back({
+                    .id = desc->UniqueID,
                     .file = file,
                     .index = plugin_index,
-                    .id = desc->UniqueID,
                     .label = desc->Label,
                     .name = desc->Name,
                     .author = desc->Maker,

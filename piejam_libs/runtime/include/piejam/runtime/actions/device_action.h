@@ -24,7 +24,6 @@ struct device_action_visitor
 
 struct device_action : ui::visitable_action_interface<device_action_visitor>
 {
-    bool operator==(device_action const&) const noexcept = default;
 };
 
 template <class Action>

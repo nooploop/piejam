@@ -18,19 +18,9 @@ struct registry
     using item = std::variant<internal, audio::ladspa::plugin_descriptor>;
 
     boxed_vector<item> entries;
+
+    bool operator==(registry const&) const noexcept = default;
 };
-
-inline bool
-operator==(registry const& l, registry const& r) noexcept
-{
-    return l.entries == r.entries;
-}
-
-inline bool
-operator!=(registry const& l, registry const& r) noexcept
-{
-    return l.entries != r.entries;
-}
 
 inline auto
 make_internal_fx_registry_entries()

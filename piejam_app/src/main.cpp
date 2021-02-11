@@ -5,6 +5,8 @@
 #include <piejam/app/gui/model/Factory.h>
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
+#include <piejam/audio/engine/processor.h>
+#include <piejam/audio/ladspa/plugin.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/device_update.h>
@@ -24,6 +26,8 @@
 #include <piejam/runtime/actions/save_session.h>
 #include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
 #include <piejam/runtime/audio_engine_middleware.h>
+#include <piejam/runtime/fx/ladspa_manager.h>
+#include <piejam/runtime/ladspa_fx_middleware.h>
 #include <piejam/runtime/locations.h>
 #include <piejam/runtime/midi_control_middleware.h>
 #include <piejam/runtime/midi_input_controller.h>
@@ -96,6 +100,9 @@ main(int argc, char* argv[]) -> int
     Q_INIT_RESOURCE(piejam_gui_resources);
     Q_INIT_RESOURCE(piejam_app_resources);
 
+    auto midi_device_manager = midi::make_device_manager();
+    runtime::fx::ladspa_manager ladspa_manager;
+
     runtime::store store(
             [](auto const& st, auto const& a) { return a.reduce(st); },
             {});
@@ -107,9 +114,8 @@ main(int argc, char* argv[]) -> int
                 std::forward<decltype(next)>(next));
     });
 
-    auto midi_device_manager = midi::make_device_manager();
-
-    store.apply_middleware([midi_device_manager = midi_device_manager.get()](
+    store.apply_middleware([midi_device_manager = midi_device_manager.get(),
+                            &ladspa_manager](
                                    auto&& get_state,
                                    auto&& dispatch,
                                    auto&& next) {
@@ -125,6 +131,9 @@ main(int argc, char* argv[]) -> int
                 &audio::alsa::get_pcm_io_descriptors,
                 &audio::alsa::get_hw_params,
                 &runtime::open_alsa_device,
+                [&ladspa_manager](auto&& id, auto&& sr) {
+                    return ladspa_manager.make_processor(id, sr);
+                },
                 runtime::make_midi_input_controller(*midi_device_manager));
     });
 
@@ -141,6 +150,16 @@ main(int argc, char* argv[]) -> int
                     return midi_device_manager->update_devices();
                 });
     });
+
+    store.apply_middleware(
+            [&ladspa_manager](auto&& get_state, auto&& dispatch, auto&& next) {
+                return redux::make_middleware<runtime::ladspa_fx_middleware>(
+                        runtime::middleware_functors(
+                                std::forward<decltype(get_state)>(get_state),
+                                std::forward<decltype(dispatch)>(dispatch),
+                                std::forward<decltype(next)>(next)),
+                        ladspa_manager);
+            });
 
     store.apply_middleware(
             redux::make_thunk_middleware<runtime::state, runtime::action>{});

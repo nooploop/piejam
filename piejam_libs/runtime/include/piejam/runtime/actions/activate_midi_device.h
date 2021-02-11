@@ -21,8 +21,6 @@ struct activate_midi_device final
     midi::device_id_t device_id;
 
     auto reduce(state const&) const -> state override;
-
-    bool operator==(activate_midi_device const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime::actions

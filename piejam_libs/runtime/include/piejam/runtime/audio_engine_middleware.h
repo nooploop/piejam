@@ -12,6 +12,7 @@
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/fx/ladspa_processor_factory.h>
 #include <piejam/runtime/middleware_functors.h>
 #include <piejam/thread/configuration.h>
 
@@ -40,6 +41,7 @@ public:
             get_pcm_io_descriptors_f,
             get_hw_params_f,
             device_factory_f,
+            fx::ladspa_processor_factory,
             std::unique_ptr<midi_input_controller>);
     audio_engine_middleware(audio_engine_middleware&&) noexcept = default;
     ~audio_engine_middleware();
@@ -69,8 +71,9 @@ private:
     get_hw_params_f m_get_hw_params;
     device_factory_f m_device_factory;
 
+    fx::ladspa_processor_factory m_ladspa_fx_processor_factory;
+
     std::unique_ptr<midi_input_controller> m_midi_controller;
-    std::unique_ptr<fx::ladspa_manager> m_ladspa_fx_manager;
 
     std::unique_ptr<audio_engine> m_engine;
     std::unique_ptr<piejam::audio::device> m_device{

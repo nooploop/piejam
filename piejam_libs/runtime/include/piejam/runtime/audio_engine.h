@@ -51,7 +51,7 @@ public:
             fx::modules_t const&,
             fx::parameters_t const& fx_params,
             parameter_maps const&,
-            fx::ladspa_processor_factory const&,
+            fx::simple_ladspa_processor_factory const&,
             std::unique_ptr<midi::input_event_handler>,
             bool midi_learn,
             midi_assignments_map const&);

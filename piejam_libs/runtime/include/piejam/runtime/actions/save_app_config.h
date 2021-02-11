@@ -31,8 +31,6 @@ struct save_app_config final
     std::vector<std::string> enabled_midi_devices;
 
     auto reduce(state const&) const -> state override;
-
-    bool operator==(save_app_config const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime::actions

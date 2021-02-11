@@ -19,8 +19,6 @@ struct action
     virtual auto clone() const -> std::unique_ptr<action> = 0;
 
     virtual auto reduce(State const&) const -> State = 0;
-
-    bool operator==(action const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime::ui

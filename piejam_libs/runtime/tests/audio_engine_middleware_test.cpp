@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <piejam/audio/engine/processor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
@@ -52,6 +53,7 @@ struct audio_engine_middleware_test : ::testing::Test
                 [this](state const& st) -> std::unique_ptr<audio::device> {
                     return m_ctrl.create_device(st);
                 },
+                [](auto&&...) { return nullptr; },
                 nullptr);
     }
 };

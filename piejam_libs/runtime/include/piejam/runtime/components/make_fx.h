@@ -19,7 +19,7 @@ namespace piejam::runtime::components
 auto make_fx(
         fx::module const&,
         fx::get_parameter_name const&,
-        fx::ladspa_processor_factory const&,
+        fx::simple_ladspa_processor_factory const&,
         parameter_processor_factory&,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;

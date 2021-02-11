@@ -137,7 +137,7 @@ make_fx_chains_map(
         mixer::buses_t const& buses,
         mixer::bus_list_t const& all_ids,
         parameter_processor_factory& param_procs,
-        fx::ladspa_processor_factory const& ladspa_fx_proc_factory)
+        fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory)
         -> fx_chains_map
 {
     auto get_fx_param_name =
@@ -576,7 +576,7 @@ audio_engine::rebuild(
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
         parameter_maps const& params,
-        fx::ladspa_processor_factory const& ladspa_fx_proc_factory,
+        fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
         std::unique_ptr<midi::input_event_handler> midi_in,
         bool midi_learn,
         midi_assignments_map const& assignments)

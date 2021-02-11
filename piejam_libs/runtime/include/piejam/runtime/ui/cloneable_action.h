@@ -17,8 +17,6 @@ struct cloneable_action : public ActionInterface
         return std::make_unique<DerivedAction>(
                 static_cast<DerivedAction const&>(*this));
     }
-
-    bool operator==(cloneable_action const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime::ui

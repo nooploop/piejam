@@ -194,58 +194,6 @@ struct update_info final : ui::cloneable_action<update_info, action>
     }
 };
 
-struct insert_ladspa_fx_module_action final
-    : ui::cloneable_action<insert_ladspa_fx_module_action, action>
-{
-    mixer::bus_id fx_chain_bus;
-    std::size_t position{};
-    fx::ladspa_instance_id instance_id;
-    audio::ladspa::plugin_descriptor plugin_desc;
-    std::span<audio::ladspa::port_descriptor const> control_inputs;
-    std::vector<fx::parameter_value_assignment> initial_values;
-    std::vector<fx::parameter_midi_assignment> midi_assigns;
-
-    auto reduce(state const& st) const -> state override
-    {
-        auto new_st = st;
-
-        runtime::insert_ladspa_fx_module(
-                new_st,
-                fx_chain_bus,
-                position,
-                instance_id,
-                plugin_desc,
-                control_inputs,
-                initial_values,
-                midi_assigns);
-
-        return new_st;
-    }
-};
-
-struct insert_missing_ladspa_fx_module_action final
-    : ui::cloneable_action<insert_missing_ladspa_fx_module_action, action>
-{
-    mixer::bus_id fx_chain_bus;
-    std::size_t position{};
-    fx::unavailable_ladspa unavailable_ladspa;
-    std::string name;
-
-    auto reduce(state const& st) const -> state override
-    {
-        auto new_st = st;
-
-        runtime::insert_missing_ladspa_fx_module(
-                new_st,
-                fx_chain_bus,
-                position,
-                unavailable_ladspa,
-                name);
-
-        return new_st;
-    }
-};
-
 } // namespace
 
 audio_engine_middleware::audio_engine_middleware(
@@ -255,6 +203,7 @@ audio_engine_middleware::audio_engine_middleware(
         get_pcm_io_descriptors_f get_pcm_io_descriptors,
         get_hw_params_f get_hw_params,
         device_factory_f device_factory,
+        fx::ladspa_processor_factory ladspa_fx_processor_factory,
         std::unique_ptr<midi_input_controller> midi_controller)
     : middleware_functors(std::move(mw_fs))
     , m_audio_thread_config(audio_thread_config)
@@ -262,10 +211,10 @@ audio_engine_middleware::audio_engine_middleware(
     , m_get_pcm_io_descriptors(std::move(get_pcm_io_descriptors))
     , m_get_hw_params(std::move(get_hw_params))
     , m_device_factory(std::move(device_factory))
+    , m_ladspa_fx_processor_factory(std::move(ladspa_fx_processor_factory))
     , m_midi_controller(
               midi_controller ? std::move(midi_controller)
                               : make_dummy_midi_input_controller())
-    , m_ladspa_fx_manager(std::make_unique<fx::ladspa_manager>())
 {
     BOOST_ASSERT(m_get_hw_params);
     BOOST_ASSERT(m_device_factory);
@@ -486,74 +435,6 @@ audio_engine_middleware::process_engine_action(Action const& a)
     rebuild();
 }
 
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        actions::delete_fx_module const& a)
-{
-    auto const& st = get_state();
-
-    if (fx::module const* const fx_mod = st.fx_modules[a.fx_mod_id])
-    {
-        auto const fx_instance_id = fx_mod->fx_instance_id;
-
-        next(a);
-
-        rebuild();
-
-        if (fx::ladspa_instance_id const* const instance_id =
-                    std::get_if<fx::ladspa_instance_id>(&fx_instance_id))
-        {
-            m_ladspa_fx_manager->unload(*instance_id);
-        }
-    }
-}
-
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        actions::load_ladspa_fx_plugin const& a)
-{
-    auto const& st = get_state();
-
-    if (auto plugin_desc =
-                find_ladspa_plugin_descriptor(st.fx_registry, a.plugin_id))
-    {
-        if (auto id = m_ladspa_fx_manager->load(*plugin_desc))
-        {
-            insert_ladspa_fx_module_action next_action;
-            next_action.fx_chain_bus = a.fx_chain_bus;
-            next_action.position = a.position;
-            next_action.instance_id = id;
-            next_action.plugin_desc = *plugin_desc;
-            next_action.control_inputs =
-                    m_ladspa_fx_manager->control_inputs(id);
-            next_action.initial_values = a.initial_values;
-            next_action.midi_assigns = a.midi_assigns;
-
-            next(next_action);
-
-            rebuild();
-
-            return;
-        }
-        else
-        {
-            spdlog::error("failed to load ladspa fx plugin: {}", a.name);
-        }
-    }
-
-    insert_missing_ladspa_fx_module_action next_action;
-    next_action.fx_chain_bus = a.fx_chain_bus;
-    next_action.position = a.position;
-    next_action.unavailable_ladspa = fx::unavailable_ladspa{
-            .plugin_id = a.plugin_id,
-            .parameter_values = a.initial_values,
-            .midi_assigns = a.midi_assigns};
-    next_action.name = a.name;
-    next(next_action);
-}
-
 template <class Parameter>
 void
 audio_engine_middleware::process_engine_action(
@@ -700,7 +581,7 @@ audio_engine_middleware::rebuild()
                 st.fx_parameters,
                 st.params,
                 [this, sr = st.samplerate](fx::ladspa_instance_id id) {
-                    return m_ladspa_fx_manager->make_processor(id, sr);
+                    return m_ladspa_fx_processor_factory(id, sr);
                 },
                 m_midi_controller->make_input_event_handler(),
                 static_cast<bool>(st.midi_learning),

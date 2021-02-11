@@ -17,6 +17,8 @@ struct unavailable_ladspa
     audio::ladspa::plugin_id_t plugin_id;
     std::vector<parameter_value_assignment> parameter_values;
     std::vector<fx::parameter_midi_assignment> midi_assigns;
+
+    bool operator==(unavailable_ladspa const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime::fx

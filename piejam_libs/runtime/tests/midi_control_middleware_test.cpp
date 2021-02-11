@@ -7,6 +7,8 @@
 #include <piejam/midi/device_update.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
+#include <piejam/runtime/actions/request_info_update.h>
+#include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/midi_control_middleware.h>
 #include <piejam/runtime/ui/action.h>
@@ -141,6 +143,7 @@ TEST_F(midi_control_middleware_test,
 TEST_F(midi_control_middleware_test, remove_and_readd_enabled_device)
 {
     using testing::_;
+    using testing::Field;
     using testing::ReturnRef;
     using testing::WhenDynamicCastTo;
 
@@ -162,14 +165,12 @@ TEST_F(midi_control_middleware_test, remove_and_readd_enabled_device)
     st.midi_devices = midi_devices_t{
             {prev_dev_id, midi_device_config{.name = "test", .enabled = true}}};
 
-    actions::activate_midi_device activate_action;
-    activate_action.device_id = next_dev_id;
-
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(
             mf_mock,
             dispatch(WhenDynamicCastTo<actions::activate_midi_device const&>(
-                    activate_action)));
+                    Field(&actions::activate_midi_device::device_id,
+                          next_dev_id))));
     EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
         st = a.reduce(st);
     });
@@ -228,6 +229,8 @@ TEST_F(midi_control_middleware_test,
        save_app_config_is_populated_with_currently_enabled_devices)
 {
     using testing::_;
+    using testing::ElementsAre;
+    using testing::Field;
     using testing::ReturnRef;
     using testing::WhenDynamicCastTo;
 
@@ -244,14 +247,12 @@ TEST_F(midi_control_middleware_test,
     actions::save_app_config action("save_file");
     ASSERT_TRUE(action.enabled_midi_devices.empty());
 
-    actions::save_app_config expected_action("save_file");
-    expected_action.enabled_midi_devices = {"test"};
-
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(
             mf_mock,
             next(WhenDynamicCastTo<actions::save_app_config const&>(
-                    expected_action)));
+                    Field(&actions::save_app_config::enabled_midi_devices,
+                          ElementsAre(std::string("test"))))));
 
     sut(action);
 }
@@ -260,6 +261,8 @@ TEST_F(midi_control_middleware_test,
        save_app_config_is_populated_with_previously_enabled_devices)
 {
     using testing::_;
+    using testing::ElementsAre;
+    using testing::Field;
     using testing::ReturnRef;
     using testing::WhenDynamicCastTo;
 
@@ -295,14 +298,52 @@ TEST_F(midi_control_middleware_test,
         actions::save_app_config action("save_file");
         ASSERT_TRUE(action.enabled_midi_devices.empty());
 
-        actions::save_app_config expected_action("save_file");
-        expected_action.enabled_midi_devices = {"test"};
-
         EXPECT_CALL(
                 mf_mock,
                 next(WhenDynamicCastTo<actions::save_app_config const&>(
-                        expected_action)));
+                        Field(&actions::save_app_config::enabled_midi_devices,
+                              ElementsAre(std::string("test"))))));
 
+        sut(action);
+    }
+}
+
+TEST_F(midi_control_middleware_test,
+       request_info_update_will_request_parameter_updates_for_each_midi_assignment)
+{
+    using testing::_;
+    using testing::ElementsAre;
+    using testing::Field;
+    using testing::InSequence;
+    using testing::ReturnRef;
+    using testing::WhenDynamicCastTo;
+
+    midi_control_middleware sut(
+            make_middleware_functors(mf_mock),
+            [=]() -> std::vector<midi::device_update> { return {}; });
+
+    state st;
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
+
+    auto param_id = float_parameter_id::generate();
+    st.midi_assignments = midi_assignments_map{{param_id, midi_assignment{}}};
+
+    {
+        InSequence seq;
+
+        EXPECT_CALL(
+                mf_mock,
+                next(WhenDynamicCastTo<actions::request_info_update const&>(
+                        _)));
+
+        EXPECT_CALL(
+                mf_mock,
+                next(WhenDynamicCastTo<
+                        actions::request_parameters_update const&>(
+                        Field(&actions::request_parameters_update::param_ids,
+                              ElementsAre(param_id)))));
+
+        actions::request_info_update action;
         sut(action);
     }
 }

@@ -4,6 +4,7 @@
 
 #include <piejam/audio/alsa/get_pcm_io_descriptors.h>
 #include <piejam/audio/alsa/get_set_hw_params.h>
+#include <piejam/audio/engine/processor.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
@@ -60,6 +61,7 @@ main(int argc, char* argv[]) -> int
                 &piejam::audio::alsa::get_pcm_io_descriptors,
                 &piejam::audio::alsa::get_hw_params,
                 &piejam::runtime::open_alsa_device,
+                [](auto&&...) { return nullptr; },
                 nullptr);
 
         {

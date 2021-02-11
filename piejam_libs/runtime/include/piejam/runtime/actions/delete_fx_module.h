@@ -6,6 +6,7 @@
 
 #include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/ladspa_fx_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/ui/action.h>
@@ -17,6 +18,7 @@ namespace piejam::runtime::actions
 struct delete_fx_module final
     : ui::cloneable_action<delete_fx_module, action>
     , visitable_engine_action<delete_fx_module>
+    , visitable_ladspa_fx_action<delete_fx_module>
 {
     fx::module_id fx_mod_id;
 

@@ -8,6 +8,7 @@
 #include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/ladspa_fx_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
@@ -36,7 +37,7 @@ struct insert_internal_fx_module final
 
 struct load_ladspa_fx_plugin final
     : ui::cloneable_action<load_ladspa_fx_plugin, action>
-    , visitable_engine_action<load_ladspa_fx_plugin>
+    , visitable_ladspa_fx_action<load_ladspa_fx_plugin>
 {
     mixer::bus_id fx_chain_bus;
     std::size_t position{};
@@ -46,6 +47,32 @@ struct load_ladspa_fx_plugin final
     std::vector<fx::parameter_midi_assignment> midi_assigns;
 
     auto reduce(state const&) const -> state override;
+};
+
+struct insert_ladspa_fx_module final
+    : ui::cloneable_action<insert_ladspa_fx_module, action>
+    , visitable_engine_action<insert_ladspa_fx_module>
+{
+    mixer::bus_id fx_chain_bus;
+    std::size_t position{};
+    fx::ladspa_instance_id instance_id;
+    audio::ladspa::plugin_descriptor plugin_desc;
+    std::span<audio::ladspa::port_descriptor const> control_inputs;
+    std::vector<fx::parameter_value_assignment> initial_values;
+    std::vector<fx::parameter_midi_assignment> midi_assigns;
+
+    auto reduce(state const& st) const -> state override;
+};
+
+struct insert_missing_ladspa_fx_module final
+    : ui::cloneable_action<insert_missing_ladspa_fx_module, action>
+{
+    mixer::bus_id fx_chain_bus;
+    std::size_t position{};
+    fx::unavailable_ladspa unavailable_ladspa;
+    std::string name;
+
+    auto reduce(state const& st) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

@@ -54,6 +54,8 @@ struct delete_fx_module;
 struct insert_internal_fx_module;
 struct finalize_ladspa_fx_plugin_scan;
 struct load_ladspa_fx_plugin;
+struct insert_ladspa_fx_module;
+struct insert_missing_ladspa_fx_module;
 struct move_fx_module_left;
 struct move_fx_module_right;
 

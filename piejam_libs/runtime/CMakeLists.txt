@@ -17,6 +17,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/initiate_device_selection.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/insert_fx_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/ladspa_fx_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/load_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/midi_control_action.h
@@ -62,6 +63,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter_assignment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/registry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/unavailable_ladspa.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/middleware_functors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi_assignment.h
@@ -158,6 +160,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/parameter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_assignment_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_control_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_input_controller.cpp

@@ -15,13 +15,13 @@ namespace piejam::audio::ladspa
 
 struct plugin_descriptor
 {
-    std::filesystem::path file;
-    unsigned long index{};
     plugin_id_t id{};
-    std::string label;
-    std::string name;
-    std::string author;
-    std::string copyright;
+    std::filesystem::path file{};
+    unsigned long index{};
+    std::string label{};
+    std::string name{};
+    std::string author{};
+    std::string copyright{};
     std::size_t num_inputs{};
     std::size_t num_outputs{};
 };

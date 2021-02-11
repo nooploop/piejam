@@ -34,4 +34,37 @@ load_ladspa_fx_plugin::reduce(state const& st) const -> state
     return st;
 }
 
+auto
+insert_ladspa_fx_module::reduce(state const& st) const -> state
+{
+    auto new_st = st;
+
+    runtime::insert_ladspa_fx_module(
+            new_st,
+            fx_chain_bus,
+            position,
+            instance_id,
+            plugin_desc,
+            control_inputs,
+            initial_values,
+            midi_assigns);
+
+    return new_st;
+}
+
+auto
+insert_missing_ladspa_fx_module::reduce(state const& st) const -> state
+{
+    auto new_st = st;
+
+    runtime::insert_missing_ladspa_fx_module(
+            new_st,
+            fx_chain_bus,
+            position,
+            unavailable_ladspa,
+            name);
+
+    return new_st;
+}
+
 } // namespace piejam::runtime::actions
