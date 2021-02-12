@@ -122,10 +122,6 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
 template <io_direction D>
 struct select_device final : ui::cloneable_action<select_device<D>, action>
 {
-    selected_device device;
-    unsigned samplerate{};
-    unsigned period_size{};
-
     auto reduce(state const&) const -> state override;
 };
 
@@ -135,13 +131,9 @@ select_device<io_direction::input>::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.input = device;
-    new_st.samplerate = samplerate;
-    new_st.period_size = period_size;
-
     clear_mixer_buses<io_direction::input>(new_st);
 
-    std::size_t const num_channels = device.hw_params->num_channels;
+    std::size_t const num_channels = new_st.input.hw_params->num_channels;
     for (std::size_t index = 0; index < num_channels; ++index)
     {
         add_mixer_bus<io_direction::input>(
@@ -160,13 +152,9 @@ select_device<io_direction::output>::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.output = device;
-    new_st.samplerate = samplerate;
-    new_st.period_size = period_size;
-
     clear_mixer_buses<io_direction::output>(new_st);
 
-    if (auto const num_channels = device.hw_params->num_channels)
+    if (auto const num_channels = new_st.output.hw_params->num_channels)
     {
         add_mixer_bus<io_direction::output>(
                 new_st,
@@ -286,21 +274,69 @@ audio_engine_middleware::process_device_action(Action const& a)
 }
 
 static auto
-next_samplerate_and_period_size(
-        box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params,
-        audio::samplerate_t const current_samplerate,
-        audio::period_size_t const current_period_size)
-        -> std::pair<audio::samplerate_t, audio::period_size_t>
+make_update_devices_action(
+        audio::device_manager& device_manager,
+        box<audio::pcm_io_descriptors> new_devices,
+        box<audio::pcm_io_descriptors> current_devices,
+        std::size_t input_index,
+        std::size_t output_index,
+        audio::samplerate_t samplerate,
+        audio::period_size_t period_size) -> update_devices
 {
-    auto next_value = [&](auto&& f, auto&& current) {
-        auto const values = f(input_hw_params, output_hw_params);
+    update_devices next_action;
+    next_action.pcm_devices = new_devices;
+
+    auto next_device = [&](auto const& new_devices,
+                           auto const& current_devices,
+                           auto const current_index) {
+        auto const found_index =
+                current_index != npos ? algorithm::index_of(
+                                                new_devices,
+                                                current_devices[current_index])
+                                      : npos;
+        return selected_device{
+                .index = found_index,
+                .hw_params = found_index != npos
+                                     ? device_manager.hw_params(
+                                               new_devices[found_index])
+                                     : audio::pcm_hw_params{}};
+    };
+
+    next_action.input = next_device(
+            new_devices->inputs,
+            current_devices->inputs,
+            input_index);
+
+    next_action.output = next_device(
+            new_devices->outputs,
+            current_devices->outputs,
+            output_index);
+
+    auto next_value = [](box<audio::pcm_hw_params> input_hw_params,
+                         box<audio::pcm_hw_params> output_hw_params,
+                         auto&& sel,
+                         auto current) {
+        auto const values = std::invoke(
+                std::forward<decltype(sel)>(sel),
+                input_hw_params,
+                output_hw_params);
         auto const it = algorithm::find_or_get_first(values, current);
         return it != values.end() ? *it : 0;
     };
 
-    return {next_value(&samplerates, current_samplerate),
-            next_value(&period_sizes, current_period_size)};
+    next_action.samplerate = next_value(
+            next_action.input.hw_params,
+            next_action.output.hw_params,
+            &samplerates,
+            samplerate);
+
+    next_action.period_size = next_value(
+            next_action.input.hw_params,
+            next_action.output.hw_params,
+            &period_sizes,
+            period_size);
+
+    return next_action;
 }
 
 template <>
@@ -310,51 +346,22 @@ audio_engine_middleware::process_device_action(
 {
     state const& current_state = get_state();
 
-    update_devices prep_action;
-    prep_action.pcm_devices = current_state.pcm_devices;
-
-    if (auto index = algorithm::index_of_if(
-                current_state.pcm_devices->inputs,
-                [&](auto const& d) {
-                    return d.name == a.conf.input_device_name;
-                });
-        index != npos)
-    {
-        prep_action.input = {
-                index,
-                m_device_manager.hw_params(
-                        prep_action.pcm_devices->inputs[index])};
-    }
-    else
-    {
-        prep_action.input = current_state.input;
-    }
-
-    if (auto index = algorithm::index_of_if(
-                current_state.pcm_devices->outputs,
-                [&](auto const& d) {
-                    return d.name == a.conf.output_device_name;
-                });
-        index != npos)
-    {
-        prep_action.output = {
-                index,
-                m_device_manager.hw_params(
-                        prep_action.pcm_devices->outputs[index])};
-    }
-    else
-    {
-        prep_action.output = current_state.output;
-    }
-
-    std::tie(prep_action.samplerate, prep_action.period_size) =
-            next_samplerate_and_period_size(
-                    prep_action.input.hw_params,
-                    prep_action.output.hw_params,
-                    a.conf.samplerate,
-                    a.conf.period_size);
-
-    next(prep_action);
+    next(make_update_devices_action(
+            m_device_manager,
+            current_state.pcm_devices,
+            current_state.pcm_devices,
+            algorithm::index_of_if(
+                    current_state.pcm_devices->inputs,
+                    [&](auto const& d) {
+                        return d.name == a.conf.input_device_name;
+                    }),
+            algorithm::index_of_if(
+                    current_state.pcm_devices->outputs,
+                    [&](auto const& d) {
+                        return d.name == a.conf.output_device_name;
+                    }),
+            a.conf.samplerate,
+            a.conf.period_size));
 
     next(a);
 }
@@ -365,43 +372,14 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
 {
     state const& current_state = get_state();
 
-    update_devices next_action;
-    next_action.pcm_devices = m_device_manager.io_descriptors();
-
-    auto next_device = [this](auto const& new_devices,
-                              auto const& current_devices,
-                              auto const current_index) {
-        auto const found_index =
-                current_index != npos ? algorithm::index_of(
-                                                new_devices,
-                                                current_devices[current_index])
-                                      : npos;
-        return selected_device{
-                .index = found_index,
-                .hw_params = found_index != npos
-                                     ? m_device_manager.hw_params(
-                                               new_devices[found_index])
-                                     : audio::pcm_hw_params{}};
-    };
-
-    next_action.input = next_device(
-            next_action.pcm_devices->inputs,
-            current_state.pcm_devices->inputs,
-            current_state.input.index);
-
-    next_action.output = next_device(
-            next_action.pcm_devices->outputs,
-            current_state.pcm_devices->outputs,
-            current_state.output.index);
-
-    std::tie(next_action.samplerate, next_action.period_size) =
-            next_samplerate_and_period_size(
-                    next_action.input.hw_params,
-                    next_action.output.hw_params,
-                    current_state.samplerate,
-                    current_state.period_size);
-
-    next(next_action);
+    next(make_update_devices_action(
+            m_device_manager,
+            m_device_manager.io_descriptors(),
+            current_state.pcm_devices,
+            current_state.input.index,
+            current_state.output.index,
+            current_state.samplerate,
+            current_state.period_size));
 }
 
 template <>
@@ -411,41 +389,31 @@ audio_engine_middleware::process_device_action(
 {
     state const& current_state = get_state();
 
-    std::size_t const index = action.index;
-
     if (action.input)
     {
-        select_input_device next_action;
-        auto const& descriptors = current_state.pcm_devices->inputs;
-        next_action.device = {
-                index,
-                m_device_manager.hw_params(descriptors[index])};
+        next(make_update_devices_action(
+                m_device_manager,
+                current_state.pcm_devices,
+                current_state.pcm_devices,
+                action.index,
+                current_state.output.index,
+                current_state.samplerate,
+                current_state.period_size));
 
-        std::tie(next_action.samplerate, next_action.period_size) =
-                next_samplerate_and_period_size(
-                        next_action.device.hw_params,
-                        current_state.output.hw_params,
-                        current_state.samplerate,
-                        current_state.period_size);
-
-        next(next_action);
+        next(select_input_device{});
     }
     else
     {
-        select_output_device next_action;
-        auto const& descriptors = current_state.pcm_devices->outputs;
-        next_action.device = {
-                index,
-                m_device_manager.hw_params(descriptors[index])};
+        next(make_update_devices_action(
+                m_device_manager,
+                current_state.pcm_devices,
+                current_state.pcm_devices,
+                current_state.input.index,
+                action.index,
+                current_state.samplerate,
+                current_state.period_size));
 
-        std::tie(next_action.samplerate, next_action.period_size) =
-                next_samplerate_and_period_size(
-                        current_state.input.hw_params,
-                        next_action.device.hw_params,
-                        current_state.samplerate,
-                        current_state.period_size);
-
-        next(next_action);
+        next(select_output_device{});
     }
 }
 
