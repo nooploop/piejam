@@ -25,9 +25,10 @@ public:
         return alsa::get_pcm_io_descriptors();
     }
 
-    auto hw_params(pcm_descriptor const& d) -> pcm_hw_params
+    auto hw_params(pcm_descriptor const& d, samplerate_t const* samplerate)
+            -> pcm_hw_params
     {
-        return alsa::get_hw_params(d);
+        return alsa::get_hw_params(d, samplerate);
     }
 
     auto make_device(

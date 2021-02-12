@@ -18,7 +18,7 @@ struct audio_device_manager_mock : public audio::device_manager
     MOCK_METHOD(
             audio::pcm_hw_params,
             hw_params,
-            (audio::pcm_descriptor const&));
+            (audio::pcm_descriptor const&, audio::samplerate_t const*));
 
     MOCK_METHOD(
             std::unique_ptr<audio::device>,

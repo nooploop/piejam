@@ -298,7 +298,8 @@ make_update_devices_action(
                 .index = found_index,
                 .hw_params = found_index != npos
                                      ? device_manager.hw_params(
-                                               new_devices[found_index])
+                                               new_devices[found_index],
+                                               nullptr)
                                      : audio::pcm_hw_params{}};
     };
 
@@ -329,6 +330,16 @@ make_update_devices_action(
             next_action.output.hw_params,
             &samplerates,
             samplerate);
+
+    if (next_action.samplerate != 0)
+    {
+        next_action.input.hw_params = device_manager.hw_params(
+                new_devices->inputs[next_action.input.index],
+                &next_action.samplerate);
+        next_action.output.hw_params = device_manager.hw_params(
+                new_devices->outputs[next_action.output.index],
+                &next_action.samplerate);
+    }
 
     next_action.period_size = next_value(
             next_action.input.hw_params,
@@ -414,6 +425,27 @@ audio_engine_middleware::process_device_action(
                 current_state.period_size));
 
         next(select_output_device{});
+    }
+}
+
+template <>
+void
+audio_engine_middleware::process_device_action(
+        actions::select_samplerate const& action)
+{
+    state const& current_state = get_state();
+
+    auto const srs = samplerates_from_state(current_state);
+    if (action.index < srs.size())
+    {
+        next(make_update_devices_action(
+                m_device_manager,
+                current_state.pcm_devices,
+                current_state.pcm_devices,
+                current_state.input.index,
+                current_state.output.index,
+                srs[action.index],
+                current_state.period_size));
     }
 }
 

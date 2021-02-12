@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
+#include <piejam/audio/types.h>
 
 #include <memory>
 
@@ -17,7 +18,8 @@ public:
     virtual ~device_manager() = default;
 
     virtual auto io_descriptors() -> pcm_io_descriptors = 0;
-    virtual auto hw_params(pcm_descriptor const&) -> pcm_hw_params = 0;
+    virtual auto hw_params(pcm_descriptor const&, samplerate_t const*)
+            -> pcm_hw_params = 0;
 
     virtual auto make_device(
             pcm_descriptor const& in,

@@ -26,16 +26,13 @@ struct audio_engine_middleware_test : ::testing::Test
     testing::StrictMock<middleware_functors_mock> mf_mock;
     testing::StrictMock<audio_device_manager_mock> audio_device_manager;
 
-    auto make_sut()
-    {
-        return audio_engine_middleware(
-                make_middleware_functors(mf_mock),
-                {},
-                {},
-                audio_device_manager,
-                [](auto&&...) { return nullptr; },
-                nullptr);
-    }
+    audio_engine_middleware sut{
+            make_middleware_functors(mf_mock),
+            {},
+            {},
+            audio_device_manager,
+            [](auto&&...) { return nullptr; },
+            nullptr};
 };
 
 TEST_F(audio_engine_middleware_test,
@@ -51,33 +48,62 @@ TEST_F(audio_engine_middleware_test,
         auto reduce(state const& st) const -> state override { return st; }
     } action;
     EXPECT_CALL(mf_mock, next(::testing::Ref(action)));
-    make_sut()(action);
+    sut(action);
 }
 
-TEST_F(audio_engine_middleware_test, select_samplerate_is_passed_to_next)
+TEST_F(audio_engine_middleware_test,
+       select_samplerate_is_ignored_if_index_is_not_in_current_samplerates)
 {
     using namespace testing;
-    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
-    EXPECT_CALL(audio_device_manager, make_device(_, _, _))
-            .WillOnce(Return(ByMove(std::make_unique<audio::dummy_device>())));
+
+    state st;
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
 
     actions::select_samplerate action;
-    EXPECT_CALL(mf_mock, next(Ref(action)));
+    sut(action);
+}
 
-    make_sut()(action);
+TEST_F(audio_engine_middleware_test, select_samplerate_will_change_samplerate)
+{
+    using namespace testing;
+
+    audio::pcm_hw_params const default_hw_params{
+            .samplerates = {44100u, 48000u},
+            .period_sizes = {}};
+
+    state st;
+    st.pcm_devices = audio::pcm_io_descriptors{
+            .inputs = {audio::pcm_descriptor{.name = "foo", .path = {}}},
+            .outputs = {audio::pcm_descriptor{.name = "foo", .path = {}}}};
+    st.input.index = 0;
+    st.input.hw_params = default_hw_params;
+    st.output.index = 0;
+    st.output.hw_params = default_hw_params;
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
+    EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
+        st = a.reduce(st);
+    });
+    EXPECT_CALL(audio_device_manager, hw_params(_, _))
+            .WillRepeatedly(Return(default_hw_params));
+
+    actions::select_samplerate action;
+    action.index = 1;
+
+    ASSERT_EQ(0u, st.samplerate);
+    sut(action);
+
+    EXPECT_EQ(48000u, st.samplerate);
 }
 
 TEST_F(audio_engine_middleware_test, select_period_size_is_passed_to_next)
 {
     using namespace testing;
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
-    EXPECT_CALL(audio_device_manager, make_device(_, _, _))
-            .WillOnce(Return(ByMove(std::make_unique<audio::dummy_device>())));
 
     actions::select_period_size action;
     EXPECT_CALL(mf_mock, next(Ref(action)));
 
-    make_sut()(action);
+    sut(action);
 }
 
 TEST_F(audio_engine_middleware_test,
@@ -85,31 +111,38 @@ TEST_F(audio_engine_middleware_test,
 {
     using namespace testing;
 
-    piejam::audio::pcm_hw_params hw_params;
-    hw_params.samplerates = {44100};
-    hw_params.period_sizes = {128};
+    piejam::audio::pcm_hw_params hw_params{
+            .samplerates = {44100},
+            .period_sizes = {128}};
 
     state st;
+    st.input.index = 0;
     st.input.hw_params = hw_params;
+    st.output.index = 0;
     st.output.hw_params = hw_params;
-
-    audio::pcm_io_descriptors descs;
-    descs.inputs.resize(2);
-    st.pcm_devices = std::move(descs);
+    st.pcm_devices = audio::pcm_io_descriptors{
+            .inputs =
+                    {audio::pcm_descriptor{.name = "foo", .path = {}},
+                     audio::pcm_descriptor{.name = "bar", .path = {}}},
+            .outputs = {audio::pcm_descriptor{.name = "foo", .path = {}}}};
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
+    EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
+        st = a.reduce(st);
+    });
+    EXPECT_CALL(audio_device_manager, hw_params(_, _))
+            .WillRepeatedly(Return(hw_params));
     EXPECT_CALL(audio_device_manager, make_device(_, _, _))
-            .WillOnce(Return(ByMove(std::make_unique<audio::dummy_device>())));
+            .WillRepeatedly(
+                    Return(ByMove(std::make_unique<audio::dummy_device>())));
 
     actions::initiate_device_selection in_action;
     in_action.input = true;
     in_action.index = 1; // select another device
 
-    EXPECT_CALL(audio_device_manager, hw_params(Ref(st.pcm_devices->inputs[1])))
-            .WillOnce(Return(hw_params));
-    EXPECT_CALL(mf_mock, next(_));
+    sut(in_action);
 
-    make_sut()(in_action);
+    EXPECT_EQ(1u, st.input.index);
 }
 
 } // namespace piejam::runtime::test

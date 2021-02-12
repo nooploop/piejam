@@ -4,6 +4,7 @@
 
 #include "get_set_hw_params.h"
 
+#include <piejam/algorithm/contains.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_format.h>
 #include <piejam/audio/pcm_hw_params.h>
@@ -13,6 +14,8 @@
 #include <piejam/system/device.h>
 
 #include <spdlog/spdlog.h>
+
+#include <boost/assert.hpp>
 
 #include <sound/asound.h>
 #include <sys/ioctl.h>
@@ -220,7 +223,8 @@ pcm_to_alsa_format(pcm_format pf) -> unsigned
 }
 
 auto
-get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
+get_hw_params(pcm_descriptor const& pcm, samplerate_t const* samplerate)
+        -> pcm_hw_params
 {
     pcm_hw_params result;
 
@@ -271,13 +275,19 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
     result.num_channels =
             get_interval(hw_params, SNDRV_PCM_HW_PARAM_CHANNELS).max;
 
-    assert(result.samplerates.empty());
+    BOOST_ASSERT(result.samplerates.empty());
     std::ranges::copy_if(
             preferred_samplerates,
             std::back_inserter(result.samplerates),
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_RATE));
 
-    assert(result.period_sizes.empty());
+    if (samplerate)
+    {
+        BOOST_ASSERT(algorithm::contains(result.samplerates, *samplerate));
+        set_interval_value(hw_params, SNDRV_PCM_HW_PARAM_RATE, *samplerate);
+    }
+
+    BOOST_ASSERT(result.period_sizes.empty());
     std::ranges::copy_if(
             preferred_period_sizes,
             std::back_inserter(result.period_sizes),

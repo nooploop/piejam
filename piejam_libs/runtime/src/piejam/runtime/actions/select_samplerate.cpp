@@ -12,9 +12,7 @@ namespace piejam::runtime::actions
 auto
 select_samplerate::reduce(state const& st) const -> state
 {
-    auto new_st = st;
-    new_st.samplerate = samplerates_from_state(st)[index];
-    return new_st;
+    return st;
 }
 
 } // namespace piejam::runtime::actions
