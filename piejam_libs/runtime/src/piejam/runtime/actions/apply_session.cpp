@@ -7,6 +7,7 @@
 #include <piejam/range/iota.h>
 #include <piejam/runtime/actions/control_midi_assignment.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
+#include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/persistence/session.h>
 #include <piejam/runtime/state.h>
@@ -98,6 +99,31 @@ apply_mixer_midi(
         batch.push_back(std::move(action));
 }
 
+void
+apply_mixer_parameters(
+        batch_action& batch,
+        mixer::bus_list_t const& bus_ids,
+        mixer::buses_t const& buses,
+        std::vector<persistence::session::mixer_bus> const& mb_data)
+{
+    for (std::size_t i : range::iota(std::min(mb_data.size(), bus_ids.size())))
+    {
+        if (mixer::bus const* const bus = buses[bus_ids[i]])
+        {
+            auto const& mix_param = mb_data[i].parameter;
+            batch.emplace_back<actions::set_float_parameter>(
+                    bus->volume,
+                    mix_param.volume);
+            batch.emplace_back<actions::set_float_parameter>(
+                    bus->pan_balance,
+                    mix_param.pan);
+            batch.emplace_back<actions::set_bool_parameter>(
+                    bus->mute,
+                    mix_param.mute);
+        }
+    }
+}
+
 template <class GetState>
 auto
 configure_mixer_buses(persistence::session const& session, GetState&& get_state)
@@ -115,6 +141,16 @@ configure_mixer_buses(persistence::session const& session, GetState&& get_state)
             st.mixer_state.buses,
             session.inputs);
     apply_mixer_midi(
+            action,
+            st.mixer_state.outputs,
+            st.mixer_state.buses,
+            session.outputs);
+    apply_mixer_parameters(
+            action,
+            st.mixer_state.inputs,
+            st.mixer_state.buses,
+            session.inputs);
+    apply_mixer_parameters(
             action,
             st.mixer_state.outputs,
             st.mixer_state.buses,

@@ -240,6 +240,16 @@ export_mixer_midi(state const& st, mixer::bus const& bus)
 }
 
 static auto
+export_mixer_parameters(state const& st, mixer::bus const& bus)
+{
+    persistence::session::mixer_parameters result;
+    result.volume = *st.params.get(bus.volume);
+    result.pan = *st.params.get(bus.pan_balance);
+    result.mute = *st.params.get(bus.mute);
+    return result;
+}
+
+static auto
 export_mixer_buses(state const& st, mixer::bus_list_t const& bus_ids)
 {
     std::vector<persistence::session::mixer_bus> result;
@@ -251,6 +261,7 @@ export_mixer_buses(state const& st, mixer::bus_list_t const& bus_ids)
         auto& mb_data = result.emplace_back();
         mb_data.fx_chain = export_fx_chain(st, *bus->fx_chain);
         mb_data.midi = export_mixer_midi(st, *bus);
+        mb_data.parameter = export_mixer_parameters(st, *bus);
     }
 
     return result;

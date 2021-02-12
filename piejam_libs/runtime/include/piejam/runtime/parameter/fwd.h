@@ -27,4 +27,7 @@ class maps_collection;
 template <class Parameter>
 using id_t = entity_id<Parameter>;
 
+template <class Parameter>
+using value_type_t = typename Parameter::value_type;
+
 } // namespace piejam::runtime::parameter

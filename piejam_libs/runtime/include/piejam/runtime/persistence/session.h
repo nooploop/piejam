@@ -48,6 +48,13 @@ struct session
         auto as_variant() const noexcept -> base_t const& { return *this; }
     };
 
+    struct mixer_parameters
+    {
+        float volume;
+        float pan;
+        bool mute;
+    };
+
     struct mixer_midi
     {
         std::optional<midi_assignment> volume;
@@ -59,6 +66,7 @@ struct session
 
     struct mixer_bus
     {
+        mixer_parameters parameter;
         mixer_midi midi;
         fx_chain_t fx_chain;
     };

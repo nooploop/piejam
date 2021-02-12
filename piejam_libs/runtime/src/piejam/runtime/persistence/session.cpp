@@ -103,6 +103,22 @@ from_json(nlohmann::json const& j, session::fx_plugin& fx_plug)
 }
 
 void
+to_json(nlohmann::json& j, session::mixer_parameters const& mixer_params)
+{
+    j = {{"volume", mixer_params.volume},
+         {"pan", mixer_params.pan},
+         {"mute", mixer_params.mute}};
+}
+
+void
+from_json(nlohmann::json const& j, session::mixer_parameters& mixer_params)
+{
+    j.at("volume").get_to(mixer_params.volume);
+    j.at("pan").get_to(mixer_params.pan);
+    j.at("mute").get_to(mixer_params.mute);
+}
+
+void
 to_json(nlohmann::json& j, session::mixer_midi const& midi)
 {
     if (midi.volume)
@@ -131,12 +147,15 @@ from_json(nlohmann::json const& j, session::mixer_midi& midi)
 void
 to_json(nlohmann::json& j, session::mixer_bus const& mb)
 {
-    j = {{"midi", mb.midi}, {"fx_chain", mb.fx_chain}};
+    j = {{"parameter", mb.parameter},
+         {"midi", mb.midi},
+         {"fx_chain", mb.fx_chain}};
 }
 
 void
 from_json(nlohmann::json const& j, session::mixer_bus& mb)
 {
+    j.at("parameter").get_to(mb.parameter);
     j.at("midi").get_to(mb.midi);
     j.at("fx_chain").get_to(mb.fx_chain);
 }
