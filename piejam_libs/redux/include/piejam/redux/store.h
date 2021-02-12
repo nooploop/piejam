@@ -6,7 +6,6 @@
 
 #include <piejam/redux/functors.h>
 
-#include <cassert>
 #include <utility>
 
 namespace piejam::redux
@@ -15,6 +14,11 @@ namespace piejam::redux
 template <class State, class Action>
 class store
 {
+    static constexpr auto no_op_reducer = [](State const& s, Action const&) {
+        return s;
+    };
+    static constexpr auto no_op_subscriber = [](State const&) {};
+
 public:
     using reducer_f = redux::reducer_f<State, Action>;
     using subscriber_f = redux::subscriber_f<State>;
@@ -23,28 +27,18 @@ public:
     using get_state_f = redux::get_state_f<State>;
 
     store(reducer_f reducer, State initial_state)
-        : m_reducer(std::move(reducer))
+        : m_reducer(reducer ? std::move(reducer) : no_op_reducer)
         , m_state(std::move(initial_state))
     {
-        assert(m_reducer);
-
         m_dispatch = [this](Action const& action) {
             m_state = m_reducer(m_state, action);
-
-            if (m_subscriber)
-                m_subscriber(m_state);
+            m_subscriber(m_state);
         };
     }
 
     auto state() const noexcept -> State const& { return m_state; }
 
     void dispatch(Action const& action) { m_dispatch(action); }
-
-    template <class DispatchedAction>
-    void dispatch(DispatchedAction&& action)
-    {
-        m_dispatch(std::forward<DispatchedAction>(action));
-    }
 
     template <class MiddlewareFactory>
     void apply_middleware(MiddlewareFactory&& mf)
@@ -56,7 +50,10 @@ public:
                 std::move(m_dispatch));                       // next
     }
 
-    void subscribe(subscriber_f s) { m_subscriber = std::move(s); }
+    void subscribe(subscriber_f s)
+    {
+        m_subscriber = s ? std::move(s) : no_op_subscriber;
+    }
 
 private:
     reducer_f m_reducer;
@@ -64,7 +61,7 @@ private:
 
     next_f m_dispatch;
 
-    subscriber_f m_subscriber;
+    subscriber_f m_subscriber{no_op_subscriber};
 };
 
 } // namespace piejam::redux
