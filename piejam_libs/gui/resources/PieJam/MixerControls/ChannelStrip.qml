@@ -24,7 +24,6 @@ Item {
 
     property alias panMidi: midiAssignPan
     property alias volumeMidi: levelMeterFader.volumeMidi
-    property alias soloMidi: channelControls.soloMidi
     property alias muteMidi: channelControls.muteMidi
 
     signal faderMoved(real newVolume)
