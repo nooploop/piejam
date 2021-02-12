@@ -15,8 +15,6 @@ namespace piejam::redux
 template <class State, class Action>
 class store
 {
-    static constexpr auto no_op_subscriber = [](State const&) {};
-
 public:
     using reducer_f = redux::reducer_f<State, Action>;
     using subscriber_f = redux::subscriber_f<State>;
@@ -64,7 +62,7 @@ private:
 
     next_f m_dispatch;
 
-    subscriber_f m_subscriber{no_op_subscriber};
+    subscriber_f m_subscriber{[](State const&) {}};
 };
 
 } // namespace piejam::redux
