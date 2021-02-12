@@ -10,13 +10,13 @@
 namespace piejam::redux
 {
 
-template <class T, class Base = T>
+template <class T>
 concept cloneable = requires(T const& x)
 {
     {
         x.clone()
     }
-    ->std::same_as<std::unique_ptr<Base>>;
+    ->std::same_as<std::unique_ptr<T>>;
 };
 
 } // namespace piejam::redux
