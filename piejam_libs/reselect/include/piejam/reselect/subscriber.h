@@ -30,13 +30,14 @@ public:
     }
 
     template <class Value, class Handler>
-    auto observe(selector<Value, State> sel, Handler&& h) -> subscription
+    auto observe(selector<Value, State> sel, Handler&& handler) -> subscription
     {
-        std::invoke(std::forward<Handler>(h), sel.get(m_get_state()));
+        std::invoke(std::forward<Handler>(handler), sel.get(m_get_state()));
         auto token = std::make_shared<subscription::token>();
-        return {m_observer.connect(
+        return subscription{
+                .m_conn = m_observer.connect(
                         [sel = std::move(sel),
-                         h = std::forward<Handler>(h),
+                         handler,
                          token = std::weak_ptr(token),
                          last = std::make_shared<std::optional<Value>>()](
                                 State const& st) mutable {
@@ -47,11 +48,11 @@ public:
                             auto current = sel.get(st);
                             if (!last->has_value() || **last != current)
                             {
-                                h(current);
+                                handler(current);
                                 *last = current;
                             }
                         }),
-                token};
+                .token = token};
     }
 
     void notify(State const& st) { m_observer(st); }
