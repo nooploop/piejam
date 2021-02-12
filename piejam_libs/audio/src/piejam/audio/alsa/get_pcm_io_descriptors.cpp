@@ -133,7 +133,9 @@ get_pcm_io_descriptors() -> pcm_io_descriptors
                     pcm_info.device,
                     stream_type);
             auto name = fmt::format("{} - {}", sc.info.name, pcm_info.name);
-            return {std::move(path), std::move(name)};
+            return pcm_descriptor{
+                    .name = std::move(name),
+                    .path = std::move(path)};
         };
     };
 

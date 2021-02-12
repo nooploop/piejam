@@ -22,6 +22,9 @@ Item {
     //   refreshDeviceLists()
     property var model
 
+    implicitWidth: 752
+    implicitHeight: 432
+
     ComboBoxSetting {
         id: inputSetting
 
@@ -38,6 +41,7 @@ Item {
         currentIndex: root.model.inputDevices.focused
 
         nameLabelText: qsTr("Input:")
+        unselectedText: qsTr("Select input device...")
 
         onOptionSelected: root.model.selectInputDevice(index)
     }
@@ -58,6 +62,7 @@ Item {
         currentIndex: root.model.outputDevices.focused
 
         nameLabelText: qsTr("Output:")
+        unselectedText: qsTr("Select output device...")
 
         onOptionSelected: root.model.selectOutputDevice(index)
     }
@@ -78,14 +83,15 @@ Item {
         currentIndex: root.model.samplerates.focused
 
         nameLabelText: qsTr("Samplerate:")
+        unselectedText: qsTr("Select samplerate...")
 
         onOptionSelected: root.model.selectSamplerate(index)
     }
 
-    Frame {
-        id: periodSizeFrame
+    ComboBoxSetting {
+        id: periodSizeSetting
 
-        height: 110
+        height: 64
 
         anchors.left: parent.left
         anchors.leftMargin: 8
@@ -94,71 +100,13 @@ Item {
         anchors.top: samplerateSetting.bottom
         anchors.topMargin: 6
 
-        Label {
-            id: periodSizeLabel
+        model: root.model.periodSizes.elements
+        currentIndex: root.model.periodSizes.focused
 
-            x: 0
-            y: 0
-            width: 120
-            height: 40
+        nameLabelText: qsTr("Period Size:")
+        unselectedText: qsTr("Select period size...")
 
-            text: qsTr("Period Size:")
-            font.pixelSize: 18
-            verticalAlignment: Text.AlignVCenter
-        }
-
-        Slider {
-            id: periodSizeSlider
-
-            visible: root.model && root.model.periodSizes.elements.length > 0
-
-            anchors.left: periodSizeLabel.right
-            anchors.leftMargin: 8
-            anchors.right: parent.right
-
-            y: 0
-            height: 40
-
-            stepSize: 1
-            from: 0
-            to: root.model.periodSizes.elements.length - 1
-            value: root.model.periodSizes.focused
-
-            onMoved: root.model.selectPeriodSize(periodSizeSlider.value)
-        }
-
-        Label {
-            id: periodSize
-
-            visible: root.model && root.model.periodSizes.elements.length > 0
-
-            y: 46
-            height: 40
-
-            anchors.left: periodSizeLabel.right
-            anchors.leftMargin: 8
-            anchors.right: parent.right
-
-            text: root.model.periodSizes.elements[root.model.periodSizes.focused] + qsTr(" Samples")
-            leftPadding: 6
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 12
-        }
-
-        Label {
-            id: unavailableLabel
-
-            visible: !root.model || root.model.periodSizes.elements.length === 0
-
-            x: periodSizeSlider.x
-            y: periodSizeSlider.y
-            width: periodSizeSlider.width
-            height: periodSizeSlider.height
-
-            text: "Unavailable"
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 18
-        }
+        onOptionSelected: root.model.selectPeriodSize(index)
     }
 
     Frame {

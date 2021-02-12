@@ -295,8 +295,8 @@ next_samplerate_and_period_size(
 {
     auto next_value = [&](auto&& f, auto&& current) {
         auto const values = f(input_hw_params, output_hw_params);
-        BOOST_ASSERT(!values.empty());
-        return *algorithm::find_or_get_first(values, current);
+        auto const it = algorithm::find_or_get_first(values, current);
+        return it != values.end() ? *it : 0;
     };
 
     return {next_value(&samplerates, current_samplerate),
@@ -370,13 +370,18 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
 
     auto next_device = [this](auto const& new_devices,
                               auto const& current_devices,
-                              auto const current_index) -> selected_device {
-        auto const found_index = algorithm::index_of(
-                new_devices,
-                current_devices[current_index]);
-        auto const next_index = found_index == npos ? 0 : found_index;
-        return {next_index,
-                m_device_manager.hw_params(new_devices[next_index])};
+                              auto const current_index) {
+        auto const found_index =
+                current_index != npos ? algorithm::index_of(
+                                                new_devices,
+                                                current_devices[current_index])
+                                      : npos;
+        return selected_device{
+                .index = found_index,
+                .hw_params = found_index != npos
+                                     ? m_device_manager.hw_params(
+                                               new_devices[found_index])
+                                     : audio::pcm_hw_params{}};
     };
 
     next_action.input = next_device(
@@ -567,9 +572,14 @@ audio_engine_middleware::close_device()
 void
 audio_engine_middleware::open_device()
 {
+    auto const& st = get_state();
+
+    if (st.input.index == npos || st.output.index == npos ||
+        st.samplerate == 0 || st.period_size == 0)
+        return;
+
     try
     {
-        auto const& st = get_state();
         auto device = m_device_manager.make_device(
                 st.pcm_devices->inputs[st.input.index],
                 st.pcm_devices->outputs[st.output.index],

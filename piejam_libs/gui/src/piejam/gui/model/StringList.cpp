@@ -19,6 +19,7 @@ StringList::setElements(QStringList const& x)
     {
         m_elements = x;
         emit elementsChanged();
+        emit focusedChanged();
     }
 }
 

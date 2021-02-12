@@ -224,17 +224,6 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
 {
     pcm_hw_params result;
 
-    if (pcm.path.empty())
-    {
-        std::ranges::copy(
-                preferred_samplerates,
-                std::back_inserter(result.samplerates));
-        std::ranges::copy(
-                preferred_period_sizes,
-                std::back_inserter(result.period_sizes));
-        return result;
-    }
-
     auto hw_params = make_snd_pcm_hw_params_for_refine_any();
 
     system::device fd(pcm.path);
@@ -271,9 +260,8 @@ get_hw_params(pcm_descriptor const& pcm) -> pcm_hw_params
             SNDRV_PCM_FORMAT_S8,
             SNDRV_PCM_FORMAT_U8};
 
-    auto it_format = std::find_if(
-            preferred_formats.begin(),
-            preferred_formats.end(),
+    auto it_format = std::ranges::find_if(
+            preferred_formats,
             test_mask_bit(hw_params, SNDRV_PCM_HW_PARAM_FORMAT));
     result.format =
             it_format != preferred_formats.end()

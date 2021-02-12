@@ -6,20 +6,17 @@
 
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/box.h>
+#include <piejam/npos.h>
 
 namespace piejam::runtime
 {
 
 struct selected_device
 {
-    std::size_t index{};
+    std::size_t index{npos};
     box<audio::pcm_hw_params> hw_params;
-};
 
-inline bool
-operator==(selected_device const& l, selected_device const& r) noexcept
-{
-    return l.index == r.index && l.hw_params == r.hw_params;
-}
+    bool operator==(selected_device const&) const noexcept = default;
+};
 
 } // namespace piejam::runtime

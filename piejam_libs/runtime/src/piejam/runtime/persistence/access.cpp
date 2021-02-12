@@ -58,9 +58,13 @@ save_app_config(
         persistence::app_config conf;
 
         conf.input_device_name =
-                state.pcm_devices->inputs[state.input.index].name;
+                state.input.index != npos
+                        ? state.pcm_devices->inputs[state.input.index].name
+                        : std::string();
         conf.output_device_name =
-                state.pcm_devices->outputs[state.output.index].name;
+                state.output.index != npos
+                        ? state.pcm_devices->outputs[state.output.index].name
+                        : std::string();
         conf.samplerate = state.samplerate;
         conf.period_size = state.period_size;
 
