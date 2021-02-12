@@ -6,6 +6,7 @@
 
 #include <piejam/redux/functors.h>
 
+#include <cassert>
 #include <utility>
 
 namespace piejam::redux
@@ -14,9 +15,6 @@ namespace piejam::redux
 template <class State, class Action>
 class store
 {
-    static constexpr auto no_op_reducer = [](State const& s, Action const&) {
-        return s;
-    };
     static constexpr auto no_op_subscriber = [](State const&) {};
 
 public:
@@ -26,10 +24,13 @@ public:
     using next_f = redux::next_f<Action>;
     using get_state_f = redux::get_state_f<State>;
 
-    store(reducer_f reducer, State initial_state)
-        : m_reducer(reducer ? std::move(reducer) : no_op_reducer)
+    template <class Reducer>
+    store(Reducer&& reducer, State initial_state = {})
+        : m_reducer(std::forward<Reducer>(reducer))
         , m_state(std::move(initial_state))
     {
+        assert(m_reducer);
+
         m_dispatch = [this](Action const& action) {
             m_state = m_reducer(m_state, action);
             m_subscriber(m_state);
@@ -50,9 +51,11 @@ public:
                 std::move(m_dispatch));                       // next
     }
 
-    void subscribe(subscriber_f s)
+    template <class Subscriber>
+    void subscribe(Subscriber&& s)
     {
-        m_subscriber = s ? std::move(s) : no_op_subscriber;
+        m_subscriber = std::forward<Subscriber>(s);
+        assert(m_subscriber);
     }
 
 private:
