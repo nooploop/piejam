@@ -13,6 +13,8 @@
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/pcm_sample_type.h>
 #include <piejam/audio/table.h>
+#include <piejam/audio/types.h>
+#include <piejam/numeric/rolling_mean.h>
 #include <piejam/system/device.h>
 
 #include <sound/asound.h>
@@ -322,6 +324,9 @@ process_step::process_step(
               m_output_fd,
               m_io_config.out_config,
               m_io_config.process_config.period_size))
+    , m_cpu_load_mean_acc(
+              io_config.process_config.samplerate /
+              io_config.process_config.period_size) // 1sec window
 {
     m_xruns.store(0, std::memory_order_relaxed);
 }
@@ -367,7 +372,9 @@ process_step::operator()() -> std::error_condition
 
     m_process_function(m_reader->buffer(), m_writer->buffer());
 
-    m_cpu_load.store(cpu_load_meter.stop(), std::memory_order_relaxed);
+    m_cpu_load.store(
+            m_cpu_load_mean_acc(cpu_load_meter.stop()),
+            std::memory_order_relaxed);
 
     if (!err)
         err = m_writer->write();

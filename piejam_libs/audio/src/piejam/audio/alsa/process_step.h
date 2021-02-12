@@ -6,6 +6,7 @@
 
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/process_function.h>
+#include <piejam/numeric/rolling_mean.h>
 #include <piejam/system/fwd.h>
 
 #include <atomic>
@@ -45,6 +46,7 @@ private:
     bool m_starting{true};
     std::unique_ptr<pcm_reader> m_reader;
     std::unique_ptr<pcm_writer> m_writer;
+    numeric::rolling_mean<float> m_cpu_load_mean_acc;
 };
 
 } // namespace piejam::audio::alsa
