@@ -172,7 +172,12 @@ main(int argc, char* argv[]) -> int
                 std::forward<decltype(next)>(next));
     });
 
-    store.apply_middleware(redux::make_queueing_middleware);
+    store.apply_middleware(
+            [](auto&& /*get_state*/, auto&& /*dispatch*/, auto&& next) {
+                return redux::make_middleware<
+                        redux::queueing_middleware<runtime::action>>(
+                        std::forward<decltype(next)>(next));
+            });
 
     store.apply_middleware(redux::make_thread_delegate_middleware(
             std::this_thread::get_id(),
