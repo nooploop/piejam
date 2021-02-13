@@ -15,11 +15,10 @@ void
 for_each_adjacent(Range&& rng, BinaryOp&& op)
 {
     auto first = std::begin(rng);
-    auto second =
-            first != std::end(rng) ? std::next(std::begin(rng)) : std::end(rng);
-    auto const end = std::end(rng);
+    auto const last = std::end(rng);
+    auto second = first != last ? std::next(std::begin(rng)) : last;
 
-    while (second != end)
+    while (second != last)
         std::invoke(std::forward<BinaryOp>(op), *first++, *second++);
 }
 
