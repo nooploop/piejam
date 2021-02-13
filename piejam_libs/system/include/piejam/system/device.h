@@ -59,7 +59,8 @@ auto device::ioctl(unsigned long request, device&) noexcept
         -> std::error_code = delete;
 
 template <>
-auto device::ioctl(unsigned long request, device const& other) noexcept
+[[nodiscard]] auto
+device::ioctl(unsigned long request, device const& other) noexcept
         -> std::error_code;
 
 } // namespace piejam::system
