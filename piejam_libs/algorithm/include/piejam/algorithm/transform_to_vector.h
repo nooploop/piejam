@@ -17,11 +17,7 @@ auto
 transform_to_vector(Range const& rng, F&& f)
 {
     std::vector<std::decay_t<decltype(f(*std::begin(rng)))>> result;
-    std::transform(
-            std::begin(rng),
-            std::end(rng),
-            std::back_inserter(result),
-            std::forward<F>(f));
+    std::ranges::transform(rng, std::back_inserter(result), std::forward<F>(f));
     return result;
 }
 
