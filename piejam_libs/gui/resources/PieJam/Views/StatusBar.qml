@@ -7,6 +7,7 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 
 import ".."
+import "../Controls"
 
 Item {
     id: root
@@ -132,6 +133,18 @@ Item {
                         }
                     }
                 }
+            }
+
+            CpuLoadMeter {
+                id: cpuLoadMeter
+
+                anchors.left: parent.left
+                anchors.right: tempLabel.left
+                anchors.top: audioLoadLabel.bottom
+                anchors.bottom: parent.bottom
+                anchors.margins: 2
+
+                model: root.model.cpuLoad
             }
 
             Label {

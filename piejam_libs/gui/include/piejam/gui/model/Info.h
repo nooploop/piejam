@@ -6,6 +6,7 @@
 
 #include <piejam/gui/model/SubscribableModel.h>
 
+#include <QList>
 #include <QStringList>
 
 #include <memory>
@@ -21,6 +22,7 @@ class Info : public SubscribableModel
 
     Q_PROPERTY(double audioLoad READ audioLoad NOTIFY audioLoadChanged FINAL)
     Q_PROPERTY(unsigned xruns READ xruns NOTIFY xrunsChanged FINAL)
+    Q_PROPERTY(QList<float> cpuLoad READ cpuLoad NOTIFY cpuLoadChanged FINAL)
     Q_PROPERTY(int cpuTemp READ cpuTemp NOTIFY cpuTempChanged FINAL)
     Q_PROPERTY(bool midiLearn READ midiLearn NOTIFY midiLearnChanged FINAL)
     Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
@@ -45,6 +47,16 @@ public:
         {
             m_xruns = xruns;
             emit xrunsChanged();
+        }
+    }
+
+    auto cpuLoad() const noexcept -> QList<float> { return m_cpuLoad; }
+    void setCpuLoad(QList<float> x)
+    {
+        if (m_cpuLoad != x)
+        {
+            m_cpuLoad = x;
+            emit cpuLoadChanged();
         }
     }
 
@@ -89,6 +101,7 @@ signals:
 
     void audioLoadChanged();
     void xrunsChanged();
+    void cpuLoadChanged();
     void cpuTempChanged();
     void midiLearnChanged();
     void logDataChanged();
@@ -97,6 +110,7 @@ signals:
 private:
     double m_audioLoad{};
     unsigned m_xruns{};
+    QList<float> m_cpuLoad;
     int m_cpuTemp{};
     bool m_midiLearn{};
     QStringList m_logData;

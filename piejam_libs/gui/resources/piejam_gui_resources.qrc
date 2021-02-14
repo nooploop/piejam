@@ -46,5 +46,6 @@
         <file>PieJam/MidiLearn.qml</file>
         <file>PieJam/Controls/MidiAssignArea.qml</file>
         <file>PieJam/MidiAssignable.qml</file>
+        <file>PieJam/Controls/CpuLoadMeter.qml</file>
     </qresource>
 </RCC>

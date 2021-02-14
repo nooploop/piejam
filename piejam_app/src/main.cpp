@@ -38,6 +38,7 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
+#include <piejam/system/avg_cpu_load_tracker.h>
 #include <piejam/system/cpu_temp.h>
 #include <piejam/thread/affinity.h>
 
@@ -225,11 +226,19 @@ main(int argc, char* argv[]) -> int
     store.dispatch(runtime::actions::load_app_config(config_file_path(locs)));
     store.dispatch(runtime::actions::load_session(session_file));
 
+    system::avg_cpu_load_tracker avg_cpu_load(4);
+
     auto timer = new QTimer(&app);
-    QObject::connect(timer, &QTimer::timeout, [&store, &model_factory]() {
+    QObject::connect(timer, &QTimer::timeout, [&]() {
         store.dispatch(runtime::actions::refresh_midi_devices{});
 
         model_factory.info()->setCpuTemp(system::cpu_temp());
+
+        avg_cpu_load.update();
+        auto cpu_load_per_core = avg_cpu_load.per_core();
+        model_factory.info()->setCpuLoad(QList<float>(
+                cpu_load_per_core.begin(),
+                cpu_load_per_core.end()));
     });
     timer->start(std::chrono::seconds(1));
 
