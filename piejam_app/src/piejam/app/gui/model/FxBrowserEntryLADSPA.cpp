@@ -11,8 +11,6 @@
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
-#include <fmt/format.h>
-
 namespace piejam::app::gui::model
 {
 
@@ -30,8 +28,8 @@ FxBrowserEntryLADSPA::FxBrowserEntryLADSPA(
     if (!m_pd.name.empty())
         setAuthor(QString::fromStdString(m_pd.author));
     if (!m_pd.copyright.empty())
-        setDescription(QString::fromStdString(
-                fmt::format("Copyright: {}", m_pd.copyright)));
+        setDescription(QString("Copyright / License: %1")
+                               .arg(QString::fromStdString(m_pd.copyright)));
 }
 
 void
