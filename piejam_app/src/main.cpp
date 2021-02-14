@@ -6,6 +6,7 @@
 #include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
+#include <piejam/gui/model/Info.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/device_update.h>
@@ -37,6 +38,7 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
+#include <piejam/system/cpu_temp.h>
 #include <piejam/thread/affinity.h>
 
 #include <QQuickStyle>
@@ -50,6 +52,8 @@
 #include <spdlog/spdlog.h>
 
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 
 static auto
 config_file_path(piejam::runtime::locations const& locs)
@@ -222,8 +226,10 @@ main(int argc, char* argv[]) -> int
     store.dispatch(runtime::actions::load_session(session_file));
 
     auto timer = new QTimer(&app);
-    QObject::connect(timer, &QTimer::timeout, [&store]() {
+    QObject::connect(timer, &QTimer::timeout, [&store, &model_factory]() {
         store.dispatch(runtime::actions::refresh_midi_devices{});
+
+        model_factory.info()->setCpuTemp(system::cpu_temp());
     });
     timer->start(std::chrono::seconds(1));
 

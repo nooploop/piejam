@@ -21,6 +21,7 @@ class Info : public SubscribableModel
 
     Q_PROPERTY(double audioLoad READ audioLoad NOTIFY audioLoadChanged FINAL)
     Q_PROPERTY(unsigned xruns READ xruns NOTIFY xrunsChanged FINAL)
+    Q_PROPERTY(int cpuTemp READ cpuTemp NOTIFY cpuTempChanged FINAL)
     Q_PROPERTY(bool midiLearn READ midiLearn NOTIFY midiLearnChanged FINAL)
     Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
     Q_PROPERTY(
@@ -44,6 +45,16 @@ public:
         {
             m_xruns = xruns;
             emit xrunsChanged();
+        }
+    }
+
+    auto cpuTemp() const noexcept -> int { return m_cpuTemp; }
+    void setCpuTemp(int x)
+    {
+        if (m_cpuTemp != x)
+        {
+            m_cpuTemp = x;
+            emit cpuTempChanged();
         }
     }
 
@@ -78,6 +89,7 @@ signals:
 
     void audioLoadChanged();
     void xrunsChanged();
+    void cpuTempChanged();
     void midiLearnChanged();
     void logDataChanged();
     void logMessageChanged();
@@ -85,6 +97,7 @@ signals:
 private:
     double m_audioLoad{};
     unsigned m_xruns{};
+    int m_cpuTemp{};
     bool m_midiLearn{};
     QStringList m_logData;
     QString m_logMessage;

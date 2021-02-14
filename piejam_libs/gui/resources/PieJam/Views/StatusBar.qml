@@ -52,7 +52,7 @@ Item {
 
             width: 38
 
-            anchors.right: audioLoadLabel.left
+            anchors.right: readoutLabel.left
             checkable: true
             anchors.rightMargin: 6
 
@@ -65,8 +65,8 @@ Item {
             }
         }
 
-        Label {
-            id: audioLoadLabel
+        Rectangle {
+            id: readoutLabel
 
             width: 64
 
@@ -75,36 +75,81 @@ Item {
             anchors.bottom: parent.bottom
             anchors.margins: 6
 
-            padding: 2
-            leftPadding: 4
-            rightPadding: 4
-            horizontalAlignment: Text.AlignRight
-            text: (root.model.audioLoad * 100).toFixed(1) + " %"
-
-            background: Rectangle {
-                color: Material.background
-                radius: 4
-            }
+            color: Material.background
+            radius: 4
 
             Label {
-                id: xrunsLabel
+                id: audioLoadLabel
 
                 height: 16
 
                 anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
+                anchors.right: xrunsLabel.left
+                anchors.top: parent.top
 
                 padding: 2
                 leftPadding: 4
                 rightPadding: 4
                 horizontalAlignment: Text.AlignRight
-                verticalAlignment: Text.AlignBottom
-                color: root.model.xruns === 0 ? Qt.rgba(0, 1, 0, 1) : Qt.rgba(1, 0, 0, 1)
-                text: root.model.xruns
+                text: (root.model.audioLoad * 100).toFixed(1)
+            }
+
+            Label {
+                id: xrunsLabel
+
+                width: 16
+                height: 16
+
+                anchors.right: parent.right
+                anchors.top: parent.top
+
+                padding: 2
+                rightPadding: 4
+                text: "%"
+                horizontalAlignment: Text.AlignHCenter
+
+                color: root.model.xruns === 0 ? "#00ff00" : "#ffff00"
+
+                ColorAnimation {
+                    id: xrunFlash
+
+                    target: xrunsLabel
+                    property: "color"
+                    from: "#ff0000"
+                    to: "#ffff00"
+                    duration: 5000
+                }
+
+                Connections {
+                    target: root.model
+
+                    function onXrunsChanged() {
+                        if (root.model.xruns !== 0)
+                            xrunFlash.restart()
+                        else {
+                            xrunFlash.stop()
+                            xrunsLabel.color = "#00ff00"
+                        }
+                    }
+                }
+            }
+
+            Label {
+                id: tempLabel
+
+                width: 32
+
+                anchors.right: parent.right
+                anchors.top: xrunsLabel.bottom
+                anchors.bottom: parent.bottom
+
+                text: root.model.cpuTemp + "°C"
+                font.pixelSize: 10
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+                padding: 2
             }
         }
-
     }
 
     Timer {
