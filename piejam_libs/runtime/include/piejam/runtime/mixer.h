@@ -40,6 +40,8 @@ struct bus
     channel_index_pair device_channels{npos};
 
     box<fx::chain_t> fx_chain{};
+
+    bool operator==(bus const&) const noexcept = default;
 };
 
 struct state

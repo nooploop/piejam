@@ -34,9 +34,10 @@ public:
         if (!m_last ||
             m_last->args != std::forward_as_tuple(std::forward<Args>(args)...))
         {
+            auto result = std::invoke(m_f, std::forward<Args>(args)...);
             m_last.emplace(
-                    std::tuple<Args...>(args...),
-                    std::invoke(m_f, std::forward<Args>(args)...));
+                    std::tuple<Args...>(std::forward<Args>(args)...),
+                    std::move(result));
         }
 
         return m_last->result;
@@ -50,9 +51,10 @@ private:
         using result_type =
                 std::decay_t<boost::callable_traits::return_type_t<F>>;
 
-        args_and_result(args_tuple_type args, result_type result)
-            : args(std::move(args))
-            , result(std::move(result))
+        template <class Args, class Result>
+        args_and_result(Args&& args, Result&& result)
+            : args(std::forward<Args>(args))
+            , result(std::forward<Result>(result))
         {
         }
 

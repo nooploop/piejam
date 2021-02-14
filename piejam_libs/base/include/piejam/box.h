@@ -6,7 +6,6 @@
 
 #include <piejam/scope_guard.h>
 
-#include <concepts>
 #include <memory>
 
 namespace piejam
@@ -45,37 +44,13 @@ public:
     }
 
     bool operator==(box const& other) const noexcept
-            requires std::equality_comparable<T>
     {
         return m_value.get() == other.m_value.get() || get() == other.get();
     }
 
-    bool operator==(box const& other) const noexcept
-            requires(!std::equality_comparable<T>)
-    {
-        return m_value.get() == other.m_value.get();
-    }
-
     bool operator!=(box const& other) const noexcept
-            requires std::equality_comparable<T>
     {
         return m_value.get() != other.m_value.get() && get() != other.get();
-    }
-
-    bool operator!=(box const& other) const noexcept
-            requires(!std::equality_comparable<T>)
-    {
-        return m_value.get() != other.m_value.get();
-    }
-
-    bool eq(box const& other) const noexcept
-    {
-        return m_value.get() == other.m_value.get();
-    }
-
-    bool neq(box const& other) const noexcept
-    {
-        return m_value.get() != other.m_value.get();
     }
 
 private:

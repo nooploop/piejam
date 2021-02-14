@@ -61,15 +61,7 @@ public:
         return m_map.update([id](map_t& m) { return m.erase(id); });
     }
 
-    bool operator==(entity_map const& other) const noexcept
-    {
-        return m_map.eq(other.m_map);
-    }
-
-    bool operator!=(entity_map const& other) const noexcept
-    {
-        return m_map.neq(other.m_map);
-    }
+    bool operator==(entity_map const&) const noexcept = default;
 
 private:
     box<map_t> m_map;

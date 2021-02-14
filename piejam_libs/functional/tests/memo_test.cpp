@@ -35,7 +35,7 @@ TEST(memo, is_recalled_when_called_with_new_arguments)
     EXPECT_EQ(5, m(2, 3));
     EXPECT_EQ(1, called);
 
-    EXPECT_EQ(7, m(4, 3));
+    EXPECT_EQ(5, m(3, 2));
     EXPECT_EQ(2, called);
 
     static_assert(std::is_same_v<int const&, decltype(m(2, 3))>);
