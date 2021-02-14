@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
+#include <piejam/audio/types.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
@@ -23,6 +24,7 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::bus_id,
+            audio::bus_type,
             runtime::float_parameter_id volume,
             runtime::float_parameter_id pan_balance,
             runtime::bool_parameter_id mute,

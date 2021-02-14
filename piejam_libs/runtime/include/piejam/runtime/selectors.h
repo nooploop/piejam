@@ -52,6 +52,7 @@ auto make_bus_list_selector(io_direction) -> selector<box<mixer::bus_list_t>>;
 struct mixer_bus_info
 {
     mixer::bus_id bus_id;
+    audio::bus_type bus_type;
     float_parameter_id volume;
     float_parameter_id pan_balance;
     bool_parameter_id mute;

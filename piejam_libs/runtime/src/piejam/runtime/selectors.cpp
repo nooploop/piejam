@@ -80,10 +80,11 @@ make_bus_infos(
         box<mixer::bus_list_t> const& bus_ids) -> boxed_vector<mixer_bus_info>
 {
     return algorithm::transform_to_vector(*bus_ids, [&buses](auto&& bus_id) {
-        auto bus = buses[bus_id];
+        mixer::bus const* const bus = buses[bus_id];
         BOOST_ASSERT(bus);
         return mixer_bus_info{
                 .bus_id = bus_id,
+                .bus_type = bus->type,
                 .volume = bus->volume,
                 .pan_balance = bus->pan_balance,
                 .mute = bus->mute,
