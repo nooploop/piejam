@@ -12,7 +12,6 @@ import "../Controls"
 Item {
     id: root
 
-    property alias soloEnabled: soloButton.enabled
     property alias solo: soloButton.checked
     property alias mute: muteButton.checked
 

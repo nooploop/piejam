@@ -17,6 +17,8 @@ public:
     ~Mixer();
 
     void setInputSolo(unsigned index) override;
+    void setOutputSolo(unsigned index) override;
+
     void requestLevelsUpdate() override;
 
 private:

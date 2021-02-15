@@ -38,6 +38,7 @@ struct delete_bus;
 template <io_direction>
 struct set_bus_solo;
 using set_input_bus_solo = set_bus_solo<io_direction::input>;
+using set_output_bus_solo = set_bus_solo<io_direction::output>;
 
 struct request_parameters_update;
 struct request_info_update;

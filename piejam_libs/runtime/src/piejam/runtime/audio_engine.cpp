@@ -327,6 +327,7 @@ make_graph(
         mixer_bus_components const& output_buses,
         fx_chains_map const& fx_chains,
         audio::engine::processor& input_solo_index,
+        audio::engine::processor& output_solo_index,
         std::vector<processor_ptr>& mixer_procs)
 {
     audio::engine::graph g;
@@ -388,6 +389,8 @@ make_graph(
                     mb_out->outputs()[1],
                     {output_proc, bus.device_channels.right},
                     mixer_procs);
+
+        g.add_event_wire({output_solo_index, 0}, mb_out->event_inputs()[0]);
     }
 
     for (auto const& [id, out_mb_in, out_mb_out] : output_buses)
@@ -481,6 +484,7 @@ struct audio_engine::impl
     mixer_bus_components output_buses;
     fx_chains_map fx_chains;
     value_input_processor_ptr<mixer::bus_id> input_solo_index_proc;
+    value_input_processor_ptr<mixer::bus_id> output_solo_index_proc;
     std::vector<processor_ptr> mixer_procs;
     value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
 
@@ -556,6 +560,12 @@ audio_engine::set_input_solo(mixer::bus_id const& id)
     m_impl->input_solo_index_proc->set(id);
 }
 
+void
+audio_engine::set_output_solo(mixer::bus_id const& id)
+{
+    m_impl->output_solo_index_proc->set(id);
+}
+
 auto
 audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
 {
@@ -613,6 +623,11 @@ audio_engine::rebuild(
                     mixer_state.input_solo_id,
                     "input_solo_index");
 
+    auto output_solo_index_proc =
+            std::make_unique<audio::engine::value_io_processor<mixer::bus_id>>(
+                    mixer_state.output_solo_id,
+                    "output_solo_index");
+
     make_midi_processors(std::move(midi_in), midi_learn, procs);
     make_midi_assignment_processors(assignments, params, procs, m_impl->procs);
     auto midi_learn_output_proc =
@@ -630,6 +645,7 @@ audio_engine::rebuild(
             output_buses,
             fx_chains,
             *input_solo_index_proc,
+            *output_solo_index_proc,
             mixers);
 
     connect_midi(
@@ -651,6 +667,7 @@ audio_engine::rebuild(
     m_impl->output_buses = std::move(output_buses);
     m_impl->fx_chains = std::move(fx_chains);
     m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
+    m_impl->output_solo_index_proc = std::move(output_solo_index_proc);
     m_impl->mixer_procs = std::move(mixers);
     m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
     m_impl->procs = std::move(procs);

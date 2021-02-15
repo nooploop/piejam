@@ -199,26 +199,29 @@ make_midi_device_enabled_selector(midi::device_id_t const device_id)
 }
 
 auto
-make_input_solo_selector(mixer::bus_id const bus_id) -> selector<bool>
+make_solo_selector(io_direction io_dir, mixer::bus_id const bus_id)
+        -> selector<bool>
 {
-    return [bus_id](state const& st) -> bool {
-        return bus_id == st.mixer_state.input_solo_id;
-    };
-}
+    switch (io_dir)
+    {
+        case io_direction::input:
+            return [bus_id](state const& st) -> bool {
+                return bus_id == st.mixer_state.input_solo_id;
+            };
 
-auto
-make_bus_level_selector(mixer::bus_id const bus_id) -> selector<stereo_level>
-{
-    return [bus_id](state const& st) -> stereo_level {
-        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-        stereo_level const* const level =
-                bus ? st.params.get(bus->level) : nullptr;
-        return level ? *level : stereo_level{};
-    };
+        case io_direction::output:
+            return [bus_id](state const& st) -> bool {
+                return bus_id == st.mixer_state.output_solo_id;
+            };
+    }
 }
 
 const selector<bool> select_input_solo_active([](state const& st) {
-    return st.mixer_state.input_solo_id != mixer::bus_id{};
+    return st.mixer_state.input_solo_id.valid();
+});
+
+const selector<bool> select_output_solo_active([](state const& st) {
+    return st.mixer_state.output_solo_id.valid();
 });
 
 const selector<mixer::bus_id> select_fx_chain_bus([](state const& st) {

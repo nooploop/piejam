@@ -504,6 +504,19 @@ audio_engine_middleware::process_engine_action(
 template <>
 void
 audio_engine_middleware::process_engine_action(
+        actions::set_output_bus_solo const& a)
+{
+    next(a);
+
+    if (m_engine)
+    {
+        m_engine->set_output_solo(get_state().mixer_state.output_solo_id);
+    }
+}
+
+template <>
+void
+audio_engine_middleware::process_engine_action(
         actions::request_parameters_update const& a)
 {
     if (m_engine)

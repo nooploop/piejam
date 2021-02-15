@@ -50,7 +50,9 @@ struct state
 
     box<bus_list_t> inputs;
     box<bus_list_t> outputs;
+
     bus_id input_solo_id;
+    bus_id output_solo_id;
 };
 
 template <io_direction D>
@@ -73,6 +75,20 @@ get_bus(state const& st, std::size_t index) -> bus const&
 {
     BOOST_ASSERT(index < bus_ids<D>(st).size());
     return *st.buses[bus_ids<D>(st)[index]];
+}
+
+template <io_direction D>
+auto
+solo_id(state const& st) -> bus_id
+{
+    return D == io_direction::input ? st.input_solo_id : st.output_solo_id;
+}
+
+template <io_direction D>
+auto
+solo_id(state& st) -> bus_id&
+{
+    return D == io_direction::input ? st.input_solo_id : st.output_solo_id;
 }
 
 } // namespace piejam::runtime::mixer

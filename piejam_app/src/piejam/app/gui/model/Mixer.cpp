@@ -59,6 +59,7 @@ Mixer::onSubscribe()
                                             dispatch(),
                                             state_change_subscriber(),
                                             bus_info.bus_id,
+                                            io_direction::input,
                                             bus_info.bus_type,
                                             bus_info.volume,
                                             bus_info.pan_balance,
@@ -84,6 +85,7 @@ Mixer::onSubscribe()
                                             dispatch(),
                                             state_change_subscriber(),
                                             bus_info.bus_id,
+                                            io_direction::output,
                                             bus_info.bus_type,
                                             bus_info.volume,
                                             bus_info.pan_balance,
@@ -98,15 +100,24 @@ Mixer::onSubscribe()
             });
 
     observe(runtime::selectors::select_input_solo_active,
-            [this](bool const input_solo_active) {
-                setInputSoloActive(input_solo_active);
-            });
+            [this](bool const active) { setInputSoloActive(active); });
+
+    observe(runtime::selectors::select_output_solo_active,
+            [this](bool const active) { setOutputSoloActive(active); });
 }
 
 void
 Mixer::setInputSolo(unsigned const index)
 {
     runtime::actions::set_input_bus_solo action;
+    action.index = index;
+    dispatch(action);
+}
+
+void
+Mixer::setOutputSolo(unsigned const index)
+{
+    runtime::actions::set_output_bus_solo action;
     action.index = index;
     dispatch(action);
 }

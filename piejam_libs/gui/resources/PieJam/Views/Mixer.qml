@@ -94,11 +94,10 @@ TopPane {
 
                 levelLeft: model.item.levelLeft
                 levelRight: model.item.levelRight
-                meterMuted: model.item.mute
+                meterMuted: (model.item.mute && !model.item.solo) || (root.model.outputSoloActive && !model.item.solo)
                 pan: model.item.panBalance
                 volume: model.item.volume
                 mute: model.item.mute
-                soloEnabled: false
                 name: model.item.name
 
                 volumeMidi.model: model.item.volumeMidi
@@ -108,6 +107,7 @@ TopPane {
                 onFaderMoved: model.item.changeVolume(newVolume)
                 onPanMoved: model.item.changePanBalance(newPan)
                 onMuteToggled: model.item.changeMute(!model.item.mute)
+                onSoloToggled: root.model.setOutputSolo(index)
                 onFxButtonClicked: {
                     model.item.focusFxChain()
                     root.fxButtonClicked()

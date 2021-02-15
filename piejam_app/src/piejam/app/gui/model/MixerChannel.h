@@ -7,6 +7,7 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/MixerChannel.h>
+#include <piejam/io_direction.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 
@@ -24,6 +25,7 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::bus_id,
+            io_direction,
             audio::bus_type,
             runtime::float_parameter_id volume,
             runtime::float_parameter_id pan_balance,
@@ -44,6 +46,7 @@ private:
     void onSubscribe() override;
 
     runtime::mixer::bus_id m_bus_id;
+    io_direction m_io_dir;
     runtime::float_parameter_id m_volume;
     runtime::float_parameter_id m_pan_balance;
     runtime::bool_parameter_id m_mute;

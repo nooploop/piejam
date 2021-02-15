@@ -22,25 +22,48 @@ class Mixer : public SubscribableModel
     Q_PROPERTY(QAbstractListModel* outputChannels READ outputChannels CONSTANT)
     Q_PROPERTY(bool inputSoloActive READ inputSoloActive NOTIFY
                        inputSoloActiveChanged FINAL)
+    Q_PROPERTY(bool outputSoloActive READ outputSoloActive NOTIFY
+                       outputSoloActiveChanged FINAL)
 
 public:
     auto inputChannels() -> MixerChannelsList* { return &m_inputChannels; }
     auto outputChannels() -> MixerChannelsList* { return &m_outputChannels; }
 
     auto inputSoloActive() const -> bool { return m_inputSoloActive; }
-    void setInputSoloActive(bool);
+    void setInputSoloActive(bool x)
+    {
+        if (m_inputSoloActive != x)
+        {
+            m_inputSoloActive = x;
+            emit inputSoloActiveChanged();
+        }
+    }
+
+    auto outputSoloActive() const -> bool { return m_outputSoloActive; }
+    void setOutputSoloActive(bool x)
+    {
+        if (m_outputSoloActive != x)
+        {
+            m_outputSoloActive = x;
+            emit outputSoloActiveChanged();
+        }
+    }
 
     virtual Q_INVOKABLE void setInputSolo(unsigned index) = 0;
+    virtual Q_INVOKABLE void setOutputSolo(unsigned index) = 0;
+
     virtual Q_INVOKABLE void requestLevelsUpdate() = 0;
 
 signals:
 
     void inputSoloActiveChanged();
+    void outputSoloActiveChanged();
 
 private:
     MixerChannelsList m_inputChannels;
     MixerChannelsList m_outputChannels;
     bool m_inputSoloActive{};
+    bool m_outputSoloActive{};
 };
 
 } // namespace piejam::gui::model

@@ -20,7 +20,6 @@ Item {
     property alias volume: levelMeterFader.volume
     property alias mute: channelControls.mute
     property alias solo: channelControls.solo
-    property alias soloEnabled: channelControls.soloEnabled
 
     property alias panMidi: midiAssignPan
     property alias volumeMidi: levelMeterFader.volumeMidi
