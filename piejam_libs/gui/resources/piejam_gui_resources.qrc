@@ -47,5 +47,6 @@
         <file>PieJam/Controls/MidiAssignArea.qml</file>
         <file>PieJam/MidiAssignable.qml</file>
         <file>PieJam/Controls/CpuLoadMeter.qml</file>
+        <file>PieJam/MixerControls/ChannelsListView.qml</file>
     </qresource>
 </RCC>

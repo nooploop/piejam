@@ -20,105 +20,31 @@ TopPane {
         anchors.fill: parent
         anchors.margins: 8
 
-        ListView {
+        ChannelsListView {
             id: inputs
 
             SplitView.fillWidth: true
             SplitView.minimumWidth: 150
 
-            spacing: 2
-            clip: true
-            orientation: ListView.Horizontal
-            boundsBehavior: Flickable.StopAtBounds
-            boundsMovement: Flickable.StopAtBounds
-            reuseItems: true
-
             model: root.model.inputChannels
 
-            delegate: ChannelStrip {
-                id: inputChannelStrip
+            soloActive: root.model.inputSoloActive
 
-                anchors.top: if (parent) parent.top
-                anchors.bottom: if (parent) parent.bottom
-
-                mono: model.item.mono
-                levelLeft: model.item.levelLeft
-                levelRight: model.item.levelRight
-                meterMuted: (model.item.mute && !model.item.solo) || (root.model.inputSoloActive && !model.item.solo)
-                pan: model.item.panBalance
-                volume: model.item.volume
-                mute: model.item.mute
-                solo: model.item.solo
-                name: model.item.name
-
-                volumeMidi.model: model.item.volumeMidi
-                panMidi.model: model.item.panMidi
-                muteMidi.model: model.item.muteMidi
-
-                onFaderMoved: model.item.changeVolume(newVolume)
-                onPanMoved: model.item.changePanBalance(newPan)
-                onMuteToggled: model.item.changeMute(!model.item.mute)
-                onSoloToggled: root.model.setInputSolo(index)
-                onFxButtonClicked: {
-                    model.item.focusFxChain()
-                    root.fxButtonClicked()
-                }
-
-                Binding {
-                    target: model.item
-                    property: "subscribed"
-                    value: visible
-                }
-            }
+            onSoloToggled: root.model.setInputSolo(index)
+            onFxButtonClicked: root.fxButtonClicked()
         }
 
-        ListView {
+        ChannelsListView {
             id: outputs
 
             SplitView.minimumWidth: 150
 
-            spacing: 2
-            clip: true
-            orientation: ListView.Horizontal
-            boundsBehavior: Flickable.StopAtBounds
-            boundsMovement: Flickable.StopAtBounds
-            reuseItems: true
-
             model: root.model.outputChannels
 
-            delegate: ChannelStrip {
-                id: outputChannelStrip
+            soloActive: root.model.outputSoloActive
 
-                anchors.top: if (parent) parent.top
-                anchors.bottom: if (parent) parent.bottom
-
-                levelLeft: model.item.levelLeft
-                levelRight: model.item.levelRight
-                meterMuted: (model.item.mute && !model.item.solo) || (root.model.outputSoloActive && !model.item.solo)
-                pan: model.item.panBalance
-                volume: model.item.volume
-                mute: model.item.mute
-                name: model.item.name
-
-                volumeMidi.model: model.item.volumeMidi
-                panMidi.model: model.item.panMidi
-                muteMidi.model: model.item.muteMidi
-
-                onFaderMoved: model.item.changeVolume(newVolume)
-                onPanMoved: model.item.changePanBalance(newPan)
-                onMuteToggled: model.item.changeMute(!model.item.mute)
-                onSoloToggled: root.model.setOutputSolo(index)
-                onFxButtonClicked: {
-                    model.item.focusFxChain()
-                    root.fxButtonClicked()
-                }
-
-                Binding {
-                    target: model.item
-                    property: "subscribed"
-                    value: visible
-                }
-            }
+            onSoloToggled: root.model.setOutputSolo(index)
+            onFxButtonClicked: root.fxButtonClicked()
         }
     }
 
