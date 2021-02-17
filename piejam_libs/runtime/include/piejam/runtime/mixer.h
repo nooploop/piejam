@@ -4,13 +4,10 @@
 
 #pragma once
 
-#include <piejam/audio/pair.h>
-#include <piejam/audio/types.h>
 #include <piejam/boxed_string.h>
 #include <piejam/entity_map.h>
 #include <piejam/io_direction.h>
-#include <piejam/npos.h>
-#include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/device_bus.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
@@ -25,19 +22,16 @@
 namespace piejam::runtime::mixer
 {
 
-using channel_type = audio::bus_type;
-
 struct bus
 {
     boxed_string name;
+
+    device_bus device;
+
     float_parameter_id volume;
     float_parameter_id pan_balance;
     bool_parameter_id mute;
     stereo_level_parameter_id level;
-    channel_type type{};
-
-    //! mono channels hold same device channel in the pair
-    channel_index_pair device_channels{npos};
 
     box<fx::chain_t> fx_chain{};
 

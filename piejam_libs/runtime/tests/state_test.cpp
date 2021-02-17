@@ -34,8 +34,8 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_bus)
     ASSERT_NE(nullptr, bus);
 
     EXPECT_EQ("foo", bus->name);
-    EXPECT_EQ(audio::bus_type::mono, bus->type);
-    EXPECT_EQ(channel_index_pair{1}, bus->device_channels);
+    EXPECT_EQ(audio::bus_type::mono, bus->device.bus_type);
+    EXPECT_EQ(channel_index_pair{1}, bus->device.channels);
 
     auto volume_param = sut.params.get_parameter(bus->volume);
     ASSERT_NE(nullptr, volume_param);

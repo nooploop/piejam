@@ -30,9 +30,10 @@ public:
             parameter_processor_factory& param_procs)
         : m_pan_balance_input_proc(param_procs.make_processor(
                   bus.pan_balance,
-                  bus.type == audio::bus_type::mono ? "pan" : "balance"))
+                  bus.device.bus_type == audio::bus_type::mono ? "pan"
+                                                               : "balance"))
         , m_pan_balance(
-                  bus.type == audio::bus_type::mono
+                  bus.device.bus_type == audio::bus_type::mono
                           ? audio::components::make_pan()
                           : audio::components::make_stereo_balance())
     {

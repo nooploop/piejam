@@ -95,16 +95,16 @@ TEST_F(audio_engine_render_test, add_input_channel)
     add_mixer_bus<io_direction::input>(
             st,
             "in1",
-            mixer::channel_type::mono,
+            audio::bus_type::mono,
             channel_index_pair(0));
 
     mixer::bus out_ch;
-    out_ch.type = mixer::channel_type::stereo;
-    out_ch.device_channels = channel_index_pair(0, 1);
+    out_ch.device.bus_type = audio::bus_type::stereo;
+    out_ch.device.channels = channel_index_pair(0, 1);
     add_mixer_bus<io_direction::output>(
             st,
             "out",
-            mixer::channel_type::stereo,
+            audio::bus_type::stereo,
             channel_index_pair(0, 1));
 
     rebuild(st);
@@ -113,7 +113,7 @@ TEST_F(audio_engine_render_test, add_input_channel)
     add_mixer_bus<io_direction::input>(
             st,
             "in2",
-            mixer::channel_type::mono,
+            audio::bus_type::mono,
             channel_index_pair(1));
 
     rebuild(st);

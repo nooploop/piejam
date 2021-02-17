@@ -49,6 +49,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mixer_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_bus.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_bus_id.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/gain.h

@@ -92,10 +92,10 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
                     in_id,
                     [num_in_channels](mixer::bus& bus) {
                         update_channel(
-                                bus.device_channels.left,
+                                bus.device.channels.left,
                                 num_in_channels);
                         update_channel(
-                                bus.device_channels.right,
+                                bus.device.channels.right,
                                 num_in_channels);
                     });
         }
@@ -107,10 +107,10 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
                     out_id,
                     [num_out_channels](mixer::bus& bus) {
                         update_channel(
-                                bus.device_channels.left,
+                                bus.device.channels.left,
                                 num_out_channels);
                         update_channel(
-                                bus.device_channels.right,
+                                bus.device.channels.right,
                                 num_out_channels);
                     });
         }

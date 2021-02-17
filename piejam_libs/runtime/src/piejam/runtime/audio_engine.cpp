@@ -348,14 +348,14 @@ make_graph(
                 *mb_out,
                 mixer_procs);
 
-        if (bus.device_channels.left != npos)
+        if (bus.device.channels.left != npos)
             g.add_wire(
-                    {input_proc, bus.device_channels.left},
+                    {input_proc, bus.device.channels.left},
                     mb_in->inputs()[0]);
 
-        if (bus.device_channels.right != npos)
+        if (bus.device.channels.right != npos)
             g.add_wire(
-                    {input_proc, bus.device_channels.right},
+                    {input_proc, bus.device.channels.right},
                     mb_in->inputs()[1]);
 
         g.add_event_wire({input_solo_index, 0}, mb_out->event_inputs()[0]);
@@ -378,16 +378,16 @@ make_graph(
                 *mb_out,
                 mixer_procs);
 
-        if (bus.device_channels.left != npos)
+        if (bus.device.channels.left != npos)
             connect(g,
                     mb_out->outputs()[0],
-                    {output_proc, bus.device_channels.left},
+                    {output_proc, bus.device.channels.left},
                     mixer_procs);
 
-        if (bus.device_channels.right != npos)
+        if (bus.device.channels.right != npos)
             connect(g,
                     mb_out->outputs()[1],
-                    {output_proc, bus.device_channels.right},
+                    {output_proc, bus.device.channels.right},
                     mixer_procs);
 
         g.add_event_wire({output_solo_index, 0}, mb_out->event_inputs()[0]);

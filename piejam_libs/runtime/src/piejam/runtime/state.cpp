@@ -347,13 +347,15 @@ template <io_direction D>
 auto
 add_mixer_bus(
         state& st,
-        std::string name,
+        std::string const& name,
         audio::bus_type type,
         channel_index_pair const& chs) -> mixer::bus_id
 {
     auto& params = st.params;
     mixer::bus_id const bus_id = st.mixer_state.buses.add(mixer::bus{
-            .name = std::move(name),
+            .name = name,
+            .device =
+                    device_bus{.name = name, .bus_type = type, .channels = chs},
             .volume = params.add(parameter::float_{
                     .default_value = 1.f,
                     .min = 0.f,
@@ -368,8 +370,6 @@ add_mixer_bus(
                     .from_normalized = &parameter::from_normalized_linear}),
             .mute = params.add(parameter::bool_{.default_value = false}),
             .level = params.add(parameter::stereo_level{}),
-            .type = type,
-            .device_channels = chs,
             .fx_chain = {}});
 
     mixer::bus_ids<D>(st.mixer_state)
@@ -382,12 +382,12 @@ add_mixer_bus(
 
 template auto add_mixer_bus<io_direction::input>(
         state&,
-        std::string,
+        std::string const&,
         audio::bus_type,
         channel_index_pair const&) -> mixer::bus_id;
 template auto add_mixer_bus<io_direction::output>(
         state&,
-        std::string,
+        std::string const&,
         audio::bus_type,
         channel_index_pair const&) -> mixer::bus_id;
 

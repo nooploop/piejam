@@ -18,15 +18,15 @@ select_bus_channel::reduce(state const& st) const -> state
         switch (channel_selector)
         {
             case audio::bus_channel::mono:
-                bus.device_channels = channel_index_pair{channel_index};
+                bus.device.channels = channel_index_pair{channel_index};
                 break;
 
             case audio::bus_channel::left:
-                bus.device_channels.left = channel_index;
+                bus.device.channels.left = channel_index;
                 break;
 
             case audio::bus_channel::right:
-                bus.device_channels.right = channel_index;
+                bus.device.channels.right = channel_index;
                 break;
         }
     });

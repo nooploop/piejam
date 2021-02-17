@@ -84,7 +84,7 @@ make_bus_infos(
         BOOST_ASSERT(bus);
         return mixer_bus_info{
                 .bus_id = bus_id,
-                .bus_type = bus->type,
+                .bus_type = bus->device.bus_type,
                 .volume = bus->volume,
                 .pan_balance = bus->pan_balance,
                 .mute = bus->mute,
@@ -126,7 +126,7 @@ make_bus_type_selector(mixer::bus_id const bus_id) -> selector<audio::bus_type>
 {
     return [bus_id](state const& st) -> audio::bus_type {
         mixer::bus const* bus = st.mixer_state.buses[bus_id];
-        return bus ? bus->type : audio::bus_type::mono;
+        return bus ? bus->device.bus_type : audio::bus_type::mono;
     };
 }
 
@@ -141,13 +141,13 @@ make_bus_channel_selector(
         case audio::bus_channel::left:
             return [bus_id](state const& st) -> std::size_t {
                 mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-                return bus ? bus->device_channels.left : piejam::npos;
+                return bus ? bus->device.channels.left : piejam::npos;
             };
 
         case audio::bus_channel::right:
             return [bus_id](state const& st) -> std::size_t {
                 mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-                return bus ? bus->device_channels.right : piejam::npos;
+                return bus ? bus->device.channels.right : piejam::npos;
             };
     }
 
