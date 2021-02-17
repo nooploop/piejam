@@ -24,7 +24,7 @@ TEST(sinusoidal_constant_power_pan, zero)
 {
     auto sut = sinusoidal_constant_power_pan(0.f);
 
-    using namespace boost::math::float_constants;
+    constexpr float one_div_root_two = 1.f / std::numbers::sqrt2_v<float>;
 
     EXPECT_FLOAT_EQ(sut.left, sut.right);
     EXPECT_FLOAT_EQ(one_div_root_two, sut.left);

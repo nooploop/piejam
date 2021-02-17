@@ -7,7 +7,7 @@
 #include <piejam/audio/pair.h>
 #include <piejam/math.h>
 
-#include <boost/math/constants/constants.hpp>
+#include <numbers>
 
 namespace piejam::audio
 {
@@ -29,12 +29,16 @@ using stereo_gain = pair<float>;
 inline constexpr auto
 sinusoidal_constant_power_pan(float pan_pos) -> stereo_gain
 {
-    using namespace boost::math::float_constants;
-    constexpr float pi_div_4root2 = pi / (4.f * root_two);
-    constexpr float pi_sqr_div_32root2 = pi_sqr / (32.f * root_two);
-    constexpr float pi_cubed_div_384root2 = pi_cubed / (384.f * root_two);
-    constexpr float pi_quad = pi_cubed * pi;
-    constexpr float pi_quad_div_6144root2 = pi_quad / (6144.f * root_two);
+    constexpr float pi_f = std::numbers::pi_v<float>;
+    constexpr float pi_sqr_f = pi_f * pi_f;
+    constexpr float pi_cubed_f = pi_sqr_f * pi_f;
+    constexpr float sqrt2_f = std::numbers::sqrt2_v<float>;
+    constexpr float pi_div_4root2 = pi_f / (4.f * sqrt2_f);
+    constexpr float pi_sqr_div_32root2 = pi_sqr_f / (32.f * sqrt2_f);
+    constexpr float pi_cubed_div_384root2 = pi_cubed_f / (384.f * sqrt2_f);
+    constexpr float pi_quad = pi_cubed_f * pi_f;
+    constexpr float pi_quad_div_6144root2 = pi_quad / (6144.f * sqrt2_f);
+    constexpr float inv_sqrt2_f = 1.f / sqrt2_f;
     float const x_sqr = pan_pos * pan_pos;
     float const x_cubed = x_sqr * pan_pos;
     float const x_quad = x_cubed * pan_pos;
@@ -42,7 +46,7 @@ sinusoidal_constant_power_pan(float pan_pos) -> stereo_gain
     float const ax2 = pi_sqr_div_32root2 * x_sqr;
     float const ax3 = pi_cubed_div_384root2 * x_cubed;
     float const ax4 = pi_quad_div_6144root2 * x_quad;
-    float const axs = one_div_root_two - ax2 + ax4;
+    float const axs = inv_sqrt2_f - ax2 + ax4;
     float const axt = ax1 - ax3;
     float const left = axs - axt;
     float const right = axs + axt;
