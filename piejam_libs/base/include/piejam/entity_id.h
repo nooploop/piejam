@@ -24,22 +24,14 @@ struct entity_id
 
     constexpr entity_id() noexcept = default;
 
-    constexpr bool operator==(entity_id const& other) const noexcept
-    {
-        return m_id == other.m_id;
-    }
-
-    constexpr bool operator!=(entity_id const& other) const noexcept
-    {
-        return m_id != other.m_id;
-    }
+    constexpr bool operator==(entity_id const& other) const noexcept = default;
 
     constexpr bool operator<(entity_id const& other) const noexcept
     {
         return m_id < other.m_id;
     }
 
-    constexpr explicit operator bool() const noexcept { return m_id; }
+    constexpr explicit operator bool() const noexcept { return valid(); }
     constexpr bool valid() const noexcept { return m_id; }
     constexpr bool invalid() const noexcept { return !m_id; }
 
