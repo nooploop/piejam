@@ -5,7 +5,6 @@
 #pragma once
 
 #include <cmath>
-#include <concepts>
 #include <limits>
 
 namespace piejam::math
@@ -16,12 +15,6 @@ constexpr auto
 pow3(T const x) noexcept -> T
 {
     return x * x * x;
-}
-
-constexpr bool
-is_power_of_two(std::integral auto x) noexcept
-{
-    return x > 0 && !(x & (x - 1));
 }
 
 constexpr auto

@@ -8,6 +8,7 @@
 
 #include <array>
 #include <atomic>
+#include <bit>
 #include <limits>
 #include <type_traits>
 
@@ -17,7 +18,7 @@ namespace piejam::thread
 template <class Job, std::size_t Capacity>
 class job_deque
 {
-    static_assert(math::is_power_of_two(Capacity));
+    static_assert(std::has_single_bit(Capacity));
     static constexpr std::size_t mask = Capacity - 1u;
 
     using signed_index_t = std::make_signed_t<std::size_t>;
