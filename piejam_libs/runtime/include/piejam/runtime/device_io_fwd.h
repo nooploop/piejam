@@ -6,10 +6,10 @@
 
 #include <piejam/fwd.h>
 
-namespace piejam::runtime
+namespace piejam::runtime::device_io
 {
 
-struct device_bus;
-using device_bus_id = entity_id<device_bus>;
+struct bus;
+using bus_id = entity_id<bus>;
 
-} // namespace piejam::runtime
+} // namespace piejam::runtime::device_io

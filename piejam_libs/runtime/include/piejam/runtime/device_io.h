@@ -6,13 +6,14 @@
 
 #include <piejam/audio/types.h>
 #include <piejam/boxed_string.h>
+#include <piejam/fwd.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
 
-namespace piejam::runtime
+namespace piejam::runtime::device_io
 {
 
-struct device_bus
+struct bus
 {
     boxed_string name;
 
@@ -21,7 +22,9 @@ struct device_bus
     //! mono channels hold same device channel in the pair
     channel_index_pair channels{npos};
 
-    bool operator==(device_bus const&) const noexcept = default;
+    bool operator==(bus const&) const noexcept = default;
 };
 
-} // namespace piejam::runtime
+using bus_id = entity_id<bus>;
+
+} // namespace piejam::runtime::device_io

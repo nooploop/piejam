@@ -7,7 +7,7 @@
 #include <piejam/boxed_string.h>
 #include <piejam/entity_map.h>
 #include <piejam/io_direction.h>
-#include <piejam/runtime/device_bus.h>
+#include <piejam/runtime/device_io.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
@@ -26,7 +26,7 @@ struct bus
 {
     boxed_string name;
 
-    device_bus device;
+    device_io::bus device;
 
     float_parameter_id volume;
     float_parameter_id pan_balance;

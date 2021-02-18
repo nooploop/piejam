@@ -355,7 +355,10 @@ add_mixer_bus(
     mixer::bus_id const bus_id = st.mixer_state.buses.add(mixer::bus{
             .name = name,
             .device =
-                    device_bus{.name = name, .bus_type = type, .channels = chs},
+                    device_io::bus{
+                            .name = name,
+                            .bus_type = type,
+                            .channels = chs},
             .volume = params.add(parameter::float_{
                     .default_value = 1.f,
                     .min = 0.f,
