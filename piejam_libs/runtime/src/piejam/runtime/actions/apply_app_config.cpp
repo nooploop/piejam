@@ -33,7 +33,10 @@ apply_bus_configs(
         auto const type = D == io_direction::output ? audio::bus_type::stereo
                                                     : bus_conf.bus_type;
 
-        add_mixer_bus<D>(st, bus_conf.name, type, chs);
+        add_mixer_bus<D>(
+                st,
+                bus_conf.name,
+                add_device_bus<D>(st, bus_conf.name, type, chs));
     }
 }
 

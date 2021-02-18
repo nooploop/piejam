@@ -19,20 +19,33 @@ add_bus::reduce(state const& st) const -> state
     switch (direction)
     {
         case io_direction::input:
+        {
+            auto name =
+                    fmt::format("In {}", new_st.mixer_state.inputs->size() + 1);
             add_mixer_bus<io_direction::input>(
                     new_st,
-                    fmt::format("In {}", new_st.mixer_state.inputs->size() + 1),
-                    type);
+                    name,
+                    add_device_bus<io_direction::input>(
+                            new_st,
+                            name,
+                            type,
+                            channel_index_pair{npos}));
             break;
+        }
 
         case io_direction::output:
         {
             auto const bus_ids_size = new_st.mixer_state.outputs->size();
+            auto name = bus_ids_size == 0 ? std::string("Main")
+                                          : fmt::format("Aux {}", bus_ids_size);
             add_mixer_bus<io_direction::output>(
                     new_st,
-                    (bus_ids_size == 0 ? std::string("Main")
-                                       : fmt::format("Aux {}", bus_ids_size)),
-                    type);
+                    name,
+                    add_device_bus<io_direction::output>(
+                            new_st,
+                            name,
+                            audio::bus_type::stereo,
+                            channel_index_pair{}));
             break;
         }
     }

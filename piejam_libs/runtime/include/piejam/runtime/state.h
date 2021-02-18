@@ -83,11 +83,14 @@ auto period_sizes(
 auto period_sizes_from_state(state const&) -> audio::period_sizes_t;
 
 template <io_direction D>
-auto add_mixer_bus(
+auto add_device_bus(
         state&,
-        std::string const& name,
-        audio::bus_type type,
-        channel_index_pair const& chs = channel_index_pair{npos})
+        std::string name,
+        audio::bus_type,
+        channel_index_pair const&) -> device_io::bus;
+
+template <io_direction D>
+auto add_mixer_bus(state&, std::string name, device_io::bus device)
         -> mixer::bus_id;
 
 void remove_mixer_bus(state&, mixer::bus_id);

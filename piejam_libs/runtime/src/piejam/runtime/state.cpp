@@ -345,20 +345,38 @@ remove_fx_module(state& st, fx::module_id id)
 
 template <io_direction D>
 auto
-add_mixer_bus(
-        state& st,
-        std::string const& name,
-        audio::bus_type type,
-        channel_index_pair const& chs) -> mixer::bus_id
+add_device_bus(
+        state&,
+        std::string name,
+        audio::bus_type const bus_type,
+        channel_index_pair const& channels) -> device_io::bus
+{
+    return {.name = std::move(name),
+            .bus_type = D != io_direction::output ? bus_type
+                                                  : audio::bus_type::stereo,
+            .channels = channels};
+}
+
+template auto add_device_bus<io_direction::input>(
+        state&,
+        std::string,
+        audio::bus_type,
+        channel_index_pair const&) -> device_io::bus;
+template auto add_device_bus<io_direction::output>(
+        state&,
+        std::string,
+        audio::bus_type,
+        channel_index_pair const&) -> device_io::bus;
+
+template <io_direction D>
+auto
+add_mixer_bus(state& st, std::string name, device_io::bus device)
+        -> mixer::bus_id
 {
     auto& params = st.params;
     mixer::bus_id const bus_id = st.mixer_state.buses.add(mixer::bus{
-            .name = name,
-            .device =
-                    device_io::bus{
-                            .name = name,
-                            .bus_type = type,
-                            .channels = chs},
+            .name = std::move(name),
+            .device = std::move(device),
             .volume = params.add(parameter::float_{
                     .default_value = 1.f,
                     .min = 0.f,
@@ -383,16 +401,12 @@ add_mixer_bus(
     return bus_id;
 }
 
-template auto add_mixer_bus<io_direction::input>(
-        state&,
-        std::string const&,
-        audio::bus_type,
-        channel_index_pair const&) -> mixer::bus_id;
-template auto add_mixer_bus<io_direction::output>(
-        state&,
-        std::string const&,
-        audio::bus_type,
-        channel_index_pair const&) -> mixer::bus_id;
+template auto
+add_mixer_bus<io_direction::input>(state&, std::string, device_io::bus)
+        -> mixer::bus_id;
+template auto
+add_mixer_bus<io_direction::output>(state&, std::string, device_io::bus)
+        -> mixer::bus_id;
 
 void
 remove_mixer_bus(state& st, mixer::bus_id const bus_id)

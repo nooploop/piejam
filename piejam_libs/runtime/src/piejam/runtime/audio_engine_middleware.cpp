@@ -136,11 +136,15 @@ select_device<io_direction::input>::reduce(state const& st) const -> state
     std::size_t const num_channels = new_st.input.hw_params->num_channels;
     for (std::size_t index = 0; index < num_channels; ++index)
     {
+        auto name = fmt::format("In {}", index + 1);
         add_mixer_bus<io_direction::input>(
                 new_st,
-                fmt::format("In {}", index + 1),
-                audio::bus_type::mono,
-                channel_index_pair(index));
+                name,
+                add_device_bus<io_direction::input>(
+                        new_st,
+                        name,
+                        audio::bus_type::mono,
+                        channel_index_pair(index)));
     }
 
     return new_st;
@@ -159,10 +163,13 @@ select_device<io_direction::output>::reduce(state const& st) const -> state
         add_mixer_bus<io_direction::output>(
                 new_st,
                 "Main",
-                audio::bus_type::stereo,
-                channel_index_pair(
-                        num_channels > 0 ? 0 : npos,
-                        num_channels > 1 ? 1 : npos));
+                add_device_bus<io_direction::output>(
+                        new_st,
+                        "Main",
+                        audio::bus_type::stereo,
+                        channel_index_pair(
+                                num_channels > 0 ? 0 : npos,
+                                num_channels > 1 ? 1 : npos)));
     }
 
     return new_st;
