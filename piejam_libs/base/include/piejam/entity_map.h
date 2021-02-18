@@ -15,11 +15,11 @@
 namespace piejam
 {
 
-template <class Entity, class EntityTag = Entity>
+template <class Entity>
 class entity_map
 {
 public:
-    using id_t = entity_id<EntityTag>;
+    using id_t = entity_id<Entity>;
     using map_t = boost::container::flat_map<id_t, Entity>;
 
     auto empty() const noexcept { return m_map->empty(); }

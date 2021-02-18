@@ -11,11 +11,9 @@
 namespace piejam::runtime::mixer
 {
 
-struct bus_tag;
-using bus_id = entity_id<bus_tag>;
-
 struct bus;
-using buses_t = entity_map<bus, bus_tag>;
+using bus_id = entity_id<bus>;
+using buses_t = entity_map<bus>;
 
 using bus_list_t = std::vector<bus_id>;
 

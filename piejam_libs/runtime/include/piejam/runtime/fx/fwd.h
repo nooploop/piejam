@@ -28,8 +28,7 @@ using ladspa_instance_id = entity_id<ladspa_instance_id_tag>;
 
 struct unavailable_ladspa;
 using unavailable_ladspa_id = entity_id<unavailable_ladspa>;
-using unavailable_ladspa_plugins =
-        entity_map<unavailable_ladspa, unavailable_ladspa>;
+using unavailable_ladspa_plugins = entity_map<unavailable_ladspa>;
 
 using instance_id =
         std::variant<internal, ladspa_instance_id, unavailable_ladspa_id>;
@@ -57,7 +56,7 @@ using module_parameters =
 using parameters_t = boost::container::flat_map<parameter_id, parameter>;
 
 using module_id = entity_id<module>;
-using modules_t = entity_map<module, module>;
+using modules_t = entity_map<module>;
 
 using chain_t = std::vector<module_id>;
 

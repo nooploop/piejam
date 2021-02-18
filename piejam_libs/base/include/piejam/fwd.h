@@ -10,7 +10,7 @@ namespace piejam
 template <class EntityTag>
 struct entity_id;
 
-template <class Entity, class EntityTag>
+template <class Entity>
 class entity_map;
 
 } // namespace piejam
