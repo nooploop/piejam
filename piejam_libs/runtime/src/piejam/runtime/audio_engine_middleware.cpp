@@ -82,36 +82,28 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
         new_st.samplerate = samplerate;
         new_st.period_size = period_size;
 
-        auto const& in_ids = *st.mixer_state.inputs;
-        auto const& out_ids = *st.mixer_state.outputs;
+        auto const& in_ids = *st.device_io_state.inputs;
+        auto const& out_ids = *st.device_io_state.outputs;
 
         std::size_t const num_in_channels = input.hw_params->num_channels;
         for (auto const& in_id : in_ids)
         {
-            new_st.mixer_state.buses.update(
+            new_st.device_io_state.buses.update(
                     in_id,
-                    [num_in_channels](mixer::bus& bus) {
-                        update_channel(
-                                bus.device.channels.left,
-                                num_in_channels);
-                        update_channel(
-                                bus.device.channels.right,
-                                num_in_channels);
+                    [num_in_channels](device_io::bus& bus) {
+                        update_channel(bus.channels.left, num_in_channels);
+                        update_channel(bus.channels.right, num_in_channels);
                     });
         }
 
         std::size_t const num_out_channels = output.hw_params->num_channels;
         for (auto const& out_id : out_ids)
         {
-            new_st.mixer_state.buses.update(
+            new_st.device_io_state.buses.update(
                     out_id,
-                    [num_out_channels](mixer::bus& bus) {
-                        update_channel(
-                                bus.device.channels.left,
-                                num_out_channels);
-                        update_channel(
-                                bus.device.channels.right,
-                                num_out_channels);
+                    [num_out_channels](device_io::bus& bus) {
+                        update_channel(bus.channels.left, num_out_channels);
+                        update_channel(bus.channels.right, num_out_channels);
                     });
         }
 
@@ -658,6 +650,7 @@ audio_engine_middleware::rebuild()
     auto const& st = get_state();
     if (!m_engine->rebuild(
                 st.mixer_state,
+                st.device_io_state.buses,
                 st.fx_modules,
                 st.fx_parameters,
                 st.params,

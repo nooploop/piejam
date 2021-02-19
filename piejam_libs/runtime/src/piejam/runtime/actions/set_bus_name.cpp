@@ -14,7 +14,7 @@ set_bus_name::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.buses.update(bus_id, [this](mixer::bus& bus) {
+    new_st.device_io_state.buses.update(bus_id, [this](device_io::bus& bus) {
         bus.name = name;
     });
 

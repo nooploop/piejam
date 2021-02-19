@@ -8,6 +8,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/midi/fwd.h>
 #include <piejam/range/table_view.h>
+#include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
 #include <piejam/runtime/midi_assignment.h>
@@ -49,6 +50,7 @@ public:
 
     [[nodiscard]] bool
     rebuild(mixer::state const&,
+            device_io::buses_t const&,
             fx::modules_t const&,
             fx::parameters_t const& fx_params,
             parameter_maps const&,

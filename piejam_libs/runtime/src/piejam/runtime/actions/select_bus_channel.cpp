@@ -14,19 +14,19 @@ select_bus_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.buses.update(bus_id, [this](mixer::bus& bus) {
+    new_st.device_io_state.buses.update(bus_id, [this](device_io::bus& bus) {
         switch (channel_selector)
         {
             case audio::bus_channel::mono:
-                bus.device.channels = channel_index_pair{channel_index};
+                bus.channels = channel_index_pair{channel_index};
                 break;
 
             case audio::bus_channel::left:
-                bus.device.channels.left = channel_index;
+                bus.channels.left = channel_index;
                 break;
 
             case audio::bus_channel::right:
-                bus.device.channels.right = channel_index;
+                bus.channels.right = channel_index;
                 break;
         }
     });

@@ -6,6 +6,8 @@
 
 #include <piejam/box.h>
 
+#include <boost/range/algorithm_ext/erase.hpp>
+
 #include <vector>
 
 namespace piejam
@@ -13,5 +15,13 @@ namespace piejam
 
 template <class T>
 using boxed_vector = box<std::vector<T>>;
+
+template <class T>
+auto
+remove_erase(boxed_vector<T>& vec, T const& value)
+{
+    vec.update(
+            [&value](std::vector<T>& vec) { boost::remove_erase(vec, value); });
+}
 
 } // namespace piejam

@@ -6,9 +6,10 @@
 
 #include <piejam/audio/types.h>
 #include <piejam/boxed_string.h>
-#include <piejam/fwd.h>
+#include <piejam/entity_map.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/device_io_fwd.h>
 
 namespace piejam::runtime::device_io
 {
@@ -25,6 +26,12 @@ struct bus
     bool operator==(bus const&) const noexcept = default;
 };
 
-using bus_id = entity_id<bus>;
+struct state
+{
+    buses_t buses;
+
+    box<bus_list_t> inputs;
+    box<bus_list_t> outputs;
+};
 
 } // namespace piejam::runtime::device_io

@@ -8,7 +8,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
 #include <piejam/io_direction.h>
-#include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/device_io_fwd.h>
 
 namespace piejam::app::gui::model
 {
@@ -33,7 +33,7 @@ private:
 
     io_direction m_settings_type;
 
-    runtime::mixer::bus_list_t m_bus_ids;
+    runtime::device_io::bus_list_t m_bus_ids;
 };
 
 class AudioInputSettings final : public AudioInputOutputSettings

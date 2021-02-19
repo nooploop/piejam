@@ -22,7 +22,7 @@ MixerChannel::MixerChannel(
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::bus_id const id,
         io_direction const io_dir,
-        audio::bus_type const bus_type,
+        runtime::device_io::bus_id const device_bus_id,
         runtime::float_parameter_id const volume,
         runtime::float_parameter_id const pan_balance,
         runtime::bool_parameter_id const mute,
@@ -30,6 +30,7 @@ MixerChannel::MixerChannel(
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_bus_id(id)
     , m_io_dir(io_dir)
+    , m_device_bus_id(device_bus_id)
     , m_volume(volume)
     , m_pan_balance(pan_balance)
     , m_mute(mute)
@@ -47,7 +48,6 @@ MixerChannel::MixerChannel(
               state_change_subscriber,
               mute))
 {
-    setMono(bus_type == audio::bus_type::mono);
 }
 
 MixerChannel::~MixerChannel() = default;
@@ -55,9 +55,14 @@ MixerChannel::~MixerChannel() = default;
 void
 MixerChannel::onSubscribe()
 {
-    observe(runtime::selectors::make_bus_name_selector(m_bus_id),
+    observe(runtime::selectors::make_bus_name_selector(m_device_bus_id),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
+            });
+
+    observe(runtime::selectors::make_bus_type_selector(m_device_bus_id),
+            [this](audio::bus_type const bus_type) {
+                setMono(bus_type == audio::bus_type::mono);
             });
 
     observe(runtime::selectors::make_float_parameter_value_selector(m_volume),

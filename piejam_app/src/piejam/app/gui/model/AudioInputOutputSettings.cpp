@@ -40,13 +40,13 @@ AudioInputOutputSettings::onSubscribe()
                 setChannels(channels);
             });
 
-    observe(selectors::make_bus_list_selector(m_settings_type),
-            [this](box<runtime::mixer::bus_list_t> const& bus_ids) {
+    observe(selectors::make_device_bus_list_selector(m_settings_type),
+            [this](box<runtime::device_io::bus_list_t> const& bus_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_bus_ids, *bus_ids),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *busConfigs(),
-                                [this](runtime::mixer::bus_id bus_id) {
+                                [this](runtime::device_io::bus_id bus_id) {
                                     return std::make_unique<BusConfig>(
                                             dispatch(),
                                             state_change_subscriber(),

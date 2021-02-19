@@ -15,6 +15,7 @@
 #include <piejam/io_direction.h>
 #include <piejam/midi/device_id.h>
 #include <piejam/reselect/fwd.h>
+#include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/midi_assignment_id.h>
@@ -49,34 +50,30 @@ auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 
 auto make_bus_list_selector(io_direction) -> selector<box<mixer::bus_list_t>>;
 
+auto make_device_bus_list_selector(io_direction)
+        -> selector<box<device_io::bus_list_t>>;
+
 struct mixer_bus_info
 {
     mixer::bus_id bus_id;
-    audio::bus_type bus_type;
+    device_io::bus_id device;
     float_parameter_id volume;
     float_parameter_id pan_balance;
     bool_parameter_id mute;
     stereo_level_parameter_id level;
 
-    constexpr bool operator==(mixer_bus_info const& other) const noexcept
-    {
-        return bus_id == other.bus_id;
-    }
-
-    constexpr bool operator!=(mixer_bus_info const& other) const noexcept
-    {
-        return bus_id != other.bus_id;
-    }
+    constexpr bool
+    operator==(mixer_bus_info const& other) const noexcept = default;
 };
 
 auto make_bus_infos_selector(io_direction)
         -> selector<boxed_vector<mixer_bus_info>>;
 
-auto make_bus_name_selector(mixer::bus_id) -> selector<boxed_string>;
+auto make_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
 
-auto make_bus_type_selector(mixer::bus_id) -> selector<audio::bus_type>;
+auto make_bus_type_selector(device_io::bus_id) -> selector<audio::bus_type>;
 
-auto make_bus_channel_selector(mixer::bus_id, audio::bus_channel)
+auto make_bus_channel_selector(device_io::bus_id, audio::bus_channel)
         -> selector<std::size_t>;
 
 extern const selector<boxed_vector<midi::device_id_t>>

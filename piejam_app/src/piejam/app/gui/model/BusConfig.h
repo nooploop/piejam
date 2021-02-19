@@ -7,7 +7,7 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/model/BusConfig.h>
-#include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/device_io_fwd.h>
 
 namespace piejam::app::gui::model
 {
@@ -18,7 +18,7 @@ public:
     BusConfig(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::mixer::bus_id);
+            runtime::device_io::bus_id);
 
     void changeName(QString const&) override;
     void changeMonoChannel(unsigned) override;
@@ -31,7 +31,7 @@ private:
 
     void changeChannel(audio::bus_channel, unsigned);
 
-    runtime::mixer::bus_id m_bus_id;
+    runtime::device_io::bus_id m_bus_id;
 };
 
 } // namespace piejam::app::gui::model

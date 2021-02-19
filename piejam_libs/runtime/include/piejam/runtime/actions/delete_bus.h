@@ -6,8 +6,8 @@
 
 #include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -18,7 +18,7 @@ struct delete_bus final
     : ui::cloneable_action<delete_bus, action>
     , visitable_engine_action<delete_bus>
 {
-    mixer::bus_id bus_id{};
+    device_io::bus_id bus_id{};
 
     auto reduce(state const&) const -> state override;
 };

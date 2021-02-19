@@ -13,6 +13,8 @@
 #include <piejam/entity_id_hash.h>
 #include <piejam/io_direction.h>
 #include <piejam/npos.h>
+#include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/device_io.h>
 #include <piejam/runtime/fx/ladspa_instances.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -48,6 +50,8 @@ struct state
 
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
+
+    device_io::state device_io_state;
 
     boxed_vector<midi::device_id_t> midi_inputs;
     box<midi_devices_t> midi_devices;
@@ -87,13 +91,15 @@ auto add_device_bus(
         state&,
         std::string name,
         audio::bus_type,
-        channel_index_pair const&) -> device_io::bus;
+        channel_index_pair const&) -> device_io::bus_id;
 
 template <io_direction D>
-auto add_mixer_bus(state&, std::string name, device_io::bus device)
+auto add_mixer_bus(state&, std::string name, device_io::bus_id device)
         -> mixer::bus_id;
 
 void remove_mixer_bus(state&, mixer::bus_id);
+
+void remove_device_bus(state&, device_io::bus_id);
 
 template <io_direction D>
 void clear_mixer_buses(state&);

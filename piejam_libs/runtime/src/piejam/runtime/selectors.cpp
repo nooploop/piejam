@@ -74,6 +74,20 @@ make_bus_list_selector(io_direction const bd)
     }
 }
 
+auto
+make_device_bus_list_selector(io_direction const bd)
+        -> selector<box<device_io::bus_list_t>>
+{
+    switch (bd)
+    {
+        case io_direction::input:
+            return [](state const& st) { return st.device_io_state.inputs; };
+
+        case io_direction::output:
+            return [](state const& st) { return st.device_io_state.outputs; };
+    }
+}
+
 static auto
 make_bus_infos(
         mixer::buses_t const& buses,
@@ -84,7 +98,7 @@ make_bus_infos(
         BOOST_ASSERT(bus);
         return mixer_bus_info{
                 .bus_id = bus_id,
-                .bus_type = bus->device.bus_type,
+                .device = bus->device,
                 .volume = bus->volume,
                 .pan_balance = bus->pan_balance,
                 .mute = bus->mute,
@@ -113,26 +127,27 @@ make_bus_infos_selector(io_direction const bd)
 }
 
 auto
-make_bus_name_selector(mixer::bus_id bus_id) -> selector<boxed_string>
+make_bus_name_selector(device_io::bus_id bus_id) -> selector<boxed_string>
 {
     return [bus_id](state const& st) mutable -> boxed_string {
-        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
+        device_io::bus const* const bus = st.device_io_state.buses[bus_id];
         return bus ? bus->name : boxed_string();
     };
 }
 
 auto
-make_bus_type_selector(mixer::bus_id const bus_id) -> selector<audio::bus_type>
+make_bus_type_selector(device_io::bus_id const bus_id)
+        -> selector<audio::bus_type>
 {
     return [bus_id](state const& st) -> audio::bus_type {
-        mixer::bus const* bus = st.mixer_state.buses[bus_id];
-        return bus ? bus->device.bus_type : audio::bus_type::mono;
+        device_io::bus const* bus = st.device_io_state.buses[bus_id];
+        return bus ? bus->bus_type : audio::bus_type::mono;
     };
 }
 
 auto
 make_bus_channel_selector(
-        mixer::bus_id const bus_id,
+        device_io::bus_id const bus_id,
         audio::bus_channel const bc) -> selector<std::size_t>
 {
     switch (bc)
@@ -140,14 +155,16 @@ make_bus_channel_selector(
         case audio::bus_channel::mono:
         case audio::bus_channel::left:
             return [bus_id](state const& st) -> std::size_t {
-                mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-                return bus ? bus->device.channels.left : piejam::npos;
+                device_io::bus const* const bus =
+                        st.device_io_state.buses[bus_id];
+                return bus ? bus->channels.left : piejam::npos;
             };
 
         case audio::bus_channel::right:
             return [bus_id](state const& st) -> std::size_t {
-                mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-                return bus ? bus->device.channels.right : piejam::npos;
+                device_io::bus const* const bus =
+                        st.device_io_state.buses[bus_id];
+                return bus ? bus->channels.right : piejam::npos;
             };
     }
 

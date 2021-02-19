@@ -27,13 +27,13 @@ class mixer_bus_input final : public audio::engine::component
 public:
     mixer_bus_input(
             mixer::bus const& bus,
+            audio::bus_type const bus_type,
             parameter_processor_factory& param_procs)
         : m_pan_balance_input_proc(param_procs.make_processor(
                   bus.pan_balance,
-                  bus.device.bus_type == audio::bus_type::mono ? "pan"
-                                                               : "balance"))
+                  bus_type == audio::bus_type::mono ? "pan" : "balance"))
         , m_pan_balance(
-                  bus.device.bus_type == audio::bus_type::mono
+                  bus_type == audio::bus_type::mono
                           ? audio::components::make_pan()
                           : audio::components::make_stereo_balance())
     {
@@ -139,11 +139,12 @@ private:
 auto
 make_mixer_bus_input(
         mixer::bus const& bus,
+        audio::bus_type const bus_type,
         parameter_processor_factory& param_procs,
         std::string_view const& /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<mixer_bus_input>(bus, param_procs);
+    return std::make_unique<mixer_bus_input>(bus, bus_type, param_procs);
 }
 
 auto

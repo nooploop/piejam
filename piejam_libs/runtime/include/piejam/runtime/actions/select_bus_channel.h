@@ -7,8 +7,8 @@
 #include <piejam/audio/types.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -19,7 +19,7 @@ struct select_bus_channel final
     : ui::cloneable_action<select_bus_channel, action>
     , visitable_engine_action<select_bus_channel>
 {
-    mixer::bus_id bus_id{};
+    device_io::bus_id bus_id{};
     audio::bus_channel channel_selector{};
     std::size_t channel_index{};
 

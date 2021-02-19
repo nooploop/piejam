@@ -14,7 +14,7 @@ delete_bus::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    remove_mixer_bus(new_st, bus_id);
+    remove_device_bus(new_st, bus_id);
 
     return new_st;
 }

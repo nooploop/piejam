@@ -26,6 +26,7 @@
 #include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/components/mixer_bus.h>
 #include <piejam/runtime/components/mute_solo.h>
+#include <piejam/runtime/device_io.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/mixer.h>
@@ -97,6 +98,7 @@ make_mixer_bus_vector(
         unsigned const samplerate,
         mixer::buses_t const& buses,
         mixer::bus_list_t const& bus_ids,
+        device_io::buses_t const& device_buses,
         parameter_processor_factory& param_procs) -> mixer_bus_components
 {
     mixer_bus_components result;
@@ -115,9 +117,15 @@ make_mixer_bus_vector(
         }
         else
         {
+            device_io::bus const* device_bus = device_buses[buses[id]->device];
+            audio::bus_type const bus_type =
+                    device_bus ? device_bus->bus_type : audio::bus_type::mono;
             result.emplace_back(
                     id,
-                    components::make_mixer_bus_input(*buses[id], param_procs),
+                    components::make_mixer_bus_input(
+                            *buses[id],
+                            bus_type,
+                            param_procs),
                     components::make_mixer_bus_output(
                             samplerate,
                             id,
@@ -321,6 +329,7 @@ connect_mixer_bus_with_fx_chain(
 auto
 make_graph(
         mixer::state const& mixer_state,
+        device_io::buses_t const& device_buses,
         audio::engine::processor& input_proc,
         audio::engine::processor& output_proc,
         mixer_bus_components const& input_buses,
@@ -348,14 +357,16 @@ make_graph(
                 *mb_out,
                 mixer_procs);
 
-        if (bus.device.channels.left != npos)
+        device_io::bus const* const device_bus = device_buses[bus.device];
+
+        if (device_bus && device_bus->channels.left != npos)
             g.add_wire(
-                    {input_proc, bus.device.channels.left},
+                    {input_proc, device_bus->channels.left},
                     mb_in->inputs()[0]);
 
-        if (bus.device.channels.right != npos)
+        if (device_bus && device_bus->channels.right != npos)
             g.add_wire(
-                    {input_proc, bus.device.channels.right},
+                    {input_proc, device_bus->channels.right},
                     mb_in->inputs()[1]);
 
         g.add_event_wire({input_solo_index, 0}, mb_out->event_inputs()[0]);
@@ -378,16 +389,18 @@ make_graph(
                 *mb_out,
                 mixer_procs);
 
-        if (bus.device.channels.left != npos)
+        device_io::bus const* const device_bus = device_buses[bus.device];
+
+        if (device_bus && device_bus->channels.left != npos)
             connect(g,
                     mb_out->outputs()[0],
-                    {output_proc, bus.device.channels.left},
+                    {output_proc, device_bus->channels.left},
                     mixer_procs);
 
-        if (bus.device.channels.right != npos)
+        if (device_bus && device_bus->channels.right != npos)
             connect(g,
                     mb_out->outputs()[1],
-                    {output_proc, bus.device.channels.right},
+                    {output_proc, device_bus->channels.right},
                     mixer_procs);
 
         g.add_event_wire({output_solo_index, 0}, mb_out->event_inputs()[0]);
@@ -583,6 +596,7 @@ audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
 bool
 audio_engine::rebuild(
         mixer::state const& mixer_state,
+        device_io::buses_t const& device_buses,
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
         parameter_maps const& params,
@@ -596,12 +610,14 @@ audio_engine::rebuild(
             m_samplerate,
             mixer_state.buses,
             mixer_state.inputs,
+            device_buses,
             m_impl->param_procs);
     auto output_buses = make_mixer_bus_vector(
             m_impl->output_buses,
             m_samplerate,
             mixer_state.buses,
             mixer_state.outputs,
+            device_buses,
             m_impl->param_procs);
     auto fx_chains = make_fx_chains_map(
             m_impl->fx_chains,
@@ -639,6 +655,7 @@ audio_engine::rebuild(
 
     auto new_graph = make_graph(
             mixer_state,
+            device_buses,
             m_impl->process.input(),
             m_impl->process.output(),
             input_buses,

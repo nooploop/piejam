@@ -68,29 +68,28 @@ save_app_config(
         conf.samplerate = state.samplerate;
         conf.period_size = state.period_size;
 
-        auto const buses_to_bus_configs =
-                [](auto const& chs, auto const& ch_ids, auto& configs) {
-                    configs.reserve(ch_ids.size());
-                    std::ranges::transform(
-                            ch_ids,
-                            std::back_inserter(configs),
-                            [&chs](mixer::bus_id const& ch_id)
-                                    -> persistence::bus_config {
-                                mixer::bus const* const bus = chs[ch_id];
-                                return {bus->name,
-                                        bus->device.bus_type,
-                                        bus->device.channels};
-                            });
-                };
+        auto const buses_to_bus_configs = [](auto const& chs,
+                                             auto const& ch_ids,
+                                             auto& configs) {
+            configs.reserve(ch_ids.size());
+            std::ranges::transform(
+                    ch_ids,
+                    std::back_inserter(configs),
+                    [&chs](device_io::bus_id const& ch_id)
+                            -> persistence::bus_config {
+                        device_io::bus const* const bus = chs[ch_id];
+                        return {bus->name, bus->bus_type, bus->channels};
+                    });
+        };
 
         buses_to_bus_configs(
-                state.mixer_state.buses,
-                state.mixer_state.inputs.get(),
+                state.device_io_state.buses,
+                state.device_io_state.inputs.get(),
                 conf.input_bus_config);
 
         buses_to_bus_configs(
-                state.mixer_state.buses,
-                state.mixer_state.outputs.get(),
+                state.device_io_state.buses,
+                state.device_io_state.outputs.get(),
                 conf.output_bus_config);
 
         conf.enabled_midi_input_devices = enabled_midi_input_devices;
