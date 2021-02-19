@@ -11,9 +11,11 @@ namespace piejam::range
 
 template <std::ranges::sized_range R>
 constexpr auto
-indices(R rng) noexcept
+indices(R&& rng) noexcept
 {
-    return std::views::iota(typename R::size_type{}, std::ranges::size(rng));
+    return std::views::iota(
+            typename std::decay_t<R>::size_type{},
+            std::ranges::size(std::forward<R>(rng)));
 }
 
 } // namespace piejam::range
