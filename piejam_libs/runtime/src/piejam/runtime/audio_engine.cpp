@@ -6,6 +6,7 @@
 
 #include <piejam/algorithm/concat.h>
 #include <piejam/algorithm/for_each_adjacent.h>
+#include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/dag_executor.h>
@@ -42,6 +43,8 @@
 
 #include <fmt/format.h>
 
+#include <boost/range/algorithm_ext/erase.hpp>
+
 #include <algorithm>
 #include <fstream>
 #include <optional>
@@ -63,6 +66,7 @@ enum class engine_processors
 };
 
 using processor_map = dynamic_key_object_map<audio::engine::processor>;
+using component_map = dynamic_key_object_map<audio::engine::component>;
 
 using processor_ptr = std::unique_ptr<audio::engine::processor>;
 using component_ptr = std::unique_ptr<audio::engine::component>;
@@ -74,16 +78,6 @@ using value_input_processor_ptr =
 template <class T>
 using value_output_processor_ptr =
         std::unique_ptr<audio::engine::value_io_processor<T>>;
-
-struct fx_module_component_mapping
-{
-    fx::module_id fx_mod_id;
-    component_ptr component;
-};
-
-using fx_chain_components = std::vector<fx_module_component_mapping>;
-
-using fx_chains_map = std::unordered_map<mixer::bus_id, fx_chain_components>;
 
 struct mixer_bus_component_mapping
 {
@@ -141,58 +135,29 @@ make_mixer_bus_vector(
 
 auto
 make_fx_chains_map(
-        fx_chains_map& prev_fx_chains,
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
         mixer::buses_t const& buses,
         mixer::bus_list_t const& all_ids,
         parameter_processor_factory& param_procs,
+        component_map& comps,
+        component_map& prev_comps,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory)
-        -> fx_chains_map
 {
     auto get_fx_param_name =
             [&fx_params](fx::parameter_id id) -> std::string_view {
         return *fx_params.at(id).name;
     };
 
-    fx_chains_map fx_chains;
-
     for (mixer::bus_id const bus_id : all_ids)
     {
-        fx_chain_components& fx_chain_comps = fx_chains[bus_id];
-
-        if (auto it = prev_fx_chains.find(bus_id); it != prev_fx_chains.end())
+        for (fx::module_id const fx_mod_id : *buses[bus_id]->fx_chain)
         {
-            for (fx::module_id const fx_mod_id : *buses[bus_id]->fx_chain)
+            if (auto fx_comp = prev_comps.remove(fx_mod_id))
             {
-                if (auto it_fx_mod = std::ranges::find(
-                            it->second,
-                            fx_mod_id,
-                            &fx_module_component_mapping::fx_mod_id);
-                    it_fx_mod != it->second.end())
-                {
-                    fx_chain_comps.emplace_back(std::move(*it_fx_mod));
-                    it->second.erase(it_fx_mod);
-                }
-                else
-                {
-                    fx::module const* const fx_mod = fx_modules[fx_mod_id];
-                    BOOST_ASSERT(fx_mod);
-                    auto comp = components::make_fx(
-                            *fx_mod,
-                            get_fx_param_name,
-                            ladspa_fx_proc_factory,
-                            param_procs);
-                    if (comp)
-                    {
-                        fx_chain_comps.emplace_back(fx_mod_id, std::move(comp));
-                    }
-                }
+                comps.insert(fx_mod_id, std::move(fx_comp));
             }
-        }
-        else
-        {
-            for (fx::module_id const fx_mod_id : *buses[bus_id]->fx_chain)
+            else
             {
                 fx::module const* const fx_mod = fx_modules[fx_mod_id];
                 BOOST_ASSERT(fx_mod);
@@ -203,13 +168,11 @@ make_fx_chains_map(
                         param_procs);
                 if (comp)
                 {
-                    fx_chain_comps.emplace_back(fx_mod_id, std::move(comp));
+                    comps.insert(fx_mod_id, std::move(comp));
                 }
             }
         }
     }
-
-    return fx_chains;
 }
 
 auto
@@ -281,34 +244,36 @@ make_midi_assignment_processors(
 auto
 connect_fx_chain(
         audio::engine::graph& g,
-        fx_chain_components const& fx_chain,
+        std::vector<audio::engine::component*> const& fx_chain_comps,
         std::vector<processor_ptr>& mixer_procs)
 {
-    for (auto const& comp : fx_chain)
-        comp.component->connect(g);
+    for (auto comp : fx_chain_comps)
+        comp->connect(g);
 
     algorithm::for_each_adjacent(
-            fx_chain,
-            [&g, &mixer_procs](
-                    fx_module_component_mapping const& l_comp,
-                    fx_module_component_mapping const& r_comp) {
-                connect_stereo_components(
-                        g,
-                        *l_comp.component,
-                        *r_comp.component,
-                        mixer_procs);
+            fx_chain_comps,
+            [&](auto const l_comp, auto const r_comp) {
+                connect_stereo_components(g, *l_comp, *r_comp, mixer_procs);
             });
 }
 
 auto
 connect_mixer_bus_with_fx_chain(
         audio::engine::graph& g,
+        component_map const& comps,
         audio::engine::component& mb_in,
-        fx_chain_components const& fx_chain,
+        fx::chain_t const& fx_chain,
         audio::engine::component& mb_out,
         std::vector<processor_ptr>& mixer_procs)
 {
-    if (fx_chain.empty())
+    auto fx_chain_comps = algorithm::transform_to_vector(
+            fx_chain,
+            [&comps](fx::module_id fx_mod_id) {
+                return comps.find(fx_mod_id);
+            });
+    boost::remove_erase(fx_chain_comps, nullptr);
+
+    if (fx_chain_comps.empty())
     {
         connect_stereo_components(g, mb_in, mb_out, mixer_procs);
     }
@@ -317,12 +282,12 @@ connect_mixer_bus_with_fx_chain(
         connect_stereo_components(
                 g,
                 mb_in,
-                *fx_chain.front().component,
+                *fx_chain_comps.front(),
                 mixer_procs);
-        connect_fx_chain(g, fx_chain, mixer_procs);
+        connect_fx_chain(g, fx_chain_comps, mixer_procs);
         connect_stereo_components(
                 g,
-                *fx_chain.back().component,
+                *fx_chain_comps.back(),
                 mb_out,
                 mixer_procs);
     }
@@ -331,12 +296,12 @@ connect_mixer_bus_with_fx_chain(
 auto
 make_graph(
         mixer::state const& mixer_state,
+        component_map const& comps,
         device_io::buses_t const& device_buses,
         audio::engine::processor& input_proc,
         audio::engine::processor& output_proc,
         mixer_bus_components const& input_buses,
         mixer_bus_components const& output_buses,
-        fx_chains_map const& fx_chains,
         audio::engine::processor& input_solo_index,
         audio::engine::processor& output_solo_index,
         std::vector<processor_ptr>& mixer_procs)
@@ -354,8 +319,9 @@ make_graph(
 
         connect_mixer_bus_with_fx_chain(
                 g,
+                comps,
                 *mb_in,
-                fx_chains.at(id),
+                bus.fx_chain,
                 *mb_out,
                 mixer_procs);
 
@@ -386,8 +352,9 @@ make_graph(
 
         connect_mixer_bus_with_fx_chain(
                 g,
+                comps,
                 *mb_in,
-                fx_chains.at(id),
+                bus.fx_chain,
                 *mb_out,
                 mixer_procs);
 
@@ -497,13 +464,13 @@ struct audio_engine::impl
 
     mixer_bus_components input_buses;
     mixer_bus_components output_buses;
-    fx_chains_map fx_chains;
     value_input_processor_ptr<mixer::bus_id> input_solo_index_proc;
     value_input_processor_ptr<mixer::bus_id> output_solo_index_proc;
     std::vector<processor_ptr> mixer_procs;
     value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
 
     processor_map procs;
+    component_map comps;
 
     parameter_processor_factory param_procs;
 
@@ -607,6 +574,8 @@ audio_engine::rebuild(
         bool midi_learn,
         midi_assignments_map const& assignments)
 {
+    component_map comps;
+
     auto input_buses = make_mixer_bus_vector(
             m_impl->input_buses,
             m_samplerate,
@@ -621,8 +590,7 @@ audio_engine::rebuild(
             mixer_state.outputs,
             device_buses,
             m_impl->param_procs);
-    auto fx_chains = make_fx_chains_map(
-            m_impl->fx_chains,
+    make_fx_chains_map(
             fx_modules,
             fx_params,
             mixer_state.buses,
@@ -630,6 +598,8 @@ audio_engine::rebuild(
                     mixer_state.inputs.get(),
                     mixer_state.outputs.get()),
             m_impl->param_procs,
+            comps,
+            m_impl->comps,
             ladspa_fx_proc_factory);
 
     m_impl->param_procs.initialize(params);
@@ -657,12 +627,12 @@ audio_engine::rebuild(
 
     auto new_graph = make_graph(
             mixer_state,
+            comps,
             device_buses,
             m_impl->process.input(),
             m_impl->process.output(),
             input_buses,
             output_buses,
-            fx_chains,
             *input_solo_index_proc,
             *output_solo_index_proc,
             mixers);
@@ -684,12 +654,12 @@ audio_engine::rebuild(
     m_impl->graph = std::move(new_graph);
     m_impl->input_buses = std::move(input_buses);
     m_impl->output_buses = std::move(output_buses);
-    m_impl->fx_chains = std::move(fx_chains);
     m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
     m_impl->output_solo_index_proc = std::move(output_solo_index_proc);
     m_impl->mixer_procs = std::move(mixers);
     m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
     m_impl->procs = std::move(procs);
+    m_impl->comps = std::move(comps);
 
     m_impl->param_procs.clear_expired();
 
