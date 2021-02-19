@@ -16,7 +16,6 @@
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/output_processor.h>
 #include <piejam/audio/engine/process.h>
-#include <piejam/audio/engine/processor_map.h>
 #include <piejam/audio/engine/value_io_processor.h>
 #include <piejam/audio/engine/value_sink_processor.h>
 #include <piejam/functional/overload.h>
@@ -27,6 +26,7 @@
 #include <piejam/runtime/components/mixer_bus.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/device_io.h>
+#include <piejam/runtime/dynamic_key_object_map.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/mixer.h>
@@ -61,6 +61,8 @@ enum class engine_processors
     midi_learn,
     midi_assign
 };
+
+using processor_map = dynamic_key_object_map<audio::engine::processor>;
 
 using processor_ptr = std::unique_ptr<audio::engine::processor>;
 using component_ptr = std::unique_ptr<audio::engine::component>;
@@ -214,7 +216,7 @@ auto
 make_midi_processors(
         std::unique_ptr<midi::input_event_handler> midi_in,
         bool const midi_learning,
-        audio::engine::processor_map& procs)
+        processor_map& procs)
 {
     if (midi_in)
     {
@@ -242,8 +244,8 @@ auto
 make_midi_assignment_processors(
         midi_assignments_map const& assignments,
         parameter_maps const& params,
-        audio::engine::processor_map& procs,
-        audio::engine::processor_map& prev_procs)
+        processor_map& procs,
+        processor_map& prev_procs)
 {
     if (assignments.empty())
         return;
@@ -420,7 +422,7 @@ make_graph(
 void
 connect_midi(
         audio::engine::graph& g,
-        audio::engine::processor_map const& procs,
+        processor_map const& procs,
         audio::engine::processor* midi_learn_output_proc,
         parameter_processor_factory const& param_procs,
         midi_assignments_map const& assignments)
@@ -501,7 +503,7 @@ struct audio_engine::impl
     std::vector<processor_ptr> mixer_procs;
     value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
 
-    audio::engine::processor_map procs;
+    processor_map procs;
 
     parameter_processor_factory param_procs;
 
@@ -632,7 +634,7 @@ audio_engine::rebuild(
 
     m_impl->param_procs.initialize(params);
 
-    audio::engine::processor_map procs;
+    processor_map procs;
 
     auto input_solo_index_proc =
             std::make_unique<audio::engine::value_io_processor<mixer::bus_id>>(

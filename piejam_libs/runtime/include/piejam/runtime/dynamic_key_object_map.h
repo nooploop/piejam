@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <piejam/audio/engine/processor.h>
-
 #include <boost/assert.hpp>
 
 #include <algorithm>
@@ -13,31 +11,32 @@
 #include <memory>
 #include <vector>
 
-namespace piejam::audio::engine
+namespace piejam::runtime
 {
 
-class processor_map
+template <class T>
+class dynamic_key_object_map
 {
-    using mapping_pair = std::pair<std::any, std::unique_ptr<processor>>;
+    using mapping_pair = std::pair<std::any, std::unique_ptr<T>>;
     using map_t = std::vector<mapping_pair>;
 
 public:
     template <class Id>
-    auto find(Id const& id) const -> processor*
+    auto find(Id const& id) const -> T*
     {
         auto it = find_it(id);
         return it != m_map.end() ? it->second.get() : nullptr;
     }
 
     template <class Id>
-    auto insert(Id const& id, std::unique_ptr<processor> proc)
+    auto insert(Id const& id, std::unique_ptr<T> obj)
     {
         BOOST_ASSERT(m_map.end() == find_it(id));
-        m_map.emplace_back(id, std::move(proc));
+        m_map.emplace_back(id, std::move(obj));
     }
 
     template <class Id>
-    auto remove(Id const& id) -> std::unique_ptr<processor>
+    auto remove(Id const& id) -> std::unique_ptr<T>
     {
         if (auto it = find_it(id); it != m_map.end())
         {
@@ -79,4 +78,4 @@ private:
     map_t m_map;
 };
 
-} // namespace piejam::audio::engine
+} // namespace piejam::runtime
