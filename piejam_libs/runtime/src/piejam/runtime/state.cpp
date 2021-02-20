@@ -68,6 +68,14 @@ from_normalized_volume(float_parameter const& p, float const norm_value)
 
 } // namespace
 
+auto
+make_initial_state() -> state
+{
+    state st;
+    st.mixer_state.main = add_mixer_bus(st, "Main");
+    return st;
+}
+
 template <class Vector>
 static auto
 set_intersection(Vector const& in, Vector const& out)
@@ -378,16 +386,14 @@ template auto add_device_bus<io_direction::output>(
         audio::bus_type,
         channel_index_pair const&) -> device_io::bus_id;
 
-template <io_direction D>
 auto
-add_mixer_bus(state& st, std::string name, mixer::io_address_t const& route)
-        -> mixer::bus_id
+add_mixer_bus(state& st, std::string name) -> mixer::bus_id
 {
     auto& params = st.params;
-    mixer::bus_id const bus_id = st.mixer_state.buses.add(mixer::bus{
+    return st.mixer_state.buses.add(mixer::bus{
             .name = std::move(name),
-            .in = D == io_direction::input ? route : mixer::io_address_t(),
-            .out = D == io_direction::input ? mixer::io_address_t() : route,
+            .in = {},
+            .out = {},
             .volume = params.add(parameter::float_{
                     .default_value = 1.f,
                     .min = 0.f,
@@ -403,6 +409,19 @@ add_mixer_bus(state& st, std::string name, mixer::io_address_t const& route)
             .mute = params.add(parameter::bool_{.default_value = false}),
             .level = params.add(parameter::stereo_level{}),
             .fx_chain = {}});
+}
+
+template <io_direction D>
+auto
+add_mixer_bus(state& st, std::string name, mixer::io_address_t const& route)
+        -> mixer::bus_id
+{
+    mixer::bus_id const bus_id = add_mixer_bus(st, std::move(name));
+
+    st.mixer_state.buses.update(bus_id, [&route](mixer::bus& bus) {
+        bus.in = D == io_direction::input ? route : mixer::io_address_t();
+        bus.out = D == io_direction::input ? mixer::io_address_t() : route;
+    });
 
     mixer::bus_ids<D>(st.mixer_state)
             .update([bus_id](mixer::bus_list_t& bus_ids) {

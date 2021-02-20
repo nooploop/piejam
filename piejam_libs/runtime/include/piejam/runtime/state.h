@@ -76,6 +76,8 @@ struct state
     float cpu_load{};
 };
 
+auto make_initial_state() -> state;
+
 auto samplerates(
         box<audio::pcm_hw_params> input_hw_params,
         box<audio::pcm_hw_params> output_hw_params) -> audio::samplerates_t;
@@ -92,6 +94,8 @@ auto add_device_bus(
         std::string name,
         audio::bus_type,
         channel_index_pair const&) -> device_io::bus_id;
+
+auto add_mixer_bus(state&, std::string name) -> mixer::bus_id;
 
 template <io_direction D>
 auto add_mixer_bus(state&, std::string name, mixer::io_address_t const& route)

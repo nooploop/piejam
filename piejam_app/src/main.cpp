@@ -109,7 +109,7 @@ main(int argc, char* argv[]) -> int
 
     runtime::store store(
             [](auto const& st, auto const& a) { return a.reduce(st); },
-            {});
+            runtime::make_initial_state());
 
     store.apply_middleware([](auto&& get_state, auto&& dispatch, auto&& next) {
         return redux::make_middleware<piejam::runtime::persistence_middleware>(

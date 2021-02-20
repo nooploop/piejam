@@ -45,6 +45,7 @@ struct state
 
     box<bus_list_t> inputs;
     box<bus_list_t> outputs;
+    bus_id main;
 
     bus_id input_solo_id;
     bus_id output_solo_id;
