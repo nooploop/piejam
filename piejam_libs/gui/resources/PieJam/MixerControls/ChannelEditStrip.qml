@@ -12,6 +12,8 @@ import ".."
 Item {
     id: root
 
+    property bool deletable: true
+
     signal deleteClicked()
 
     implicitWidth: 150
@@ -24,6 +26,9 @@ Item {
 
         Button {
             id: deleteButton
+
+            visible: root.deletable
+            enabled: root.deletable
 
             anchors.left: parent.left
             anchors.right: parent.right
@@ -112,7 +117,5 @@ Item {
                 text: qsTr(">")
             }
         }
-
-
     }
 }
