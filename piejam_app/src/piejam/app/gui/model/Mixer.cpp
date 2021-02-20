@@ -20,8 +20,9 @@ namespace piejam::app::gui::model
 struct Mixer::Impl
 {
     boxed_vector<runtime::selectors::mixer_bus_info> inputs;
-    boxed_vector<runtime::selectors::mixer_bus_info> outputs;
+    box<runtime::selectors::mixer_bus_info> mainBusInfo;
     runtime::mixer::bus_list_t all;
+    std::unique_ptr<piejam::app::gui::model::MixerChannel> mainChannel;
 };
 
 static auto
@@ -45,10 +46,16 @@ Mixer::Mixer(
 
 Mixer::~Mixer() = default;
 
+auto
+Mixer::mainChannel() const -> piejam::gui::model::MixerChannel*
+{
+    return m_impl->mainChannel.get();
+}
+
 void
 Mixer::onSubscribe()
 {
-    observe(runtime::selectors::make_bus_infos_selector(io_direction::input),
+    observe(runtime::selectors::select_mixer_bus_infos,
             [this](boxed_vector<runtime::selectors::mixer_bus_info> const&
                            bus_infos) {
                 algorithm::apply_edit_script(
@@ -70,36 +77,34 @@ Mixer::onSubscribe()
                                 }});
 
                 m_impl->inputs = bus_infos;
+
                 m_impl->all.clear();
                 append_bus_ids(*m_impl->inputs, m_impl->all);
-                append_bus_ids(*m_impl->outputs, m_impl->all);
+                m_impl->all.emplace_back(m_impl->mainBusInfo->bus_id);
             });
 
-    observe(runtime::selectors::make_bus_infos_selector(io_direction::output),
-            [this](boxed_vector<runtime::selectors::mixer_bus_info> const&
-                           bus_infos) {
-                algorithm::apply_edit_script(
-                        algorithm::edit_script(*m_impl->outputs, *bus_infos),
-                        piejam::gui::generic_list_model_edit_script_executor{
-                                *outputChannels(),
-                                [this](auto const& bus_info) {
-                                    return std::make_unique<MixerChannel>(
-                                            dispatch(),
-                                            state_change_subscriber(),
-                                            bus_info.bus_id,
-                                            std::get<
-                                                    runtime::device_io::bus_id>(
-                                                    bus_info.out),
-                                            bus_info.volume,
-                                            bus_info.pan_balance,
-                                            bus_info.mute,
-                                            bus_info.level);
-                                }});
+    observe(runtime::selectors::select_mixer_main_bus_info,
+            [this](box<runtime::selectors::mixer_bus_info> const& mainBusInfo) {
+                if (mainBusInfo != m_impl->mainBusInfo)
+                {
+                    m_impl->mainChannel = std::make_unique<MixerChannel>(
+                            dispatch(),
+                            state_change_subscriber(),
+                            mainBusInfo->bus_id,
+                            runtime::device_io::bus_id{},
+                            mainBusInfo->volume,
+                            mainBusInfo->pan_balance,
+                            mainBusInfo->mute,
+                            mainBusInfo->level);
 
-                m_impl->outputs = bus_infos;
-                m_impl->all.clear();
-                append_bus_ids(*m_impl->inputs, m_impl->all);
-                append_bus_ids(*m_impl->outputs, m_impl->all);
+                    emit mainChannelChanged();
+
+                    m_impl->mainBusInfo = mainBusInfo;
+
+                    m_impl->all.clear();
+                    append_bus_ids(*m_impl->inputs, m_impl->all);
+                    m_impl->all.emplace_back(m_impl->mainBusInfo->bus_id);
+                }
             });
 
     observe(runtime::selectors::select_input_solo_active,

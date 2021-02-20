@@ -19,7 +19,8 @@ class Mixer : public SubscribableModel
     Q_OBJECT
 
     Q_PROPERTY(QAbstractListModel* inputChannels READ inputChannels CONSTANT)
-    Q_PROPERTY(QAbstractListModel* outputChannels READ outputChannels CONSTANT)
+    Q_PROPERTY(piejam::gui::model::MixerChannel* mainChannel READ mainChannel
+                       NOTIFY mainChannelChanged FINAL)
     Q_PROPERTY(bool inputSoloActive READ inputSoloActive NOTIFY
                        inputSoloActiveChanged FINAL)
     Q_PROPERTY(bool outputSoloActive READ outputSoloActive NOTIFY
@@ -27,7 +28,6 @@ class Mixer : public SubscribableModel
 
 public:
     auto inputChannels() -> MixerChannelsList* { return &m_inputChannels; }
-    auto outputChannels() -> MixerChannelsList* { return &m_outputChannels; }
 
     auto inputSoloActive() const -> bool { return m_inputSoloActive; }
     void setInputSoloActive(bool x)
@@ -38,6 +38,8 @@ public:
             emit inputSoloActiveChanged();
         }
     }
+
+    virtual auto mainChannel() const -> MixerChannel* = 0;
 
     auto outputSoloActive() const -> bool { return m_outputSoloActive; }
     void setOutputSoloActive(bool x)
@@ -58,6 +60,7 @@ public:
 
 signals:
 
+    void mainChannelChanged();
     void inputSoloActiveChanged();
     void outputSoloActiveChanged();
 

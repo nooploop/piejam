@@ -16,6 +16,8 @@ public:
     Mixer(runtime::store_dispatch, runtime::subscriber&);
     ~Mixer();
 
+    auto mainChannel() const -> piejam::gui::model::MixerChannel* override;
+
     void addChannel() override;
 
     void setInputSolo(unsigned index) override;

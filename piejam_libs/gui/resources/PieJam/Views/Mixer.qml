@@ -16,41 +16,71 @@ TopPane {
 
     signal fxButtonClicked()
 
-    SplitView {
+    ChannelsListView {
+        id: inputs
+
         anchors.left: parent.left
+        anchors.right: mainChannelStrip.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.margins: 8
+
+        model: root.model.inputChannels
+
+        soloActive: root.model.inputSoloActive
+
+        onSoloToggled: root.model.setInputSolo(index)
+        onFxButtonClicked: root.fxButtonClicked()
+        onAddChannelClicked: root.model.addChannel()
+    }
+
+    Loader {
+        id: mainChannelStrip
+
         anchors.right: mixerToolbar.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.margins: 8
 
-        ChannelsListView {
-            id: inputs
+        active: root.model.mainChannel !== null
 
-            SplitView.fillWidth: true
-            SplitView.minimumWidth: 150
+        sourceComponent: ChannelStrip {
 
-            model: root.model.inputChannels
+            perform.mono: root.model.mainChannel.mono
+            perform.levelLeft: root.model.mainChannel.levelLeft
+            perform.levelRight: root.model.mainChannel.levelRight
+            perform.meterMuted: root.model.mainChannel.mute
+            perform.pan: root.model.mainChannel.panBalance
+            perform.volume: root.model.mainChannel.volume
+            perform.mute: root.model.mainChannel.mute
+            perform.solo: root.model.mainChannel.solo
+            perform.name: root.model.mainChannel.name
 
-            soloActive: root.model.inputSoloActive
+            perform.volumeMidi.model: root.model.mainChannel.volumeMidi
+            perform.panMidi.model: root.model.mainChannel.panMidi
+            perform.muteMidi.model: root.model.mainChannel.muteMidi
 
-            onSoloToggled: root.model.setInputSolo(index)
-            onFxButtonClicked: root.fxButtonClicked()
-            onAddChannelClicked: root.model.addChannel()
+            perform.onFaderMoved: root.model.mainChannel.changeVolume(newVolume)
+            perform.onPanMoved: root.model.mainChannel.changePanBalance(newPan)
+            perform.onMuteToggled: root.model.mainChannel.changeMute(!model.item.mute)
+    //        perform.onSoloToggled: root.soloToggled(index)
+    //        perform.onFxButtonClicked: {
+    //            model.item.focusFxChain()
+    //            root.fxButtonClicked()
+    //        }
+
+            edit.deletable: false
+            perform.onFxButtonClicked: root.fxButtonClicked()
+
+            Binding {
+                target: root.model.mainChannel
+                property: "subscribed"
+                value: visible
+            }
         }
 
-        ChannelsListView {
-            id: outputs
-
-            SplitView.minimumWidth: 150
-
-            model: root.model.outputChannels
-
-            soloActive: root.model.outputSoloActive
-
-            onSoloToggled: root.model.setOutputSolo(index)
-            onFxButtonClicked: root.fxButtonClicked()
-        }
     }
+
 
     Rectangle {
         id: mixerToolbar

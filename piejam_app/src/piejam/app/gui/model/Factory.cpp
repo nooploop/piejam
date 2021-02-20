@@ -47,6 +47,7 @@ Factory::Factory(
     qRegisterMetaType<piejam::gui::model::AudioDeviceSettings*>();
     qRegisterMetaType<piejam::gui::model::AudioInputOutputSettings*>();
     qRegisterMetaType<piejam::gui::model::Mixer*>();
+    qRegisterMetaType<piejam::gui::model::MixerChannel*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::FxChain*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();

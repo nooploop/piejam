@@ -67,8 +67,8 @@ struct mixer_bus_info
     operator==(mixer_bus_info const& other) const noexcept = default;
 };
 
-auto make_bus_infos_selector(io_direction)
-        -> selector<boxed_vector<mixer_bus_info>>;
+extern const selector<boxed_vector<mixer_bus_info>> select_mixer_bus_infos;
+extern const selector<box<mixer_bus_info>> select_mixer_main_bus_info;
 
 auto make_device_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
 

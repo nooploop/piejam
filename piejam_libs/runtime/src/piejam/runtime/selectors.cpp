@@ -89,43 +89,40 @@ make_device_bus_list_selector(io_direction const bd)
 }
 
 static auto
+make_bus_info(mixer::buses_t const& buses, mixer::bus_id const bus_id)
+        -> mixer_bus_info
+{
+    mixer::bus const* const bus = buses[bus_id];
+    BOOST_ASSERT(bus);
+    return mixer_bus_info{
+            .bus_id = bus_id,
+            .in = bus->in,
+            .out = bus->out,
+            .volume = bus->volume,
+            .pan_balance = bus->pan_balance,
+            .mute = bus->mute,
+            .level = bus->level};
+}
+
+static auto
 make_bus_infos(
         mixer::buses_t const& buses,
         box<mixer::bus_list_t> const& bus_ids) -> boxed_vector<mixer_bus_info>
 {
     return algorithm::transform_to_vector(*bus_ids, [&buses](auto&& bus_id) {
-        mixer::bus const* const bus = buses[bus_id];
-        BOOST_ASSERT(bus);
-        return mixer_bus_info{
-                .bus_id = bus_id,
-                .in = bus->in,
-                .out = bus->out,
-                .volume = bus->volume,
-                .pan_balance = bus->pan_balance,
-                .mute = bus->mute,
-                .level = bus->level};
+        return make_bus_info(buses, bus_id);
     });
 }
 
-auto
-make_bus_infos_selector(io_direction const io_dir)
-        -> selector<boxed_vector<mixer_bus_info>>
-{
-    switch (io_dir)
-    {
-        case io_direction::input:
-            return [get_infos =
-                            memo(&make_bus_infos)](state const& st) mutable {
-                return get_infos(st.mixer_state.buses, st.mixer_state.inputs);
-            };
+const selector<boxed_vector<mixer_bus_info>> select_mixer_bus_infos(
+        [get_infos = memo(&make_bus_infos)](state const& st) mutable {
+            return get_infos(st.mixer_state.buses, st.mixer_state.inputs);
+        });
 
-        case io_direction::output:
-            return [get_infos =
-                            memo(&make_bus_infos)](state const& st) mutable {
-                return get_infos(st.mixer_state.buses, st.mixer_state.outputs);
-            };
-    }
-}
+const selector<box<mixer_bus_info>> select_mixer_main_bus_info(
+        [get = memo(boxify_result(&make_bus_info))](state const& st) mutable {
+            return get(st.mixer_state.buses, st.mixer_state.main);
+        });
 
 auto
 make_device_bus_name_selector(device_io::bus_id const bus_id)
