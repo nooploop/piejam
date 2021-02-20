@@ -60,7 +60,6 @@ Mixer::onSubscribe()
                                             dispatch(),
                                             state_change_subscriber(),
                                             bus_info.bus_id,
-                                            io_direction::input,
                                             std::get<
                                                     runtime::device_io::bus_id>(
                                                     bus_info.in),
@@ -88,7 +87,6 @@ Mixer::onSubscribe()
                                             dispatch(),
                                             state_change_subscriber(),
                                             bus_info.bus_id,
-                                            io_direction::output,
                                             std::get<
                                                     runtime::device_io::bus_id>(
                                                     bus_info.out),

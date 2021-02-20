@@ -22,7 +22,6 @@ MixerChannel::MixerChannel(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::bus_id const id,
-        io_direction const io_dir,
         runtime::device_io::bus_id const device_bus_id,
         runtime::float_parameter_id const volume,
         runtime::float_parameter_id const pan_balance,
@@ -30,7 +29,6 @@ MixerChannel::MixerChannel(
         runtime::stereo_level_parameter_id const level)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_bus_id(id)
-    , m_io_dir(io_dir)
     , m_device_bus_id(device_bus_id)
     , m_volume(volume)
     , m_pan_balance(pan_balance)
@@ -76,8 +74,8 @@ MixerChannel::onSubscribe()
     observe(runtime::selectors::make_bool_parameter_value_selector(m_mute),
             [this](bool x) { setMute(x); });
 
-    observe(runtime::selectors::make_solo_selector(m_io_dir, m_bus_id),
-            [this](bool x) { setSolo(x); });
+    //    observe(runtime::selectors::make_solo_selector(m_io_dir, m_bus_id),
+    //            [this](bool x) { setSolo(x); });
 
     observe(runtime::selectors::make_level_parameter_value_selector(m_level),
             [this](runtime::stereo_level const& x) {

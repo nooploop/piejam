@@ -26,7 +26,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::bus_id,
-            io_direction,
             runtime::device_io::bus_id,
             runtime::float_parameter_id volume,
             runtime::float_parameter_id pan_balance,
@@ -48,7 +47,6 @@ private:
     void onSubscribe() override;
 
     runtime::mixer::bus_id m_bus_id;
-    io_direction m_io_dir;
     runtime::device_io::bus_id m_device_bus_id;
     runtime::float_parameter_id m_volume;
     runtime::float_parameter_id m_pan_balance;
