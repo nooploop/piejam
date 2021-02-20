@@ -98,7 +98,8 @@ make_bus_infos(
         BOOST_ASSERT(bus);
         return mixer_bus_info{
                 .bus_id = bus_id,
-                .device = bus->device,
+                .in = bus->in,
+                .out = bus->out,
                 .volume = bus->volume,
                 .pan_balance = bus->pan_balance,
                 .mute = bus->mute,

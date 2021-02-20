@@ -88,6 +88,29 @@ struct mixer_bus_component_mapping
 
 using mixer_bus_components = std::vector<mixer_bus_component_mapping>;
 
+struct mixer_input_bus_type
+{
+    device_io::buses_t const& device_buses;
+
+    auto operator()(device_io::bus_id const id) const noexcept
+            -> audio::bus_type
+    {
+        auto const device_bus = device_buses[id];
+        BOOST_ASSERT(device_bus);
+        return device_bus->bus_type;
+    }
+
+    auto operator()(std::nullptr_t) const noexcept -> audio::bus_type
+    {
+        return audio::bus_type::stereo;
+    }
+
+    auto operator()(mixer::bus_id) const noexcept -> audio::bus_type
+    {
+        return audio::bus_type::stereo;
+    }
+};
+
 auto
 make_mixer_bus_vector(
         mixer_bus_components& prev_buses,
@@ -113,9 +136,10 @@ make_mixer_bus_vector(
         }
         else
         {
-            device_io::bus const* device_bus = device_buses[buses[id]->device];
-            audio::bus_type const bus_type =
-                    device_bus ? device_bus->bus_type : audio::bus_type::mono;
+            audio::bus_type const bus_type = std::visit(
+                    mixer_input_bus_type{device_buses},
+                    buses[id]->in);
+
             result.emplace_back(
                     id,
                     components::make_mixer_bus_input(
@@ -325,7 +349,8 @@ make_graph(
                 *mb_out,
                 mixer_procs);
 
-        device_io::bus const* const device_bus = device_buses[bus.device];
+        device_io::bus const* const device_bus =
+                device_buses[std::get<device_io::bus_id>(bus.in)];
 
         if (device_bus && device_bus->channels.left != npos)
             g.add_wire(
@@ -358,7 +383,8 @@ make_graph(
                 *mb_out,
                 mixer_procs);
 
-        device_io::bus const* const device_bus = device_buses[bus.device];
+        device_io::bus const* const device_bus =
+                device_buses[std::get<device_io::bus_id>(bus.out)];
 
         if (device_bus && device_bus->channels.left != npos)
             connect(g,

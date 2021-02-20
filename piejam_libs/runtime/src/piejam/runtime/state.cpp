@@ -386,7 +386,10 @@ add_mixer_bus(state& st, std::string name, device_io::bus_id device)
     auto& params = st.params;
     mixer::bus_id const bus_id = st.mixer_state.buses.add(mixer::bus{
             .name = std::move(name),
-            .device = device,
+            .in = D == io_direction::input ? mixer::io_address_t(device)
+                                           : mixer::io_address_t(nullptr),
+            .out = D == io_direction::input ? mixer::io_address_t(nullptr)
+                                            : mixer::io_address_t(device),
             .volume = params.add(parameter::float_{
                     .default_value = 1.f,
                     .min = 0.f,

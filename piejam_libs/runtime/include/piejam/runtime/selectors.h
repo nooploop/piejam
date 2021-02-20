@@ -56,7 +56,8 @@ auto make_device_bus_list_selector(io_direction)
 struct mixer_bus_info
 {
     mixer::bus_id bus_id;
-    device_io::bus_id device;
+    mixer::io_address_t in;
+    mixer::io_address_t out;
     float_parameter_id volume;
     float_parameter_id pan_balance;
     bool_parameter_id mute;

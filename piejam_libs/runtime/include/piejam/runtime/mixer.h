@@ -26,7 +26,8 @@ struct bus
 {
     boxed_string name;
 
-    device_io::bus_id device;
+    io_address_t in;
+    io_address_t out;
 
     float_parameter_id volume;
     float_parameter_id pan_balance;
