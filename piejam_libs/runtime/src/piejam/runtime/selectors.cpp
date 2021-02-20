@@ -108,10 +108,10 @@ make_bus_infos(
 }
 
 auto
-make_bus_infos_selector(io_direction const bd)
+make_bus_infos_selector(io_direction const io_dir)
         -> selector<boxed_vector<mixer_bus_info>>
 {
-    switch (bd)
+    switch (io_dir)
     {
         case io_direction::input:
             return [get_infos =
@@ -128,10 +128,21 @@ make_bus_infos_selector(io_direction const bd)
 }
 
 auto
-make_bus_name_selector(device_io::bus_id bus_id) -> selector<boxed_string>
+make_device_bus_name_selector(device_io::bus_id const bus_id)
+        -> selector<boxed_string>
 {
     return [bus_id](state const& st) mutable -> boxed_string {
         device_io::bus const* const bus = st.device_io_state.buses[bus_id];
+        return bus ? bus->name : boxed_string();
+    };
+}
+
+auto
+make_mixer_bus_name_selector(mixer::bus_id const bus_id)
+        -> selector<boxed_string>
+{
+    return [bus_id](state const& st) mutable -> boxed_string {
+        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
         return bus ? bus->name : boxed_string();
     };
 }

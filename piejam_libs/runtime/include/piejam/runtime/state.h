@@ -94,7 +94,7 @@ auto add_device_bus(
         channel_index_pair const&) -> device_io::bus_id;
 
 template <io_direction D>
-auto add_mixer_bus(state&, std::string name, device_io::bus_id device)
+auto add_mixer_bus(state&, std::string name, mixer::io_address_t const& route)
         -> mixer::bus_id;
 
 void remove_mixer_bus(state&, mixer::bus_id);

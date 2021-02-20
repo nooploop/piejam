@@ -6,6 +6,7 @@
 
 #include <piejam/app/gui/model/MidiAssignable.h>
 #include <piejam/runtime/actions/fwd.h>
+#include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/parameter/float_.h>
@@ -55,7 +56,7 @@ MixerChannel::~MixerChannel() = default;
 void
 MixerChannel::onSubscribe()
 {
-    observe(runtime::selectors::make_bus_name_selector(m_device_bus_id),
+    observe(runtime::selectors::make_mixer_bus_name_selector(m_bus_id),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
@@ -110,6 +111,14 @@ void
 MixerChannel::focusFxChain()
 {
     runtime::actions::select_fx_chain_bus action;
+    action.bus_id = m_bus_id;
+    dispatch(action);
+}
+
+void
+MixerChannel::deleteChannel()
+{
+    runtime::actions::delete_mixer_bus action;
     action.bus_id = m_bus_id;
     dispatch(action);
 }

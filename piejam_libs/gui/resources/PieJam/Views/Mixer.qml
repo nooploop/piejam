@@ -17,7 +17,10 @@ TopPane {
     signal fxButtonClicked()
 
     SplitView {
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: mixerToolbar.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         anchors.margins: 8
 
         ChannelsListView {
@@ -32,6 +35,7 @@ TopPane {
 
             onSoloToggled: root.model.setInputSolo(index)
             onFxButtonClicked: root.fxButtonClicked()
+            onAddChannelClicked: root.model.addChannel()
         }
 
         ChannelsListView {
@@ -45,6 +49,55 @@ TopPane {
 
             onSoloToggled: root.model.setOutputSolo(index)
             onFxButtonClicked: root.fxButtonClicked()
+        }
+    }
+
+    Rectangle {
+        id: mixerToolbar
+
+        width: 48
+
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+
+        color: Material.color(Material.Grey, Material.Shade800)
+
+        ButtonGroup {
+            buttons: toolbarButtons.children
+        }
+
+        Column {
+            id: toolbarButtons
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Button {
+                id: editButton
+
+                width: 32
+                height: 44
+
+                text: "E"
+                checkable: true
+                checked: MixerViewSettings.mode === MixerViewSettings.edit
+                autoExclusive: true
+
+                onClicked: MixerViewSettings.mode = MixerViewSettings.edit
+            }
+
+            Button {
+                id: performButton
+
+                width: 32
+                height: 44
+
+                text: "P"
+                checkable: true
+                checked: MixerViewSettings.mode === MixerViewSettings.perform
+                autoExclusive: true
+
+                onClicked: MixerViewSettings.mode = MixerViewSettings.perform
+            }
         }
     }
 

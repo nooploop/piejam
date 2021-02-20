@@ -22,7 +22,7 @@
         <file>PieJam/Views/MainWindow.qml</file>
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/Util/MathExt.js</file>
-        <file>PieJam/MixerControls/ChannelStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelPerformStrip.qml</file>
         <file>PieJam/Controls/BipolarSlider.qml</file>
         <file>PieJam/SettingsControls/BusConfig.qml</file>
         <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
@@ -48,5 +48,10 @@
         <file>PieJam/MidiAssignable.qml</file>
         <file>PieJam/Controls/CpuLoadMeter.qml</file>
         <file>PieJam/MixerControls/ChannelsListView.qml</file>
+        <file>PieJam/MixerControls/ChannelEditStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelAddStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelStrip.qml</file>
+        <file>PieJam/MixerControls/MixerViewSettings.qml</file>
+        <file>PieJam/MixerControls/qmldir</file>
     </qresource>
 </RCC>

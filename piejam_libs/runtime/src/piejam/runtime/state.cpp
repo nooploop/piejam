@@ -380,16 +380,14 @@ template auto add_device_bus<io_direction::output>(
 
 template <io_direction D>
 auto
-add_mixer_bus(state& st, std::string name, device_io::bus_id device)
+add_mixer_bus(state& st, std::string name, mixer::io_address_t const& route)
         -> mixer::bus_id
 {
     auto& params = st.params;
     mixer::bus_id const bus_id = st.mixer_state.buses.add(mixer::bus{
             .name = std::move(name),
-            .in = D == io_direction::input ? mixer::io_address_t(device)
-                                           : mixer::io_address_t(nullptr),
-            .out = D == io_direction::input ? mixer::io_address_t(nullptr)
-                                            : mixer::io_address_t(device),
+            .in = D == io_direction::input ? route : mixer::io_address_t(),
+            .out = D == io_direction::input ? mixer::io_address_t() : route,
             .volume = params.add(parameter::float_{
                     .default_value = 1.f,
                     .min = 0.f,
@@ -414,12 +412,14 @@ add_mixer_bus(state& st, std::string name, device_io::bus_id device)
     return bus_id;
 }
 
-template auto
-add_mixer_bus<io_direction::input>(state&, std::string, device_io::bus_id)
-        -> mixer::bus_id;
-template auto
-add_mixer_bus<io_direction::output>(state&, std::string, device_io::bus_id)
-        -> mixer::bus_id;
+template auto add_mixer_bus<io_direction::input>(
+        state&,
+        std::string,
+        mixer::io_address_t const&) -> mixer::bus_id;
+template auto add_mixer_bus<io_direction::output>(
+        state&,
+        std::string,
+        mixer::io_address_t const&) -> mixer::bus_id;
 
 void
 remove_mixer_bus(state& st, mixer::bus_id const bus_id)

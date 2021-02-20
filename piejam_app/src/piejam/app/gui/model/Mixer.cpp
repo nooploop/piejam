@@ -8,6 +8,7 @@
 #include <piejam/app/gui/model/MixerChannel.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
+#include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/selectors.h>
@@ -108,6 +109,13 @@ Mixer::onSubscribe()
 
     observe(runtime::selectors::select_output_solo_active,
             [this](bool const active) { setOutputSoloActive(active); });
+}
+
+void
+Mixer::addChannel()
+{
+    runtime::actions::add_mixer_bus action;
+    dispatch(action);
 }
 
 void

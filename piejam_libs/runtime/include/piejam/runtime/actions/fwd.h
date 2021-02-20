@@ -35,6 +35,9 @@ struct select_bus_channel;
 struct add_bus;
 struct delete_bus;
 
+struct add_mixer_bus;
+struct delete_mixer_bus;
+
 template <io_direction>
 struct set_bus_solo;
 using set_input_bus_solo = set_bus_solo<io_direction::input>;

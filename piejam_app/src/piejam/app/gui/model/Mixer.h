@@ -16,6 +16,8 @@ public:
     Mixer(runtime::store_dispatch, runtime::subscriber&);
     ~Mixer();
 
+    void addChannel() override;
+
     void setInputSolo(unsigned index) override;
     void setOutputSolo(unsigned index) override;
 

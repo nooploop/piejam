@@ -13,6 +13,7 @@ ListView {
 
     signal soloToggled(int index)
     signal fxButtonClicked()
+    signal addChannelClicked()
 
     spacing: 2
     clip: true
@@ -25,33 +26,52 @@ ListView {
         anchors.top: if (parent) parent.top
         anchors.bottom: if (parent) parent.bottom
 
-        mono: model.item.mono
-        levelLeft: model.item.levelLeft
-        levelRight: model.item.levelRight
-        meterMuted: (model.item.mute && !model.item.solo) || (root.soloActive && !model.item.solo)
-        pan: model.item.panBalance
-        volume: model.item.volume
-        mute: model.item.mute
-        solo: model.item.solo
-        name: model.item.name
+        perform.mono: model.item.mono
+        perform.levelLeft: model.item.levelLeft
+        perform.levelRight: model.item.levelRight
+        perform.meterMuted: (model.item.mute && !model.item.solo) || (root.soloActive && !model.item.solo)
+        perform.pan: model.item.panBalance
+        perform.volume: model.item.volume
+        perform.mute: model.item.mute
+        perform.solo: model.item.solo
+        perform.name: model.item.name
 
-        volumeMidi.model: model.item.volumeMidi
-        panMidi.model: model.item.panMidi
-        muteMidi.model: model.item.muteMidi
+        perform.volumeMidi.model: model.item.volumeMidi
+        perform.panMidi.model: model.item.panMidi
+        perform.muteMidi.model: model.item.muteMidi
 
-        onFaderMoved: model.item.changeVolume(newVolume)
-        onPanMoved: model.item.changePanBalance(newPan)
-        onMuteToggled: model.item.changeMute(!model.item.mute)
-        onSoloToggled: root.soloToggled(index)
-        onFxButtonClicked: {
+        perform.onFaderMoved: model.item.changeVolume(newVolume)
+        perform.onPanMoved: model.item.changePanBalance(newPan)
+        perform.onMuteToggled: model.item.changeMute(!model.item.mute)
+        perform.onSoloToggled: root.soloToggled(index)
+        perform.onFxButtonClicked: {
             model.item.focusFxChain()
             root.fxButtonClicked()
         }
+
+        edit.onDeleteClicked: model.item.deleteChannel()
 
         Binding {
             target: model.item
             property: "subscribed"
             value: visible
+        }
+    }
+
+    footer: Item {
+        width: 152
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+
+        visible: MixerViewSettings.mode == MixerViewSettings.edit
+
+        ChannelAddStrip {
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+
+            onAddClicked: root.addChannelClicked()
         }
     }
 }

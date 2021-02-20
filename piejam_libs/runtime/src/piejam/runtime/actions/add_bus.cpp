@@ -22,7 +22,7 @@ add_bus::reduce(state const& st) const -> state
         {
             auto name =
                     fmt::format("In {}", new_st.mixer_state.inputs->size() + 1);
-            add_mixer_bus<io_direction::input>(
+            runtime::add_mixer_bus<io_direction::input>(
                     new_st,
                     name,
                     add_device_bus<io_direction::input>(
@@ -38,7 +38,7 @@ add_bus::reduce(state const& st) const -> state
             auto const bus_ids_size = new_st.mixer_state.outputs->size();
             auto name = bus_ids_size == 0 ? std::string("Main")
                                           : fmt::format("Aux {}", bus_ids_size);
-            add_mixer_bus<io_direction::output>(
+            runtime::add_mixer_bus<io_direction::output>(
                     new_st,
                     name,
                     add_device_bus<io_direction::output>(

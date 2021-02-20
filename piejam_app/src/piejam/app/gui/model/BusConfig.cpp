@@ -24,7 +24,7 @@ BusConfig::BusConfig(
 void
 BusConfig::onSubscribe()
 {
-    observe(runtime::selectors::make_bus_name_selector(m_bus_id),
+    observe(runtime::selectors::make_device_bus_name_selector(m_bus_id),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });

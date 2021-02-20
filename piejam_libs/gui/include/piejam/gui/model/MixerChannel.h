@@ -67,6 +67,8 @@ public:
 
     Q_INVOKABLE virtual void focusFxChain() = 0;
 
+    Q_INVOKABLE virtual void deleteChannel() = 0;
+
     virtual auto volumeMidi() const -> MidiAssignable* = 0;
     virtual auto panMidi() const -> MidiAssignable* = 0;
     virtual auto muteMidi() const -> MidiAssignable* = 0;

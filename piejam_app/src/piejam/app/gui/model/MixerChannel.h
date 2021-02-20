@@ -38,6 +38,7 @@ public:
     void changePanBalance(double) override;
     void changeMute(bool) override;
     void focusFxChain() override;
+    void deleteChannel() override;
 
     auto volumeMidi() const -> piejam::gui::model::MidiAssignable* override;
     auto panMidi() const -> piejam::gui::model::MidiAssignable* override;
