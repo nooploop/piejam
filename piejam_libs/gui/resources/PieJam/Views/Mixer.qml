@@ -64,13 +64,15 @@ TopPane {
             perform.onPanMoved: root.model.mainChannel.changePanBalance(newPan)
             perform.onMuteToggled: root.model.mainChannel.changeMute(!model.item.mute)
     //        perform.onSoloToggled: root.soloToggled(index)
+            perform.onFxButtonClicked: root.fxButtonClicked()
     //        perform.onFxButtonClicked: {
     //            model.item.focusFxChain()
     //            root.fxButtonClicked()
     //        }
 
+            edit.name: root.model.mainChannel.name
+            edit.onNameEdited: root.model.mainChannel.changeName(newName)
             edit.deletable: false
-            perform.onFxButtonClicked: root.fxButtonClicked()
 
             Binding {
                 target: root.model.mainChannel

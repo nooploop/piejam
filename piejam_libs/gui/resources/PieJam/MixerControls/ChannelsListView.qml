@@ -49,6 +49,8 @@ ListView {
             root.fxButtonClicked()
         }
 
+        edit.name: model.item.name
+        edit.onNameEdited: model.item.changeName(newName)
         edit.onDeleteClicked: model.item.deleteChannel()
 
         Binding {

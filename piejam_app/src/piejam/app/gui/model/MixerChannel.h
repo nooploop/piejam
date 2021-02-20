@@ -33,6 +33,7 @@ public:
             runtime::stereo_level_parameter_id level);
     ~MixerChannel();
 
+    void changeName(QString const&) override;
     void changeVolume(double) override;
     void changePanBalance(double) override;
     void changeMute(bool) override;

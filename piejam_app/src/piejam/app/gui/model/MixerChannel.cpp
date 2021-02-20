@@ -84,6 +84,15 @@ MixerChannel::onSubscribe()
 }
 
 void
+MixerChannel::changeName(QString const& name)
+{
+    runtime::actions::set_mixer_bus_name action;
+    action.bus_id = m_bus_id;
+    action.name = name.toStdString();
+    dispatch(action);
+}
+
+void
 MixerChannel::changeVolume(double value)
 {
     dispatch(runtime::actions::set_float_parameter(

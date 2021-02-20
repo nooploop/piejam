@@ -30,4 +30,13 @@ struct delete_mixer_bus final
     auto reduce(state const&) const -> state override;
 };
 
+struct set_mixer_bus_name final
+    : ui::cloneable_action<set_mixer_bus_name, action>
+{
+    mixer::bus_id bus_id;
+    std::string name;
+
+    auto reduce(state const&) const -> state override;
+};
+
 } // namespace piejam::runtime::actions

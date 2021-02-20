@@ -12,9 +12,11 @@ import ".."
 Item {
     id: root
 
+    property alias name: nameText.text
     property bool deletable: true
 
     signal deleteClicked()
+    signal nameEdited(string newName)
 
     implicitWidth: 150
     implicitHeight: 400
@@ -49,6 +51,8 @@ Item {
             anchors.top: parent.top
 
             placeholderText: qsTr("Name")
+
+            onTextEdited: root.nameEdited(nameText.text)
         }
 
         Label {
