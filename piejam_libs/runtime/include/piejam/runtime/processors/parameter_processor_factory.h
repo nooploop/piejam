@@ -39,8 +39,7 @@ public:
             -> std::shared_ptr<parameter_processor<P>>
     {
         auto proc = std::make_shared<parameter_processor<P>>(name);
-        BOOST_VERIFY(
-                std::get<processor_map<P>>(m_procs).emplace(id, proc).second);
+        std::get<processor_map<P>>(m_procs).insert_or_assign(id, proc);
         return proc;
     }
 

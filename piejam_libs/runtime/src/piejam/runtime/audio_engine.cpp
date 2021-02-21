@@ -65,6 +65,12 @@ enum class engine_processors
     midi_assign
 };
 
+enum class engine_components
+{
+    mixer_input,
+    mixer_output
+};
+
 using processor_map = dynamic_key_object_map<audio::engine::processor>;
 using component_map = dynamic_key_object_map<audio::engine::component>;
 
@@ -78,15 +84,6 @@ using value_input_processor_ptr =
 template <class T>
 using value_output_processor_ptr =
         std::unique_ptr<audio::engine::value_io_processor<T>>;
-
-struct mixer_bus_component_mapping
-{
-    mixer::bus_id bus_id;
-    component_ptr input;
-    component_ptr output;
-};
-
-using mixer_bus_components = std::vector<mixer_bus_component_mapping>;
 
 struct mixer_input_bus_type
 {
@@ -111,50 +108,52 @@ struct mixer_input_bus_type
     }
 };
 
-auto
-make_mixer_bus_vector(
-        mixer_bus_components& prev_buses,
+void
+make_mixer_components(
+        component_map& comps,
+        component_map& prev_comps,
         unsigned const samplerate,
-        mixer::buses_t const& buses,
-        mixer::bus_list_t const& bus_ids,
+        mixer::buses_t const& mixer_buses,
         device_io::buses_t const& device_buses,
-        parameter_processor_factory& param_procs) -> mixer_bus_components
+        parameter_processor_factory& param_procs)
 {
-    mixer_bus_components result;
-    result.reserve(bus_ids.size());
-
-    for (auto const& id : bus_ids)
+    for (auto const& [id, bus] : mixer_buses)
     {
-        if (auto it = std::ranges::find(
-                    prev_buses,
-                    id,
-                    &mixer_bus_component_mapping::bus_id);
-            it != prev_buses.end())
+        std::tuple in_key(id, engine_components::mixer_input, bus.in);
+        if (auto comp = prev_comps.remove(in_key))
         {
-            result.emplace_back(std::move(*it));
-            prev_buses.erase(it);
+            comps.insert(in_key, std::move(comp));
         }
         else
         {
             audio::bus_type const bus_type = std::visit(
                     mixer_input_bus_type{device_buses},
-                    buses[id]->in);
+                    mixer_buses[id]->in);
 
-            result.emplace_back(
-                    id,
+            comps.insert(
+                    in_key,
                     components::make_mixer_bus_input(
-                            *buses[id],
+                            bus,
                             bus_type,
-                            param_procs),
+                            param_procs));
+        }
+
+        std::tuple out_key(id, engine_components::mixer_output);
+        if (auto comp = prev_comps.remove(out_key))
+        {
+            comps.insert(out_key, std::move(comp));
+        }
+        else
+        {
+            comps.insert(
+                    out_key,
                     components::make_mixer_bus_output(
                             samplerate,
                             id,
-                            *buses[id],
+                            bus,
                             param_procs));
         }
     }
-
-    return result;
 }
 
 auto
@@ -317,6 +316,106 @@ connect_mixer_bus_with_fx_chain(
     }
 }
 
+void
+connect_mixer_input(
+        audio::engine::graph& g,
+        mixer::buses_t const& mixer_buses,
+        device_io::buses_t const& device_buses,
+        component_map const& comps,
+        audio::engine::processor& input_proc,
+        std::vector<processor_ptr>& mixer_procs,
+        mixer::bus const& bus,
+        audio::engine::component& mb_in)
+{
+    std::visit(
+            overload{
+                    [&](std::nullptr_t) {},
+                    [&](device_io::bus_id const device_bus_id) {
+                        auto const* const device_bus =
+                                device_buses[device_bus_id];
+                        BOOST_ASSERT(device_bus);
+
+                        if (device_bus->channels.left != npos)
+                            g.add_wire(
+                                    {input_proc, device_bus->channels.left},
+                                    mb_in.inputs()[0]);
+
+                        if (device_bus->channels.right != npos)
+                            g.add_wire(
+                                    {input_proc, device_bus->channels.right},
+                                    mb_in.inputs()[1]);
+                    },
+                    [&](mixer::bus_id const src_bus_id) {
+                        auto const* const src_bus = mixer_buses[src_bus_id];
+                        BOOST_ASSERT(src_bus);
+
+                        auto* const source_mb_out = comps.find(std::tuple(
+                                src_bus_id,
+                                engine_components::mixer_output));
+                        BOOST_ASSERT(source_mb_out);
+
+                        audio::engine::connect_stereo_components(
+                                g,
+                                *source_mb_out,
+                                mb_in,
+                                mixer_procs);
+                    }},
+            bus.in);
+}
+
+void
+connect_mixer_output(
+        audio::engine::graph& g,
+        mixer::buses_t const& mixer_buses,
+        device_io::buses_t const& device_buses,
+        component_map const& comps,
+        audio::engine::processor& output_proc,
+        std::vector<processor_ptr>& mixer_procs,
+        mixer::bus const& bus,
+        audio::engine::component& mb_out)
+{
+    std::visit(
+            overload{
+                    [&](std::nullptr_t) {},
+                    [&](device_io::bus_id const device_bus_id) {
+                        auto const* const device_bus =
+                                device_buses[device_bus_id];
+                        BOOST_ASSERT(device_bus);
+
+                        if (device_bus->channels.left != npos)
+                            connect(g,
+                                    mb_out.outputs()[0],
+                                    {output_proc, device_bus->channels.left},
+                                    mixer_procs);
+
+                        if (device_bus->channels.right != npos)
+                            connect(g,
+                                    mb_out.outputs()[1],
+                                    {output_proc, device_bus->channels.right},
+                                    mixer_procs);
+                    },
+                    [&](mixer::bus_id const dst_bus_id) {
+                        auto const* const dst_bus = mixer_buses[dst_bus_id];
+                        BOOST_ASSERT(dst_bus);
+
+                        if (std::holds_alternative<std::nullptr_t>(dst_bus->in))
+                        {
+                            auto* const dst_mb_in = comps.find(std::tuple(
+                                    dst_bus_id,
+                                    engine_components::mixer_input,
+                                    dst_bus->in));
+                            BOOST_ASSERT(dst_mb_in);
+
+                            audio::engine::connect_stereo_components(
+                                    g,
+                                    mb_out,
+                                    *dst_mb_in,
+                                    mixer_procs);
+                        }
+                    }},
+            bus.out);
+}
+
 auto
 make_graph(
         mixer::state const& mixer_state,
@@ -324,22 +423,32 @@ make_graph(
         device_io::buses_t const& device_buses,
         audio::engine::processor& input_proc,
         audio::engine::processor& output_proc,
-        mixer_bus_components const& input_buses,
-        mixer_bus_components const& output_buses,
-        audio::engine::processor& input_solo_index,
-        audio::engine::processor& output_solo_index,
         std::vector<processor_ptr>& mixer_procs)
 {
     audio::engine::graph g;
 
-    BOOST_ASSERT(mixer_state.inputs->size() == input_buses.size());
-    for (std::size_t idx = 0; idx < mixer_state.inputs->size(); ++idx)
+    for (auto const& [id, bus] : mixer_state.buses)
     {
-        auto const& bus = mixer::get_bus<io_direction::input>(mixer_state, idx);
-        auto const& [id, mb_in, mb_out] = input_buses[idx];
+        auto* mb_in = comps.find(
+                std::tuple(id, engine_components::mixer_input, bus.in));
+        auto* mb_out =
+                comps.find(std::tuple(id, engine_components::mixer_output));
+
+        BOOST_ASSERT(mb_in);
+        BOOST_ASSERT(mb_out);
 
         mb_in->connect(g);
         mb_out->connect(g);
+
+        connect_mixer_input(
+                g,
+                mixer_state.buses,
+                device_buses,
+                comps,
+                input_proc,
+                mixer_procs,
+                bus,
+                *mb_in);
 
         connect_mixer_bus_with_fx_chain(
                 g,
@@ -349,64 +458,15 @@ make_graph(
                 *mb_out,
                 mixer_procs);
 
-        device_io::bus const* const device_bus =
-                device_buses[std::get<device_io::bus_id>(bus.in)];
-
-        if (device_bus && device_bus->channels.left != npos)
-            g.add_wire(
-                    {input_proc, device_bus->channels.left},
-                    mb_in->inputs()[0]);
-
-        if (device_bus && device_bus->channels.right != npos)
-            g.add_wire(
-                    {input_proc, device_bus->channels.right},
-                    mb_in->inputs()[1]);
-
-        g.add_event_wire({input_solo_index, 0}, mb_out->event_inputs()[0]);
-    }
-
-    BOOST_ASSERT(mixer_state.outputs->size() == output_buses.size());
-    for (std::size_t idx = 0; idx < mixer_state.outputs->size(); ++idx)
-    {
-        auto const& bus =
-                mixer::get_bus<io_direction::output>(mixer_state, idx);
-        auto const& [id, mb_in, mb_out] = output_buses[idx];
-
-        mb_in->connect(g);
-        mb_out->connect(g);
-
-        connect_mixer_bus_with_fx_chain(
+        connect_mixer_output(
                 g,
+                mixer_state.buses,
+                device_buses,
                 comps,
-                *mb_in,
-                bus.fx_chain,
-                *mb_out,
-                mixer_procs);
-
-        device_io::bus const* const device_bus =
-                device_buses[std::get<device_io::bus_id>(bus.out)];
-
-        if (device_bus && device_bus->channels.left != npos)
-            connect(g,
-                    mb_out->outputs()[0],
-                    {output_proc, device_bus->channels.left},
-                    mixer_procs);
-
-        if (device_bus && device_bus->channels.right != npos)
-            connect(g,
-                    mb_out->outputs()[1],
-                    {output_proc, device_bus->channels.right},
-                    mixer_procs);
-
-        g.add_event_wire({output_solo_index, 0}, mb_out->event_inputs()[0]);
-    }
-
-    for (auto const& [id, out_mb_in, out_mb_out] : output_buses)
-    {
-        for (auto const& [id, in_mb_in, in_mb_out] : input_buses)
-        {
-            connect_stereo_components(g, *in_mb_out, *out_mb_in, mixer_procs);
-        }
+                output_proc,
+                mixer_procs,
+                bus,
+                *mb_out);
     }
 
     return g;
@@ -488,8 +548,6 @@ struct audio_engine::impl
     audio::engine::process process;
     std::vector<thread::worker> worker_threads;
 
-    mixer_bus_components input_buses;
-    mixer_bus_components output_buses;
     value_input_processor_ptr<mixer::bus_id> input_solo_index_proc;
     value_input_processor_ptr<mixer::bus_id> output_solo_index_proc;
     std::vector<processor_ptr> mixer_procs;
@@ -602,18 +660,11 @@ audio_engine::rebuild(
 {
     component_map comps;
 
-    auto input_buses = make_mixer_bus_vector(
-            m_impl->input_buses,
+    make_mixer_components(
+            comps,
+            m_impl->comps,
             m_samplerate,
             mixer_state.buses,
-            mixer_state.inputs,
-            device_buses,
-            m_impl->param_procs);
-    auto output_buses = make_mixer_bus_vector(
-            m_impl->output_buses,
-            m_samplerate,
-            mixer_state.buses,
-            mixer_state.outputs,
             device_buses,
             m_impl->param_procs);
     make_fx_chains_map(
@@ -657,10 +708,6 @@ audio_engine::rebuild(
             device_buses,
             m_impl->process.input(),
             m_impl->process.output(),
-            input_buses,
-            output_buses,
-            *input_solo_index_proc,
-            *output_solo_index_proc,
             mixers);
 
     connect_midi(
@@ -678,8 +725,6 @@ audio_engine::rebuild(
         return false;
 
     m_impl->graph = std::move(new_graph);
-    m_impl->input_buses = std::move(input_buses);
-    m_impl->output_buses = std::move(output_buses);
     m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
     m_impl->output_solo_index_proc = std::move(output_solo_index_proc);
     m_impl->mixer_procs = std::move(mixers);
