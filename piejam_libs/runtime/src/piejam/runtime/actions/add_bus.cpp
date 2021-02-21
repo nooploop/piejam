@@ -20,32 +20,26 @@ add_bus::reduce(state const& st) const -> state
     {
         case io_direction::input:
         {
-            auto name =
-                    fmt::format("In {}", new_st.mixer_state.inputs->size() + 1);
-            runtime::add_mixer_bus<io_direction::input>(
+            add_device_bus<io_direction::input>(
                     new_st,
-                    name,
-                    add_device_bus<io_direction::input>(
-                            new_st,
-                            name,
-                            type,
-                            channel_index_pair{npos}));
+                    fmt::format(
+                            "{} In {}",
+                            type == audio::bus_type::mono ? "Mono" : "Stereo",
+                            new_st.device_io_state.inputs->size() + 1),
+                    type,
+                    channel_index_pair{npos});
             break;
         }
 
         case io_direction::output:
         {
-            auto const bus_ids_size = new_st.mixer_state.outputs->size();
-            auto name = bus_ids_size == 0 ? std::string("Main")
-                                          : fmt::format("Aux {}", bus_ids_size);
-            runtime::add_mixer_bus<io_direction::output>(
+            add_device_bus<io_direction::output>(
                     new_st,
-                    name,
-                    add_device_bus<io_direction::output>(
-                            new_st,
-                            name,
-                            audio::bus_type::stereo,
-                            channel_index_pair{}));
+                    fmt::format(
+                            "Speaker {}",
+                            new_st.device_io_state.outputs->size() + 1),
+                    audio::bus_type::stereo,
+                    channel_index_pair{npos});
             break;
         }
     }
