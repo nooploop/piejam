@@ -28,7 +28,7 @@ public:
     }
 
     template <class... Args>
-    auto operator()(Args&&... args) -> std::add_lvalue_reference_t<
+    auto operator()(Args&&... args) const -> std::add_lvalue_reference_t<
             std::add_const_t<std::invoke_result_t<F, Args&&...>>>
     {
         if (!m_last ||
@@ -64,7 +64,7 @@ private:
 
     F m_f;
 
-    std::optional<args_and_result> m_last;
+    mutable std::optional<args_and_result> m_last;
 };
 
 template <class F>
