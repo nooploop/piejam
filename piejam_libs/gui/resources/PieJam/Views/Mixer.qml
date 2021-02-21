@@ -64,11 +64,10 @@ TopPane {
             perform.onPanMoved: root.model.mainChannel.changePanBalance(newPan)
             perform.onMuteToggled: root.model.mainChannel.changeMute(!model.item.mute)
     //        perform.onSoloToggled: root.soloToggled(index)
-            perform.onFxButtonClicked: root.fxButtonClicked()
-    //        perform.onFxButtonClicked: {
-    //            model.item.focusFxChain()
-    //            root.fxButtonClicked()
-    //        }
+            perform.onFxButtonClicked: {
+                root.model.mainChannel.focusFxChain()
+                root.fxButtonClicked()
+            }
 
             edit.name: root.model.mainChannel.name
             edit.selectedInput: root.model.mainChannel.selectedInput
