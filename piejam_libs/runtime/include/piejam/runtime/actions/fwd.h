@@ -37,6 +37,10 @@ struct delete_bus;
 
 struct add_mixer_bus;
 struct delete_mixer_bus;
+template <io_direction>
+struct set_mixer_channel_route;
+using set_mixer_channel_input = set_mixer_channel_route<io_direction::input>;
+using set_mixer_channel_output = set_mixer_channel_route<io_direction::output>;
 
 template <io_direction>
 struct set_bus_solo;

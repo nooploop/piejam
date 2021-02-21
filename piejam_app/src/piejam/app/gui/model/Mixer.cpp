@@ -67,9 +67,6 @@ Mixer::onSubscribe()
                                             dispatch(),
                                             state_change_subscriber(),
                                             bus_info.bus_id,
-                                            std::get<
-                                                    runtime::device_io::bus_id>(
-                                                    bus_info.in),
                                             bus_info.volume,
                                             bus_info.pan_balance,
                                             bus_info.mute,
@@ -91,7 +88,6 @@ Mixer::onSubscribe()
                             dispatch(),
                             state_change_subscriber(),
                             mainBusInfo->bus_id,
-                            runtime::device_io::bus_id{},
                             mainBusInfo->volume,
                             mainBusInfo->pan_balance,
                             mainBusInfo->mute,

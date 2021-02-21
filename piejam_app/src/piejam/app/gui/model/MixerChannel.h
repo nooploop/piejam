@@ -25,7 +25,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::bus_id,
-            runtime::device_io::bus_id,
             runtime::float_parameter_id volume,
             runtime::float_parameter_id pan_balance,
             runtime::bool_parameter_id mute,
@@ -42,6 +41,14 @@ public:
     auto volumeMidi() const -> piejam::gui::model::MidiAssignable* override;
     auto panMidi() const -> piejam::gui::model::MidiAssignable* override;
     auto muteMidi() const -> piejam::gui::model::MidiAssignable* override;
+
+    void changeInputToMix() override;
+    void changeInputToDevice(unsigned index) override;
+    void changeInputToChannel(unsigned index) override;
+
+    void changeOutputToNone() override;
+    void changeOutputToDevice(unsigned index) override;
+    void changeOutputToChannel(unsigned index) override;
 
 private:
     void onSubscribe() override;

@@ -39,4 +39,15 @@ struct set_mixer_bus_name final
     auto reduce(state const&) const -> state override;
 };
 
+template <io_direction D>
+struct set_mixer_channel_route final
+    : ui::cloneable_action<set_mixer_channel_route<D>, action>
+    , visitable_engine_action<set_mixer_channel_route<D>>
+{
+    mixer::bus_id bus_id;
+    mixer::io_address_t route;
+
+    auto reduce(state const&) const -> state override;
+};
+
 } // namespace piejam::runtime::actions

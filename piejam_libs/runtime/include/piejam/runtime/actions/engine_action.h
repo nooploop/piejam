@@ -17,6 +17,8 @@ struct engine_action_visitor
               delete_bus,
               add_mixer_bus,
               delete_mixer_bus,
+              set_mixer_channel_input,
+              set_mixer_channel_output,
               delete_fx_module,
               insert_internal_fx_module,
               insert_ladspa_fx_module,

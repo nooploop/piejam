@@ -55,12 +55,12 @@ ListView {
         edit.outputDevices: model.item.outputDevices
         edit.outputChannels: model.item.outputChannels
 
-        edit.onAudioInMixSelected: console.log("mix selected")
-        edit.onAudioInDeviceSelected: console.log("device selected ", index)
-        edit.onAudioInChannelSelected: console.log("channel selected ", index)
-        edit.onAudioOutNoneSelected: console.log("mix selected")
-        edit.onAudioOutDeviceSelected: console.log("device selected ", index)
-        edit.onAudioOutChannelSelected: console.log("channel selected ", index)
+        edit.onAudioInMixSelected: model.item.changeInputToMix()
+        edit.onAudioInDeviceSelected: model.item.changeInputToDevice(index)
+        edit.onAudioInChannelSelected: model.item.changeInputToChannel(index)
+        edit.onAudioOutNoneSelected: model.item.changeOutputToNone()
+        edit.onAudioOutDeviceSelected: model.item.changeOutputToDevice(index)
+        edit.onAudioOutChannelSelected: model.item.changeOutputToChannel(index)
         edit.onNameEdited: model.item.changeName(newName)
         edit.onDeleteClicked: model.item.deleteChannel()
 

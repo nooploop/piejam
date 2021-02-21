@@ -41,4 +41,24 @@ set_mixer_bus_name::reduce(state const& st) const -> state
     return new_st;
 }
 
+template <io_direction D>
+auto
+set_mixer_channel_route<D>::reduce(state const& st) const -> state
+{
+    auto new_st = st;
+
+    new_st.mixer_state.buses.update(bus_id, [this](mixer::bus& bus) {
+        (D == io_direction::input ? bus.in : bus.out) = route;
+    });
+
+    return new_st;
+}
+
+template auto
+set_mixer_channel_route<io_direction::input>::reduce(state const&) const
+        -> state;
+template auto
+set_mixer_channel_route<io_direction::output>::reduce(state const&) const
+        -> state;
+
 } // namespace piejam::runtime::actions

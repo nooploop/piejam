@@ -21,7 +21,6 @@ namespace piejam::app::gui::model
 struct MixerChannel::Impl
 {
     runtime::mixer::bus_id m_bus_id;
-    runtime::device_io::bus_id m_device_bus_id;
     runtime::float_parameter_id m_volume;
     runtime::float_parameter_id m_pan_balance;
     runtime::bool_parameter_id m_mute;
@@ -41,7 +40,6 @@ MixerChannel::MixerChannel(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::bus_id const id,
-        runtime::device_io::bus_id const device_bus_id,
         runtime::float_parameter_id const volume,
         runtime::float_parameter_id const pan_balance,
         runtime::bool_parameter_id const mute,
@@ -49,7 +47,6 @@ MixerChannel::MixerChannel(
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
               id,
-              device_bus_id,
               volume,
               pan_balance,
               mute,
@@ -79,10 +76,10 @@ MixerChannel::onSubscribe()
                 setName(QString::fromStdString(*name));
             });
 
-    observe(runtime::selectors::make_bus_type_selector(m_impl->m_device_bus_id),
-            [this](audio::bus_type const bus_type) {
-                setMono(bus_type == audio::bus_type::mono);
-            });
+    //    observe(runtime::selectors::make_bus_type_selector(m_impl->m_device_bus_id),
+    //            [this](audio::bus_type const bus_type) {
+    //                setMono(bus_type == audio::bus_type::mono);
+    //            });
 
     observe(runtime::selectors::make_float_parameter_value_selector(
                     m_impl->m_volume),
@@ -227,6 +224,66 @@ auto
 MixerChannel::muteMidi() const -> piejam::gui::model::MidiAssignable*
 {
     return m_impl->m_muteMidi.get();
+}
+
+void
+MixerChannel::changeInputToMix()
+{
+    runtime::actions::set_mixer_channel_input action;
+    action.bus_id = m_impl->m_bus_id;
+    dispatch(action);
+}
+
+void
+MixerChannel::changeInputToDevice(unsigned index)
+{
+    BOOST_ASSERT(index < m_impl->inputDevices->size());
+
+    runtime::actions::set_mixer_channel_input action;
+    action.bus_id = m_impl->m_bus_id;
+    action.route = (*m_impl->inputDevices)[index].bus_id;
+    dispatch(action);
+}
+
+void
+MixerChannel::changeInputToChannel(unsigned index)
+{
+    BOOST_ASSERT(index < m_impl->inputChannels->size());
+
+    runtime::actions::set_mixer_channel_input action;
+    action.bus_id = m_impl->m_bus_id;
+    action.route = (*m_impl->inputChannels)[index].bus_id;
+    dispatch(action);
+}
+
+void
+MixerChannel::changeOutputToNone()
+{
+    runtime::actions::set_mixer_channel_output action;
+    action.bus_id = m_impl->m_bus_id;
+    dispatch(action);
+}
+
+void
+MixerChannel::changeOutputToDevice(unsigned index)
+{
+    BOOST_ASSERT(index < m_impl->outputDevices->size());
+
+    runtime::actions::set_mixer_channel_output action;
+    action.bus_id = m_impl->m_bus_id;
+    action.route = (*m_impl->outputDevices)[index].bus_id;
+    dispatch(action);
+}
+
+void
+MixerChannel::changeOutputToChannel(unsigned index)
+{
+    BOOST_ASSERT(index < m_impl->outputChannels->size());
+
+    runtime::actions::set_mixer_channel_output action;
+    action.bus_id = m_impl->m_bus_id;
+    action.route = (*m_impl->outputChannels)[index].bus_id;
+    dispatch(action);
 }
 
 } // namespace piejam::app::gui::model

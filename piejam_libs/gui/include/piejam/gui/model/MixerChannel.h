@@ -105,6 +105,10 @@ public:
         }
     }
 
+    Q_INVOKABLE virtual void changeInputToMix() = 0;
+    Q_INVOKABLE virtual void changeInputToDevice(unsigned index) = 0;
+    Q_INVOKABLE virtual void changeInputToChannel(unsigned index) = 0;
+
     auto outputDevices() const -> QStringList const& { return m_outputDevices; }
     void setOutputDevices(QStringList const& x)
     {
@@ -128,6 +132,10 @@ public:
             emit outputChannelsChanged();
         }
     }
+
+    Q_INVOKABLE virtual void changeOutputToNone() = 0;
+    Q_INVOKABLE virtual void changeOutputToDevice(unsigned index) = 0;
+    Q_INVOKABLE virtual void changeOutputToChannel(unsigned index) = 0;
 
 signals:
 
