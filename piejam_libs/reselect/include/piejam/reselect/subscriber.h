@@ -11,7 +11,6 @@
 
 #include <functional>
 #include <memory>
-#include <optional>
 #include <utility>
 
 namespace piejam::reselect
@@ -32,26 +31,25 @@ public:
     template <class Value, class Handler>
     auto observe(selector<Value, State> sel, Handler&& handler) -> subscription
     {
-        std::invoke(std::forward<Handler>(handler), sel.get(m_get_state()));
+        auto last = std::make_shared<Value>(sel.get(m_get_state()));
+        std::invoke(std::forward<Handler>(handler), *last);
         auto token = std::make_shared<subscription::token>();
         return subscription{
-                .m_conn = m_observer.connect(
-                        [sel = std::move(sel),
-                         handler,
-                         token = std::weak_ptr(token),
-                         last = std::make_shared<std::optional<Value>>()](
-                                State const& st) mutable {
-                            auto alive = token.lock();
-                            if (!alive)
-                                return;
+                .m_conn = m_observer.connect([sel = std::move(sel),
+                                              handler,
+                                              token = std::weak_ptr(token),
+                                              last](State const& st) mutable {
+                    auto alive = token.lock();
+                    if (!alive)
+                        return;
 
-                            auto current = sel.get(st);
-                            if (!last->has_value() || **last != current)
-                            {
-                                handler(current);
-                                *last = current;
-                            }
-                        }),
+                    auto current = sel.get(st);
+                    if (*last != current)
+                    {
+                        handler(current);
+                        *last = current;
+                    }
+                }),
                 .token = token};
     }
 
