@@ -14,9 +14,21 @@ Item {
 
     property alias name: nameText.text
     property bool deletable: true
+    property alias selectedInput: audioInSelect.displayText
+    property alias inputDevices: inDevicesRep.model
+    property alias inputChannels: inChannelsRep.model
+    property alias selectedOutput: audioOutSelect.displayText
+    property alias outputDevices: outDevicesRep.model
+    property alias outputChannels: outChannelsRep.model
 
     signal deleteClicked()
     signal nameEdited(string newName)
+    signal audioInMixSelected()
+    signal audioInDeviceSelected(int index)
+    signal audioInChannelSelected(int index)
+    signal audioOutNoneSelected()
+    signal audioOutDeviceSelected(int index)
+    signal audioOutChannelSelected(int index)
 
     implicitWidth: 150
     implicitHeight: 400
@@ -72,6 +84,44 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: audioInLabel.bottom
+
+            popup: Menu {
+                id: audioInMenu
+
+                MenuItem {
+                    text: qsTr("Mix")
+
+                    onClicked: root.audioInMixSelected()
+                }
+
+                Menu {
+                    title: qsTr("Devices")
+
+                    Repeater {
+                        id: inDevicesRep
+
+                        delegate: MenuItem {
+                            text: modelData
+
+                            onClicked: root.audioInDeviceSelected(index)
+                        }
+                    }
+                }
+
+                Menu {
+                    title: qsTr("Channels")
+
+                    Repeater {
+                        id: inChannelsRep
+
+                        delegate: MenuItem {
+                            text: modelData
+
+                            onClicked: root.audioInChannelSelected(index)
+                        }
+                    }
+                }
+            }
         }
 
         Label {
@@ -91,6 +141,44 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: audioOutLabel.bottom
+
+            popup: Menu {
+                id: audioOutMenu
+
+                MenuItem {
+                    text: qsTr("None")
+
+                    onClicked: root.audioOutNoneSelected()
+                }
+
+                Menu {
+                    title: qsTr("Devices")
+
+                    Repeater {
+                        id: outDevicesRep
+
+                        delegate: MenuItem {
+                            text: modelData
+
+                            onClicked: root.audioOutDeviceSelected(index)
+                        }
+                    }
+                }
+
+                Menu {
+                    title: qsTr("Channels")
+
+                    Repeater {
+                        id: outChannelsRep
+
+                        delegate: MenuItem {
+                            text: modelData
+
+                            onClicked: root.audioOutChannelSelected(index)
+                        }
+                    }
+                }
+            }
         }
 
         Row {

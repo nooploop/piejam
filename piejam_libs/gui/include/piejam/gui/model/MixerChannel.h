@@ -7,6 +7,8 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <QStringList>
+
 namespace piejam::gui::model
 {
 
@@ -29,6 +31,15 @@ class MixerChannel : public SubscribableModel
                        FINAL)
     Q_PROPERTY(piejam::gui::model::MidiAssignable* muteMidi READ muteMidi
                        CONSTANT FINAL)
+
+    Q_PROPERTY(QStringList inputDevices READ inputDevices NOTIFY
+                       inputDevicesChanged FINAL)
+    Q_PROPERTY(QStringList inputChannels READ inputChannels NOTIFY
+                       inputChannelsChanged FINAL)
+    Q_PROPERTY(QStringList outputDevices READ outputDevices NOTIFY
+                       outputDevicesChanged FINAL)
+    Q_PROPERTY(QStringList outputChannels READ outputChannels NOTIFY
+                       outputChannelsChanged FINAL)
 
 public:
     using SubscribableModel::SubscribableModel;
@@ -74,6 +85,50 @@ public:
     virtual auto panMidi() const -> MidiAssignable* = 0;
     virtual auto muteMidi() const -> MidiAssignable* = 0;
 
+    auto inputDevices() const -> QStringList const& { return m_inputDevices; }
+    void setInputDevices(QStringList const& x)
+    {
+        if (m_inputDevices != x)
+        {
+            m_inputDevices = x;
+            emit inputDevicesChanged();
+        }
+    }
+
+    auto inputChannels() const -> QStringList const& { return m_inputChannels; }
+    void setInputChannels(QStringList const& x)
+    {
+        if (m_inputChannels != x)
+        {
+            m_inputChannels = x;
+            emit inputChannelsChanged();
+        }
+    }
+
+    auto outputDevices() const -> QStringList const& { return m_outputDevices; }
+    void setOutputDevices(QStringList const& x)
+    {
+        if (m_outputDevices != x)
+        {
+            m_outputDevices = x;
+            emit outputDevicesChanged();
+        }
+    }
+
+    auto outputChannels() const -> QStringList const&
+    {
+        return m_outputChannels;
+    }
+
+    void setOutputChannels(QStringList const& x)
+    {
+        if (m_outputChannels != x)
+        {
+            m_outputChannels = x;
+            emit outputChannelsChanged();
+        }
+    }
+
 signals:
 
     void nameChanged();
@@ -84,6 +139,10 @@ signals:
     void panBalanceChanged();
     void muteChanged();
     void soloChanged();
+    void inputDevicesChanged();
+    void inputChannelsChanged();
+    void outputDevicesChanged();
+    void outputChannelsChanged();
 
 private:
     QString m_name;
@@ -94,6 +153,10 @@ private:
     double m_panBalance{};
     bool m_mute{};
     bool m_solo{};
+    QStringList m_inputDevices;
+    QStringList m_inputChannels;
+    QStringList m_outputDevices;
+    QStringList m_outputChannels;
 };
 
 } // namespace piejam::gui::model

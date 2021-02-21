@@ -23,7 +23,7 @@ apply_bus_configs(
         std::vector<persistence::bus_config> const& configs,
         std::size_t const num_ch)
 {
-    clear_mixer_buses<D>(st);
+    clear_device_buses<D>(st);
     for (auto const& bus_conf : configs)
     {
         auto chs = bus_conf.channels;
@@ -33,10 +33,7 @@ apply_bus_configs(
         auto const type = D == io_direction::output ? audio::bus_type::stereo
                                                     : bus_conf.bus_type;
 
-        runtime::add_mixer_bus<D>(
-                st,
-                bus_conf.name,
-                add_device_bus<D>(st, bus_conf.name, type, chs));
+        add_device_bus<D>(st, bus_conf.name, type, chs);
     }
 }
 

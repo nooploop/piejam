@@ -71,6 +71,17 @@ TopPane {
     //        }
 
             edit.name: root.model.mainChannel.name
+            edit.inputDevices: root.model.mainChannel.inputDevices
+            edit.inputChannels: root.model.mainChannel.inputChannels
+            edit.outputDevices: root.model.mainChannel.outputDevices
+            edit.outputChannels: root.model.mainChannel.outputChannels
+
+            edit.onAudioInMixSelected: console.log("mix selected")
+            edit.onAudioInDeviceSelected: console.log("device selected ", index)
+            edit.onAudioInChannelSelected: console.log("channel selected ", index)
+            edit.onAudioOutNoneSelected: console.log("mix selected")
+            edit.onAudioOutDeviceSelected: console.log("device selected ", index)
+            edit.onAudioOutChannelSelected: console.log("channel selected ", index)
             edit.onNameEdited: root.model.mainChannel.changeName(newName)
             edit.deletable: false
 

@@ -63,12 +63,38 @@ struct mixer_bus_info
     bool_parameter_id mute;
     stereo_level_parameter_id level;
 
-    constexpr bool
-    operator==(mixer_bus_info const& other) const noexcept = default;
+    constexpr bool operator==(mixer_bus_info const&) const noexcept = default;
 };
 
 extern const selector<boxed_vector<mixer_bus_info>> select_mixer_bus_infos;
 extern const selector<box<mixer_bus_info>> select_mixer_main_bus_info;
+
+struct mixer_device_route
+{
+    device_io::bus_id bus_id;
+    std::string name;
+
+    bool operator==(mixer_device_route const&) const noexcept = default;
+};
+
+extern const selector<boxed_vector<mixer_device_route>>
+        select_mixer_input_devices;
+extern const selector<boxed_vector<mixer_device_route>>
+        select_mixer_output_devices;
+
+struct mixer_channel_route
+{
+    mixer::bus_id bus_id;
+    std::string name;
+
+    bool operator==(mixer_channel_route const&) const noexcept = default;
+};
+
+auto make_mixer_input_channels_selector(mixer::bus_id)
+        -> selector<boxed_vector<mixer_channel_route>>;
+
+auto make_mixer_output_channels_selector(mixer::bus_id)
+        -> selector<boxed_vector<mixer_channel_route>>;
 
 auto make_device_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
 

@@ -124,6 +124,75 @@ const selector<box<mixer_bus_info>> select_mixer_main_bus_info(
             return get(st.mixer_state.buses, st.mixer_state.main);
         });
 
+static auto
+make_mixer_device_routes(
+        device_io::buses_t const& device_buses,
+        box<device_io::bus_list_t> const& inputs)
+{
+    return algorithm::transform_to_vector(
+            *inputs,
+            [&](device_io::bus_id bus_id) {
+                device_io::bus const* const bus = device_buses[bus_id];
+                return mixer_device_route{
+                        .bus_id = bus_id,
+                        .name = bus ? *bus->name : std::string()};
+            });
+}
+
+const selector<boxed_vector<mixer_device_route>> select_mixer_input_devices(
+        [get = memo(boxify_result(&make_mixer_device_routes))](
+                state const& st) mutable {
+            return get(st.device_io_state.buses, st.device_io_state.inputs);
+        });
+
+const selector<boxed_vector<mixer_device_route>> select_mixer_output_devices(
+        [get = memo(boxify_result(&make_mixer_device_routes))](
+                state const& st) mutable {
+            return get(st.device_io_state.buses, st.device_io_state.outputs);
+        });
+
+static auto
+make_mixer_input_channel_routes(mixer::buses_t const& mixer_buses)
+{
+    return algorithm::transform_to_vector(
+            mixer_buses,
+            [&](auto const& id_ch_pair) {
+                auto const& [bus_id, bus] = id_ch_pair;
+                return mixer_channel_route{.bus_id = bus_id, .name = bus.name};
+            });
+}
+
+static auto
+make_mixer_output_channel_routes(mixer::buses_t const& mixer_buses)
+{
+    return algorithm::transform_to_vector(
+            mixer_buses,
+            [&](auto const& id_ch_pair) {
+                auto const& [bus_id, bus] = id_ch_pair;
+                return mixer_channel_route{.bus_id = bus_id, .name = bus.name};
+            });
+}
+
+auto
+make_mixer_input_channels_selector(mixer::bus_id const)
+        -> selector<boxed_vector<mixer_channel_route>>
+{
+    return [get = memo(boxify_result(&make_mixer_input_channel_routes))](
+                   state const& st) mutable {
+        return get(st.mixer_state.buses);
+    };
+}
+
+auto
+make_mixer_output_channels_selector(mixer::bus_id const)
+        -> selector<boxed_vector<mixer_channel_route>>
+{
+    return [get = memo(boxify_result(&make_mixer_output_channel_routes))](
+                   state const& st) mutable {
+        return get(st.mixer_state.buses);
+    };
+}
+
 auto
 make_device_bus_name_selector(device_io::bus_id const bus_id)
         -> selector<boxed_string>
