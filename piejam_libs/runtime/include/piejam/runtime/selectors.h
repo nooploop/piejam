@@ -96,6 +96,10 @@ auto make_mixer_input_channels_selector(mixer::bus_id)
 auto make_mixer_output_channels_selector(mixer::bus_id)
         -> selector<boxed_vector<mixer_channel_route>>;
 
+auto make_mixer_channel_input_selector(mixer::bus_id) -> selector<boxed_string>;
+auto make_mixer_channel_output_selector(mixer::bus_id)
+        -> selector<boxed_string>;
+
 auto make_device_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
 
 auto make_mixer_bus_name_selector(mixer::bus_id) -> selector<boxed_string>;

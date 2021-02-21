@@ -7,6 +7,7 @@
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/boxify_result.h>
 #include <piejam/functional/memo.h>
+#include <piejam/functional/overload.h>
 #include <piejam/npos.h>
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -190,6 +191,80 @@ make_mixer_output_channels_selector(mixer::bus_id const)
     return [get = memo(boxify_result(&make_mixer_output_channel_routes))](
                    state const& st) mutable {
         return get(st.mixer_state.buses);
+    };
+}
+
+static auto
+get_mixer_input_name(
+        mixer::bus_id const bus_id,
+        mixer::buses_t const& mixer_buses,
+        device_io::buses_t const& device_buses) -> boxed_string
+{
+    static boxed_string s_mix("Mix");
+
+    mixer::bus const* const bus = mixer_buses[bus_id];
+    if (!bus)
+        return s_mix;
+
+    return std::visit(
+            overload{
+                    [](std::nullptr_t) { return s_mix; },
+                    [&](mixer::bus_id const src_bus_id) {
+                        mixer::bus const* const src_bus =
+                                mixer_buses[src_bus_id];
+                        return src_bus ? src_bus->name : s_mix;
+                    },
+                    [&](device_io::bus_id const dev_bus_id) {
+                        device_io::bus const* const dev_bus =
+                                device_buses[dev_bus_id];
+                        return dev_bus ? dev_bus->name : s_mix;
+                    }},
+            bus->in);
+}
+
+auto
+make_mixer_channel_input_selector(mixer::bus_id const bus_id)
+        -> selector<boxed_string>
+{
+    return [bus_id, get = memo(&get_mixer_input_name)](state const& st) {
+        return get(bus_id, st.mixer_state.buses, st.device_io_state.buses);
+    };
+}
+
+static auto
+get_mixer_output_name(
+        mixer::bus_id const bus_id,
+        mixer::buses_t const& mixer_buses,
+        device_io::buses_t const& device_buses) -> boxed_string
+{
+    static boxed_string s_none("None");
+
+    mixer::bus const* const bus = mixer_buses[bus_id];
+    if (!bus)
+        return s_none;
+
+    return std::visit(
+            overload{
+                    [](std::nullptr_t) { return s_none; },
+                    [&](mixer::bus_id const dst_bus_id) {
+                        mixer::bus const* const dst_bus =
+                                mixer_buses[dst_bus_id];
+                        return dst_bus ? dst_bus->name : s_none;
+                    },
+                    [&](device_io::bus_id const dev_bus_id) {
+                        device_io::bus const* const dev_bus =
+                                device_buses[dev_bus_id];
+                        return dev_bus ? dev_bus->name : s_none;
+                    }},
+            bus->out);
+}
+
+auto
+make_mixer_channel_output_selector(mixer::bus_id const bus_id)
+        -> selector<boxed_string>
+{
+    return [bus_id, get = memo(&get_mixer_output_name)](state const& st) {
+        return get(bus_id, st.mixer_state.buses, st.device_io_state.buses);
     };
 }
 

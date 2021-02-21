@@ -71,8 +71,10 @@ TopPane {
     //        }
 
             edit.name: root.model.mainChannel.name
+            edit.selectedInput: root.model.mainChannel.selectedInput
             edit.inputDevices: root.model.mainChannel.inputDevices
             edit.inputChannels: root.model.mainChannel.inputChannels
+            edit.selectedOutput: root.model.mainChannel.selectedOutput
             edit.outputDevices: root.model.mainChannel.outputDevices
             edit.outputChannels: root.model.mainChannel.outputChannels
 

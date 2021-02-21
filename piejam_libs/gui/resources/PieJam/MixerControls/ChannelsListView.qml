@@ -50,8 +50,10 @@ ListView {
         }
 
         edit.name: model.item.name
+        edit.selectedInput: model.item.selectedInput
         edit.inputDevices: model.item.inputDevices
         edit.inputChannels: model.item.inputChannels
+        edit.selectedOutput: model.item.selectedOutput
         edit.outputDevices: model.item.outputDevices
         edit.outputChannels: model.item.outputChannels
 

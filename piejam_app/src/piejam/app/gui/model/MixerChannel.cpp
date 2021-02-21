@@ -102,6 +102,12 @@ MixerChannel::onSubscribe()
                 setLevel(x.left, x.right);
             });
 
+    observe(runtime::selectors::make_mixer_channel_input_selector(
+                    m_impl->m_bus_id),
+            [this](boxed_string const& name) {
+                setSelectedInput(QString::fromStdString(*name));
+            });
+
     observe(runtime::selectors::select_mixer_input_devices,
             [this](boxed_vector<runtime::selectors::mixer_device_route> const&
                            inputDevices) {
@@ -129,6 +135,12 @@ MixerChannel::onSubscribe()
                         &QString::fromStdString,
                         &runtime::selectors::mixer_channel_route::name);
                 setInputChannels(std::move(inputChannelNames));
+            });
+
+    observe(runtime::selectors::make_mixer_channel_output_selector(
+                    m_impl->m_bus_id),
+            [this](boxed_string const& name) {
+                setSelectedOutput(QString::fromStdString(*name));
             });
 
     observe(runtime::selectors::select_mixer_output_devices,

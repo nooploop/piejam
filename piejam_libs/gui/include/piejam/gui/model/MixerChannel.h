@@ -32,10 +32,14 @@ class MixerChannel : public SubscribableModel
     Q_PROPERTY(piejam::gui::model::MidiAssignable* muteMidi READ muteMidi
                        CONSTANT FINAL)
 
+    Q_PROPERTY(QString selectedInput READ selectedInput NOTIFY
+                       selectedInputChanged FINAL)
     Q_PROPERTY(QStringList inputDevices READ inputDevices NOTIFY
                        inputDevicesChanged FINAL)
     Q_PROPERTY(QStringList inputChannels READ inputChannels NOTIFY
                        inputChannelsChanged FINAL)
+    Q_PROPERTY(QString selectedOutput READ selectedOutput NOTIFY
+                       selectedOutputChanged FINAL)
     Q_PROPERTY(QStringList outputDevices READ outputDevices NOTIFY
                        outputDevicesChanged FINAL)
     Q_PROPERTY(QStringList outputChannels READ outputChannels NOTIFY
@@ -85,6 +89,20 @@ public:
     virtual auto panMidi() const -> MidiAssignable* = 0;
     virtual auto muteMidi() const -> MidiAssignable* = 0;
 
+    auto selectedInput() const noexcept -> QString const&
+    {
+        return m_selectedInput;
+    }
+
+    void setSelectedInput(QString const& x)
+    {
+        if (m_selectedInput != x)
+        {
+            m_selectedInput = x;
+            emit selectedInputChanged();
+        }
+    }
+
     auto inputDevices() const -> QStringList const& { return m_inputDevices; }
     void setInputDevices(QStringList const& x)
     {
@@ -108,6 +126,20 @@ public:
     Q_INVOKABLE virtual void changeInputToMix() = 0;
     Q_INVOKABLE virtual void changeInputToDevice(unsigned index) = 0;
     Q_INVOKABLE virtual void changeInputToChannel(unsigned index) = 0;
+
+    auto selectedOutput() const noexcept -> QString const&
+    {
+        return m_selectedOutput;
+    }
+
+    void setSelectedOutput(QString const& x)
+    {
+        if (m_selectedOutput != x)
+        {
+            m_selectedOutput = x;
+            emit selectedOutputChanged();
+        }
+    }
 
     auto outputDevices() const -> QStringList const& { return m_outputDevices; }
     void setOutputDevices(QStringList const& x)
@@ -147,8 +179,10 @@ signals:
     void panBalanceChanged();
     void muteChanged();
     void soloChanged();
+    void selectedInputChanged();
     void inputDevicesChanged();
     void inputChannelsChanged();
+    void selectedOutputChanged();
     void outputDevicesChanged();
     void outputChannelsChanged();
 
@@ -161,8 +195,10 @@ private:
     double m_panBalance{};
     bool m_mute{};
     bool m_solo{};
+    QString m_selectedInput;
     QStringList m_inputDevices;
     QStringList m_inputChannels;
+    QString m_selectedOutput;
     QStringList m_outputDevices;
     QStringList m_outputChannels;
 };
