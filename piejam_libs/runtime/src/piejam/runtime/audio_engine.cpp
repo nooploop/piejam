@@ -65,10 +65,19 @@ enum class engine_processors
     midi_assign
 };
 
-enum class engine_components
+struct mixer_input_key
 {
-    mixer_input,
-    mixer_output
+    mixer::bus_id bus_id;
+    mixer::io_address_t route;
+
+    bool operator==(mixer_input_key const&) const noexcept = default;
+};
+
+struct mixer_output_key
+{
+    mixer::bus_id bus_id;
+
+    bool operator==(mixer_output_key const&) const noexcept = default;
 };
 
 using processor_map = dynamic_key_object_map<audio::engine::processor>;
@@ -119,7 +128,7 @@ make_mixer_components(
 {
     for (auto const& [id, bus] : mixer_buses)
     {
-        std::tuple in_key(id, engine_components::mixer_input, bus.in);
+        mixer_input_key const in_key{id, bus.in};
         if (auto comp = prev_comps.remove(in_key))
         {
             comps.insert(in_key, std::move(comp));
@@ -138,7 +147,7 @@ make_mixer_components(
                             param_procs));
         }
 
-        std::tuple out_key(id, engine_components::mixer_output);
+        mixer_output_key const out_key{id};
         if (auto comp = prev_comps.remove(out_key))
         {
             comps.insert(out_key, std::move(comp));
@@ -349,9 +358,8 @@ connect_mixer_input(
                         auto const* const src_bus = mixer_buses[src_bus_id];
                         BOOST_ASSERT(src_bus);
 
-                        auto* const source_mb_out = comps.find(std::tuple(
-                                src_bus_id,
-                                engine_components::mixer_output));
+                        auto* const source_mb_out =
+                                comps.find(mixer_output_key{src_bus_id});
                         BOOST_ASSERT(source_mb_out);
 
                         audio::engine::connect_stereo_components(
@@ -400,10 +408,8 @@ connect_mixer_output(
 
                         if (std::holds_alternative<std::nullptr_t>(dst_bus->in))
                         {
-                            auto* const dst_mb_in = comps.find(std::tuple(
-                                    dst_bus_id,
-                                    engine_components::mixer_input,
-                                    dst_bus->in));
+                            auto* const dst_mb_in = comps.find(
+                                    mixer_input_key{dst_bus_id, dst_bus->in});
                             BOOST_ASSERT(dst_mb_in);
 
                             audio::engine::connect_stereo_components(
@@ -429,10 +435,8 @@ make_graph(
 
     for (auto const& [id, bus] : mixer_state.buses)
     {
-        auto* mb_in = comps.find(
-                std::tuple(id, engine_components::mixer_input, bus.in));
-        auto* mb_out =
-                comps.find(std::tuple(id, engine_components::mixer_output));
+        auto* mb_in = comps.find(mixer_input_key{id, bus.in});
+        auto* mb_out = comps.find(mixer_output_key{id});
 
         BOOST_ASSERT(mb_in);
         BOOST_ASSERT(mb_out);
