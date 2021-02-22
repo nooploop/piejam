@@ -48,8 +48,6 @@ extern const selector<output_devices> select_output_devices;
 
 auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 
-auto make_bus_list_selector(io_direction) -> selector<box<mixer::bus_list_t>>;
-
 auto make_device_bus_list_selector(io_direction)
         -> selector<box<device_io::bus_list_t>>;
 

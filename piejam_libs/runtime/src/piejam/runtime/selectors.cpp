@@ -62,20 +62,6 @@ make_num_device_channels_selector(io_direction const bd)
 }
 
 auto
-make_bus_list_selector(io_direction const bd)
-        -> selector<box<mixer::bus_list_t>>
-{
-    switch (bd)
-    {
-        case io_direction::input:
-            return [](state const& st) { return st.mixer_state.inputs; };
-
-        case io_direction::output:
-            return [](state const& st) { return st.mixer_state.outputs; };
-    }
-}
-
-auto
 make_device_bus_list_selector(io_direction const bd)
         -> selector<box<device_io::bus_list_t>>
 {
