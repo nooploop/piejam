@@ -14,7 +14,7 @@ add_mixer_bus::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    runtime::add_mixer_bus<io_direction::input>(new_st, {}, {});
+    runtime::add_mixer_bus(new_st, name);
 
     return new_st;
 }

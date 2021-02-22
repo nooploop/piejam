@@ -18,6 +18,8 @@ struct add_mixer_bus final
     : ui::cloneable_action<add_mixer_bus, action>
     , visitable_engine_action<add_mixer_bus>
 {
+    std::string name;
+
     auto reduce(state const&) const -> state override;
 };
 

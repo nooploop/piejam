@@ -97,10 +97,6 @@ auto add_device_bus(
 
 auto add_mixer_bus(state&, std::string name) -> mixer::bus_id;
 
-template <io_direction D>
-auto add_mixer_bus(state&, std::string name, mixer::io_address_t const& route)
-        -> mixer::bus_id;
-
 void remove_mixer_bus(state&, mixer::bus_id);
 
 void remove_device_bus(state&, device_io::bus_id);
