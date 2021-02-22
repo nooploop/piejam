@@ -170,7 +170,6 @@ make_fx_chain_components(
         component_map& prev_comps,
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
-        mixer::buses_t const& buses,
         parameter_processor_factory& param_procs,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory)
 {
@@ -179,27 +178,22 @@ make_fx_chain_components(
         return *fx_params.at(id).name;
     };
 
-    for (auto const& [bus_id, bus] : buses)
+    for (auto const& [fx_mod_id, fx_mod] : fx_modules)
     {
-        for (fx::module_id const fx_mod_id : *bus.fx_chain)
+        if (auto fx_comp = prev_comps.remove(fx_mod_id))
         {
-            if (auto fx_comp = prev_comps.remove(fx_mod_id))
+            comps.insert(fx_mod_id, std::move(fx_comp));
+        }
+        else
+        {
+            auto comp = components::make_fx(
+                    fx_mod,
+                    get_fx_param_name,
+                    ladspa_fx_proc_factory,
+                    param_procs);
+            if (comp)
             {
-                comps.insert(fx_mod_id, std::move(fx_comp));
-            }
-            else
-            {
-                fx::module const* const fx_mod = fx_modules[fx_mod_id];
-                BOOST_ASSERT(fx_mod);
-                auto comp = components::make_fx(
-                        *fx_mod,
-                        get_fx_param_name,
-                        ladspa_fx_proc_factory,
-                        param_procs);
-                if (comp)
-                {
-                    comps.insert(fx_mod_id, std::move(comp));
-                }
+                comps.insert(fx_mod_id, std::move(comp));
             }
         }
     }
@@ -674,7 +668,6 @@ audio_engine::rebuild(
             m_impl->comps,
             fx_modules,
             fx_params,
-            mixer_state.buses,
             m_impl->param_procs,
             ladspa_fx_proc_factory);
 
