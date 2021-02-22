@@ -69,6 +69,15 @@ public:
         });
     }
 
+    template <std::invocable<id_t, Entity&> U>
+    auto update(U&& u)
+    {
+        m_map.update([&u](map_t& m) {
+            for (auto&& [id, value] : m)
+                u(id, value);
+        });
+    }
+
     auto remove(id_t const id) -> typename map_t::size_type
     {
         return m_map.update([id](map_t& m) { return m.erase(id); });
