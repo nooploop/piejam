@@ -361,16 +361,14 @@ add_device_bus(
 {
     auto id = st.device_io_state.buses.add(device_io::bus{
             .name = std::move(name),
-            .bus_type = D != io_direction::output ? bus_type
-                                                  : audio::bus_type::stereo,
+            .bus_type = D == io_direction::input ? bus_type
+                                                 : audio::bus_type::stereo,
             .channels = channels});
 
     auto& bus_list = D == io_direction::input ? st.device_io_state.inputs
                                               : st.device_io_state.outputs;
 
-    bus_list.update([id](device_io::bus_list_t& bus_list) {
-        bus_list.emplace_back(id);
-    });
+    emplace_back(bus_list, id);
 
     return id;
 }

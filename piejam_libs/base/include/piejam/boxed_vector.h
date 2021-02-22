@@ -24,4 +24,13 @@ remove_erase(boxed_vector<T>& vec, T const& value)
             [&value](std::vector<T>& vec) { boost::remove_erase(vec, value); });
 }
 
+template <class T, class... Args>
+void
+emplace_back(boxed_vector<T>& vec, Args&&... args)
+{
+    vec.update([&](std::vector<T>& vec) {
+        vec.emplace_back(std::forward<decltype(args)>(args)...);
+    });
+}
+
 } // namespace piejam
