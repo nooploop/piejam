@@ -459,18 +459,6 @@ remove_device_bus(state& st, device_io::bus_id const bus_id)
     }
 }
 
-template <io_direction D>
-void
-clear_mixer_buses(state& st)
-{
-    auto const bus_ids = mixer::bus_ids<D>(st.mixer_state);
-    for (auto const bus_id : *bus_ids)
-        remove_mixer_bus(st, bus_id);
-}
-
-template void clear_mixer_buses<io_direction::input>(state&);
-template void clear_mixer_buses<io_direction::output>(state&);
-
 void
 update_midi_assignments(state& st, midi_assignments_map const& assignments)
 {
