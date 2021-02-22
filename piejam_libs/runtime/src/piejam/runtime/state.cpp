@@ -497,19 +497,6 @@ clear_mixer_buses(state& st)
 template void clear_mixer_buses<io_direction::input>(state&);
 template void clear_mixer_buses<io_direction::output>(state&);
 
-template <io_direction D>
-void
-clear_device_buses(state& st)
-{
-    auto const bus_ids = D == io_direction::input ? st.device_io_state.inputs
-                                                  : st.device_io_state.outputs;
-    for (auto const bus_id : *bus_ids)
-        remove_device_bus(st, bus_id);
-}
-
-template void clear_device_buses<io_direction::input>(state&);
-template void clear_device_buses<io_direction::output>(state&);
-
 void
 update_midi_assignments(state& st, midi_assignments_map const& assignments)
 {

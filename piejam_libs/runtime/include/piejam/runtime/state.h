@@ -108,9 +108,6 @@ void remove_device_bus(state&, device_io::bus_id);
 template <io_direction D>
 void clear_mixer_buses(state&);
 
-template <io_direction D>
-void clear_device_buses(state&);
-
 auto insert_internal_fx_module(
         state&,
         mixer::bus_id,

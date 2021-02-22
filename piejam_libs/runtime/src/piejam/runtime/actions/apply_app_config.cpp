@@ -23,7 +23,10 @@ apply_bus_configs(
         std::vector<persistence::bus_config> const& configs,
         std::size_t const num_ch)
 {
-    clear_device_buses<D>(st);
+    BOOST_ASSERT_MSG(
+            D == io_direction::input ? st.device_io_state.inputs->empty()
+                                     : st.device_io_state.outputs->empty(),
+            "configs should be cleared before applying");
     for (auto const& bus_conf : configs)
     {
         auto chs = bus_conf.channels;
