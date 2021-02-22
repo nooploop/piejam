@@ -83,93 +83,27 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
         new_st.samplerate = samplerate;
         new_st.period_size = period_size;
 
-        auto const& in_ids = *st.device_io_state.inputs;
-        auto const& out_ids = *st.device_io_state.outputs;
+        new_st.device_io_state.buses.update(
+                *st.device_io_state.inputs,
+                [num_in_channels = input.hw_params->num_channels](
+                        device_io::bus_id,
+                        device_io::bus& bus) {
+                    update_channel(bus.channels.left, num_in_channels);
+                    update_channel(bus.channels.right, num_in_channels);
+                });
 
-        std::size_t const num_in_channels = input.hw_params->num_channels;
-        for (auto const& in_id : in_ids)
-        {
-            new_st.device_io_state.buses.update(
-                    in_id,
-                    [num_in_channels](device_io::bus& bus) {
-                        update_channel(bus.channels.left, num_in_channels);
-                        update_channel(bus.channels.right, num_in_channels);
-                    });
-        }
-
-        std::size_t const num_out_channels = output.hw_params->num_channels;
-        for (auto const& out_id : out_ids)
-        {
-            new_st.device_io_state.buses.update(
-                    out_id,
-                    [num_out_channels](device_io::bus& bus) {
-                        update_channel(bus.channels.left, num_out_channels);
-                        update_channel(bus.channels.right, num_out_channels);
-                    });
-        }
+        new_st.device_io_state.buses.update(
+                *st.device_io_state.outputs,
+                [num_out_channels = output.hw_params->num_channels](
+                        device_io::bus_id,
+                        device_io::bus& bus) {
+                    update_channel(bus.channels.left, num_out_channels);
+                    update_channel(bus.channels.right, num_out_channels);
+                });
 
         return new_st;
     }
 };
-
-template <io_direction D>
-struct select_device final : ui::cloneable_action<select_device<D>, action>
-{
-    auto reduce(state const&) const -> state override;
-};
-
-template <>
-auto
-select_device<io_direction::input>::reduce(state const& st) const -> state
-{
-    auto new_st = st;
-
-    clear_mixer_buses<io_direction::input>(new_st);
-
-    std::size_t const num_channels = new_st.input.hw_params->num_channels;
-    for (std::size_t index = 0; index < num_channels; ++index)
-    {
-        auto name = fmt::format("In {}", index + 1);
-        add_mixer_bus<io_direction::input>(
-                new_st,
-                name,
-                add_device_bus<io_direction::input>(
-                        new_st,
-                        name,
-                        audio::bus_type::mono,
-                        channel_index_pair(index)));
-    }
-
-    return new_st;
-}
-
-template <>
-auto
-select_device<io_direction::output>::reduce(state const& st) const -> state
-{
-    auto new_st = st;
-
-    clear_mixer_buses<io_direction::output>(new_st);
-
-    if (auto const num_channels = new_st.output.hw_params->num_channels)
-    {
-        add_mixer_bus<io_direction::output>(
-                new_st,
-                "Main",
-                add_device_bus<io_direction::output>(
-                        new_st,
-                        "Main",
-                        audio::bus_type::stereo,
-                        channel_index_pair(
-                                num_channels > 0 ? 0 : npos,
-                                num_channels > 1 ? 1 : npos)));
-    }
-
-    return new_st;
-}
-
-using select_input_device = select_device<io_direction::input>;
-using select_output_device = select_device<io_direction::output>;
 
 struct update_info final : ui::cloneable_action<update_info, action>
 {
@@ -400,32 +334,14 @@ audio_engine_middleware::process_device_action(
 {
     state const& current_state = get_state();
 
-    if (action.input)
-    {
-        next(make_update_devices_action(
-                m_device_manager,
-                current_state.pcm_devices,
-                current_state.pcm_devices,
-                action.index,
-                current_state.output.index,
-                current_state.samplerate,
-                current_state.period_size));
-
-        next(select_input_device{});
-    }
-    else
-    {
-        next(make_update_devices_action(
-                m_device_manager,
-                current_state.pcm_devices,
-                current_state.pcm_devices,
-                current_state.input.index,
-                action.index,
-                current_state.samplerate,
-                current_state.period_size));
-
-        next(select_output_device{});
-    }
+    next(make_update_devices_action(
+            m_device_manager,
+            current_state.pcm_devices,
+            current_state.pcm_devices,
+            action.input ? action.index : current_state.input.index,
+            action.input ? current_state.output.index : action.index,
+            current_state.samplerate,
+            current_state.period_size));
 }
 
 template <>
