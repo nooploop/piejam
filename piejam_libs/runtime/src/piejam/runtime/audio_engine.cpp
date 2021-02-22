@@ -4,7 +4,6 @@
 
 #include <piejam/runtime/audio_engine.h>
 
-#include <piejam/algorithm/concat.h>
 #include <piejam/algorithm/for_each_adjacent.h>
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/component.h>
@@ -166,11 +165,10 @@ make_mixer_components(
 }
 
 auto
-make_fx_chains_map(
+make_fx_chain_components(
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
         mixer::buses_t const& buses,
-        mixer::bus_list_t const& all_ids,
         parameter_processor_factory& param_procs,
         component_map& comps,
         component_map& prev_comps,
@@ -181,9 +179,9 @@ make_fx_chains_map(
         return *fx_params.at(id).name;
     };
 
-    for (mixer::bus_id const bus_id : all_ids)
+    for (auto const& [bus_id, bus] : buses)
     {
-        for (fx::module_id const fx_mod_id : *buses[bus_id]->fx_chain)
+        for (fx::module_id const fx_mod_id : *bus.fx_chain)
         {
             if (auto fx_comp = prev_comps.remove(fx_mod_id))
             {
@@ -671,13 +669,10 @@ audio_engine::rebuild(
             mixer_state.buses,
             device_buses,
             m_impl->param_procs);
-    make_fx_chains_map(
+    make_fx_chain_components(
             fx_modules,
             fx_params,
             mixer_state.buses,
-            algorithm::concat<mixer::bus_list_t>(
-                    mixer_state.inputs.get(),
-                    mixer_state.outputs.get()),
             m_impl->param_procs,
             comps,
             m_impl->comps,
