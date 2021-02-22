@@ -11,6 +11,7 @@
 #include <boost/container/flat_map.hpp>
 
 #include <concepts>
+#include <span>
 
 namespace piejam
 {
@@ -28,9 +29,9 @@ public:
     auto begin() const noexcept { return m_map->begin(); }
     auto end() const noexcept { return m_map->end(); }
 
-    auto contains(id_t id) const noexcept { return m_map->contains(id); }
+    auto contains(id_t const id) const noexcept { return m_map->contains(id); }
 
-    auto operator[](id_t id) const noexcept -> Entity const*
+    auto operator[](id_t const id) const noexcept -> Entity const*
     {
         auto it = m_map->find(id);
         return it != m_map->end() ? &(it->second) : nullptr;
@@ -47,7 +48,7 @@ public:
     }
 
     template <std::invocable<Entity&> U>
-    auto update(id_t id, U&& u)
+    auto update(id_t const id, U&& u)
     {
         return m_map.update([id, &u](map_t& m) {
             auto it = m.find(id);
@@ -56,7 +57,19 @@ public:
         });
     }
 
-    auto remove(id_t id) -> typename map_t::size_type
+    template <std::invocable<id_t, Entity&> U>
+    auto update(std::span<id_t const> const& ids, U&& u)
+    {
+        m_map.update([ids, &u](map_t& m) {
+            for (auto const id : ids)
+            {
+                if (auto it = m.find(id); it != m.end())
+                    u(id, it->second);
+            }
+        });
+    }
+
+    auto remove(id_t const id) -> typename map_t::size_type
     {
         return m_map.update([id](map_t& m) { return m.erase(id); });
     }
