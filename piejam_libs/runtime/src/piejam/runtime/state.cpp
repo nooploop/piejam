@@ -420,26 +420,21 @@ remove_mixer_bus(state& st, mixer::bus_id const bus_id)
 
     mixer::bus const* const bus = st.mixer_state.buses[bus_id];
     BOOST_ASSERT(bus);
+
     st.params.remove(bus->volume);
     st.params.remove(bus->pan_balance);
     st.params.remove(bus->mute);
     st.params.remove(bus->level);
 
-    fx::chain_t const fx_chain = *bus->fx_chain;
-    for (auto&& fx_mod_id : fx_chain)
-        remove_fx_module(st, fx_mod_id);
+    BOOST_ASSERT_MSG(
+            bus->fx_chain->empty(),
+            "fx_chain should be emptied before");
 
     if (st.fx_chain_bus == bus_id)
         st.fx_chain_bus = {};
 
-    if (algorithm::contains(*st.mixer_state.inputs, bus_id))
-    {
-        remove_erase(st.mixer_state.inputs, bus_id);
-    }
-    else
-    {
-        remove_erase(st.mixer_state.outputs, bus_id);
-    }
+    BOOST_ASSERT(algorithm::contains(*st.mixer_state.inputs, bus_id));
+    remove_erase(st.mixer_state.inputs, bus_id);
 
     st.mixer_state.buses.remove(bus_id);
 }
