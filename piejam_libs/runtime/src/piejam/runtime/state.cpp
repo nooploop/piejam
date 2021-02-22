@@ -415,6 +415,8 @@ add_mixer_bus(state& st, std::string name) -> mixer::bus_id
 void
 remove_mixer_bus(state& st, mixer::bus_id const bus_id)
 {
+    BOOST_ASSERT(bus_id != st.mixer_state.main);
+
     if (st.mixer_state.input_solo_id == bus_id)
         st.mixer_state.input_solo_id = mixer::bus_id{};
 
@@ -437,6 +439,14 @@ remove_mixer_bus(state& st, mixer::bus_id const bus_id)
     remove_erase(st.mixer_state.inputs, bus_id);
 
     st.mixer_state.buses.remove(bus_id);
+
+    st.mixer_state.buses.update([bus_id](mixer::bus_id, mixer::bus& bus) {
+        if (bus.in == mixer::io_address_t(bus_id))
+            bus.in = {};
+
+        if (bus.out == mixer::io_address_t(bus_id))
+            bus.out = {};
+    });
 }
 
 void
