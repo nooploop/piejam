@@ -166,12 +166,12 @@ make_mixer_components(
 
 auto
 make_fx_chain_components(
+        component_map& comps,
+        component_map& prev_comps,
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
         mixer::buses_t const& buses,
         parameter_processor_factory& param_procs,
-        component_map& comps,
-        component_map& prev_comps,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory)
 {
     auto get_fx_param_name =
@@ -422,8 +422,8 @@ connect_mixer_output(
 
 auto
 make_graph(
-        mixer::state const& mixer_state,
         component_map const& comps,
+        mixer::buses_t const& mixer_buses,
         device_io::buses_t const& device_buses,
         audio::engine::processor& input_proc,
         audio::engine::processor& output_proc,
@@ -431,7 +431,7 @@ make_graph(
 {
     audio::engine::graph g;
 
-    for (auto const& [id, bus] : mixer_state.buses)
+    for (auto const& [id, bus] : mixer_buses)
     {
         auto* mb_in = comps.find(mixer_input_key{id, bus.in});
         auto* mb_out = comps.find(mixer_output_key{id});
@@ -444,7 +444,7 @@ make_graph(
 
         connect_mixer_input(
                 g,
-                mixer_state.buses,
+                mixer_buses,
                 device_buses,
                 comps,
                 input_proc,
@@ -462,7 +462,7 @@ make_graph(
 
         connect_mixer_output(
                 g,
-                mixer_state.buses,
+                mixer_buses,
                 device_buses,
                 comps,
                 output_proc,
@@ -670,12 +670,12 @@ audio_engine::rebuild(
             device_buses,
             m_impl->param_procs);
     make_fx_chain_components(
+            comps,
+            m_impl->comps,
             fx_modules,
             fx_params,
             mixer_state.buses,
             m_impl->param_procs,
-            comps,
-            m_impl->comps,
             ladspa_fx_proc_factory);
 
     m_impl->param_procs.initialize(params);
@@ -702,8 +702,8 @@ audio_engine::rebuild(
     std::vector<processor_ptr> mixers;
 
     auto new_graph = make_graph(
-            mixer_state,
             comps,
+            mixer_state.buses,
             device_buses,
             m_impl->process.input(),
             m_impl->process.output(),
