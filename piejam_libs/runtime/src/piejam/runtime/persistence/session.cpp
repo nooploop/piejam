@@ -147,7 +147,8 @@ from_json(nlohmann::json const& j, session::mixer_midi& midi)
 void
 to_json(nlohmann::json& j, session::mixer_bus const& mb)
 {
-    j = {{"parameter", mb.parameter},
+    j = {{"name", mb.name},
+         {"parameter", mb.parameter},
          {"midi", mb.midi},
          {"fx_chain", mb.fx_chain}};
 }
@@ -155,28 +156,29 @@ to_json(nlohmann::json& j, session::mixer_bus const& mb)
 void
 from_json(nlohmann::json const& j, session::mixer_bus& mb)
 {
+    j.at("name").get_to(mb.name);
     j.at("parameter").get_to(mb.parameter);
     j.at("midi").get_to(mb.midi);
     j.at("fx_chain").get_to(mb.fx_chain);
 }
 
-static auto const s_key_inputs = "inputs";
-static auto const s_key_outputs = "outputs";
+static auto const s_key_mixer_channels = "mixer_channels";
+static auto const s_key_main_mixer_channel = "main_mixer_channel";
 
 void
 to_json(nlohmann::json& json_ses, session const& ses)
 {
     json_ses = {
             {s_key_version, current_session_version},
-            {s_key_inputs, ses.inputs},
-            {s_key_outputs, ses.outputs}};
+            {s_key_mixer_channels, ses.mixer_channels},
+            {s_key_main_mixer_channel, ses.main_mixer_channel}};
 }
 
 void
 from_json(nlohmann::json const& json_ses, session& ses)
 {
-    json_ses.at(s_key_inputs).get_to(ses.inputs);
-    json_ses.at(s_key_outputs).get_to(ses.outputs);
+    json_ses.at(s_key_mixer_channels).get_to(ses.mixer_channels);
+    json_ses.at(s_key_main_mixer_channel).get_to(ses.main_mixer_channel);
 }
 
 using upgrade_function = void (*)(nlohmann::json&);

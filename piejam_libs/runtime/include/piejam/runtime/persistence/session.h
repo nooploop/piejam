@@ -66,13 +66,14 @@ struct session
 
     struct mixer_bus
     {
+        std::string name;
         mixer_parameters parameter;
         mixer_midi midi;
         fx_chain_t fx_chain;
     };
 
-    std::vector<mixer_bus> inputs;
-    std::vector<mixer_bus> outputs;
+    std::vector<mixer_bus> mixer_channels;
+    mixer_bus main_mixer_channel;
 };
 
 void to_json(nlohmann::json&, session const&);

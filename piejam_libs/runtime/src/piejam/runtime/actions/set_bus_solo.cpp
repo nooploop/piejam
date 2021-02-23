@@ -17,11 +17,12 @@ set_bus_solo<D>::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    BOOST_ASSERT(index < mixer::bus_ids<D>(st.mixer_state).size());
-    auto const id = mixer::bus_ids<D>(st.mixer_state)[index];
+    //    BOOST_ASSERT(index < mixer::bus_ids<D>(st.mixer_state).size());
+    //    auto const id = mixer::bus_ids<D>(st.mixer_state)[index];
 
-    mixer::solo_id<D>(new_st.mixer_state) =
-            id == mixer::solo_id<D>(st.mixer_state) ? mixer::bus_id{} : id;
+    //    mixer::solo_id<D>(new_st.mixer_state) =
+    //            id == mixer::solo_id<D>(st.mixer_state) ? mixer::bus_id{} :
+    //            id;
 
     return new_st;
 }

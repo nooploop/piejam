@@ -4,6 +4,7 @@
 
 #include <piejam/runtime/persistence/access.h>
 
+#include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
@@ -250,21 +251,26 @@ export_mixer_parameters(state const& st, mixer::bus const& bus)
 }
 
 static auto
+export_mixer_bus(state const& st, mixer::bus const& bus)
+{
+    persistence::session::mixer_bus result;
+    result.name = bus.name;
+    result.fx_chain = export_fx_chain(st, *bus.fx_chain);
+    result.midi = export_mixer_midi(st, bus);
+    result.parameter = export_mixer_parameters(st, bus);
+    return result;
+}
+
+static auto
 export_mixer_buses(state const& st, mixer::bus_list_t const& bus_ids)
 {
-    std::vector<persistence::session::mixer_bus> result;
-
-    for (auto const& bus_id : bus_ids)
-    {
-        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-
-        auto& mb_data = result.emplace_back();
-        mb_data.fx_chain = export_fx_chain(st, *bus->fx_chain);
-        mb_data.midi = export_mixer_midi(st, *bus);
-        mb_data.parameter = export_mixer_parameters(st, *bus);
-    }
-
-    return result;
+    return algorithm::transform_to_vector(
+            bus_ids,
+            [&st](mixer::bus_id const bus_id) {
+                mixer::bus const* const bus = st.mixer_state.buses[bus_id];
+                BOOST_ASSERT(bus);
+                return export_mixer_bus(st, *bus);
+            });
 }
 
 void
@@ -276,7 +282,7 @@ load_session(std::filesystem::path const& file, dispatch_f const& dispatch)
         if (!in.is_open())
             throw std::runtime_error("could not open session file");
 
-        dispatch(actions::apply_session(persistence::load_session(in)));
+        actions::apply_session(persistence::load_session(in), dispatch);
     }
     catch (std::exception const& err)
     {
@@ -295,8 +301,10 @@ save_session(std::filesystem::path const& file, state const& st)
 
         session ses;
 
-        ses.inputs = export_mixer_buses(st, *st.mixer_state.inputs);
-        ses.outputs = export_mixer_buses(st, *st.mixer_state.outputs);
+        ses.mixer_channels = export_mixer_buses(st, *st.mixer_state.inputs);
+        ses.main_mixer_channel = export_mixer_bus(
+                st,
+                *st.mixer_state.buses[st.mixer_state.main]);
 
         save_session(out, ses);
     }

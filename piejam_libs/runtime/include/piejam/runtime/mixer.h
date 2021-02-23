@@ -44,34 +44,11 @@ struct state
     buses_t buses;
 
     box<bus_list_t> inputs;
-    box<bus_list_t> outputs;
     bus_id main;
 
     bus_id input_solo_id;
     bus_id output_solo_id;
 };
-
-template <io_direction D>
-auto
-bus_ids(state const& st) -> bus_list_t const&
-{
-    return D == io_direction::input ? st.inputs : st.outputs;
-}
-
-template <io_direction D>
-auto
-bus_ids(state& st) -> box<bus_list_t>&
-{
-    return D == io_direction::input ? st.inputs : st.outputs;
-}
-
-template <io_direction D>
-auto
-get_bus(state const& st, std::size_t index) -> bus const&
-{
-    BOOST_ASSERT(index < bus_ids<D>(st).size());
-    return *st.buses[bus_ids<D>(st)[index]];
-}
 
 template <io_direction D>
 auto

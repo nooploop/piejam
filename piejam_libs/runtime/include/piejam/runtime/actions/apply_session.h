@@ -10,6 +10,6 @@
 namespace piejam::runtime::actions
 {
 
-auto apply_session(persistence::session) -> thunk_action;
+void apply_session(persistence::session, dispatch_f const&);
 
 } // namespace piejam::runtime::actions
