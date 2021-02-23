@@ -110,40 +110,47 @@ TopPane {
         color: Material.color(Material.Grey, Material.Shade800)
 
         ButtonGroup {
-            buttons: toolbarButtons.children
+            id: mixerViewButtonGroup
         }
 
-        Column {
-            id: toolbarButtons
+        Button {
+            id: performButton
+
+            width: 32
+            height: 44
+
+            anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
+            anchors.margins: 4
 
-            Button {
-                id: editButton
+            ButtonGroup.group: mixerViewButtonGroup
 
-                width: 32
-                height: 44
+            text: "P"
+            checkable: true
+            checked: MixerViewSettings.mode === MixerViewSettings.perform
+            autoExclusive: true
 
-                text: "E"
-                checkable: true
-                checked: MixerViewSettings.mode === MixerViewSettings.edit
-                autoExclusive: true
+            onClicked: MixerViewSettings.mode = MixerViewSettings.perform
+        }
 
-                onClicked: MixerViewSettings.mode = MixerViewSettings.edit
-            }
+        Button {
+            id: editButton
 
-            Button {
-                id: performButton
+            width: 32
+            height: 44
 
-                width: 32
-                height: 44
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.margins: 4
 
-                text: "P"
-                checkable: true
-                checked: MixerViewSettings.mode === MixerViewSettings.perform
-                autoExclusive: true
+            ButtonGroup.group: mixerViewButtonGroup
 
-                onClicked: MixerViewSettings.mode = MixerViewSettings.perform
-            }
+            text: "E"
+            checkable: true
+            checked: MixerViewSettings.mode === MixerViewSettings.edit
+            autoExclusive: true
+
+            onClicked: MixerViewSettings.mode = MixerViewSettings.edit
         }
     }
 
