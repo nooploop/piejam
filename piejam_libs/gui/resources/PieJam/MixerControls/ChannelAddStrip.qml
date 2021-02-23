@@ -12,6 +12,8 @@ import ".."
 Item {
     id: root
 
+    property alias name: nameText.text
+
     signal addClicked()
 
     implicitWidth: 150
@@ -21,6 +23,16 @@ Item {
         id: frame
 
         anchors.fill: parent
+
+        TextField {
+            id: nameText
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+
+            placeholderText: qsTr("Name")
+        }
 
         Button {
             id: addButton

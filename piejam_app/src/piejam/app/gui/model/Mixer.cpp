@@ -111,9 +111,10 @@ Mixer::onSubscribe()
 }
 
 void
-Mixer::addChannel()
+Mixer::addChannel(QString const& newChannelName)
 {
     runtime::actions::add_mixer_bus action;
+    action.name = newChannelName.toStdString();
     dispatch(action);
 }
 

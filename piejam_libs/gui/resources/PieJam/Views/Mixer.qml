@@ -31,7 +31,7 @@ TopPane {
 
         onSoloToggled: root.model.setInputSolo(index)
         onFxButtonClicked: root.fxButtonClicked()
-        onAddChannelClicked: root.model.addChannel()
+        onAddChannelClicked: root.model.addChannel(newChannelName)
     }
 
     Loader {

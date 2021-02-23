@@ -18,7 +18,7 @@ public:
 
     auto mainChannel() const -> piejam::gui::model::MixerChannel* override;
 
-    void addChannel() override;
+    void addChannel(QString const& newChannelName) override;
 
     void setInputSolo(unsigned index) override;
     void setOutputSolo(unsigned index) override;
