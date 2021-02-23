@@ -146,6 +146,96 @@ apply_mixer_parameters(
     }
 }
 
+auto
+find_mixer_bus_by_name(
+        mixer::buses_t const& mixer_buses,
+        std::string const& name)
+{
+    return std::ranges::find_if(mixer_buses, [&name](auto const& p) {
+        return p.second.name == name;
+    });
+}
+
+auto
+find_device_bus_by_name(
+        device_io::buses_t const& device_buses,
+        std::string const& name)
+{
+    return std::ranges::find_if(device_buses, [&name](auto const& p) {
+        return p.second.name == name;
+    });
+}
+
+void
+apply_mixer_io(
+        batch_action& batch,
+        device_io::buses_t const& device_buses,
+        mixer::buses_t const& mixer_buses,
+        mixer::bus_id const& bus_id,
+        persistence::session::mixer_io const& in,
+        persistence::session::mixer_io const& out)
+{
+    auto get_io_addr = [&](auto const& mixer_io) {
+        switch (mixer_io.type)
+        {
+            case persistence::session::mixer_io_type::device:
+                if (auto it = find_device_bus_by_name(
+                            device_buses,
+                            mixer_io.name);
+                    it != device_buses.end())
+                    return mixer::io_address_t(it->first);
+                else
+                    return mixer::io_address_t(mixer_io.name);
+
+            case persistence::session::mixer_io_type::channel:
+                if (auto it =
+                            find_mixer_bus_by_name(mixer_buses, mixer_io.name);
+                    it != mixer_buses.end())
+                    return mixer::io_address_t(it->first);
+                else
+                    return mixer::io_address_t();
+
+            default:
+                return mixer::io_address_t();
+        }
+    };
+
+    {
+        auto action = std::make_unique<set_mixer_channel_input>();
+        action->bus_id = bus_id;
+        action->route = get_io_addr(in);
+        batch.push_back(std::move(action));
+    }
+
+    {
+        auto action = std::make_unique<set_mixer_channel_output>();
+        action->bus_id = bus_id;
+        action->route = get_io_addr(out);
+        batch.push_back(std::move(action));
+    }
+}
+
+void
+apply_mixer_io(
+        batch_action& batch,
+        device_io::buses_t const& device_buses,
+        mixer::buses_t const& buses,
+        mixer::bus_list_t const& mixer_bus_ids,
+        std::vector<persistence::session::mixer_bus> const& mb_data)
+{
+    BOOST_ASSERT(mb_data.size() == mixer_bus_ids.size());
+    for (std::size_t const i : range::indices(mixer_bus_ids))
+    {
+        apply_mixer_io(
+                batch,
+                device_buses,
+                buses,
+                mixer_bus_ids[i],
+                mb_data[i].in,
+                mb_data[i].out);
+    }
+}
+
 template <class GetState>
 auto
 configure_mixer_buses(persistence::session const& session, GetState&& get_state)
@@ -193,6 +283,7 @@ configure_mixer_buses(persistence::session const& session, GetState&& get_state)
             action.push_back(std::move(midi_action));
     }
 
+    // paramaeters
     apply_mixer_parameters(
             action,
             st.mixer_state.buses,
@@ -202,6 +293,21 @@ configure_mixer_buses(persistence::session const& session, GetState&& get_state)
             action,
             *st.mixer_state.buses[st.mixer_state.main],
             session.main_mixer_channel.parameter);
+
+    // io
+    apply_mixer_io(
+            action,
+            st.device_io_state.buses,
+            st.mixer_state.buses,
+            st.mixer_state.inputs,
+            session.mixer_channels);
+    apply_mixer_io(
+            action,
+            st.device_io_state.buses,
+            st.mixer_state.buses,
+            st.mixer_state.main,
+            session.main_mixer_channel.in,
+            session.main_mixer_channel.out);
 
     return action;
 }

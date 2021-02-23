@@ -64,12 +64,27 @@ struct session
 
     using fx_chain_t = std::vector<fx_plugin>;
 
+    enum class mixer_io_type
+    {
+        default_,
+        device,
+        channel
+    };
+
+    struct mixer_io
+    {
+        mixer_io_type type;
+        std::string name;
+    };
+
     struct mixer_bus
     {
         std::string name;
         mixer_parameters parameter;
         mixer_midi midi;
         fx_chain_t fx_chain;
+        mixer_io in;
+        mixer_io out;
     };
 
     std::vector<mixer_bus> mixer_channels;

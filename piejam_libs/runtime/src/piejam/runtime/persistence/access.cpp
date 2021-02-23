@@ -6,6 +6,7 @@
 
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/entity_id_hash.h>
+#include <piejam/functional/overload.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
@@ -243,7 +244,7 @@ export_mixer_midi(state const& st, mixer::bus const& bus)
 static auto
 export_mixer_parameters(state const& st, mixer::bus const& bus)
 {
-    persistence::session::mixer_parameters result;
+    session::mixer_parameters result;
     result.volume = *st.params.get(bus.volume);
     result.pan = *st.params.get(bus.pan_balance);
     result.mute = *st.params.get(bus.mute);
@@ -251,13 +252,48 @@ export_mixer_parameters(state const& st, mixer::bus const& bus)
 }
 
 static auto
+export_mixer_io(state const& st, mixer::io_address_t const& addr)
+{
+    return std::visit(
+            overload{
+                    [](std::nullptr_t) {
+                        return session::mixer_io{
+                                .type = session::mixer_io_type::default_,
+                                .name = {}};
+                    },
+                    [&st](mixer::bus_id const& bus_id) {
+                        auto const* const bus = st.mixer_state.buses[bus_id];
+                        BOOST_ASSERT(bus);
+                        return session::mixer_io{
+                                .type = session::mixer_io_type::channel,
+                                .name = *bus->name};
+                    },
+                    [&st](device_io::bus_id const& bus_id) {
+                        auto const* const bus =
+                                st.device_io_state.buses[bus_id];
+                        BOOST_ASSERT(bus);
+                        return session::mixer_io{
+                                .type = session::mixer_io_type::device,
+                                .name = *bus->name};
+                    },
+                    [](mixer::missing_device_address const& name) {
+                        return session::mixer_io{
+                                .type = session::mixer_io_type::device,
+                                .name = name};
+                    }},
+            addr);
+}
+
+static auto
 export_mixer_bus(state const& st, mixer::bus const& bus)
 {
-    persistence::session::mixer_bus result;
+    session::mixer_bus result;
     result.name = bus.name;
     result.fx_chain = export_fx_chain(st, *bus.fx_chain);
     result.midi = export_mixer_midi(st, bus);
     result.parameter = export_mixer_parameters(st, bus);
+    result.in = export_mixer_io(st, bus.in);
+    result.out = export_mixer_io(st, bus.out);
     return result;
 }
 

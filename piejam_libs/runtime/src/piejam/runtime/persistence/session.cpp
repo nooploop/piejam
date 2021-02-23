@@ -144,13 +144,34 @@ from_json(nlohmann::json const& j, session::mixer_midi& midi)
         midi.mute = j.at("mute").get<midi_assignment>();
 }
 
+NLOHMANN_JSON_SERIALIZE_ENUM(
+        session::mixer_io_type,
+        {{session::mixer_io_type::default_, "default"},
+         {session::mixer_io_type::device, "device"},
+         {session::mixer_io_type::channel, "channel"}})
+
+void
+to_json(nlohmann::json& j, session::mixer_io const& mixer_io)
+{
+    j = {{"type", mixer_io.type}, {"name", mixer_io.name}};
+}
+
+void
+from_json(nlohmann::json const& j, session::mixer_io& mixer_io)
+{
+    j.at("type").get_to(mixer_io.type);
+    j.at("name").get_to(mixer_io.name);
+}
+
 void
 to_json(nlohmann::json& j, session::mixer_bus const& mb)
 {
     j = {{"name", mb.name},
          {"parameter", mb.parameter},
          {"midi", mb.midi},
-         {"fx_chain", mb.fx_chain}};
+         {"fx_chain", mb.fx_chain},
+         {"in", mb.in},
+         {"out", mb.out}};
 }
 
 void
@@ -160,6 +181,8 @@ from_json(nlohmann::json const& j, session::mixer_bus& mb)
     j.at("parameter").get_to(mb.parameter);
     j.at("midi").get_to(mb.midi);
     j.at("fx_chain").get_to(mb.fx_chain);
+    j.at("in").get_to(mb.in);
+    j.at("out").get_to(mb.out);
 }
 
 static auto const s_key_mixer_channels = "mixer_channels";
