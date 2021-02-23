@@ -450,17 +450,28 @@ remove_mixer_bus(state& st, mixer::bus_id const bus_id)
 }
 
 void
-remove_device_bus(state& st, device_io::bus_id const bus_id)
+remove_device_bus(state& st, device_io::bus_id const device_bus_id)
 {
-    st.device_io_state.buses.remove(bus_id);
+    auto const name = st.device_io_state.buses[device_bus_id]->name;
 
-    if (algorithm::contains(*st.device_io_state.inputs, bus_id))
+    st.mixer_state.buses.update(
+            [device_bus_id, &name](mixer::bus_id, mixer::bus& mixer_bus) {
+                if (mixer_bus.in == mixer::io_address_t(device_bus_id))
+                    mixer_bus.in = mixer::missing_device_address(name);
+
+                if (mixer_bus.out == mixer::io_address_t(device_bus_id))
+                    mixer_bus.out = mixer::missing_device_address(name);
+            });
+
+    st.device_io_state.buses.remove(device_bus_id);
+
+    if (algorithm::contains(*st.device_io_state.inputs, device_bus_id))
     {
-        remove_erase(st.device_io_state.inputs, bus_id);
+        remove_erase(st.device_io_state.inputs, device_bus_id);
     }
     else
     {
-        remove_erase(st.device_io_state.outputs, bus_id);
+        remove_erase(st.device_io_state.outputs, device_bus_id);
     }
 }
 

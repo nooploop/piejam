@@ -104,8 +104,9 @@ MixerChannel::onSubscribe()
 
     observe(runtime::selectors::make_mixer_channel_input_selector(
                     m_impl->m_bus_id),
-            [this](boxed_string const& name) {
-                setSelectedInput(QString::fromStdString(*name));
+            [this](box<runtime::selectors::selected_route> const& sel_route) {
+                setSelectedInput(QString::fromStdString(sel_route->name));
+                setSelectedInputIsValid(sel_route->valid);
             });
 
     observe(runtime::selectors::select_mixer_input_devices,
@@ -139,8 +140,9 @@ MixerChannel::onSubscribe()
 
     observe(runtime::selectors::make_mixer_channel_output_selector(
                     m_impl->m_bus_id),
-            [this](boxed_string const& name) {
-                setSelectedOutput(QString::fromStdString(*name));
+            [this](box<runtime::selectors::selected_route> const& sel_route) {
+                setSelectedOutput(QString::fromStdString(sel_route->name));
+                setSelectedOutputIsValid(sel_route->valid);
             });
 
     observe(runtime::selectors::select_mixer_output_devices,

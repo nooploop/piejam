@@ -15,9 +15,11 @@ Item {
     property alias name: nameText.text
     property bool deletable: true
     property alias selectedInput: audioInSelect.displayText
+    property bool selectedInputIsValid: false
     property alias inputDevices: inDevicesRep.model
     property alias inputChannels: inChannelsRep.model
     property alias selectedOutput: audioOutSelect.displayText
+    property bool selectedOutputIsValid: false
     property alias outputDevices: outDevicesRep.model
     property alias outputChannels: outChannelsRep.model
 
@@ -85,6 +87,8 @@ Item {
             anchors.right: parent.right
             anchors.top: audioInLabel.bottom
 
+            Material.foreground: selectedInputIsValid ? Material.primaryTextColor : Material.Red
+
             popup: Menu {
                 id: audioInMenu
 
@@ -141,6 +145,8 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: audioOutLabel.bottom
+
+            Material.foreground: selectedOutputIsValid ? Material.primaryTextColor : Material.Red
 
             popup: Menu {
                 id: audioOutMenu

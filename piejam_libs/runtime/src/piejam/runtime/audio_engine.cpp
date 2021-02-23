@@ -105,12 +105,8 @@ struct mixer_input_bus_type
         return device_bus->bus_type;
     }
 
-    auto operator()(std::nullptr_t) const noexcept -> audio::bus_type
-    {
-        return audio::bus_type::stereo;
-    }
-
-    auto operator()(mixer::bus_id) const noexcept -> audio::bus_type
+    template <class T>
+    auto operator()(T const&) const noexcept -> audio::bus_type
     {
         return audio::bus_type::stereo;
     }
@@ -330,7 +326,7 @@ connect_mixer_input(
 {
     std::visit(
             overload{
-                    [&](std::nullptr_t) {},
+                    [](std::nullptr_t) {},
                     [&](device_io::bus_id const device_bus_id) {
                         auto const* const device_bus =
                                 device_buses[device_bus_id];
@@ -359,7 +355,8 @@ connect_mixer_input(
                                 *source_mb_out,
                                 mb_in,
                                 mixer_procs);
-                    }},
+                    },
+                    [](boxed_string const&) {}},
             bus.in);
 }
 
@@ -376,7 +373,7 @@ connect_mixer_output(
 {
     std::visit(
             overload{
-                    [&](std::nullptr_t) {},
+                    [](std::nullptr_t) {},
                     [&](device_io::bus_id const device_bus_id) {
                         auto const* const device_bus =
                                 device_buses[device_bus_id];
@@ -410,7 +407,8 @@ connect_mixer_output(
                                     *dst_mb_in,
                                     mixer_procs);
                         }
-                    }},
+                    },
+                    [](boxed_string const&) {}},
             bus.out);
 }
 
