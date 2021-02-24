@@ -4,7 +4,8 @@
 
 #include <piejam/system/cpu_load.h>
 
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include <array>
 #include <fstream>
