@@ -327,7 +327,7 @@ private:
         tasks.reserve(workers.size());
 
         for (auto& w : workers)
-            tasks.emplace_back([&w]() { w(); });
+            tasks.emplace_back(std::ref(w));
 
         return tasks;
     }

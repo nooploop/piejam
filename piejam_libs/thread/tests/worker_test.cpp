@@ -14,9 +14,7 @@ TEST(worker, executes_after_wakeup)
     std::atomic_bool worked{false};
 
     worker wt;
-    worker::task_t task(
-            [&]() { worked.store(true, std::memory_order_release); });
-    wt.wakeup(task);
+    wt.wakeup([&]() { worked.store(true, std::memory_order_release); });
     std::this_thread::sleep_for(std::chrono::microseconds{100});
 
     EXPECT_TRUE(worked);

@@ -9,6 +9,7 @@
 #include <piejam/thread/priority.h>
 
 #include <atomic>
+#include <concepts>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
@@ -43,7 +44,7 @@ public:
                 if (!m_running.load(std::memory_order_consume))
                     break;
 
-                m_task.get()();
+                m_task();
             }
         })
     {
@@ -51,11 +52,12 @@ public:
 
     ~worker() { stop(); }
 
-    void wakeup(std::reference_wrapper<task_t const> task)
+    template <std::invocable<> F>
+    void wakeup(F&& task)
     {
         {
             std::lock_guard<std::mutex> lock(m_work_mutex);
-            m_task = task;
+            m_task = std::forward<F>(task);
             m_work = true;
         }
 
@@ -66,7 +68,7 @@ public:
     {
         m_running.store(false, std::memory_order_release);
 
-        wakeup(s_default_task);
+        wakeup([]() {});
 
         m_thread.join();
     }
@@ -76,8 +78,7 @@ private:
     std::mutex m_work_mutex;
     std::condition_variable m_work_cond_var;
     bool m_work{false};
-    inline static task_t const s_default_task{[]() {}};
-    std::reference_wrapper<task_t const> m_task{s_default_task};
+    task_t m_task{[]() {}};
     std::thread m_thread;
 };
 
