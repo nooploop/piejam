@@ -4,6 +4,9 @@
 
 #include <piejam/thread/affinity.h>
 
+#include <pthread.h>
+#include <sched.h>
+
 #include <cstring>
 #include <stdexcept>
 #include <thread>
