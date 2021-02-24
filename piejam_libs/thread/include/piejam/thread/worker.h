@@ -9,6 +9,7 @@
 #include <piejam/thread/priority.h>
 
 #include <atomic>
+#include <cassert>
 #include <concepts>
 #include <condition_variable>
 #include <functional>
@@ -35,11 +36,9 @@ public:
 
             while (m_running.load(std::memory_order_consume))
             {
-                {
-                    std::unique_lock<std::mutex> lock(m_work_mutex);
-                    m_work_cond_var.wait(lock, [this]() { return m_work; });
-                    m_work = false;
-                }
+                std::unique_lock<std::mutex> lock(m_work_mutex);
+                m_work_cond_var.wait(lock, [this]() { return m_work; });
+                m_work = false;
 
                 if (!m_running.load(std::memory_order_consume))
                     break;
@@ -55,6 +54,8 @@ public:
     template <std::invocable<> F>
     void wakeup(F&& task)
     {
+        assert(!m_work);
+
         {
             std::lock_guard<std::mutex> lock(m_work_mutex);
             m_task = std::forward<F>(task);
