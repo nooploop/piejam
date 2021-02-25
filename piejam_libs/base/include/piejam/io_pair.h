@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/io_direction.h>
+
 #include <type_traits>
 #include <utility>
 
@@ -45,6 +47,16 @@ struct io_pair
     constexpr auto operator=(io_pair&&) -> io_pair& = default;
 
     constexpr bool operator==(io_pair const&) const noexcept = default;
+
+    constexpr auto get(io_direction const io_dir) const noexcept -> T const&
+    {
+        return io_dir == io_direction::input ? in : out;
+    }
+
+    constexpr auto get(io_direction const io_dir) noexcept -> T&
+    {
+        return io_dir == io_direction::input ? in : out;
+    }
 };
 
 } // namespace piejam
