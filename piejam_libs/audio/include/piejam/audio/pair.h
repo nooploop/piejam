@@ -50,22 +50,10 @@ struct pair
     constexpr pair(pair const&) = default;
     constexpr pair(pair&&) = default;
 
-    constexpr auto operator=(pair const&) -> pair<T>& = default;
-    constexpr auto operator=(pair &&) -> pair<T>& = default;
+    constexpr auto operator=(pair const&) -> pair& = default;
+    constexpr auto operator=(pair&&) -> pair& = default;
+
+    constexpr bool operator==(pair const&) const noexcept = default;
 };
-
-template <class T>
-constexpr bool
-operator==(pair<T> const& l, pair<T> const& r)
-{
-    return l.left == r.left && l.right == r.right;
-}
-
-template <class T>
-constexpr bool
-operator!=(pair<T> const& l, pair<T> const& r)
-{
-    return !(l == r);
-}
 
 } // namespace piejam::audio
