@@ -292,20 +292,17 @@ insert_missing_ladspa_fx_module(
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
-    auto id = st.fx_unavailable_ladspa_plugins.add(unavail);
-
-    fx::chain_t fx_chain = st.mixer_state.buses[bus_id]->fx_chain;
-    auto const insert_pos = std::min(position, fx_chain.size());
-
-    fx_chain.emplace(
-            std::next(fx_chain.begin(), insert_pos),
-            st.fx_modules.add(fx::module{
-                    .fx_instance_id = id,
-                    .name = name,
-                    .parameters = {}}));
-
     st.mixer_state.buses.update(bus_id, [&](mixer::bus& bus) {
-        bus.fx_chain = std::move(fx_chain);
+        bus.fx_chain.update([&](fx::chain_t& fx_chain) {
+            auto id = st.fx_unavailable_ladspa_plugins.add(unavail);
+            auto const insert_pos = std::min(position, fx_chain.size());
+            fx_chain.emplace(
+                    std::next(fx_chain.begin(), insert_pos),
+                    st.fx_modules.add(fx::module{
+                            .fx_instance_id = id,
+                            .name = name,
+                            .parameters = {}}));
+        });
     });
 }
 
