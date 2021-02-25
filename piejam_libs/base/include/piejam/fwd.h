@@ -13,4 +13,7 @@ struct entity_id;
 template <class Entity>
 class entity_map;
 
+template <class T>
+struct io_pair;
+
 } // namespace piejam

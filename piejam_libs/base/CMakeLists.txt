@@ -15,6 +15,7 @@ target_sources(piejam_base INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/indexed_access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/io_direction.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/io_pair.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/math.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/npos.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/scope_guard.h

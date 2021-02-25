@@ -1,0 +1,50 @@
+// PieJam - An audio mixer for Raspberry Pi.
+// SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#pragma once
+
+#include <type_traits>
+#include <utility>
+
+namespace piejam
+{
+
+template <class T>
+struct io_pair
+{
+    using type = T;
+
+    T in;
+    T out;
+
+    constexpr io_pair() noexcept(std::is_nothrow_default_constructible_v<T>)
+        : in()
+        , out()
+    {
+    }
+
+    constexpr io_pair(T const& i, T const& o) noexcept(
+            std::is_nothrow_copy_constructible_v<T>)
+        : in(i)
+        , out(o)
+    {
+    }
+
+    constexpr io_pair(T&& i, T&& o) noexcept(
+            std::is_nothrow_move_constructible_v<T>)
+        : in(std::move(i))
+        , out(std::move(o))
+    {
+    }
+
+    constexpr io_pair(io_pair const&) = default;
+    constexpr io_pair(io_pair&&) = default;
+
+    constexpr auto operator=(io_pair const&) -> io_pair& = default;
+    constexpr auto operator=(io_pair&&) -> io_pair& = default;
+
+    constexpr bool operator==(io_pair const&) const noexcept = default;
+};
+
+} // namespace piejam
