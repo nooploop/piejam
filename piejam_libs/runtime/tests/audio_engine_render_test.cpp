@@ -64,6 +64,7 @@ struct audio_engine_render_test : public ::testing::Test
         auto engine_swap = std::async(std::launch::async, [&]() {
             return sut.rebuild(
                     st.mixer_state,
+                    st.device_io_state.buses,
                     st.fx_modules,
                     st.fx_parameters,
                     st.params,
@@ -92,29 +93,13 @@ TEST_F(audio_engine_render_test, add_input_channel)
 {
     state st;
 
-    add_mixer_bus<io_direction::input>(
-            st,
-            "in1",
-            audio::bus_type::mono,
-            channel_index_pair(0));
-
-    mixer::bus out_ch;
-    out_ch.device.bus_type = audio::bus_type::stereo;
-    out_ch.device.channels = channel_index_pair(0, 1);
-    add_mixer_bus<io_direction::output>(
-            st,
-            "out",
-            audio::bus_type::stereo,
-            channel_index_pair(0, 1));
+    add_mixer_bus(st, "in1");
+    add_mixer_bus(st, "out");
 
     rebuild(st);
     render(200);
 
-    add_mixer_bus<io_direction::input>(
-            st,
-            "in2",
-            audio::bus_type::mono,
-            channel_index_pair(1));
+    add_mixer_bus(st, "in2");
 
     rebuild(st);
     render(200);
