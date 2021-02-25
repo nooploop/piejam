@@ -309,47 +309,50 @@ insert_missing_ladspa_fx_module(
     });
 }
 
+static auto
+find_mixer_bus_containing_fx_module(
+        mixer::buses_t const& mixer_buses,
+        fx::module_id const fx_mod_id)
+{
+    return std::ranges::find_if(mixer_buses, [fx_mod_id](auto const& id_bus) {
+        return algorithm::contains(*id_bus.second.fx_chain, fx_mod_id);
+    });
+}
+
 void
 remove_fx_module(state& st, fx::module_id id)
 {
-    if (fx::module const* const fx_mod = st.fx_modules[id])
+    fx::module const* const fx_mod = st.fx_modules[id];
+    BOOST_ASSERT(fx_mod);
+
+    auto it = find_mixer_bus_containing_fx_module(st.mixer_state.buses, id);
+    BOOST_ASSERT(it != st.mixer_state.buses.end());
+
+    st.mixer_state.buses.update(it->first, [id](mixer::bus& bus) {
+        remove_erase(bus.fx_chain, id);
+    });
+
+    fx::parameters_t fx_params = st.fx_parameters;
+    for (auto&& [key, fx_param_id] : *fx_mod->parameters)
     {
-        for (auto&& [bus_id, bus] : st.mixer_state.buses)
-        {
-            if (algorithm::contains(*bus.fx_chain, id))
-            {
-                st.mixer_state.buses.update(bus_id, [id](mixer::bus& bus) {
-                    fx::chain_t fx_chain = *bus.fx_chain;
-                    boost::remove_erase(fx_chain, id);
-                    bus.fx_chain = std::move(fx_chain);
-                });
-            }
-        }
+        std::visit([&st](auto&& id) { st.params.remove(id); }, fx_param_id);
+        fx_params.erase(fx_param_id);
+    }
+    st.fx_parameters = std::move(fx_params);
 
-        fx::parameters_t fx_params = st.fx_parameters;
-        for (auto&& [key, fx_param_id] : *fx_mod->parameters)
-        {
-            std::visit([&st](auto&& id) { st.params.remove(id); }, fx_param_id);
-            fx_params.erase(fx_param_id);
-        }
-        st.fx_parameters = std::move(fx_params);
+    st.fx_modules.remove(id);
 
-        st.fx_modules.remove(id);
-
-        if (auto id = std::get_if<fx::ladspa_instance_id>(
+    if (auto id = std::get_if<fx::ladspa_instance_id>(&fx_mod->fx_instance_id))
+    {
+        st.fx_ladspa_instances.update([id](fx::ladspa_instances& instances) {
+            instances.erase(*id);
+        });
+    }
+    else if (
+            auto id = std::get_if<fx::unavailable_ladspa_id>(
                     &fx_mod->fx_instance_id))
-        {
-            st.fx_ladspa_instances.update(
-                    [id](fx::ladspa_instances& instances) {
-                        instances.erase(*id);
-                    });
-        }
-        else if (
-                auto id = std::get_if<fx::unavailable_ladspa_id>(
-                        &fx_mod->fx_instance_id))
-        {
-            st.fx_unavailable_ladspa_plugins.remove(*id);
-        }
+    {
+        st.fx_unavailable_ladspa_plugins.remove(*id);
     }
 }
 
