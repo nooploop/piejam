@@ -5,12 +5,13 @@
 #include <piejam/audio/engine/graph.h>
 
 #include <piejam/algorithm/escape_html.h>
-#include <piejam/algorithm/unique_erase.h>
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/functional/address_compare.h>
 
 #include <fmt/format.h>
+
+#include <boost/range/algorithm_ext/erase.hpp>
 
 #include <algorithm>
 #include <ranges>
@@ -39,7 +40,7 @@ graph_processors(graph const& g)
 
     std::ranges::sort(procs, address_less<processor>{});
 
-    algorithm::unique_erase(procs, address_equal_to<processor>{});
+    boost::unique_erase(procs, address_equal_to<processor>{});
 
     return procs;
 }
