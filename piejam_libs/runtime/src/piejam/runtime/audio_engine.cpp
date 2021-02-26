@@ -324,6 +324,7 @@ connect_mixer_input(
         mixer::bus const& bus,
         audio::engine::component& mb_in)
 {
+    boost::ignore_unused(mixer_buses);
     std::visit(
             overload{
                     [](std::nullptr_t) {},
@@ -343,8 +344,7 @@ connect_mixer_input(
                                     mb_in.inputs()[1]);
                     },
                     [&](mixer::bus_id const src_bus_id) {
-                        auto const* const src_bus = mixer_buses[src_bus_id];
-                        BOOST_ASSERT(src_bus);
+                        BOOST_ASSERT(mixer_buses[src_bus_id]);
 
                         auto* const source_mb_out =
                                 comps.find(mixer_output_key{src_bus_id});
