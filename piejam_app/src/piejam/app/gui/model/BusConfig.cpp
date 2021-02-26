@@ -6,7 +6,7 @@
 
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
-#include <piejam/runtime/actions/set_bus_name.h>
+#include <piejam/runtime/actions/set_device_bus_name.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model
@@ -53,7 +53,7 @@ BusConfig::onSubscribe()
 void
 BusConfig::changeName(QString const& name)
 {
-    runtime::actions::set_bus_name action;
+    runtime::actions::set_device_bus_name action;
     action.bus_id = m_bus_id;
     action.name = name.toStdString();
     dispatch(action);

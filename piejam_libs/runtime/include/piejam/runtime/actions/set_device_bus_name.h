@@ -15,7 +15,8 @@
 namespace piejam::runtime::actions
 {
 
-struct set_bus_name final : ui::cloneable_action<set_bus_name, action>
+struct set_device_bus_name final
+    : ui::cloneable_action<set_device_bus_name, action>
 {
     device_io::bus_id bus_id;
     std::string name;

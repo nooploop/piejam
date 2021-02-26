@@ -50,7 +50,7 @@ using set_output_bus_solo = set_bus_solo<io_direction::output>;
 struct request_parameters_update;
 struct request_info_update;
 
-struct set_bus_name;
+struct set_device_bus_name;
 
 template <class>
 struct set_parameter_value;
