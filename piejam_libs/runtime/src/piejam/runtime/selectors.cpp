@@ -21,14 +21,14 @@ namespace piejam::runtime::selectors
 
 const selector<samplerate> select_samplerate(
         [get_samplerates = memo(boxify_result(&runtime::samplerates))](
-                state const& st) mutable -> samplerate {
+                state const& st) -> samplerate {
             return {get_samplerates(st.input.hw_params, st.output.hw_params),
                     st.samplerate};
         });
 
 const selector<period_size> select_period_size(
         [get_period_sizes = memo(boxify_result(&runtime::period_sizes))](
-                state const& st) mutable -> period_size {
+                state const& st) -> period_size {
             return {get_period_sizes(st.input.hw_params, st.output.hw_params),
                     st.period_size};
         });
@@ -102,12 +102,12 @@ make_bus_infos(
 }
 
 const selector<boxed_vector<mixer_bus_info>> select_mixer_bus_infos(
-        [get_infos = memo(&make_bus_infos)](state const& st) mutable {
+        [get_infos = memo(&make_bus_infos)](state const& st) {
             return get_infos(st.mixer_state.buses, st.mixer_state.inputs);
         });
 
 const selector<box<mixer_bus_info>> select_mixer_main_bus_info(
-        [get = memo(boxify_result(&make_bus_info))](state const& st) mutable {
+        [get = memo(boxify_result(&make_bus_info))](state const& st) {
             return get(st.mixer_state.buses, st.mixer_state.main);
         });
 
@@ -294,9 +294,15 @@ auto
 make_device_bus_name_selector(device_io::bus_id const bus_id)
         -> selector<boxed_string>
 {
-    return [bus_id](state const& st) mutable -> boxed_string {
-        device_io::bus const* const bus = st.device_io_state.buses[bus_id];
+    auto get_device_bus_name = [](device_io::buses_t const& device_buses,
+                                  device_io::bus_id const bus_id) {
+        device_io::bus const* const bus = device_buses[bus_id];
         return bus ? bus->name : boxed_string();
+    };
+
+    return [bus_id,
+            get = memo(get_device_bus_name)](state const& st) -> boxed_string {
+        return get(st.device_io_state.buses, bus_id);
     };
 }
 
@@ -304,9 +310,15 @@ auto
 make_mixer_bus_name_selector(mixer::bus_id const bus_id)
         -> selector<boxed_string>
 {
-    return [bus_id](state const& st) mutable -> boxed_string {
-        mixer::bus const* const bus = st.mixer_state.buses[bus_id];
+    auto get_mixer_bus_name = [](mixer::buses_t const& mixer_buses,
+                                 mixer::bus_id const bus_id) {
+        mixer::bus const* const bus = mixer_buses[bus_id];
         return bus ? bus->name : boxed_string();
+    };
+
+    return [bus_id,
+            get = memo(get_mixer_bus_name)](state const& st) -> boxed_string {
+        return get(st.mixer_state.buses, bus_id);
     };
 }
 
