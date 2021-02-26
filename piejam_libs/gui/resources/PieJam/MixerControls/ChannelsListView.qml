@@ -50,6 +50,7 @@ ListView {
         }
 
         edit.name: model.item.name
+        edit.defaultInputIsValid: model.item.defaultInputIsValid
         edit.selectedInput: model.item.selectedInput
         edit.selectedInputIsValid: model.item.selectedInputIsValid
         edit.inputDevices: model.item.inputDevices

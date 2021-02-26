@@ -17,6 +17,7 @@ add_executable(piejam_runtime_test
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware_functors_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/midi_control_middleware_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/midi_input_controller_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/mixer_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/parameter_map_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/state_test.cpp
 )

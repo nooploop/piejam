@@ -24,15 +24,15 @@ namespace piejam::runtime::mixer
 
 struct bus
 {
-    boxed_string name;
+    boxed_string name{};
 
-    io_address_t in;
-    io_address_t out;
+    io_address_t in{};
+    io_address_t out{};
 
-    float_parameter_id volume;
-    float_parameter_id pan_balance;
-    bool_parameter_id mute;
-    stereo_level_parameter_id level;
+    float_parameter_id volume{};
+    float_parameter_id pan_balance{};
+    bool_parameter_id mute{};
+    stereo_level_parameter_id level{};
 
     box<fx::chain_t> fx_chain{};
 
@@ -63,5 +63,13 @@ solo_id(state& st) -> bus_id&
 {
     return D == io_direction::input ? st.input_solo_id : st.output_solo_id;
 }
+
+bool is_default_source_valid(buses_t const&, bus_id);
+
+auto valid_source_channels(buses_t const&, bus_id)
+        -> std::vector<mixer::bus_id>;
+
+auto valid_target_channels(buses_t const&, bus_id)
+        -> std::vector<mixer::bus_id>;
 
 } // namespace piejam::runtime::mixer

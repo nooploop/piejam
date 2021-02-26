@@ -70,6 +70,7 @@ TopPane {
             }
 
             edit.name: root.model.mainChannel.name
+            edit.defaultInputIsValid: root.model.mainChannel.defaultInputIsValid
             edit.selectedInput: root.model.mainChannel.selectedInput
             edit.selectedInputIsValid: root.model.mainChannel.selectedInputIsValid
             edit.inputDevices: root.model.mainChannel.inputDevices

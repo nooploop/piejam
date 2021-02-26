@@ -26,6 +26,8 @@ using io_address_t = std::variant<
         missing_device_address,
         bus_id>;
 
+using bus_io_t = io_pair<io_address_t>;
+
 using bus_list_t = std::vector<bus_id>;
 
 struct state;

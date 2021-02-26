@@ -15,6 +15,7 @@ Item {
     property alias name: nameText.text
     property bool deletable: true
     property alias selectedInput: audioInSelect.displayText
+    property alias defaultInputIsValid: defaultInputMenuEntry.enabled
     property bool selectedInputIsValid: false
     property alias inputDevices: inDevicesRep.model
     property alias inputChannels: inChannelsRep.model
@@ -93,6 +94,8 @@ Item {
                 id: audioInMenu
 
                 MenuItem {
+                    id: defaultInputMenuEntry
+
                     text: qsTr("Mix")
 
                     onClicked: root.audioInMixSelected()
@@ -100,6 +103,8 @@ Item {
 
                 Menu {
                     title: qsTr("Devices")
+
+                    enabled: inDevicesRep.count > 0
 
                     Repeater {
                         id: inDevicesRep
@@ -114,6 +119,8 @@ Item {
 
                 Menu {
                     title: qsTr("Channels")
+
+                    enabled: inChannelsRep.count > 0
 
                     Repeater {
                         id: inChannelsRep
@@ -160,6 +167,8 @@ Item {
                 Menu {
                     title: qsTr("Devices")
 
+                    enabled: outDevicesRep.count > 0
+
                     Repeater {
                         id: outDevicesRep
 
@@ -173,6 +182,8 @@ Item {
 
                 Menu {
                     title: qsTr("Channels")
+
+                    enabled: outChannelsRep.count > 0
 
                     Repeater {
                         id: outChannelsRep

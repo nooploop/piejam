@@ -88,6 +88,9 @@ struct mixer_channel_route
     bool operator==(mixer_channel_route const&) const noexcept = default;
 };
 
+auto make_default_mixer_channel_input_is_valid_selector(mixer::bus_id)
+        -> selector<bool>;
+
 auto make_mixer_input_channels_selector(mixer::bus_id)
         -> selector<boxed_vector<mixer_channel_route>>;
 

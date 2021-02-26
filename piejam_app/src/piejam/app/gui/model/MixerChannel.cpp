@@ -102,6 +102,11 @@ MixerChannel::onSubscribe()
                 setLevel(x.left, x.right);
             });
 
+    observe(runtime::selectors::
+                    make_default_mixer_channel_input_is_valid_selector(
+                            m_impl->m_bus_id),
+            [this](bool const x) { setDefaultInputIsValid(x); });
+
     observe(runtime::selectors::make_mixer_channel_input_selector(
                     m_impl->m_bus_id),
             [this](box<runtime::selectors::selected_route> const& sel_route) {

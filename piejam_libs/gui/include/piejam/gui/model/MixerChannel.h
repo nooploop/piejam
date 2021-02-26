@@ -32,6 +32,8 @@ class MixerChannel : public SubscribableModel
     Q_PROPERTY(piejam::gui::model::MidiAssignable* muteMidi READ muteMidi
                        CONSTANT FINAL)
 
+    Q_PROPERTY(bool defaultInputIsValid READ defaultInputIsValid NOTIFY
+                       defaultInputIsValidChanged FINAL)
     Q_PROPERTY(bool selectedInputIsValid READ selectedInputIsValid NOTIFY
                        selectedInputIsValidChanged FINAL)
     Q_PROPERTY(QString selectedInput READ selectedInput NOTIFY
@@ -92,6 +94,16 @@ public:
     virtual auto volumeMidi() const -> MidiAssignable* = 0;
     virtual auto panMidi() const -> MidiAssignable* = 0;
     virtual auto muteMidi() const -> MidiAssignable* = 0;
+
+    bool defaultInputIsValid() const noexcept { return m_defaultInputIsValid; }
+    void setDefaultInputIsValid(bool x)
+    {
+        if (m_defaultInputIsValid != x)
+        {
+            m_defaultInputIsValid = x;
+            emit defaultInputIsValidChanged();
+        }
+    }
 
     bool selectedInputIsValid() const noexcept
     {
@@ -211,6 +223,7 @@ signals:
     void panBalanceChanged();
     void muteChanged();
     void soloChanged();
+    void defaultInputIsValidChanged();
     void selectedInputIsValidChanged();
     void selectedInputChanged();
     void inputDevicesChanged();
@@ -229,6 +242,7 @@ private:
     double m_panBalance{};
     bool m_mute{};
     bool m_solo{};
+    bool m_defaultInputIsValid{};
     bool m_selectedInputIsValid{};
     QString m_selectedInput;
     QStringList m_inputDevices;
