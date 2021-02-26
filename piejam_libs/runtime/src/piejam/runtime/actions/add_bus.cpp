@@ -8,6 +8,8 @@
 
 #include <fmt/format.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::actions
 {
 
@@ -16,33 +18,32 @@ add_bus::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    switch (direction)
-    {
-        case io_direction::input:
+    auto bus_name = [this](auto const& st) {
+        switch (direction)
         {
-            add_device_bus<io_direction::input>(
-                    new_st,
-                    fmt::format(
-                            "{} In {}",
-                            type == audio::bus_type::mono ? "Mono" : "Stereo",
-                            new_st.device_io_state.inputs->size() + 1),
-                    type,
-                    channel_index_pair{npos});
-            break;
-        }
+            case io_direction::input:
+                return fmt::format(
+                        "{} In {}",
+                        type == audio::bus_type::mono ? "Mono" : "Stereo",
+                        st.device_io_state.inputs->size() + 1);
 
-        case io_direction::output:
-        {
-            add_device_bus<io_direction::output>(
-                    new_st,
-                    fmt::format(
-                            "Speaker {}",
-                            new_st.device_io_state.outputs->size() + 1),
-                    audio::bus_type::stereo,
-                    channel_index_pair{npos});
-            break;
+            case io_direction::output:
+                return fmt::format(
+                        "Speaker {}",
+                        st.device_io_state.outputs->size() + 1);
         }
-    }
+    }(new_st);
+
+    BOOST_ASSERT(
+            direction != io_direction::output ||
+            type == audio::bus_type::stereo);
+
+    add_device_bus(
+            new_st,
+            std::move(bus_name),
+            direction,
+            type,
+            channel_index_pair{npos});
 
     return new_st;
 }

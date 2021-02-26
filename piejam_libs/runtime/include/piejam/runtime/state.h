@@ -88,10 +88,10 @@ auto period_sizes(
         box<audio::pcm_hw_params> output_hw_params) -> audio::period_sizes_t;
 auto period_sizes_from_state(state const&) -> audio::period_sizes_t;
 
-template <io_direction D>
 auto add_device_bus(
         state&,
         std::string name,
+        io_direction,
         audio::bus_type,
         channel_index_pair const&) -> device_io::bus_id;
 

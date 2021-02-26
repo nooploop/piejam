@@ -353,38 +353,27 @@ remove_fx_module(state& st, fx::module_id id)
     }
 }
 
-template <io_direction D>
 auto
 add_device_bus(
         state& st,
         std::string name,
+        io_direction const io_dir,
         audio::bus_type const bus_type,
         channel_index_pair const& channels) -> device_io::bus_id
 {
     auto id = st.device_io_state.buses.add(device_io::bus{
             .name = std::move(name),
-            .bus_type = D == io_direction::input ? bus_type
-                                                 : audio::bus_type::stereo,
+            .bus_type = io_dir == io_direction::input ? bus_type
+                                                      : audio::bus_type::stereo,
             .channels = channels});
 
-    auto& bus_list = D == io_direction::input ? st.device_io_state.inputs
-                                              : st.device_io_state.outputs;
+    auto& bus_list = io_dir == io_direction::input ? st.device_io_state.inputs
+                                                   : st.device_io_state.outputs;
 
     emplace_back(bus_list, id);
 
     return id;
 }
-
-template auto add_device_bus<io_direction::input>(
-        state&,
-        std::string,
-        audio::bus_type,
-        channel_index_pair const&) -> device_io::bus_id;
-template auto add_device_bus<io_direction::output>(
-        state&,
-        std::string,
-        audio::bus_type,
-        channel_index_pair const&) -> device_io::bus_id;
 
 auto
 add_mixer_bus(state& st, std::string name) -> mixer::bus_id
