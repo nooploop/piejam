@@ -111,6 +111,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/store_dispatch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/subscriber.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action_tracker_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/batch_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/batch_action_impl.h
