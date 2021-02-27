@@ -86,13 +86,17 @@ processor_job::operator()(
         std::size_t const buffer_size)
 {
     // set output buffer sizes
-    for (std::span<float>& out : m_outputs)
-        out = {out.data(), buffer_size};
+    if (m_process_context.buffer_size != buffer_size)
+    {
+        for (std::span<float>& out : m_outputs)
+            out = {out.data(), buffer_size};
+
+        m_process_context.buffer_size = buffer_size;
+    }
 
     BOOST_ASSERT(ctx.event_memory);
     m_event_outputs.set_event_memory(ctx.event_memory);
 
-    m_process_context.buffer_size = buffer_size;
     m_proc.process(m_process_context);
 }
 
