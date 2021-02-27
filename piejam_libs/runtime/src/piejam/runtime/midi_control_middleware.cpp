@@ -214,11 +214,9 @@ midi_control_middleware::process_midi_control_action(
 
     algorithm::for_each_visit(
             st.midi_assignments.get() | std::views::keys,
-            [&param_update](auto const& id) {
-                param_update.param_ids.emplace_back(id);
-            });
+            [&param_update](auto const& id) { param_update.push_back(id); });
 
-    if (!param_update.param_ids.empty())
+    if (!param_update.empty())
         next(param_update);
 }
 

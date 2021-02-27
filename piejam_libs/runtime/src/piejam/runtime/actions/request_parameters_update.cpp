@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/state.h>
 
+#include <boost/mp11/tuple.hpp>
+
 namespace piejam::runtime::actions
 {
 
@@ -13,6 +15,18 @@ auto
 request_parameters_update::reduce(state const& st) const -> state
 {
     return st;
+}
+
+auto
+request_parameters_update::empty() const noexcept -> bool
+{
+    bool result{true};
+
+    boost::mp11::tuple_for_each(param_ids, [&result](auto const& ids) {
+        result = result && ids.empty();
+    });
+
+    return result;
 }
 
 } // namespace piejam::runtime::actions

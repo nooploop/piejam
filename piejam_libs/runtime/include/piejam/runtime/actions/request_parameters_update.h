@@ -10,10 +10,10 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
+#include <boost/container/flat_set.hpp>
 #include <boost/mp11/algorithm.hpp>
 
-#include <variant>
-#include <vector>
+#include <tuple>
 
 namespace piejam::runtime::actions
 {
@@ -22,11 +22,24 @@ struct request_parameters_update final
     : ui::cloneable_action<request_parameters_update, action>
     , visitable_engine_action<request_parameters_update>
 {
-    using parameter_id_t = boost::mp11::mp_rename<
-            boost::mp11::mp_transform<parameter::id_t, parameters_t>,
-            std::variant>;
+    template <class Parameter>
+    using parameter_ids_set_t =
+            boost::container::flat_set<parameter::id_t<Parameter>>;
 
-    std::vector<parameter_id_t> param_ids;
+    using parameter_ids_t = boost::mp11::mp_rename<
+            boost::mp11::mp_transform<parameter_ids_set_t, parameters_t>,
+            std::tuple>;
+
+    parameter_ids_t param_ids;
+
+    template <class Parameter>
+    void push_back(parameter::id_t<Parameter> const id)
+    {
+        auto& ids = std::get<parameter_ids_set_t<Parameter>>(param_ids);
+        ids.emplace_hint(ids.end(), id);
+    }
+
+    auto empty() const noexcept -> bool;
 
     auto reduce(state const&) const -> state override;
 };

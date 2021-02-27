@@ -312,7 +312,6 @@ TEST_F(midi_control_middleware_test,
        request_info_update_will_request_parameter_updates_for_each_midi_assignment)
 {
     using testing::_;
-    using testing::ElementsAre;
     using testing::Field;
     using testing::InSequence;
     using testing::ReturnRef;
@@ -336,12 +335,15 @@ TEST_F(midi_control_middleware_test,
                 next(WhenDynamicCastTo<actions::request_info_update const&>(
                         _)));
 
+        actions::request_parameters_update::parameter_ids_t expected_ids;
+        std::get<0>(expected_ids).emplace(param_id);
+
         EXPECT_CALL(
                 mf_mock,
                 next(WhenDynamicCastTo<
                         actions::request_parameters_update const&>(
                         Field(&actions::request_parameters_update::param_ids,
-                              ElementsAre(param_id)))));
+                              expected_ids))));
 
         actions::request_info_update action;
         sut(action);

@@ -49,6 +49,7 @@
 #include <spdlog/spdlog.h>
 
 #include <boost/assert.hpp>
+#include <boost/mp11/tuple.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 
 namespace piejam::runtime
@@ -442,10 +443,15 @@ audio_engine_middleware::process_engine_action(
     {
         actions::update_parameter_values next_action;
 
-        algorithm::for_each_visit(a.param_ids, [this, &next_action](auto&& id) {
-            if (auto value = m_engine->get_parameter_update(id))
-                next_action.push_back(id, *value);
-        });
+        boost::mp11::tuple_for_each(
+                a.param_ids,
+                [this, &next_action](auto&& ids) {
+                    for (auto&& id : ids)
+                    {
+                        if (auto value = m_engine->get_parameter_update(id))
+                            next_action.push_back(id, *value);
+                    }
+                });
 
         if (!next_action.empty())
             next(next_action);
