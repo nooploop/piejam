@@ -69,6 +69,12 @@ public:
         return get_map<P>().set(id, std::forward<V>(value));
     }
 
+    template <class P>
+    auto set(id_value_map_t<P> const& id_values)
+    {
+        get_map<P>().set(id_values);
+    }
+
 private:
     std::tuple<map<Parameter>...> m_maps;
 };

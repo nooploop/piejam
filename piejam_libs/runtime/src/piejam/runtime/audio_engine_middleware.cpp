@@ -441,10 +441,10 @@ audio_engine_middleware::process_engine_action(
 
         algorithm::for_each_visit(a.param_ids, [this, &next_action](auto&& id) {
             if (auto value = m_engine->get_parameter_update(id))
-                next_action.values.emplace_back(std::pair(id, *value));
+                next_action.push_back(id, *value);
         });
 
-        if (!next_action.values.empty())
+        if (!next_action.empty())
             next(next_action);
     }
 }

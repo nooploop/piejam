@@ -4,8 +4,9 @@
 
 #include <piejam/runtime/actions/update_parameter_values.h>
 
-#include <piejam/algorithm/for_each_visit.h>
 #include <piejam/runtime/state.h>
+
+#include <boost/mp11/tuple.hpp>
 
 namespace piejam::runtime::actions
 {
@@ -15,11 +16,23 @@ update_parameter_values::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    algorithm::for_each_visit(values, [&new_st](auto const& id_value) {
-        new_st.params.set(id_value.first, id_value.second);
+    boost::mp11::tuple_for_each(values, [&new_st](auto const& id_value_pairs) {
+        new_st.params.set(id_value_pairs);
     });
 
     return new_st;
+}
+
+auto
+update_parameter_values::empty() const noexcept -> bool
+{
+    bool result{true};
+
+    boost::mp11::tuple_for_each(values, [&result](auto const& v) {
+        result = result && v.empty();
+    });
+
+    return result;
 }
 
 } // namespace piejam::runtime::actions

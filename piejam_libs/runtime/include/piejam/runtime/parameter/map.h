@@ -5,9 +5,12 @@
 #pragma once
 
 #include <piejam/entity_map.h>
+#include <piejam/runtime/parameter/fwd.h>
+#include <piejam/tuple_element_compare.h>
 
 #include <boost/container/flat_map.hpp>
 
+#include <algorithm>
 #include <concepts>
 
 namespace piejam::runtime::parameter
@@ -72,9 +75,23 @@ public:
         return false;
     }
 
+    auto set(id_value_map_t<Parameter> const& id_values)
+    {
+        auto it = m_values.begin();
+        for (auto&& [id, value] : id_values)
+        {
+            it = std::ranges::find_if(
+                    it,
+                    m_values.end(),
+                    tuple::element<0>.equal_to(id));
+            BOOST_ASSERT(it != m_values.end());
+            it->second = value;
+        }
+    }
+
 private:
     entity_map<Parameter> m_parameters;
-    boost::container::flat_map<id_t, value_type> m_values;
+    id_value_map_t<Parameter> m_values;
 };
 
 } // namespace piejam::runtime::parameter

@@ -14,7 +14,7 @@
 
 #include <boost/mp11/algorithm.hpp>
 
-#include <variant>
+#include <tuple>
 #include <vector>
 
 namespace piejam::runtime::actions
@@ -23,17 +23,20 @@ namespace piejam::runtime::actions
 struct update_parameter_values final
     : ui::cloneable_action<update_parameter_values, action>
 {
-    template <class P>
-    using parameter_id_value_pair =
-            std::pair<parameter::id_t<P>, typename P::value_type>;
-
-    using parameter_id_value_t = boost::mp11::mp_rename<
-            boost::mp11::mp_transform<parameter_id_value_pair, parameters_t>,
-            std::variant>;
-
-    using parameter_values_t = std::vector<parameter_id_value_t>;
+    using parameter_values_t = boost::mp11::mp_rename<
+            boost::mp11::mp_transform<parameter::id_value_map_t, parameters_t>,
+            std::tuple>;
 
     parameter_values_t values;
+
+    template <class P>
+    void
+    push_back(parameter::id_t<P> const id, typename P::value_type const value)
+    {
+        std::get<parameter::id_value_map_t<P>>(values).emplace(id, value);
+    }
+
+    auto empty() const noexcept -> bool;
 
     auto reduce(state const& st) const -> state;
 };
