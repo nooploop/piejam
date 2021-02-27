@@ -118,6 +118,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/batch_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/cloneable_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/profiling_reducer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/activate_midi_device.cpp
