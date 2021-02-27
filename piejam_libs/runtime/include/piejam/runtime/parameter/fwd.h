@@ -7,7 +7,7 @@
 #include <piejam/audio/fwd.h>
 #include <piejam/fwd.h>
 
-#include <boost/container/flat_map.hpp>
+#include <boost/container/container_fwd.hpp>
 
 namespace piejam::runtime::parameter
 {

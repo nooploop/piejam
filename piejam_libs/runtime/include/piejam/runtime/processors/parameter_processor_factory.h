@@ -7,9 +7,9 @@
 #include <piejam/audio/engine/value_io_processor.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/runtime/parameter/fwd.h>
-#include <piejam/runtime/parameter/map.h>
 
 #include <boost/assert.hpp>
+#include <boost/mp11/tuple.hpp>
 
 #include <concepts>
 #include <memory>
@@ -52,25 +52,21 @@ public:
         return it != map.end() ? it->second.lock() : nullptr;
     }
 
-    template <class P>
-    void initialize(parameter::map<P> const& params) const
+    template <class FindValue>
+    void initialize(FindValue&& find_value) const
     {
-        for (auto&& [id, weak_proc] : std::get<processor_map<P>>(m_procs))
-        {
-            if (auto proc = weak_proc.lock())
+        boost::mp11::tuple_for_each(m_procs, [&](auto&& procs) {
+            for (auto&& [id, weak_proc] : procs)
             {
-                if (auto const* value = params.get(id))
+                if (auto proc = weak_proc.lock())
                 {
-                    proc->set(*value);
+                    if (auto const* value = find_value(id))
+                    {
+                        proc->set(*value);
+                    }
                 }
             }
-        }
-    }
-
-    template <class... Ps>
-    void initialize(parameter::maps_collection<Ps...> const& params) const
-    {
-        (initialize(params.template get_map<Parameter>()), ...);
+        });
     }
 
     template <class P, std::convertible_to<typename P::value_type> V>

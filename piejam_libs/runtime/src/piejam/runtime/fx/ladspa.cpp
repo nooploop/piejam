@@ -12,7 +12,7 @@
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
-#include <piejam/runtime/parameter/map.h>
+#include <piejam/runtime/parameter_maps_access.h>
 
 #include <boost/container/flat_map.hpp>
 
@@ -23,9 +23,7 @@ static auto
 make_module_parameters(
         std::span<audio::ladspa::port_descriptor const> control_inputs,
         parameters_t& fx_params,
-        float_parameters& float_params,
-        int_parameters& int_params,
-        bool_parameters& bool_params) -> fx::module_parameters
+        parameter_maps& params) -> fx::module_parameters
 {
     fx::module_parameters module_params;
 
@@ -36,19 +34,23 @@ make_module_parameters(
         {
             bool const logarithmic =
                     p->logarithmic && p->min > 0.f && p->max > 0.f;
-            auto id = float_params.add(float_parameter{
-                    .default_value = p->default_value,
-                    .min = p->min,
-                    .max = p->max,
-                    .to_normalized =
-                            logarithmic
-                                    ? &runtime::parameter::to_normalized_log
-                                    : &runtime::parameter::to_normalized_linear,
-                    .from_normalized =
-                            logarithmic
-                                    ? &runtime::parameter::from_normalized_log
-                                    : &runtime::parameter::
-                                              from_normalized_linear});
+            auto id = add_parameter(
+                    params,
+                    float_parameter{
+                            .default_value = p->default_value,
+                            .min = p->min,
+                            .max = p->max,
+                            .to_normalized =
+                                    logarithmic ? &runtime::parameter::
+                                                          to_normalized_log
+                                                : &runtime::parameter::
+                                                          to_normalized_linear,
+                            .from_normalized =
+                                    logarithmic
+                                            ? &runtime::parameter::
+                                                      from_normalized_log
+                                            : &runtime::parameter::
+                                                      from_normalized_linear});
 
             fx_params.emplace(
                     parameter_id(id),
@@ -63,10 +65,12 @@ make_module_parameters(
                         &port_desc.type_desc))
         {
             BOOST_ASSERT(!p->logarithmic);
-            auto id = int_params.add(int_parameter{
-                    .default_value = p->default_value,
-                    .min = p->min,
-                    .max = p->max});
+            auto id = add_parameter(
+                    params,
+                    int_parameter{
+                            .default_value = p->default_value,
+                            .min = p->min,
+                            .max = p->max});
 
             fx_params.emplace(
                     id,
@@ -80,7 +84,8 @@ make_module_parameters(
                 auto const* const p = std::get_if<audio::ladspa::bool_port>(
                         &port_desc.type_desc))
         {
-            auto id = bool_params.add(
+            auto id = add_parameter(
+                    params,
                     bool_parameter{.default_value = p->default_value});
 
             fx_params.emplace(
@@ -102,19 +107,13 @@ make_ladspa_module(
         std::string const& name,
         std::span<audio::ladspa::port_descriptor const> control_inputs,
         parameters_t& fx_params,
-        float_parameters& float_params,
-        int_parameters& int_params,
-        bool_parameters& bool_params) -> module
+        parameter_maps& params) -> module
 {
     return module{
             .fx_instance_id = instance_id,
             .name = name,
-            .parameters = make_module_parameters(
-                    control_inputs,
-                    fx_params,
-                    float_params,
-                    int_params,
-                    bool_params)};
+            .parameters =
+                    make_module_parameters(control_inputs, fx_params, params)};
 }
 
 } // namespace piejam::runtime::fx

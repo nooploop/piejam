@@ -30,8 +30,7 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/mixer.h>
-#include <piejam/runtime/parameter/map.h>
-#include <piejam/runtime/parameter/maps_collection.h>
+#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/runtime/processors/midi_assignment_processor.h>
 #include <piejam/runtime/processors/midi_input_processor.h>
@@ -241,8 +240,7 @@ make_midi_assignment_processors(
     {
         std::visit(
                 [&](auto const& param_id) {
-                    auto const* param = params.get_parameter(param_id);
-                    BOOST_ASSERT(param);
+                    auto const& param = get_parameter(params, param_id);
 
                     std::tuple const proc_id{param_id, ass};
                     if (auto proc = prev_procs.remove(proc_id))
@@ -254,7 +252,7 @@ make_midi_assignment_processors(
                         procs.insert(
                                 proc_id,
                                 processors::make_midi_cc_to_parameter_processor(
-                                        *param));
+                                        param));
                     }
                 },
                 id);
@@ -669,7 +667,9 @@ audio_engine::rebuild(
             m_impl->param_procs,
             ladspa_fx_proc_factory);
 
-    m_impl->param_procs.initialize(params);
+    m_impl->param_procs.initialize([&params](auto const id) {
+        return find_parameter_value(params, id);
+    });
 
     processor_map procs;
 

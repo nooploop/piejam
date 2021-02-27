@@ -12,6 +12,7 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
+#include <boost/container/flat_map.hpp>
 #include <boost/mp11/algorithm.hpp>
 
 #include <tuple>

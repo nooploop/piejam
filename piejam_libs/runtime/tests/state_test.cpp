@@ -4,6 +4,8 @@
 
 #include <piejam/runtime/state.h>
 
+#include <piejam/runtime/parameter_maps_access.h>
+
 #include <gtest/gtest.h>
 
 namespace piejam::runtime::test
@@ -30,88 +32,47 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_bus)
 
     EXPECT_EQ("foo", bus->name);
 
-    auto volume_param = sut.params.get_parameter(bus->volume);
-    ASSERT_NE(nullptr, volume_param);
-    EXPECT_EQ(1.f, volume_param->default_value);
-    EXPECT_EQ(0.f, volume_param->min);
-    EXPECT_EQ(4.f, volume_param->max);
-    auto volume_value = sut.params.get(bus->volume);
-    ASSERT_NE(nullptr, volume_value);
-    EXPECT_EQ(1.f, *volume_value);
+    auto const& volume_param = get_parameter(sut.params, bus->volume);
+    EXPECT_EQ(1.f, volume_param.default_value);
+    EXPECT_EQ(0.f, volume_param.min);
+    EXPECT_EQ(4.f, volume_param.max);
+    auto volume_value = get_parameter_value(sut.params, bus->volume);
+    EXPECT_EQ(1.f, volume_value);
 
-    auto pan_balance_param = sut.params.get_parameter(bus->pan_balance);
-    ASSERT_NE(nullptr, pan_balance_param);
-    EXPECT_EQ(0.f, pan_balance_param->default_value);
-    EXPECT_EQ(-1.f, pan_balance_param->min);
-    EXPECT_EQ(1.f, pan_balance_param->max);
-    auto pan_balance_value = sut.params.get(bus->pan_balance);
-    ASSERT_NE(nullptr, pan_balance_value);
-    EXPECT_EQ(0.f, *pan_balance_value);
+    auto const& pan_balance_param = get_parameter(sut.params, bus->pan_balance);
+    EXPECT_EQ(0.f, pan_balance_param.default_value);
+    EXPECT_EQ(-1.f, pan_balance_param.min);
+    EXPECT_EQ(1.f, pan_balance_param.max);
+    auto pan_balance_value = get_parameter_value(sut.params, bus->pan_balance);
+    EXPECT_EQ(0.f, pan_balance_value);
 
-    auto mute_param = sut.params.get_parameter(bus->mute);
-    ASSERT_NE(nullptr, mute_param);
-    EXPECT_EQ(false, mute_param->default_value);
-    auto mute_value = sut.params.get(bus->mute);
-    ASSERT_NE(nullptr, mute_param);
-    EXPECT_EQ(false, *mute_value);
+    auto const& mute_param = get_parameter(sut.params, bus->mute);
+    EXPECT_EQ(false, mute_param.default_value);
+    auto mute_value = get_parameter_value(sut.params, bus->mute);
+    EXPECT_EQ(false, mute_value);
 
-    auto level_param = sut.params.get_parameter(bus->level);
-    ASSERT_NE(nullptr, level_param);
-    EXPECT_EQ(stereo_level{}, level_param->default_value);
-    auto level_value = sut.params.get(bus->level);
-    ASSERT_NE(nullptr, level_param);
-    EXPECT_EQ(0.f, level_value->left);
-    EXPECT_EQ(0.f, level_value->right);
+    auto const& level_param = get_parameter(sut.params, bus->level);
+    EXPECT_EQ(stereo_level{}, level_param.default_value);
+    auto level_value = get_parameter_value(sut.params, bus->level);
+    EXPECT_EQ(0.f, level_value.left);
+    EXPECT_EQ(0.f, level_value.right);
 }
 
-TEST_F(state_with_one_mixer_input, remove_mixer_bus)
+TEST_F(state_with_one_mixer_input,
+       removing_mixer_bus_removes_also_its_parameters)
 {
     ASSERT_EQ(1u, sut.mixer_state.inputs->size());
-    ASSERT_EQ(2u, sut.params.get_map<float_parameter>().size());
-    ASSERT_EQ(1u, sut.params.get_map<bool_parameter>().size());
-    ASSERT_EQ(1u, sut.params.get_map<stereo_level_parameter>().size());
+    ASSERT_EQ(2u, size<float_parameter>(sut.params));
+    ASSERT_EQ(1u, size<bool_parameter>(sut.params));
+    ASSERT_EQ(1u, size<stereo_level_parameter>(sut.params));
 
     remove_mixer_bus(sut, bus_id);
 
     EXPECT_TRUE(sut.mixer_state.inputs->empty());
     EXPECT_EQ(nullptr, sut.mixer_state.buses[bus_id]);
-    EXPECT_TRUE(sut.params.get_map<float_parameter>().empty());
-    EXPECT_TRUE(sut.params.get_map<bool_parameter>().empty());
-    EXPECT_TRUE(sut.params.get_map<stereo_level_parameter>().empty());
-}
-
-TEST_F(state_with_one_mixer_input, clear_mixer_buses)
-{
-    ASSERT_EQ(1u, sut.mixer_state.inputs->size());
-    ASSERT_EQ(2u, sut.params.get_map<float_parameter>().size());
-    ASSERT_EQ(1u, sut.params.get_map<bool_parameter>().size());
-    ASSERT_EQ(1u, sut.params.get_map<stereo_level_parameter>().size());
-
-    //    clear_mixer_buses<io_direction::input>(sut);
-
-    EXPECT_TRUE(sut.mixer_state.inputs->empty());
-    EXPECT_EQ(nullptr, sut.mixer_state.buses[bus_id]);
-    EXPECT_TRUE(sut.params.get_map<float_parameter>().empty());
-    EXPECT_TRUE(sut.params.get_map<bool_parameter>().empty());
-    EXPECT_TRUE(sut.params.get_map<stereo_level_parameter>().empty());
-}
-
-TEST_F(state_with_one_mixer_input, clear_mixer_buses_other_direction)
-{
-    ASSERT_EQ(1u, sut.mixer_state.inputs->size());
-    //    EXPECT_TRUE(sut.mixer_state.outputs->empty());
-    ASSERT_EQ(2u, sut.params.get_map<float_parameter>().size());
-    ASSERT_EQ(1u, sut.params.get_map<bool_parameter>().size());
-    ASSERT_EQ(1u, sut.params.get_map<stereo_level_parameter>().size());
-
-    //    clear_mixer_buses<io_direction::output>(sut);
-
-    EXPECT_EQ(1u, sut.mixer_state.inputs->size());
-    EXPECT_NE(nullptr, sut.mixer_state.buses[bus_id]);
-    //    EXPECT_TRUE(sut.mixer_state.outputs->empty());
-    EXPECT_EQ(2u, sut.params.get_map<float_parameter>().size());
-    EXPECT_EQ(1u, sut.params.get_map<bool_parameter>().size());
-    EXPECT_EQ(1u, sut.params.get_map<stereo_level_parameter>().size());
+    EXPECT_TRUE(empty<float_parameter>(sut.params));
+    EXPECT_TRUE(empty<bool_parameter>(sut.params));
+    EXPECT_TRUE(empty<stereo_level_parameter>(sut.params));
 }
 
 struct state_with_one_fx : testing::Test
@@ -148,39 +109,6 @@ TEST_F(state_with_one_fx, remove_fx)
 
     EXPECT_TRUE(sut.fx_modules.empty());
     EXPECT_EQ(nullptr, sut.fx_modules[fx_mod_id]);
-}
-
-TEST_F(state_with_one_fx, remove_mixer_bus)
-{
-    EXPECT_EQ(1u, sut.fx_modules.size());
-    ASSERT_NE(nullptr, sut.fx_modules[fx_mod_id]);
-
-    remove_mixer_bus(sut, bus_id);
-
-    EXPECT_TRUE(sut.fx_modules.empty());
-    EXPECT_EQ(nullptr, sut.fx_modules[fx_mod_id]);
-}
-
-TEST_F(state_with_one_fx, clear_mixer_buses)
-{
-    EXPECT_EQ(1u, sut.fx_modules.size());
-    ASSERT_NE(nullptr, sut.fx_modules[fx_mod_id]);
-
-    //    clear_mixer_buses<io_direction::input>(sut);
-
-    EXPECT_TRUE(sut.fx_modules.empty());
-    EXPECT_EQ(nullptr, sut.fx_modules[fx_mod_id]);
-}
-
-TEST_F(state_with_one_fx, clear_mixer_buses_other_direction)
-{
-    EXPECT_EQ(1u, sut.fx_modules.size());
-    ASSERT_NE(nullptr, sut.fx_modules[fx_mod_id]);
-
-    //    clear_mixer_buses<io_direction::output>(sut);
-
-    EXPECT_EQ(1u, sut.fx_modules.size());
-    EXPECT_NE(nullptr, sut.fx_modules[fx_mod_id]);
 }
 
 } // namespace piejam::runtime::test

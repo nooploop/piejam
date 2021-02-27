@@ -12,6 +12,7 @@
 #include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_normalize.h>
+#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
 
 #include <boost/range/algorithm_ext/erase.hpp>
@@ -125,8 +126,7 @@ make_fx_gain(
         fx::parameters_t& fx_params,
         parameter_maps& params)
 {
-    return fx_modules.add(
-            fx::make_gain_module(fx_params, params.get_map<float_parameter>()));
+    return fx_modules.add(fx::make_gain_module(fx_params, params));
 }
 
 static void
@@ -144,13 +144,13 @@ apply_parameter_values(
             std::visit(
                     overload{
                             [&params](float_parameter_id id, float v) {
-                                params.set(id, v);
+                                set_parameter_value(params, id, v);
                             },
                             [&params](int_parameter_id id, int v) {
-                                params.set(id, v);
+                                set_parameter_value(params, id, v);
                             },
                             [&params](bool_parameter_id id, bool v) {
-                                params.set(id, v);
+                                set_parameter_value(params, id, v);
                             },
                             [](auto&&, auto&&) { BOOST_ASSERT(false); }},
                     fx_param_id,
@@ -262,9 +262,7 @@ insert_ladspa_fx_module(
                     plugin_desc.name,
                     control_inputs,
                     fx_params,
-                    st.params.get_map<float_parameter>(),
-                    st.params.get_map<int_parameter>(),
-                    st.params.get_map<bool_parameter>())));
+                    st.params)));
 
     st.fx_parameters = std::move(fx_params);
 
@@ -332,7 +330,9 @@ remove_fx_module(state& st, fx::module_id id)
     fx::parameters_t fx_params = st.fx_parameters;
     for (auto&& [key, fx_param_id] : *fx_mod->parameters)
     {
-        std::visit([&st](auto&& id) { st.params.remove(id); }, fx_param_id);
+        std::visit(
+                [&st](auto&& id) { remove_parameter(st.params, id); },
+                fx_param_id);
         fx_params.erase(fx_param_id);
     }
     st.fx_parameters = std::move(fx_params);
@@ -382,20 +382,27 @@ add_mixer_bus(state& st, std::string name) -> mixer::bus_id
             .name = std::move(name),
             .in = {},
             .out = {},
-            .volume = st.params.add(parameter::float_{
-                    .default_value = 1.f,
-                    .min = 0.f,
-                    .max = 4.f,
-                    .to_normalized = &to_normalized_volume,
-                    .from_normalized = &from_normalized_volume}),
-            .pan_balance = st.params.add(parameter::float_{
-                    .default_value = 0.f,
-                    .min = -1.f,
-                    .max = 1.f,
-                    .to_normalized = &parameter::to_normalized_linear,
-                    .from_normalized = &parameter::from_normalized_linear}),
-            .mute = st.params.add(parameter::bool_{.default_value = false}),
-            .level = st.params.add(parameter::stereo_level{}),
+            .volume = add_parameter(
+                    st.params,
+                    parameter::float_{
+                            .default_value = 1.f,
+                            .min = 0.f,
+                            .max = 4.f,
+                            .to_normalized = &to_normalized_volume,
+                            .from_normalized = &from_normalized_volume}),
+            .pan_balance = add_parameter(
+                    st.params,
+                    parameter::float_{
+                            .default_value = 0.f,
+                            .min = -1.f,
+                            .max = 1.f,
+                            .to_normalized = &parameter::to_normalized_linear,
+                            .from_normalized =
+                                    &parameter::from_normalized_linear}),
+            .mute = add_parameter(
+                    st.params,
+                    parameter::bool_{.default_value = false}),
+            .level = add_parameter(st.params, parameter::stereo_level{}),
             .fx_chain = {}});
     emplace_back(st.mixer_state.inputs, bus_id);
     return bus_id;
@@ -412,10 +419,10 @@ remove_mixer_bus(state& st, mixer::bus_id const bus_id)
     mixer::bus const* const bus = st.mixer_state.buses[bus_id];
     BOOST_ASSERT(bus);
 
-    st.params.remove(bus->volume);
-    st.params.remove(bus->pan_balance);
-    st.params.remove(bus->mute);
-    st.params.remove(bus->level);
+    remove_parameter(st.params, bus->volume);
+    remove_parameter(st.params, bus->pan_balance);
+    remove_parameter(st.params, bus->mute);
+    remove_parameter(st.params, bus->level);
 
     BOOST_ASSERT_MSG(
             bus->fx_chain->empty(),

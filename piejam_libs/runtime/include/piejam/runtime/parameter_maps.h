@@ -6,20 +6,35 @@
 
 #include <piejam/runtime/parameters.h>
 
+#include <memory>
+
 namespace piejam::runtime
 {
 
-using parameter_maps = parameter::maps_collection<
-        float_parameter,
-        bool_parameter,
-        int_parameter,
-        stereo_level_parameter>;
+namespace detail
+{
 
-// workaround helpers to avoid some compiler issues on arm
-auto get_parameter_value(parameter_maps const&, float_parameter_id)
-        -> float const*;
-auto get_parameter_value(parameter_maps const&, int_parameter_id) -> int const*;
-auto get_parameter_value(parameter_maps const&, bool_parameter_id)
-        -> bool const*;
+template <class P>
+struct parameter_maps_access;
+
+} // namespace detail
+
+class parameter_maps
+{
+public:
+    parameter_maps();
+    parameter_maps(parameter_maps const&);
+
+    ~parameter_maps();
+
+    auto operator=(parameter_maps const&) -> parameter_maps&;
+
+private:
+    template <class P>
+    friend struct detail::parameter_maps_access;
+
+    struct impl;
+    std::unique_ptr<impl> m_impl;
+};
 
 } // namespace piejam::runtime

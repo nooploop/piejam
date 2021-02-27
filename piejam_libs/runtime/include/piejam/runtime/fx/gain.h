@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/parameters.h>
 
@@ -15,6 +16,6 @@ enum class gain_parameter_key : parameter_key
     gain
 };
 
-auto make_gain_module(parameters_t&, float_parameters&) -> module;
+auto make_gain_module(parameters_t&, parameter_maps&) -> module;
 
 } // namespace piejam::runtime::fx

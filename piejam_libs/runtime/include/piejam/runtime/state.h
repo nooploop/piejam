@@ -27,8 +27,6 @@
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
-#include <piejam/runtime/parameter/map.h>
-#include <piejam/runtime/parameter/maps_collection.h>
 #include <piejam/runtime/parameter_maps.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/selected_device.h>

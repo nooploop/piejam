@@ -12,6 +12,7 @@
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
+#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
 
 #include <cassert>
@@ -442,14 +443,15 @@ const selector<stereo_level>
         select_current_fx_chain_bus_level([](state const& st) -> stereo_level {
             mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
             stereo_level const* const level =
-                    bus ? st.params.get(bus->level) : nullptr;
+                    bus ? find_parameter_value(st.params, bus->level) : nullptr;
             return level ? *level : stereo_level();
         });
 
 const selector<float>
 select_current_fx_chain_bus_volume([](state const& st) -> float {
     mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
-    float const* const volume = bus ? st.params.get(bus->volume) : nullptr;
+    float const* const volume =
+            bus ? find_parameter_value(st.params, bus->volume) : nullptr;
     return volume ? *volume : 0.f;
 });
 
@@ -538,7 +540,8 @@ make_fx_parameter_value_string_selector(fx::parameter_id const param_id)
         {
             return std::visit(
                     [it, &st](auto&& id) {
-                        return it->second.value_to_string(*st.params.get(id));
+                        return it->second.value_to_string(
+                                get_parameter_value(st.params, id));
                     },
                     param_id);
         }
@@ -551,7 +554,7 @@ make_bool_parameter_value_selector(bool_parameter_id const param_id)
         -> selector<bool>
 {
     return [param_id](state const& st) -> bool {
-        bool const* const value = st.params.get(param_id);
+        bool const* const value = find_parameter_value(st.params, param_id);
         return value && *value;
     };
 }
@@ -561,7 +564,7 @@ make_float_parameter_value_selector(float_parameter_id const param_id)
         -> selector<float>
 {
     return [param_id](state const& st) -> float {
-        float const* const value = st.params.get(param_id);
+        float const* const value = find_parameter_value(st.params, param_id);
         return value ? *value : 0.f;
     };
 }
@@ -572,12 +575,11 @@ make_float_parameter_normalized_value_selector(
 {
     return [param_id](state const& st) -> float {
         if (float_parameter const* const param =
-                    st.params.get_parameter(param_id))
+                    find_parameter(st.params, param_id))
         {
-            float const* const value = st.params.get(param_id);
-            BOOST_ASSERT(value);
+            float const value = get_parameter_value(st.params, param_id);
             BOOST_ASSERT(param->to_normalized);
-            return param->to_normalized(*param, *value);
+            return param->to_normalized(*param, value);
         }
         return {};
     };
@@ -588,7 +590,7 @@ make_int_parameter_value_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        int const* const value = st.params.get(param_id);
+        int const* const value = find_parameter_value(st.params, param_id);
         return value ? *value : 0;
     };
 }
@@ -598,7 +600,7 @@ make_int_parameter_min_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        auto const* const param = st.params.get_parameter(param_id);
+        auto const* const param = find_parameter(st.params, param_id);
         return param ? param->min : 0;
     };
 }
@@ -608,7 +610,7 @@ make_int_parameter_max_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        auto const* const param = st.params.get_parameter(param_id);
+        auto const* const param = find_parameter(st.params, param_id);
         return param ? param->max : 0;
     };
 }
@@ -618,7 +620,8 @@ make_level_parameter_value_selector(stereo_level_parameter_id const param_id)
         -> selector<stereo_level>
 {
     return [param_id](state const& st) -> stereo_level {
-        stereo_level const* const value = st.params.get(param_id);
+        stereo_level const* const value =
+                find_parameter_value(st.params, param_id);
         return value ? *value : stereo_level{};
     };
 }

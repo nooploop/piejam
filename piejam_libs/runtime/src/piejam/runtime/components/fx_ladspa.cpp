@@ -14,6 +14,8 @@
 
 #include <fmt/format.h>
 
+#include <boost/container/flat_map.hpp>
+
 #include <algorithm>
 #include <array>
 #include <vector>

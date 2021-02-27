@@ -86,6 +86,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/maps_collection.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_maps.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_maps_access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/access.h

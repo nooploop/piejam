@@ -9,9 +9,11 @@
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
-#include <piejam/runtime/parameter/map.h>
+#include <piejam/runtime/parameter_maps_access.h>
 
 #include <fmt/format.h>
+
+#include <boost/container/flat_map.hpp>
 
 namespace piejam::runtime::fx
 {
@@ -41,13 +43,12 @@ to_dB_string(float x) -> std::string
 } // namespace
 
 auto
-make_gain_module(parameters_t& fx_params, float_parameters& float_params)
-        -> module
+make_gain_module(parameters_t& fx_params, parameter_maps& params) -> module
 {
     using namespace std::string_literals;
 
     auto add_param = [&](auto&& p, auto&& name) {
-        auto id = float_params.add(std::forward<decltype(p)>(p));
+        auto id = add_parameter(params, std::forward<decltype(p)>(p));
         fx_params.emplace(
                 id,
                 parameter{

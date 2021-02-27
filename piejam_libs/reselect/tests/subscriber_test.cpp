@@ -47,7 +47,7 @@ TEST(subscriber,
     sut.notify(st);
     sut.notify(st);
 
-    EXPECT_EQ(2, handler_called);
+    EXPECT_EQ(1, handler_called);
 }
 
 TEST(subscriber,

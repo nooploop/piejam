@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/ladspa/fwd.h>
+#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/parameters.h>
 
@@ -19,8 +20,6 @@ auto make_ladspa_module(
         std::string const& name,
         std::span<audio::ladspa::port_descriptor const> control_inputs,
         parameters_t&,
-        float_parameters&,
-        int_parameters&,
-        bool_parameters&) -> module;
+        parameter_maps&) -> module;
 
 } // namespace piejam::runtime::fx

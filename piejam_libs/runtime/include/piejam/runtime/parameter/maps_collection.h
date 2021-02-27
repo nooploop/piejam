@@ -40,7 +40,7 @@ public:
     }
 
     template <class P>
-    void remove(id_t<P> const id)
+    auto remove(id_t<P> const id) -> void
     {
         get_map<P>().remove(id);
     }

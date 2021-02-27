@@ -9,11 +9,11 @@
 #include <piejam/midi/fwd.h>
 #include <piejam/range/table_view.h>
 #include <piejam/runtime/device_io_fwd.h>
+#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer_fwd.h>
-#include <piejam/runtime/parameter_maps.h>
 #include <piejam/runtime/stereo_level.h>
 #include <piejam/thread/fwd.h>
 

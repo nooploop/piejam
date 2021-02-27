@@ -10,7 +10,7 @@
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
-#include <piejam/runtime/parameter_maps.h>
+#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/persistence/app_config.h>
 #include <piejam/runtime/persistence/session.h>
 #include <piejam/runtime/state.h>
@@ -115,11 +115,9 @@ export_parameter_values(fx::module const& fx_mod, parameter_maps const& params)
     {
         std::visit(
                 [&](auto&& param) {
-                    auto const* const value =
-                            get_parameter_value(params, param);
-                    BOOST_ASSERT(value);
-                    result.emplace_back(
-                            fx::parameter_value_assignment{key, *value});
+                    result.emplace_back(fx::parameter_value_assignment{
+                            key,
+                            get_parameter_value(params, param)});
                 },
                 fx_param_id);
     }
@@ -247,9 +245,9 @@ static auto
 export_mixer_parameters(state const& st, mixer::bus const& bus)
 {
     session::mixer_parameters result;
-    result.volume = *get_parameter_value(st.params, bus.volume);
-    result.pan = *get_parameter_value(st.params, bus.pan_balance);
-    result.mute = *get_parameter_value(st.params, bus.mute);
+    result.volume = get_parameter_value(st.params, bus.volume);
+    result.pan = get_parameter_value(st.params, bus.pan_balance);
+    result.mute = get_parameter_value(st.params, bus.mute);
     return result;
 }
 

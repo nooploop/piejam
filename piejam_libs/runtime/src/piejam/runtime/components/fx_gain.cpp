@@ -14,6 +14,8 @@
 
 #include <fmt/format.h>
 
+#include <boost/container/flat_map.hpp>
+
 #include <array>
 
 namespace piejam::runtime::components
