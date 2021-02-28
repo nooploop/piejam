@@ -4,6 +4,8 @@
 
 import QtQuick 2.13
 
+import "../Util/MathExt.js" as MathExt
+
 Item {
     id: root
 
@@ -24,10 +26,9 @@ Item {
     Rectangle {
         id: filler
 
-        anchors.bottomMargin: Math.max(0, Math.min(parent.height, level * parent.height))
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.left: parent.left
-        anchors.top: parent.top
+        x: 0
+        y: 0
+        width: root.width
+        height: MathExt.clamp((1 - level) * parent.height, 0, parent.height)
     }
 }
