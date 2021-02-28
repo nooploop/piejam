@@ -76,6 +76,10 @@ make_initial_state() -> state
     st.mixer_state.main = add_mixer_bus(st, "Main");
     // main doesn't belong into inputs
     remove_erase(st.mixer_state.inputs, st.mixer_state.main);
+    // reset the output to default back again
+    st.mixer_state.buses.update(st.mixer_state.main, [](mixer::bus& bus) {
+        bus.out = nullptr;
+    });
     return st;
 }
 
@@ -380,7 +384,7 @@ add_mixer_bus(state& st, std::string name) -> mixer::bus_id
     auto bus_id = st.mixer_state.buses.add(mixer::bus{
             .name = std::move(name),
             .in = {},
-            .out = {},
+            .out = st.mixer_state.main,
             .volume = add_parameter(
                     st.params,
                     parameter::float_{
