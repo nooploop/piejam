@@ -27,13 +27,12 @@ make_replace_fx_module_action(
 {
     batch_action batch;
 
-    mixer::bus const* const bus = st.mixer_state.buses[fx_chain_bus];
-    BOOST_ASSERT(bus);
+    mixer::bus const& bus = st.mixer_state.buses[fx_chain_bus];
 
-    if (position < bus->fx_chain->size())
+    if (position < bus.fx_chain->size())
     {
         auto delete_action = std::make_unique<actions::delete_fx_module>();
-        delete_action->fx_mod_id = (*bus->fx_chain)[position];
+        delete_action->fx_mod_id = (*bus.fx_chain)[position];
         batch.push_back(std::move(delete_action));
     }
 
@@ -86,13 +85,12 @@ make_replace_fx_module_action(
 {
     batch_action batch;
 
-    mixer::bus const* const bus = st.mixer_state.buses[fx_chain_bus];
-    BOOST_ASSERT(bus);
+    mixer::bus const& bus = st.mixer_state.buses[fx_chain_bus];
 
-    if (position < bus->fx_chain->size())
+    if (position < bus.fx_chain->size())
     {
         auto delete_action = std::make_unique<actions::delete_fx_module>();
-        delete_action->fx_mod_id = (*bus->fx_chain)[position];
+        delete_action->fx_mod_id = (*bus.fx_chain)[position];
         batch.push_back(std::move(delete_action));
     }
 

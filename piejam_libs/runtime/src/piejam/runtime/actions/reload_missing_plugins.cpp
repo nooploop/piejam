@@ -28,21 +28,19 @@ reload_missing_plugins() -> thunk_action
             for (std::size_t fx_pos : range::indices(*bus.fx_chain))
             {
                 auto&& fx_mod_id = (*bus.fx_chain)[fx_pos];
-                auto fx_mod = st.fx_modules[fx_mod_id];
-                BOOST_ASSERT(fx_mod);
+                auto const& fx_mod = st.fx_modules[fx_mod_id];
 
                 if (auto id = std::get_if<fx::unavailable_ladspa_id>(
-                            &fx_mod->fx_instance_id))
+                            &fx_mod.fx_instance_id))
                 {
-                    auto unavail = st.fx_unavailable_ladspa_plugins[*id];
-                    BOOST_ASSERT(unavail);
+                    auto const& unavail = st.fx_unavailable_ladspa_plugins[*id];
                     batch.append(actions::make_replace_fx_module_action(
                             st,
                             bus_id,
                             fx_pos,
-                            unavail->plugin_id,
-                            *fx_mod->name,
-                            unavail->parameter_values));
+                            unavail.plugin_id,
+                            *fx_mod.name,
+                            unavail.parameter_values));
                 }
             }
         }

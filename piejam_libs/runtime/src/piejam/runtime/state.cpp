@@ -207,7 +207,7 @@ insert_internal_fx_module(
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
-    fx::chain_t fx_chain = st.mixer_state.buses[bus_id]->fx_chain;
+    fx::chain_t fx_chain = st.mixer_state.buses[bus_id].fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
     fx::parameters_t fx_params = st.fx_parameters;
@@ -225,7 +225,7 @@ insert_internal_fx_module(
 
     st.fx_parameters = std::move(fx_params);
 
-    auto const& fx_mod = *st.fx_modules[fx_chain[insert_pos]];
+    auto const& fx_mod = st.fx_modules[fx_chain[insert_pos]];
 
     apply_parameter_values(initial_assignments, fx_mod, st.params);
     apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
@@ -250,7 +250,7 @@ insert_ladspa_fx_module(
 {
     BOOST_ASSERT(bus_id != mixer::bus_id{});
 
-    fx::chain_t fx_chain = st.mixer_state.buses[bus_id]->fx_chain;
+    fx::chain_t fx_chain = st.mixer_state.buses[bus_id].fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
     fx::parameters_t fx_params = st.fx_parameters;
@@ -266,7 +266,7 @@ insert_ladspa_fx_module(
 
     st.fx_parameters = std::move(fx_params);
 
-    auto const& fx_mod = *st.fx_modules[fx_chain[insert_pos]];
+    auto const& fx_mod = st.fx_modules[fx_chain[insert_pos]];
     apply_parameter_values(initial_values, fx_mod, st.params);
     apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
 
@@ -317,8 +317,7 @@ find_mixer_bus_containing_fx_module(
 void
 remove_fx_module(state& st, fx::module_id id)
 {
-    fx::module const* const fx_mod = st.fx_modules[id];
-    BOOST_ASSERT(fx_mod);
+    fx::module const& fx_mod = st.fx_modules[id];
 
     auto it = find_mixer_bus_containing_fx_module(st.mixer_state.buses, id);
     BOOST_ASSERT(it != st.mixer_state.buses.end());
@@ -328,7 +327,7 @@ remove_fx_module(state& st, fx::module_id id)
     });
 
     fx::parameters_t fx_params = st.fx_parameters;
-    for (auto&& [key, fx_param_id] : *fx_mod->parameters)
+    for (auto&& [key, fx_param_id] : *fx_mod.parameters)
     {
         std::visit(
                 [&st](auto&& id) { remove_parameter(st.params, id); },
@@ -339,7 +338,7 @@ remove_fx_module(state& st, fx::module_id id)
 
     st.fx_modules.remove(id);
 
-    if (auto id = std::get_if<fx::ladspa_instance_id>(&fx_mod->fx_instance_id))
+    if (auto id = std::get_if<fx::ladspa_instance_id>(&fx_mod.fx_instance_id))
     {
         st.fx_ladspa_instances.update([id](fx::ladspa_instances& instances) {
             instances.erase(*id);
@@ -347,7 +346,7 @@ remove_fx_module(state& st, fx::module_id id)
     }
     else if (
             auto id = std::get_if<fx::unavailable_ladspa_id>(
-                    &fx_mod->fx_instance_id))
+                    &fx_mod.fx_instance_id))
     {
         st.fx_unavailable_ladspa_plugins.remove(*id);
     }
@@ -416,16 +415,15 @@ remove_mixer_bus(state& st, mixer::bus_id const bus_id)
     if (st.mixer_state.input_solo_id == bus_id)
         st.mixer_state.input_solo_id = mixer::bus_id{};
 
-    mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-    BOOST_ASSERT(bus);
+    mixer::bus const& bus = st.mixer_state.buses[bus_id];
 
-    remove_parameter(st.params, bus->volume);
-    remove_parameter(st.params, bus->pan_balance);
-    remove_parameter(st.params, bus->mute);
-    remove_parameter(st.params, bus->level);
+    remove_parameter(st.params, bus.volume);
+    remove_parameter(st.params, bus.pan_balance);
+    remove_parameter(st.params, bus.mute);
+    remove_parameter(st.params, bus.level);
 
     BOOST_ASSERT_MSG(
-            bus->fx_chain->empty(),
+            bus.fx_chain->empty(),
             "fx_chain should be emptied before");
 
     if (st.fx_chain_bus == bus_id)
@@ -448,7 +446,7 @@ remove_mixer_bus(state& st, mixer::bus_id const bus_id)
 void
 remove_device_bus(state& st, device_io::bus_id const device_bus_id)
 {
-    auto const name = st.device_io_state.buses[device_bus_id]->name;
+    auto const name = st.device_io_state.buses[device_bus_id].name;
 
     st.mixer_state.buses.update(
             [device_bus_id, &name](mixer::bus_id, mixer::bus& mixer_bus) {

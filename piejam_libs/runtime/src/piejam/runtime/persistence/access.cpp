@@ -71,19 +71,18 @@ save_app_config(
         conf.samplerate = state.samplerate;
         conf.period_size = state.period_size;
 
-        auto const buses_to_bus_configs = [](auto const& chs,
-                                             auto const& ch_ids,
-                                             auto& configs) {
-            configs.reserve(ch_ids.size());
-            std::ranges::transform(
-                    ch_ids,
-                    std::back_inserter(configs),
-                    [&chs](device_io::bus_id const& ch_id)
-                            -> persistence::bus_config {
-                        device_io::bus const* const bus = chs[ch_id];
-                        return {bus->name, bus->bus_type, bus->channels};
-                    });
-        };
+        auto const buses_to_bus_configs =
+                [](auto const& chs, auto const& ch_ids, auto& configs) {
+                    configs.reserve(ch_ids.size());
+                    std::ranges::transform(
+                            ch_ids,
+                            std::back_inserter(configs),
+                            [&chs](device_io::bus_id const& ch_id)
+                                    -> persistence::bus_config {
+                                device_io::bus const& bus = chs[ch_id];
+                                return {bus.name, bus.bus_type, bus.channels};
+                            });
+                };
 
         buses_to_bus_configs(
                 state.device_io_state.buses,
@@ -191,13 +190,12 @@ export_fx_plugin(
     BOOST_ASSERT(
             std::get<fx::unavailable_ladspa_id>(fx_mod.fx_instance_id) == id);
 
-    auto unavail = st.fx_unavailable_ladspa_plugins[id];
-    BOOST_ASSERT(unavail);
+    auto const& unavail = st.fx_unavailable_ladspa_plugins[id];
     session::ladspa_plugin plug;
-    plug.id = unavail->plugin_id;
+    plug.id = unavail.plugin_id;
     plug.name = fx_mod.name;
-    plug.preset = unavail->parameter_values;
-    plug.midi = unavail->midi_assigns;
+    plug.preset = unavail.parameter_values;
+    plug.midi = unavail.midi_assigns;
     return plug;
 }
 
@@ -209,12 +207,12 @@ export_fx_chain(state const& st, fx::chain_t const& fx_chain)
 
     for (auto const& fx_mod_id : fx_chain)
     {
-        fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
+        fx::module const& fx_mod = st.fx_modules[fx_mod_id];
         result.emplace_back(std::visit(
-                [&st, fx_mod](auto const& id) {
-                    return export_fx_plugin(st, *fx_mod, id);
+                [&st, &fx_mod](auto const& id) {
+                    return export_fx_plugin(st, fx_mod, id);
                 },
-                fx_mod->fx_instance_id));
+                fx_mod.fx_instance_id));
     }
 
     return result;
@@ -262,19 +260,17 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 .name = {}};
                     },
                     [&st](mixer::bus_id const& bus_id) {
-                        auto const* const bus = st.mixer_state.buses[bus_id];
-                        BOOST_ASSERT(bus);
+                        mixer::bus const& bus = st.mixer_state.buses[bus_id];
                         return session::mixer_io{
                                 .type = session::mixer_io_type::channel,
-                                .name = *bus->name};
+                                .name = bus.name};
                     },
                     [&st](device_io::bus_id const& bus_id) {
-                        auto const* const bus =
+                        device_io::bus const& bus =
                                 st.device_io_state.buses[bus_id];
-                        BOOST_ASSERT(bus);
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,
-                                .name = *bus->name};
+                                .name = bus.name};
                     },
                     [](mixer::missing_device_address const& name) {
                         return session::mixer_io{
@@ -303,9 +299,8 @@ export_mixer_buses(state const& st, mixer::bus_list_t const& bus_ids)
     return algorithm::transform_to_vector(
             bus_ids,
             [&st](mixer::bus_id const bus_id) {
-                mixer::bus const* const bus = st.mixer_state.buses[bus_id];
-                BOOST_ASSERT(bus);
-                return export_mixer_bus(st, *bus);
+                mixer::bus const& bus = st.mixer_state.buses[bus_id];
+                return export_mixer_bus(st, bus);
             });
 }
 
@@ -338,9 +333,8 @@ save_session(std::filesystem::path const& file, state const& st)
         session ses;
 
         ses.mixer_channels = export_mixer_buses(st, *st.mixer_state.inputs);
-        ses.main_mixer_channel = export_mixer_bus(
-                st,
-                *st.mixer_state.buses[st.mixer_state.main]);
+        ses.main_mixer_channel =
+                export_mixer_bus(st, st.mixer_state.buses[st.mixer_state.main]);
 
         save_session(out, ses);
     }

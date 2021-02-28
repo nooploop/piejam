@@ -80,16 +80,15 @@ static auto
 make_bus_info(mixer::buses_t const& buses, mixer::bus_id const bus_id)
         -> mixer_bus_info
 {
-    mixer::bus const* const bus = buses[bus_id];
-    BOOST_ASSERT(bus);
+    mixer::bus const& bus = buses[bus_id];
     return mixer_bus_info{
             .bus_id = bus_id,
-            .in = bus->in,
-            .out = bus->out,
-            .volume = bus->volume,
-            .pan_balance = bus->pan_balance,
-            .mute = bus->mute,
-            .level = bus->level};
+            .in = bus.in,
+            .out = bus.out,
+            .volume = bus.volume,
+            .pan_balance = bus.pan_balance,
+            .mute = bus.mute,
+            .level = bus.level};
 }
 
 static auto
@@ -120,7 +119,7 @@ make_mixer_device_routes(
     return algorithm::transform_to_vector(
             *inputs,
             [&](device_io::bus_id bus_id) {
-                device_io::bus const* const bus = device_buses[bus_id];
+                device_io::bus const* const bus = device_buses.find(bus_id);
                 return mixer_device_route{
                         .bus_id = bus_id,
                         .name = bus ? *bus->name : std::string()};
@@ -156,9 +155,7 @@ make_mixer_input_channel_routes(
 {
     auto valid_sources = mixer::valid_source_channels(mixer_buses, bus_id);
     return algorithm::transform_to_vector(valid_sources, [&](auto const& id) {
-        return mixer_channel_route{
-                .bus_id = id,
-                .name = *mixer_buses[id]->name};
+        return mixer_channel_route{.bus_id = id, .name = mixer_buses[id].name};
     });
 }
 
@@ -180,9 +177,7 @@ make_mixer_output_channel_routes(
 {
     auto valid_targets = mixer::valid_target_channels(mixer_buses, bus_id);
     return algorithm::transform_to_vector(valid_targets, [&](auto const& id) {
-        return mixer_channel_route{
-                .bus_id = id,
-                .name = *mixer_buses[id]->name};
+        return mixer_channel_route{.bus_id = id, .name = mixer_buses[id].name};
     });
 }
 
@@ -205,7 +200,7 @@ get_mixer_input_name(
 {
     static std::string s_mix{"Mix"};
 
-    mixer::bus const* const bus = mixer_buses[bus_id];
+    mixer::bus const* const bus = mixer_buses.find(bus_id);
     if (!bus)
         return selected_route{true, s_mix};
 
@@ -216,14 +211,14 @@ get_mixer_input_name(
                     },
                     [&](mixer::bus_id const src_bus_id) {
                         mixer::bus const* const src_bus =
-                                mixer_buses[src_bus_id];
+                                mixer_buses.find(src_bus_id);
                         return selected_route{
                                 true,
                                 src_bus ? *src_bus->name : s_mix};
                     },
                     [&](device_io::bus_id const dev_bus_id) {
                         device_io::bus const* const dev_bus =
-                                device_buses[dev_bus_id];
+                                device_buses.find(dev_bus_id);
                         return selected_route{
                                 true,
                                 dev_bus ? *dev_bus->name : s_mix};
@@ -252,7 +247,7 @@ get_mixer_output_name(
 {
     static std::string s_none{"None"};
 
-    mixer::bus const* const bus = mixer_buses[bus_id];
+    mixer::bus const* const bus = mixer_buses.find(bus_id);
     if (!bus)
         return selected_route{true, s_none};
 
@@ -263,14 +258,14 @@ get_mixer_output_name(
                     },
                     [&](mixer::bus_id const dst_bus_id) {
                         mixer::bus const* const dst_bus =
-                                mixer_buses[dst_bus_id];
+                                mixer_buses.find(dst_bus_id);
                         return selected_route{
                                 true,
                                 dst_bus ? *dst_bus->name : s_none};
                     },
                     [&](device_io::bus_id const dev_bus_id) {
                         device_io::bus const* const dev_bus =
-                                device_buses[dev_bus_id];
+                                device_buses.find(dev_bus_id);
                         return selected_route{
                                 true,
                                 dev_bus ? *dev_bus->name : s_none};
@@ -297,7 +292,7 @@ make_device_bus_name_selector(device_io::bus_id const bus_id)
 {
     auto get_device_bus_name = [](device_io::buses_t const& device_buses,
                                   device_io::bus_id const bus_id) {
-        device_io::bus const* const bus = device_buses[bus_id];
+        device_io::bus const* const bus = device_buses.find(bus_id);
         return bus ? bus->name : boxed_string();
     };
 
@@ -313,7 +308,7 @@ make_mixer_bus_name_selector(mixer::bus_id const bus_id)
 {
     auto get_mixer_bus_name = [](mixer::buses_t const& mixer_buses,
                                  mixer::bus_id const bus_id) {
-        mixer::bus const* const bus = mixer_buses[bus_id];
+        mixer::bus const* const bus = mixer_buses.find(bus_id);
         return bus ? bus->name : boxed_string();
     };
 
@@ -328,7 +323,7 @@ make_bus_type_selector(device_io::bus_id const bus_id)
         -> selector<audio::bus_type>
 {
     return [bus_id](state const& st) -> audio::bus_type {
-        device_io::bus const* bus = st.device_io_state.buses[bus_id];
+        device_io::bus const* bus = st.device_io_state.buses.find(bus_id);
         return bus ? bus->bus_type : audio::bus_type::mono;
     };
 }
@@ -344,14 +339,14 @@ make_bus_channel_selector(
         case audio::bus_channel::left:
             return [bus_id](state const& st) -> std::size_t {
                 device_io::bus const* const bus =
-                        st.device_io_state.buses[bus_id];
+                        st.device_io_state.buses.find(bus_id);
                 return bus ? bus->channels.left : piejam::npos;
             };
 
         case audio::bus_channel::right:
             return [bus_id](state const& st) -> std::size_t {
                 device_io::bus const* const bus =
-                        st.device_io_state.buses[bus_id];
+                        st.device_io_state.buses.find(bus_id);
                 return bus ? bus->channels.right : piejam::npos;
             };
     }
@@ -435,13 +430,14 @@ const selector<mixer::bus_id> select_fx_chain_bus([](state const& st) {
 
 const selector<box<fx::chain_t>> select_current_fx_chain([](state const& st) {
     static box<fx::chain_t> s_empty_fx_chain;
-    mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+    mixer::bus const* const bus = st.mixer_state.buses.find(st.fx_chain_bus);
     return bus ? bus->fx_chain : s_empty_fx_chain;
 });
 
 const selector<stereo_level>
         select_current_fx_chain_bus_level([](state const& st) -> stereo_level {
-            mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+            mixer::bus const* const bus =
+                    st.mixer_state.buses.find(st.fx_chain_bus);
             stereo_level const* const level =
                     bus ? find_parameter_value(st.params, bus->level) : nullptr;
             return level ? *level : stereo_level();
@@ -449,7 +445,7 @@ const selector<stereo_level>
 
 const selector<float>
 select_current_fx_chain_bus_volume([](state const& st) -> float {
-    mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+    mixer::bus const* const bus = st.mixer_state.buses.find(st.fx_chain_bus);
     float const* const volume =
             bus ? find_parameter_value(st.params, bus->volume) : nullptr;
     return volume ? *volume : 0.f;
@@ -460,7 +456,7 @@ make_fx_module_name_selector(fx::module_id fx_mod_id) -> selector<boxed_string>
 {
     return [fx_mod_id](state const& st) -> boxed_string {
         static boxed_string s_empty_name;
-        fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
+        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
         return fx_mod ? fx_mod->name : s_empty_name;
     };
 }
@@ -471,7 +467,7 @@ make_fx_module_parameters_selector(fx::module_id fx_mod_id)
 {
     return [fx_mod_id](state const& st) -> box<fx::module_parameters> {
         static box<fx::module_parameters> s_empty;
-        fx::module const* const fx_mod = st.fx_modules[fx_mod_id];
+        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
         return fx_mod ? fx_mod->parameters : s_empty;
     };
 }
@@ -480,7 +476,8 @@ auto
 make_fx_module_can_move_left_selector(fx::module_id fx_mod_id) -> selector<bool>
 {
     return [fx_mod_id](state const& st) -> bool {
-        mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+        mixer::bus const* const bus =
+                st.mixer_state.buses.find(st.fx_chain_bus);
         return bus && !bus->fx_chain->empty() &&
                bus->fx_chain->front() != fx_mod_id;
     };
@@ -491,7 +488,8 @@ make_fx_module_can_move_right_selector(fx::module_id fx_mod_id)
         -> selector<bool>
 {
     return [fx_mod_id](state const& st) -> bool {
-        mixer::bus const* const bus = st.mixer_state.buses[st.fx_chain_bus];
+        mixer::bus const* const bus =
+                st.mixer_state.buses.find(st.fx_chain_bus);
         return bus && !bus->fx_chain->empty() &&
                bus->fx_chain->back() != fx_mod_id;
     };
@@ -518,7 +516,7 @@ make_fx_parameter_id_selector(
         fx::parameter_key const fx_param_key) -> selector<fx::parameter_id>
 {
     return [fx_mod_id, fx_param_key](state const& st) -> fx::parameter_id {
-        if (fx::module const* const fx_mod = st.fx_modules[fx_mod_id])
+        if (fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id))
         {
             if (auto it = fx_mod->parameters->find(fx_param_key);
                 it != fx_mod->parameters->end())

@@ -31,10 +31,17 @@ public:
 
     auto contains(id_t const id) const noexcept { return m_map->contains(id); }
 
-    auto operator[](id_t const id) const noexcept -> Entity const*
+    auto find(id_t const id) const noexcept -> Entity const*
     {
         auto it = m_map->find(id);
-        return it != m_map->end() ? &(it->second) : nullptr;
+        return it != m_map->end() ? std::addressof(it->second) : nullptr;
+    }
+
+    auto operator[](id_t const id) const noexcept -> Entity const&
+    {
+        auto it = m_map->find(id);
+        BOOST_ASSERT(it != m_map->end());
+        return it->second;
     }
 
     template <std::convertible_to<Entity> V>

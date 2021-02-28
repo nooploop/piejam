@@ -53,7 +53,7 @@ public:
 
     auto get_parameter(id_t id) const noexcept -> Parameter const*
     {
-        return m_parameters[id];
+        return m_parameters.find(id);
     }
 
     auto find(id_t id) const noexcept -> value_type const*

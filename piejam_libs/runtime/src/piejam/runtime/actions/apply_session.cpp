@@ -69,7 +69,7 @@ make_add_fx_module_actions(
     for (std::size_t i : range::indices(bus_ids))
     {
         mixer::bus_id const fx_chain_bus = bus_ids[i];
-        BOOST_ASSERT(buses[fx_chain_bus]->fx_chain->empty());
+        BOOST_ASSERT(buses[fx_chain_bus].fx_chain->empty());
         for (auto const& fx_plug : mb_data[i].fx_chain)
         {
             batch.push_back(std::visit(
@@ -86,17 +86,16 @@ apply_mixer_midi(
         mixer::bus_id const bus_id,
         persistence::session::mixer_midi const& mixer_midi)
 {
-    mixer::bus const* const bus = buses[bus_id];
-    BOOST_ASSERT(bus);
+    mixer::bus const& bus = buses[bus_id];
 
     if (mixer_midi.volume)
-        action.assignments.emplace(bus->volume, *mixer_midi.volume);
+        action.assignments.emplace(bus.volume, *mixer_midi.volume);
 
     if (mixer_midi.pan)
-        action.assignments.emplace(bus->pan_balance, *mixer_midi.pan);
+        action.assignments.emplace(bus.pan_balance, *mixer_midi.pan);
 
     if (mixer_midi.mute)
-        action.assignments.emplace(bus->mute, *mixer_midi.mute);
+        action.assignments.emplace(bus.mute, *mixer_midi.mute);
 }
 
 void
@@ -139,10 +138,8 @@ apply_mixer_parameters(
     BOOST_ASSERT(mb_data.size() == bus_ids.size());
     for (std::size_t const i : range::indices(bus_ids))
     {
-        if (mixer::bus const* const bus = buses[bus_ids[i]])
-        {
-            apply_mixer_parameters(batch, *bus, mb_data[i].parameter);
-        }
+        mixer::bus const& bus = buses[bus_ids[i]];
+        apply_mixer_parameters(batch, bus, mb_data[i].parameter);
     }
 }
 
@@ -254,7 +251,7 @@ configure_mixer_buses(persistence::session const& session, GetState&& get_state)
                 session.mixer_channels);
 
         BOOST_ASSERT(
-                st.mixer_state.buses[st.mixer_state.main]->fx_chain->empty());
+                st.mixer_state.buses[st.mixer_state.main].fx_chain->empty());
         for (auto const& fx_plug : session.main_mixer_channel.fx_chain)
         {
             action.push_back(std::visit(
@@ -291,7 +288,7 @@ configure_mixer_buses(persistence::session const& session, GetState&& get_state)
             session.mixer_channels);
     apply_mixer_parameters(
             action,
-            *st.mixer_state.buses[st.mixer_state.main],
+            st.mixer_state.buses[st.mixer_state.main],
             session.main_mixer_channel.parameter);
 
     // io

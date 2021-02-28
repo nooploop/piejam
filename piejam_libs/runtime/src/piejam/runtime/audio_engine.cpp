@@ -99,9 +99,7 @@ struct mixer_input_bus_type
     auto operator()(device_io::bus_id const id) const noexcept
             -> audio::bus_type
     {
-        auto const device_bus = device_buses[id];
-        BOOST_ASSERT(device_bus);
-        return device_bus->bus_type;
+        return device_buses[id].bus_type;
     }
 
     template <class T>
@@ -131,7 +129,7 @@ make_mixer_components(
         {
             audio::bus_type const bus_type = std::visit(
                     mixer_input_bus_type{device_buses},
-                    mixer_buses[id]->in);
+                    mixer_buses[id].in);
 
             comps.insert(
                     in_key,
@@ -327,22 +325,21 @@ connect_mixer_input(
             overload{
                     [](std::nullptr_t) {},
                     [&](device_io::bus_id const device_bus_id) {
-                        auto const* const device_bus =
+                        device_io::bus const& device_bus =
                                 device_buses[device_bus_id];
-                        BOOST_ASSERT(device_bus);
 
-                        if (device_bus->channels.left != npos)
+                        if (device_bus.channels.left != npos)
                             g.add_wire(
-                                    {input_proc, device_bus->channels.left},
+                                    {input_proc, device_bus.channels.left},
                                     mb_in.inputs()[0]);
 
-                        if (device_bus->channels.right != npos)
+                        if (device_bus.channels.right != npos)
                             g.add_wire(
-                                    {input_proc, device_bus->channels.right},
+                                    {input_proc, device_bus.channels.right},
                                     mb_in.inputs()[1]);
                     },
                     [&](mixer::bus_id const src_bus_id) {
-                        BOOST_ASSERT(mixer_buses[src_bus_id]);
+                        BOOST_ASSERT(mixer_buses.contains(src_bus_id));
 
                         auto* const source_mb_out =
                                 comps.find(mixer_output_key{src_bus_id});
@@ -373,30 +370,28 @@ connect_mixer_output(
             overload{
                     [](std::nullptr_t) {},
                     [&](device_io::bus_id const device_bus_id) {
-                        auto const* const device_bus =
+                        device_io::bus const& device_bus =
                                 device_buses[device_bus_id];
-                        BOOST_ASSERT(device_bus);
 
-                        if (device_bus->channels.left != npos)
+                        if (device_bus.channels.left != npos)
                             connect(g,
                                     mb_out.outputs()[0],
-                                    {output_proc, device_bus->channels.left},
+                                    {output_proc, device_bus.channels.left},
                                     mixer_procs);
 
-                        if (device_bus->channels.right != npos)
+                        if (device_bus.channels.right != npos)
                             connect(g,
                                     mb_out.outputs()[1],
-                                    {output_proc, device_bus->channels.right},
+                                    {output_proc, device_bus.channels.right},
                                     mixer_procs);
                     },
                     [&](mixer::bus_id const dst_bus_id) {
-                        auto const* const dst_bus = mixer_buses[dst_bus_id];
-                        BOOST_ASSERT(dst_bus);
+                        mixer::bus const& dst_bus = mixer_buses[dst_bus_id];
 
-                        if (std::holds_alternative<std::nullptr_t>(dst_bus->in))
+                        if (std::holds_alternative<std::nullptr_t>(dst_bus.in))
                         {
                             auto* const dst_mb_in = comps.find(
-                                    mixer_input_key{dst_bus_id, dst_bus->in});
+                                    mixer_input_key{dst_bus_id, dst_bus.in});
                             BOOST_ASSERT(dst_mb_in);
 
                             audio::engine::connect_stereo_components(

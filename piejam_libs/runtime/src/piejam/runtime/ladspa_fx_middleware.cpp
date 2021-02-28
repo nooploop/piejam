@@ -90,17 +90,16 @@ ladspa_fx_middleware::process_ladspa_fx_action(
 {
     auto const& st = get_state();
 
-    if (fx::module const* const fx_mod = st.fx_modules[a.fx_mod_id])
+    fx::module const& fx_mod = st.fx_modules[a.fx_mod_id];
+
+    auto const fx_instance_id = fx_mod.fx_instance_id;
+
+    next(a);
+
+    if (fx::ladspa_instance_id const* const instance_id =
+                std::get_if<fx::ladspa_instance_id>(&fx_instance_id))
     {
-        auto const fx_instance_id = fx_mod->fx_instance_id;
-
-        next(a);
-
-        if (fx::ladspa_instance_id const* const instance_id =
-                    std::get_if<fx::ladspa_instance_id>(&fx_instance_id))
-        {
-            m_ladspa_control.unload(*instance_id);
-        }
+        m_ladspa_control.unload(*instance_id);
     }
 }
 
