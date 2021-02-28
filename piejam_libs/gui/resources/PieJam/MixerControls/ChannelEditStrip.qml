@@ -7,14 +7,12 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
-import QtQml 2.15
-
 import ".."
 
 Item {
     id: root
 
-    property var model
+    property var model: privates.nullModel
     property bool deletable: true
 
     implicitWidth: 150
@@ -49,7 +47,7 @@ Item {
             anchors.right: parent.right
             anchors.top: parent.top
 
-            text: root.model ? root.model.name : ""
+            text: root.model.name
 
             placeholderText: qsTr("Name")
 
@@ -74,17 +72,15 @@ Item {
             anchors.right: parent.right
             anchors.top: audioInLabel.bottom
 
-            displayText: root.model ? root.model.selectedInput : ""
+            displayText: root.model.selectedInput
 
-            Material.foreground: (root.model ? root.model.selectedInputIsValid : true)
-                                        ? Material.primaryTextColor
-                                        : Material.Red
+            Material.foreground: root.model.selectedInputIsValid ? Material.primaryTextColor : Material.Red
 
             popup: Menu {
                 id: audioInMenu
 
                 MenuItem {
-                    enabled: root.model ? root.model.defaultInputIsValid : false
+                    enabled: root.model.defaultInputIsValid
 
                     text: qsTr("Mix")
 
@@ -99,7 +95,7 @@ Item {
                     Repeater {
                         id: inDevicesRep
 
-                        model: root.model ? root.model.inputDevices : []
+                        model: root.model.inputDevices
 
                         delegate: MenuItem {
                             text: modelData
@@ -117,7 +113,7 @@ Item {
                     Repeater {
                         id: inChannelsRep
 
-                        model: root.model ? root.model.inputChannels : []
+                        model: root.model.inputChannels
 
                         delegate: MenuItem {
                             text: modelData
@@ -147,11 +143,9 @@ Item {
             anchors.right: parent.right
             anchors.top: audioOutLabel.bottom
 
-            displayText: root.model ? root.model.selectedOutput : ""
+            displayText: root.model.selectedOutput
 
-            Material.foreground: (root.model ? root.model.selectedOutputIsValid : true)
-                                        ? Material.primaryTextColor
-                                        : Material.Red
+            Material.foreground: root.model.selectedOutputIsValid ? Material.primaryTextColor : Material.Red
 
             popup: Menu {
                 id: audioOutMenu
@@ -170,7 +164,7 @@ Item {
                     Repeater {
                         id: outDevicesRep
 
-                        model: root.model ? root.model.outputDevices : []
+                        model: root.model.outputDevices
 
                         delegate: MenuItem {
                             text: modelData
@@ -188,7 +182,7 @@ Item {
                     Repeater {
                         id: outChannelsRep
 
-                        model: root.model ? root.model.outputChannels : []
+                        model: root.model.outputChannels
 
                         delegate: MenuItem {
                             text: modelData
@@ -230,11 +224,28 @@ Item {
         }
     }
 
-    Binding {
-        when: root.model
-        target: root.model
-        property: "subscribed"
-        value: root.visible
-        restoreMode: Binding.RestoreBinding
+    onModelChanged: {
+        if (!root.model) {
+            root.model = privates.nullModel
+        } else {
+            root.model.subscribed = Qt.binding(function () { return root.visible })
+        }
+    }
+
+    QtObject {
+        id: privates
+
+        readonly property var nullModel: ({
+            name: "",
+            selectedInput: "",
+            selectedInputIsValid: true,
+            defaultInputIsValid: true,
+            inputDevices: [],
+            inputChannels: [],
+            selectedOutput: "",
+            selectedOutputIsValid: true,
+            outputDevices: [],
+            outputChannels: []
+        })
     }
 }
