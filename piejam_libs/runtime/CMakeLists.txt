@@ -78,6 +78,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi_input_controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_util.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_normalize.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/fwd.h
@@ -172,6 +173,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_control_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_input_controller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer_util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/parameter_maps.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp

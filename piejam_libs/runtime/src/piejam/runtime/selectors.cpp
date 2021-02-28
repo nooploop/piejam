@@ -12,6 +12,7 @@
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
+#include <piejam/runtime/mixer_util.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
 
@@ -313,6 +314,15 @@ make_mixer_bus_name_selector(mixer::bus_id const bus_id)
     return [bus_id,
             get = memo(get_mixer_bus_name)](state const& st) -> boxed_string {
         return get(st.mixer_state.buses, bus_id);
+    };
+}
+
+auto
+make_mixer_bus_input_type_selector(mixer::bus_id const bus_id)
+        -> selector<audio::bus_type>
+{
+    return [bus_id, get = memo(&mixer_bus_input_type)](state const& st) {
+        return get(st.mixer_state.buses, bus_id, st.device_io_state.buses);
     };
 }
 

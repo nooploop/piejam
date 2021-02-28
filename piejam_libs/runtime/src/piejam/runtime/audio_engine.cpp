@@ -30,6 +30,7 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/mixer.h>
+#include <piejam/runtime/mixer_util.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/runtime/processors/midi_assignment_processor.h>
@@ -92,23 +93,6 @@ template <class T>
 using value_output_processor_ptr =
         std::unique_ptr<audio::engine::value_io_processor<T>>;
 
-struct mixer_input_bus_type
-{
-    device_io::buses_t const& device_buses;
-
-    auto operator()(device_io::bus_id const id) const noexcept
-            -> audio::bus_type
-    {
-        return device_buses[id].bus_type;
-    }
-
-    template <class T>
-    auto operator()(T const&) const noexcept -> audio::bus_type
-    {
-        return audio::bus_type::stereo;
-    }
-};
-
 void
 make_mixer_components(
         component_map& comps,
@@ -127,9 +111,8 @@ make_mixer_components(
         }
         else
         {
-            audio::bus_type const bus_type = std::visit(
-                    mixer_input_bus_type{device_buses},
-                    mixer_buses[id].in);
+            audio::bus_type const bus_type =
+                    mixer_bus_input_type(mixer_buses, id, device_buses);
 
             comps.insert(
                     in_key,

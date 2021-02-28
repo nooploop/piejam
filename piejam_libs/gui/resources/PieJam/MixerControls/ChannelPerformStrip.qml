@@ -17,7 +17,6 @@ Item {
 
     property var model
     property alias meterMuted: levelMeterFader.muted
-    property bool mono: false
 
     signal soloToggled()
     signal fxButtonClicked()
@@ -55,8 +54,8 @@ Item {
 
             onMoved: {
                 root.model.changePanBalance(panControls.value)
-                Info.quickTip =
-                        (root.mono ? "<b>Pan:</b> " : "<b>Balance:</b> ") + panControls.value.toFixed(2)
+                Info.quickTip = ((root.model ? root.model.mono : false) ? "<b>Pan:</b> " : "<b>Balance:</b> ")
+                        + panControls.value.toFixed(2)
             }
 
             MidiAssignArea {

@@ -71,10 +71,11 @@ MixerChannelPerform::onSubscribe()
                 setName(QString::fromStdString(*name));
             });
 
-    //    observe(runtime::selectors::make_bus_type_selector(m_impl->m_device_bus_id),
-    //            [this](audio::bus_type const bus_type) {
-    //                setMono(bus_type == audio::bus_type::mono);
-    //            });
+    observe(runtime::selectors::make_mixer_bus_input_type_selector(
+                    m_impl->m_bus_id),
+            [this](audio::bus_type const bus_type) {
+                setMono(bus_type == audio::bus_type::mono);
+            });
 
     observe(runtime::selectors::make_float_parameter_value_selector(
                     m_impl->m_volume),

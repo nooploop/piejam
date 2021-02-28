@@ -112,6 +112,9 @@ auto make_device_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
 
 auto make_mixer_bus_name_selector(mixer::bus_id) -> selector<boxed_string>;
 
+auto make_mixer_bus_input_type_selector(mixer::bus_id)
+        -> selector<audio::bus_type>;
+
 auto make_bus_type_selector(device_io::bus_id) -> selector<audio::bus_type>;
 
 auto make_bus_channel_selector(device_io::bus_id, audio::bus_channel)
