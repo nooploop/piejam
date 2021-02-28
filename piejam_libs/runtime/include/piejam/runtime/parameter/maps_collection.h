@@ -6,6 +6,7 @@
 
 #include <piejam/runtime/parameter/fwd.h>
 
+#include <memory>
 #include <tuple>
 
 namespace piejam::runtime::parameter
@@ -58,15 +59,22 @@ public:
     }
 
     template <class P>
-    auto find(id_t<P> const id) const -> value_type_t<P> const*
+    auto find(id_t<P> const id) const noexcept -> value_type_t<P> const*
     {
         return get_map<P>().find(id);
     }
 
     template <class P>
-    auto get(id_t<P> const id) const -> value_type_t<P> const&
+    auto get(id_t<P> const id) const noexcept -> value_type_t<P> const&
     {
         return get_map<P>().get(id);
+    }
+
+    template <class P>
+    auto get_cached(id_t<P> const id) const noexcept
+            -> std::shared_ptr<value_type_t<P> const>
+    {
+        return get_map<P>().get_cached(id);
     }
 
     template <class P, class V>

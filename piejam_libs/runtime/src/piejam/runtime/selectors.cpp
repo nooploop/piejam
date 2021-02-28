@@ -559,8 +559,12 @@ auto
 make_bool_parameter_value_selector(bool_parameter_id const param_id)
         -> selector<bool>
 {
-    return [param_id](state const& st) -> bool {
-        bool const* const value = find_parameter_value(st.params, param_id);
+    return [param_id, value = std::shared_ptr<bool const>()](
+                   state const& st) mutable -> bool {
+        if (value) [[likely]]
+            return *value;
+
+        value = get_parameter_cached_value(st.params, param_id);
         return value && *value;
     };
 }
@@ -569,9 +573,13 @@ auto
 make_float_parameter_value_selector(float_parameter_id const param_id)
         -> selector<float>
 {
-    return [param_id](state const& st) -> float {
-        float const* const value = find_parameter_value(st.params, param_id);
-        return value ? *value : 0.f;
+    return [param_id, value = std::shared_ptr<float const>()](
+                   state const& st) mutable -> float {
+        if (value) [[likely]]
+            return *value;
+
+        value = get_parameter_cached_value(st.params, param_id);
+        return value ? *value : float{};
     };
 }
 
@@ -595,9 +603,13 @@ auto
 make_int_parameter_value_selector(int_parameter_id const param_id)
         -> selector<int>
 {
-    return [param_id](state const& st) -> int {
-        int const* const value = find_parameter_value(st.params, param_id);
-        return value ? *value : 0;
+    return [param_id, value = std::shared_ptr<int const>()](
+                   state const& st) mutable -> int {
+        if (value) [[likely]]
+            return *value;
+
+        value = get_parameter_cached_value(st.params, param_id);
+        return value ? *value : int{};
     };
 }
 
@@ -625,9 +637,12 @@ auto
 make_level_parameter_value_selector(stereo_level_parameter_id const param_id)
         -> selector<stereo_level>
 {
-    return [param_id](state const& st) -> stereo_level {
-        stereo_level const* const value =
-                find_parameter_value(st.params, param_id);
+    return [param_id, value = std::shared_ptr<stereo_level const>()](
+                   state const& st) mutable -> stereo_level {
+        if (value) [[likely]]
+            return *value;
+
+        value = get_parameter_cached_value(st.params, param_id);
         return value ? *value : stereo_level{};
     };
 }

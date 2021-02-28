@@ -12,6 +12,8 @@
 
 #include <algorithm>
 #include <concepts>
+#include <memory>
+#include <vector>
 
 namespace piejam::runtime::parameter
 {
@@ -22,6 +24,10 @@ class map
 public:
     using id_t = typename entity_map<Parameter>::id_t;
     using value_type = typename Parameter::value_type;
+
+    using cached_type = std::shared_ptr<value_type>;
+    using const_cached_type = std::shared_ptr<value_type const>;
+    using cache_t = std::vector<cached_type>;
 
     bool empty() const noexcept { return m_parameters.empty(); }
     auto size() const noexcept -> std::size_t { return m_parameters.size(); }
@@ -36,14 +42,20 @@ public:
     auto add(P&& p, V&& value) -> id_t
     {
         auto id = m_parameters.add(std::forward<P>(p));
-        m_values.emplace(id, std::forward<V>(value));
+        auto&& [it, inserted] = m_values.emplace(id, std::forward<V>(value));
+        BOOST_ASSERT(inserted);
+        m_cache->insert(
+                std::next(m_cache->begin(), m_values.index_of(it)),
+                std::make_shared<value_type>(it->second));
         return id;
     }
 
     auto remove(id_t id) -> void
     {
         m_parameters.remove(id);
-        m_values.erase(id);
+        auto it = m_values.find(id);
+        m_cache->erase(std::next(m_cache->begin(), m_values.index_of(it)));
+        m_values.erase(it);
     }
 
     auto contains(id_t id) const noexcept -> bool
@@ -69,12 +81,21 @@ public:
         return it->second;
     }
 
+    auto get_cached(id_t id) const noexcept -> const_cached_type
+    {
+        auto it = m_values.find(id);
+        return it != m_values.end() ? (*m_cache)[m_values.index_of(it)]
+                                    : nullptr;
+    }
+
     template <std::convertible_to<value_type> V>
     auto set(id_t id, V&& value) -> void
     {
         auto it = m_values.find(id);
         BOOST_ASSERT(it != m_values.end());
         it->second = std::forward<V>(value);
+
+        *(*m_cache)[m_values.index_of(it)] = it->second;
     }
 
     auto set(id_value_map_t<Parameter> const& id_values)
@@ -88,12 +109,15 @@ public:
                     tuple::element<0>.equal_to(id));
             BOOST_ASSERT(it != m_values.end());
             it->second = value;
+
+            *(*m_cache)[m_values.index_of(it)] = it->second;
         }
     }
 
 private:
     entity_map<Parameter> m_parameters;
     id_value_map_t<Parameter> m_values;
+    std::shared_ptr<cache_t> m_cache{std::make_shared<cache_t>()};
 };
 
 } // namespace piejam::runtime::parameter

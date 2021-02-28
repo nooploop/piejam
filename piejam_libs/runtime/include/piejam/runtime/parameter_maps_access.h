@@ -11,6 +11,8 @@
 #include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/parameters.h>
 
+#include <memory>
+
 namespace piejam::runtime
 {
 
@@ -43,6 +45,9 @@ struct parameter_maps_access
             -> parameter::value_type_t<P> const*;
     static auto get(parameter_maps const&, parameter::id_t<P>) noexcept
             -> parameter::value_type_t<P> const&;
+
+    static auto get_cached(parameter_maps const&, parameter::id_t<P>) noexcept
+            -> std::shared_ptr<parameter::value_type_t<P> const>;
 
     static auto
     set(parameter_maps&, parameter::id_t<P>, parameter::value_type_t<P>)
@@ -137,6 +142,16 @@ get_parameter_value(
         -> parameter::value_type_t<P> const&
 {
     return detail::parameter_maps_access<P>::get(m, id);
+}
+
+template <class P>
+auto
+get_parameter_cached_value(
+        parameter_maps const& m,
+        parameter::id_t<P> const id) noexcept
+        -> std::shared_ptr<parameter::value_type_t<P> const>
+{
+    return detail::parameter_maps_access<P>::get_cached(m, id);
 }
 
 template <class P, class V>

@@ -139,6 +139,16 @@ parameter_maps_access<P>::get(
 
 template <class P>
 auto
+parameter_maps_access<P>::get_cached(
+        parameter_maps const& m,
+        parameter::id_t<P> const id) noexcept
+        -> std::shared_ptr<parameter::value_type_t<P> const>
+{
+    return m.m_impl->maps.get_cached(id);
+}
+
+template <class P>
+auto
 parameter_maps_access<P>::set(
         parameter_maps& m,
         parameter::id_t<P> const id,
