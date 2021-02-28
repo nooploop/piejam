@@ -116,7 +116,7 @@ TopPane {
 
     Timer {
         interval: 16
-        running: root.visible
+        running: root.visible && MixerViewSettings.mode === MixerViewSettings.perform
         repeat: true
         onTriggered: root.model.requestLevelsUpdate()
     }
