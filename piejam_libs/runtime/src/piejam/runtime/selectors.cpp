@@ -83,8 +83,6 @@ make_bus_info(mixer::buses_t const& buses, mixer::bus_id const bus_id)
     mixer::bus const& bus = buses[bus_id];
     return mixer_bus_info{
             .bus_id = bus_id,
-            .in = bus.in,
-            .out = bus.out,
             .volume = bus.volume,
             .pan_balance = bus.pan_balance,
             .mute = bus.mute,
