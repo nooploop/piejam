@@ -6,7 +6,6 @@
 
 #include <piejam/algorithm/contains.h>
 #include <piejam/algorithm/for_each_visit.h>
-#include <piejam/algorithm/unique_erase.h>
 #include <piejam/midi/device_update.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/apply_app_config.h>
@@ -197,7 +196,7 @@ midi_control_middleware::process_midi_control_action(
     }
 
     std::ranges::sort(m_enabled_devices);
-    algorithm::unique_erase(m_enabled_devices);
+    boost::unique_erase(m_enabled_devices);
 
     next(action);
 }
