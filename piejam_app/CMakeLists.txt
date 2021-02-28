@@ -51,6 +51,10 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannelEdit.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannelEdit.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannelPerform.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MixerChannelPerform.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Subscribable.h
 )
 target_include_directories(piejam_app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

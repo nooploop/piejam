@@ -26,54 +26,14 @@ ListView {
         anchors.top: if (parent) parent.top
         anchors.bottom: if (parent) parent.bottom
 
-        perform.mono: model.item.mono
-        perform.levelLeft: model.item.levelLeft
-        perform.levelRight: model.item.levelRight
-        perform.meterMuted: (model.item.mute && !model.item.solo) || (root.soloActive && !model.item.solo)
-        perform.pan: model.item.panBalance
-        perform.volume: model.item.volume
-        perform.mute: model.item.mute
-        perform.solo: model.item.solo
-        perform.name: model.item.name
+        perform.model: model.item.perform
+        perform.onFxButtonClicked: root.fxButtonClicked()
 
-        perform.volumeMidi.model: model.item.volumeMidi
-        perform.panMidi.model: model.item.panMidi
-        perform.muteMidi.model: model.item.muteMidi
+        edit.model: model.item.edit
 
-        perform.onFaderMoved: model.item.changeVolume(newVolume)
-        perform.onPanMoved: model.item.changePanBalance(newPan)
-        perform.onMuteToggled: model.item.changeMute(!model.item.mute)
-        perform.onSoloToggled: root.soloToggled(index)
-        perform.onFxButtonClicked: {
-            model.item.focusFxChain()
-            root.fxButtonClicked()
-        }
+//        perform.meterMuted: (model.item.mute && !model.item.solo) || (root.soloActive && !model.item.solo)
 
-        edit.name: model.item.name
-        edit.defaultInputIsValid: model.item.defaultInputIsValid
-        edit.selectedInput: model.item.selectedInput
-        edit.selectedInputIsValid: model.item.selectedInputIsValid
-        edit.inputDevices: model.item.inputDevices
-        edit.inputChannels: model.item.inputChannels
-        edit.selectedOutput: model.item.selectedOutput
-        edit.selectedOutputIsValid: model.item.selectedOutputIsValid
-        edit.outputDevices: model.item.outputDevices
-        edit.outputChannels: model.item.outputChannels
-
-        edit.onAudioInMixSelected: model.item.changeInputToMix()
-        edit.onAudioInDeviceSelected: model.item.changeInputToDevice(index)
-        edit.onAudioInChannelSelected: model.item.changeInputToChannel(index)
-        edit.onAudioOutNoneSelected: model.item.changeOutputToNone()
-        edit.onAudioOutDeviceSelected: model.item.changeOutputToDevice(index)
-        edit.onAudioOutChannelSelected: model.item.changeOutputToChannel(index)
-        edit.onNameEdited: model.item.changeName(newName)
-        edit.onDeleteClicked: model.item.deleteChannel()
-
-        Binding {
-            target: model.item
-            property: "subscribed"
-            value: visible
-        }
+//        perform.onSoloToggled: root.soloToggled(index)
     }
 
     footer: Item {

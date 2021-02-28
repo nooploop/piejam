@@ -1,11 +1,13 @@
 // PieJam - An audio mixer for Raspberry Pi.
-// SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
+// SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/gui/model/MixerChannel.h>
+#include <piejam/audio/types.h>
+#include <piejam/gui/model/MixerChannelPerform.h>
+#include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 
@@ -14,10 +16,12 @@
 namespace piejam::app::gui::model
 {
 
-class MixerChannel final : public Subscribable<piejam::gui::model::MixerChannel>
+class MidiAssignable;
+
+class MixerChannelPerform final : public Subscribable<piejam::gui::model::MixerChannelPerform>
 {
 public:
-    MixerChannel(
+    MixerChannelPerform(
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::bus_id,
@@ -25,10 +29,16 @@ public:
             runtime::float_parameter_id pan_balance,
             runtime::bool_parameter_id mute,
             runtime::stereo_level_parameter_id level);
-    ~MixerChannel();
+    ~MixerChannelPerform();
 
-    auto perform() const -> piejam::gui::model::MixerChannelPerform* override;
-    auto edit() const -> piejam::gui::model::MixerChannelEdit* override;
+    void changeVolume(double) override;
+    void changePanBalance(double) override;
+    void changeMute(bool) override;
+    void focusFxChain() override;
+
+    auto volumeMidi() const -> piejam::gui::model::MidiAssignable* override;
+    auto panMidi() const -> piejam::gui::model::MidiAssignable* override;
+    auto muteMidi() const -> piejam::gui::model::MidiAssignable* override;
 
 private:
     void onSubscribe() override;

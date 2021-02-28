@@ -7,31 +7,20 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
+import QtQml 2.15
+
 import ".."
 import "../Controls"
 
 Item {
-    property alias name: title.text
-    property bool mono: false
-    property alias levelLeft: levelMeterFader.levelLeft
-    property alias levelRight: levelMeterFader.levelRight
+    id: root
+
+    property var model
     property alias meterMuted: levelMeterFader.muted
-    property alias pan: panControls.value
-    property alias volume: levelMeterFader.volume
-    property alias mute: channelControls.mute
-    property alias solo: channelControls.solo
+    property bool mono: false
 
-    property alias panMidi: midiAssignPan
-    property alias volumeMidi: levelMeterFader.volumeMidi
-    property alias muteMidi: channelControls.muteMidi
-
-    signal faderMoved(real newVolume)
-    signal panMoved(real newPan)
-    signal muteToggled()
     signal soloToggled()
     signal fxButtonClicked()
-
-    id: root
 
     implicitWidth: 150
     implicitHeight: 400
@@ -43,30 +32,37 @@ Item {
 
         HeaderLabel {
             id: title
-            width: 96
 
+            width: 96
             height: 24
 
             anchors.top: parent.top
             anchors.left: parent.left
+
+            text: root.model ? root.model.name : ""
         }
 
         BipolarSlider {
             id: panControls
 
             height: 40
+
             anchors.right: parent.right
             anchors.left: parent.left
             anchors.top: title.bottom
 
+            value: root.model ? root.model.panBalance : 0
+
             onMoved: {
-                root.panMoved(panControls.value)
+                root.model.changePanBalance(panControls.value)
                 Info.quickTip =
                         (root.mono ? "<b>Pan:</b> " : "<b>Balance:</b> ") + panControls.value.toFixed(2)
             }
 
             MidiAssignArea {
                 id: midiAssignPan
+
+                model: root.model ? root.model.panMidi : null
 
                 anchors.fill: parent
                 anchors.topMargin: 1
@@ -82,16 +78,29 @@ Item {
             anchors.bottom: channelControls.top
             anchors.top: panControls.bottom
 
-            onFaderMoved: root.faderMoved(newVolume)
+            volume: root.model ? root.model.volume : 0
+            levelLeft: root.model ? root.model.levelLeft : 0
+            levelRight: root.model ? root.model.levelRight : 0
+
+            volumeMidi.model: root.model ? root.model.volumeMidi : null
+
+            onFaderMoved: root.model.changeVolume(newVolume)
         }
 
         ChannelControls {
             id: channelControls
+
             height: 32
+
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
-            onMuteToggled: root.muteToggled()
+            mute: root.model ? root.model.mute : false
+            solo: root.model ? root.model.solo : false
+
+            muteMidi.model: root.model ? root.model.muteMidi : null
+
+            onMuteToggled: root.model.changeMute(!root.model.mute)
             onSoloToggled: root.soloToggled()
         }
 
@@ -110,7 +119,18 @@ Item {
 
             padding: 6
 
-            onClicked: root.fxButtonClicked()
+            onClicked: {
+                root.model.focusFxChain()
+                root.fxButtonClicked()
+            }
         }
+    }
+
+    Binding {
+        when: root.model
+        target: root.model
+        property: "subscribed"
+        value: root.visible
+        restoreMode: Binding.RestoreBinding
     }
 }

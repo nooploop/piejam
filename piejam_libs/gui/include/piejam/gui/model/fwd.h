@@ -22,6 +22,8 @@ class Info;
 class Mixer;
 class MixerChannel;
 using MixerChannelsList = GenericListModel<MixerChannel>;
+class MixerChannelPerform;
+class MixerChannelEdit;
 
 class BusConfig;
 using BusConfigsList = GenericListModel<BusConfig>;

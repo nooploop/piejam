@@ -17,6 +17,8 @@
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/gui/model/MidiDeviceConfig.h>
 #include <piejam/gui/model/MixerChannel.h>
+#include <piejam/gui/model/MixerChannelEdit.h>
+#include <piejam/gui/model/MixerChannelPerform.h>
 
 namespace piejam::app::gui::model
 {
@@ -48,6 +50,8 @@ Factory::Factory(
     qRegisterMetaType<piejam::gui::model::AudioInputOutputSettings*>();
     qRegisterMetaType<piejam::gui::model::Mixer*>();
     qRegisterMetaType<piejam::gui::model::MixerChannel*>();
+    qRegisterMetaType<piejam::gui::model::MixerChannelEdit*>();
+    qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::FxChain*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();

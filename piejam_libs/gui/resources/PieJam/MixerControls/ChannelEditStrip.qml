@@ -7,31 +7,15 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
+import QtQml 2.15
+
 import ".."
 
 Item {
     id: root
 
-    property alias name: nameText.text
+    property var model
     property bool deletable: true
-    property alias selectedInput: audioInSelect.displayText
-    property alias defaultInputIsValid: defaultInputMenuEntry.enabled
-    property bool selectedInputIsValid: false
-    property alias inputDevices: inDevicesRep.model
-    property alias inputChannels: inChannelsRep.model
-    property alias selectedOutput: audioOutSelect.displayText
-    property bool selectedOutputIsValid: false
-    property alias outputDevices: outDevicesRep.model
-    property alias outputChannels: outChannelsRep.model
-
-    signal deleteClicked()
-    signal nameEdited(string newName)
-    signal audioInMixSelected()
-    signal audioInDeviceSelected(int index)
-    signal audioInChannelSelected(int index)
-    signal audioOutNoneSelected()
-    signal audioOutDeviceSelected(int index)
-    signal audioOutChannelSelected(int index)
 
     implicitWidth: 150
     implicitHeight: 400
@@ -55,7 +39,7 @@ Item {
 
             Material.background: Material.Red
 
-            onClicked: root.deleteClicked()
+            onClicked: root.model.deleteChannel()
         }
 
         TextField {
@@ -65,9 +49,11 @@ Item {
             anchors.right: parent.right
             anchors.top: parent.top
 
+            text: root.model ? root.model.name : ""
+
             placeholderText: qsTr("Name")
 
-            onTextEdited: root.nameEdited(nameText.text)
+            onTextEdited: root.model.changeName(nameText.text)
         }
 
         Label {
@@ -88,17 +74,21 @@ Item {
             anchors.right: parent.right
             anchors.top: audioInLabel.bottom
 
-            Material.foreground: selectedInputIsValid ? Material.primaryTextColor : Material.Red
+            displayText: root.model ? root.model.selectedInput : ""
+
+            Material.foreground: (root.model ? root.model.selectedInputIsValid : true)
+                                        ? Material.primaryTextColor
+                                        : Material.Red
 
             popup: Menu {
                 id: audioInMenu
 
                 MenuItem {
-                    id: defaultInputMenuEntry
+                    enabled: root.model ? root.model.defaultInputIsValid : false
 
                     text: qsTr("Mix")
 
-                    onClicked: root.audioInMixSelected()
+                    onClicked: root.model.changeInputToMix()
                 }
 
                 Menu {
@@ -109,10 +99,12 @@ Item {
                     Repeater {
                         id: inDevicesRep
 
+                        model: root.model ? root.model.inputDevices : []
+
                         delegate: MenuItem {
                             text: modelData
 
-                            onClicked: root.audioInDeviceSelected(index)
+                            onClicked: root.model.changeInputToDevice(index)
                         }
                     }
                 }
@@ -125,10 +117,12 @@ Item {
                     Repeater {
                         id: inChannelsRep
 
+                        model: root.model ? root.model.inputChannels : []
+
                         delegate: MenuItem {
                             text: modelData
 
-                            onClicked: root.audioInChannelSelected(index)
+                            onClicked: root.model.changeInputToChannel(index)
                         }
                     }
                 }
@@ -153,7 +147,11 @@ Item {
             anchors.right: parent.right
             anchors.top: audioOutLabel.bottom
 
-            Material.foreground: selectedOutputIsValid ? Material.primaryTextColor : Material.Red
+            displayText: root.model ? root.model.selectedOutput : ""
+
+            Material.foreground: (root.model ? root.model.selectedOutputIsValid : true)
+                                        ? Material.primaryTextColor
+                                        : Material.Red
 
             popup: Menu {
                 id: audioOutMenu
@@ -161,7 +159,7 @@ Item {
                 MenuItem {
                     text: qsTr("None")
 
-                    onClicked: root.audioOutNoneSelected()
+                    onClicked: root.model.changeOutputToNone()
                 }
 
                 Menu {
@@ -172,10 +170,12 @@ Item {
                     Repeater {
                         id: outDevicesRep
 
+                        model: root.model ? root.model.outputDevices : []
+
                         delegate: MenuItem {
                             text: modelData
 
-                            onClicked: root.audioOutDeviceSelected(index)
+                            onClicked: root.model.changeOutputToDevice(index)
                         }
                     }
                 }
@@ -188,10 +188,12 @@ Item {
                     Repeater {
                         id: outChannelsRep
 
+                        model: root.model ? root.model.outputChannels : []
+
                         delegate: MenuItem {
                             text: modelData
 
-                            onClicked: root.audioOutChannelSelected(index)
+                            onClicked: root.model.changeOutputToChannel(index)
                         }
                     }
                 }
@@ -226,5 +228,13 @@ Item {
                 text: qsTr(">")
             }
         }
+    }
+
+    Binding {
+        when: root.model
+        target: root.model
+        property: "subscribed"
+        value: root.visible
+        restoreMode: Binding.RestoreBinding
     }
 }

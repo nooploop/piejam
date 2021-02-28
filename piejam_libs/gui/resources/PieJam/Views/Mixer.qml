@@ -46,54 +46,13 @@ TopPane {
 
         sourceComponent: ChannelStrip {
 
-            perform.mono: root.model.mainChannel.mono
-            perform.levelLeft: root.model.mainChannel.levelLeft
-            perform.levelRight: root.model.mainChannel.levelRight
-            perform.meterMuted: root.model.mainChannel.mute
-            perform.pan: root.model.mainChannel.panBalance
-            perform.volume: root.model.mainChannel.volume
-            perform.mute: root.model.mainChannel.mute
-            perform.solo: root.model.mainChannel.solo
-            perform.name: root.model.mainChannel.name
+            perform.model: root.model.mainChannel.perform
+            perform.onFxButtonClicked: root.fxButtonClicked()
 
-            perform.volumeMidi.model: root.model.mainChannel.volumeMidi
-            perform.panMidi.model: root.model.mainChannel.panMidi
-            perform.muteMidi.model: root.model.mainChannel.muteMidi
-
-            perform.onFaderMoved: root.model.mainChannel.changeVolume(newVolume)
-            perform.onPanMoved: root.model.mainChannel.changePanBalance(newPan)
-            perform.onMuteToggled: root.model.mainChannel.changeMute(!model.item.mute)
-    //        perform.onSoloToggled: root.soloToggled(index)
-            perform.onFxButtonClicked: {
-                root.model.mainChannel.focusFxChain()
-                root.fxButtonClicked()
-            }
-
-            edit.name: root.model.mainChannel.name
-            edit.defaultInputIsValid: root.model.mainChannel.defaultInputIsValid
-            edit.selectedInput: root.model.mainChannel.selectedInput
-            edit.selectedInputIsValid: root.model.mainChannel.selectedInputIsValid
-            edit.inputDevices: root.model.mainChannel.inputDevices
-            edit.inputChannels: root.model.mainChannel.inputChannels
-            edit.selectedOutput: root.model.mainChannel.selectedOutput
-            edit.selectedOutputIsValid: root.model.mainChannel.selectedOutputIsValid
-            edit.outputDevices: root.model.mainChannel.outputDevices
-            edit.outputChannels: root.model.mainChannel.outputChannels
-
-            edit.onAudioInMixSelected: root.model.mainChannel.changeInputToMix()
-            edit.onAudioInDeviceSelected: root.model.mainChannel.changeInputToDevice(index)
-            edit.onAudioInChannelSelected: root.model.mainChannel.changeInputToChannel(index)
-            edit.onAudioOutNoneSelected: root.model.mainChannel.changeOutputToNone()
-            edit.onAudioOutDeviceSelected: root.model.mainChannel.changeOutputToDevice(index)
-            edit.onAudioOutChannelSelected: root.model.mainChannel.changeOutputToChannel(index)
-            edit.onNameEdited: root.model.mainChannel.changeName(newName)
+            edit.model: root.model.mainChannel.edit
             edit.deletable: false
 
-            Binding {
-                target: root.model.mainChannel
-                property: "subscribed"
-                value: visible
-            }
+//    //        perform.onSoloToggled: root.soloToggled(index)
         }
 
     }
