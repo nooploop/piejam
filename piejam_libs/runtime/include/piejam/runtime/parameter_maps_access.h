@@ -42,7 +42,7 @@ struct parameter_maps_access
     static auto find(parameter_maps const&, parameter::id_t<P>) noexcept
             -> parameter::value_type_t<P> const*;
     static auto get(parameter_maps const&, parameter::id_t<P>) noexcept
-            -> parameter::value_type_t<P>;
+            -> parameter::value_type_t<P> const&;
 
     static auto
     set(parameter_maps&, parameter::id_t<P>, parameter::value_type_t<P>)
@@ -133,7 +133,8 @@ template <class P>
 auto
 get_parameter_value(
         parameter_maps const& m,
-        parameter::id_t<P> const id) noexcept -> parameter::value_type_t<P>
+        parameter::id_t<P> const id) noexcept
+        -> parameter::value_type_t<P> const&
 {
     return detail::parameter_maps_access<P>::get(m, id);
 }

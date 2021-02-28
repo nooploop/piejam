@@ -124,18 +124,17 @@ parameter_maps_access<P>::find(
         parameter::id_t<P> const id) noexcept
         -> parameter::value_type_t<P> const*
 {
-    return m.m_impl->maps.get(id);
+    return m.m_impl->maps.find(id);
 }
 
 template <class P>
 auto
 parameter_maps_access<P>::get(
         parameter_maps const& m,
-        parameter::id_t<P> const id) noexcept -> parameter::value_type_t<P>
+        parameter::id_t<P> const id) noexcept
+        -> parameter::value_type_t<P> const&
 {
-    auto const* const value = m.m_impl->maps.get(id);
-    BOOST_ASSERT(value);
-    return *value;
+    return m.m_impl->maps.get(id);
 }
 
 template <class P>

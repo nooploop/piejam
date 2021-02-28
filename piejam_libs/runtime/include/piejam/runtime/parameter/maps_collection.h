@@ -58,15 +58,21 @@ public:
     }
 
     template <class P>
-    auto get(id_t<P> const id) const
+    auto find(id_t<P> const id) const -> value_type_t<P> const*
+    {
+        return get_map<P>().find(id);
+    }
+
+    template <class P>
+    auto get(id_t<P> const id) const -> value_type_t<P> const&
     {
         return get_map<P>().get(id);
     }
 
     template <class P, class V>
-    auto set(id_t<P> const id, V&& value) -> bool
+    auto set(id_t<P> const id, V&& value) -> void
     {
-        return get_map<P>().set(id, std::forward<V>(value));
+        get_map<P>().set(id, std::forward<V>(value));
     }
 
     template <class P>

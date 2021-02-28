@@ -40,7 +40,7 @@ public:
         return id;
     }
 
-    void remove(id_t id)
+    auto remove(id_t id) -> void
     {
         m_parameters.remove(id);
         m_values.erase(id);
@@ -56,23 +56,25 @@ public:
         return m_parameters[id];
     }
 
-    auto get(id_t id) const noexcept -> value_type const*
+    auto find(id_t id) const noexcept -> value_type const*
     {
         auto it = m_values.find(id);
         return it != m_values.end() ? std::addressof(it->second) : nullptr;
     }
 
-    template <std::convertible_to<value_type> V>
-    auto set(id_t id, V&& value) -> bool
+    auto get(id_t id) const noexcept -> value_type const&
     {
         auto it = m_values.find(id);
-        if (it != m_values.end())
-        {
-            it->second = std::forward<V>(value);
-            return true;
-        }
+        BOOST_ASSERT(it != m_values.end());
+        return it->second;
+    }
 
-        return false;
+    template <std::convertible_to<value_type> V>
+    auto set(id_t id, V&& value) -> void
+    {
+        auto it = m_values.find(id);
+        BOOST_ASSERT(it != m_values.end());
+        it->second = std::forward<V>(value);
     }
 
     auto set(id_value_map_t<Parameter> const& id_values)
