@@ -18,7 +18,8 @@ namespace piejam::app::gui::model
 
 class MidiAssignable;
 
-class MixerChannelPerform final : public Subscribable<piejam::gui::model::MixerChannelPerform>
+class MixerChannelPerform final
+    : public Subscribable<piejam::gui::model::MixerChannelPerform>
 {
 public:
     MixerChannelPerform(
@@ -26,7 +27,7 @@ public:
             runtime::subscriber&,
             runtime::mixer::bus_id,
             runtime::float_parameter_id volume,
-            runtime::float_parameter_id pan_balance,
+            runtime::float_parameter_id panBalance,
             runtime::bool_parameter_id mute,
             runtime::stereo_level_parameter_id level);
     ~MixerChannelPerform();
