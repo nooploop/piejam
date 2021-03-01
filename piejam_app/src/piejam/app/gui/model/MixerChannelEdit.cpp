@@ -50,7 +50,16 @@ MixerChannelEdit::onSubscribe()
                     m_impl->busId),
             [this](box<runtime::selectors::selected_route> const& sel_route) {
                 setSelectedInput(QString::fromStdString(sel_route->name));
-                setSelectedInputIsValid(sel_route->valid);
+                switch (sel_route->state)
+                {
+                    case runtime::selectors::selected_route::state_t::valid:
+                        setSelectedInputState(SelectedInputState::Valid);
+                        break;
+
+                    default:
+                        setSelectedInputState(SelectedInputState::Invalid);
+                        break;
+                }
             });
 
     observe(runtime::selectors::select_mixer_input_devices,
@@ -86,7 +95,20 @@ MixerChannelEdit::onSubscribe()
                     m_impl->busId),
             [this](box<runtime::selectors::selected_route> const& sel_route) {
                 setSelectedOutput(QString::fromStdString(sel_route->name));
-                setSelectedOutputIsValid(sel_route->valid);
+                switch (sel_route->state)
+                {
+                    case runtime::selectors::selected_route::state_t::invalid:
+                        setSelectedOutputState(SelectedOutputState::Invalid);
+                        break;
+
+                    case runtime::selectors::selected_route::state_t::valid:
+                        setSelectedOutputState(SelectedOutputState::Valid);
+                        break;
+
+                    case runtime::selectors::selected_route::state_t::not_mixed:
+                        setSelectedOutputState(SelectedOutputState::NotMixed);
+                        break;
+                }
             });
 
     observe(runtime::selectors::select_mixer_output_devices,

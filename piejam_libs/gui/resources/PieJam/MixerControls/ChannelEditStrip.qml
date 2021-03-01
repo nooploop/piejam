@@ -7,6 +7,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
+import PieJam.Models 1.0
+
 import ".."
 
 Item {
@@ -74,7 +76,9 @@ Item {
 
             displayText: root.model.selectedInput
 
-            Material.foreground: root.model.selectedInputIsValid ? Material.primaryTextColor : Material.Red
+            Material.foreground: MixerChannelEdit.SelectedInputState.Invalid === root.model.selectedInputState
+                                        ? Material.Red
+                                        : Material.primaryTextColor
 
             popup: Menu {
                 id: audioInMenu
@@ -145,7 +149,11 @@ Item {
 
             displayText: root.model.selectedOutput
 
-            Material.foreground: root.model.selectedOutputIsValid ? Material.primaryTextColor : Material.Red
+            Material.foreground: root.model.selectedOutputState === MixerChannelEdit.SelectedOutputState.Invalid
+                                        ? Material.Red
+                                        : root.model.selectedOutputState === MixerChannelEdit.SelectedOutputState.NotMixed
+                                                ? Material.Yellow
+                                                : Material.primaryTextColor;
 
             popup: Menu {
                 id: audioOutMenu
@@ -238,12 +246,12 @@ Item {
         readonly property var nullModel: ({
             name: "",
             selectedInput: "",
-            selectedInputIsValid: true,
+            selectedInputState: true,
             defaultInputIsValid: true,
             inputDevices: [],
             inputChannels: [],
             selectedOutput: "",
-            selectedOutputIsValid: true,
+            selectedOutputState: true,
             outputDevices: [],
             outputChannels: []
         })

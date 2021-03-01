@@ -97,7 +97,14 @@ auto make_mixer_output_channels_selector(mixer::bus_id)
 
 struct selected_route
 {
-    bool valid{};
+    enum class state_t
+    {
+        invalid,
+        valid,
+        not_mixed
+    };
+
+    state_t state{};
     std::string name;
 
     bool operator==(selected_route const&) const noexcept = default;

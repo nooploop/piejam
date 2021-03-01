@@ -20,6 +20,8 @@
 #include <piejam/gui/model/MixerChannelEdit.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
 
+#include <QQmlEngine>
+
 namespace piejam::app::gui::model
 {
 
@@ -57,6 +59,13 @@ Factory::Factory(
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
     qRegisterMetaType<piejam::gui::model::MidiAssignable*>();
+
+    qmlRegisterUncreatableType<piejam::gui::model::MixerChannelEdit>(
+            "PieJam.Models",
+            1,
+            0,
+            "MixerChannelEdit",
+            "Not creatable");
 }
 
 Factory::~Factory() = default;

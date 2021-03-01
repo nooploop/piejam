@@ -36,6 +36,7 @@
 #include <piejam/runtime/store.h>
 #include <piejam/runtime/subscriber.h>
 #include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/action_tracker_middleware.h>
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
 #include <piejam/system/avg_cpu_load_tracker.h>
@@ -110,6 +111,15 @@ main(int argc, char* argv[]) -> int
     runtime::store store(
             [](auto const& st, auto const& a) { return a.reduce(st); },
             runtime::make_initial_state());
+
+    store.apply_middleware([](auto&& /*get_state*/,
+                              auto&& /*dispatch*/,
+                              auto&& next) {
+        return redux::make_middleware<
+                piejam::runtime::ui::action_tracker_middleware<runtime::state>>(
+                std::forward<decltype(next)>(next),
+                "reduce_time");
+    });
 
     store.apply_middleware([](auto&& get_state, auto&& dispatch, auto&& next) {
         return redux::make_middleware<piejam::runtime::persistence_middleware>(

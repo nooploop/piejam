@@ -20,16 +20,16 @@ class MixerChannelEdit : public SubscribableModel
 
     Q_PROPERTY(bool defaultInputIsValid READ defaultInputIsValid NOTIFY
                        defaultInputIsValidChanged FINAL)
-    Q_PROPERTY(bool selectedInputIsValid READ selectedInputIsValid NOTIFY
-                       selectedInputIsValidChanged FINAL)
+    Q_PROPERTY(SelectedInputState selectedInputState READ selectedInputState
+                       NOTIFY selectedInputStateChanged FINAL)
     Q_PROPERTY(QString selectedInput READ selectedInput NOTIFY
                        selectedInputChanged FINAL)
     Q_PROPERTY(QStringList inputDevices READ inputDevices NOTIFY
                        inputDevicesChanged FINAL)
     Q_PROPERTY(QStringList inputChannels READ inputChannels NOTIFY
                        inputChannelsChanged FINAL)
-    Q_PROPERTY(bool selectedOutputIsValid READ selectedOutputIsValid NOTIFY
-                       selectedOutputIsValidChanged FINAL)
+    Q_PROPERTY(SelectedOutputState selectedOutputState READ selectedOutputState
+                       NOTIFY selectedOutputStateChanged FINAL)
     Q_PROPERTY(QString selectedOutput READ selectedOutput NOTIFY
                        selectedOutputChanged FINAL)
     Q_PROPERTY(QStringList outputDevices READ outputDevices NOTIFY
@@ -64,17 +64,24 @@ public:
         }
     }
 
-    bool selectedInputIsValid() const noexcept
+    enum class SelectedInputState
     {
-        return m_selectedInputIsValid;
+        Invalid,
+        Valid
+    };
+    Q_ENUM(SelectedInputState)
+
+    auto selectedInputState() const noexcept -> SelectedInputState
+    {
+        return m_selectedInputState;
     }
 
-    void setSelectedInputIsValid(bool x)
+    void setSelectedInputState(SelectedInputState x)
     {
-        if (m_selectedInputIsValid != x)
+        if (m_selectedInputState != x)
         {
-            m_selectedInputIsValid = x;
-            emit selectedInputIsValidChanged();
+            m_selectedInputState = x;
+            emit selectedInputStateChanged();
         }
     }
 
@@ -116,17 +123,25 @@ public:
     Q_INVOKABLE virtual void changeInputToDevice(unsigned index) = 0;
     Q_INVOKABLE virtual void changeInputToChannel(unsigned index) = 0;
 
-    bool selectedOutputIsValid() const noexcept
+    enum class SelectedOutputState
     {
-        return m_selectedOutputIsValid;
+        Invalid,
+        Valid,
+        NotMixed
+    };
+    Q_ENUM(SelectedOutputState)
+
+    auto selectedOutputState() const noexcept -> SelectedOutputState
+    {
+        return m_selectedOutputState;
     }
 
-    void setSelectedOutputIsValid(bool x)
+    void setSelectedOutputState(SelectedOutputState x)
     {
-        if (m_selectedOutputIsValid != x)
+        if (m_selectedOutputState != x)
         {
-            m_selectedOutputIsValid = x;
-            emit selectedOutputIsValidChanged();
+            m_selectedOutputState = x;
+            emit selectedOutputStateChanged();
         }
     }
 
@@ -176,11 +191,11 @@ signals:
 
     void nameChanged();
     void defaultInputIsValidChanged();
-    void selectedInputIsValidChanged();
+    void selectedInputStateChanged();
     void selectedInputChanged();
     void inputDevicesChanged();
     void inputChannelsChanged();
-    void selectedOutputIsValidChanged();
+    void selectedOutputStateChanged();
     void selectedOutputChanged();
     void outputDevicesChanged();
     void outputChannelsChanged();
@@ -188,11 +203,11 @@ signals:
 private:
     QString m_name;
     bool m_defaultInputIsValid{};
-    bool m_selectedInputIsValid{};
+    SelectedInputState m_selectedInputState{};
     QString m_selectedInput;
     QStringList m_inputDevices;
     QStringList m_inputChannels;
-    bool m_selectedOutputIsValid{};
+    SelectedOutputState m_selectedOutputState{};
     QString m_selectedOutput;
     QStringList m_outputDevices;
     QStringList m_outputChannels;

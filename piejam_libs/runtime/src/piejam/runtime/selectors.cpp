@@ -192,7 +192,7 @@ make_mixer_output_channels_selector(mixer::bus_id const bus_id)
 }
 
 static auto
-get_mixer_input_name(
+get_mixer_channel_selected_input(
         mixer::bus_id const bus_id,
         mixer::buses_t const& mixer_buses,
         device_io::buses_t const& device_buses) -> selected_route
@@ -201,29 +201,33 @@ get_mixer_input_name(
 
     mixer::bus const* const bus = mixer_buses.find(bus_id);
     if (!bus)
-        return selected_route{true, s_mix};
+        return selected_route{selected_route::state_t::invalid, s_mix};
 
     return std::visit(
             overload{
                     [](std::nullptr_t) {
-                        return selected_route{true, s_mix};
+                        return selected_route{
+                                .state = selected_route::state_t::valid,
+                                .name = s_mix};
                     },
                     [&](mixer::bus_id const src_bus_id) {
                         mixer::bus const* const src_bus =
                                 mixer_buses.find(src_bus_id);
                         return selected_route{
-                                true,
-                                src_bus ? *src_bus->name : s_mix};
+                                .state = selected_route::state_t::valid,
+                                .name = src_bus ? *src_bus->name : s_mix};
                     },
                     [&](device_io::bus_id const dev_bus_id) {
                         device_io::bus const* const dev_bus =
                                 device_buses.find(dev_bus_id);
                         return selected_route{
-                                true,
-                                dev_bus ? *dev_bus->name : s_mix};
+                                .state = selected_route::state_t::valid,
+                                .name = dev_bus ? *dev_bus->name : s_mix};
                     },
                     [](mixer::missing_device_address const& name) {
-                        return selected_route{false, name};
+                        return selected_route{
+                                .state = selected_route::state_t::invalid,
+                                .name = name};
                     }},
             bus->in);
 }
@@ -233,13 +237,14 @@ make_mixer_channel_input_selector(mixer::bus_id const bus_id)
         -> selector<box<selected_route>>
 {
     return [bus_id,
-            get = memo(boxify_result(&get_mixer_input_name))](state const& st) {
+            get = memo(boxify_result(&get_mixer_channel_selected_input))](
+                   state const& st) {
         return get(bus_id, st.mixer_state.buses, st.device_io_state.buses);
     };
 }
 
 static auto
-get_mixer_output_name(
+get_mixer_channel_selected_output(
         mixer::bus_id const bus_id,
         mixer::buses_t const& mixer_buses,
         device_io::buses_t const& device_buses) -> selected_route
@@ -248,29 +253,47 @@ get_mixer_output_name(
 
     mixer::bus const* const bus = mixer_buses.find(bus_id);
     if (!bus)
-        return selected_route{true, s_none};
+        return selected_route{selected_route::state_t::invalid, s_none};
 
     return std::visit(
             overload{
                     [](std::nullptr_t) {
-                        return selected_route{true, s_none};
+                        return selected_route{
+                                .state = selected_route::state_t::valid,
+                                .name = s_none};
                     },
                     [&](mixer::bus_id const dst_bus_id) {
-                        mixer::bus const* const dst_bus =
-                                mixer_buses.find(dst_bus_id);
-                        return selected_route{
-                                true,
-                                dst_bus ? *dst_bus->name : s_none};
+                        if (mixer::bus const* const dst_bus =
+                                    mixer_buses.find(dst_bus_id))
+                        {
+                            return selected_route{
+                                    .state =
+                                            std::holds_alternative<
+                                                    std::nullptr_t>(dst_bus->in)
+                                                    ? selected_route::state_t::
+                                                              valid
+                                                    : selected_route::state_t::
+                                                              not_mixed,
+                                    .name = dst_bus->name};
+                        }
+                        else
+                        {
+                            return selected_route{
+                                    .state = selected_route::state_t::valid,
+                                    .name = s_none};
+                        }
                     },
                     [&](device_io::bus_id const dev_bus_id) {
                         device_io::bus const* const dev_bus =
                                 device_buses.find(dev_bus_id);
                         return selected_route{
-                                true,
-                                dev_bus ? *dev_bus->name : s_none};
+                                .state = selected_route::state_t::valid,
+                                .name = dev_bus ? *dev_bus->name : s_none};
                     },
                     [](mixer::missing_device_address const& name) {
-                        return selected_route{false, name};
+                        return selected_route{
+                                .state = selected_route::state_t::invalid,
+                                .name = name};
                     }},
             bus->out);
 }
@@ -279,7 +302,8 @@ auto
 make_mixer_channel_output_selector(mixer::bus_id const bus_id)
         -> selector<box<selected_route>>
 {
-    return [bus_id, get = memo(boxify_result(&get_mixer_output_name))](
+    return [bus_id,
+            get = memo(boxify_result(&get_mixer_channel_selected_output))](
                    state const& st) {
         return get(bus_id, st.mixer_state.buses, st.device_io_state.buses);
     };
