@@ -17,25 +17,13 @@ static void
 BM_copy_state_benchmark(benchmark::State& bench_state)
 {
     state st;
-    auto in1 = add_mixer_bus<io_direction::input>(
-            st,
-            "In1yohohofoobarbaz",
-            audio::bus_type::mono);
+    auto in1 = add_mixer_bus(st, "In1yohohofoobarbaz");
     insert_internal_fx_module(st, in1, npos, fx::internal::gain, {}, {});
-    auto in2 = add_mixer_bus<io_direction::input>(
-            st,
-            "In2",
-            audio::bus_type::mono);
+    auto in2 = add_mixer_bus(st, "In2");
     insert_internal_fx_module(st, in2, npos, fx::internal::gain, {}, {});
-    auto in3 = add_mixer_bus<io_direction::input>(
-            st,
-            "In3",
-            audio::bus_type::mono);
+    auto in3 = add_mixer_bus(st, "In3");
     insert_internal_fx_module(st, in3, npos, fx::internal::gain, {}, {});
-    auto out = add_mixer_bus<io_direction::output>(
-            st,
-            "out",
-            audio::bus_type::stereo);
+    auto out = add_mixer_bus(st, "out");
     insert_internal_fx_module(st, out, npos, fx::internal::gain, {}, {});
 
     actions::finalize_ladspa_fx_plugin_scan ladspa_fx_scan;
@@ -56,28 +44,16 @@ static void
 BM_get_bus_name_benchmark(benchmark::State& bench_state)
 {
     state st;
-    auto in1 = add_mixer_bus<io_direction::input>(
-            st,
-            "In1",
-            audio::bus_type::mono);
+    auto in1 = add_mixer_bus(st, "In1");
     insert_internal_fx_module(st, in1, npos, fx::internal::gain, {}, {});
-    auto in2 = add_mixer_bus<io_direction::input>(
-            st,
-            "In2",
-            audio::bus_type::mono);
+    auto in2 = add_mixer_bus(st, "In2");
     insert_internal_fx_module(st, in2, npos, fx::internal::gain, {}, {});
-    auto in3 = add_mixer_bus<io_direction::input>(
-            st,
-            "In3",
-            audio::bus_type::mono);
+    auto in3 = add_mixer_bus(st, "In3");
     insert_internal_fx_module(st, in3, npos, fx::internal::gain, {}, {});
-    auto out = add_mixer_bus<io_direction::output>(
-            st,
-            "out",
-            audio::bus_type::stereo);
+    auto out = add_mixer_bus(st, "out");
     insert_internal_fx_module(st, out, npos, fx::internal::gain, {}, {});
 
-    auto const get_name = selectors::make_bus_name_selector(in1);
+    auto const get_name = selectors::make_mixer_bus_name_selector(in1);
 
     for (auto _ : bench_state)
     {
