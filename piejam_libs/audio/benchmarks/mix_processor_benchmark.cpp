@@ -48,7 +48,10 @@ BM_mix_processor_2_inputs(benchmark::State& state)
     process_context ctx{in, out, res, {}, {}, buffer_size};
 
     for (auto _ : state)
+    {
         sut->process(ctx);
+        benchmark::ClobberMemory();
+    }
 }
 
 static void
@@ -82,7 +85,10 @@ BM_mix_processor_3_inputs(benchmark::State& state)
     process_context ctx{in, out, res, {}, {}, buffer_size};
 
     for (auto _ : state)
+    {
         sut->process(ctx);
+        benchmark::ClobberMemory();
+    }
 }
 
 static void
@@ -119,7 +125,10 @@ BM_mix_processor_4_inputs(benchmark::State& state)
     process_context ctx{in, out, res, {}, {}, buffer_size};
 
     for (auto _ : state)
+    {
         sut->process(ctx);
+        benchmark::ClobberMemory();
+    }
 }
 
 BENCHMARK(BM_mix_processor_2_inputs)->RangeMultiplier(2)->Range(1, 1024);
