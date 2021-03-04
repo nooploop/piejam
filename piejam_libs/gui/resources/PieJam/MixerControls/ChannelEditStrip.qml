@@ -7,6 +7,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
+import QtQml 2.15
+
 import PieJam.Models 1.0
 
 import ".."
@@ -14,7 +16,7 @@ import ".."
 Item {
     id: root
 
-    property var model: privates.nullModel
+    property var model
     property bool deletable: true
 
     implicitWidth: 150
@@ -49,7 +51,7 @@ Item {
             anchors.right: parent.right
             anchors.top: parent.top
 
-            text: root.model.name
+            text: root.model ? root.model.name : ""
 
             placeholderText: qsTr("Name")
 
@@ -74,17 +76,17 @@ Item {
             anchors.right: parent.right
             anchors.top: audioInLabel.bottom
 
-            displayText: root.model.selectedInput
+            displayText: root.model ? root.model.selectedInput : ""
 
-            Material.foreground: MixerChannelEdit.SelectedInputState.Invalid === root.model.selectedInputState
+            Material.foreground: root.model ? (MixerChannelEdit.SelectedInputState.Invalid === root.model.selectedInputState
                                         ? Material.Red
-                                        : Material.primaryTextColor
+                                        : Material.primaryTextColor) : Material.primaryTextColor
 
             popup: Menu {
                 id: audioInMenu
 
                 MenuItem {
-                    enabled: root.model.defaultInputIsValid
+                    enabled: root.model ? root.model.defaultInputIsValid : true
 
                     text: qsTr("Mix")
 
@@ -99,7 +101,7 @@ Item {
                     Repeater {
                         id: inDevicesRep
 
-                        model: root.model.inputDevices
+                        model: root.model ? root.model.inputDevices : []
 
                         delegate: MenuItem {
                             text: modelData
@@ -117,7 +119,7 @@ Item {
                     Repeater {
                         id: inChannelsRep
 
-                        model: root.model.inputChannels
+                        model: root.model ? root.model.inputChannels : []
 
                         delegate: MenuItem {
                             text: modelData
@@ -147,13 +149,13 @@ Item {
             anchors.right: parent.right
             anchors.top: audioOutLabel.bottom
 
-            displayText: root.model.selectedOutput
+            displayText: root.model ? root.model.selectedOutput : ""
 
-            Material.foreground: root.model.selectedOutputState === MixerChannelEdit.SelectedOutputState.Invalid
+            Material.foreground: root.model ? (root.model.selectedOutputState === MixerChannelEdit.SelectedOutputState.Invalid
                                         ? Material.Red
                                         : root.model.selectedOutputState === MixerChannelEdit.SelectedOutputState.NotMixed
                                                 ? Material.Yellow
-                                                : Material.primaryTextColor;
+                                                : Material.primaryTextColor) : Material.primaryTextColor;
 
             popup: Menu {
                 id: audioOutMenu
@@ -172,7 +174,7 @@ Item {
                     Repeater {
                         id: outDevicesRep
 
-                        model: root.model.outputDevices
+                        model: root.model ? root.model.outputDevices : []
 
                         delegate: MenuItem {
                             text: modelData
@@ -190,7 +192,7 @@ Item {
                     Repeater {
                         id: outChannelsRep
 
-                        model: root.model.outputChannels
+                        model: root.model ? root.model.outputChannels : []
 
                         delegate: MenuItem {
                             text: modelData
@@ -232,28 +234,11 @@ Item {
         }
     }
 
-    onModelChanged: {
-        if (!root.model) {
-            root.model = privates.nullModel
-        } else {
-            root.model.subscribed = Qt.binding(function () { return root.visible })
-        }
-    }
-
-    QtObject {
-        id: privates
-
-        readonly property var nullModel: ({
-            name: "",
-            selectedInput: "",
-            selectedInputState: true,
-            defaultInputIsValid: true,
-            inputDevices: [],
-            inputChannels: [],
-            selectedOutput: "",
-            selectedOutputState: true,
-            outputDevices: [],
-            outputChannels: []
-        })
+    Binding {
+        when: root.model
+        target: root.model
+        property: "subscribed"
+        value: root.visible
+        restoreMode: Binding.RestoreBinding
     }
 }
