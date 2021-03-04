@@ -9,8 +9,6 @@ import QtQuick.Controls.Material 2.15
 ListView {
     id: root
 
-    property bool soloActive: false
-
     signal soloToggled(int index)
     signal fxButtonClicked()
     signal addChannelClicked(string newChannelName)
@@ -30,8 +28,6 @@ ListView {
         perform.onFxButtonClicked: root.fxButtonClicked()
 
         edit.model: model.item.edit
-
-//        perform.meterMuted: (model.item.mute && !model.item.solo) || (root.soloActive && !model.item.solo)
     }
 
     footer: Item {

@@ -14,7 +14,10 @@
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/mixer_util.h>
 #include <piejam/runtime/parameter_maps_access.h>
+#include <piejam/runtime/solo_group.h>
 #include <piejam/runtime/state.h>
+
+#include <boost/hof/unpack.hpp>
 
 #include <cassert>
 
@@ -431,31 +434,56 @@ make_midi_device_enabled_selector(midi::device_id_t const device_id)
     };
 }
 
-auto
-make_solo_selector(io_direction io_dir, mixer::bus_id const bus_id)
-        -> selector<bool>
-{
-    switch (io_dir)
-    {
-        case io_direction::input:
-            return [bus_id](state const& st) -> bool {
-                return bus_id == st.mixer_state.input_solo_id;
-            };
+using muted_by_solo_state_t =
+        std::unordered_map<mixer::bus_id, std::function<bool(state const&)>>;
 
-        case io_direction::output:
-            return [bus_id](state const& st) -> bool {
-                return bus_id == st.mixer_state.output_solo_id;
-            };
+static auto
+make_muted_by_solo_state(mixer::buses_t const& mixer_buses)
+{
+    muted_by_solo_state_t result;
+
+    for (auto&& [owner, group] : runtime::solo_groups(mixer_buses))
+    {
+        auto group_selectors = algorithm::transform_to_vector(
+                group,
+                [](solo_group_member const& sg_member) {
+                    return make_bool_parameter_value_selector(
+                            sg_member.solo_param);
+                });
+
+        for (auto&& [param, member] : group)
+        {
+            result.emplace(
+                    member,
+                    [group_selectors,
+                     member_selector = make_bool_parameter_value_selector(
+                             param)](state const& st) {
+                        return std::ranges::any_of(
+                                       group_selectors,
+                                       [&st](auto const& sel) {
+                                           return sel.get(st);
+                                       }) &&
+                               !member_selector.get(st);
+                    });
+        }
     }
+
+    return result;
 }
 
-const selector<bool> select_input_solo_active([](state const& st) {
-    return st.mixer_state.input_solo_id.valid();
-});
+selector<box<muted_by_solo_state_t>> select_muted_by_solo_state(
+        [get = memo(boxify_result(&make_muted_by_solo_state))](
+                state const& st) { return get(st.mixer_state.buses); });
 
-const selector<bool> select_output_solo_active([](state const& st) {
-    return st.mixer_state.output_solo_id.valid();
-});
+auto
+make_muted_by_solo_selector(mixer::bus_id const mixer_bus_id) -> selector<bool>
+{
+    return [mixer_bus_id](state const& st) {
+        auto const& muted_by_solo = select_muted_by_solo_state.get(st);
+        auto it = muted_by_solo->find(mixer_bus_id);
+        return it != muted_by_solo->end() && it->second(st);
+    };
+}
 
 const selector<mixer::bus_id> select_fx_chain_bus([](state const& st) {
     return st.fx_chain_bus;

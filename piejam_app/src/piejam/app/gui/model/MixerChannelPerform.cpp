@@ -99,6 +99,9 @@ MixerChannelPerform::onSubscribe()
                     m_impl->solo),
             [this](bool x) { setSolo(x); });
 
+    observe(runtime::selectors::make_muted_by_solo_selector(m_impl->busId),
+            [this](bool x) { setMutedBySolo(x); });
+
     observe(runtime::selectors::make_level_parameter_value_selector(
                     m_impl->level),
             [this](runtime::stereo_level const& x) {

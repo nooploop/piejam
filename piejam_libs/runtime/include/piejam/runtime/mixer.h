@@ -46,24 +46,7 @@ struct state
 
     box<bus_list_t> inputs;
     bus_id main;
-
-    bus_id input_solo_id;
-    bus_id output_solo_id;
 };
-
-template <io_direction D>
-auto
-solo_id(state const& st) -> bus_id
-{
-    return D == io_direction::input ? st.input_solo_id : st.output_solo_id;
-}
-
-template <io_direction D>
-auto
-solo_id(state& st) -> bus_id&
-{
-    return D == io_direction::input ? st.input_solo_id : st.output_solo_id;
-}
 
 bool is_default_source_valid(buses_t const&, bus_id);
 

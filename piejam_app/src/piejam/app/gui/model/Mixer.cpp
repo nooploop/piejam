@@ -103,12 +103,6 @@ Mixer::onSubscribe()
                     m_impl->all.emplace_back(m_impl->mainBusInfo->bus_id);
                 }
             });
-
-    observe(runtime::selectors::select_input_solo_active,
-            [this](bool const active) { setInputSoloActive(active); });
-
-    observe(runtime::selectors::select_output_solo_active,
-            [this](bool const active) { setOutputSoloActive(active); });
 }
 
 void

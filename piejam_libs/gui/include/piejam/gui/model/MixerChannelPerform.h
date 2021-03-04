@@ -22,6 +22,8 @@ class MixerChannelPerform : public SubscribableModel
     Q_PROPERTY(double panBalance READ panBalance NOTIFY panBalanceChanged FINAL)
     Q_PROPERTY(bool mute READ mute NOTIFY muteChanged FINAL)
     Q_PROPERTY(bool solo READ solo NOTIFY soloChanged FINAL)
+    Q_PROPERTY(
+            bool mutedBySolo READ mutedBySolo NOTIFY mutedBySoloChanged FINAL)
 
     Q_PROPERTY(piejam::gui::model::MidiAssignable* volumeMidi READ volumeMidi
                        CONSTANT FINAL)
@@ -120,6 +122,16 @@ public:
 
     Q_INVOKABLE virtual void changeSolo(bool) = 0;
 
+    auto mutedBySolo() const noexcept -> bool { return m_mutedBySolo; }
+    void setMutedBySolo(bool const x)
+    {
+        if (m_mutedBySolo != x)
+        {
+            m_mutedBySolo = x;
+            emit mutedBySoloChanged();
+        }
+    }
+
     Q_INVOKABLE virtual void focusFxChain() = 0;
 
     virtual auto volumeMidi() const -> MidiAssignable* = 0;
@@ -137,6 +149,7 @@ signals:
     void panBalanceChanged();
     void muteChanged();
     void soloChanged();
+    void mutedBySoloChanged();
 
 private:
     QString m_name;
@@ -147,6 +160,7 @@ private:
     double m_panBalance{};
     bool m_mute{};
     bool m_solo{};
+    bool m_mutedBySolo{};
 };
 
 } // namespace piejam::gui::model

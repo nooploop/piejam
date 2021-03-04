@@ -136,10 +136,7 @@ auto make_midi_device_name_selector(midi::device_id_t)
 
 auto make_midi_device_enabled_selector(midi::device_id_t) -> selector<bool>;
 
-auto make_solo_selector(io_direction, mixer::bus_id) -> selector<bool>;
-
-extern const selector<bool> select_input_solo_active;
-extern const selector<bool> select_output_solo_active;
+auto make_muted_by_solo_selector(mixer::bus_id) -> selector<bool>;
 
 extern const selector<mixer::bus_id> select_fx_chain_bus;
 

@@ -419,14 +419,12 @@ remove_mixer_bus(state& st, mixer::bus_id const bus_id)
 {
     BOOST_ASSERT(bus_id != st.mixer_state.main);
 
-    if (st.mixer_state.input_solo_id == bus_id)
-        st.mixer_state.input_solo_id = mixer::bus_id{};
-
     mixer::bus const& bus = st.mixer_state.buses[bus_id];
 
     remove_parameter(st.params, bus.volume);
     remove_parameter(st.params, bus.pan_balance);
     remove_parameter(st.params, bus.mute);
+    remove_parameter(st.params, bus.solo);
     remove_parameter(st.params, bus.level);
 
     BOOST_ASSERT_MSG(

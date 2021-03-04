@@ -15,8 +15,6 @@ Item {
 
     property var model: privates.nullModel
 
-    property alias meterMuted: levelMeterFader.muted
-
     signal fxButtonClicked()
 
     implicitWidth: 150
@@ -79,6 +77,8 @@ Item {
             levelLeft: root.model.levelLeft
             levelRight: root.model.levelRight
 
+            muted: root.model.mute || root.model.mutedBySolo
+
             volumeMidi.model: root.model.volumeMidi
 
             onFaderMoved: root.model.changeVolume(newVolume)
@@ -138,13 +138,13 @@ Item {
         readonly property var nullModel: ({
             name: "",
             mono: false,
-            solo: false,
             volume: 0,
             levelLeft: 0,
             levelRight: 0,
             panBalance: 0,
             mute: false,
             solo: false,
+            mutedBySolo: false,
             volumeMidi: null,
             panMidi: null,
             muteMidi: null,
