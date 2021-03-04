@@ -220,7 +220,11 @@ Item {
                 width: 48
                 height: 48
 
+                enabled: root.model && root.model.canMoveLeft
+
                 text: qsTr("<")
+
+                onClicked: root.model.moveLeft()
             }
 
             Button {
@@ -229,7 +233,11 @@ Item {
                 width: 48
                 height: 48
 
+                enabled: root.model && root.model.canMoveRight
+
                 text: qsTr(">")
+
+                onClicked: root.model.moveRight()
             }
         }
     }

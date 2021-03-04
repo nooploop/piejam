@@ -18,6 +18,12 @@ class MixerChannelEdit : public SubscribableModel
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
 
+    Q_PROPERTY(
+            bool canMoveLeft READ canMoveLeft NOTIFY canMoveLeftChanged FINAL)
+
+    Q_PROPERTY(bool canMoveRight READ canMoveRight NOTIFY canMoveRightChanged
+                       FINAL)
+
     Q_PROPERTY(bool defaultInputIsValid READ defaultInputIsValid NOTIFY
                        defaultInputIsValidChanged FINAL)
     Q_PROPERTY(SelectedInputState selectedInputState READ selectedInputState
@@ -51,6 +57,30 @@ public:
     }
 
     Q_INVOKABLE virtual void changeName(QString const&) = 0;
+
+    auto canMoveLeft() const noexcept -> bool { return m_canMoveLeft; }
+    void setCanMoveLeft(bool const x)
+    {
+        if (m_canMoveLeft != x)
+        {
+            m_canMoveLeft = x;
+            emit canMoveLeftChanged();
+        }
+    }
+
+    Q_INVOKABLE virtual void moveLeft() = 0;
+
+    auto canMoveRight() const noexcept -> bool { return m_canMoveRight; }
+    void setCanMoveRight(bool const x)
+    {
+        if (m_canMoveRight != x)
+        {
+            m_canMoveRight = x;
+            emit canMoveRightChanged();
+        }
+    }
+
+    Q_INVOKABLE virtual void moveRight() = 0;
 
     Q_INVOKABLE virtual void deleteChannel() = 0;
 
@@ -190,6 +220,8 @@ public:
 signals:
 
     void nameChanged();
+    void canMoveLeftChanged();
+    void canMoveRightChanged();
     void defaultInputIsValidChanged();
     void selectedInputStateChanged();
     void selectedInputChanged();
@@ -202,6 +234,8 @@ signals:
 
 private:
     QString m_name;
+    bool m_canMoveLeft{};
+    bool m_canMoveRight{};
     bool m_defaultInputIsValid{};
     SelectedInputState m_selectedInputState{};
     QString m_selectedInput;

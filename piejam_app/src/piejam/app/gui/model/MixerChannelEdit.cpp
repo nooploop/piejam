@@ -42,6 +42,14 @@ MixerChannelEdit::onSubscribe()
                 setName(QString::fromStdString(*name));
             });
 
+    observe(runtime::selectors::make_mixer_channel_can_move_left_selector(
+                    m_impl->channelId),
+            [this](bool const x) { setCanMoveLeft(x); });
+
+    observe(runtime::selectors::make_mixer_channel_can_move_right_selector(
+                    m_impl->channelId),
+            [this](bool const x) { setCanMoveRight(x); });
+
     observe(runtime::selectors::
                     make_default_mixer_channel_input_is_valid_selector(
                             m_impl->channelId),
@@ -148,6 +156,24 @@ MixerChannelEdit::changeName(QString const& name)
     runtime::actions::set_mixer_channel_name action;
     action.channel_id = m_impl->channelId;
     action.name = name.toStdString();
+    dispatch(action);
+}
+
+void
+MixerChannelEdit::moveLeft()
+{
+    BOOST_ASSERT(canMoveLeft());
+    runtime::actions::move_mixer_channel_left action;
+    action.channel_id = m_impl->channelId;
+    dispatch(action);
+}
+
+void
+MixerChannelEdit::moveRight()
+{
+    BOOST_ASSERT(canMoveRight());
+    runtime::actions::move_mixer_channel_right action;
+    action.channel_id = m_impl->channelId;
     dispatch(action);
 }
 

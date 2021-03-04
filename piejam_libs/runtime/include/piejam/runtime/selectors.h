@@ -126,6 +126,11 @@ auto make_mixer_channel_name_selector(mixer::channel_id)
 auto make_mixer_channel_input_type_selector(mixer::channel_id)
         -> selector<audio::bus_type>;
 
+auto make_mixer_channel_can_move_left_selector(mixer::channel_id)
+        -> selector<bool>;
+auto make_mixer_channel_can_move_right_selector(mixer::channel_id)
+        -> selector<bool>;
+
 auto make_bus_type_selector(device_io::bus_id) -> selector<audio::bus_type>;
 
 auto make_bus_channel_selector(device_io::bus_id, audio::bus_channel)

@@ -369,6 +369,28 @@ make_mixer_channel_input_type_selector(mixer::channel_id const channel_id)
 }
 
 auto
+make_mixer_channel_can_move_left_selector(mixer::channel_id const channel_id)
+        -> selector<bool>
+{
+    return [channel_id](state const& st) {
+        return channel_id != st.mixer_state.main &&
+               !st.mixer_state.inputs->empty() &&
+               channel_id != st.mixer_state.inputs->front();
+    };
+}
+
+auto
+make_mixer_channel_can_move_right_selector(mixer::channel_id const channel_id)
+        -> selector<bool>
+{
+    return [channel_id](state const& st) {
+        return channel_id != st.mixer_state.main &&
+               !st.mixer_state.inputs->empty() &&
+               channel_id != st.mixer_state.inputs->back();
+    };
+}
+
+auto
 make_bus_type_selector(device_io::bus_id const bus_id)
         -> selector<audio::bus_type>
 {

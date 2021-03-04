@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/state.h>
 
+#include <iterator>
+
 namespace piejam::runtime::actions
 {
 
@@ -60,5 +62,35 @@ set_mixer_channel_route<io_direction::input>::reduce(state const&) const
 template auto
 set_mixer_channel_route<io_direction::output>::reduce(state const&) const
         -> state;
+
+auto
+move_mixer_channel_left::reduce(state const& st) const -> state
+{
+    auto new_st = st;
+
+    new_st.mixer_state.inputs.update([this](mixer::channel_ids_t& channel_ids) {
+        auto it = std::ranges::find(channel_ids, channel_id);
+        BOOST_ASSERT(it != channel_ids.end());
+        BOOST_ASSERT(it != channel_ids.begin());
+        std::iter_swap(it, std::prev(it));
+    });
+
+    return new_st;
+}
+
+auto
+move_mixer_channel_right::reduce(state const& st) const -> state
+{
+    auto new_st = st;
+
+    new_st.mixer_state.inputs.update([this](mixer::channel_ids_t& channel_ids) {
+        auto it = std::ranges::find(channel_ids, channel_id);
+        BOOST_ASSERT(it != channel_ids.end());
+        BOOST_ASSERT(std::next(it) != channel_ids.begin());
+        std::iter_swap(it, std::next(it));
+    });
+
+    return new_st;
+}
 
 } // namespace piejam::runtime::actions

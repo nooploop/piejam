@@ -58,4 +58,22 @@ struct set_mixer_channel_route final
     auto reduce(state const&) const -> state override;
 };
 
+struct move_mixer_channel_left final
+    : ui::cloneable_action<move_mixer_channel_left, action>
+    , visitable_engine_action<move_mixer_channel_left>
+{
+    mixer::channel_id channel_id;
+
+    auto reduce(state const&) const -> state override;
+};
+
+struct move_mixer_channel_right final
+    : ui::cloneable_action<move_mixer_channel_right, action>
+    , visitable_engine_action<move_mixer_channel_right>
+{
+    mixer::channel_id channel_id;
+
+    auto reduce(state const&) const -> state override;
+};
+
 } // namespace piejam::runtime::actions

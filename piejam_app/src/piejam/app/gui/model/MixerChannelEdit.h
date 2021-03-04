@@ -27,6 +27,9 @@ public:
 
     void changeName(QString const&) override;
 
+    void moveLeft() override;
+    void moveRight() override;
+
     void deleteChannel() override;
 
     void changeInputToMix() override;

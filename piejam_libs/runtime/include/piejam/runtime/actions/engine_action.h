@@ -19,6 +19,8 @@ struct engine_action_visitor
               delete_mixer_channel,
               set_mixer_channel_input,
               set_mixer_channel_output,
+              move_mixer_channel_left,
+              move_mixer_channel_right,
               delete_fx_module,
               insert_internal_fx_module,
               insert_ladspa_fx_module,
