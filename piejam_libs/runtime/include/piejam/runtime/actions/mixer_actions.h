@@ -14,12 +14,12 @@
 namespace piejam::runtime::actions
 {
 
-struct add_mixer_bus final
-    : ui::cloneable_action<add_mixer_bus, action>
-    , visitable_engine_action<add_mixer_bus>
+struct add_mixer_channel final
+    : ui::cloneable_action<add_mixer_channel, action>
+    , visitable_engine_action<add_mixer_channel>
 {
-    add_mixer_bus() = default;
-    add_mixer_bus(std::string name)
+    add_mixer_channel() = default;
+    add_mixer_channel(std::string name)
         : name(std::move(name))
     {
     }
@@ -29,19 +29,19 @@ struct add_mixer_bus final
     auto reduce(state const&) const -> state override;
 };
 
-struct delete_mixer_bus final
-    : ui::cloneable_action<delete_mixer_bus, action>
-    , visitable_engine_action<delete_mixer_bus>
+struct delete_mixer_channel final
+    : ui::cloneable_action<delete_mixer_channel, action>
+    , visitable_engine_action<delete_mixer_channel>
 {
-    mixer::bus_id bus_id{};
+    mixer::channel_id channel_id{};
 
     auto reduce(state const&) const -> state override;
 };
 
-struct set_mixer_bus_name final
-    : ui::cloneable_action<set_mixer_bus_name, action>
+struct set_mixer_channel_name final
+    : ui::cloneable_action<set_mixer_channel_name, action>
 {
-    mixer::bus_id bus_id;
+    mixer::channel_id channel_id;
     std::string name;
 
     auto reduce(state const&) const -> state override;
@@ -52,7 +52,7 @@ struct set_mixer_channel_route final
     : ui::cloneable_action<set_mixer_channel_route<D>, action>
     , visitable_engine_action<set_mixer_channel_route<D>>
 {
-    mixer::bus_id bus_id;
+    mixer::channel_id channel_id;
     mixer::io_address_t route;
 
     auto reduce(state const&) const -> state override;

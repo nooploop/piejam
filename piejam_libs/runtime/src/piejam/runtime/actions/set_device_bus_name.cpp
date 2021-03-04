@@ -18,10 +18,10 @@ set_device_bus_name::reduce(state const& st) const -> state
         bus.name = name;
     });
 
-    new_st.mixer_state.buses.update(
+    new_st.mixer_state.channels.update(
             [this, addr_name = mixer::io_address_t(boxed_string(name))](
-                    mixer::bus_id,
-                    mixer::bus& bus) {
+                    mixer::channel_id,
+                    mixer::channel& bus) {
                 if (bus.in == addr_name)
                     bus.in = bus_id;
 

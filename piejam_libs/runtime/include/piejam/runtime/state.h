@@ -65,7 +65,7 @@ struct state
 
     mixer::state mixer_state{};
 
-    mixer::bus_id fx_chain_bus{};
+    mixer::channel_id fx_chain_channel{};
 
     box<midi_assignments_map> midi_assignments;
     std::optional<midi_assignment_id> midi_learning{};
@@ -93,15 +93,15 @@ auto add_device_bus(
         audio::bus_type,
         channel_index_pair const&) -> device_io::bus_id;
 
-auto add_mixer_bus(state&, std::string name) -> mixer::bus_id;
+auto add_mixer_channel(state&, std::string name) -> mixer::channel_id;
 
-void remove_mixer_bus(state&, mixer::bus_id);
+void remove_mixer_channel(state&, mixer::channel_id);
 
 void remove_device_bus(state&, device_io::bus_id);
 
 auto insert_internal_fx_module(
         state&,
-        mixer::bus_id,
+        mixer::channel_id,
         std::size_t position,
         fx::internal,
         std::vector<fx::parameter_value_assignment> const& initial_values,
@@ -109,7 +109,7 @@ auto insert_internal_fx_module(
         -> fx::module_id;
 void insert_ladspa_fx_module(
         state&,
-        mixer::bus_id,
+        mixer::channel_id,
         std::size_t position,
         fx::ladspa_instance_id,
         audio::ladspa::plugin_descriptor const&,
@@ -118,7 +118,7 @@ void insert_ladspa_fx_module(
         std::vector<fx::parameter_midi_assignment> const& midi_assigns);
 void insert_missing_ladspa_fx_module(
         state&,
-        mixer::bus_id,
+        mixer::channel_id,
         std::size_t position,
         fx::unavailable_ladspa const&,
         std::string_view const& name);

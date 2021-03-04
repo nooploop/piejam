@@ -10,31 +10,31 @@ namespace piejam::runtime::actions
 {
 
 auto
-add_mixer_bus::reduce(state const& st) const -> state
+add_mixer_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    runtime::add_mixer_bus(new_st, name);
+    runtime::add_mixer_channel(new_st, name);
 
     return new_st;
 }
 
 auto
-delete_mixer_bus::reduce(state const& st) const -> state
+delete_mixer_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    runtime::remove_mixer_bus(new_st, bus_id);
+    runtime::remove_mixer_channel(new_st, channel_id);
 
     return new_st;
 }
 
 auto
-set_mixer_bus_name::reduce(state const& st) const -> state
+set_mixer_channel_name::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.buses.update(bus_id, [this](mixer::bus& bus) {
+    new_st.mixer_state.channels.update(channel_id, [this](mixer::channel& bus) {
         bus.name = name;
     });
 
@@ -47,7 +47,7 @@ set_mixer_channel_route<D>::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.buses.update(bus_id, [this](mixer::bus& bus) {
+    new_st.mixer_state.channels.update(channel_id, [this](mixer::channel& bus) {
         (D == io_direction::input ? bus.in : bus.out) = route;
     });
 

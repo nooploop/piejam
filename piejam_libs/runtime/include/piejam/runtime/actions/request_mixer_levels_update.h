@@ -12,6 +12,6 @@
 namespace piejam::runtime::actions
 {
 
-auto request_mixer_levels_update(std::vector<mixer::bus_id>) -> thunk_action;
+auto request_mixer_levels_update(mixer::channel_ids_t) -> thunk_action;
 
 } // namespace piejam::runtime::actions

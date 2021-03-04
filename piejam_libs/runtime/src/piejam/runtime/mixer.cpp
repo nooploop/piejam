@@ -16,19 +16,19 @@ namespace piejam::runtime::mixer
 namespace
 {
 
-using bus_ios_t = boost::container::flat_map<bus_id, bus_io_t>;
+using channel_ios_t = boost::container::flat_map<channel_id, channel_io_t>;
 
 auto
-extract_bus_ios(buses_t const& buses) -> bus_ios_t
+extract_bus_ios(channels_t const& channels) -> channel_ios_t
 {
-    bus_ios_t result;
-    result.reserve(buses.size());
+    channel_ios_t result;
+    result.reserve(channels.size());
 
     std::ranges::transform(
-            buses,
+            channels,
             std::inserter(result, result.end()),
-            boost::hof::unpack([](auto const id, auto const& bus) {
-                return std::pair(id, bus_io_t(bus.in, bus.out));
+            boost::hof::unpack([](auto const id, auto const& channel) {
+                return std::pair(id, channel_io_t(channel.in, channel.out));
             }));
 
     return result;
@@ -36,15 +36,15 @@ extract_bus_ios(buses_t const& buses) -> bus_ios_t
 
 struct io_graph_node
 {
-    std::vector<bus_id> children;
+    std::vector<channel_id> children;
     bool finished{};
     bool visited{};
 };
 
-using io_graph = boost::container::flat_map<bus_id, io_graph_node>;
+using io_graph = boost::container::flat_map<channel_id, io_graph_node>;
 
 auto
-make_bus_io_graph(bus_ios_t const& bus_ios) -> io_graph
+make_bus_io_graph(channel_ios_t const& bus_ios) -> io_graph
 {
     io_graph result;
     result.reserve(bus_ios.size());
@@ -53,17 +53,19 @@ make_bus_io_graph(bus_ios_t const& bus_ios) -> io_graph
     {
         result[id];
 
-        if (bus_id const* const in_bus_id = std::get_if<bus_id>(&bus_io.in))
+        if (channel_id const* const in_channel_id =
+                    std::get_if<channel_id>(&bus_io.in))
         {
-            result[*in_bus_id].children.push_back(id);
+            result[*in_channel_id].children.push_back(id);
         }
 
-        if (bus_id const* const out_bus_id = std::get_if<bus_id>(&bus_io.out))
+        if (channel_id const* const out_channel_id =
+                    std::get_if<channel_id>(&bus_io.out))
         {
             if (std::holds_alternative<std::nullptr_t>(
-                        bus_ios.at(*out_bus_id).in))
+                        bus_ios.at(*out_channel_id).in))
             {
-                result[id].children.push_back(*out_bus_id);
+                result[id].children.push_back(*out_channel_id);
             }
         }
     }
@@ -72,7 +74,7 @@ make_bus_io_graph(bus_ios_t const& bus_ios) -> io_graph
 }
 
 bool
-has_cycle(io_graph& g, bus_id const id)
+has_cycle(io_graph& g, channel_id const id)
 {
     BOOST_ASSERT(g.contains(id));
 
@@ -106,19 +108,19 @@ has_cycle(io_graph g)
 
 template <io_direction D>
 auto
-valid_io_channels(buses_t const& mixer_buses, bus_id const mixer_bus_id)
-        -> std::vector<mixer::bus_id>
+valid_io_channels(channels_t const& channels, channel_id const ch_id)
+        -> std::vector<mixer::channel_id>
 {
-    auto const current = extract_bus_ios(mixer_buses);
+    auto const current = extract_bus_ios(channels);
 
-    std::vector<mixer::bus_id> valid_ids;
-    for (auto const& [id, bus] : mixer_buses)
+    std::vector<mixer::channel_id> valid_ids;
+    for (auto const& [id, bus] : channels)
     {
-        if (id == mixer_bus_id)
+        if (id == ch_id)
             continue;
 
         auto test = current;
-        test[mixer_bus_id].get(D) = id;
+        test[ch_id].get(D) = id;
 
         if (!has_cycle(make_bus_io_graph(test)))
             valid_ids.push_back(id);
@@ -130,25 +132,25 @@ valid_io_channels(buses_t const& mixer_buses, bus_id const mixer_bus_id)
 } // namespace
 
 bool
-is_default_source_valid(buses_t const& mixer_buses, bus_id const mixer_bus_id)
+is_default_source_valid(channels_t const& channels, channel_id const ch_id)
 {
-    auto test = extract_bus_ios(mixer_buses);
-    test[mixer_bus_id].in = nullptr; // default case
+    auto test = extract_bus_ios(channels);
+    test[ch_id].in = nullptr; // default case
     return !has_cycle(make_bus_io_graph(test));
 }
 
 auto
-valid_source_channels(buses_t const& mixer_buses, bus_id const mixer_bus_id)
-        -> std::vector<mixer::bus_id>
+valid_source_channels(channels_t const& channels, channel_id const ch_id)
+        -> std::vector<mixer::channel_id>
 {
-    return valid_io_channels<io_direction::input>(mixer_buses, mixer_bus_id);
+    return valid_io_channels<io_direction::input>(channels, ch_id);
 }
 
 auto
-valid_target_channels(buses_t const& mixer_buses, bus_id const mixer_bus_id)
-        -> std::vector<mixer::bus_id>
+valid_target_channels(channels_t const& channels, channel_id const ch_id)
+        -> std::vector<mixer::channel_id>
 {
-    return valid_io_channels<io_direction::output>(mixer_buses, mixer_bus_id);
+    return valid_io_channels<io_direction::output>(channels, ch_id);
 }
 
 } // namespace piejam::runtime::mixer

@@ -29,7 +29,7 @@ private:
     void onSubscribe() override;
 
     runtime::fx::internal m_fx_type;
-    runtime::mixer::bus_id m_fx_chain_bus;
+    runtime::mixer::channel_id m_fx_chain_channel;
 };
 
 } // namespace piejam::app::gui::model

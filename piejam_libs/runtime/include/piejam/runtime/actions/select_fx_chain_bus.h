@@ -16,7 +16,7 @@ namespace piejam::runtime::actions
 struct select_fx_chain_bus final
     : ui::cloneable_action<select_fx_chain_bus, action>
 {
-    mixer::bus_id bus_id{};
+    mixer::channel_id channel_id{};
 
     auto reduce(state const&) const -> state override;
 };

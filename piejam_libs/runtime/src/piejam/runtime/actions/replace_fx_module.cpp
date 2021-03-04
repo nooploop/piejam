@@ -21,13 +21,13 @@ namespace piejam::runtime::actions
 auto
 make_replace_fx_module_action(
         state const& st,
-        mixer::bus_id const fx_chain_bus,
+        mixer::channel_id const fx_chain_bus,
         std::size_t const position,
         fx::internal const fx_type) -> batch_action
 {
     batch_action batch;
 
-    mixer::bus const& bus = st.mixer_state.buses[fx_chain_bus];
+    mixer::channel const& bus = st.mixer_state.channels[fx_chain_bus];
 
     if (position < bus.fx_chain->size())
     {
@@ -47,14 +47,14 @@ make_replace_fx_module_action(
 
 auto
 replace_fx_module(
-        mixer::bus_id const fx_chain_bus,
+        mixer::channel_id const fx_chain_channel,
         std::size_t const position,
         fx::internal const fx_type) -> thunk_action
 {
     return [=](auto&& get_state, auto&& dispatch) {
         dispatch(make_replace_fx_module_action(
                 get_state(),
-                fx_chain_bus,
+                fx_chain_channel,
                 position,
                 fx_type));
     };
@@ -67,7 +67,7 @@ replace_fx_module(std::size_t const position, fx::internal const fx_type)
     return [=](auto&& get_state, auto&& dispatch) {
         dispatch(make_replace_fx_module_action(
                 get_state(),
-                get_state().fx_chain_bus,
+                get_state().fx_chain_channel,
                 position,
                 fx_type));
     };
@@ -76,7 +76,7 @@ replace_fx_module(std::size_t const position, fx::internal const fx_type)
 auto
 make_replace_fx_module_action(
         state const& st,
-        mixer::bus_id const fx_chain_bus,
+        mixer::channel_id const fx_chain_channel,
         std::size_t const position,
         audio::ladspa::plugin_id_t const plugin_id,
         std::string_view const& name,
@@ -85,7 +85,7 @@ make_replace_fx_module_action(
 {
     batch_action batch;
 
-    mixer::bus const& bus = st.mixer_state.buses[fx_chain_bus];
+    mixer::channel const& bus = st.mixer_state.channels[fx_chain_channel];
 
     if (position < bus.fx_chain->size())
     {
@@ -95,7 +95,7 @@ make_replace_fx_module_action(
     }
 
     auto insert_action = std::make_unique<actions::load_ladspa_fx_plugin>();
-    insert_action->fx_chain_bus = fx_chain_bus;
+    insert_action->fx_chain_bus = fx_chain_channel;
     insert_action->position = position;
     insert_action->plugin_id = plugin_id;
     insert_action->name = name;
@@ -107,7 +107,7 @@ make_replace_fx_module_action(
 
 auto
 replace_fx_module(
-        mixer::bus_id const fx_chain_bus,
+        mixer::channel_id const fx_chain_channel,
         std::size_t const position,
         audio::ladspa::plugin_id_t const plugin_id,
         std::string_view const& name) -> thunk_action
@@ -115,7 +115,7 @@ replace_fx_module(
     return [=, name = std::string(name)](auto&& get_state, auto&& dispatch) {
         dispatch(make_replace_fx_module_action(
                 get_state(),
-                fx_chain_bus,
+                fx_chain_channel,
                 position,
                 plugin_id,
                 name,
@@ -132,7 +132,7 @@ replace_fx_module(
     return [=, name = std::string(name)](auto&& get_state, auto&& dispatch) {
         dispatch(make_replace_fx_module_action(
                 get_state(),
-                get_state().fx_chain_bus,
+                get_state().fx_chain_channel,
                 position,
                 plugin_id,
                 name,

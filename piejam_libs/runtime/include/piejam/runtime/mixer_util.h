@@ -11,9 +11,9 @@
 namespace piejam::runtime
 {
 
-auto mixer_bus_input_type(
-        mixer::buses_t const&,
-        mixer::bus_id,
+auto mixer_channel_input_type(
+        mixer::channels_t const&,
+        mixer::channel_id,
         device_io::buses_t const&) -> audio::bus_type;
 
 } // namespace piejam::runtime

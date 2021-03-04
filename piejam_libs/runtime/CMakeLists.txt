@@ -47,7 +47,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/channel_index_pair.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_gain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_ladspa.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mixer_bus.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mixer_channel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/solo_switch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io_fwd.h
@@ -162,7 +162,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_gain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_ladspa.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/make_fx.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mixer_bus.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mixer_channel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/solo_switch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/gain.cpp

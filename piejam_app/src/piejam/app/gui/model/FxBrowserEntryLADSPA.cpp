@@ -35,8 +35,8 @@ FxBrowserEntryLADSPA::FxBrowserEntryLADSPA(
 void
 FxBrowserEntryLADSPA::onSubscribe()
 {
-    observe(runtime::selectors::select_fx_chain_bus,
-            [this](runtime::mixer::bus_id fx_chain_bus) {
+    observe(runtime::selectors::select_fx_chain_channel,
+            [this](runtime::mixer::channel_id fx_chain_bus) {
                 m_fx_chain_bus = fx_chain_bus;
             });
 }

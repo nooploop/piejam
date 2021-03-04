@@ -37,9 +37,9 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
 void
 FxBrowserEntryInternal::onSubscribe()
 {
-    observe(runtime::selectors::select_fx_chain_bus,
-            [this](runtime::mixer::bus_id fx_chain_bus) {
-                m_fx_chain_bus = fx_chain_bus;
+    observe(runtime::selectors::select_fx_chain_channel,
+            [this](runtime::mixer::channel_id fx_chain_bus) {
+                m_fx_chain_channel = fx_chain_bus;
             });
 }
 
@@ -47,7 +47,7 @@ void
 FxBrowserEntryInternal::insertModule(unsigned pos)
 {
     runtime::actions::insert_internal_fx_module action;
-    action.fx_chain_bus = m_fx_chain_bus;
+    action.fx_chain_bus = m_fx_chain_channel;
     action.position = pos;
     action.type = m_fx_type;
     dispatch(action);

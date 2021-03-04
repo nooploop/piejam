@@ -10,16 +10,16 @@ namespace piejam::runtime
 {
 
 auto
-solo_groups(mixer::buses_t const& mixer_buses) -> solo_groups_t
+solo_groups(mixer::channels_t const& channels) -> solo_groups_t
 {
     solo_groups_t result;
 
-    for (auto const& [id, bus] : mixer_buses)
+    for (auto const& [id, channel] : channels)
     {
-        if (mixer::bus_id const* const target =
-                    std::get_if<mixer::bus_id>(&bus.out))
+        if (mixer::channel_id const* const target =
+                    std::get_if<mixer::channel_id>(&channel.out))
         {
-            result[*target].emplace_back(bus.solo, id);
+            result[*target].emplace_back(channel.solo, id);
         }
     }
 

@@ -22,7 +22,7 @@ public:
     MixerChannelEdit(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::mixer::bus_id);
+            runtime::mixer::channel_id);
     ~MixerChannelEdit();
 
     void changeName(QString const&) override;

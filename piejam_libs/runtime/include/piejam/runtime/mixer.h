@@ -22,7 +22,7 @@
 namespace piejam::runtime::mixer
 {
 
-struct bus
+struct channel
 {
     boxed_string name{};
 
@@ -37,23 +37,23 @@ struct bus
 
     box<fx::chain_t> fx_chain{};
 
-    bool operator==(bus const&) const noexcept = default;
+    bool operator==(channel const&) const noexcept = default;
 };
 
 struct state
 {
-    buses_t buses;
+    channels_t channels;
 
-    box<bus_list_t> inputs;
-    bus_id main;
+    box<channel_ids_t> inputs;
+    channel_id main;
 };
 
-bool is_default_source_valid(buses_t const&, bus_id);
+bool is_default_source_valid(channels_t const&, channel_id);
 
-auto valid_source_channels(buses_t const&, bus_id)
-        -> std::vector<mixer::bus_id>;
+auto valid_source_channels(channels_t const&, channel_id)
+        -> std::vector<mixer::channel_id>;
 
-auto valid_target_channels(buses_t const&, bus_id)
-        -> std::vector<mixer::bus_id>;
+auto valid_target_channels(channels_t const&, channel_id)
+        -> std::vector<mixer::channel_id>;
 
 } // namespace piejam::runtime::mixer

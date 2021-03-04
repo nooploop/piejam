@@ -18,21 +18,22 @@ namespace piejam::app::gui::model
 
 struct Mixer::Impl
 {
-    boxed_vector<runtime::selectors::mixer_bus_info> inputs;
-    box<runtime::selectors::mixer_bus_info> mainBusInfo;
-    runtime::mixer::bus_list_t all;
+    boxed_vector<runtime::selectors::mixer_channel_info> inputs;
+    box<runtime::selectors::mixer_channel_info> mainChannelInfo;
+    runtime::mixer::channel_ids_t allChannelIds;
     std::unique_ptr<piejam::app::gui::model::MixerChannel> mainChannel;
 };
 
 static auto
-append_bus_ids(
-        std::vector<runtime::selectors::mixer_bus_info> const& bus_infos,
-        runtime::mixer::bus_list_t& bus_ids)
+append_channel_ids(
+        std::vector<runtime::selectors::mixer_channel_info> const&
+                channel_infos,
+        runtime::mixer::channel_ids_t& channel_ids)
 {
     std::ranges::transform(
-            bus_infos,
-            std::back_inserter(bus_ids),
-            &runtime::selectors::mixer_bus_info::bus_id);
+            channel_infos,
+            std::back_inserter(channel_ids),
+            &runtime::selectors::mixer_channel_info::channel_id);
 }
 
 Mixer::Mixer(
@@ -54,8 +55,8 @@ Mixer::mainChannel() const -> piejam::gui::model::MixerChannel*
 void
 Mixer::onSubscribe()
 {
-    observe(runtime::selectors::select_mixer_bus_infos,
-            [this](boxed_vector<runtime::selectors::mixer_bus_info> const&
+    observe(runtime::selectors::select_mixer_channel_infos,
+            [this](boxed_vector<runtime::selectors::mixer_channel_info> const&
                            bus_infos) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->inputs, *bus_infos),
@@ -65,7 +66,7 @@ Mixer::onSubscribe()
                                     return std::make_unique<MixerChannel>(
                                             dispatch(),
                                             state_change_subscriber(),
-                                            bus_info.bus_id,
+                                            bus_info.channel_id,
                                             bus_info.volume,
                                             bus_info.pan_balance,
                                             bus_info.mute,
@@ -75,19 +76,21 @@ Mixer::onSubscribe()
 
                 m_impl->inputs = bus_infos;
 
-                m_impl->all.clear();
-                append_bus_ids(*m_impl->inputs, m_impl->all);
-                m_impl->all.emplace_back(m_impl->mainBusInfo->bus_id);
+                m_impl->allChannelIds.clear();
+                append_channel_ids(*m_impl->inputs, m_impl->allChannelIds);
+                m_impl->allChannelIds.emplace_back(
+                        m_impl->mainChannelInfo->channel_id);
             });
 
-    observe(runtime::selectors::select_mixer_main_bus_info,
-            [this](box<runtime::selectors::mixer_bus_info> const& mainBusInfo) {
-                if (mainBusInfo != m_impl->mainBusInfo)
+    observe(runtime::selectors::select_mixer_main_channel_info,
+            [this](box<runtime::selectors::mixer_channel_info> const&
+                           mainBusInfo) {
+                if (mainBusInfo != m_impl->mainChannelInfo)
                 {
                     m_impl->mainChannel = std::make_unique<MixerChannel>(
                             dispatch(),
                             state_change_subscriber(),
-                            mainBusInfo->bus_id,
+                            mainBusInfo->channel_id,
                             mainBusInfo->volume,
                             mainBusInfo->pan_balance,
                             mainBusInfo->mute,
@@ -96,11 +99,12 @@ Mixer::onSubscribe()
 
                     emit mainChannelChanged();
 
-                    m_impl->mainBusInfo = mainBusInfo;
+                    m_impl->mainChannelInfo = mainBusInfo;
 
-                    m_impl->all.clear();
-                    append_bus_ids(*m_impl->inputs, m_impl->all);
-                    m_impl->all.emplace_back(m_impl->mainBusInfo->bus_id);
+                    m_impl->allChannelIds.clear();
+                    append_channel_ids(*m_impl->inputs, m_impl->allChannelIds);
+                    m_impl->allChannelIds.emplace_back(
+                            m_impl->mainChannelInfo->channel_id);
                 }
             });
 }
@@ -108,7 +112,7 @@ Mixer::onSubscribe()
 void
 Mixer::addChannel(QString const& newChannelName)
 {
-    runtime::actions::add_mixer_bus action;
+    runtime::actions::add_mixer_channel action;
     action.name = newChannelName.toStdString();
     dispatch(action);
 }
@@ -116,7 +120,8 @@ Mixer::addChannel(QString const& newChannelName)
 void
 Mixer::requestLevelsUpdate()
 {
-    dispatch(runtime::actions::request_mixer_levels_update(m_impl->all));
+    dispatch(runtime::actions::request_mixer_levels_update(
+            m_impl->allChannelIds));
 }
 
 } // namespace piejam::app::gui::model

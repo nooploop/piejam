@@ -77,7 +77,7 @@ struct session
         std::string name;
     };
 
-    struct mixer_bus
+    struct mixer_channel
     {
         std::string name;
         mixer_parameters parameter;
@@ -87,8 +87,8 @@ struct session
         mixer_io out;
     };
 
-    std::vector<mixer_bus> mixer_channels;
-    mixer_bus main_mixer_channel;
+    std::vector<mixer_channel> mixer_channels;
+    mixer_channel main_mixer_channel;
 };
 
 void to_json(nlohmann::json&, session const&);

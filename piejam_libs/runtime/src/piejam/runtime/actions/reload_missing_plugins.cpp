@@ -23,7 +23,7 @@ reload_missing_plugins() -> thunk_action
 
         state const& st = get_state();
 
-        for (auto&& [bus_id, bus] : st.mixer_state.buses)
+        for (auto&& [bus_id, bus] : st.mixer_state.channels)
         {
             for (std::size_t fx_pos : range::indices(*bus.fx_chain))
             {

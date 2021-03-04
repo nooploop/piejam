@@ -19,7 +19,7 @@ struct MixerChannel::Impl
 MixerChannel::MixerChannel(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::mixer::bus_id const id,
+        runtime::mixer::channel_id const id,
         runtime::float_parameter_id const volume,
         runtime::float_parameter_id const pan_balance,
         runtime::bool_parameter_id const mute,

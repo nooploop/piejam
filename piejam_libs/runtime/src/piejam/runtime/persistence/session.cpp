@@ -164,7 +164,7 @@ from_json(nlohmann::json const& j, session::mixer_io& mixer_io)
 }
 
 void
-to_json(nlohmann::json& j, session::mixer_bus const& mb)
+to_json(nlohmann::json& j, session::mixer_channel const& mb)
 {
     j = {{"name", mb.name},
          {"parameter", mb.parameter},
@@ -175,7 +175,7 @@ to_json(nlohmann::json& j, session::mixer_bus const& mb)
 }
 
 void
-from_json(nlohmann::json const& j, session::mixer_bus& mb)
+from_json(nlohmann::json const& j, session::mixer_channel& mb)
 {
     j.at("name").get_to(mb.name);
     j.at("parameter").get_to(mb.parameter);

@@ -18,7 +18,7 @@ namespace piejam::app::gui::model
 
 struct MixerChannelPerform::Impl
 {
-    runtime::mixer::bus_id busId;
+    runtime::mixer::channel_id busId;
     runtime::float_parameter_id volume;
     runtime::float_parameter_id panBalance;
     runtime::bool_parameter_id mute;
@@ -34,7 +34,7 @@ struct MixerChannelPerform::Impl
 MixerChannelPerform::MixerChannelPerform(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::mixer::bus_id const id,
+        runtime::mixer::channel_id const id,
         runtime::float_parameter_id const volume,
         runtime::float_parameter_id const panBalance,
         runtime::bool_parameter_id const mute,
@@ -72,12 +72,12 @@ MixerChannelPerform::~MixerChannelPerform() = default;
 void
 MixerChannelPerform::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_bus_name_selector(m_impl->busId),
+    observe(runtime::selectors::make_mixer_channel_name_selector(m_impl->busId),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
 
-    observe(runtime::selectors::make_mixer_bus_input_type_selector(
+    observe(runtime::selectors::make_mixer_channel_input_type_selector(
                     m_impl->busId),
             [this](audio::bus_type const bus_type) {
                 setMono(bus_type == audio::bus_type::mono);
@@ -141,7 +141,7 @@ void
 MixerChannelPerform::focusFxChain()
 {
     runtime::actions::select_fx_chain_bus action;
-    action.bus_id = m_impl->busId;
+    action.channel_id = m_impl->busId;
     dispatch(action);
 }
 

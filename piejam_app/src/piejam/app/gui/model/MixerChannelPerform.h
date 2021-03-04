@@ -25,7 +25,7 @@ public:
     MixerChannelPerform(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::mixer::bus_id,
+            runtime::mixer::channel_id,
             runtime::float_parameter_id volume,
             runtime::float_parameter_id panBalance,
             runtime::bool_parameter_id mute,

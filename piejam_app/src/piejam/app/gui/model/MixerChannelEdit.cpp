@@ -14,7 +14,7 @@ namespace piejam::app::gui::model
 
 struct MixerChannelEdit::Impl
 {
-    runtime::mixer::bus_id busId;
+    runtime::mixer::channel_id channelId;
 
     boxed_vector<runtime::selectors::mixer_device_route> inputDevices;
     boxed_vector<runtime::selectors::mixer_channel_route> inputChannels;
@@ -25,7 +25,7 @@ struct MixerChannelEdit::Impl
 MixerChannelEdit::MixerChannelEdit(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::mixer::bus_id const id)
+        runtime::mixer::channel_id const id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(id))
 {
@@ -36,18 +36,19 @@ MixerChannelEdit::~MixerChannelEdit() = default;
 void
 MixerChannelEdit::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_bus_name_selector(m_impl->busId),
+    observe(runtime::selectors::make_mixer_channel_name_selector(
+                    m_impl->channelId),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
 
     observe(runtime::selectors::
                     make_default_mixer_channel_input_is_valid_selector(
-                            m_impl->busId),
+                            m_impl->channelId),
             [this](bool const x) { setDefaultInputIsValid(x); });
 
     observe(runtime::selectors::make_mixer_channel_input_selector(
-                    m_impl->busId),
+                    m_impl->channelId),
             [this](box<runtime::selectors::selected_route> const& sel_route) {
                 setSelectedInput(QString::fromStdString(sel_route->name));
                 switch (sel_route->state)
@@ -77,7 +78,7 @@ MixerChannelEdit::onSubscribe()
             });
 
     observe(runtime::selectors::make_mixer_input_channels_selector(
-                    m_impl->busId),
+                    m_impl->channelId),
             [this](boxed_vector<runtime::selectors::mixer_channel_route> const&
                            inputChannels) {
                 m_impl->inputChannels = inputChannels;
@@ -92,7 +93,7 @@ MixerChannelEdit::onSubscribe()
             });
 
     observe(runtime::selectors::make_mixer_channel_output_selector(
-                    m_impl->busId),
+                    m_impl->channelId),
             [this](box<runtime::selectors::selected_route> const& sel_route) {
                 setSelectedOutput(QString::fromStdString(sel_route->name));
                 switch (sel_route->state)
@@ -126,7 +127,7 @@ MixerChannelEdit::onSubscribe()
             });
 
     observe(runtime::selectors::make_mixer_output_channels_selector(
-                    m_impl->busId),
+                    m_impl->channelId),
             [this](boxed_vector<runtime::selectors::mixer_channel_route> const&
                            outputChannels) {
                 m_impl->outputChannels = outputChannels;
@@ -144,8 +145,8 @@ MixerChannelEdit::onSubscribe()
 void
 MixerChannelEdit::changeName(QString const& name)
 {
-    runtime::actions::set_mixer_bus_name action;
-    action.bus_id = m_impl->busId;
+    runtime::actions::set_mixer_channel_name action;
+    action.channel_id = m_impl->channelId;
     action.name = name.toStdString();
     dispatch(action);
 }
@@ -153,8 +154,8 @@ MixerChannelEdit::changeName(QString const& name)
 void
 MixerChannelEdit::deleteChannel()
 {
-    runtime::actions::delete_mixer_bus action;
-    action.bus_id = m_impl->busId;
+    runtime::actions::delete_mixer_channel action;
+    action.channel_id = m_impl->channelId;
     dispatch(action);
 }
 
@@ -162,7 +163,7 @@ void
 MixerChannelEdit::changeInputToMix()
 {
     runtime::actions::set_mixer_channel_input action;
-    action.bus_id = m_impl->busId;
+    action.channel_id = m_impl->channelId;
     dispatch(action);
 }
 
@@ -172,7 +173,7 @@ MixerChannelEdit::changeInputToDevice(unsigned index)
     BOOST_ASSERT(index < m_impl->inputDevices->size());
 
     runtime::actions::set_mixer_channel_input action;
-    action.bus_id = m_impl->busId;
+    action.channel_id = m_impl->channelId;
     action.route = (*m_impl->inputDevices)[index].bus_id;
     dispatch(action);
 }
@@ -183,8 +184,8 @@ MixerChannelEdit::changeInputToChannel(unsigned index)
     BOOST_ASSERT(index < m_impl->inputChannels->size());
 
     runtime::actions::set_mixer_channel_input action;
-    action.bus_id = m_impl->busId;
-    action.route = (*m_impl->inputChannels)[index].bus_id;
+    action.channel_id = m_impl->channelId;
+    action.route = (*m_impl->inputChannels)[index].channel_id;
     dispatch(action);
 }
 
@@ -192,7 +193,7 @@ void
 MixerChannelEdit::changeOutputToNone()
 {
     runtime::actions::set_mixer_channel_output action;
-    action.bus_id = m_impl->busId;
+    action.channel_id = m_impl->channelId;
     dispatch(action);
 }
 
@@ -202,7 +203,7 @@ MixerChannelEdit::changeOutputToDevice(unsigned index)
     BOOST_ASSERT(index < m_impl->outputDevices->size());
 
     runtime::actions::set_mixer_channel_output action;
-    action.bus_id = m_impl->busId;
+    action.channel_id = m_impl->channelId;
     action.route = (*m_impl->outputDevices)[index].bus_id;
     dispatch(action);
 }
@@ -213,8 +214,8 @@ MixerChannelEdit::changeOutputToChannel(unsigned index)
     BOOST_ASSERT(index < m_impl->outputChannels->size());
 
     runtime::actions::set_mixer_channel_output action;
-    action.bus_id = m_impl->busId;
-    action.route = (*m_impl->outputChannels)[index].bus_id;
+    action.channel_id = m_impl->channelId;
+    action.route = (*m_impl->outputChannels)[index].channel_id;
     dispatch(action);
 }
 

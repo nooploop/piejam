@@ -151,7 +151,7 @@ private:
     {
         std::vector<std::shared_ptr<audio::engine::processor>> result;
 
-        for (auto&& [param_id, bus_id] : solo_group)
+        for (auto&& [param_id, channel_id] : solo_group)
             result.emplace_back(param_procs.make_processor(param_id, "solo"));
 
         return result;

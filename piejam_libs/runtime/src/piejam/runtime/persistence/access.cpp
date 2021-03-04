@@ -219,7 +219,7 @@ export_fx_chain(state const& st, fx::chain_t const& fx_chain)
 }
 
 static auto
-export_mixer_midi(state const& st, mixer::bus const& bus)
+export_mixer_midi(state const& st, mixer::channel const& bus)
         -> persistence::session::mixer_midi
 {
     persistence::session::mixer_midi result;
@@ -240,7 +240,7 @@ export_mixer_midi(state const& st, mixer::bus const& bus)
 }
 
 static auto
-export_mixer_parameters(state const& st, mixer::bus const& bus)
+export_mixer_parameters(state const& st, mixer::channel const& bus)
 {
     session::mixer_parameters result;
     result.volume = get_parameter_value(st.params, bus.volume);
@@ -259,11 +259,12 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 .type = session::mixer_io_type::default_,
                                 .name = {}};
                     },
-                    [&st](mixer::bus_id const& bus_id) {
-                        mixer::bus const& bus = st.mixer_state.buses[bus_id];
+                    [&st](mixer::channel_id const& channel_id) {
+                        mixer::channel const& channel =
+                                st.mixer_state.channels[channel_id];
                         return session::mixer_io{
                                 .type = session::mixer_io_type::channel,
-                                .name = bus.name};
+                                .name = channel.name};
                     },
                     [&st](device_io::bus_id const& bus_id) {
                         device_io::bus const& bus =
@@ -281,9 +282,9 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
 }
 
 static auto
-export_mixer_bus(state const& st, mixer::bus const& bus)
+export_mixer_channel(state const& st, mixer::channel const& bus)
 {
-    session::mixer_bus result;
+    session::mixer_channel result;
     result.name = bus.name;
     result.fx_chain = export_fx_chain(st, *bus.fx_chain);
     result.midi = export_mixer_midi(st, bus);
@@ -294,13 +295,13 @@ export_mixer_bus(state const& st, mixer::bus const& bus)
 }
 
 static auto
-export_mixer_buses(state const& st, mixer::bus_list_t const& bus_ids)
+export_mixer_channels(state const& st, mixer::channel_ids_t const& channel_ids)
 {
     return algorithm::transform_to_vector(
-            bus_ids,
-            [&st](mixer::bus_id const bus_id) {
-                mixer::bus const& bus = st.mixer_state.buses[bus_id];
-                return export_mixer_bus(st, bus);
+            channel_ids,
+            [&st](mixer::channel_id const channel_id) {
+                mixer::channel const& bus = st.mixer_state.channels[channel_id];
+                return export_mixer_channel(st, bus);
             });
 }
 
@@ -332,9 +333,10 @@ save_session(std::filesystem::path const& file, state const& st)
 
         session ses;
 
-        ses.mixer_channels = export_mixer_buses(st, *st.mixer_state.inputs);
-        ses.main_mixer_channel =
-                export_mixer_bus(st, st.mixer_state.buses[st.mixer_state.main]);
+        ses.mixer_channels = export_mixer_channels(st, *st.mixer_state.inputs);
+        ses.main_mixer_channel = export_mixer_channel(
+                st,
+                st.mixer_state.channels[st.mixer_state.main]);
 
         save_session(out, ses);
     }

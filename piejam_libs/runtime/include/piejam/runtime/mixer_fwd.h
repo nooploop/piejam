@@ -14,9 +14,9 @@
 namespace piejam::runtime::mixer
 {
 
-struct bus;
-using bus_id = entity_id<bus>;
-using buses_t = entity_map<bus>;
+struct channel;
+using channel_id = entity_id<channel>;
+using channels_t = entity_map<channel>;
 
 using missing_device_address = boxed_string;
 
@@ -24,11 +24,11 @@ using io_address_t = std::variant<
         std::nullptr_t,
         device_io::bus_id,
         missing_device_address,
-        bus_id>;
+        channel_id>;
 
-using bus_io_t = io_pair<io_address_t>;
+using channel_io_t = io_pair<io_address_t>;
 
-using bus_list_t = std::vector<bus_id>;
+using channel_ids_t = std::vector<channel_id>;
 
 struct state;
 

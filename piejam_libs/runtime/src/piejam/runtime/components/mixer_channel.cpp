@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/components/mixer_bus.h>
+#include <piejam/runtime/components/mixer_channel.h>
 
 #include <piejam/audio/components/amplifier.h>
 #include <piejam/audio/components/level_meter.h>
@@ -22,11 +22,11 @@ namespace piejam::runtime::components
 namespace
 {
 
-class mixer_bus_input final : public audio::engine::component
+class mixer_channel_input final : public audio::engine::component
 {
 public:
-    mixer_bus_input(
-            mixer::bus const& bus,
+    mixer_channel_input(
+            mixer::channel const& bus,
             audio::bus_type const bus_type,
             parameter_processor_factory& param_procs)
         : m_pan_balance_input_proc(param_procs.make_processor(
@@ -66,12 +66,12 @@ private:
     std::unique_ptr<audio::engine::component> m_pan_balance;
 };
 
-class mixer_bus_output final : public audio::engine::component
+class mixer_channel_output final : public audio::engine::component
 {
 public:
-    mixer_bus_output(
+    mixer_channel_output(
             audio::samplerate_t const samplerate,
-            mixer::bus const& bus,
+            mixer::channel const& bus,
             parameter_processor_factory& param_procs)
         : m_volume_input_proc(param_procs.make_processor(bus.volume, "volume"))
         , m_mute_input_proc(param_procs.make_processor(bus.mute, "mute"))
@@ -136,25 +136,25 @@ private:
 } // namespace
 
 auto
-make_mixer_bus_input(
-        mixer::bus const& bus,
+make_mixer_channel_input(
+        mixer::channel const& bus,
         audio::bus_type const bus_type,
         parameter_processor_factory& param_procs,
         std::string_view const& /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<mixer_bus_input>(bus, bus_type, param_procs);
+    return std::make_unique<mixer_channel_input>(bus, bus_type, param_procs);
 }
 
 auto
-make_mixer_bus_output(
-        mixer::bus const& channel,
+make_mixer_channel_output(
+        mixer::channel const& channel,
         audio::samplerate_t const samplerate,
         parameter_processor_factory& param_procs,
         std::string_view const& /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<mixer_bus_output>(samplerate, channel, param_procs);
+    return std::make_unique<mixer_channel_output>(samplerate, channel, param_procs);
 }
 
 } // namespace piejam::runtime::components

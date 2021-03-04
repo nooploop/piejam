@@ -13,12 +13,12 @@ namespace piejam::runtime
 {
 
 auto
-mixer_bus_input_type(
-        mixer::buses_t const& mixer_buses,
-        mixer::bus_id const mixer_bus_id,
+mixer_channel_input_type(
+        mixer::channels_t const& channels,
+        mixer::channel_id const channel_id,
         device_io::buses_t const& device_buses) -> audio::bus_type
 {
-    mixer::bus const* const bus = mixer_buses.find(mixer_bus_id);
+    mixer::channel const* const bus = channels.find(channel_id);
     if (!bus)
         return audio::bus_type::stereo;
 

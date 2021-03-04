@@ -29,7 +29,7 @@ private:
     void onSubscribe() override;
 
     audio::ladspa::plugin_descriptor m_pd;
-    runtime::mixer::bus_id m_fx_chain_bus;
+    runtime::mixer::channel_id m_fx_chain_bus;
 };
 
 } // namespace piejam::app::gui::model

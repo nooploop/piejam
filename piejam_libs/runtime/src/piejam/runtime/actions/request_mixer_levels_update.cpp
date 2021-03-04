@@ -14,16 +14,16 @@ namespace piejam::runtime::actions
 {
 
 auto
-request_mixer_levels_update(std::vector<mixer::bus_id> bus_ids) -> thunk_action
+request_mixer_levels_update(mixer::channel_ids_t channel_ids) -> thunk_action
 {
-    return [bus_ids = std::move(
-                    bus_ids)](auto const& get_state, auto const& dispatch) {
+    return [channel_ids = std::move(
+                    channel_ids)](auto const& get_state, auto const& dispatch) {
         state const& st = get_state();
         request_parameters_update next_action;
 
-        for (mixer::bus_id const bus_id : bus_ids)
+        for (mixer::channel_id const bus_id : channel_ids)
         {
-            next_action.push_back(st.mixer_state.buses[bus_id].level);
+            next_action.push_back(st.mixer_state.channels[bus_id].level);
         }
 
         dispatch(next_action);

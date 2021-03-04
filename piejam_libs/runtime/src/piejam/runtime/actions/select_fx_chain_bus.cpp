@@ -14,7 +14,7 @@ select_fx_chain_bus::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.fx_chain_bus = bus_id;
+    new_st.fx_chain_channel = channel_id;
 
     return new_st;
 }

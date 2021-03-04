@@ -93,13 +93,13 @@ TEST_F(audio_engine_render_test, add_input_channel)
 {
     state st;
 
-    add_mixer_bus(st, "in1");
-    add_mixer_bus(st, "out");
+    add_mixer_channel(st, "in1");
+    add_mixer_channel(st, "out");
 
     rebuild(st);
     render(200);
 
-    add_mixer_bus(st, "in2");
+    add_mixer_channel(st, "in2");
 
     rebuild(st);
     render(200);

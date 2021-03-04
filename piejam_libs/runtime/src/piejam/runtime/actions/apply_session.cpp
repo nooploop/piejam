@@ -29,7 +29,7 @@ namespace
 
 struct make_add_fx_module_action
 {
-    mixer::bus_id fx_chain_bus;
+    mixer::channel_id fx_chain_bus;
 
     auto operator()(persistence::session::internal_fx const& fx) const
             -> std::unique_ptr<action>
@@ -60,16 +60,16 @@ struct make_add_fx_module_action
 void
 make_add_fx_module_actions(
         batch_action& batch,
-        mixer::buses_t const& buses,
-        mixer::bus_list_t const& bus_ids,
-        std::vector<persistence::session::mixer_bus> const& mb_data)
+        mixer::channels_t const& channels,
+        mixer::channel_ids_t const& channel_ids,
+        std::vector<persistence::session::mixer_channel> const& mb_data)
 {
-    boost::ignore_unused(buses);
-    BOOST_ASSERT(bus_ids.size() == mb_data.size());
-    for (std::size_t i : range::indices(bus_ids))
+    boost::ignore_unused(channels);
+    BOOST_ASSERT(channel_ids.size() == mb_data.size());
+    for (std::size_t i : range::indices(channel_ids))
     {
-        mixer::bus_id const fx_chain_bus = bus_ids[i];
-        BOOST_ASSERT(buses[fx_chain_bus].fx_chain->empty());
+        mixer::channel_id const fx_chain_bus = channel_ids[i];
+        BOOST_ASSERT(channels[fx_chain_bus].fx_chain->empty());
         for (auto const& fx_plug : mb_data[i].fx_chain)
         {
             batch.push_back(std::visit(
@@ -82,11 +82,11 @@ make_add_fx_module_actions(
 void
 apply_mixer_midi(
         actions::update_midi_assignments& action,
-        mixer::buses_t const& buses,
-        mixer::bus_id const bus_id,
+        mixer::channels_t const& channels,
+        mixer::channel_id const channel_id,
         persistence::session::mixer_midi const& mixer_midi)
 {
-    mixer::bus const& bus = buses[bus_id];
+    mixer::channel const& bus = channels[channel_id];
 
     if (mixer_midi.volume)
         action.assignments.emplace(bus.volume, *mixer_midi.volume);
@@ -101,20 +101,20 @@ apply_mixer_midi(
 void
 apply_mixer_midi(
         actions::update_midi_assignments& action,
-        mixer::buses_t const& buses,
-        mixer::bus_list_t const& bus_ids,
-        std::vector<persistence::session::mixer_bus> const& mb_data)
+        mixer::channels_t const& channels,
+        mixer::channel_ids_t const& channel_ids,
+        std::vector<persistence::session::mixer_channel> const& mb_data)
 {
-    BOOST_ASSERT(mb_data.size() == bus_ids.size());
+    BOOST_ASSERT(mb_data.size() == channel_ids.size());
 
-    for (std::size_t const i : range::indices(bus_ids))
-        apply_mixer_midi(action, buses, bus_ids[i], mb_data[i].midi);
+    for (std::size_t const i : range::indices(channel_ids))
+        apply_mixer_midi(action, channels, channel_ids[i], mb_data[i].midi);
 }
 
 void
 apply_mixer_parameters(
         batch_action& batch,
-        mixer::bus const& bus,
+        mixer::channel const& bus,
         persistence::session::mixer_parameters const& mixer_params)
 {
     batch.emplace_back<actions::set_float_parameter>(
@@ -131,24 +131,24 @@ apply_mixer_parameters(
 void
 apply_mixer_parameters(
         batch_action& batch,
-        mixer::buses_t const& buses,
-        mixer::bus_list_t const& bus_ids,
-        std::vector<persistence::session::mixer_bus> const& mb_data)
+        mixer::channels_t const& channels,
+        mixer::channel_ids_t const& channel_ids,
+        std::vector<persistence::session::mixer_channel> const& mb_data)
 {
-    BOOST_ASSERT(mb_data.size() == bus_ids.size());
-    for (std::size_t const i : range::indices(bus_ids))
+    BOOST_ASSERT(mb_data.size() == channel_ids.size());
+    for (std::size_t const i : range::indices(channel_ids))
     {
-        mixer::bus const& bus = buses[bus_ids[i]];
+        mixer::channel const& bus = channels[channel_ids[i]];
         apply_mixer_parameters(batch, bus, mb_data[i].parameter);
     }
 }
 
 auto
-find_mixer_bus_by_name(
-        mixer::buses_t const& mixer_buses,
+find_mixer_channel_by_name(
+        mixer::channels_t const& channels,
         std::string const& name)
 {
-    return std::ranges::find_if(mixer_buses, [&name](auto const& p) {
+    return std::ranges::find_if(channels, [&name](auto const& p) {
         return p.second.name == name;
     });
 }
@@ -167,8 +167,8 @@ void
 apply_mixer_io(
         batch_action& batch,
         device_io::buses_t const& device_buses,
-        mixer::buses_t const& mixer_buses,
-        mixer::bus_id const& bus_id,
+        mixer::channels_t const& channels,
+        mixer::channel_id const& channel_id,
         persistence::session::mixer_io const& in,
         persistence::session::mixer_io const& out)
 {
@@ -186,8 +186,8 @@ apply_mixer_io(
 
             case persistence::session::mixer_io_type::channel:
                 if (auto it =
-                            find_mixer_bus_by_name(mixer_buses, mixer_io.name);
-                    it != mixer_buses.end())
+                            find_mixer_channel_by_name(channels, mixer_io.name);
+                    it != channels.end())
                     return mixer::io_address_t(it->first);
                 else
                     return mixer::io_address_t();
@@ -199,14 +199,14 @@ apply_mixer_io(
 
     {
         auto action = std::make_unique<set_mixer_channel_input>();
-        action->bus_id = bus_id;
+        action->channel_id = channel_id;
         action->route = get_io_addr(in);
         batch.push_back(std::move(action));
     }
 
     {
         auto action = std::make_unique<set_mixer_channel_output>();
-        action->bus_id = bus_id;
+        action->channel_id = channel_id;
         action->route = get_io_addr(out);
         batch.push_back(std::move(action));
     }
@@ -216,18 +216,18 @@ void
 apply_mixer_io(
         batch_action& batch,
         device_io::buses_t const& device_buses,
-        mixer::buses_t const& buses,
-        mixer::bus_list_t const& mixer_bus_ids,
-        std::vector<persistence::session::mixer_bus> const& mb_data)
+        mixer::channels_t const& channels,
+        mixer::channel_ids_t const& channel_ids,
+        std::vector<persistence::session::mixer_channel> const& mb_data)
 {
-    BOOST_ASSERT(mb_data.size() == mixer_bus_ids.size());
-    for (std::size_t const i : range::indices(mixer_bus_ids))
+    BOOST_ASSERT(mb_data.size() == channel_ids.size());
+    for (std::size_t const i : range::indices(channel_ids))
     {
         apply_mixer_io(
                 batch,
                 device_buses,
-                buses,
-                mixer_bus_ids[i],
+                channels,
+                channel_ids[i],
                 mb_data[i].in,
                 mb_data[i].out);
     }
@@ -235,8 +235,9 @@ apply_mixer_io(
 
 template <class GetState>
 auto
-configure_mixer_buses(persistence::session const& session, GetState&& get_state)
-        -> batch_action
+configure_mixer_channels(
+        persistence::session const& session,
+        GetState&& get_state) -> batch_action
 {
     batch_action action;
 
@@ -246,12 +247,12 @@ configure_mixer_buses(persistence::session const& session, GetState&& get_state)
     {
         make_add_fx_module_actions(
                 action,
-                st.mixer_state.buses,
+                st.mixer_state.channels,
                 st.mixer_state.inputs,
                 session.mixer_channels);
 
         BOOST_ASSERT(
-                st.mixer_state.buses[st.mixer_state.main].fx_chain->empty());
+                st.mixer_state.channels[st.mixer_state.main].fx_chain->empty());
         for (auto const& fx_plug : session.main_mixer_channel.fx_chain)
         {
             action.push_back(std::visit(
@@ -266,13 +267,13 @@ configure_mixer_buses(persistence::session const& session, GetState&& get_state)
 
         apply_mixer_midi(
                 *midi_action,
-                st.mixer_state.buses,
+                st.mixer_state.channels,
                 st.mixer_state.inputs,
                 session.mixer_channels);
 
         apply_mixer_midi(
                 *midi_action,
-                st.mixer_state.buses,
+                st.mixer_state.channels,
                 st.mixer_state.main,
                 session.main_mixer_channel.midi);
 
@@ -283,25 +284,25 @@ configure_mixer_buses(persistence::session const& session, GetState&& get_state)
     // paramaeters
     apply_mixer_parameters(
             action,
-            st.mixer_state.buses,
+            st.mixer_state.channels,
             st.mixer_state.inputs,
             session.mixer_channels);
     apply_mixer_parameters(
             action,
-            st.mixer_state.buses[st.mixer_state.main],
+            st.mixer_state.channels[st.mixer_state.main],
             session.main_mixer_channel.parameter);
 
     // io
     apply_mixer_io(
             action,
             st.device_io_state.buses,
-            st.mixer_state.buses,
+            st.mixer_state.channels,
             st.mixer_state.inputs,
             session.mixer_channels);
     apply_mixer_io(
             action,
             st.device_io_state.buses,
-            st.mixer_state.buses,
+            st.mixer_state.channels,
             st.mixer_state.main,
             session.main_mixer_channel.in,
             session.main_mixer_channel.out);
@@ -317,28 +318,28 @@ apply_session_data(persistence::session session)
             [s = std::move(session)](auto&& get_state, auto&& dispatch) {
                 std::invoke(
                         std::forward<decltype(dispatch)>(dispatch),
-                        configure_mixer_buses(
+                        configure_mixer_channels(
                                 s,
                                 std::forward<decltype(get_state)>(get_state)));
             });
 }
 
 auto
-make_mixer_buses(persistence::session session) -> thunk_action
+make_mixer_channels(persistence::session session) -> thunk_action
 {
     return [session = std::move(session)](auto&& get_state, auto&& dispatch) {
         state const& st = get_state();
         BOOST_ASSERT(st.mixer_state.inputs->empty());
-        BOOST_ASSERT(st.mixer_state.buses.size() == 1);
+        BOOST_ASSERT(st.mixer_state.channels.size() == 1);
 
         batch_action action;
 
         for (auto const& mb_data : session.mixer_channels)
-            action.emplace_back<actions::add_mixer_bus>(mb_data.name);
+            action.emplace_back<actions::add_mixer_channel>(mb_data.name);
 
         auto set_main_name_action =
-                std::make_unique<actions::set_mixer_bus_name>();
-        set_main_name_action->bus_id = st.mixer_state.main;
+                std::make_unique<actions::set_mixer_channel_name>();
+        set_main_name_action->channel_id = st.mixer_state.main;
         set_main_name_action->name = session.main_mixer_channel.name;
         action.push_back(std::move(set_main_name_action));
 
@@ -353,7 +354,7 @@ make_mixer_buses(persistence::session session) -> thunk_action
 void
 apply_session(persistence::session session, dispatch_f const& dispatch)
 {
-    dispatch(make_mixer_buses(std::move(session)));
+    dispatch(make_mixer_channels(std::move(session)));
 }
 
 } // namespace piejam::runtime::actions

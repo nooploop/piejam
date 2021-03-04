@@ -14,20 +14,20 @@ namespace piejam::runtime::test
 struct state_with_one_mixer_input : testing::Test
 {
     state_with_one_mixer_input()
-        : bus_id(add_mixer_bus(sut, "foo"))
+        : bus_id(add_mixer_channel(sut, "foo"))
     {
     }
 
     state sut;
-    mixer::bus_id bus_id;
-    mixer::bus const* bus{};
+    mixer::channel_id bus_id;
+    mixer::channel const* bus{};
 };
 
-TEST_F(state_with_one_mixer_input, after_add_mixer_bus)
+TEST_F(state_with_one_mixer_input, after_add_mixer_channel)
 {
     ASSERT_EQ(1u, sut.mixer_state.inputs->size());
 
-    auto const& bus = sut.mixer_state.buses[bus_id];
+    auto const& bus = sut.mixer_state.channels[bus_id];
 
     EXPECT_EQ("foo", bus.name);
 
@@ -58,17 +58,17 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_bus)
 }
 
 TEST_F(state_with_one_mixer_input,
-       removing_mixer_bus_removes_also_its_parameters)
+       removing_mixer_channel_removes_also_its_parameters)
 {
     ASSERT_EQ(1u, sut.mixer_state.inputs->size());
     ASSERT_EQ(2u, size<float_parameter>(sut.params));
     ASSERT_EQ(1u, size<bool_parameter>(sut.params));
     ASSERT_EQ(1u, size<stereo_level_parameter>(sut.params));
 
-    remove_mixer_bus(sut, bus_id);
+    remove_mixer_channel(sut, bus_id);
 
     EXPECT_TRUE(sut.mixer_state.inputs->empty());
-    EXPECT_EQ(nullptr, sut.mixer_state.buses.find(bus_id));
+    EXPECT_EQ(nullptr, sut.mixer_state.channels.find(bus_id));
     EXPECT_TRUE(empty<float_parameter>(sut.params));
     EXPECT_TRUE(empty<bool_parameter>(sut.params));
     EXPECT_TRUE(empty<stereo_level_parameter>(sut.params));
@@ -77,7 +77,7 @@ TEST_F(state_with_one_mixer_input,
 struct state_with_one_fx : testing::Test
 {
     state_with_one_fx()
-        : bus_id(add_mixer_bus(sut, "foo"))
+        : bus_id(add_mixer_channel(sut, "foo"))
         , fx_mod_id(insert_internal_fx_module(
                   sut,
                   bus_id,
@@ -89,7 +89,7 @@ struct state_with_one_fx : testing::Test
     }
 
     state sut;
-    mixer::bus_id bus_id;
+    mixer::channel_id bus_id;
     fx::module_id fx_mod_id;
 };
 

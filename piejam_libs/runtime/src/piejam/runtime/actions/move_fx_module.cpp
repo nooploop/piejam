@@ -16,15 +16,17 @@ move_fx_module_left::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.buses.update(st.fx_chain_bus, [this](mixer::bus& bus) {
-        bus.fx_chain.update([this](fx::chain_t& fx_chain) {
-            if (auto it = std::ranges::find(fx_chain, fx_mod_id);
-                it != fx_chain.end() && it != fx_chain.begin())
-            {
-                std::iter_swap(it, std::prev(it));
-            }
-        });
-    });
+    new_st.mixer_state.channels.update(
+            st.fx_chain_channel,
+            [this](mixer::channel& bus) {
+                bus.fx_chain.update([this](fx::chain_t& fx_chain) {
+                    if (auto it = std::ranges::find(fx_chain, fx_mod_id);
+                        it != fx_chain.end() && it != fx_chain.begin())
+                    {
+                        std::iter_swap(it, std::prev(it));
+                    }
+                });
+            });
 
     return new_st;
 }
@@ -34,15 +36,17 @@ move_fx_module_right::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.buses.update(st.fx_chain_bus, [this](mixer::bus& bus) {
-        bus.fx_chain.update([this](fx::chain_t& fx_chain) {
-            if (auto it = std::ranges::find(fx_chain, fx_mod_id);
-                it != fx_chain.end() && std::next(it) != fx_chain.end())
-            {
-                std::iter_swap(it, std::next(it));
-            }
-        });
-    });
+    new_st.mixer_state.channels.update(
+            st.fx_chain_channel,
+            [this](mixer::channel& bus) {
+                bus.fx_chain.update([this](fx::chain_t& fx_chain) {
+                    if (auto it = std::ranges::find(fx_chain, fx_mod_id);
+                        it != fx_chain.end() && std::next(it) != fx_chain.end())
+                    {
+                        std::iter_swap(it, std::next(it));
+                    }
+                });
+            });
 
     return new_st;
 }

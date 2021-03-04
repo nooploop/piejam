@@ -51,20 +51,22 @@ auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 auto make_device_bus_list_selector(io_direction)
         -> selector<box<device_io::bus_list_t>>;
 
-struct mixer_bus_info
+struct mixer_channel_info
 {
-    mixer::bus_id bus_id;
+    mixer::channel_id channel_id;
     float_parameter_id volume;
     float_parameter_id pan_balance;
     bool_parameter_id mute;
     bool_parameter_id solo;
     stereo_level_parameter_id level;
 
-    constexpr bool operator==(mixer_bus_info const&) const noexcept = default;
+    constexpr bool
+    operator==(mixer_channel_info const&) const noexcept = default;
 };
 
-extern const selector<boxed_vector<mixer_bus_info>> select_mixer_bus_infos;
-extern const selector<box<mixer_bus_info>> select_mixer_main_bus_info;
+extern const selector<boxed_vector<mixer_channel_info>>
+        select_mixer_channel_infos;
+extern const selector<box<mixer_channel_info>> select_mixer_main_channel_info;
 
 struct mixer_device_route
 {
@@ -81,19 +83,19 @@ extern const selector<boxed_vector<mixer_device_route>>
 
 struct mixer_channel_route
 {
-    mixer::bus_id bus_id;
+    mixer::channel_id channel_id;
     std::string name;
 
     bool operator==(mixer_channel_route const&) const noexcept = default;
 };
 
-auto make_default_mixer_channel_input_is_valid_selector(mixer::bus_id)
+auto make_default_mixer_channel_input_is_valid_selector(mixer::channel_id)
         -> selector<bool>;
 
-auto make_mixer_input_channels_selector(mixer::bus_id)
+auto make_mixer_input_channels_selector(mixer::channel_id)
         -> selector<boxed_vector<mixer_channel_route>>;
 
-auto make_mixer_output_channels_selector(mixer::bus_id)
+auto make_mixer_output_channels_selector(mixer::channel_id)
         -> selector<boxed_vector<mixer_channel_route>>;
 
 struct selected_route
@@ -111,16 +113,17 @@ struct selected_route
     bool operator==(selected_route const&) const noexcept = default;
 };
 
-auto make_mixer_channel_input_selector(mixer::bus_id)
+auto make_mixer_channel_input_selector(mixer::channel_id)
         -> selector<box<selected_route>>;
-auto make_mixer_channel_output_selector(mixer::bus_id)
+auto make_mixer_channel_output_selector(mixer::channel_id)
         -> selector<box<selected_route>>;
 
 auto make_device_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
 
-auto make_mixer_bus_name_selector(mixer::bus_id) -> selector<boxed_string>;
+auto make_mixer_channel_name_selector(mixer::channel_id)
+        -> selector<boxed_string>;
 
-auto make_mixer_bus_input_type_selector(mixer::bus_id)
+auto make_mixer_channel_input_type_selector(mixer::channel_id)
         -> selector<audio::bus_type>;
 
 auto make_bus_type_selector(device_io::bus_id) -> selector<audio::bus_type>;
@@ -136,13 +139,11 @@ auto make_midi_device_name_selector(midi::device_id_t)
 
 auto make_midi_device_enabled_selector(midi::device_id_t) -> selector<bool>;
 
-auto make_muted_by_solo_selector(mixer::bus_id) -> selector<bool>;
+auto make_muted_by_solo_selector(mixer::channel_id) -> selector<bool>;
 
-extern const selector<mixer::bus_id> select_fx_chain_bus;
+extern const selector<mixer::channel_id> select_fx_chain_channel;
 
 extern const selector<box<fx::chain_t>> select_current_fx_chain;
-extern const selector<stereo_level> select_current_fx_chain_bus_level;
-extern const selector<float> select_current_fx_chain_bus_volume;
 
 auto make_fx_module_name_selector(fx::module_id) -> selector<boxed_string>;
 auto make_fx_module_parameters_selector(fx::module_id)
