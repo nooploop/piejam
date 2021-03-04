@@ -25,8 +25,6 @@ struct engine_action_visitor
               set_bool_parameter,
               set_float_parameter,
               set_int_parameter,
-              set_input_bus_solo,
-              set_output_bus_solo,
               request_parameters_update,
               request_info_update,
               move_fx_module_left,

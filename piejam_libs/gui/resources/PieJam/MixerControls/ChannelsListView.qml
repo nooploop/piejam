@@ -32,8 +32,6 @@ ListView {
         edit.model: model.item.edit
 
 //        perform.meterMuted: (model.item.mute && !model.item.solo) || (root.soloActive && !model.item.solo)
-
-//        perform.onSoloToggled: root.soloToggled(index)
     }
 
     footer: Item {

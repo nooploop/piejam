@@ -20,9 +20,6 @@ public:
 
     void addChannel(QString const& newChannelName) override;
 
-    void setInputSolo(unsigned index) override;
-    void setOutputSolo(unsigned index) override;
-
     void requestLevelsUpdate() override;
 
 private:

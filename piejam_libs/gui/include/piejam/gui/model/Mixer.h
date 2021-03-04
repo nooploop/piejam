@@ -53,9 +53,6 @@ public:
 
     virtual Q_INVOKABLE void addChannel(QString const& newChannelName) = 0;
 
-    virtual Q_INVOKABLE void setInputSolo(unsigned index) = 0;
-    virtual Q_INVOKABLE void setOutputSolo(unsigned index) = 0;
-
     virtual Q_INVOKABLE void requestLevelsUpdate() = 0;
 
 signals:

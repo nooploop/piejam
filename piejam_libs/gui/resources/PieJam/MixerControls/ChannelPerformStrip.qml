@@ -17,7 +17,6 @@ Item {
 
     property alias meterMuted: levelMeterFader.muted
 
-    signal soloToggled()
     signal fxButtonClicked()
 
     implicitWidth: 150
@@ -97,9 +96,10 @@ Item {
             solo: root.model.solo
 
             muteMidi.model: root.model.muteMidi
+            soloMidi.model: root.model.soloMidi
 
             onMuteToggled: root.model.changeMute(!root.model.mute)
-            onSoloToggled: root.soloToggled()
+            onSoloToggled: root.model.changeSolo(!root.model.solo)
         }
 
         Button {
@@ -138,6 +138,7 @@ Item {
         readonly property var nullModel: ({
             name: "",
             mono: false,
+            solo: false,
             volume: 0,
             levelLeft: 0,
             levelRight: 0,
@@ -146,7 +147,8 @@ Item {
             solo: false,
             volumeMidi: null,
             panMidi: null,
-            muteMidi: null
+            muteMidi: null,
+            soloMidi: null
         })
     }
 }

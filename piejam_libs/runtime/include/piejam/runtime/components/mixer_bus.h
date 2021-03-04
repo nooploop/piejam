@@ -18,15 +18,14 @@ namespace piejam::runtime::components
 auto make_mixer_bus_input(
         mixer::bus const&,
         audio::bus_type,
-        parameter_processor_factory& param_procs,
+        parameter_processor_factory&,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;
 
 auto make_mixer_bus_output(
-        audio::samplerate_t const samplerate,
-        mixer::bus_id,
         mixer::bus const&,
-        parameter_processor_factory& param_procs,
+        audio::samplerate_t,
+        parameter_processor_factory&,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;
 

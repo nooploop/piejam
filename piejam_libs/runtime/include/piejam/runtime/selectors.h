@@ -57,6 +57,7 @@ struct mixer_bus_info
     float_parameter_id volume;
     float_parameter_id pan_balance;
     bool_parameter_id mute;
+    bool_parameter_id solo;
     stereo_level_parameter_id level;
 
     constexpr bool operator==(mixer_bus_info const&) const noexcept = default;

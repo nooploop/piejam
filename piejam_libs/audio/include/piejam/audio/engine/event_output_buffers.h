@@ -20,6 +20,8 @@ namespace piejam::audio::engine
 class event_output_buffers final
 {
 public:
+    using size_type = std::size_t;
+
     auto empty() const noexcept -> bool { return m_event_buffers.empty(); }
     auto size() const noexcept -> std::size_t { return m_event_buffers.size(); }
 

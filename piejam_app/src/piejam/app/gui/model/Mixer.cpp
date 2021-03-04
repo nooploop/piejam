@@ -10,7 +10,6 @@
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
-#include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
@@ -70,6 +69,7 @@ Mixer::onSubscribe()
                                             bus_info.volume,
                                             bus_info.pan_balance,
                                             bus_info.mute,
+                                            bus_info.solo,
                                             bus_info.level);
                                 }});
 
@@ -91,6 +91,7 @@ Mixer::onSubscribe()
                             mainBusInfo->volume,
                             mainBusInfo->pan_balance,
                             mainBusInfo->mute,
+                            mainBusInfo->solo,
                             mainBusInfo->level);
 
                     emit mainChannelChanged();
@@ -115,22 +116,6 @@ Mixer::addChannel(QString const& newChannelName)
 {
     runtime::actions::add_mixer_bus action;
     action.name = newChannelName.toStdString();
-    dispatch(action);
-}
-
-void
-Mixer::setInputSolo(unsigned const index)
-{
-    runtime::actions::set_input_bus_solo action;
-    action.index = index;
-    dispatch(action);
-}
-
-void
-Mixer::setOutputSolo(unsigned const index)
-{
-    runtime::actions::set_output_bus_solo action;
-    action.index = index;
     dispatch(action);
 }
 

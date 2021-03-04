@@ -42,11 +42,6 @@ struct set_mixer_channel_route;
 using set_mixer_channel_input = set_mixer_channel_route<io_direction::input>;
 using set_mixer_channel_output = set_mixer_channel_route<io_direction::output>;
 
-template <io_direction>
-struct set_bus_solo;
-using set_input_bus_solo = set_bus_solo<io_direction::input>;
-using set_output_bus_solo = set_bus_solo<io_direction::output>;
-
 struct request_parameters_update;
 struct request_info_update;
 

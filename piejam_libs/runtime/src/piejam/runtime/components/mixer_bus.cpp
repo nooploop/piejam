@@ -71,13 +71,12 @@ class mixer_bus_output final : public audio::engine::component
 public:
     mixer_bus_output(
             audio::samplerate_t const samplerate,
-            mixer::bus_id bus_id,
             mixer::bus const& bus,
             parameter_processor_factory& param_procs)
         : m_volume_input_proc(param_procs.make_processor(bus.volume, "volume"))
         , m_mute_input_proc(param_procs.make_processor(bus.mute, "mute"))
         , m_volume_amp(audio::components::make_stereo_amplifier("volume"))
-        , m_mute_solo(components::make_mute_solo(bus_id))
+        , m_mute_solo(components::make_mute_solo())
         , m_level_meter(audio::components::make_stereo_level_meter(samplerate))
         , m_peak_level_proc(
                   param_procs.make_processor(bus.level, "stereo_level"))
@@ -149,18 +148,13 @@ make_mixer_bus_input(
 
 auto
 make_mixer_bus_output(
-        audio::samplerate_t const samplerate,
-        mixer::bus_id bus_id,
         mixer::bus const& channel,
+        audio::samplerate_t const samplerate,
         parameter_processor_factory& param_procs,
         std::string_view const& /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<mixer_bus_output>(
-            samplerate,
-            bus_id,
-            channel,
-            param_procs);
+    return std::make_unique<mixer_bus_output>(samplerate, channel, param_procs);
 }
 
 } // namespace piejam::runtime::components

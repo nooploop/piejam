@@ -23,8 +23,8 @@ namespace
 class mute_solo final : public audio::engine::component
 {
 public:
-    mute_solo(mixer::bus_id solo_id, std::string_view const& name)
-        : m_mute_solo_proc(processors::make_mute_solo_processor(solo_id, name))
+    mute_solo(std::string_view const& name)
+        : m_mute_solo_proc(processors::make_mute_solo_processor(name))
         , m_mute_solo_amp(audio::components::make_stereo_amplifier("mute_amp"))
     {
     }
@@ -59,10 +59,10 @@ private:
 } // namespace
 
 auto
-make_mute_solo(mixer::bus_id const solo_id, std::string_view const& name)
+make_mute_solo(std::string_view const& name)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<mute_solo>(solo_id, name);
+    return std::make_unique<mute_solo>(name);
 }
 
 } // namespace piejam::runtime::components

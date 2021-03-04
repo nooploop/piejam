@@ -24,6 +24,7 @@ public:
             runtime::float_parameter_id volume,
             runtime::float_parameter_id pan_balance,
             runtime::bool_parameter_id mute,
+            runtime::bool_parameter_id solo,
             runtime::stereo_level_parameter_id level);
     ~MixerChannel();
 

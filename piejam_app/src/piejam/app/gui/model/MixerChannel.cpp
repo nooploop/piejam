@@ -23,6 +23,7 @@ MixerChannel::MixerChannel(
         runtime::float_parameter_id const volume,
         runtime::float_parameter_id const pan_balance,
         runtime::bool_parameter_id const mute,
+        runtime::bool_parameter_id const solo,
         runtime::stereo_level_parameter_id const level)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
@@ -33,6 +34,7 @@ MixerChannel::MixerChannel(
                       volume,
                       pan_balance,
                       mute,
+                      solo,
                       level),
               std::make_unique<MixerChannelEdit>(
                       store_dispatch,

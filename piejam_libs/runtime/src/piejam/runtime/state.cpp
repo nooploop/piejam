@@ -405,6 +405,9 @@ add_mixer_bus(state& st, std::string name) -> mixer::bus_id
             .mute = add_parameter(
                     st.params,
                     parameter::bool_{.default_value = false}),
+            .solo = add_parameter(
+                    st.params,
+                    parameter::bool_{.default_value = false}),
             .level = add_parameter(st.params, parameter::stereo_level{}),
             .fx_chain = {}});
     emplace_back(st.mixer_state.inputs, bus_id);

@@ -51,8 +51,6 @@ TopPane {
 
             edit.model: root.model.mainChannel.edit
             edit.deletable: false
-
-//    //        perform.onSoloToggled: root.soloToggled(index)
         }
 
     }

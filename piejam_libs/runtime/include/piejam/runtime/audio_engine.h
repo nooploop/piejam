@@ -43,9 +43,6 @@ public:
     auto get_parameter_update(parameter::id_t<P>) const
             -> std::optional<typename P::value_type>;
 
-    void set_input_solo(mixer::bus_id const&);
-    void set_output_solo(mixer::bus_id const&);
-
     auto get_learned_midi() const -> std::optional<midi::external_event>;
 
     [[nodiscard]] bool

@@ -34,7 +34,6 @@
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
-#include <piejam/runtime/actions/set_bus_solo.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/actions/update_parameter_values.h>
 #include <piejam/runtime/audio_engine.h>
@@ -405,32 +404,6 @@ audio_engine_middleware::process_engine_action(
         m_engine->set_parameter_value(
                 a.id,
                 get_parameter_value(get_state().params, a.id));
-    }
-}
-
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        actions::set_input_bus_solo const& a)
-{
-    next(a);
-
-    if (m_engine)
-    {
-        m_engine->set_input_solo(get_state().mixer_state.input_solo_id);
-    }
-}
-
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        actions::set_output_bus_solo const& a)
-{
-    next(a);
-
-    if (m_engine)
-    {
-        m_engine->set_output_solo(get_state().mixer_state.output_solo_id);
     }
 }
 

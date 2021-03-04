@@ -12,20 +12,16 @@ namespace piejam::runtime::processors
 {
 
 auto
-make_mute_solo_processor(
-        mixer::bus_id const solo_id,
-        std::string_view const& name)
+make_mute_solo_processor(std::string_view const& name)
         -> std::unique_ptr<audio::engine::processor>
 {
     static std::array s_input_names{
             std::string_view("mute"),
-            std::string_view("solo_index")};
+            std::string_view("muted_by_solo")};
     return std::unique_ptr<audio::engine::processor>{
             new audio::engine::event_converter_processor(
-                    [solo_id](bool mute, mixer::bus_id in_solo_id) -> float {
-                        return in_solo_id == mixer::bus_id{}
-                                       ? !mute
-                                       : in_solo_id == solo_id;
+                    [](bool mute, bool muted_by_solo) -> float {
+                        return !(mute || muted_by_solo);
                     },
                     std::span(s_input_names),
                     "gain",

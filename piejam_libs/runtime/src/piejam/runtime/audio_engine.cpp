@@ -21,10 +21,12 @@
 #include <piejam/functional/overload.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
+#include <piejam/range/indices.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/components/mixer_bus.h>
 #include <piejam/runtime/components/mute_solo.h>
+#include <piejam/runtime/components/solo_switch.h>
 #include <piejam/runtime/device_io.h>
 #include <piejam/runtime/dynamic_key_object_map.h>
 #include <piejam/runtime/fx/module.h>
@@ -37,6 +39,7 @@
 #include <piejam/runtime/processors/midi_input_processor.h>
 #include <piejam/runtime/processors/midi_learn_processor.h>
 #include <piejam/runtime/processors/midi_to_parameter_processor.h>
+#include <piejam/runtime/solo_group.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/worker.h>
 
@@ -77,6 +80,13 @@ struct mixer_output_key
     mixer::bus_id bus_id;
 
     bool operator==(mixer_output_key const&) const noexcept = default;
+};
+
+struct solo_group_key
+{
+    mixer::bus_id owner;
+
+    bool operator==(solo_group_key const&) const noexcept = default;
 };
 
 using processor_map = dynamic_key_object_map<audio::engine::processor>;
@@ -132,11 +142,25 @@ make_mixer_components(
             comps.insert(
                     out_key,
                     components::make_mixer_bus_output(
-                            samplerate,
-                            id,
                             bus,
+                            samplerate,
                             param_procs));
         }
+    }
+}
+
+void
+make_solo_group_components(
+        component_map& comps,
+        solo_groups_t const& solo_groups,
+        parameter_processor_factory& param_procs)
+{
+    for (auto&& [id, group] : solo_groups)
+    {
+        solo_group_key key{id};
+        comps.insert(
+                key,
+                components::make_solo_switch(group, param_procs, "solo"));
     }
 }
 
@@ -503,6 +527,33 @@ connect_midi(
     }
 }
 
+void
+connect_solo_groups(
+        audio::engine::graph& g,
+        component_map const& comps,
+        solo_groups_t const& solo_groups)
+{
+    for (auto const& [owner, group] : solo_groups)
+    {
+        auto solo_switch = comps.find(solo_group_key{owner});
+        BOOST_ASSERT(solo_switch);
+
+        solo_switch->connect(g);
+
+        BOOST_ASSERT(group.size() == solo_switch->event_outputs().size());
+        for (std::size_t const index : range::indices(group))
+        {
+            auto const& [param, member] = group[index];
+            auto mix_out = comps.find(mixer_output_key{.bus_id = member});
+            BOOST_ASSERT(mix_out);
+
+            g.add_event_wire(
+                    solo_switch->event_outputs()[index],
+                    mix_out->event_inputs()[0]);
+        }
+    }
+}
+
 } // namespace
 
 struct audio_engine::impl
@@ -518,8 +569,6 @@ struct audio_engine::impl
     audio::engine::process process;
     std::vector<thread::worker> worker_threads;
 
-    value_input_processor_ptr<mixer::bus_id> input_solo_index_proc;
-    value_input_processor_ptr<mixer::bus_id> output_solo_index_proc;
     std::vector<processor_ptr> mixer_procs;
     value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
 
@@ -590,18 +639,6 @@ template auto
         audio_engine::get_parameter_update(stereo_level_parameter_id) const
         -> std::optional<stereo_level>;
 
-void
-audio_engine::set_input_solo(mixer::bus_id const& id)
-{
-    m_impl->input_solo_index_proc->set(id);
-}
-
-void
-audio_engine::set_output_solo(mixer::bus_id const& id)
-{
-    m_impl->output_solo_index_proc->set(id);
-}
-
 auto
 audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
 {
@@ -644,22 +681,14 @@ audio_engine::rebuild(
             fx_params,
             m_impl->param_procs,
             ladspa_fx_proc_factory);
+    auto const solo_groups = runtime::solo_groups(mixer_state.buses);
+    make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 
     m_impl->param_procs.initialize([&params](auto const id) {
         return find_parameter_value(params, id);
     });
 
     processor_map procs;
-
-    auto input_solo_index_proc =
-            std::make_unique<audio::engine::value_io_processor<mixer::bus_id>>(
-                    mixer_state.input_solo_id,
-                    "input_solo_index");
-
-    auto output_solo_index_proc =
-            std::make_unique<audio::engine::value_io_processor<mixer::bus_id>>(
-                    mixer_state.output_solo_id,
-                    "output_solo_index");
 
     make_midi_processors(std::move(midi_in), midi_learn, procs);
     make_midi_assignment_processors(assignments, params, procs, m_impl->procs);
@@ -685,6 +714,8 @@ audio_engine::rebuild(
             m_impl->param_procs,
             assignments);
 
+    connect_solo_groups(new_graph, comps, solo_groups);
+
     audio::engine::bypass_event_identity_processors(new_graph);
 
     if (!m_impl->process.swap_executor(
@@ -693,8 +724,6 @@ audio_engine::rebuild(
         return false;
 
     m_impl->graph = std::move(new_graph);
-    m_impl->input_solo_index_proc = std::move(input_solo_index_proc);
-    m_impl->output_solo_index_proc = std::move(output_solo_index_proc);
     m_impl->mixer_procs = std::move(mixers);
     m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
     m_impl->procs = std::move(procs);

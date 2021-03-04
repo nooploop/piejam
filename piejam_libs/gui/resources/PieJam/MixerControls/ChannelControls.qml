@@ -16,6 +16,7 @@ Item {
     property alias mute: muteButton.checked
 
     property alias muteMidi: midiAssignMute
+    property alias soloMidi: midiAssignSolo
 
     signal soloToggled()
     signal muteToggled()
@@ -33,6 +34,14 @@ Item {
         Material.accent: Material.Yellow
 
         onToggled: root.soloToggled()
+
+        MidiAssignArea {
+            id: midiAssignSolo
+
+            anchors.fill: parent
+            anchors.topMargin: 1
+            anchors.bottomMargin: 1
+        }
     }
 
     Button {

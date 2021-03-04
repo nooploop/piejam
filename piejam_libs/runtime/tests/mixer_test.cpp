@@ -39,7 +39,13 @@ TEST(mixer_valid_io, test2)
 
     buses_t buses;
     auto bus1 = buses.add(bus{});
-    auto bus2 = buses.add(bus{.in = bus1});
+    auto bus2 = buses.add(
+            bus{.in = bus1,
+                .volume = {},
+                .pan_balance = {},
+                .mute = {},
+                .solo = {},
+                .level = {}});
 
     auto vs1 = valid_source_channels(buses, bus1);
     EXPECT_TRUE(vs1.empty());

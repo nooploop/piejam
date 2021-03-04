@@ -29,17 +29,20 @@ public:
             runtime::float_parameter_id volume,
             runtime::float_parameter_id panBalance,
             runtime::bool_parameter_id mute,
+            runtime::bool_parameter_id solo,
             runtime::stereo_level_parameter_id level);
     ~MixerChannelPerform();
 
     void changeVolume(double) override;
     void changePanBalance(double) override;
     void changeMute(bool) override;
+    void changeSolo(bool) override;
     void focusFxChain() override;
 
     auto volumeMidi() const -> piejam::gui::model::MidiAssignable* override;
     auto panMidi() const -> piejam::gui::model::MidiAssignable* override;
     auto muteMidi() const -> piejam::gui::model::MidiAssignable* override;
+    auto soloMidi() const -> piejam::gui::model::MidiAssignable* override;
 
 private:
     void onSubscribe() override;

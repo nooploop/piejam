@@ -22,11 +22,13 @@ struct MixerChannelPerform::Impl
     runtime::float_parameter_id volume;
     runtime::float_parameter_id panBalance;
     runtime::bool_parameter_id mute;
+    runtime::bool_parameter_id solo;
     runtime::stereo_level_parameter_id level;
 
     std::unique_ptr<MidiAssignable> volumeMidi;
     std::unique_ptr<MidiAssignable> panMidi;
     std::unique_ptr<MidiAssignable> muteMidi;
+    std::unique_ptr<MidiAssignable> soloMidi;
 };
 
 MixerChannelPerform::MixerChannelPerform(
@@ -36,6 +38,7 @@ MixerChannelPerform::MixerChannelPerform(
         runtime::float_parameter_id const volume,
         runtime::float_parameter_id const panBalance,
         runtime::bool_parameter_id const mute,
+        runtime::bool_parameter_id const solo,
         runtime::stereo_level_parameter_id const level)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
@@ -43,6 +46,7 @@ MixerChannelPerform::MixerChannelPerform(
               volume,
               panBalance,
               mute,
+              solo,
               level,
               std::make_unique<MidiAssignable>(
                       store_dispatch,
@@ -55,7 +59,11 @@ MixerChannelPerform::MixerChannelPerform(
               std::make_unique<MidiAssignable>(
                       store_dispatch,
                       state_change_subscriber,
-                      mute)))
+                      mute),
+              std::make_unique<MidiAssignable>(
+                      store_dispatch,
+                      state_change_subscriber,
+                      solo)))
 {
 }
 
@@ -87,8 +95,9 @@ MixerChannelPerform::onSubscribe()
                     m_impl->mute),
             [this](bool x) { setMute(x); });
 
-    //    observe(runtime::selectors::make_solo_selector(m_io_dir, m_bus_id),
-    //            [this](bool x) { setSolo(x); });
+    observe(runtime::selectors::make_bool_parameter_value_selector(
+                    m_impl->solo),
+            [this](bool x) { setSolo(x); });
 
     observe(runtime::selectors::make_level_parameter_value_selector(
                     m_impl->level),
@@ -120,6 +129,12 @@ MixerChannelPerform::changeMute(bool value)
 }
 
 void
+MixerChannelPerform::changeSolo(bool value)
+{
+    dispatch(runtime::actions::set_bool_parameter(m_impl->solo, value));
+}
+
+void
 MixerChannelPerform::focusFxChain()
 {
     runtime::actions::select_fx_chain_bus action;
@@ -143,6 +158,12 @@ auto
 MixerChannelPerform::muteMidi() const -> piejam::gui::model::MidiAssignable*
 {
     return m_impl->muteMidi.get();
+}
+
+auto
+MixerChannelPerform::soloMidi() const -> piejam::gui::model::MidiAssignable*
+{
+    return m_impl->soloMidi.get();
 }
 
 } // namespace piejam::app::gui::model

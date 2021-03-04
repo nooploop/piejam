@@ -29,10 +29,11 @@ struct bus
     io_address_t in{};
     io_address_t out{};
 
-    float_parameter_id volume{};
-    float_parameter_id pan_balance{};
-    bool_parameter_id mute{};
-    stereo_level_parameter_id level{};
+    float_parameter_id volume;
+    float_parameter_id pan_balance;
+    bool_parameter_id mute;
+    bool_parameter_id solo;
+    stereo_level_parameter_id level;
 
     box<fx::chain_t> fx_chain{};
 
