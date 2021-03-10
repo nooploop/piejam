@@ -36,9 +36,10 @@ public:
     void consume(F&& f) noexcept(
             noexcept(std::invoke(std::forward<F>(f), std::declval<T>())))
     {
-        if (marked(m_swap_pos.load()))
+        if (marked(m_swap_pos.load(std::memory_order_relaxed)))
         {
-            m_read = pos(m_swap_pos.exchange(m_read));
+            m_read =
+                    pos(m_swap_pos.exchange(m_read, std::memory_order_acq_rel));
             std::invoke(std::forward<F>(f), m_store[m_read].value);
         }
     }
@@ -57,7 +58,8 @@ public:
 private:
     void commit() noexcept
     {
-        m_write = pos(m_swap_pos.exchange(mark(m_write)));
+        m_write = pos(
+                m_swap_pos.exchange(mark(m_write), std::memory_order_acq_rel));
     }
 
     static auto mark(std::size_t x) -> std::size_t { return x | 0b100; }
