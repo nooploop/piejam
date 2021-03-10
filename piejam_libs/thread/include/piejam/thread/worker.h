@@ -7,13 +7,11 @@
 #include <piejam/thread/affinity.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/priority.h>
+#include <piejam/thread/semaphore.h>
 
 #include <atomic>
-#include <cassert>
 #include <concepts>
-#include <condition_variable>
 #include <functional>
-#include <mutex>
 #include <thread>
 
 namespace piejam::thread
@@ -36,9 +34,7 @@ public:
 
             while (m_running.load(std::memory_order_consume))
             {
-                std::unique_lock<std::mutex> lock(m_work_mutex);
-                m_work_cond_var.wait(lock, [this]() { return m_work; });
-                m_work = false;
+                m_sem.acquire();
 
                 if (!m_running.load(std::memory_order_consume))
                     break;
@@ -54,15 +50,8 @@ public:
     template <std::invocable<> F>
     void wakeup(F&& task)
     {
-        assert(!m_work);
-
-        {
-            std::lock_guard<std::mutex> lock(m_work_mutex);
-            m_task = std::forward<F>(task);
-            m_work = true;
-        }
-
-        m_work_cond_var.notify_one();
+        m_task = std::forward<F>(task);
+        m_sem.release();
     }
 
     void stop()
@@ -76,9 +65,8 @@ public:
 
 private:
     std::atomic_bool m_running{true};
-    std::mutex m_work_mutex;
-    std::condition_variable m_work_cond_var;
-    bool m_work{false};
+    semaphore m_sem;
+
     task_t m_task{[]() {}};
     std::thread m_thread;
 };

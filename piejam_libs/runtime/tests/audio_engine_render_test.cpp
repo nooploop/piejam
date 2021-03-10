@@ -91,7 +91,7 @@ struct audio_engine_render_test : public ::testing::Test
 
 TEST_F(audio_engine_render_test, add_input_channel)
 {
-    state st;
+    auto st = make_initial_state();
 
     add_mixer_channel(st, "in1");
     add_mixer_channel(st, "out");
