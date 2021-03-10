@@ -4,6 +4,7 @@
 
 add_library(piejam_thread STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/affinity.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/cache_line_size.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/configuration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/job_deque.h
@@ -21,4 +22,5 @@ target_compile_options(piejam_thread PRIVATE -Wall -Wextra -Werror -pedantic-err
 
 target_link_libraries(piejam_thread PUBLIC piejam_base PRIVATE pthread)
 
+add_subdirectory(benchmarks)
 add_subdirectory(tests)
