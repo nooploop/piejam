@@ -38,6 +38,8 @@ struct delete_mixer_channel final
     auto reduce(state const&) const -> state override;
 };
 
+auto initiate_mixer_channel_deletion(mixer::channel_id) -> thunk_action;
+
 struct set_mixer_channel_name final
     : ui::cloneable_action<set_mixer_channel_name, action>
 {

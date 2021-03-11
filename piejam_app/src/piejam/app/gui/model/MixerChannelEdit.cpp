@@ -8,6 +8,7 @@
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/selectors.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::app::gui::model
 {
@@ -180,9 +181,8 @@ MixerChannelEdit::moveRight()
 void
 MixerChannelEdit::deleteChannel()
 {
-    runtime::actions::delete_mixer_channel action;
-    action.channel_id = m_impl->channelId;
-    dispatch(action);
+    dispatch(runtime::actions::initiate_mixer_channel_deletion(
+            m_impl->channelId));
 }
 
 void

@@ -4,7 +4,10 @@
 
 #include <piejam/runtime/actions/mixer_actions.h>
 
+#include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/state.h>
+#include <piejam/runtime/ui/batch_action.h>
+#include <piejam/runtime/ui/thunk_action.h>
 
 #include <iterator>
 
@@ -29,6 +32,37 @@ delete_mixer_channel::reduce(state const& st) const -> state
     runtime::remove_mixer_channel(new_st, channel_id);
 
     return new_st;
+}
+
+auto
+initiate_mixer_channel_deletion(mixer::channel_id channel_id) -> thunk_action
+{
+    return [=](auto&& get_state, auto&& dispatch) {
+        state const& st = get_state();
+        mixer::channel const& ch = st.mixer_state.channels[channel_id];
+        if (ch.fx_chain->empty())
+        {
+            delete_mixer_channel action;
+            action.channel_id = channel_id;
+            dispatch(action);
+        }
+        else
+        {
+            batch_action batch;
+            for (fx::module_id const fx_mod_id : *ch.fx_chain)
+            {
+                auto delete_fx_mod = std::make_unique<delete_fx_module>();
+                delete_fx_mod->fx_mod_id = fx_mod_id;
+                batch.push_back(std::move(delete_fx_mod));
+            }
+
+            auto action = std::make_unique<delete_mixer_channel>();
+            action->channel_id = channel_id;
+            batch.push_back(std::move(action));
+
+            dispatch(batch);
+        }
+    };
 }
 
 auto
