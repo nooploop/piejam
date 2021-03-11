@@ -103,6 +103,9 @@ template <class T>
 using value_output_processor_ptr =
         std::unique_ptr<audio::engine::value_io_processor<T>>;
 
+using get_device_processor_f =
+        std::function<audio::engine::processor&(std::size_t)>;
+
 void
 make_mixer_components(
         component_map& comps,
@@ -322,7 +325,7 @@ connect_mixer_input(
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         component_map const& comps,
-        audio::engine::processor& input_proc,
+        get_device_processor_f const& get_input_proc,
         std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& bus,
         audio::engine::component& mb_in)
@@ -337,12 +340,16 @@ connect_mixer_input(
 
                         if (device_bus.channels.left != npos)
                             g.add_wire(
-                                    {input_proc, device_bus.channels.left},
+                                    {.proc = get_input_proc(
+                                             device_bus.channels.left),
+                                     .port = 0},
                                     mb_in.inputs()[0]);
 
                         if (device_bus.channels.right != npos)
                             g.add_wire(
-                                    {input_proc, device_bus.channels.right},
+                                    {.proc = get_input_proc(
+                                             device_bus.channels.right),
+                                     .port = 0},
                                     mb_in.inputs()[1]);
                     },
                     [&](mixer::channel_id const src_channel_id) {
@@ -368,7 +375,7 @@ connect_mixer_output(
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         component_map const& comps,
-        audio::engine::processor& output_proc,
+        get_device_processor_f const& get_output_proc,
         std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& bus,
         audio::engine::component& mb_out)
@@ -383,13 +390,17 @@ connect_mixer_output(
                         if (device_bus.channels.left != npos)
                             connect(g,
                                     mb_out.outputs()[0],
-                                    {output_proc, device_bus.channels.left},
+                                    {.proc = get_output_proc(
+                                             device_bus.channels.left),
+                                     .port = 0},
                                     mixer_procs);
 
                         if (device_bus.channels.right != npos)
                             connect(g,
                                     mb_out.outputs()[1],
-                                    {output_proc, device_bus.channels.right},
+                                    {.proc = get_output_proc(
+                                             device_bus.channels.right),
+                                     .port = 0},
                                     mixer_procs);
                     },
                     [&](mixer::channel_id const dst_channel_id) {
@@ -420,8 +431,8 @@ make_graph(
         component_map const& comps,
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
-        audio::engine::processor& input_proc,
-        audio::engine::processor& output_proc,
+        get_device_processor_f const& get_input_proc,
+        get_device_processor_f const& get_output_proc,
         std::vector<processor_ptr>& mixer_procs)
 {
     audio::engine::graph g;
@@ -442,7 +453,7 @@ make_graph(
                 channels,
                 device_buses,
                 comps,
-                input_proc,
+                get_input_proc,
                 mixer_procs,
                 bus,
                 *mb_in);
@@ -460,7 +471,7 @@ make_graph(
                 channels,
                 device_buses,
                 comps,
-                output_proc,
+                get_output_proc,
                 mixer_procs,
                 bus,
                 *mb_out);
@@ -706,8 +717,12 @@ audio_engine::rebuild(
             comps,
             mixer_state.channels,
             device_buses,
-            m_impl->process.input(),
-            m_impl->process.output(),
+            [this](std::size_t ch) -> audio::engine::processor& {
+                return m_impl->process.input(ch);
+            },
+            [this](std::size_t ch) -> audio::engine::processor& {
+                return m_impl->process.output(ch);
+            },
             mixers);
 
     connect_midi(

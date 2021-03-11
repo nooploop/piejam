@@ -5,8 +5,8 @@
 #pragma once
 
 #include <piejam/audio/engine/named_processor.h>
-#include <piejam/range/table_view.h>
 
+#include <span>
 #include <vector>
 
 namespace piejam::audio::engine
@@ -15,9 +15,9 @@ namespace piejam::audio::engine
 class input_processor final : public named_processor
 {
 public:
-    input_processor(std::size_t num_outputs, std::string_view const& name = {});
+    input_processor(std::string_view const& name = {});
 
-    void set_input(range::table_view<float const> const& engine_input)
+    void set_input(std::span<float const> const& engine_input)
     {
         m_engine_input = engine_input;
     }
@@ -25,7 +25,7 @@ public:
     auto type_name() const -> std::string_view override { return "input"; }
 
     auto num_inputs() const -> std::size_t override { return 0; }
-    auto num_outputs() const -> std::size_t override { return m_num_outputs; }
+    auto num_outputs() const -> std::size_t override { return 1; }
 
     auto event_inputs() const -> event_ports override { return {}; }
     auto event_outputs() const -> event_ports override { return {}; }
@@ -33,9 +33,7 @@ public:
     void process(process_context const&) override;
 
 private:
-    std::size_t const m_num_outputs{};
-
-    range::table_view<float const> m_engine_input;
+    std::span<float const> m_engine_input;
 };
 
 } // namespace piejam::audio::engine

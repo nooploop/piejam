@@ -19,21 +19,18 @@ namespace piejam::audio::engine::test
 
 TEST(input_processor, input_table_is_propagated_to_outputs)
 {
-    container::table<float> data(2, 16);
-    input_processor sut(2);
-    sut.set_input(as_const(data.rows()));
+    std::vector<float> data({2.f, 3.f, 5.f, 7.f});
+    input_processor sut;
+    sut.set_input(data);
 
-    std::array<float, 16> out_buf{};
-    std::vector<std::span<float>> outputs{out_buf, out_buf};
-    std::vector<audio_slice> results(2);
-    sut.process({{}, outputs, results, {}, {}, 16});
+    std::array<float, 4> out_buf{};
+    std::vector<std::span<float>> outputs{out_buf};
+    std::vector<audio_slice> results(1);
+    sut.process({{}, outputs, results, {}, {}, 4});
 
     ASSERT_TRUE(results[0].is_buffer());
-    EXPECT_EQ(results[0].buffer().data(), data.rows()[0].data());
-    EXPECT_EQ(results[0].buffer().size(), data.rows()[0].size());
-    ASSERT_TRUE(results[1].is_buffer());
-    EXPECT_EQ(results[1].buffer().data(), data.rows()[1].data());
-    EXPECT_EQ(results[1].buffer().size(), data.rows()[1].size());
+    EXPECT_EQ(results[0].buffer().data(), data.data());
+    EXPECT_EQ(results[0].buffer().size(), data.size());
 }
 
 } // namespace piejam::audio::engine::test

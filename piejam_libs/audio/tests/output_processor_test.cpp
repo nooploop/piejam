@@ -19,23 +19,20 @@ namespace piejam::audio::engine::test
 
 TEST(output_processor, input_table_is_propagated_to_outputs)
 {
-    container::table<float> data(2, 2);
-    fill(data.rows(), -1.f);
-    output_processor sut(2);
-    sut.set_output(data.rows());
+    std::vector<float> data({-1.f, -1.f});
+    output_processor sut;
+    sut.set_output(data);
 
     std::array<float, 2> in_buf{0.23f, 0.58f};
-    std::vector<audio_slice> in_spans{in_buf, {}};
+    std::vector<audio_slice> in_spans{in_buf};
     std::vector<std::reference_wrapper<audio_slice const>> inputs{
             in_spans.begin(),
             in_spans.end()};
 
     sut.process({inputs, {}, {}, {}, {}, 2});
 
-    EXPECT_FLOAT_EQ(0.23f, data.rows()[0][0]);
-    EXPECT_FLOAT_EQ(0.58f, data.rows()[0][1]);
-    EXPECT_FLOAT_EQ(0.f, data.rows()[1][0]);
-    EXPECT_FLOAT_EQ(0.f, data.rows()[1][1]);
+    EXPECT_FLOAT_EQ(0.23f, data[0]);
+    EXPECT_FLOAT_EQ(0.58f, data[1]);
 }
 
 } // namespace piejam::audio::engine::test

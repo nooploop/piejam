@@ -6,6 +6,7 @@
 
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/process.h>
+#include <piejam/range/table_view.h>
 
 #include <gtest/gtest.h>
 

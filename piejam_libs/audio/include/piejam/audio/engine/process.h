@@ -7,6 +7,7 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/input_processor.h>
 #include <piejam/audio/engine/output_processor.h>
+#include <piejam/range/fwd.h>
 
 #include <atomic>
 #include <future>
@@ -18,12 +19,19 @@ namespace piejam::audio::engine
 class process
 {
 public:
-    process(unsigned num_device_input_channels,
-            unsigned num_device_output_channels);
+    process(std::size_t num_device_input_channels,
+            std::size_t num_device_output_channels);
     ~process();
 
-    auto input() noexcept -> processor& { return m_input_proc; }
-    auto output() noexcept -> processor& { return m_output_proc; }
+    auto input(std::size_t const index) noexcept -> processor&
+    {
+        return m_input_procs[index];
+    }
+
+    auto output(std::size_t const index) noexcept -> processor&
+    {
+        return m_output_procs[index];
+    }
 
     [[nodiscard]] bool swap_executor(std::unique_ptr<dag_executor>);
 
@@ -32,8 +40,8 @@ public:
             range::table_view<float> const& out_audio) noexcept;
 
 private:
-    input_processor m_input_proc;
-    output_processor m_output_proc;
+    std::vector<input_processor> m_input_procs;
+    std::vector<output_processor> m_output_procs;
 
     std::unique_ptr<dag_executor> m_executor;
 
