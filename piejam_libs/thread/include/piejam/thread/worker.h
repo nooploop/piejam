@@ -26,17 +26,17 @@ public:
     using task_t = std::function<void()>;
 
     worker(thread::configuration conf = {})
-        : m_thread([this, conf = std::move(conf)]() mutable {
+        : m_thread([this, conf = std::move(conf)](std::stop_token stoken) {
             if (conf.affinity)
                 this_thread::set_affinity(*conf.affinity);
             if (conf.priority)
                 this_thread::set_priority(*conf.priority);
 
-            while (m_running.load(std::memory_order_consume))
+            while (!stoken.stop_requested())
             {
                 m_sem.acquire();
 
-                if (!m_running.load(std::memory_order_consume))
+                if (stoken.stop_requested())
                     break;
 
                 m_task();
@@ -45,7 +45,17 @@ public:
     {
     }
 
-    ~worker() { stop(); }
+    worker(worker const&) = delete;
+    worker(worker&&) = delete;
+
+    ~worker()
+    {
+        m_thread.request_stop();
+        wakeup([]() {});
+    }
+
+    auto operator=(worker const&) -> worker& = delete;
+    auto operator=(worker&&) -> worker& = delete;
 
     template <std::invocable<> F>
     void wakeup(F&& task)
@@ -54,21 +64,11 @@ public:
         m_sem.release();
     }
 
-    void stop()
-    {
-        m_running.store(false, std::memory_order_release);
-
-        wakeup([]() {});
-
-        m_thread.join();
-    }
-
 private:
-    std::atomic_bool m_running{true};
     semaphore m_sem;
 
     task_t m_task{[]() {}};
-    std::thread m_thread;
+    std::jthread m_thread;
 };
 
 } // namespace piejam::thread
