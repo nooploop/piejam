@@ -6,6 +6,7 @@
 
 #include <piejam/algorithm/for_each_adjacent.h>
 #include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/engine/clip_processor.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/dag.h>
 #include <piejam/audio/engine/dag_executor.h>
@@ -326,7 +327,7 @@ connect_mixer_input(
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         component_map const& comps,
-        get_device_processor_f const& get_input_proc,
+        std::span<audio::engine::input_processor> const& input_procs,
         std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& bus,
         audio::engine::component& mb_in)
@@ -341,15 +342,15 @@ connect_mixer_input(
 
                         if (device_bus.channels.left != npos)
                             g.add_wire(
-                                    {.proc = get_input_proc(
-                                             device_bus.channels.left),
+                                    {.proc = input_procs[device_bus.channels
+                                                                 .left],
                                      .port = 0},
                                     mb_in.inputs()[0]);
 
                         if (device_bus.channels.right != npos)
                             g.add_wire(
-                                    {.proc = get_input_proc(
-                                             device_bus.channels.right),
+                                    {.proc = input_procs[device_bus.channels
+                                                                 .right],
                                      .port = 0},
                                     mb_in.inputs()[1]);
                     },
@@ -376,7 +377,8 @@ connect_mixer_output(
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         component_map const& comps,
-        get_device_processor_f const& get_output_proc,
+        std::span<audio::engine::output_processor> const& output_procs,
+        std::span<processor_ptr> const& output_clip_procs,
         std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& bus,
         audio::engine::component& mb_out)
@@ -388,21 +390,42 @@ connect_mixer_output(
                         device_io::bus const& device_bus =
                                 device_buses[device_bus_id];
 
-                        if (device_bus.channels.left != npos)
+                        auto get_clip_proc = [&](std::size_t const ch)
+                                -> audio::engine::processor& {
+                            auto& clip_proc = output_clip_procs[ch];
+                            if (!clip_proc)
+                            {
+                                clip_proc = audio::engine::make_clip_processor(
+                                        -1.f,
+                                        1.f,
+                                        std::to_string(ch));
+
+                                connect(g,
+                                        {.proc = *clip_proc, .port = 0},
+                                        {.proc = output_procs[ch], .port = 0},
+                                        mixer_procs);
+                            }
+
+                            return *clip_proc;
+                        };
+
+                        if (auto const ch = device_bus.channels.left;
+                            ch != npos)
+                        {
                             connect(g,
                                     mb_out.outputs()[0],
-                                    {.proc = get_output_proc(
-                                             device_bus.channels.left),
-                                     .port = 0},
+                                    {.proc = get_clip_proc(ch), .port = 0},
                                     mixer_procs);
+                        }
 
-                        if (device_bus.channels.right != npos)
+                        if (auto const ch = device_bus.channels.right;
+                            ch != npos)
+                        {
                             connect(g,
                                     mb_out.outputs()[1],
-                                    {.proc = get_output_proc(
-                                             device_bus.channels.right),
-                                     .port = 0},
+                                    {.proc = get_clip_proc(ch), .port = 0},
                                     mixer_procs);
+                        }
                     },
                     [&](mixer::channel_id const dst_channel_id) {
                         mixer::channel const& dst_channel =
@@ -432,8 +455,9 @@ make_graph(
         component_map const& comps,
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
-        get_device_processor_f const& get_input_proc,
-        get_device_processor_f const& get_output_proc,
+        std::span<audio::engine::input_processor> const& input_procs,
+        std::span<audio::engine::output_processor> const& output_procs,
+        std::span<processor_ptr> const& output_clip_procs,
         std::vector<processor_ptr>& mixer_procs)
 {
     audio::engine::graph g;
@@ -454,7 +478,7 @@ make_graph(
                 channels,
                 device_buses,
                 comps,
-                get_input_proc,
+                input_procs,
                 mixer_procs,
                 bus,
                 *mb_in);
@@ -472,7 +496,8 @@ make_graph(
                 channels,
                 device_buses,
                 comps,
-                get_output_proc,
+                output_procs,
+                output_clip_procs,
                 mixer_procs,
                 bus,
                 *mb_out);
@@ -583,13 +608,15 @@ make_io_processors(std::size_t num_channels)
 struct audio_engine::impl
 {
     impl(std::span<thread::configuration const> const& wt_configs,
-         unsigned num_device_input_channels,
-         unsigned num_device_output_channels)
+         std::size_t num_device_input_channels,
+         std::size_t num_device_output_channels)
         : worker_threads(wt_configs.begin(), wt_configs.end())
         , input_procs(make_io_processors<audio::engine::input_processor>(
                   num_device_input_channels))
         , output_procs(make_io_processors<audio::engine::output_processor>(
                   num_device_output_channels))
+        , output_clip_procs(
+                  std::vector<processor_ptr>(num_device_output_channels))
     {
     }
 
@@ -599,6 +626,7 @@ struct audio_engine::impl
     std::vector<audio::engine::input_processor> input_procs;
     std::vector<audio::engine::output_processor> output_procs;
 
+    std::vector<processor_ptr> output_clip_procs;
     std::vector<processor_ptr> mixer_procs;
     value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
 
@@ -727,18 +755,17 @@ audio_engine::rebuild(
                                  midi::external_event>>("midi_learned")
                        : nullptr;
 
+    std::vector<processor_ptr> output_clip_procs(
+            m_impl->output_clip_procs.size());
     std::vector<processor_ptr> mixers;
 
     auto new_graph = make_graph(
             comps,
             mixer_channels,
             device_buses,
-            [this](std::size_t ch) -> audio::engine::processor& {
-                return m_impl->input_procs[ch];
-            },
-            [this](std::size_t ch) -> audio::engine::processor& {
-                return m_impl->output_procs[ch];
-            },
+            m_impl->input_procs,
+            m_impl->output_procs,
+            output_clip_procs,
             mixers);
 
     connect_midi(
@@ -758,6 +785,7 @@ audio_engine::rebuild(
         return false;
 
     m_impl->graph = std::move(new_graph);
+    m_impl->output_clip_procs = std::move(output_clip_procs);
     m_impl->mixer_procs = std::move(mixers);
     m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
     m_impl->procs = std::move(procs);

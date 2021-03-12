@@ -6,6 +6,7 @@
 
 #include <piejam/audio/engine/slice.h>
 
+#include <xsimd/math/xsimd_basic_math.hpp>
 #include <xsimd/stl/algorithms.hpp>
 
 #include <boost/align/is_aligned.hpp>
@@ -172,6 +173,44 @@ private:
 };
 
 template <class T>
+struct slice_clip
+{
+    constexpr slice_clip(T min, T max, std::span<T> const& out) noexcept
+        : m_min(min)
+        , m_max(max)
+        , m_out(out)
+    {
+        BOOST_ASSERT(min <= max);
+    }
+
+    constexpr auto operator()(T const c) const -> slice<T>
+    {
+        return std::clamp(c, m_min, m_max);
+    }
+
+    constexpr auto operator()(typename slice<T>::span_t const& buf) const
+            -> slice<T>
+    {
+        xsimd::transform(
+                buf.begin(),
+                buf.end(),
+                m_out.begin(),
+                [min = m_min, max = m_max](auto&& x) {
+                    using x_t = std::decay_t<decltype(x)>;
+                    return xsimd::clip(
+                            std::forward<decltype(x)>(x),
+                            x_t{min},
+                            x_t{max});
+                });
+    }
+
+private:
+    T m_min;
+    T m_max;
+    std::span<T> const m_out;
+};
+
+template <class T>
 struct slice_copy
 {
     constexpr slice_copy(std::span<T> const& out) noexcept
@@ -281,6 +320,14 @@ multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
             detail::slice_multiply<T>(out),
             l.as_variant(),
             r.as_variant());
+}
+
+template <class T>
+constexpr auto
+clip(slice<T> const& s, T min, T max, std::span<T> const& out) noexcept
+        -> slice<T>
+{
+    return std::visit(detail::slice_clip<T>(min, max, out), s.as_variant());
 }
 
 template <class T>

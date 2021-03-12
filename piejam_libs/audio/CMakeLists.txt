@@ -17,6 +17,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/audio_slice.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/clip_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag_executor.h
@@ -91,6 +92,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/device_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/audio_slice.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/clip_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/dag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/event_to_audio_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/export_graph_as_dot.cpp
