@@ -22,6 +22,7 @@
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/range/indices.h>
+#include <piejam/range/iota.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/components/mixer_channel.h>
@@ -568,6 +569,15 @@ connect_solo_groups(
     }
 }
 
+template <class Processor>
+auto
+make_io_processors(std::size_t num_channels)
+{
+    return algorithm::transform_to_vector(
+            range::iota(num_channels),
+            [](std::size_t const i) { return Processor(std::to_string(i)); });
+}
+
 } // namespace
 
 struct audio_engine::impl
@@ -575,13 +585,19 @@ struct audio_engine::impl
     impl(std::span<thread::configuration const> const& wt_configs,
          unsigned num_device_input_channels,
          unsigned num_device_output_channels)
-        : process(num_device_input_channels, num_device_output_channels)
-        , worker_threads(wt_configs.begin(), wt_configs.end())
+        : worker_threads(wt_configs.begin(), wt_configs.end())
+        , input_procs(make_io_processors<audio::engine::input_processor>(
+                  num_device_input_channels))
+        , output_procs(make_io_processors<audio::engine::output_processor>(
+                  num_device_output_channels))
     {
     }
 
     audio::engine::process process;
     std::vector<thread::worker> worker_threads;
+
+    std::vector<audio::engine::input_processor> input_procs;
+    std::vector<audio::engine::output_processor> output_procs;
 
     std::vector<processor_ptr> mixer_procs;
     value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
@@ -718,10 +734,10 @@ audio_engine::rebuild(
             mixer_channels,
             device_buses,
             [this](std::size_t ch) -> audio::engine::processor& {
-                return m_impl->process.input(ch);
+                return m_impl->input_procs[ch];
             },
             [this](std::size_t ch) -> audio::engine::processor& {
-                return m_impl->process.output(ch);
+                return m_impl->output_procs[ch];
             },
             mixers);
 
@@ -761,7 +777,19 @@ audio_engine::operator()(
         std::span<audio::pcm_output_buffer_converter const> const& out_conv,
         std::size_t const buffer_size) noexcept
 {
-    m_impl->process(in_conv, out_conv, buffer_size);
+    BOOST_ASSERT(m_impl->input_procs.size() == in_conv.size());
+    for (std::size_t const i : range::indices(in_conv))
+    {
+        m_impl->input_procs[i].set_input(in_conv[i]);
+    }
+
+    BOOST_ASSERT(m_impl->output_procs.size() == out_conv.size());
+    for (std::size_t const i : range::indices(out_conv))
+    {
+        m_impl->output_procs[i].set_output(out_conv[i]);
+    }
+
+    m_impl->process(buffer_size);
 }
 
 } // namespace piejam::runtime

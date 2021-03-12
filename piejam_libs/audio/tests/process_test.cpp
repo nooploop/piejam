@@ -29,13 +29,11 @@ struct test_dummy_dag_executor : public dag_executor
 TEST(process_test, swap_executor)
 {
     std::atomic_bool running{true};
-    process sut(0, 0);
+    process sut;
     std::thread process_thread([&running, &sut] {
-        std::span<pcm_input_buffer_converter> in_converter;
-        std::span<pcm_output_buffer_converter> out_converter;
         while (running.load(std::memory_order_relaxed))
         {
-            sut(in_converter, out_converter, 2);
+            sut(2);
         }
     });
 
@@ -49,7 +47,7 @@ TEST(process_test, swap_executor)
 
 TEST(process_test, swap_executor_fails_if_processing_thread_is_not_running)
 {
-    process sut(2, 2);
+    process sut;
     EXPECT_FALSE(
             sut.swap_executor(std::make_unique<test_dummy_dag_executor>()));
 }
