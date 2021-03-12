@@ -669,7 +669,7 @@ audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
 
 bool
 audio_engine::rebuild(
-        mixer::state const& mixer_state,
+        mixer::channels_t const& mixer_channels,
         device_io::buses_t const& device_buses,
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
@@ -685,7 +685,7 @@ audio_engine::rebuild(
             comps,
             m_impl->comps,
             m_samplerate,
-            mixer_state.channels,
+            mixer_channels,
             device_buses,
             m_impl->param_procs);
     make_fx_chain_components(
@@ -695,7 +695,7 @@ audio_engine::rebuild(
             fx_params,
             m_impl->param_procs,
             ladspa_fx_proc_factory);
-    auto const solo_groups = runtime::solo_groups(mixer_state.channels);
+    auto const solo_groups = runtime::solo_groups(mixer_channels);
     make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 
     m_impl->param_procs.initialize([&params](auto const id) {
@@ -715,7 +715,7 @@ audio_engine::rebuild(
 
     auto new_graph = make_graph(
             comps,
-            mixer_state.channels,
+            mixer_channels,
             device_buses,
             [this](std::size_t ch) -> audio::engine::processor& {
                 return m_impl->process.input(ch);

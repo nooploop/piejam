@@ -551,7 +551,7 @@ audio_engine_middleware::rebuild()
 
     auto const& st = get_state();
     if (!m_engine->rebuild(
-                st.mixer_state,
+                st.mixer_state.channels,
                 st.device_io_state.buses,
                 st.fx_modules,
                 st.fx_parameters,

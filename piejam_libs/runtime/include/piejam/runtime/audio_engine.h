@@ -46,7 +46,7 @@ public:
     auto get_learned_midi() const -> std::optional<midi::external_event>;
 
     [[nodiscard]] bool
-    rebuild(mixer::state const&,
+    rebuild(mixer::channels_t const&,
             device_io::buses_t const&,
             fx::modules_t const&,
             fx::parameters_t const& fx_params,
