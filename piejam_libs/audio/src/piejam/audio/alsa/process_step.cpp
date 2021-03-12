@@ -360,6 +360,7 @@ process_step::process_step(
         pcm_io_config const& io_config,
         std::atomic<float>& cpu_load,
         std::atomic_size_t& xruns,
+        init_process_function const& init_process_function,
         process_function process_function)
     : m_input_fd(input_fd)
     , m_output_fd(output_fd)
@@ -380,6 +381,8 @@ process_step::process_step(
               io_config.process_config.period_size) // 1sec window
 {
     m_xruns.store(0, std::memory_order_relaxed);
+
+    init_process_function(m_reader->converter(), m_writer->converter());
 }
 
 process_step::process_step(process_step&&) = default;
@@ -419,10 +422,7 @@ process_step::operator()() -> std::error_condition
             m_io_config.process_config.period_size,
             m_io_config.process_config.samplerate);
 
-    m_process_function(
-            m_reader->converter(),
-            m_writer->converter(),
-            m_io_config.process_config.period_size);
+    m_process_function(m_io_config.process_config.period_size);
 
     m_cpu_load.store(
             m_cpu_load_mean_acc(cpu_load_meter.stop()),

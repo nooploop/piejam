@@ -28,7 +28,12 @@ public:
     void close() override;
 
     bool is_running() const noexcept override;
-    void start(thread::configuration const&, process_function) override;
+
+    void
+    start(thread::configuration const&,
+          init_process_function const&,
+          process_function) override;
+
     void stop() override;
 
     auto cpu_load() const noexcept -> float override

@@ -12,9 +12,10 @@
 namespace piejam::audio
 {
 
-using process_function = std::function<void(
-        std::span<pcm_input_buffer_converter const> const& /*in*/,
-        std::span<pcm_output_buffer_converter const> const& /*out*/,
-        std::size_t /*buffer_size*/)>;
+using init_process_function = std::function<void(
+        std::span<pcm_input_buffer_converter const> const&,
+        std::span<pcm_output_buffer_converter const> const&)>;
+
+using process_function = std::function<void(std::size_t /*buffer_size*/)>;
 
 } // namespace piejam::audio

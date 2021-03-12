@@ -56,10 +56,11 @@ public:
             bool midi_learn,
             midi_assignments_map const&);
 
-    void operator()(
+    void init_process(
             std::span<audio::pcm_input_buffer_converter const> const&,
-            std::span<audio::pcm_output_buffer_converter const> const&,
-            std::size_t buffer_size) noexcept;
+            std::span<audio::pcm_output_buffer_converter const> const&);
+
+    void process(std::size_t buffer_size) noexcept;
 
 private:
     audio::samplerate_t const m_samplerate;

@@ -29,6 +29,7 @@ public:
             pcm_io_config const&,
             std::atomic<float>& cpu_load,
             std::atomic_size_t& xruns,
+            init_process_function const&,
             process_function);
     process_step(process_step&&);
     ~process_step();

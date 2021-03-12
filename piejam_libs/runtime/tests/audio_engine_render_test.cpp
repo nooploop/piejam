@@ -62,7 +62,7 @@ struct audio_engine_render_test : public ::testing::Test
     {
         fill_sine();
 
-        sut(in_converter, out_converter, buffer_size);
+        sut.process(buffer_size);
 
         for (std::size_t o = 0; o < buffer_size; ++o)
             output.emplace_back(audio_out.rows()[0][o], audio_out.rows()[1][o]);
@@ -70,6 +70,7 @@ struct audio_engine_render_test : public ::testing::Test
 
     void render(std::size_t iterations)
     {
+        sut.init_process(in_converter, out_converter);
         while (iterations--)
             render_buffer();
     }

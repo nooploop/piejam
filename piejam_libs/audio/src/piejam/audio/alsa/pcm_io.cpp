@@ -128,6 +128,7 @@ pcm_io::is_running() const noexcept
 void
 pcm_io::start(
         thread::configuration const& thread_config,
+        init_process_function const& init_process_function,
         process_function process_function)
 {
     BOOST_ASSERT(is_open());
@@ -144,6 +145,7 @@ pcm_io::start(
                     m_io_config,
                     m_cpu_load,
                     m_xruns,
+                    init_process_function,
                     std::move(process_function)));
 
     BOOST_ASSERT(m_process_thread->is_running());

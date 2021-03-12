@@ -772,10 +772,9 @@ audio_engine::rebuild(
 }
 
 void
-audio_engine::operator()(
+audio_engine::init_process(
         std::span<audio::pcm_input_buffer_converter const> const& in_conv,
-        std::span<audio::pcm_output_buffer_converter const> const& out_conv,
-        std::size_t const buffer_size) noexcept
+        std::span<audio::pcm_output_buffer_converter const> const& out_conv)
 {
     BOOST_ASSERT(m_impl->input_procs.size() == in_conv.size());
     for (std::size_t const i : range::indices(in_conv))
@@ -788,7 +787,11 @@ audio_engine::operator()(
     {
         m_impl->output_procs[i].set_output(out_conv[i]);
     }
+}
 
+void
+audio_engine::process(std::size_t const buffer_size) noexcept
+{
     m_impl->process(buffer_size);
 }
 

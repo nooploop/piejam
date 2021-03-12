@@ -20,7 +20,7 @@ public:
 
     void set_output(pcm_output_buffer_converter const& engine_output)
     {
-        m_engine_output = std::ref(engine_output);
+        m_engine_output = engine_output;
     }
 
     auto type_name() const -> std::string_view override { return "output"; }

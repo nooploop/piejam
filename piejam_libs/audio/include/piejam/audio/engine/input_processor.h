@@ -20,7 +20,7 @@ public:
 
     void set_input(pcm_input_buffer_converter const& engine_input)
     {
-        m_engine_input = std::ref(engine_input);
+        m_engine_input = engine_input;
     }
 
     auto type_name() const -> std::string_view override { return "input"; }

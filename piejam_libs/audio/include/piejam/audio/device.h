@@ -19,7 +19,12 @@ public:
     virtual void close() = 0;
 
     virtual bool is_running() const noexcept = 0;
-    virtual void start(thread::configuration const&, process_function) = 0;
+
+    virtual void
+    start(thread::configuration const&,
+          init_process_function const&,
+          process_function) = 0;
+
     virtual void stop() = 0;
 
     virtual auto cpu_load() const noexcept -> float = 0;
@@ -33,7 +38,14 @@ public:
     void close() override {}
 
     bool is_running() const noexcept override { return false; }
-    void start(thread::configuration const&, process_function) override {}
+
+    void
+    start(thread::configuration const&,
+          init_process_function const&,
+          process_function) override
+    {
+    }
+
     void stop() override {}
 
     auto cpu_load() const noexcept -> float override { return 0.f; }
