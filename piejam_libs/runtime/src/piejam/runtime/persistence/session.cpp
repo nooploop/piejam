@@ -56,7 +56,10 @@ from_json(nlohmann::json const& j, session::internal_fx& fx)
 void
 to_json(nlohmann::json& j, session::ladspa_plugin const& plug)
 {
-    j = {{"id", plug.id}, {"name", plug.name}, {"preset", plug.preset}};
+    j = {{"id", plug.id},
+         {"name", plug.name},
+         {"preset", plug.preset},
+         {"midi", plug.midi}};
 }
 
 void
@@ -65,6 +68,7 @@ from_json(nlohmann::json const& j, session::ladspa_plugin& plug)
     j.at("id").get_to(plug.id);
     j.at("name").get_to(plug.name);
     j.at("preset").get_to(plug.preset);
+    j.at("midi").get_to(plug.midi);
 }
 
 void

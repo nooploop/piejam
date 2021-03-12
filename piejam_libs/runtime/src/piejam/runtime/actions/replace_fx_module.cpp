@@ -80,7 +80,8 @@ make_replace_fx_module_action(
         std::size_t const position,
         audio::ladspa::plugin_id_t const plugin_id,
         std::string_view const& name,
-        std::vector<fx::parameter_value_assignment> const& initial_values)
+        std::vector<fx::parameter_value_assignment> const& initial_values,
+        std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> batch_action
 {
     batch_action batch;
@@ -100,6 +101,7 @@ make_replace_fx_module_action(
     insert_action->plugin_id = plugin_id;
     insert_action->name = name;
     insert_action->initial_values = initial_values;
+    insert_action->midi_assigns = midi_assigns;
     batch.push_back(std::move(insert_action));
 
     return batch;
@@ -119,6 +121,7 @@ replace_fx_module(
                 position,
                 plugin_id,
                 name,
+                {},
                 {}));
     };
 }
@@ -136,6 +139,7 @@ replace_fx_module(
                 position,
                 plugin_id,
                 name,
+                {},
                 {}));
     };
 }

@@ -32,7 +32,8 @@ auto make_replace_fx_module_action(
         std::size_t position,
         audio::ladspa::plugin_id_t,
         std::string_view const& name,
-        std::vector<fx::parameter_value_assignment> const& initial_values)
+        std::vector<fx::parameter_value_assignment> const& initial_values,
+        std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> batch_action;
 
 auto replace_fx_module(
