@@ -15,6 +15,7 @@
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
 
+#include <boost/mp11/algorithm.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 
 #include <algorithm>
@@ -318,6 +319,28 @@ find_mixer_channel_containing_fx_module(
     });
 }
 
+template <class P>
+static auto
+remove_midi_assignement_for_parameter(state& st, parameter::id_t<P> id)
+{
+    st.midi_assignments.update(
+            [id](midi_assignments_map& m) { m.erase(midi_assignment_id{id}); });
+}
+
+template <class P>
+static auto
+remove_parameter(state& st, parameter::id_t<P> id)
+{
+    remove_parameter(st.params, id);
+
+    if constexpr (boost::mp11::mp_contains<
+                          midi_assignment_id,
+                          parameter::id_t<P>>::value)
+    {
+        remove_midi_assignement_for_parameter(st, id);
+    }
+}
+
 void
 remove_fx_module(state& st, fx::module_id id)
 {
@@ -335,9 +358,7 @@ remove_fx_module(state& st, fx::module_id id)
     fx::parameters_t fx_params = st.fx_parameters;
     for (auto&& [key, fx_param_id] : *fx_mod.parameters)
     {
-        std::visit(
-                [&st](auto&& id) { remove_parameter(st.params, id); },
-                fx_param_id);
+        std::visit([&st](auto&& id) { remove_parameter(st, id); }, fx_param_id);
         fx_params.erase(fx_param_id);
     }
     st.fx_parameters = std::move(fx_params);
@@ -423,11 +444,11 @@ remove_mixer_channel(state& st, mixer::channel_id const channel_id)
 
     mixer::channel const& bus = st.mixer_state.channels[channel_id];
 
-    remove_parameter(st.params, bus.volume);
-    remove_parameter(st.params, bus.pan_balance);
-    remove_parameter(st.params, bus.mute);
-    remove_parameter(st.params, bus.solo);
-    remove_parameter(st.params, bus.level);
+    remove_parameter(st, bus.volume);
+    remove_parameter(st, bus.pan_balance);
+    remove_parameter(st, bus.mute);
+    remove_parameter(st, bus.solo);
+    remove_parameter(st, bus.level);
 
     BOOST_ASSERT_MSG(
             bus.fx_chain->empty(),
