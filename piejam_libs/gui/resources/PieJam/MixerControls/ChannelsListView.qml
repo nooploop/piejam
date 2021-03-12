@@ -9,7 +9,6 @@ import QtQuick.Controls.Material 2.15
 ListView {
     id: root
 
-    signal soloToggled(int index)
     signal fxButtonClicked()
     signal addChannelClicked(string newChannelName)
 

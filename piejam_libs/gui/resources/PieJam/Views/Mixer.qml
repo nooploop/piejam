@@ -27,7 +27,6 @@ TopPane {
 
         model: root.model.inputChannels
 
-        onSoloToggled: root.model.setInputSolo(index)
         onFxButtonClicked: root.fxButtonClicked()
         onAddChannelClicked: root.model.addChannel(newChannelName)
     }
