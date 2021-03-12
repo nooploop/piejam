@@ -36,8 +36,8 @@ public:
     {
         verify_process_context(*this, ctx);
 
-        clip(ctx.inputs[0].get(), m_min, m_max, ctx.outputs[0]);
-        ctx.results[0] = ctx.outputs[0];
+        ctx.results[0] =
+                clip(ctx.inputs[0].get(), m_min, m_max, ctx.outputs[0]);
     }
 
 private:

@@ -202,6 +202,7 @@ struct slice_clip
                             x_t{min},
                             x_t{max});
                 });
+        return m_out;
     }
 
 private:
