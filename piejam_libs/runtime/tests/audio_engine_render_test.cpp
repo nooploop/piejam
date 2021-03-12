@@ -42,11 +42,15 @@ struct audio_engine_render_test : public ::testing::Test
                 std::ranges::copy(audio_in.rows()[1], buffer.begin());
             }};
     std::vector<audio::pcm_output_buffer_converter> out_converter{
-            [this](std::span<float const> const& buffer) {
-                std::ranges::copy(buffer, audio_out.rows()[0].begin());
+            [this](audio::pcm_output_source_buffer_t const& buffer) {
+                std::ranges::copy(
+                        std::get<std::span<float const>>(buffer),
+                        audio_out.rows()[0].begin());
             },
-            [this](std::span<float const> const& buffer) {
-                std::ranges::copy(buffer, audio_out.rows()[1].begin());
+            [this](audio::pcm_output_source_buffer_t const& buffer) {
+                std::ranges::copy(
+                        std::get<std::span<float const>>(buffer),
+                        audio_out.rows()[1].begin());
             }};
 
     void fill_sine()

@@ -26,19 +26,7 @@ output_processor::process(process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
-    if (ctx.inputs[0].get().is_buffer())
-    {
-        m_engine_output(ctx.inputs[0].get().buffer());
-    }
-    else
-    {
-        std::array<float, max_period_size> out;
-        std::ranges::fill_n(
-                out.begin(),
-                ctx.buffer_size,
-                ctx.inputs[0].get().constant());
-        m_engine_output(std::span(out.data(), ctx.buffer_size));
-    }
+    m_engine_output(ctx.inputs[0].get().as_variant());
 }
 
 } // namespace piejam::audio::engine

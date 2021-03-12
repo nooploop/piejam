@@ -6,12 +6,19 @@
 
 #include <functional>
 #include <span>
+#include <variant>
 
 namespace piejam::audio
 {
 
-using pcm_input_buffer_converter = std::function<void(std::span<float> const&)>;
+// from pcm to target
+using pcm_input_target_buffer_t = std::span<float>;
+using pcm_input_buffer_converter =
+        std::function<void(pcm_input_target_buffer_t const&)>;
+
+// from source to pcm
+using pcm_output_source_buffer_t = std::variant<float, std::span<float const>>;
 using pcm_output_buffer_converter =
-        std::function<void(std::span<float const> const&)>;
+        std::function<void(pcm_output_source_buffer_t const&)>;
 
 } // namespace piejam::audio

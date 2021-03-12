@@ -55,6 +55,7 @@ transferi(
             return err;
 
         frames_transferred += static_cast<std::size_t>(arg.result);
+        BOOST_ASSERT(frames_transferred <= frames);
     }
 
     return {};
@@ -248,13 +249,22 @@ struct interleaved_writer final : pcm_writer
                   range::iota(num_channels),
                   [this](std::size_t const channel) {
                       return pcm_output_buffer_converter(
-                              [this,
-                               channel](std::span<float const> const& buffer) {
-                                  convert(channel, buffer);
+                              [this, channel](pcm_output_source_buffer_t const&
+                                                      buffer) {
+                                  convert_source(channel, buffer);
                               });
                   }))
     {
         BOOST_ASSERT(m_fd);
+    }
+
+    void convert_source(
+            std::size_t const channel,
+            pcm_output_source_buffer_t const& buffer)
+    {
+        std::visit(
+                [this, channel](auto const& b) { convert(channel, b); },
+                buffer);
     }
 
     void
@@ -274,6 +284,21 @@ struct interleaved_writer final : pcm_writer
                 buffer,
                 non_interleaved[channel].begin(),
                 &pcm_convert::to<F>);
+    }
+
+    void convert(std::size_t const channel, float const constant)
+    {
+        BOOST_ASSERT(channel < m_num_channels);
+        range::table_view<pcm_sample_t<F>> non_interleaved(
+                m_write_buffer.data(),
+                m_num_channels,
+                m_period_size,
+                1,
+                m_num_channels);
+
+        std::ranges::fill(
+                non_interleaved[channel],
+                pcm_convert::to<F>(constant));
     }
 
     auto converter() const noexcept -> std::span<converter_f const> override

@@ -22,8 +22,10 @@ TEST(output_processor, input_table_is_propagated_to_outputs)
     std::vector<float> data({0.f, 0.f});
     output_processor sut;
     auto converter = pcm_output_buffer_converter(
-            [&data](std::span<float const> const& buf) {
-                std::ranges::copy(buf, data.begin());
+            [&data](pcm_output_source_buffer_t const& buf) {
+                std::ranges::copy(
+                        std::get<std::span<float const>>(buf),
+                        data.begin());
             });
     sut.set_output(converter);
 
