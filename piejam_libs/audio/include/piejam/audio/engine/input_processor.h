@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/engine/named_processor.h>
+#include <piejam/audio/pcm_buffer_converter.h>
 
 #include <span>
 #include <vector>
@@ -17,9 +18,9 @@ class input_processor final : public named_processor
 public:
     input_processor(std::string_view const& name = {});
 
-    void set_input(std::span<float const> const& engine_input)
+    void set_input(pcm_input_buffer_converter const& engine_input)
     {
-        m_engine_input = engine_input;
+        m_engine_input = std::ref(engine_input);
     }
 
     auto type_name() const -> std::string_view override { return "input"; }
@@ -33,7 +34,7 @@ public:
     void process(process_context const&) override;
 
 private:
-    std::span<float const> m_engine_input;
+    pcm_input_buffer_converter m_engine_input;
 };
 
 } // namespace piejam::audio::engine

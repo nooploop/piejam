@@ -27,10 +27,12 @@ output_processor::process(process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
-    transform(ctx.inputs[0].get(), m_engine_output, [](auto&& x) {
-        using x_t = std::decay_t<decltype(x)>;
-        return xsimd::clip(std::forward<decltype(x)>(x), x_t{-1.f}, x_t{1.f});
-    });
+    m_engine_output(ctx.inputs[0].get().buffer());
+    //    transform(ctx.inputs[0].get(), m_engine_output, [](auto&& x) {
+    //        using x_t = std::decay_t<decltype(x)>;
+    //        return xsimd::clip(std::forward<decltype(x)>(x), x_t{-1.f},
+    //        x_t{1.f});
+    //    });
 }
 
 } // namespace piejam::audio::engine

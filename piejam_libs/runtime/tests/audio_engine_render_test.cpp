@@ -34,6 +34,21 @@ struct audio_engine_render_test : public ::testing::Test
     std::size_t sine_wave_pos{};
     std::vector<audio::pair<float>> output;
 
+    std::vector<audio::pcm_input_buffer_converter> in_converter{
+            [this](std::span<float> const& buffer) {
+                std::ranges::copy(audio_in.rows()[0], buffer.begin());
+            },
+            [this](std::span<float> const& buffer) {
+                std::ranges::copy(audio_in.rows()[1], buffer.begin());
+            }};
+    std::vector<audio::pcm_output_buffer_converter> out_converter{
+            [this](std::span<float const> const& buffer) {
+                std::ranges::copy(buffer, audio_out.rows()[0].begin());
+            },
+            [this](std::span<float const> const& buffer) {
+                std::ranges::copy(buffer, audio_out.rows()[1].begin());
+            }};
+
     void fill_sine()
     {
         std::ranges::generate(audio_in.rows()[0], [this]() -> float {
@@ -47,7 +62,7 @@ struct audio_engine_render_test : public ::testing::Test
     {
         fill_sine();
 
-        sut(as_const(audio_in.rows()), audio_out.rows());
+        sut(in_converter, out_converter, buffer_size);
 
         for (std::size_t o = 0; o < buffer_size; ++o)
             output.emplace_back(audio_out.rows()[0][o], audio_out.rows()[1][o]);

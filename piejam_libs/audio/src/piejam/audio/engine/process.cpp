@@ -85,8 +85,9 @@ process::swap_executor(std::unique_ptr<dag_executor> next_dag_executor)
 
 void
 process::operator()(
-        range::table_view<float const> const& in_audio,
-        range::table_view<float> const& out_audio) noexcept
+        std::span<pcm_input_buffer_converter const> const& in_converter,
+        std::span<pcm_output_buffer_converter const> const& out_converter,
+        std::size_t const buffer_size) noexcept
 {
     if (auto next_dag_executor = std::unique_ptr<dag_executor>(
                 m_next_executor.exchange(nullptr, std::memory_order_acq_rel)))
@@ -95,21 +96,19 @@ process::operator()(
         m_prev_executor.set_value(std::move(next_dag_executor));
     }
 
-    for (std::size_t const i : range::indices(in_audio))
+    BOOST_ASSERT(m_input_procs.size() == in_converter.size());
+    for (std::size_t const i : range::indices(in_converter))
     {
-        BOOST_ASSERT(in_audio.minor_step() == 1);
-        m_input_procs[i].set_input(
-                std::span(in_audio[i].data(), in_audio[i].size()));
+        m_input_procs[i].set_input(in_converter[i]);
     }
 
-    for (std::size_t const i : range::indices(out_audio))
+    BOOST_ASSERT(m_output_procs.size() == out_converter.size());
+    for (std::size_t const i : range::indices(out_converter))
     {
-        BOOST_ASSERT(out_audio.minor_step() == 1);
-        m_output_procs[i].set_output(
-                std::span(out_audio[i].data(), out_audio[i].size()));
+        m_output_procs[i].set_output(out_converter[i]);
     }
 
-    (*m_executor)(in_audio.minor_size());
+    (*m_executor)(buffer_size);
 }
 
 } // namespace piejam::audio::engine

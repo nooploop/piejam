@@ -7,7 +7,7 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/input_processor.h>
 #include <piejam/audio/engine/output_processor.h>
-#include <piejam/range/fwd.h>
+#include <piejam/audio/pcm_buffer_converter.h>
 
 #include <atomic>
 #include <future>
@@ -36,8 +36,9 @@ public:
     [[nodiscard]] bool swap_executor(std::unique_ptr<dag_executor>);
 
     void operator()(
-            range::table_view<float const> const& in_audio,
-            range::table_view<float> const& out_audio) noexcept;
+            std::span<pcm_input_buffer_converter const> const&,
+            std::span<pcm_output_buffer_converter const> const&,
+            std::size_t buffer_size) noexcept;
 
 private:
     std::vector<input_processor> m_input_procs;

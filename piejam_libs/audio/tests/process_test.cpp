@@ -29,13 +29,13 @@ struct test_dummy_dag_executor : public dag_executor
 TEST(process_test, swap_executor)
 {
     std::atomic_bool running{true};
-    process sut(2, 2);
+    process sut(0, 0);
     std::thread process_thread([&running, &sut] {
-        range::table_view<float const> in_audio;
-        range::table_view<float> out_audio;
+        std::span<pcm_input_buffer_converter> in_converter;
+        std::span<pcm_output_buffer_converter> out_converter;
         while (running.load(std::memory_order_relaxed))
         {
-            sut(in_audio, out_audio);
+            sut(in_converter, out_converter, 2);
         }
     });
 

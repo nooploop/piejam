@@ -532,8 +532,11 @@ audio_engine_middleware::start_engine()
 
         m_device->start(
                 m_audio_thread_config,
-                [engine = m_engine.get()](auto const& in, auto const& out) {
-                    engine->operator()(in, out);
+                [engine = m_engine.get()](
+                        auto const& in,
+                        auto const& out,
+                        auto const buffer_size) {
+                    engine->operator()(in, out, buffer_size);
                 });
 
         rebuild();

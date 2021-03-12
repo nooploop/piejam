@@ -25,8 +25,8 @@ input_processor::process(process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
-    BOOST_ASSERT(ctx.buffer_size == m_engine_input.size());
-    ctx.results[0] = m_engine_input;
+    m_engine_input(ctx.outputs[0]);
+    ctx.results[0] = ctx.outputs[0];
 }
 
 } // namespace piejam::audio::engine

@@ -21,16 +21,20 @@ TEST(input_processor, input_table_is_propagated_to_outputs)
 {
     std::vector<float> data({2.f, 3.f, 5.f, 7.f});
     input_processor sut;
-    sut.set_input(data);
 
     std::array<float, 4> out_buf{};
     std::vector<std::span<float>> outputs{out_buf};
     std::vector<audio_slice> results(1);
+    auto converter =
+            pcm_input_buffer_converter([&out_buf](std::span<float> const& buf) {
+                std::ranges::copy(out_buf, buf.begin());
+            });
+    sut.set_input(converter);
     sut.process({{}, outputs, results, {}, {}, 4});
 
     ASSERT_TRUE(results[0].is_buffer());
-    EXPECT_EQ(results[0].buffer().data(), data.data());
-    EXPECT_EQ(results[0].buffer().size(), data.size());
+    EXPECT_EQ(results[0].buffer().data(), out_buf.data());
+    EXPECT_EQ(results[0].buffer().size(), out_buf.size());
 }
 
 } // namespace piejam::audio::engine::test

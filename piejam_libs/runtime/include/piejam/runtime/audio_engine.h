@@ -5,9 +5,9 @@
 #pragma once
 
 #include <piejam/audio/pair.h>
+#include <piejam/audio/pcm_buffer_converter.h>
 #include <piejam/audio/types.h>
 #include <piejam/midi/fwd.h>
-#include <piejam/range/table_view.h>
 #include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -57,8 +57,9 @@ public:
             midi_assignments_map const&);
 
     void operator()(
-            range::table_view<float const> const& in_audio,
-            range::table_view<float> const& out_audio) noexcept;
+            std::span<audio::pcm_input_buffer_converter const> const&,
+            std::span<audio::pcm_output_buffer_converter const> const&,
+            std::size_t buffer_size) noexcept;
 
 private:
     audio::samplerate_t const m_samplerate;

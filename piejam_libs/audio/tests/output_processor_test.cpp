@@ -19,9 +19,13 @@ namespace piejam::audio::engine::test
 
 TEST(output_processor, input_table_is_propagated_to_outputs)
 {
-    std::vector<float> data({-1.f, -1.f});
+    std::vector<float> data({0.f, 0.f});
     output_processor sut;
-    sut.set_output(data);
+    auto converter = pcm_output_buffer_converter(
+            [&data](std::span<float const> const& buf) {
+                std::ranges::copy(buf, data.begin());
+            });
+    sut.set_output(converter);
 
     std::array<float, 2> in_buf{0.23f, 0.58f};
     std::vector<audio_slice> in_spans{in_buf};

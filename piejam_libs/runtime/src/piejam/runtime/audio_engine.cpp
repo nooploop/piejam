@@ -757,10 +757,11 @@ audio_engine::rebuild(
 
 void
 audio_engine::operator()(
-        range::table_view<float const> const& in_audio,
-        range::table_view<float> const& out_audio) noexcept
+        std::span<audio::pcm_input_buffer_converter const> const& in_conv,
+        std::span<audio::pcm_output_buffer_converter const> const& out_conv,
+        std::size_t const buffer_size) noexcept
 {
-    m_impl->process(in_audio, out_audio);
+    m_impl->process(in_conv, out_conv, buffer_size);
 }
 
 } // namespace piejam::runtime

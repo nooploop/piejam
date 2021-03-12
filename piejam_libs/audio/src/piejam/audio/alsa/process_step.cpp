@@ -7,6 +7,7 @@
 #include "pcm_reader.h"
 #include "pcm_writer.h"
 
+#include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/cpu_load_meter.h>
 #include <piejam/audio/pcm_convert.h>
 #include <piejam/audio/pcm_format.h>
@@ -15,13 +16,15 @@
 #include <piejam/audio/table.h>
 #include <piejam/audio/types.h>
 #include <piejam/numeric/rolling_mean.h>
+#include <piejam/range/iota.h>
 #include <piejam/system/device.h>
 
 #include <sound/asound.h>
 #include <sys/ioctl.h>
 
+#include <boost/assert.hpp>
+
 #include <algorithm>
-#include <cassert>
 
 namespace piejam::audio::alsa
 {
@@ -89,14 +92,13 @@ writei(system::device& fd,
 
 struct dummy_reader final : pcm_reader
 {
-    auto buffer() const noexcept -> range::table_view<float const> override
+    auto converter() const noexcept -> std::span<converter_f const> override
     {
         return {};
     }
 
-    auto read() noexcept -> std::error_code override { return {}; }
-
-    void clear_buffer() noexcept override {}
+    auto transfer() noexcept -> std::error_code override { return {}; }
+    void clear() noexcept override {}
 };
 
 template <pcm_format F>
@@ -110,17 +112,43 @@ struct interleaved_reader final : pcm_reader
         , m_num_channels(num_channels)
         , m_period_size(period_size)
         , m_read_buffer(num_channels * period_size)
-        , m_buffer(num_channels, period_size)
+        , m_converter(algorithm::transform_to_vector(
+                  range::iota(num_channels),
+                  [this](std::size_t const channel) {
+                      return pcm_input_buffer_converter(
+                              [this, channel](std::span<float> const& buffer) {
+                                  convert(channel, buffer);
+                              });
+                  }))
     {
-        assert(m_fd);
+        BOOST_ASSERT(m_fd);
     }
 
-    auto buffer() const noexcept -> range::table_view<float const> override
+    void
+    convert(std::size_t const channel, std::span<float> const& buffer) noexcept
     {
-        return m_buffer.rows();
+        BOOST_ASSERT(channel < m_num_channels);
+        range::table_view<pcm_sample_t<F>> non_interleaved(
+                m_read_buffer.data(),
+                m_num_channels,
+                m_period_size,
+                1,
+                m_num_channels);
+
+        BOOST_ASSERT(non_interleaved[channel].size() == buffer.size());
+
+        std::ranges::transform(
+                non_interleaved[channel],
+                buffer.begin(),
+                &pcm_convert::from<F>);
     }
 
-    auto read() noexcept -> std::error_code override
+    auto converter() const noexcept -> std::span<converter_f const> override
+    {
+        return m_converter;
+    }
+
+    auto transfer() noexcept -> std::error_code override
     {
         if (auto err =
                     readi(m_fd,
@@ -129,26 +157,20 @@ struct interleaved_reader final : pcm_reader
                           m_num_channels))
             return err;
 
-        range::table_view<pcm_sample_t<F>> non_interleaved(
-                m_read_buffer.data(),
-                m_num_channels,
-                m_period_size,
-                1,
-                m_num_channels);
-
-        transform(non_interleaved, m_buffer.rows(), &pcm_convert::from<F>);
-
         return {};
     }
 
-    void clear_buffer() noexcept override { fill(m_buffer.rows(), 0.f); }
+    void clear() noexcept override
+    {
+        std::ranges::fill(m_read_buffer, pcm_sample_t<F>{});
+    }
 
 private:
     system::device& m_fd;
     std::size_t m_num_channels;
     std::size_t m_period_size;
     std::vector<pcm_sample_t<F>> m_read_buffer;
-    table m_buffer;
+    std::vector<converter_f> m_converter;
 };
 
 auto
@@ -188,7 +210,7 @@ make_reader(
             M_PIEJAM_INTERLEAVED_READER_CASE(pcm_format::u24_3be);
 
             default:
-                assert(false);
+                BOOST_ASSERT(false);
                 return std::make_unique<dummy_reader>();
         }
 
@@ -202,9 +224,13 @@ make_reader(
 
 struct dummy_writer final : pcm_writer
 {
-    auto buffer() noexcept -> range::table_view<float> override { return {}; }
+    auto converter() const noexcept -> std::span<converter_f const> override
+    {
+        return {};
+    }
 
-    auto write() noexcept -> std::error_code override { return {}; }
+    auto transfer() noexcept -> std::error_code override { return {}; }
+    void clear() noexcept override {}
 };
 
 template <pcm_format F>
@@ -218,25 +244,45 @@ struct interleaved_writer final : pcm_writer
         , m_num_channels(num_channels)
         , m_period_size(period_size)
         , m_write_buffer(num_channels * period_size)
-        , m_buffer(num_channels, period_size)
+        , m_converter(algorithm::transform_to_vector(
+                  range::iota(num_channels),
+                  [this](std::size_t const channel) {
+                      return pcm_output_buffer_converter(
+                              [this,
+                               channel](std::span<float const> const& buffer) {
+                                  convert(channel, buffer);
+                              });
+                  }))
     {
-        assert(m_fd);
+        BOOST_ASSERT(m_fd);
     }
 
-    auto buffer() noexcept -> range::table_view<float> override
+    void
+    convert(std::size_t const channel, std::span<float const> const& buffer)
     {
-        return m_buffer.rows();
-    }
-
-    auto write() noexcept -> std::error_code override
-    {
+        BOOST_ASSERT(channel < m_num_channels);
         range::table_view<pcm_sample_t<F>> non_interleaved(
                 m_write_buffer.data(),
                 m_num_channels,
                 m_period_size,
                 1,
                 m_num_channels);
-        transform(m_buffer.rows(), non_interleaved, &pcm_convert::to<F>);
+
+        BOOST_ASSERT(buffer.size() == non_interleaved[channel].size());
+
+        std::ranges::transform(
+                buffer,
+                non_interleaved[channel].begin(),
+                &pcm_convert::to<F>);
+    }
+
+    auto converter() const noexcept -> std::span<converter_f const> override
+    {
+        return m_converter;
+    }
+
+    auto transfer() noexcept -> std::error_code override
+    {
         return writei(
                 m_fd,
                 m_write_buffer.data(),
@@ -244,12 +290,17 @@ struct interleaved_writer final : pcm_writer
                 m_num_channels);
     }
 
+    void clear() noexcept override
+    {
+        std::ranges::fill(m_write_buffer, pcm_sample_t<F>{});
+    }
+
 private:
     system::device& m_fd;
     std::size_t m_num_channels;
     std::size_t m_period_size;
     std::vector<pcm_sample_t<F>> m_write_buffer;
-    table m_buffer;
+    std::vector<converter_f> m_converter;
 };
 
 auto
@@ -289,7 +340,7 @@ make_writer(
             M_PIEJAM_INTERLEAVED_WRITER_CASE(pcm_format::u24_3be);
 
             default:
-                assert(false);
+                BOOST_ASSERT(false);
                 return std::make_unique<dummy_writer>();
         }
 
@@ -342,12 +393,12 @@ process_step::operator()() -> std::error_condition
     {
         if (m_output_fd)
         {
-            fill(m_writer->buffer(), 0.f);
+            m_writer->clear();
 
             for (unsigned i = 0; i < m_io_config.process_config.period_count;
                  ++i)
             {
-                if (auto err = m_writer->write())
+                if (auto err = m_writer->transfer())
                     return err.default_error_condition();
             }
         }
@@ -357,27 +408,28 @@ process_step::operator()() -> std::error_condition
                 return err.default_error_condition();
         }
 
-        m_reader->clear_buffer();
+        m_reader->clear();
 
         m_starting = false;
     }
 
-    auto err = m_reader->read();
+    auto err = m_reader->transfer();
 
     cpu_load_meter cpu_load_meter(
-            std::max(
-                    m_reader->buffer().minor_size(),
-                    m_writer->buffer().minor_size()),
+            m_io_config.process_config.period_size,
             m_io_config.process_config.samplerate);
 
-    m_process_function(m_reader->buffer(), m_writer->buffer());
+    m_process_function(
+            m_reader->converter(),
+            m_writer->converter(),
+            m_io_config.process_config.period_size);
 
     m_cpu_load.store(
             m_cpu_load_mean_acc(cpu_load_meter.stop()),
             std::memory_order_relaxed);
 
     if (!err)
-        err = m_writer->write();
+        err = m_writer->transfer();
 
     if (err)
     {

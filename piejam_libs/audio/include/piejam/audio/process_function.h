@@ -4,15 +4,17 @@
 
 #pragma once
 
-#include <piejam/range/fwd.h>
+#include <piejam/audio/pcm_buffer_converter.h>
 
 #include <functional>
+#include <span>
 
 namespace piejam::audio
 {
 
 using process_function = std::function<void(
-        range::table_view<float const> const& /* in */,
-        range::table_view<float> const& /* out */)>;
+        std::span<pcm_input_buffer_converter const> const& /*in*/,
+        std::span<pcm_output_buffer_converter const> const& /*out*/,
+        std::size_t /*buffer_size*/)>;
 
 } // namespace piejam::audio
