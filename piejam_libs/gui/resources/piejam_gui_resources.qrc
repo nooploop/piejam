@@ -10,7 +10,7 @@
         <file>PieJam/MixerControls/LevelMeterFader.qml</file>
         <file>PieJam/Views/Mixer.qml</file>
         <file>PieJam/Views/Power.qml</file>
-        <file>PieJam/Views/TopPane.qml</file>
+        <file>PieJam/Views/ViewPane.qml</file>
         <file>images/icons/mixer.png</file>
         <file>images/icons/settings.png</file>
         <file>images/icons/power.png</file>

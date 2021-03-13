@@ -9,7 +9,7 @@ import QtQuick.Controls.Material 2.15
 import ".."
 import "../MixerControls"
 
-TopPane {
+ViewPane {
     id: root
 
     property var model

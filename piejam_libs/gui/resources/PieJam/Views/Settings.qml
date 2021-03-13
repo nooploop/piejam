@@ -10,7 +10,7 @@ import QtQuick.Layouts 1.15
 import "../Controls"
 import "../SettingsControls"
 
-TopPane {
+ViewPane {
 
     id: root
 
