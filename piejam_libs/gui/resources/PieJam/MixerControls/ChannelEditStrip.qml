@@ -64,6 +64,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: moveButtonsRow.bottom
+            textFormat: Text.PlainText
             anchors.topMargin: 8
 
             text: qsTr("Audio In")
@@ -137,6 +138,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: audioInSelect.bottom
+            textFormat: Text.PlainText
             anchors.topMargin: 8
 
             text: qsTr("Audio Out")

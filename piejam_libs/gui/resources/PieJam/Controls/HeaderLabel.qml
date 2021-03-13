@@ -16,6 +16,7 @@ Label {
     rightPadding: 4
 
     verticalAlignment: Text.AlignVCenter
+    textFormat: Text.PlainText
     font.bold: true
     font.pixelSize: 12
 

@@ -80,6 +80,7 @@ Item {
 
             padding: 4
             verticalAlignment: Text.AlignVCenter
+            textFormat: Text.PlainText
             background: Rectangle {
                 color: Material.primaryColor
                 radius: 2

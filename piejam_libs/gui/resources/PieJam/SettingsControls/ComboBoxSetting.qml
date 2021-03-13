@@ -33,6 +33,7 @@ Item {
             anchors.left: parent.left
 
             verticalAlignment: Text.AlignVCenter
+            textFormat: Text.PlainText
             font.pixelSize: 18
         }
 
@@ -54,3 +55,9 @@ Item {
     }
 
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

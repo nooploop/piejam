@@ -39,6 +39,7 @@ Item {
         anchors.right: parent.right
 
         verticalAlignment: Text.AlignVCenter
+        textFormat: Text.PlainText
         font.bold: true
         font.pixelSize: 16
     }

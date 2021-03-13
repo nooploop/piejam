@@ -92,6 +92,7 @@ Item {
                 leftPadding: 4
                 rightPadding: 4
                 horizontalAlignment: Text.AlignRight
+                textFormat: Text.PlainText
                 text: (root.model.audioLoad * 100).toFixed(1)
             }
 
@@ -108,6 +109,7 @@ Item {
                 rightPadding: 4
                 text: "%"
                 horizontalAlignment: Text.AlignHCenter
+                textFormat: Text.PlainText
 
                 color: root.model.xruns === 0 ? "#00ff00" : "#ffff00"
 
@@ -160,6 +162,7 @@ Item {
                 font.pixelSize: 10
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
+                textFormat: Text.PlainText
                 padding: 2
             }
         }

@@ -74,6 +74,7 @@ Item {
                 radius: 2
             }
             verticalAlignment: Text.AlignVCenter
+            textFormat: Text.PlainText
             anchors.topMargin: 4
             font.pixelSize: 12
             horizontalAlignment: Text.AlignRight
@@ -118,3 +119,9 @@ Item {
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

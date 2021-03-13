@@ -35,6 +35,7 @@ Item {
 
         font.pixelSize: 11
         wrapMode: Text.WordWrap
+        textFormat: Text.PlainText
         font.bold: true
         padding: 2
         color: "#ffffff"
