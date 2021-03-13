@@ -53,5 +53,6 @@
         <file>PieJam/MixerControls/ChannelStrip.qml</file>
         <file>PieJam/MixerControls/MixerViewSettings.qml</file>
         <file>PieJam/MixerControls/qmldir</file>
+        <file>PieJam/Views/RootView.qml</file>
     </qresource>
 </RCC>
