@@ -23,9 +23,9 @@ add_bus::reduce(state const& st) const -> state
         {
             case io_direction::input:
                 return fmt::format(
-                        "{} In {}",
-                        type == audio::bus_type::mono ? "Mono" : "Stereo",
-                        st.device_io_state.inputs->size() + 1);
+                        "In {} {}",
+                        st.device_io_state.inputs->size() + 1,
+                        type == audio::bus_type::mono ? "M" : "S");
 
             case io_direction::output:
                 return fmt::format(
