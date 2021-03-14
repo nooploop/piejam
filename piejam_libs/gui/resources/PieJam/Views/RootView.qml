@@ -29,7 +29,9 @@ Item {
         ToolButton {
             id: btnMixer
 
-            icon.source: "qrc:///images/icons/mixer.png"
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/tune-vertical.svg"
             display: AbstractButton.IconOnly
 
             onClicked: { content.currentIndex = 2 }
@@ -40,7 +42,9 @@ Item {
 
             anchors.bottom: btnPower.top
 
-            icon.source: "qrc:///images/icons/settings.png"
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/cog.svg"
             display: AbstractButton.IconOnly
 
             onClicked: { content.currentIndex = 1 }
@@ -51,7 +55,9 @@ Item {
 
             anchors.bottom: parent.bottom
 
-            icon.source: "qrc:///images/icons/power.png"
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/power.svg"
             display: AbstractButton.IconOnly
 
             onClicked: { content.currentIndex = 0 }

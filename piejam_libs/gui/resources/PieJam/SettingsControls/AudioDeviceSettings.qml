@@ -129,7 +129,9 @@ Item {
             width: 72
             height: 72
 
-            icon.source: "qrc:///images/icons/ic_refresh_white_48dp.png"
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/autorenew.svg"
             display: AbstractButton.IconOnly
 
             onClicked: root.model.refreshDeviceLists()

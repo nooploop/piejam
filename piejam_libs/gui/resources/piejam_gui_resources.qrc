@@ -17,13 +17,9 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Views/Mixer.qml</file>
         <file>PieJam/Views/Power.qml</file>
         <file>PieJam/Views/ViewPane.qml</file>
-        <file>images/icons/mixer.png</file>
-        <file>images/icons/settings.png</file>
-        <file>images/icons/power.png</file>
         <file>PieJam/Controls/Color.js</file>
         <file>PieJam/Controls/Knob.qml</file>
         <file>PieJam/Controls/LabeledKnob.qml</file>
-        <file>images/icons/ic_refresh_white_48dp.png</file>
         <file>PieJam/Views/MainWindow.qml</file>
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/Util/MathExt.js</file>
@@ -59,5 +55,9 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/MixerControls/MixerViewSettings.qml</file>
         <file>PieJam/MixerControls/qmldir</file>
         <file>PieJam/Views/RootView.qml</file>
+        <file>images/icons/cog.svg</file>
+        <file>images/icons/power.svg</file>
+        <file>images/icons/tune-vertical.svg</file>
+        <file>images/icons/autorenew.svg</file>
     </qresource>
 </RCC>
