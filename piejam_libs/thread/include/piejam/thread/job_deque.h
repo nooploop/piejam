@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/math.h>
+#include <piejam/thread/cache_line_size.h>
 
 #include <array>
 #include <atomic>
@@ -108,9 +108,9 @@ public:
     }
 
 private:
-    std::atomic_size_t m_bottom{};
+    alignas(cache_line_size) std::atomic_size_t m_bottom{};
     std::array<Job*, Capacity> m_jobs{};
-    std::atomic_size_t m_top{};
+    alignas(cache_line_size) std::atomic_size_t m_top{};
 };
 
 } // namespace piejam::thread
