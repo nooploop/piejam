@@ -60,5 +60,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/tune-vertical.svg</file>
         <file>images/icons/autorenew.svg</file>
         <file>images/icons/midi-port.svg</file>
+        <file>images/icons/pencil.svg</file>
+        <file>images/icons/hand-right.svg</file>
     </qresource>
 </RCC>

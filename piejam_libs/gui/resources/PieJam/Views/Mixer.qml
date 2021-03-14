@@ -80,7 +80,11 @@ ViewPane {
 
             ButtonGroup.group: mixerViewButtonGroup
 
-            text: "P"
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/hand-right.svg"
+            display: AbstractButton.IconOnly
+
             checkable: true
             checked: MixerViewSettings.mode === MixerViewSettings.perform
             autoExclusive: true
@@ -100,7 +104,11 @@ ViewPane {
 
             ButtonGroup.group: mixerViewButtonGroup
 
-            text: "E"
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/pencil.svg"
+            display: AbstractButton.IconOnly
+
             checkable: true
             checked: MixerViewSettings.mode === MixerViewSettings.edit
             autoExclusive: true
