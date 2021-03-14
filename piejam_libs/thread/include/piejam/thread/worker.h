@@ -54,7 +54,9 @@ public:
 
     ~worker()
     {
+        m_sem_finished.acquire();
         m_thread.request_stop();
+        m_sem_finished.release();
         wakeup([]() {});
     }
 

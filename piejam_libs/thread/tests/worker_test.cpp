@@ -15,7 +15,8 @@ TEST(worker, executes_after_wakeup)
 
     worker wt;
     wt.wakeup([&]() { worked.store(true, std::memory_order_release); });
-    std::this_thread::sleep_for(std::chrono::microseconds{100});
+
+    wt.wakeup([]() {});
 
     EXPECT_TRUE(worked);
 }
@@ -36,7 +37,8 @@ TEST(worker, on_multiple_wakeups_block_until_previous_task_is_finished)
         select = !select;
     }
 
-    std::this_thread::sleep_for(std::chrono::microseconds{100});
+    wt.wakeup([]() {});
+
     EXPECT_EQ(50u, counter1);
     EXPECT_EQ(50u, counter2);
 }
