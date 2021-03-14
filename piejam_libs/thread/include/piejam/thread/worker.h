@@ -34,12 +34,14 @@ public:
 
             while (!stoken.stop_requested())
             {
-                m_sem.acquire();
+                m_sem_work.acquire();
 
                 if (stoken.stop_requested())
                     break;
 
                 m_task();
+
+                m_sem_finished.release();
             }
         })
     {
@@ -60,12 +62,14 @@ public:
     template <std::invocable<> F>
     void wakeup(F&& task)
     {
+        m_sem_finished.acquire();
         m_task = std::forward<F>(task);
-        m_sem.release();
+        m_sem_work.release();
     }
 
 private:
-    semaphore m_sem;
+    semaphore m_sem_work;
+    semaphore m_sem_finished{1};
 
     task_t m_task{[]() {}};
     std::jthread m_thread;

@@ -20,4 +20,25 @@ TEST(worker, executes_after_wakeup)
     EXPECT_TRUE(worked);
 }
 
+TEST(worker, on_multiple_wakeups_block_until_previous_task_is_finished)
+{
+    std::size_t counter1{};
+    std::size_t counter2{};
+    bool select{};
+
+    worker wt;
+    for (std::size_t i = 0; i < 100; ++i)
+    {
+        if (select)
+            wt.wakeup([&]() { ++counter1; });
+        else
+            wt.wakeup([&]() { ++counter2; });
+        select = !select;
+    }
+
+    std::this_thread::sleep_for(std::chrono::microseconds{100});
+    EXPECT_EQ(50u, counter1);
+    EXPECT_EQ(50u, counter2);
+}
+
 } // namespace piejam::thread::test
