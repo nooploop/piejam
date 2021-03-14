@@ -32,6 +32,8 @@ public:
             if (conf.priority)
                 this_thread::set_priority(*conf.priority);
 
+            m_sem_finished.release();
+
             while (!stoken.stop_requested())
             {
                 m_sem_work.acquire();
@@ -69,7 +71,7 @@ public:
 
 private:
     semaphore m_sem_work;
-    semaphore m_sem_finished{1};
+    semaphore m_sem_finished;
 
     task_t m_task{[]() {}};
     std::jthread m_thread;
