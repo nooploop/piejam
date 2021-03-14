@@ -12,6 +12,7 @@
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
+#include <piejam/audio/period_sizes.h>
 #include <piejam/npos.h>
 #include <piejam/range/indices.h>
 #include <piejam/range/iota.h>
@@ -391,6 +392,7 @@ public:
         , m_output_port_indices(audio_outputs.size())
         , m_event_inputs(to_event_ports(control_inputs))
         , m_event_outputs(to_event_ports(control_outputs))
+        , m_constant_audio_inputs(audio_inputs.size())
     {
         std::ranges::transform(
                 audio_inputs,
@@ -457,20 +459,12 @@ public:
     {
         engine::verify_process_context(*this, ctx);
 
-        BOOST_ASSERT(m_output_port_indices.size() == ctx.outputs.size());
-        for (std::size_t i : range::indices(ctx.outputs))
-        {
-            m_instance.connect_port(
-                    m_output_port_indices[i],
-                    ctx.outputs[i].data());
-            ctx.results[i] = ctx.outputs[i];
-        }
-
         BOOST_ASSERT(ctx.event_inputs.size() == m_event_inputs.size());
         for (std::size_t i : range::indices(ctx.event_inputs))
             m_control_inputs[i].initialize(ctx.event_inputs, i);
 
         BOOST_ASSERT(m_input_port_indices.size() == ctx.inputs.size());
+        BOOST_ASSERT(m_output_port_indices.size() == ctx.outputs.size());
 
         std::size_t offset{};
         while (offset < ctx.buffer_size)
@@ -485,19 +479,36 @@ public:
 
             if (offset < min_offset)
             {
+                auto const slice_size = min_offset - offset;
+
                 for (std::size_t i : range::indices(ctx.inputs))
                 {
-                    auto sub = audio::engine::subslice(
-                            ctx.inputs[i].get(),
-                            offset,
-                            min_offset - offset);
+                    auto sub =
+                            subslice(ctx.inputs[i].get(), offset, slice_size);
+
+                    if (sub.is_constant())
+                    {
+                        std::ranges::fill_n(
+                                m_constant_audio_inputs[i].begin(),
+                                slice_size,
+                                sub.constant());
+                        sub = audio::engine::audio_slice(std::span(
+                                m_constant_audio_inputs[i].data(),
+                                slice_size));
+                    }
 
                     m_instance.connect_port(
                             m_input_port_indices[i],
                             const_cast<LADSPA_Data*>(sub.buffer().data()));
                 }
 
-                m_instance.run(static_cast<unsigned long>(min_offset - offset));
+                for (std::size_t i : range::indices(ctx.outputs))
+                {
+                    auto sub = ctx.outputs[i].data() + offset;
+                    m_instance.connect_port(m_output_port_indices[i], sub);
+                }
+
+                m_instance.run(static_cast<unsigned long>(slice_size));
             }
 
             for (control_input& ci : m_control_inputs)
@@ -508,6 +519,8 @@ public:
 
             offset = min_offset;
         }
+
+        std::ranges::copy(ctx.outputs, ctx.results.begin());
     }
 
 private:
@@ -517,6 +530,7 @@ private:
     std::vector<unsigned long> m_output_port_indices{};
     std::vector<engine::event_port> m_event_inputs;
     std::vector<engine::event_port> m_event_outputs;
+    std::vector<std::array<float, max_period_size>> m_constant_audio_inputs;
     std::vector<control_input> m_control_inputs;
     std::vector<float> m_control_outputs;
 };
