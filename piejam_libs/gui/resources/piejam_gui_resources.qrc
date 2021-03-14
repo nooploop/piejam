@@ -24,7 +24,6 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Controls/Knob.qml</file>
         <file>PieJam/Controls/LabeledKnob.qml</file>
         <file>images/icons/ic_refresh_white_48dp.png</file>
-        <file>images/icons/ic_info_outline_white_18dp.png</file>
         <file>PieJam/Views/MainWindow.qml</file>
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/Util/MathExt.js</file>
