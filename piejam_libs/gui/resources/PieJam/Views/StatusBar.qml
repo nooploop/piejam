@@ -54,10 +54,14 @@ Item {
             width: 38
 
             anchors.right: readoutLabel.left
-            checkable: true
             anchors.rightMargin: 6
 
-            text: qsTr("M")
+            checkable: true
+
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/midi-port.svg"
+            display: AbstractButton.IconOnly
 
             Binding {
                 target: MidiLearn
