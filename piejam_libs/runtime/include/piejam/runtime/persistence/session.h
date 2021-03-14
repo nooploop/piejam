@@ -11,7 +11,7 @@
 #include <piejam/runtime/persistence/fx_midi_assignments.h>
 #include <piejam/runtime/persistence/fx_preset.h>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include <iosfwd>
 #include <optional>

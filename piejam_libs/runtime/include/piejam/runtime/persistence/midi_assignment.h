@@ -6,7 +6,7 @@
 
 #include <piejam/runtime/fwd.h>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 #include <vector>
 

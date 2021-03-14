@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/fx/parameter_assignment.h>
 
+#include <nlohmann/json.hpp>
+
 namespace piejam::runtime::fx
 {
 

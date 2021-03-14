@@ -8,6 +8,8 @@
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/persistence/midi_assignment.h>
 
+#include <nlohmann/json.hpp>
+
 namespace piejam::runtime::fx
 {
 

@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/midi_assignment.h>
 
+#include <nlohmann/json.hpp>
+
 namespace piejam::runtime
 {
 
