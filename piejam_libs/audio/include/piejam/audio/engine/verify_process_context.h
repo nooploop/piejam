@@ -12,6 +12,9 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
 
+#include <xsimd/config/xsimd_align.hpp>
+
+#include <boost/align/is_aligned.hpp>
 #include <boost/assert.hpp>
 #include <boost/core/ignore_unused.hpp>
 
@@ -29,11 +32,17 @@ verify_process_context(processor const& proc, process_context const& ctx)
     BOOST_ASSERT(proc.event_inputs().size() == ctx.event_inputs.size());
     BOOST_ASSERT(proc.event_outputs().size() == ctx.event_outputs.size());
     BOOST_ASSERT(std::ranges::all_of(ctx.inputs, [&](audio_slice const& b) {
-        return b.is_constant() || b.buffer().size() == ctx.buffer_size;
+        return b.is_constant() || (b.buffer().size() == ctx.buffer_size &&
+                                   boost::alignment::is_aligned(
+                                           b.buffer().data(),
+                                           XSIMD_DEFAULT_ALIGNMENT));
     }));
     BOOST_ASSERT(
             std::ranges::all_of(ctx.outputs, [&](std::span<float> const& b) {
-                return b.data() && b.size() == ctx.buffer_size;
+                return b.data() && (b.size() == ctx.buffer_size &&
+                                    boost::alignment::is_aligned(
+                                            b.data(),
+                                            XSIMD_DEFAULT_ALIGNMENT));
             }));
     BOOST_ASSERT(std::ranges::equal(
             proc.event_inputs(),

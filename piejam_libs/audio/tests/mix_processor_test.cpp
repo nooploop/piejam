@@ -11,6 +11,8 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
 
+#include <xsimd/config/xsimd_align.hpp>
+
 #include <gtest/gtest.h>
 
 #include <array>
@@ -100,7 +102,7 @@ TEST(mix_processor, mix_two_silence_channels)
     audio_slice const silence;
 
     std::vector<std::reference_wrapper<audio_slice const>> in(2, silence);
-    std::array out_buf{0.f};
+    alignas(XSIMD_DEFAULT_ALIGNMENT) std::array out_buf{0.f};
     std::vector<std::span<float>> out = {out_buf};
     std::vector<audio_slice> result{out[0]};
 
@@ -116,13 +118,13 @@ TEST(mix_processor, mix_one_silence_one_non_silence_channel)
     auto sut = make_mix_processor(2);
 
     audio_slice const silence;
-    std::array in_buf{0.23f};
+    alignas(XSIMD_DEFAULT_ALIGNMENT) std::array in_buf{0.23f};
     audio_slice in_buf_span(in_buf);
 
     std::vector<std::reference_wrapper<audio_slice const>> in{
             silence,
             in_buf_span};
-    std::array out_buf{0.f};
+    alignas(XSIMD_DEFAULT_ALIGNMENT) std::array out_buf{0.f};
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 
@@ -166,13 +168,13 @@ TEST(mix_processor, mix_two_silence_one_non_silence_channel)
     auto sut = make_mix_processor(3);
 
     audio_slice const silence;
-    std::array in_buf{0.23f};
+    alignas(XSIMD_DEFAULT_ALIGNMENT) std::array in_buf{0.23f};
     audio_slice in_buf_span(in_buf);
     std::vector<std::reference_wrapper<audio_slice const>> in{
             silence,
             silence,
             in_buf_span};
-    std::array out_buf{0.f};
+    alignas(XSIMD_DEFAULT_ALIGNMENT) std::array out_buf{0.f};
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 

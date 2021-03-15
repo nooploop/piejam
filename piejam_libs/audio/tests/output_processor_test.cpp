@@ -29,7 +29,7 @@ TEST(output_processor, input_table_is_propagated_to_outputs)
             });
     sut.set_output(converter);
 
-    std::array<float, 2> in_buf{0.23f, 0.58f};
+    alignas(XSIMD_DEFAULT_ALIGNMENT) std::array<float, 2> in_buf{0.23f, 0.58f};
     std::vector<audio_slice> in_spans{in_buf};
     std::vector<std::reference_wrapper<audio_slice const>> inputs{
             in_spans.begin(),
