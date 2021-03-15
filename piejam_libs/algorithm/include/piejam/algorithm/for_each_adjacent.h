@@ -11,7 +11,7 @@ namespace piejam::algorithm
 {
 
 template <class Range, class BinaryOp>
-void
+constexpr void
 for_each_adjacent(Range&& rng, BinaryOp&& op)
 {
     auto first = std::begin(rng);

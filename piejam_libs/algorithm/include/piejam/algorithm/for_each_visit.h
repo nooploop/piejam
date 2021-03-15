@@ -10,7 +10,7 @@ namespace piejam::algorithm
 {
 
 template <class Range, class Visitor>
-void
+constexpr void
 for_each_visit(Range&& rng, Visitor&& v)
 {
     for (auto&& var : std::forward<Range>(rng))

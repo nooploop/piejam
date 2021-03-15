@@ -12,7 +12,7 @@ namespace piejam::algorithm
 {
 
 template <class Range, class T>
-auto
+constexpr auto
 find_or_get_first(Range const& rng, T&& value)
 {
     auto first = std::begin(rng);
