@@ -40,7 +40,7 @@ public:
 
     void clear_event_output_buffers();
 
-    void operator()(thread_context const&, std::size_t buffer_size);
+    void operator()(thread_context const&);
 
 private:
     processor& m_proc;

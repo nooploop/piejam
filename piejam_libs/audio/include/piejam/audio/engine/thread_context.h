@@ -12,6 +12,7 @@ namespace piejam::audio::engine
 struct thread_context
 {
     std::pmr::memory_resource* event_memory{std::pmr::get_default_resource()};
+    std::size_t buffer_size{};
 };
 
 } // namespace piejam::audio::engine

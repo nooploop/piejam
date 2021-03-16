@@ -81,11 +81,10 @@ processor_job::clear_event_output_buffers()
 }
 
 void
-processor_job::operator()(
-        thread_context const& ctx,
-        std::size_t const buffer_size)
+processor_job::operator()(thread_context const& ctx)
 {
     // set output buffer sizes
+    auto const buffer_size = ctx.buffer_size;
     if (m_process_context.buffer_size != buffer_size)
     {
         for (std::span<float>& out : m_outputs)

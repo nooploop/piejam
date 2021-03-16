@@ -21,8 +21,7 @@ class dag
 {
 public:
     using task_id_t = std::size_t;
-    using task_t =
-            std::function<void(thread_context const&, std::size_t buffer_size)>;
+    using task_t = std::function<void(thread_context const&)>;
     using tasks_t = std::vector<std::pair<task_id_t, task_t>>;
     using graph_t = std::unordered_map<task_id_t, std::vector<task_id_t>>;
 

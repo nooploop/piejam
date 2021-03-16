@@ -108,6 +108,8 @@ public:
             }
         }
 
+        m_thread_context.buffer_size = buffer_size;
+
         while (!m_run_queue.empty())
         {
             node* const nd = m_run_queue.back();
@@ -116,7 +118,7 @@ public:
             BOOST_ASSERT(
                     nd->parents_to_process.load(std::memory_order_relaxed) ==
                     0);
-            nd->task(m_thread_context, buffer_size);
+            nd->task(m_thread_context);
 
             for (node& child : nd->children)
             {
@@ -237,7 +239,7 @@ private:
 
         void operator()()
         {
-            std::size_t const buffer_size =
+            m_thread_context.buffer_size =
                     m_buffer_size.load(std::memory_order_consume);
 
             auto& worker_queue = m_run_queues[m_worker_index];
@@ -250,7 +252,7 @@ private:
                 if (node* n = worker_queue.pop())
                 {
                     while (n)
-                        n = process_node(*n, buffer_size);
+                        n = process_node(*n);
                 }
                 else
                 {
@@ -262,7 +264,7 @@ private:
                         if (node* n = m_run_queues[steal_index].steal())
                         {
                             while (n)
-                                n = process_node(*n, buffer_size);
+                                n = process_node(*n);
                             break;
                         }
                     }
@@ -273,13 +275,13 @@ private:
         }
 
     private:
-        auto process_node(node& n, std::size_t const buffer_size) -> node*
+        auto process_node(node& n) -> node*
         {
             job_deque_t& run_queue = m_run_queues[m_worker_index];
 
             BOOST_ASSERT(n.parents_to_process == 0);
 
-            n.task(m_thread_context, buffer_size);
+            n.task(m_thread_context);
 
             m_nodes_to_process.fetch_sub(1, std::memory_order_acq_rel);
 
@@ -355,7 +357,7 @@ private:
     }
 
     std::atomic_size_t m_nodes_to_process{};
-    std::vector<std::vector<node*>> m_initial_tasks;
+    std::vector<std::vector<node*>> const m_initial_tasks;
     std::vector<job_deque_t> m_run_queues;
     dag_worker m_main_worker;
     std::span<thread::worker> m_worker_threads;

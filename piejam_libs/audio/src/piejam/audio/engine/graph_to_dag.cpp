@@ -45,11 +45,8 @@ graph_to_dag(graph const& g) -> dag
     auto add_job = [&](graph_endpoint const& e) {
         auto job = std::make_shared<processor_job>(e.proc);
         auto job_ptr = job.get();
-        auto id = result.add_task([j = std::move(job)](
-                                          thread_context const& ctx,
-                                          std::size_t const buffer_size) {
-            (*j)(ctx, buffer_size);
-        });
+        auto id = result.add_task(
+                [j = std::move(job)](thread_context const& ctx) { (*j)(ctx); });
         processor_job_mapping.emplace(e.proc, std::pair(id, job_ptr));
         if (!e.proc.get().event_outputs().empty())
             clear_event_buffer_jobs.push_back(job_ptr);
@@ -124,8 +121,7 @@ graph_to_dag(graph const& g) -> dag
 
         auto clear_job_id =
                 result.add_task([jobs = std::move(clear_event_buffer_jobs)](
-                                        thread_context const&,
-                                        std::size_t) {
+                                        thread_context const&) {
                     for (auto job : jobs)
                         job->clear_event_output_buffers();
                 });
