@@ -134,8 +134,9 @@ main(int argc, char* argv[]) -> int
                                    auto&& get_state,
                                    auto&& dispatch,
                                    auto&& next) {
-        thread::configuration const audio_thread_config{2, 96};
-        std::array const worker_thread_configs{thread::configuration{3, 96}};
+        thread::configuration const audio_thread_config{2, 96, "audio_main"};
+        std::array const worker_thread_configs{
+                thread::configuration{3, 96, "audio_worker_0"}};
         return redux::make_middleware<runtime::audio_engine_middleware>(
                 runtime::middleware_functors(
                         std::forward<decltype(get_state)>(get_state),

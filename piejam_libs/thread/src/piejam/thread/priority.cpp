@@ -7,9 +7,7 @@
 #include <pthread.h>
 #include <sched.h>
 
-#include <cstring>
-#include <stdexcept>
-#include <thread>
+#include <system_error>
 
 namespace piejam::this_thread
 {
@@ -20,7 +18,7 @@ set_priority(int prio)
     sched_param const parm{.sched_priority = prio};
     int const status = pthread_setschedparam(pthread_self(), SCHED_FIFO, &parm);
     if (status)
-        throw std::runtime_error(std::strerror(status));
+        throw std::system_error(status, std::generic_category());
 }
 
 } // namespace piejam::this_thread

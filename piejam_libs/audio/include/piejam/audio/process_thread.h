@@ -4,9 +4,7 @@
 
 #pragma once
 
-#include <piejam/thread/affinity.h>
 #include <piejam/thread/configuration.h>
-#include <piejam/thread/priority.h>
 #include <piejam/type_traits.h>
 
 #include <spdlog/spdlog.h>
@@ -45,10 +43,7 @@ public:
                 [this,
                  conf,
                  fprocess = std::forward<Process>(process)]() mutable {
-                    if (conf.affinity)
-                        this_thread::set_affinity(*conf.affinity);
-                    if (conf.priority)
-                        this_thread::set_priority(*conf.priority);
+                    conf.apply();
 
                     while (m_running.load(std::memory_order_relaxed))
                     {

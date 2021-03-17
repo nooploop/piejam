@@ -4,9 +4,7 @@
 
 #pragma once
 
-#include <piejam/thread/affinity.h>
 #include <piejam/thread/configuration.h>
-#include <piejam/thread/priority.h>
 #include <piejam/thread/semaphore.h>
 
 #include <atomic>
@@ -27,10 +25,7 @@ public:
 
     worker(thread::configuration conf = {})
         : m_thread([this, conf = std::move(conf)](std::stop_token stoken) {
-            if (conf.affinity)
-                this_thread::set_affinity(*conf.affinity);
-            if (conf.priority)
-                this_thread::set_priority(*conf.priority);
+            conf.apply();
 
             m_sem_finished.release();
 

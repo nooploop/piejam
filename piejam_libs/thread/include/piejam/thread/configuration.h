@@ -5,6 +5,7 @@
 #pragma once
 
 #include <optional>
+#include <string>
 
 namespace piejam::thread
 {
@@ -13,6 +14,9 @@ struct configuration
 {
     std::optional<int> affinity;
     std::optional<int> priority;
+    std::optional<std::string> name;
+
+    void apply() const;
 };
 
-} // namespace piejam::audio::engine
+} // namespace piejam::thread
