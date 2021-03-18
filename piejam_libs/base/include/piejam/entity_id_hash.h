@@ -11,10 +11,11 @@
 namespace std
 {
 
- template <class EntityTag>
- struct hash<piejam::entity_id<EntityTag>>
+template <class EntityTag>
+struct hash<piejam::entity_id<EntityTag>>
 {
-    auto operator()(piejam::entity_id<EntityTag> const& e) const noexcept
+    constexpr auto
+    operator()(piejam::entity_id<EntityTag> const& e) const noexcept
             -> std::size_t
     {
         return std::hash<std::size_t>{}(e.m_id);
