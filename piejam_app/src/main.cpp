@@ -112,15 +112,6 @@ main(int argc, char* argv[]) -> int
             [](auto const& st, auto const& a) { return a.reduce(st); },
             runtime::make_initial_state());
 
-    store.apply_middleware([](auto&& /*get_state*/,
-                              auto&& /*dispatch*/,
-                              auto&& next) {
-        return redux::make_middleware<
-                piejam::runtime::ui::action_tracker_middleware<runtime::state>>(
-                std::forward<decltype(next)>(next),
-                "reduce_time");
-    });
-
     store.apply_middleware([](auto&& get_state, auto&& dispatch, auto&& next) {
         return redux::make_middleware<piejam::runtime::persistence_middleware>(
                 std::forward<decltype(get_state)>(get_state),
