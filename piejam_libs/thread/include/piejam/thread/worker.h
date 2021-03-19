@@ -52,18 +52,23 @@ public:
         m_sem_finished.acquire();
         m_thread.request_stop();
         m_sem_finished.release();
-        wakeup([]() {});
+        m_sem_work.release();
     }
 
     auto operator=(worker const&) -> worker& = delete;
     auto operator=(worker&&) -> worker& = delete;
 
     template <std::invocable<> F>
-    void wakeup(F&& task)
+    bool wakeup(F&& task) noexcept
     {
-        m_sem_finished.acquire();
-        m_task = std::forward<F>(task);
-        m_sem_work.release();
+        if (m_sem_finished.try_acquire())
+        {
+            m_task = std::forward<F>(task);
+            m_sem_work.release();
+            return true;
+        }
+
+        return false;
     }
 
 private:

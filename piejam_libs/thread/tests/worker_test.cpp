@@ -13,10 +13,12 @@ TEST(worker, executes_after_wakeup)
 {
     std::atomic_bool worked{false};
 
-    worker wt;
-    wt.wakeup([&]() { worked.store(true, std::memory_order_release); });
-
-    wt.wakeup([]() {}); // block until we finished with the previous task
+    {
+        worker wt;
+        while (!wt.wakeup(
+                [&]() { worked.store(true, std::memory_order_release); }))
+            ;
+    }
 
     EXPECT_TRUE(worked);
 }
@@ -27,17 +29,19 @@ TEST(worker, on_multiple_wakeups_block_until_previous_task_is_finished)
     std::size_t counter2{};
     bool select{};
 
-    worker wt;
-    for (std::size_t i = 0; i < 100; ++i)
     {
-        if (select)
-            wt.wakeup([&]() { ++counter1; });
-        else
-            wt.wakeup([&]() { ++counter2; });
-        select = !select;
+        worker wt;
+        for (std::size_t i = 0; i < 100; ++i)
+        {
+            if (select)
+                while (!wt.wakeup([&]() { ++counter1; }))
+                    ;
+            else
+                while (!wt.wakeup([&]() { ++counter2; }))
+                    ;
+            select = !select;
+        }
     }
-
-    wt.wakeup([]() {}); // block until we finished previous tasks
 
     EXPECT_EQ(50u, counter1);
     EXPECT_EQ(50u, counter2);

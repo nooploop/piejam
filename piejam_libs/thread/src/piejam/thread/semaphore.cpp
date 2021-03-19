@@ -6,7 +6,9 @@
 
 #include <semaphore.h>
 
-#include <cassert>
+#include <boost/assert.hpp>
+#include <boost/core/ignore_unused.hpp>
+
 #include <system_error>
 
 namespace piejam::thread
@@ -39,16 +41,23 @@ semaphore::~semaphore()
 }
 
 void
-semaphore::acquire()
+semaphore::acquire() noexcept
 {
-    assert(m_impl);
+    BOOST_ASSERT(m_impl);
     ::sem_wait(&m_impl->sem);
 }
 
-void
-semaphore::release()
+bool
+semaphore::try_acquire() noexcept
 {
-    assert(m_impl);
+    BOOST_ASSERT(m_impl);
+    return 0 == ::sem_trywait(&m_impl->sem);
+}
+
+void
+semaphore::release() noexcept
+{
+    BOOST_ASSERT(m_impl);
     ::sem_post(&m_impl->sem);
 }
 

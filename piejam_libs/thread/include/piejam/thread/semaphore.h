@@ -23,9 +23,10 @@ public:
     auto operator=(semaphore const&) -> semaphore& = delete;
     auto operator=(semaphore&& other) noexcept -> semaphore& = default;
 
-    void acquire();
+    void acquire() noexcept;
+    bool try_acquire() noexcept;
 
-    void release();
+    void release() noexcept;
 
 private:
     struct impl;
