@@ -189,6 +189,11 @@ public:
         for (auto&& [id, n] : m_nodes)
             init_node_for_process(n);
 
+        BOOST_ASSERT(m_initial_tasks.size() == m_run_queues.size());
+        for (std::size_t const i : range::indices(m_initial_tasks))
+            for (node* const n : m_initial_tasks[i])
+                m_run_queues[i].push(n);
+
         BOOST_ASSERT(m_worker_tasks.size() == m_worker_threads.size());
         for (std::size_t const w : range::indices(m_worker_threads))
         {
@@ -243,9 +248,6 @@ private:
                     m_buffer_size.load(std::memory_order_consume);
 
             auto& worker_queue = m_run_queues[m_worker_index];
-
-            for (node* const n : m_initial_tasks)
-                worker_queue.push(n);
 
             while (m_nodes_to_process.load(std::memory_order_relaxed))
             {
