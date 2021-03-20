@@ -607,10 +607,10 @@ make_io_processors(std::size_t num_channels)
 
 struct audio_engine::impl
 {
-    impl(std::span<thread::configuration const> const& wt_configs,
+    impl(std::span<thread::worker> const& workers,
          std::size_t num_device_input_channels,
          std::size_t num_device_output_channels)
-        : worker_threads(wt_configs.begin(), wt_configs.end())
+        : worker_threads(workers)
         , input_procs(make_io_processors<audio::engine::input_processor>(
                   num_device_input_channels))
         , output_procs(make_io_processors<audio::engine::output_processor>(
@@ -621,7 +621,7 @@ struct audio_engine::impl
     }
 
     audio::engine::process process;
-    std::vector<thread::worker> worker_threads;
+    std::span<thread::worker> worker_threads;
 
     std::vector<audio::engine::input_processor> input_procs;
     std::vector<audio::engine::output_processor> output_procs;
@@ -639,13 +639,13 @@ struct audio_engine::impl
 };
 
 audio_engine::audio_engine(
-        std::span<thread::configuration const> const& wt_configs,
+        std::span<thread::worker> const& workers,
         audio::samplerate_t const samplerate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels)
     : m_samplerate(samplerate)
     , m_impl(std::make_unique<impl>(
-              wt_configs,
+              workers,
               num_device_input_channels,
               num_device_output_channels))
 {

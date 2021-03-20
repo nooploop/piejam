@@ -29,7 +29,7 @@ class audio_engine
 {
 public:
     audio_engine(
-            std::span<thread::configuration const> const& wt_configs,
+            std::span<thread::worker> const& workers,
             audio::samplerate_t,
             unsigned num_device_input_channels,
             unsigned num_device_output_channels);

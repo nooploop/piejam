@@ -43,6 +43,7 @@
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/batch_action.h>
+#include <piejam/thread/worker.h>
 #include <piejam/tuple_element_compare.h>
 
 #include <spdlog/spdlog.h>
@@ -161,7 +162,7 @@ audio_engine_middleware::audio_engine_middleware(
         std::unique_ptr<midi_input_controller> midi_controller)
     : middleware_functors(std::move(mw_fs))
     , m_audio_thread_config(audio_thread_config)
-    , m_wt_configs(wt_configs.begin(), wt_configs.end())
+    , m_workers(wt_configs.begin(), wt_configs.end())
     , m_device_manager(device_manager)
     , m_ladspa_fx_processor_factory(std::move(ladspa_fx_processor_factory))
     , m_midi_controller(
@@ -525,7 +526,7 @@ audio_engine_middleware::start_engine()
         auto const& state = get_state();
 
         m_engine = std::make_unique<audio_engine>(
-                m_wt_configs,
+                m_workers,
                 state.samplerate,
                 state.input.hw_params->num_channels,
                 state.output.hw_params->num_channels);

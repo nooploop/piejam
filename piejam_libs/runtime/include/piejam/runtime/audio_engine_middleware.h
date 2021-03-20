@@ -10,6 +10,7 @@
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
 #include <piejam/runtime/middleware_functors.h>
 #include <piejam/thread/configuration.h>
+#include <piejam/thread/fwd.h>
 
 #include <functional>
 #include <memory>
@@ -51,7 +52,7 @@ private:
     void rebuild();
 
     thread::configuration m_audio_thread_config;
-    std::vector<thread::configuration> m_wt_configs;
+    std::vector<thread::worker> m_workers;
 
     audio::device_manager& m_device_manager;
     fx::ladspa_processor_factory m_ladspa_fx_processor_factory;
