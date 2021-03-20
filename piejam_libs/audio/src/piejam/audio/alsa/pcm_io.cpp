@@ -57,9 +57,6 @@ open_pcm(
         if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_SW_PARAMS, sw_params))
             throw std::system_error(err);
 
-        if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_PREPARE))
-            throw std::system_error(err);
-
         return fd;
     }
 

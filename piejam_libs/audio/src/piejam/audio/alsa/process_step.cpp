@@ -419,6 +419,11 @@ process_step::operator()() -> std::error_condition
 {
     if (m_starting)
     {
+        system::device& fd = m_input_fd ? m_input_fd : m_output_fd;
+
+        if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_PREPARE))
+            return err.default_error_condition();
+
         if (m_output_fd)
         {
             m_writer->clear();
@@ -460,11 +465,6 @@ process_step::operator()() -> std::error_condition
     {
         if (err == std::make_error_code(std::errc::broken_pipe))
         {
-            system::device& fd = m_input_fd ? m_input_fd : m_output_fd;
-
-            if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_PREPARE))
-                return err.default_error_condition();
-
             m_starting = true;
             ++m_xruns;
         }
