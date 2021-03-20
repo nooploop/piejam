@@ -68,6 +68,8 @@ config_file_path(piejam::runtime::locations const& locs)
     return locs.config_dir / "piejam.config";
 }
 
+constexpr int realtime_priority = 96;
+
 auto
 main(int argc, char* argv[]) -> int
 {
@@ -125,9 +127,15 @@ main(int argc, char* argv[]) -> int
                                    auto&& get_state,
                                    auto&& dispatch,
                                    auto&& next) {
-        thread::configuration const audio_thread_config{2, 96, "audio_main"};
+        thread::configuration const audio_thread_config{
+                2,
+                realtime_priority,
+                "audio_main"};
         std::array const worker_thread_configs{
-                thread::configuration{3, 96, "audio_worker_0"}};
+                thread::configuration{3, realtime_priority, "audio_worker_0"},
+                thread::configuration{0, realtime_priority, "audio_worker_1"},
+                thread::configuration{1, realtime_priority, "audio_worker_2"},
+        };
         return redux::make_middleware<runtime::audio_engine_middleware>(
                 runtime::middleware_functors(
                         std::forward<decltype(get_state)>(get_state),
