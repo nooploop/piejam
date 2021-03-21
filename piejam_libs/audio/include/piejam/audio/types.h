@@ -9,6 +9,7 @@ namespace piejam::audio
 
 using samplerate_t = unsigned;
 using period_size_t = unsigned;
+using period_count_t = unsigned;
 
 enum class bus_type : bool
 {

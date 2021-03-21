@@ -21,6 +21,7 @@ public:
     virtual void selectOutputDevice(unsigned index) override;
     virtual void selectSamplerate(unsigned index) override;
     virtual void selectPeriodSize(unsigned index) override;
+    virtual void selectPeriodCount(unsigned index) override;
 
 private:
     void onSubscribe() override;

@@ -38,6 +38,19 @@ const selector<period_size> select_period_size(
                     st.period_size};
         });
 
+const selector<period_count> select_period_count(
+        [get = memo(boxify_result(&runtime::period_counts))](state const& st)
+                -> period_count {
+            return {get(st.input.hw_params, st.output.hw_params),
+                    st.period_count};
+        });
+
+const selector<float> select_buffer_latency([](state const& st) {
+    return st.samplerate
+                   ? (st.period_size * st.period_count * 1000.f) / st.samplerate
+                   : 0.f;
+});
+
 const selector<input_devices>
         select_input_devices([](state const& st) -> input_devices {
             return {st.pcm_devices, st.input.index};

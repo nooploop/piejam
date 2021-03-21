@@ -125,6 +125,22 @@ period_sizes_from_state(state const& state) -> audio::period_sizes_t
     return period_sizes(state.input.hw_params, state.output.hw_params);
 }
 
+auto
+period_counts(
+        box<audio::pcm_hw_params> input_hw_params,
+        box<audio::pcm_hw_params> output_hw_params) -> audio::period_counts_t
+{
+    return set_intersection(
+            input_hw_params->period_counts,
+            output_hw_params->period_counts);
+}
+
+auto
+period_counts_from_state(state const& state) -> audio::period_counts_t
+{
+    return period_counts(state.input.hw_params, state.output.hw_params);
+}
+
 static auto
 make_fx_gain(
         fx::modules_t& fx_modules,

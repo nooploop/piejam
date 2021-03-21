@@ -6,15 +6,16 @@
 
 #include <piejam/runtime/state.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::actions
 {
 
 auto
 select_period_size::reduce(state const& st) const -> state
 {
-    auto new_st = st;
-    new_st.period_size = period_sizes_from_state(st)[index];
-    return new_st;
+    BOOST_ASSERT_MSG(false, "not reducible");
+    return st;
 }
 
 } // namespace piejam::runtime::actions

@@ -223,8 +223,10 @@ pcm_to_alsa_format(pcm_format pf) -> unsigned
 }
 
 auto
-get_hw_params(pcm_descriptor const& pcm, samplerate_t const* samplerate)
-        -> pcm_hw_params
+get_hw_params(
+        pcm_descriptor const& pcm,
+        samplerate_t const* const samplerate,
+        period_size_t const* const period_size) -> pcm_hw_params
 {
     pcm_hw_params result;
 
@@ -293,10 +295,20 @@ get_hw_params(pcm_descriptor const& pcm, samplerate_t const* samplerate)
             std::back_inserter(result.period_sizes),
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIOD_SIZE));
 
-    snd_interval const& period_count =
-            get_interval(hw_params, SNDRV_PCM_HW_PARAM_PERIODS);
-    result.period_count_min = period_count.min;
-    result.period_count_max = period_count.max;
+    if (period_size)
+    {
+        BOOST_ASSERT(algorithm::contains(result.period_sizes, *period_size));
+        set_interval_value(
+                hw_params,
+                SNDRV_PCM_HW_PARAM_PERIOD_SIZE,
+                *period_size);
+    }
+
+    BOOST_ASSERT(result.period_counts.empty());
+    std::ranges::copy_if(
+            preferred_period_counts,
+            std::back_inserter(result.period_counts),
+            test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIODS));
 
     return result;
 }

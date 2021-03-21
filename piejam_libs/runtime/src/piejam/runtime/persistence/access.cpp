@@ -70,6 +70,7 @@ save_app_config(
                         : std::string();
         conf.samplerate = state.samplerate;
         conf.period_size = state.period_size;
+        conf.period_count = state.period_count;
 
         auto const buses_to_bus_configs =
                 [](auto const& chs, auto const& ch_ids, auto& configs) {

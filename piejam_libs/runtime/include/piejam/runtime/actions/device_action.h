@@ -17,6 +17,7 @@ struct device_action_visitor
               initiate_device_selection,
               select_samplerate,
               select_period_size,
+              select_period_count,
               activate_midi_device,
               deactivate_midi_device>
 {

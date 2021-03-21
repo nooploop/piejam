@@ -48,6 +48,7 @@ struct state
 
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
+    audio::period_count_t period_count{};
 
     device_io::state device_io_state;
 
@@ -85,6 +86,11 @@ auto period_sizes(
         box<audio::pcm_hw_params> input_hw_params,
         box<audio::pcm_hw_params> output_hw_params) -> audio::period_sizes_t;
 auto period_sizes_from_state(state const&) -> audio::period_sizes_t;
+
+auto period_counts(
+        box<audio::pcm_hw_params> input_hw_params,
+        box<audio::pcm_hw_params> output_hw_params) -> audio::period_counts_t;
+auto period_counts_from_state(state const&) -> audio::period_counts_t;
 
 auto add_device_bus(
         state&,

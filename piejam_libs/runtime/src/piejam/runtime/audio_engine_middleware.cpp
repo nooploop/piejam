@@ -32,6 +32,7 @@
 #include <piejam/runtime/actions/move_fx_module.h>
 #include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
+#include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
@@ -74,6 +75,7 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
 
     audio::samplerate_t samplerate{};
     audio::period_size_t period_size{};
+    audio::period_count_t period_count{};
 
     auto reduce(state const& st) const -> state override
     {
@@ -84,6 +86,7 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
         new_st.output = output;
         new_st.samplerate = samplerate;
         new_st.period_size = period_size;
+        new_st.period_count = period_count;
 
         new_st.device_io_state.buses.update(
                 *st.device_io_state.inputs,
@@ -120,36 +123,6 @@ struct update_info final : ui::cloneable_action<update_info, action>
         return new_st;
     }
 };
-
-static auto
-period_count(state const& state) -> unsigned
-{
-    constexpr unsigned default_period_count = 2u;
-    unsigned min_period_count{};
-    unsigned max_period_count{};
-
-    if (state.input.index && state.output.index)
-    {
-        min_period_count = std::max(
-                state.input.hw_params->period_count_min,
-                state.output.hw_params->period_count_min);
-        max_period_count = std::min(
-                state.input.hw_params->period_count_max,
-                state.output.hw_params->period_count_max);
-    }
-    else if (state.input.index)
-    {
-        min_period_count = state.input.hw_params->period_count_min;
-        max_period_count = state.input.hw_params->period_count_max;
-    }
-    else
-    {
-        min_period_count = state.output.hw_params->period_count_min;
-        max_period_count = state.output.hw_params->period_count_max;
-    }
-
-    return std::clamp(default_period_count, min_period_count, max_period_count);
-}
 
 } // namespace
 
@@ -214,10 +187,11 @@ make_update_devices_action(
         audio::device_manager& device_manager,
         box<audio::pcm_io_descriptors> new_devices,
         box<audio::pcm_io_descriptors> current_devices,
-        std::size_t input_index,
-        std::size_t output_index,
-        audio::samplerate_t samplerate,
-        audio::period_size_t period_size) -> update_devices
+        std::size_t const input_index,
+        std::size_t const output_index,
+        audio::samplerate_t const samplerate,
+        audio::period_size_t const period_size,
+        audio::period_count_t const period_count) -> update_devices
 {
     update_devices next_action;
     next_action.pcm_devices = new_devices;
@@ -235,6 +209,7 @@ make_update_devices_action(
                 .hw_params = found_index != npos
                                      ? device_manager.hw_params(
                                                new_devices[found_index],
+                                               nullptr,
                                                nullptr)
                                      : audio::pcm_hw_params{}};
     };
@@ -271,10 +246,12 @@ make_update_devices_action(
     {
         next_action.input.hw_params = device_manager.hw_params(
                 new_devices->inputs[next_action.input.index],
-                &next_action.samplerate);
+                &next_action.samplerate,
+                nullptr);
         next_action.output.hw_params = device_manager.hw_params(
                 new_devices->outputs[next_action.output.index],
-                &next_action.samplerate);
+                &next_action.samplerate,
+                nullptr);
     }
 
     next_action.period_size = next_value(
@@ -282,6 +259,24 @@ make_update_devices_action(
             next_action.output.hw_params,
             &period_sizes,
             period_size);
+
+    if (next_action.period_size != 0)
+    {
+        next_action.input.hw_params = device_manager.hw_params(
+                new_devices->inputs[next_action.input.index],
+                &next_action.samplerate,
+                &next_action.period_size);
+        next_action.output.hw_params = device_manager.hw_params(
+                new_devices->outputs[next_action.output.index],
+                &next_action.samplerate,
+                &next_action.period_size);
+    }
+
+    next_action.period_count = next_value(
+            next_action.input.hw_params,
+            next_action.output.hw_params,
+            &period_counts,
+            period_count);
 
     return next_action;
 }
@@ -308,7 +303,8 @@ audio_engine_middleware::process_device_action(
                         return d.name == a.conf.output_device_name;
                     }),
             a.conf.samplerate,
-            a.conf.period_size));
+            a.conf.period_size,
+            a.conf.period_count));
 
     next(a);
 }
@@ -326,7 +322,8 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
             current_state.input.index,
             current_state.output.index,
             current_state.samplerate,
-            current_state.period_size));
+            current_state.period_size,
+            current_state.period_count));
 }
 
 template <>
@@ -343,7 +340,8 @@ audio_engine_middleware::process_device_action(
             action.input ? action.index : current_state.input.index,
             action.input ? current_state.output.index : action.index,
             current_state.samplerate,
-            current_state.period_size));
+            current_state.period_size,
+            current_state.period_count));
 }
 
 template <>
@@ -363,7 +361,52 @@ audio_engine_middleware::process_device_action(
                 current_state.input.index,
                 current_state.output.index,
                 srs[action.index],
-                current_state.period_size));
+                current_state.period_size,
+                current_state.period_count));
+    }
+}
+
+template <>
+void
+audio_engine_middleware::process_device_action(
+        actions::select_period_size const& action)
+{
+    state const& current_state = get_state();
+
+    auto const pss = period_sizes_from_state(current_state);
+    if (action.index < pss.size())
+    {
+        next(make_update_devices_action(
+                m_device_manager,
+                current_state.pcm_devices,
+                current_state.pcm_devices,
+                current_state.input.index,
+                current_state.output.index,
+                current_state.samplerate,
+                pss[action.index],
+                current_state.period_count));
+    }
+}
+
+template <>
+void
+audio_engine_middleware::process_device_action(
+        actions::select_period_count const& action)
+{
+    state const& current_state = get_state();
+
+    auto const pcs = period_counts_from_state(current_state);
+    if (action.index < pcs.size())
+    {
+        next(make_update_devices_action(
+                m_device_manager,
+                current_state.pcm_devices,
+                current_state.pcm_devices,
+                current_state.input.index,
+                current_state.output.index,
+                current_state.samplerate,
+                current_state.period_size,
+                pcs[action.index]));
     }
 }
 
@@ -487,7 +530,7 @@ audio_engine_middleware::open_device()
     auto const& st = get_state();
 
     if (st.input.index == npos || st.output.index == npos ||
-        st.samplerate == 0 || st.period_size == 0)
+        st.samplerate == 0 || st.period_size == 0 || st.period_count == 0)
         return;
 
     try
@@ -507,7 +550,7 @@ audio_engine_middleware::open_device()
                         audio::pcm_process_config{
                                 st.samplerate,
                                 st.period_size,
-                                period_count(st)}});
+                                st.period_count}});
         m_device.swap(device);
     }
     catch (std::exception const& err)

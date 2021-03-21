@@ -27,6 +27,7 @@ struct refresh_midi_devices;
 
 struct select_samplerate;
 struct select_period_size;
+struct select_period_count;
 
 struct activate_midi_device;
 struct deactivate_midi_device;

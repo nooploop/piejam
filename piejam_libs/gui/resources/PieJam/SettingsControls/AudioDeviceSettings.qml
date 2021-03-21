@@ -28,8 +28,6 @@ Item {
     ComboBoxSetting {
         id: inputSetting
 
-        height: 64
-
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.right: reloadButtonFrame.left
@@ -48,8 +46,6 @@ Item {
 
     ComboBoxSetting {
         id: outputSetting
-
-        height: 64
 
         anchors.left: parent.left
         anchors.leftMargin: 8
@@ -70,8 +66,6 @@ Item {
     ComboBoxSetting {
         id: samplerateSetting
 
-        height: 64
-
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.right: parent.right
@@ -91,8 +85,6 @@ Item {
     ComboBoxSetting {
         id: periodSizeSetting
 
-        height: 64
-
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.right: parent.right
@@ -103,31 +95,50 @@ Item {
         model: root.model.periodSizes.elements
         currentIndex: root.model.periodSizes.focused
 
-        nameLabelText: qsTr("Period Size:")
+        nameLabelText: qsTr("Period size:")
         unselectedText: qsTr("Select period size...")
 
         onOptionSelected: root.model.selectPeriodSize(index)
     }
 
+    ComboBoxSetting {
+        id: periodCountSetting
+
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.top: periodSizeSetting.bottom
+        anchors.topMargin: 6
+
+        model: root.model.periodCounts.elements
+        currentIndex: root.model.periodCounts.focused
+
+        nameLabelText: qsTr("Period count:")
+        unselectedText: qsTr("Select period count...")
+
+        onOptionSelected: root.model.selectPeriodCount(index)
+    }
+
     Frame {
         id: reloadButtonFrame
 
-        x: 658
-        width: 134
-        height: 134
+        width: reloadButtonFrame.height
 
         anchors.right: parent.right
         anchors.rightMargin: 8
         anchors.top: parent.top
+        anchors.bottom: outputSetting.bottom
         anchors.topMargin: 8
 
         RoundButton {
             id: reloadBtn
 
-            x: 19
-            y: 19
             width: 72
             height: 72
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
 
             icon.width: 24
             icon.height: 24
@@ -135,6 +146,51 @@ Item {
             display: AbstractButton.IconOnly
 
             onClicked: root.model.refreshDeviceLists()
+        }
+    }
+
+    Frame {
+        id: bufferLatencyFrame
+
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.top: periodCountSetting.bottom
+        anchors.topMargin: 6
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
+
+        Label {
+            id: bufferLatencyLabel
+
+            width: 128
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+
+            verticalAlignment: Text.AlignVCenter
+            textFormat: Text.PlainText
+            font.pixelSize: 18
+
+            text: qsTr("Buffer latency:")
+        }
+
+        Label {
+            id: bufferLatencyValueLabel
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: bufferLatencyLabel.right
+            anchors.leftMargin: 8
+            anchors.right: parent.right
+            anchors.rightMargin: 8
+
+            verticalAlignment: Text.AlignVCenter
+            font.italic: true
+            textFormat: Text.PlainText
+            font.pixelSize: 18
+
+            text: root.model.bufferLatency.toFixed(2) + qsTr(" ms")
         }
     }
 

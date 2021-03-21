@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/pcm_descriptor.h>
+#include <piejam/audio/period_counts.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
 #include <piejam/audio/types.h>
@@ -32,11 +33,17 @@ namespace piejam::runtime::selectors
 template <class Value>
 using selector = reselect::selector<Value, state>;
 
-using samplerate = std::pair<box<audio::samplerates_t>, unsigned>;
+using samplerate = std::pair<box<audio::samplerates_t>, audio::samplerate_t>;
 extern const selector<samplerate> select_samplerate;
 
-using period_size = std::pair<box<audio::period_sizes_t>, unsigned>;
+using period_size = std::pair<box<audio::period_sizes_t>, audio::period_size_t>;
 extern const selector<period_size> select_period_size;
+
+using period_count =
+        std::pair<box<audio::period_counts_t>, audio::period_count_t>;
+extern const selector<period_count> select_period_count;
+
+extern const selector<float> select_buffer_latency;
 
 //! \todo input_devices/output_devices could get a reduced value, not the whole
 //! pcm_io_descriptors

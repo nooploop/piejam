@@ -69,7 +69,8 @@ TEST_F(audio_engine_middleware_test, select_samplerate_will_change_samplerate)
 
     audio::pcm_hw_params const default_hw_params{
             .samplerates = {44100u, 48000u},
-            .period_sizes = {}};
+            .period_sizes = {},
+            .period_counts = {}};
 
     state st;
     st.pcm_devices = audio::pcm_io_descriptors{
@@ -83,7 +84,7 @@ TEST_F(audio_engine_middleware_test, select_samplerate_will_change_samplerate)
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
         st = a.reduce(st);
     });
-    EXPECT_CALL(audio_device_manager, hw_params(_, _))
+    EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(default_hw_params));
 
     actions::select_samplerate action;
@@ -95,15 +96,37 @@ TEST_F(audio_engine_middleware_test, select_samplerate_will_change_samplerate)
     EXPECT_EQ(48000u, st.samplerate);
 }
 
-TEST_F(audio_engine_middleware_test, select_period_size_is_passed_to_next)
+TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
 {
     using namespace testing;
-    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRefOfCopy(state()));
+
+    audio::pcm_hw_params const default_hw_params{
+            .samplerates = {44100u, 48000u},
+            .period_sizes = {64u, 128u},
+            .period_counts = {}};
+
+    state st;
+    st.pcm_devices = audio::pcm_io_descriptors{
+            .inputs = {audio::pcm_descriptor{.name = "foo", .path = {}}},
+            .outputs = {audio::pcm_descriptor{.name = "foo", .path = {}}}};
+    st.input.index = 0;
+    st.input.hw_params = default_hw_params;
+    st.output.index = 0;
+    st.output.hw_params = default_hw_params;
+    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
+    EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
+        st = a.reduce(st);
+    });
+    EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
+            .WillRepeatedly(Return(default_hw_params));
 
     actions::select_period_size action;
-    EXPECT_CALL(mf_mock, next(Ref(action)));
+    action.index = 1;
 
+    ASSERT_EQ(0u, st.period_size);
     sut(action);
+
+    EXPECT_EQ(128u, st.period_size);
 }
 
 TEST_F(audio_engine_middleware_test,
@@ -113,7 +136,8 @@ TEST_F(audio_engine_middleware_test,
 
     piejam::audio::pcm_hw_params hw_params{
             .samplerates = {44100},
-            .period_sizes = {128}};
+            .period_sizes = {128},
+            .period_counts = {2}};
 
     state st;
     st.input.index = 0;
@@ -130,7 +154,7 @@ TEST_F(audio_engine_middleware_test,
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
         st = a.reduce(st);
     });
-    EXPECT_CALL(audio_device_manager, hw_params(_, _))
+    EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(hw_params));
     EXPECT_CALL(audio_device_manager, make_device(_, _, _))
             .WillRepeatedly(

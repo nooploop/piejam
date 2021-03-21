@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/audio/period_counts.h>
 #include <piejam/audio/period_sizes.h>
 #include <piejam/audio/samplerates.h>
 
@@ -21,24 +22,9 @@ struct pcm_hw_params
     unsigned num_channels{};
     samplerates_t samplerates;
     period_sizes_t period_sizes;
-    unsigned period_count_min{};
-    unsigned period_count_max{};
+    period_counts_t period_counts;
+
+    bool operator==(pcm_hw_params const&) const noexcept = default;
 };
-
-inline bool
-operator==(pcm_hw_params const& l, pcm_hw_params const& r) noexcept
-{
-    return l.interleaved == r.interleaved && l.format == r.format &&
-           l.num_channels == r.num_channels && l.samplerates == r.samplerates &&
-           l.period_sizes == r.period_sizes &&
-           l.period_count_min == r.period_count_min &&
-           l.period_count_max == r.period_count_max;
-}
-
-inline bool
-operator!=(pcm_hw_params const& l, pcm_hw_params const& r) noexcept
-{
-    return !(l == r);
-}
 
 } // namespace piejam::audio

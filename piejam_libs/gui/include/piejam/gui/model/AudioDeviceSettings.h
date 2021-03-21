@@ -24,30 +24,50 @@ class AudioDeviceSettings : public SubscribableModel
                        sampleratesChanged FINAL)
     Q_PROPERTY(StringList* periodSizes READ periodSizes NOTIFY
                        periodSizesChanged FINAL)
+    Q_PROPERTY(StringList* periodCounts READ periodCounts NOTIFY
+                       periodCountsChanged FINAL)
+    Q_PROPERTY(double bufferLatency READ bufferLatency NOTIFY
+                       bufferLatencyChanged FINAL)
 
 public:
     auto inputDevices() -> StringList* { return &m_inputDevices; }
     auto outputDevices() -> StringList* { return &m_outputDevices; }
     auto samplerates() -> StringList* { return &m_samplerates; }
     auto periodSizes() -> StringList* { return &m_periodSizes; }
+    auto periodCounts() -> StringList* { return &m_periodCounts; }
+
+    auto bufferLatency() const noexcept -> double { return m_bufferLatency; }
+    void setBufferLatency(double x)
+    {
+        if (m_bufferLatency != x)
+        {
+            m_bufferLatency = x;
+            emit bufferLatencyChanged();
+        }
+    }
 
     virtual Q_INVOKABLE void refreshDeviceLists() = 0;
     virtual Q_INVOKABLE void selectInputDevice(unsigned index) = 0;
     virtual Q_INVOKABLE void selectOutputDevice(unsigned index) = 0;
     virtual Q_INVOKABLE void selectSamplerate(unsigned index) = 0;
     virtual Q_INVOKABLE void selectPeriodSize(unsigned index) = 0;
+    virtual Q_INVOKABLE void selectPeriodCount(unsigned index) = 0;
 
 signals:
     void inputDevicesChanged();
     void outputDevicesChanged();
     void sampleratesChanged();
     void periodSizesChanged();
+    void periodCountsChanged();
+    void bufferLatencyChanged();
 
 private:
     StringList m_inputDevices;
     StringList m_outputDevices;
     StringList m_samplerates;
     StringList m_periodSizes;
+    StringList m_periodCounts;
+    double m_bufferLatency{};
 };
 
 } // namespace piejam::gui::model

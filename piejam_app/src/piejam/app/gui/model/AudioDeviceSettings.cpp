@@ -10,6 +10,7 @@
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/refresh_devices.h>
+#include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/selectors.h>
@@ -94,6 +95,20 @@ AudioDeviceSettings::onSubscribe()
                 periodSizes()->setElements(to_QStringList(*period_size.first));
                 periodSizes()->setFocused(static_cast<int>(index));
             });
+
+    observe(selectors::select_period_count,
+            [this](selectors::period_count const& period_count) {
+                auto const index = algorithm::index_of(
+                        *period_count.first,
+                        period_count.second);
+
+                periodCounts()->setElements(
+                        to_QStringList(*period_count.first));
+                periodCounts()->setFocused(static_cast<int>(index));
+            });
+
+    observe(selectors::select_buffer_latency,
+            [this](float const x) { setBufferLatency(x); });
 }
 
 void
@@ -121,7 +136,7 @@ AudioDeviceSettings::selectOutputDevice(unsigned const index)
 }
 
 void
-AudioDeviceSettings::selectSamplerate(unsigned index)
+AudioDeviceSettings::selectSamplerate(unsigned const index)
 {
     runtime::actions::select_samplerate action;
     action.index = index;
@@ -129,9 +144,17 @@ AudioDeviceSettings::selectSamplerate(unsigned index)
 }
 
 void
-AudioDeviceSettings::selectPeriodSize(unsigned index)
+AudioDeviceSettings::selectPeriodSize(unsigned const index)
 {
     runtime::actions::select_period_size action;
+    action.index = index;
+    dispatch(action);
+}
+
+void
+AudioDeviceSettings::selectPeriodCount(unsigned const index)
+{
+    runtime::actions::select_period_count action;
     action.index = index;
     dispatch(action);
 }

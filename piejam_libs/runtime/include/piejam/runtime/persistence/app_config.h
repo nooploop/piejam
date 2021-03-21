@@ -29,8 +29,9 @@ struct app_config
 {
     std::string input_device_name;
     std::string output_device_name;
-    unsigned samplerate{};
-    unsigned period_size{};
+    audio::samplerate_t samplerate{};
+    audio::period_size_t period_size{};
+    audio::period_count_t period_count{};
 
     std::vector<bus_config> input_bus_config;
     std::vector<bus_config> output_bus_config;

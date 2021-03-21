@@ -11,7 +11,9 @@
 namespace piejam::audio::alsa
 {
 
-auto get_hw_params(pcm_descriptor const&, samplerate_t const*) -> pcm_hw_params;
+auto
+get_hw_params(pcm_descriptor const&, samplerate_t const*, period_size_t const*)
+        -> pcm_hw_params;
 
 void set_hw_params(
         system::device&,
