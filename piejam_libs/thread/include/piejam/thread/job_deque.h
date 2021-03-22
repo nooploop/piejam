@@ -6,111 +6,136 @@
 
 #include <piejam/thread/cache_line_size.h>
 
+#include <boost/assert.hpp>
+
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <bit>
-#include <limits>
+#include <cstdint>
+#include <iterator>
+#include <ranges>
 #include <type_traits>
 
 namespace piejam::thread
 {
 
+// Work-stealing queue from
+// "Thread Scheduling for Multiprogrammed Multiprocessors"
+// by Nimar S. Arora, Robert D. Blumofe, C. Greg Plaxton
+
 template <class Job, std::size_t Capacity>
 class job_deque
 {
-    static_assert(std::has_single_bit(Capacity));
-    static constexpr std::size_t mask = Capacity - 1u;
+    static_assert(std::has_single_bit(Capacity)); // is power of two?
 
-    using signed_index_t = std::make_signed_t<std::size_t>;
+    using bottom_index = std::uint32_t;
+
+    static_assert(std::atomic<bottom_index>::is_always_lock_free);
+
+    struct top_index
+    {
+        std::uint16_t index{};
+        std::uint16_t tag{};
+    };
+
+    static_assert(sizeof(top_index) == sizeof(bottom_index));
+    static_assert(std::atomic<top_index>::is_always_lock_free);
 
 public:
     constexpr auto capacity() const noexcept -> std::size_t { return Capacity; }
 
-    //! Can only be called by owner.
-    auto size() const noexcept -> std::size_t
+    template <std::input_iterator<> Iterator>
+    void initialize(Iterator&& first, Iterator&& last)
     {
-        return m_bottom.load(std::memory_order_relaxed) -
-               m_top.load(std::memory_order_relaxed);
+        m_top.store({}, std::memory_order_relaxed);
+        auto it = std::copy(
+                std::forward<Iterator>(first),
+                std::forward<Iterator>(last),
+                m_jobs.begin());
+        m_bottom.store(
+                static_cast<bottom_index>(std::distance(m_jobs.begin(), it)),
+                std::memory_order_release);
+        BOOST_ASSERT(it <= m_jobs.end());
     }
 
-    //! Can only be called by owner.
-    void push(Job* job)
+    template <std::ranges::input_range<> Range>
+    void initialize(Range&& rng)
     {
-        std::size_t const bottom = m_bottom.load(std::memory_order_acquire);
-        m_jobs[bottom & mask] = job;
+        initialize(
+                std::ranges::begin(std::forward<Range>(rng)),
+                std::ranges::end(std::forward<Range>(rng)));
+    }
+
+    void push(Job* const job) noexcept
+    {
+        bottom_index const bottom = m_bottom.load(std::memory_order_relaxed);
+        BOOST_ASSERT(bottom < Capacity);
+        m_jobs[bottom] = job;
         m_bottom.store(bottom + 1, std::memory_order_release);
     }
 
-    //! Can only be called by owner.
-    auto pop() -> Job*
+    auto pop() noexcept -> Job*
     {
-        std::size_t const bottom = m_bottom.load(std::memory_order_acquire) - 1;
-        m_bottom.store(bottom, std::memory_order_release);
-        std::size_t top = m_top.load(std::memory_order_acquire);
-
-        if (static_cast<signed_index_t>(top) <=
-            static_cast<signed_index_t>(bottom))
-        {
-            Job* job = m_jobs[bottom & mask];
-            if (top != bottom)
-            {
-                return job;
-            }
-            else
-            {
-                std::size_t expected_top = top;
-                if (!m_top.compare_exchange_strong(
-                            expected_top,
-                            top + 1,
-                            std::memory_order_acq_rel))
-                {
-                    job = nullptr;
-                }
-
-                m_bottom.store(top + 1, std::memory_order_release);
-                return job;
-            }
-        }
-        else
-        {
-            m_bottom.store(top, std::memory_order_release);
+        bottom_index const bottom = m_bottom.load(std::memory_order_relaxed);
+        if (bottom == 0)
             return nullptr;
-        }
-    }
 
-    //! Can only be called by thieves.
-    auto steal() -> Job*
-    {
-        std::size_t top = m_top.load(std::memory_order_acquire);
-        std::size_t const bottom = m_bottom.load(std::memory_order_consume);
+        bottom_index const newBottom = bottom - 1;
 
-        if (static_cast<signed_index_t>(top) <
-            static_cast<signed_index_t>(bottom))
+        m_bottom.store(newBottom);
+
+        Job* const job = m_jobs[newBottom];
+
+        top_index top = m_top.load();
+        if (newBottom > top.index)
+            return job;
+
+        top_index newTop;
+        newTop.index = 0;
+        newTop.tag = top.tag + 1;
+
+        m_bottom.store(0);
+
+        if (newBottom == top.index)
         {
-            Job* const job = m_jobs[top & mask];
             if (m_top.compare_exchange_strong(
                         top,
-                        top + 1,
-                        std::memory_order_release))
-            {
+                        newTop,
+                        std::memory_order_acq_rel))
                 return job;
-            }
         }
+
+        m_top.store(newTop, std::memory_order_release);
+        return nullptr;
+    }
+
+    auto steal() noexcept -> Job*
+    {
+        top_index top = m_top.load(std::memory_order_acquire);
+
+        if (m_bottom.load(std::memory_order_relaxed) <= top.index)
+            return nullptr;
+
+        Job* const job = m_jobs[top.index];
+
+        top_index newTop;
+        newTop.index = top.index + 1;
+        newTop.tag = top.tag + 1;
+
+        if (m_top.compare_exchange_strong(
+                    top,
+                    newTop,
+                    std::memory_order_acq_rel))
+            return job;
 
         return nullptr;
     }
 
-    //! Should only be called when not in use.
-    void reset()
-    {
-        m_bottom.store(0, std::memory_order_relaxed);
-        m_top.store(0, std::memory_order_relaxed);
-    }
-
 private:
-    alignas(cache_line_size) std::atomic_size_t m_bottom{};
-    std::array<Job*, Capacity> m_jobs{};
-    alignas(cache_line_size) std::atomic_size_t m_top{};
+    alignas(cache_line_size) std::atomic<bottom_index> m_bottom{};
+    alignas(cache_line_size) std::atomic<top_index> m_top{};
+    alignas(cache_line_size) std::array<Job*, Capacity> m_jobs{};
 };
 
 } // namespace piejam::thread

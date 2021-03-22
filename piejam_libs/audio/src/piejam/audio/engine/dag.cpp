@@ -7,6 +7,7 @@
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/thread_context.h>
+#include <piejam/functional/partial_compare.h>
 #include <piejam/range/indices.h>
 #include <piejam/thread/job_deque.h>
 #include <piejam/thread/worker.h>
@@ -48,7 +49,7 @@ protected:
 
     static void init_node_for_process(node& n)
     {
-        n.parents_to_process = n.num_parents;
+        n.parents_to_process.store(n.num_parents, std::memory_order_relaxed);
     }
 
     using nodes_t = std::unordered_map<dag::task_id_t, node>;
@@ -99,7 +100,7 @@ public:
     {
         for (auto& [id, nd] : m_nodes)
         {
-            nd.parents_to_process = nd.num_parents;
+            init_node_for_process(nd);
 
             if (nd.num_parents == 0)
             {
@@ -174,25 +175,27 @@ public:
                   m_initial_tasks))
         , m_worker_tasks(make_worker_tasks(m_workers))
     {
+        if (std::ranges::any_of(
+                    m_initial_tasks,
+                    greater(job_deque_capacity),
+                    std::ranges::size))
+            throw std::runtime_error("Too many processors.");
     }
 
     void operator()(std::size_t const buffer_size) override
     {
-        BOOST_ASSERT(m_run_queues[0].size() == 0);
-
-        m_nodes_to_process.store(m_nodes.size(), std::memory_order_release);
-        m_buffer_size.store(buffer_size, std::memory_order_release);
-
-        for (auto&& rq : m_run_queues)
-            rq.reset();
+        m_buffer_size.store(buffer_size, std::memory_order_relaxed);
 
         for (auto&& [id, n] : m_nodes)
             init_node_for_process(n);
 
         BOOST_ASSERT(m_initial_tasks.size() == m_run_queues.size());
         for (std::size_t const i : range::indices(m_initial_tasks))
-            for (node* const n : m_initial_tasks[i])
-                m_run_queues[i].push(n);
+        {
+            m_run_queues[i].initialize(m_initial_tasks[i]);
+        }
+
+        m_nodes_to_process.store(m_nodes.size(), std::memory_order_release);
 
         BOOST_ASSERT(m_worker_tasks.size() == m_worker_threads.size());
         for (std::size_t const w : range::indices(m_worker_threads))
@@ -245,11 +248,11 @@ private:
         void operator()()
         {
             m_thread_context.buffer_size =
-                    m_buffer_size.load(std::memory_order_consume);
+                    m_buffer_size.load(std::memory_order_relaxed);
 
             auto& worker_queue = m_run_queues[m_worker_index];
 
-            while (m_nodes_to_process.load(std::memory_order_relaxed))
+            while (m_nodes_to_process.load(std::memory_order_acquire))
             {
                 if (node* n = worker_queue.pop())
                 {
@@ -281,11 +284,14 @@ private:
         {
             job_deque_t& run_queue = m_run_queues[m_worker_index];
 
-            BOOST_ASSERT(n.parents_to_process == 0);
+            BOOST_ASSERT(
+                    n.parents_to_process.load(std::memory_order_relaxed) == 0);
 
             n.task(m_thread_context);
 
-            m_nodes_to_process.fetch_sub(1, std::memory_order_acq_rel);
+            BOOST_VERIFY(
+                    0 <
+                    m_nodes_to_process.fetch_sub(1, std::memory_order_acq_rel));
 
             node* next{};
             for (node& child : n.children)
@@ -296,7 +302,6 @@ private:
                 {
                     if (next)
                     {
-                        BOOST_ASSERT(run_queue.size() < run_queue.capacity());
                         run_queue.push(std::addressof(child));
                     }
                     else

@@ -56,12 +56,13 @@ TEST(job_deque, push_pop_and_steal_concurrently)
     int j;
     std::atomic_bool finished{false};
 
-    constexpr std::size_t num_pushes{1 << 20};
+    constexpr std::size_t num_runs{10000};
+    constexpr std::size_t num_pushes{128};
     std::size_t num_pops{};
     std::size_t num_steals{};
 
     auto steal_thread = std::thread([&sut, &finished, &j, &num_steals] {
-        while (!finished.load(std::memory_order_consume))
+        while (!finished.load(std::memory_order_relaxed))
         {
             auto const r = sut.steal();
             if (r != nullptr)
@@ -73,14 +74,21 @@ TEST(job_deque, push_pop_and_steal_concurrently)
     });
 
     auto gen_thread = std::thread([&sut, &finished, &j, &num_pops]() {
-        for (std::size_t i = 0; i < num_pushes; ++i)
+        for (std::size_t n = 0; n < num_runs; ++n)
         {
-            sut.push(&j);
-            auto const r = sut.pop();
-            if (r != nullptr)
+            for (std::size_t i = 0; i < num_pushes; ++i)
             {
-                EXPECT_EQ(r, &j);
-                ++num_pops;
+                sut.push(&j);
+            }
+
+            for (std::size_t i = 0; i < num_pushes; ++i)
+            {
+                auto const r = sut.pop();
+                if (r != nullptr)
+                {
+                    EXPECT_EQ(r, &j);
+                    ++num_pops;
+                }
             }
         }
 
@@ -90,7 +98,7 @@ TEST(job_deque, push_pop_and_steal_concurrently)
     steal_thread.join();
     gen_thread.join();
 
-    EXPECT_EQ(num_pushes, num_pops + num_steals);
+    EXPECT_EQ(num_runs * num_pushes, num_pops + num_steals);
 }
 
 } // namespace piejam::thread::test
