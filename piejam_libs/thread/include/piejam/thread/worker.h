@@ -49,9 +49,7 @@ public:
 
     ~worker()
     {
-        m_sem_finished.acquire();
         m_thread.request_stop();
-        m_sem_finished.release();
         m_sem_work.release();
     }
 
@@ -59,17 +57,13 @@ public:
     auto operator=(worker&&) -> worker& = delete;
 
     template <std::invocable<> F>
-    bool wakeup(F&& task) noexcept
+    void wakeup(F&& task) noexcept
     {
-        if (m_sem_finished.try_acquire())
-        {
-            m_task = std::forward<F>(task);
-            m_sem_work.release();
-            return true;
-        }
-
-        return false;
+        m_task = std::forward<F>(task);
+        m_sem_work.release();
     }
+
+    void wait() { m_sem_finished.acquire(); }
 
 private:
     semaphore m_sem_work;
