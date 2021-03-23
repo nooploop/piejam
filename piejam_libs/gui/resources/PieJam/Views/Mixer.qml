@@ -64,12 +64,8 @@ ViewPane {
 
         color: Material.color(Material.Grey, Material.Shade800)
 
-        ButtonGroup {
-            id: mixerViewButtonGroup
-        }
-
         Button {
-            id: performButton
+            id: editButton
 
             width: 32
             height: 44
@@ -78,32 +74,6 @@ ViewPane {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.margins: 4
 
-            ButtonGroup.group: mixerViewButtonGroup
-
-            icon.width: 24
-            icon.height: 24
-            icon.source: "qrc:///images/icons/hand-right.svg"
-            display: AbstractButton.IconOnly
-
-            checkable: true
-            checked: MixerViewSettings.mode === MixerViewSettings.perform
-            autoExclusive: true
-
-            onClicked: MixerViewSettings.mode = MixerViewSettings.perform
-        }
-
-        Button {
-            id: editButton
-
-            width: 32
-            height: 44
-
-            anchors.bottom: parent.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.margins: 4
-
-            ButtonGroup.group: mixerViewButtonGroup
-
             icon.width: 24
             icon.height: 24
             icon.source: "qrc:///images/icons/pencil.svg"
@@ -111,9 +81,13 @@ ViewPane {
 
             checkable: true
             checked: MixerViewSettings.mode === MixerViewSettings.edit
-            autoExclusive: true
 
-            onClicked: MixerViewSettings.mode = MixerViewSettings.edit
+            onClicked: {
+                if (MixerViewSettings.mode === MixerViewSettings.edit)
+                    MixerViewSettings.mode = MixerViewSettings.perform
+                else
+                    MixerViewSettings.mode = MixerViewSettings.edit
+            }
         }
     }
 
