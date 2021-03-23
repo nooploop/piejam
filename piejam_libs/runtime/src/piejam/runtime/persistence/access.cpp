@@ -30,6 +30,9 @@ namespace piejam::runtime::persistence
 void
 load_app_config(std::filesystem::path const& file, dispatch_f const& dispatch)
 {
+    if (!std::filesystem::exists(file))
+        return;
+
     try
     {
         std::ifstream in(file);
@@ -309,6 +312,9 @@ export_mixer_channels(state const& st, mixer::channel_ids_t const& channel_ids)
 void
 load_session(std::filesystem::path const& file, dispatch_f const& dispatch)
 {
+    if (!std::filesystem::exists(file))
+        return;
+
     try
     {
         std::ifstream in(file);
