@@ -398,13 +398,13 @@ remove_fx_module(state& st, fx::module_id id)
 auto
 add_device_bus(
         state& st,
-        std::string name,
+        std::string const& name,
         io_direction const io_dir,
         audio::bus_type const bus_type,
         channel_index_pair const& channels) -> device_io::bus_id
 {
     auto id = st.device_io_state.buses.add(device_io::bus{
-            .name = std::move(name),
+            .name = name,
             .bus_type = io_dir == io_direction::input ? bus_type
                                                       : audio::bus_type::stereo,
             .channels = channels});
@@ -413,6 +413,23 @@ add_device_bus(
                                                    : st.device_io_state.outputs;
 
     emplace_back(bus_list, id);
+
+    st.mixer_state.channels.update(
+            [id,
+             io_dir,
+             route_name = mixer::io_address_t(mixer::missing_device_address(
+                     name))](mixer::channel_id, mixer::channel& mixer_channel) {
+                if (io_dir == io_direction::input)
+                {
+                    if (mixer_channel.in == route_name)
+                        mixer_channel.in = mixer::io_address_t(id);
+                }
+                else
+                {
+                    if (mixer_channel.out == route_name)
+                        mixer_channel.out = mixer::io_address_t(id);
+                }
+            });
 
     return id;
 }

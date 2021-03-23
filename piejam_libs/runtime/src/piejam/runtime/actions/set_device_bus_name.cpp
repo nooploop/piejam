@@ -4,6 +4,7 @@
 
 #include <piejam/runtime/actions/set_device_bus_name.h>
 
+#include <piejam/algorithm/contains.h>
 #include <piejam/runtime/state.h>
 
 namespace piejam::runtime::actions
@@ -18,15 +19,26 @@ set_device_bus_name::reduce(state const& st) const -> state
         bus.name = name;
     });
 
-    new_st.mixer_state.channels.update(
-            [this, addr_name = mixer::io_address_t(boxed_string(name))](
-                    mixer::channel_id,
-                    mixer::channel& bus) {
-                if (bus.in == addr_name)
-                    bus.in = bus_id;
+    auto const io_dir =
+            algorithm::contains(*new_st.device_io_state.inputs, bus_id)
+                    ? io_direction::input
+                    : io_direction::output;
 
-                if (bus.out == addr_name)
-                    bus.out = bus_id;
+    new_st.mixer_state.channels.update(
+            [this,
+             io_dir,
+             route_name = mixer::io_address_t(mixer::missing_device_address(
+                     name))](mixer::channel_id, mixer::channel& bus) {
+                if (io_dir == io_direction::input)
+                {
+                    if (bus.in == route_name)
+                        bus.in = bus_id;
+                }
+                else
+                {
+                    if (bus.out == route_name)
+                        bus.out = bus_id;
+                }
             });
 
     return new_st;

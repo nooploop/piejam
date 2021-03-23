@@ -94,7 +94,7 @@ auto period_counts_from_state(state const&) -> audio::period_counts_t;
 
 auto add_device_bus(
         state&,
-        std::string name,
+        std::string const& name,
         io_direction,
         audio::bus_type,
         channel_index_pair const&) -> device_io::bus_id;
