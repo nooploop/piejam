@@ -11,6 +11,7 @@
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/midi/event.h>
+#include <piejam/range/iota.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
@@ -30,7 +31,7 @@ make_cc_to_float_lut(float_parameter const& param) -> std::array<float, 128>
     std::array<float, 128> result;
 
     std::ranges::transform(
-            std::views::iota(std::size_t{0}, std::size_t{128}),
+            range::iota(std::size_t{128}),
             result.begin(),
             [&param](std::size_t const cc_value) -> float {
                 return param.from_normalized(param, cc_value / 127.f);
@@ -62,7 +63,7 @@ make_cc_to_int_lut(int_parameter const& param) -> std::array<int, 128>
     if (num_values <= 32)
     {
         std::ranges::transform(
-                std::views::iota(std::size_t{0}, std::size_t{128}),
+                range::iota(std::size_t{128}),
                 result.begin(),
                 [min = param.min,
                  max = param.max](std::size_t const cc_value) -> int {
@@ -72,7 +73,7 @@ make_cc_to_int_lut(int_parameter const& param) -> std::array<int, 128>
     else if (num_values <= 64)
     {
         std::ranges::transform(
-                std::views::iota(std::size_t{0}, std::size_t{128}),
+                range::iota(std::size_t{128}),
                 result.begin(),
                 [min = param.min,
                  max = param.max](std::size_t const cc_value) -> int {
@@ -82,7 +83,7 @@ make_cc_to_int_lut(int_parameter const& param) -> std::array<int, 128>
     else
     {
         std::ranges::transform(
-                std::views::iota(std::size_t{0}, std::size_t{128}),
+                range::iota(std::size_t{128}),
                 result.begin(),
                 [min = param.min, diff = param.max - param.min](
                         std::size_t const cc_value) -> int {
