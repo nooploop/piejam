@@ -16,6 +16,31 @@ ViewPane {
 
     signal fxButtonClicked()
 
+    Rectangle {
+        id: leftBorderShadow
+
+        width: 4
+        anchors.left: parent.left
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        z: 100
+        gradient: Gradient {
+
+            orientation: Gradient.Horizontal
+
+            GradientStop {
+                position: 0
+                color: "#ff000000"
+            }
+
+            GradientStop {
+                position: 1
+                color: "#00000000"
+            }
+        }
+    }
+
     ChannelsListView {
         id: inputs
 
@@ -24,11 +49,76 @@ ViewPane {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.margins: 8
+        anchors.leftMargin: 0
 
         model: root.model.inputChannels
 
         onFxButtonClicked: root.fxButtonClicked()
-        onAddChannelClicked: root.model.addChannel(newChannelName)
+
+        header: Item {
+            width: 8
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+        }
+
+        footer: Item {
+            width: 160
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+
+            visible: MixerViewSettings.mode == MixerViewSettings.edit
+
+            ChannelAddStrip {
+                id: channelAddStrip
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.rightMargin: 8
+
+                name: privates.channelAddStripName
+
+                onAddClicked: root.model.addChannel(channelAddStrip.name)
+            }
+        }
+
+        QtObject {
+            id: privates
+
+            property string channelAddStripName: ""
+        }
+
+        onCountChanged: privates.channelAddStripName = "In " + (inputs.count + 1)
+    }
+
+    Rectangle {
+        id: channelsSeparator
+
+        width: 4
+
+        anchors.right: mainChannelStrip.left
+        anchors.rightMargin: 8
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+
+        z: 100
+
+        gradient: Gradient {
+
+            orientation: Gradient.Horizontal
+
+            GradientStop {
+                position: 0
+                color: "#00000000"
+            }
+
+            GradientStop {
+                position: 1
+                color: "#ff000000"
+            }
+        }
     }
 
     Loader {

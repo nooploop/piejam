@@ -10,7 +10,6 @@ ListView {
     id: root
 
     signal fxButtonClicked()
-    signal addChannelClicked(string newChannelName)
 
     spacing: 2
     clip: true
@@ -28,34 +27,5 @@ ListView {
 
         edit.model: model.item.edit
     }
-
-    footer: Item {
-        width: 152
-
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-
-        visible: MixerViewSettings.mode == MixerViewSettings.edit
-
-        ChannelAddStrip {
-            id: channelAddStrip
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-
-            name: privates.channelAddStripName
-
-            onAddClicked: root.addChannelClicked(channelAddStrip.name)
-        }
-    }
-
-    QtObject {
-        id: privates
-
-        property string channelAddStripName: ""
-    }
-
-    onCountChanged: privates.channelAddStripName = "In " + (root.count + 1)
 }
 
