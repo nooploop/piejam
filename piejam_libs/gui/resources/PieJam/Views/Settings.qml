@@ -50,7 +50,7 @@ ViewPane {
     Rectangle {
         id: tabsShadow
 
-        width: 8
+        width: 4
 
         anchors.right: settings.left
         anchors.top: parent.top
