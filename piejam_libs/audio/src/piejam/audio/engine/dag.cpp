@@ -7,7 +7,7 @@
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/thread_context.h>
-#include <piejam/functional/partial_compare.h>
+#include <piejam/functional/compare.h>
 #include <piejam/range/indices.h>
 #include <piejam/thread/job_deque.h>
 #include <piejam/thread/worker.h>

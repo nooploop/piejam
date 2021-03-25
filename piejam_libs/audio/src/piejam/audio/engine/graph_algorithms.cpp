@@ -9,7 +9,7 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/functional/partial_compare.h>
+#include <piejam/functional/compare.h>
 
 #include <boost/assert.hpp>
 

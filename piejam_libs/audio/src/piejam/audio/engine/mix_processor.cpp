@@ -9,7 +9,7 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/functional/partial_compare.h>
+#include <piejam/functional/compare.h>
 #include <piejam/npos.h>
 
 #include <boost/assert.hpp>

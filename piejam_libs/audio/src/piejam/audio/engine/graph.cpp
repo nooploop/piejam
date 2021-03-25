@@ -6,7 +6,7 @@
 
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/functional/partial_compare.h>
+#include <piejam/functional/compare.h>
 
 #include <boost/assert.hpp>
 
