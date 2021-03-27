@@ -2,18 +2,33 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import QtQuick 2.13
-import QtQuick.Controls 2.13
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 
 ViewPane {
     id: root
 
-    Button {
+    Column {
+        width: 256
+        height: 96
+
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
 
-        text: "Shutdown"
+        Label {
+            height: 24
+            text: "Hint: Turn off you speakers first."
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
 
-        onClicked: Qt.quit()
+        Button {
+
+            text: "Shutdown"
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            onClicked: Qt.quit()
+        }
+
     }
 }
