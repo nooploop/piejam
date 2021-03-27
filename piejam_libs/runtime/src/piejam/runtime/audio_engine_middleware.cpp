@@ -26,6 +26,7 @@
 #include <piejam/runtime/actions/deactivate_midi_device.h>
 #include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
+#include <piejam/runtime/actions/fx_chain_actions.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/mixer_actions.h>

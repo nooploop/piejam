@@ -158,6 +158,7 @@ extern const selector<mixer::channel_id> select_fx_chain_channel;
 extern const selector<box<fx::chain_t>> select_current_fx_chain;
 
 auto make_fx_module_name_selector(fx::module_id) -> selector<boxed_string>;
+auto make_fx_module_bypass_selector(fx::module_id) -> selector<bool>;
 auto make_fx_module_parameters_selector(fx::module_id)
         -> selector<box<fx::module_parameters>>;
 auto make_fx_module_can_move_left_selector(fx::module_id) -> selector<bool>;

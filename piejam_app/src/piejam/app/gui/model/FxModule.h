@@ -20,6 +20,7 @@ public:
             runtime::subscriber&,
             runtime::fx::module_id);
 
+    void toggleBypass() override;
     void deleteModule() override;
     void moveLeft() override;
     void moveRight() override;

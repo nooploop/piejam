@@ -64,6 +64,7 @@ struct insert_ladspa_fx_module;
 struct insert_missing_ladspa_fx_module;
 struct move_fx_module_left;
 struct move_fx_module_right;
+struct toggle_fx_module_bypass;
 
 struct start_midi_learning;
 struct stop_midi_learning;

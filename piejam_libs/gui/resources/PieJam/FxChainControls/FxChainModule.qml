@@ -12,9 +12,11 @@ Item {
 
     property alias name: nameLabel.text
     property alias parameters: parametersList.model
+    property bool bypassed: false
     property alias moveLeftEnabled: moveLeftButton.enabled
     property alias moveRightEnabled: moveRightButton.enabled
 
+    signal bypassButtonClicked()
     signal swapButtonClicked()
     signal deleteButtonClicked()
     signal addButtonClicked()
@@ -30,13 +32,38 @@ Item {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
 
-        width: Math.max(moveLeftButton.width +
+        width: Math.max(bypassButton.width +
+                        moveLeftButton.width +
                         moveRightButton.width +
                         nameLabel.implicitWidth +
                         swapButton.width +
                         deleteButton.width +
-                        16, parametersList.implicitWidth) + 2 * frame.padding
+                        20, parametersList.implicitWidth) + 2 * frame.padding
         height: nameLabel.implicitHeight + parametersList.implicitHeight + 2 * frame.padding
+
+        Button {
+            id: bypassButton
+
+            width: 24
+            height: 35
+
+            anchors.top: parent.top
+            anchors.topMargin: -6
+
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/power.svg"
+            display: AbstractButton.IconOnly
+            padding: 8
+
+            font.bold: true
+            font.pixelSize: 12
+
+            checkable: true
+            checked: !root.bypassed
+
+            onClicked: root.bypassButtonClicked()
+        }
 
         Button {
             id: moveLeftButton
@@ -45,6 +72,8 @@ Item {
 
             anchors.top: parent.top
             anchors.topMargin: -6
+            anchors.left: bypassButton.right
+            anchors.leftMargin: 4
 
             text: "<"
 
@@ -72,10 +101,32 @@ Item {
             onClicked: root.moveRightButtonClicked()
         }
 
+        Button {
+            id: swapButton
+            width: 24
+            height: 35
+
+            anchors.top: parent.top
+            anchors.topMargin: -6
+            anchors.left: moveRightButton.right
+            anchors.leftMargin: 4
+
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/autorenew.svg"
+            display: AbstractButton.IconOnly
+            padding: 8
+
+            font.bold: true
+            font.pixelSize: 12
+
+            onClicked: swapButtonClicked()
+        }
+
         Label {
             id: nameLabel
 
-            anchors.left: moveRightButton.right
+            anchors.left: swapButton.right
             anchors.leftMargin: 4
 
             padding: 4
@@ -87,24 +138,6 @@ Item {
             }
             font.bold: true
             font.pixelSize: 12
-        }
-
-        Button {
-            id: swapButton
-            width: 24
-            height: 35
-
-            anchors.right: deleteButton.left
-            anchors.rightMargin: 4
-            anchors.top: parent.top
-            anchors.topMargin: -6
-
-            text: "s"
-
-            font.bold: true
-            font.pixelSize: 12
-
-            onClicked: swapButtonClicked()
         }
 
         Button {

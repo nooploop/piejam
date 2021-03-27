@@ -69,6 +69,7 @@ ViewPane {
                 }
                 onMoveLeftButtonClicked: model.item.moveLeft()
                 onMoveRightButtonClicked: model.item.moveRight()
+                onBypassButtonClicked: model.item.toggleBypass()
 
                 Binding {
                     target: model.item

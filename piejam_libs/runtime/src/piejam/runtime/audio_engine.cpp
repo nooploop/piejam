@@ -185,6 +185,9 @@ make_fx_chain_components(
 
     for (auto const& [fx_mod_id, fx_mod] : fx_modules)
     {
+        if (fx_mod.bypassed)
+            continue;
+
         if (auto fx_comp = prev_comps.remove(fx_mod_id))
         {
             comps.insert(fx_mod_id, std::move(fx_comp));

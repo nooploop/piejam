@@ -16,6 +16,7 @@ class FxModule : public SubscribableModel
     Q_OBJECT
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
+    Q_PROPERTY(bool bypassed READ bypassed NOTIFY bypassedChanged FINAL)
     Q_PROPERTY(QAbstractListModel* parameters READ parameters CONSTANT)
     Q_PROPERTY(
             bool canMoveLeft READ canMoveLeft NOTIFY canMoveLeftChanged FINAL)
@@ -30,6 +31,16 @@ public:
         {
             m_name = x;
             emit nameChanged();
+        }
+    }
+
+    bool bypassed() const noexcept { return m_bypassed; }
+    void setBypassed(bool const x)
+    {
+        if (m_bypassed != x)
+        {
+            m_bypassed = x;
+            emit bypassedChanged();
         }
     }
 
@@ -55,17 +66,20 @@ public:
 
     auto parameters() noexcept -> FxParametersList* { return &m_parameters; }
 
+    Q_INVOKABLE virtual void toggleBypass() = 0;
     Q_INVOKABLE virtual void deleteModule() = 0;
     Q_INVOKABLE virtual void moveLeft() = 0;
     Q_INVOKABLE virtual void moveRight() = 0;
 
 signals:
     void nameChanged();
+    void bypassedChanged();
     void canMoveLeftChanged();
     void canMoveRightChanged();
 
 private:
     QString m_name;
+    bool m_bypassed{};
     FxParametersList m_parameters;
     bool m_canMoveLeft{};
     bool m_canMoveRight{};

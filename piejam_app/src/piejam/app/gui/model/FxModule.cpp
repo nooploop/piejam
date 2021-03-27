@@ -8,6 +8,7 @@
 #include <piejam/app/gui/model/FxParameter.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
+#include <piejam/runtime/actions/fx_chain_actions.h>
 #include <piejam/runtime/actions/move_fx_module.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -66,6 +67,9 @@ FxModule::onSubscribe()
                 setName(QString::fromStdString(*name));
             });
 
+    observe(runtime::selectors::make_fx_module_bypass_selector(m_fx_mod_id),
+            [this](bool const x) { setBypassed(x); });
+
     observe(runtime::selectors::make_fx_module_can_move_left_selector(
                     m_fx_mod_id),
             [this](bool const x) { setCanMoveLeft(x); });
@@ -91,6 +95,14 @@ FxModule::onSubscribe()
 
                 m_param_ids = param_ids;
             });
+}
+
+void
+FxModule::toggleBypass()
+{
+    runtime::actions::toggle_fx_module_bypass action;
+    action.fx_mod_id = m_fx_mod_id;
+    dispatch(action);
 }
 
 void

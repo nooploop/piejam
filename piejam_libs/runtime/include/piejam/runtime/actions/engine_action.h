@@ -24,6 +24,7 @@ struct engine_action_visitor
               delete_fx_module,
               insert_internal_fx_module,
               insert_ladspa_fx_module,
+              toggle_fx_module_bypass,
               set_bool_parameter,
               set_float_parameter,
               set_int_parameter,

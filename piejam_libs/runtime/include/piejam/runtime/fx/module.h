@@ -16,6 +16,7 @@ struct module
 {
     instance_id fx_instance_id;
     boxed_string name;
+    bool bypassed{};
     box<module_parameters> parameters;
 };
 

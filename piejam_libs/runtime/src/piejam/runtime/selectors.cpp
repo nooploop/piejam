@@ -557,6 +557,15 @@ make_fx_module_name_selector(fx::module_id fx_mod_id) -> selector<boxed_string>
 }
 
 auto
+make_fx_module_bypass_selector(fx::module_id fx_mod_id) -> selector<bool>
+{
+    return [fx_mod_id](state const& st) -> bool {
+        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
+        return fx_mod && fx_mod->bypassed;
+    };
+}
+
+auto
 make_fx_module_parameters_selector(fx::module_id fx_mod_id)
         -> selector<box<fx::module_parameters>>
 {
