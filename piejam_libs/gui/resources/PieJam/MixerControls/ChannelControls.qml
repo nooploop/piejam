@@ -23,14 +23,15 @@ Item {
 
     Button {
         id: soloButton
+
         width: 32
         height: 40
-        text: qsTr("S")
+
         anchors.right: muteButton.left
-        anchors.rightMargin: 8
+        anchors.rightMargin: 6
 
+        text: qsTr("S")
         checkable: true
-
         Material.accent: Material.Yellow
 
         onToggled: root.soloToggled()
@@ -46,11 +47,13 @@ Item {
 
     Button {
         id: muteButton
+
         width: 32
         height: 40
-        text: qsTr("M")
+
         anchors.right: parent.right
 
+        text: qsTr("M")
         checkable: true
 
         onToggled: root.muteToggled()
