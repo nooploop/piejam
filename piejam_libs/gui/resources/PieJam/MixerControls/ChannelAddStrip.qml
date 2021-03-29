@@ -43,7 +43,7 @@ Item {
 
             text: qsTr("Add")
 
-            Material.background: Material.Green
+            Material.background: Material.color(Material.Green, Material.Shade400)
 
             onClicked: root.addClicked()
         }

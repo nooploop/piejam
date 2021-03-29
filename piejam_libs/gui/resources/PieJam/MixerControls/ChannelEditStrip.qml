@@ -39,7 +39,7 @@ Item {
 
             text: qsTr("Delete")
 
-            Material.background: Material.Red
+            Material.background: Material.color(Material.Red, Material.Shade400)
 
             onClicked: root.model.deleteChannel()
         }
