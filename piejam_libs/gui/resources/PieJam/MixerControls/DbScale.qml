@@ -19,7 +19,7 @@ Canvas {
     property bool enableText: true
     property var backgroundColor: Qt.rgba(0, 0, 0, 1)
 
-    implicitWidth: enableText ? 48 : 12
+    implicitWidth: enableText ? 32 : 12
 
     onPaint: {
         var ctx = getContext("2d");

@@ -18,7 +18,7 @@ function dbToString(db) {
     else if (db === Number.POSITIVE_INFINITY)
         return "Inf"
     else if (db > 0)
-        return "+%1 dB".arg(db)
+        return "+%1".arg(db)
     else
-        return "%1 dB".arg(db)
+        return "%1".arg(db)
 }

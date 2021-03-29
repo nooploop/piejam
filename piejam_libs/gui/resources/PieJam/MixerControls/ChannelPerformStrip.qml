@@ -19,7 +19,7 @@ Item {
 
     signal fxButtonClicked()
 
-    implicitWidth: 150
+    implicitWidth: 132
     implicitHeight: 400
 
     Frame {
@@ -30,10 +30,11 @@ Item {
         HeaderLabel {
             id: title
 
-            width: 96
             height: 24
 
             anchors.top: parent.top
+            anchors.right: fxButton.left
+            anchors.rightMargin: 4
             anchors.left: parent.left
 
             text: root.model ? root.model.name : ""
@@ -131,6 +132,6 @@ Item {
         target: root.model
         property: "subscribed"
         value: root.visible
-        restoreMode: Binding.RestoreBinding
+//        restoreMode: Binding.RestoreBinding
     }
 }

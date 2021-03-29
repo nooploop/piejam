@@ -19,7 +19,7 @@ Item {
     property var model
     property bool deletable: true
 
-    implicitWidth: 150
+    implicitWidth: 132
     implicitHeight: 400
 
     Frame {
@@ -249,6 +249,6 @@ Item {
         target: root.model
         property: "subscribed"
         value: root.visible
-        restoreMode: Binding.RestoreBinding
+//        restoreMode: Binding.RestoreBinding
     }
 }

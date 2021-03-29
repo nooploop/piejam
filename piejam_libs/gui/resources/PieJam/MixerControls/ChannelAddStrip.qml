@@ -16,7 +16,7 @@ Item {
 
     signal addClicked()
 
-    implicitWidth: 150
+    implicitWidth: 132
     implicitHeight: 400
 
     Frame {

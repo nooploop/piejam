@@ -23,7 +23,7 @@ Item {
 
     Button {
         id: soloButton
-        width: 40
+        width: 32
         height: 40
         text: qsTr("S")
         anchors.right: muteButton.left
@@ -46,7 +46,7 @@ Item {
 
     Button {
         id: muteButton
-        width: 40
+        width: 32
         height: 40
         text: qsTr("M")
         anchors.right: parent.right

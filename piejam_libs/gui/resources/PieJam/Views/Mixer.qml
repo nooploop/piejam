@@ -63,7 +63,7 @@ ViewPane {
         }
 
         footer: Item {
-            width: 160
+            width: 142
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom

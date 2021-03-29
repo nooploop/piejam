@@ -11,7 +11,7 @@ Item {
     property alias perform: performStrip
     property alias edit: editStrip
 
-    implicitWidth: 150
+    implicitWidth: 132
     implicitHeight: 400
 
     StackLayout {
