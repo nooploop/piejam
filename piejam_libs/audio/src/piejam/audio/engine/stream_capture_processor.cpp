@@ -33,12 +33,10 @@ stream_capture_processor::process(process_context const& ctx)
                     [this, &ctx](float const constant) {
                         // use the output buffer as temporary storage
                         std::ranges::fill(ctx.outputs[0], constant);
-                        m_buffer.push(
-                                ctx.outputs[0].data(),
-                                ctx.outputs[0].size());
+                        m_buffer.write(ctx.outputs[0]);
                     },
                     [this](std::span<float const> const& buffer) {
-                        m_buffer.push(buffer.data(), buffer.size());
+                        m_buffer.write(buffer);
                     }},
             in.get().as_variant());
 

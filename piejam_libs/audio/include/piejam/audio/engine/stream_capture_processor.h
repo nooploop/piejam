@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <piejam/audio/engine/audio_stream_buffer.h>
 #include <piejam/audio/engine/named_processor.h>
-
-#include <boost/lockfree/spsc_queue.hpp>
 
 #include <string_view>
 
@@ -34,13 +33,13 @@ public:
     void process(process_context const& ctx) override;
 
     template <class F>
-    void consume_all(F&& f)
+    void consume(F&& f)
     {
-        m_buffer.consume_all(std::forward<F>(f));
+        m_buffer.consume(std::forward<F>(f));
     }
 
 private:
-    boost::lockfree::spsc_queue<float> m_buffer;
+    audio_stream_buffer m_buffer;
 };
 
 } // namespace piejam::audio::engine
