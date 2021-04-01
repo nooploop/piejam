@@ -132,6 +132,6 @@ Item {
         target: root.model
         property: "subscribed"
         value: root.visible
-//        restoreMode: Binding.RestoreBinding
+        restoreMode: Binding.RestoreBinding
     }
 }
