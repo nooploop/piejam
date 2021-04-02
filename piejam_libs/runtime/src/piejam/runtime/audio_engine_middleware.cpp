@@ -39,6 +39,7 @@
 #include <piejam/runtime/actions/select_samplerate.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/actions/update_parameter_values.h>
+#include <piejam/runtime/actions/update_streams.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/ladspa_manager.h>
@@ -480,25 +481,20 @@ audio_engine_middleware::process_engine_action(
 template <>
 void
 audio_engine_middleware::process_engine_action(
-        actions::request_streams_update const& /*a*/)
+        actions::request_streams_update const& a)
 {
     if (m_engine)
     {
-        //        actions::update_parameter_values next_action;
+        actions::update_streams next_action;
 
-        //        boost::mp11::tuple_for_each(
-        //                a.param_ids,
-        //                [this, &next_action](auto&& ids) {
-        //                    for (auto&& id : ids)
-        //                    {
-        //                        if (auto value =
-        //                        m_engine->get_parameter_update(id))
-        //                            next_action.push_back(id, *value);
-        //                    }
-        //                });
+        for (auto const& id : a.streams)
+        {
+            if (auto buffer = m_engine->get_stream(id); !buffer->empty())
+                next_action.streams.emplace(id, std::move(buffer));
+        }
 
-        //        if (!next_action.empty())
-        //            next(next_action);
+        if (!next_action.streams.empty())
+            next(next_action);
     }
 }
 

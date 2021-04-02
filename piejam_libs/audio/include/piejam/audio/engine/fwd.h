@@ -25,6 +25,7 @@ class processor;
 class named_processor;
 class input_processor;
 class output_processor;
+class stream_processor;
 template <class T>
 class value_io_processor;
 

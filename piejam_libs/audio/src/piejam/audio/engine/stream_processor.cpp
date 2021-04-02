@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/engine/stream_capture_processor.h>
+#include <piejam/audio/engine/stream_processor.h>
 
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/functional/overload.h>
@@ -13,7 +13,7 @@
 namespace piejam::audio::engine
 {
 
-stream_capture_processor::stream_capture_processor(
+stream_processor::stream_processor(
         std::size_t capacity,
         std::string_view const& name)
     : named_processor(name)
@@ -22,7 +22,7 @@ stream_capture_processor::stream_capture_processor(
 }
 
 void
-stream_capture_processor::process(process_context const& ctx)
+stream_processor::process(process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 

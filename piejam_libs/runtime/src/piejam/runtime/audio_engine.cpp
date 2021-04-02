@@ -17,6 +17,7 @@
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/output_processor.h>
 #include <piejam/audio/engine/process.h>
+#include <piejam/audio/engine/stream_processor.h>
 #include <piejam/audio/engine/value_io_processor.h>
 #include <piejam/audio/engine/value_sink_processor.h>
 #include <piejam/functional/overload.h>
@@ -41,6 +42,7 @@
 #include <piejam/runtime/processors/midi_input_processor.h>
 #include <piejam/runtime/processors/midi_learn_processor.h>
 #include <piejam/runtime/processors/midi_to_parameter_processor.h>
+#include <piejam/runtime/processors/stream_processor_factory.h>
 #include <piejam/runtime/solo_group.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/worker.h>
@@ -637,6 +639,7 @@ struct audio_engine::impl
     component_map comps;
 
     parameter_processor_factory param_procs;
+    processors::stream_processor_factory stream_procs;
 
     audio::engine::graph graph;
 };
@@ -714,9 +717,19 @@ audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
     return result;
 }
 
-auto audio_engine::get_stream(audio_stream_id) const -> audio_stream_buffer
+auto
+audio_engine::get_stream(audio_stream_id const id) const -> audio_stream_buffer
 {
-    return {};
+    audio_stream_buffer result;
+
+    if (auto proc = m_impl->stream_procs.find_processor(id))
+    {
+        proc->consume([&result](std::span<float const> data) {
+            result = std::vector<float>(data.begin(), data.end());
+        });
+    }
+
+    return result;
 }
 
 bool
@@ -732,6 +745,8 @@ audio_engine::rebuild(
         midi_assignments_map const& assignments)
 {
     component_map comps;
+
+    processors::stream_processor_factory stream_procs;
 
     make_mixer_components(
             comps,
@@ -800,6 +815,9 @@ audio_engine::rebuild(
     m_impl->comps = std::move(comps);
 
     m_impl->param_procs.clear_expired();
+
+    stream_procs.takeover(m_impl->stream_procs);
+    m_impl->stream_procs = std::move(stream_procs);
 
     std::ofstream("graph.dot")
             << audio::engine::export_graph_as_dot(m_impl->graph) << std::endl;

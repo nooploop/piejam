@@ -12,10 +12,10 @@
 namespace piejam::audio::engine
 {
 
-class stream_capture_processor final : public named_processor
+class stream_processor final : public named_processor
 {
 public:
-    stream_capture_processor(
+    stream_processor(
             std::size_t capacity,
             std::string_view const& name = {});
 
