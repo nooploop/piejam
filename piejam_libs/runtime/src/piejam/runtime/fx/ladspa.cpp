@@ -113,7 +113,8 @@ make_ladspa_module(
             .fx_instance_id = instance_id,
             .name = name,
             .parameters =
-                    make_module_parameters(control_inputs, fx_params, params)};
+                    make_module_parameters(control_inputs, fx_params, params),
+            .streams = {}};
 }
 
 } // namespace piejam::runtime::fx

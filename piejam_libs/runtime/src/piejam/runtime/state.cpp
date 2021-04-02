@@ -320,7 +320,8 @@ insert_missing_ladspa_fx_module(
                     st.fx_modules.add(fx::module{
                             .fx_instance_id = id,
                             .name = name,
-                            .parameters = {}}));
+                            .parameters = {},
+                            .streams = {}}));
         });
     });
 }

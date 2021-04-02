@@ -60,22 +60,27 @@ make_gain_module(parameters_t& fx_params, parameter_maps& params) -> module
 
     return module{
             .fx_instance_id = internal::gain,
-            .name = "gain"s,
-            .parameters = fx::module_parameters{
-                    {static_cast<std::size_t>(gain_parameter_key::gain),
-                     add_param(
-                             runtime::parameter::float_{
-                                     .default_value =
-                                             gain_defaults::default_value,
-                                     .min = gain_defaults::min,
-                                     .max = gain_defaults::max,
-                                     .to_normalized = runtime::parameter::
-                                             to_normalized_db<dB_ival>,
-                                     .from_normalized =
-                                             &runtime::parameter::
-                                                     from_normalized_db<
-                                                             dB_ival>},
-                             "gain"s)}}};
+            .name = "Gain"s,
+            .parameters =
+                    fx::module_parameters{
+                            {static_cast<parameter_key>(
+                                     gain_parameter_key::gain),
+                             add_param(
+                                     runtime::parameter::float_{
+                                             .default_value = gain_defaults::
+                                                     default_value,
+                                             .min = gain_defaults::min,
+                                             .max = gain_defaults::max,
+                                             .to_normalized =
+                                                     runtime::parameter::
+                                                             to_normalized_db<
+                                                                     dB_ival>,
+                                             .from_normalized =
+                                                     &runtime::parameter::
+                                                             from_normalized_db<
+                                                                     dB_ival>},
+                                     "Gain"s)}},
+            .streams = {}};
 }
 
 } // namespace piejam::runtime::fx

@@ -54,6 +54,8 @@ public:
         return id;
     }
 
+    auto add() -> id_t { return add(Entity{}); }
+
     template <std::invocable<Entity&> U>
     auto update(id_t const id, U&& u)
     {
