@@ -30,6 +30,7 @@
 #include <piejam/runtime/parameter_maps.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/selected_device.h>
+#include <piejam/runtime/audio_stream.h>
 
 #include <functional>
 #include <optional>
@@ -56,6 +57,7 @@ struct state
     box<midi_devices_t> midi_devices;
 
     parameter_maps params;
+    audio_streams_cache streams;
 
     fx::registry fx_registry{fx::make_default_registry()};
 

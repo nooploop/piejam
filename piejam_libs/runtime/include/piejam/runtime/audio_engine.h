@@ -8,6 +8,7 @@
 #include <piejam/audio/pcm_buffer_converter.h>
 #include <piejam/audio/types.h>
 #include <piejam/midi/fwd.h>
+#include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -44,6 +45,8 @@ public:
             -> std::optional<typename P::value_type>;
 
     auto get_learned_midi() const -> std::optional<midi::external_event>;
+
+    auto get_stream(audio_stream_id) const -> audio_stream_buffer;
 
     [[nodiscard]] bool
     rebuild(mixer::channels_t const&,

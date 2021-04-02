@@ -32,6 +32,7 @@
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/move_fx_module.h>
 #include <piejam/runtime/actions/request_parameters_update.h>
+#include <piejam/runtime/actions/request_streams_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
@@ -473,6 +474,31 @@ audio_engine_middleware::process_engine_action(
 
         if (!next_action.empty())
             next(next_action);
+    }
+}
+
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        actions::request_streams_update const& /*a*/)
+{
+    if (m_engine)
+    {
+        //        actions::update_parameter_values next_action;
+
+        //        boost::mp11::tuple_for_each(
+        //                a.param_ids,
+        //                [this, &next_action](auto&& ids) {
+        //                    for (auto&& id : ids)
+        //                    {
+        //                        if (auto value =
+        //                        m_engine->get_parameter_update(id))
+        //                            next_action.push_back(id, *value);
+        //                    }
+        //                });
+
+        //        if (!next_action.empty())
+        //            next(next_action);
     }
 }
 

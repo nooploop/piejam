@@ -5,7 +5,9 @@
 #pragma once
 
 #include <piejam/boxed_string.h>
+#include <piejam/boxed_vector.h>
 #include <piejam/entity_id.h>
+#include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
 
@@ -18,6 +20,7 @@ struct module
     boxed_string name;
     bool bypassed{};
     box<module_parameters> parameters;
+    boxed_vector<audio_stream_id> streams{};
 };
 
 } // namespace piejam::runtime::fx

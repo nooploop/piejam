@@ -714,6 +714,11 @@ audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
     return result;
 }
 
+auto audio_engine::get_stream(audio_stream_id) const -> audio_stream_buffer
+{
+    return {};
+}
+
 bool
 audio_engine::rebuild(
         mixer::channels_t const& mixer_channels,

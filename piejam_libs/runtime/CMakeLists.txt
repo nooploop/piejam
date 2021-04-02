@@ -32,6 +32,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_info_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_mixer_levels_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_parameters_update.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/request_streams_update.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/save_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/save_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/scan_ladspa_fx_plugins.h
@@ -44,8 +45,10 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_float_parameter_normalized.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_parameter_value.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_parameter_values.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_streams.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine_middleware.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_stream.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/channel_index_pair.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_gain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_ladspa.h
@@ -148,6 +151,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_info_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_mixer_levels_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_parameters_update.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_streams_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/save_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/save_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/scan_ladspa_fx_plugins.cpp
@@ -160,6 +164,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_float_parameter_normalized.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_parameter_value.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_parameter_values.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_streams.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/batch_action.cpp

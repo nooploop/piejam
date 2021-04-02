@@ -30,6 +30,7 @@ struct engine_action_visitor
               set_int_parameter,
               request_parameters_update,
               request_info_update,
+              request_streams_update,
               move_fx_module_left,
               move_fx_module_right,
               start_midi_learning,

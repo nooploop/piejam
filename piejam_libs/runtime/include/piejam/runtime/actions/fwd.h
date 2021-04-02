@@ -47,6 +47,7 @@ struct move_mixer_channel_right;
 
 struct request_parameters_update;
 struct request_info_update;
+struct request_streams_update;
 
 struct set_device_bus_name;
 
