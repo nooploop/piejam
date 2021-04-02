@@ -21,7 +21,9 @@ namespace piejam::runtime
 namespace fx
 {
 
-NLOHMANN_JSON_SERIALIZE_ENUM(internal, {{internal::gain, "gain"}})
+NLOHMANN_JSON_SERIALIZE_ENUM(
+        internal,
+        {{internal::gain, "gain"}, {internal::scope, "scope"}})
 
 } // namespace fx
 

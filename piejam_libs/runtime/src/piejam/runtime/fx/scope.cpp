@@ -62,7 +62,7 @@ make_scope_module(
     };
 
     return module{
-            .fx_instance_id = internal::gain,
+            .fx_instance_id = internal::scope,
             .name = "Scope"s,
             .parameters =
                     fx::module_parameters{

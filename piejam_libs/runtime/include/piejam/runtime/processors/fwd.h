@@ -10,4 +10,6 @@ namespace piejam::runtime::processors
 template <class...>
 class parameter_processor_factory;
 
+class stream_processor_factory;
+
 } // namespace piejam::runtime::processors

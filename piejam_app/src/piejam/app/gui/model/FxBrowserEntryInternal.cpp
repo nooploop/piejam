@@ -23,13 +23,18 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
     , m_fx_type(fx_type)
 {
     static QString s_section_internal{tr("Internal")};
+    setSection(s_section_internal);
 
     switch (fx_type)
     {
         case runtime::fx::internal::gain:
             setName(tr("Gain"));
-            setSection(s_section_internal);
             setDescription(tr("Amplify or attenuate a signal."));
+            break;
+
+        case runtime::fx::internal::scope:
+            setName(tr("Scope"));
+            setDescription(tr("Observe audio signal."));
             break;
     }
 }

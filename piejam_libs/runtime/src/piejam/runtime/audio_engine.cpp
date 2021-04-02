@@ -178,7 +178,9 @@ make_fx_chain_components(
         fx::modules_t const& fx_modules,
         fx::parameters_t const& fx_params,
         parameter_processor_factory& param_procs,
-        fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory)
+        processors::stream_processor_factory& stream_procs,
+        fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
+        audio::samplerate_t const samplerate)
 {
     auto get_fx_param_name =
             [&fx_params](fx::parameter_id id) -> std::string_view {
@@ -200,7 +202,9 @@ make_fx_chain_components(
                     fx_mod,
                     get_fx_param_name,
                     ladspa_fx_proc_factory,
-                    param_procs);
+                    param_procs,
+                    stream_procs,
+                    samplerate);
             if (comp)
             {
                 comps.insert(fx_mod_id, std::move(comp));
@@ -761,7 +765,9 @@ audio_engine::rebuild(
             fx_modules,
             fx_params,
             m_impl->param_procs,
-            ladspa_fx_proc_factory);
+            m_impl->stream_procs,
+            ladspa_fx_proc_factory,
+            m_samplerate);
     auto const solo_groups = runtime::solo_groups(mixer_channels);
     make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 

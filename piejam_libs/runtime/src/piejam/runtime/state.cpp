@@ -11,6 +11,7 @@
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
+#include <piejam/runtime/fx/scope.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
@@ -150,6 +151,16 @@ make_fx_gain(
     return fx_modules.add(fx::make_gain_module(fx_params, params));
 }
 
+static auto
+make_fx_scope(
+        fx::modules_t& fx_modules,
+        fx::parameters_t& fx_params,
+        parameter_maps& params,
+        audio_streams_cache& streams)
+{
+    return fx_modules.add(fx::make_scope_module(fx_params, params, streams));
+}
+
 static void
 apply_parameter_values(
         std::vector<fx::parameter_value_assignment> const& values,
@@ -238,11 +249,18 @@ insert_internal_fx_module(
     {
         case fx::internal::gain:
             fx_mod_id = make_fx_gain(st.fx_modules, fx_params, st.params);
-            fx_chain.emplace(
-                    std::next(fx_chain.begin(), insert_pos),
-                    fx_mod_id);
+            break;
+
+        case fx::internal::scope:
+            fx_mod_id = make_fx_scope(
+                    st.fx_modules,
+                    fx_params,
+                    st.params,
+                    st.streams);
             break;
     }
+
+    fx_chain.emplace(std::next(fx_chain.begin(), insert_pos), fx_mod_id);
 
     st.fx_parameters = std::move(fx_params);
 
