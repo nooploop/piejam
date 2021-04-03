@@ -539,12 +539,58 @@ const selector<mixer::channel_id> select_fx_chain_channel([](state const& st) {
     return st.fx_chain_channel;
 });
 
-const selector<box<fx::chain_t>> select_current_fx_chain([](state const& st) {
-    static box<fx::chain_t> s_empty_fx_chain;
-    mixer::channel const* const bus =
-            st.mixer_state.channels.find(st.fx_chain_channel);
-    return bus ? bus->fx_chain : s_empty_fx_chain;
-});
+static auto
+get_fx_module_info_gui_model(fx::instance_id const& instance_id)
+{
+    return std::visit(
+            overload{
+                    [](fx::internal const fx_type) {
+                        switch (fx_type)
+                        {
+                            case fx::internal::scope:
+                                return fx_module_info::gui_model::scope;
+
+                            default:
+                                return fx_module_info::gui_model::generic;
+                        }
+                    },
+                    [](auto const&) {
+                        return fx_module_info::gui_model::generic;
+                    }},
+            instance_id);
+}
+
+static auto
+get_fx_chain_module_infos(
+        mixer::channels_t const& mixer_channels,
+        mixer::channel_id const channel_id,
+        fx::modules_t const& fx_modules) -> boxed_vector<fx_module_info>
+{
+    static boxed_vector<fx_module_info> s_empty_fx_chain;
+    if (mixer::channel const* const bus = mixer_channels.find(channel_id))
+    {
+        return algorithm::transform_to_vector(
+                *bus->fx_chain,
+                [&fx_modules](fx::module_id const fx_mod_id) -> fx_module_info {
+                    auto fx_mod = fx_modules.find(fx_mod_id);
+                    return fx_module_info{
+                            .fx_mod_id = fx_mod_id,
+                            .gui = fx_mod ? get_fx_module_info_gui_model(
+                                                    fx_mod->fx_instance_id)
+                                          : fx_module_info::gui_model::generic};
+                });
+    }
+
+    return s_empty_fx_chain;
+}
+
+const selector<boxed_vector<fx_module_info>> select_current_fx_chain(
+        [get = memo(&get_fx_chain_module_infos)](state const& st) {
+            return get(
+                    st.mixer_state.channels,
+                    st.fx_chain_channel,
+                    st.fx_modules);
+        });
 
 auto
 make_fx_module_name_selector(fx::module_id fx_mod_id) -> selector<boxed_string>

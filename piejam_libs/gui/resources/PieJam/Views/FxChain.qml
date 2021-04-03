@@ -52,6 +52,7 @@ ViewPane {
                 anchors.bottom: if (parent) parent.bottom
 
                 name: model.item.name
+                type: model.item.type
                 parameters: model.item.parameters
                 moveLeftEnabled: model.item.canMoveLeft
                 moveRightEnabled: model.item.canMoveRight

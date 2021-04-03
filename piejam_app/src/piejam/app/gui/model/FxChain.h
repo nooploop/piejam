@@ -5,9 +5,9 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/box.h>
 #include <piejam/gui/model/FxChain.h>
-#include <piejam/runtime/fx/fwd.h>
+
+#include <memory>
 
 namespace piejam::app::gui::model
 {
@@ -16,11 +16,13 @@ class FxChain final : public Subscribable<piejam::gui::model::FxChain>
 {
 public:
     FxChain(runtime::store_dispatch, runtime::subscriber&);
+    ~FxChain();
 
 private:
     void onSubscribe() override;
 
-    box<runtime::fx::chain_t> m_fx_chain;
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace piejam::app::gui::model

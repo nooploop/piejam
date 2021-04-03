@@ -13,30 +13,40 @@
 namespace piejam::app::gui::model
 {
 
+struct FxChain::Impl
+{
+    boxed_vector<runtime::selectors::fx_module_info> fx_chain;
+};
+
 FxChain::FxChain(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
+    , m_impl(std::make_unique<Impl>())
 {
 }
+
+FxChain::~FxChain() = default;
 
 void
 FxChain::onSubscribe()
 {
     observe(runtime::selectors::select_current_fx_chain,
-            [this](box<runtime::fx::chain_t> const& fx_chain) {
+            [this](boxed_vector<runtime::selectors::fx_module_info> const&
+                           fx_chain) {
                 algorithm::apply_edit_script(
-                        algorithm::edit_script(*m_fx_chain, *fx_chain),
+                        algorithm::edit_script(*m_impl->fx_chain, *fx_chain),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *modules(),
-                                [this](runtime::fx::module_id fx_mod_id) {
+                                [this](runtime::selectors::fx_module_info const&
+                                               fx_mod_info) {
                                     return std::make_unique<FxModule>(
                                             dispatch(),
                                             state_change_subscriber(),
-                                            fx_mod_id);
+                                            fx_mod_info.fx_mod_id);
                                 }});
 
-                m_fx_chain = fx_chain;
+                m_impl->fx_chain = fx_chain;
             });
 }
 

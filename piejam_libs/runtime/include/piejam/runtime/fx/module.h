@@ -19,6 +19,8 @@ struct module
     bool bypassed{};
     box<module_parameters> parameters;
     box<module_streams> streams;
+
+    bool operator==(module const&) const noexcept = default;
 };
 
 } // namespace piejam::runtime::fx

@@ -24,6 +24,18 @@ class FxModule : public SubscribableModel
                        FINAL)
 
 public:
+    enum class Type
+    {
+        Generic = 0,
+        Scope
+    };
+
+    Q_ENUM(Type)
+
+    Q_PROPERTY(Type type READ type CONSTANT FINAL)
+
+    virtual auto type() const noexcept -> Type { return Type::Generic; }
+
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
     {

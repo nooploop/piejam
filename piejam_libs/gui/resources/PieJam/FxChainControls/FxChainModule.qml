@@ -11,6 +11,7 @@ Item {
     id: root
 
     property alias name: nameLabel.text
+    property alias type: moduleContent.currentIndex
     property alias parameters: parametersList.model
     property bool bypassed: false
     property alias moveLeftEnabled: moveLeftButton.enabled
@@ -157,11 +158,19 @@ Item {
             onClicked: deleteButtonClicked()
         }
 
-        ParametersListView {
-            id: parametersList
+        StackLayout {
+            id: moduleContent
 
             anchors.top: nameLabel.bottom
             anchors.bottom: parent.bottom
+
+            ParametersListView {
+                id: parametersList
+            }
+
+            Label {
+                text: "scope"
+            }
         }
     }
 

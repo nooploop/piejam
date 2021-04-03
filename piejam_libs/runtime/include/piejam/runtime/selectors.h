@@ -155,7 +155,21 @@ auto make_muted_by_solo_selector(mixer::channel_id) -> selector<bool>;
 
 extern const selector<mixer::channel_id> select_fx_chain_channel;
 
-extern const selector<box<fx::chain_t>> select_current_fx_chain;
+struct fx_module_info
+{
+    enum class gui_model
+    {
+        generic,
+        scope
+    };
+
+    fx::module_id fx_mod_id;
+    gui_model gui;
+
+    bool operator==(fx_module_info const&) const noexcept = default;
+};
+
+extern const selector<boxed_vector<fx_module_info>> select_current_fx_chain;
 
 auto make_fx_module_name_selector(fx::module_id) -> selector<boxed_string>;
 auto make_fx_module_bypass_selector(fx::module_id) -> selector<bool>;
