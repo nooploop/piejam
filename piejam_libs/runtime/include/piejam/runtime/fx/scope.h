@@ -19,8 +19,7 @@ enum class scope_parameter_key : parameter_key
 
 enum class scope_stream_key : stream_key
 {
-    left,
-    right
+    left_right
 };
 
 auto make_scope_module(parameters_t&, parameter_maps&, audio_streams_cache&)

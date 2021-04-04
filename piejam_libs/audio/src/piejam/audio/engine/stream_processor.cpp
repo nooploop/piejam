@@ -5,7 +5,10 @@
 #include <piejam/audio/engine/stream_processor.h>
 
 #include <piejam/audio/engine/verify_process_context.h>
+#include <piejam/audio/period_sizes.h>
 #include <piejam/functional/overload.h>
+#include <piejam/range/iota.h>
+#include <piejam/range/stride_iterator.h>
 
 #include <boost/hof/always.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
@@ -14,10 +17,13 @@ namespace piejam::audio::engine
 {
 
 stream_processor::stream_processor(
-        std::size_t capacity,
+        std::size_t const num_channels,
+        std::size_t const capacity_per_channel,
         std::string_view const& name)
     : named_processor(name)
-    , m_buffer(capacity)
+    , m_num_channels(num_channels)
+    , m_buffer(num_channels * capacity_per_channel)
+    , m_interleave_buffer(num_channels * max_period_size)
 {
 }
 
@@ -26,21 +32,34 @@ stream_processor::process(process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
-    auto const& in = ctx.inputs[0];
+    for (std::size_t const ch : range::iota(m_num_channels))
+    {
+        auto const& in = ctx.inputs[ch];
 
-    std::visit(
-            overload{
-                    [this, &ctx](float const constant) {
-                        // use the output buffer as temporary storage
-                        std::ranges::fill(ctx.outputs[0], constant);
-                        m_buffer.write(ctx.outputs[0]);
-                    },
-                    [this](std::span<float const> const& buffer) {
-                        m_buffer.write(buffer);
-                    }},
-            in.get().as_variant());
+        std::visit(
+                overload{
+                        [this, ch, &ctx](float const constant) {
+                            std::ranges::fill_n(
+                                    range::stride_iterator(
+                                            m_interleave_buffer.data() + ch,
+                                            m_num_channels),
+                                    ctx.buffer_size,
+                                    constant);
+                        },
+                        [this, ch](std::span<float const> const& buffer) {
+                            std::ranges::copy(
+                                    buffer,
+                                    range::stride_iterator(
+                                            m_interleave_buffer.data() + ch,
+                                            m_num_channels));
+                        }},
+                in.get().as_variant());
 
-    ctx.results[0] = in;
+        ctx.results[ch] = in;
+    }
+
+    m_buffer.write(
+            {m_interleave_buffer.data(), ctx.buffer_size * m_num_channels});
 }
 
 } // namespace piejam::audio::engine

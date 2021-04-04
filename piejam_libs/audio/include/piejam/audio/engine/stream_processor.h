@@ -16,16 +16,14 @@ class stream_processor final : public named_processor
 {
 public:
     stream_processor(
-            std::size_t capacity,
+            std::size_t num_channels,
+            std::size_t capacity_per_channel,
             std::string_view const& name = {});
 
-    auto type_name() const -> std::string_view override
-    {
-        return "stream_capture";
-    }
+    auto type_name() const -> std::string_view override { return "stream"; }
 
-    auto num_inputs() const -> std::size_t override { return 1; }
-    auto num_outputs() const -> std::size_t override { return 1; }
+    auto num_inputs() const -> std::size_t override { return m_num_channels; }
+    auto num_outputs() const -> std::size_t override { return m_num_channels; }
 
     auto event_inputs() const -> event_ports override { return {}; }
     auto event_outputs() const -> event_ports override { return {}; }
@@ -39,7 +37,9 @@ public:
     }
 
 private:
+    std::size_t m_num_channels;
     audio_stream_buffer m_buffer;
+    std::vector<float> m_interleave_buffer;
 };
 
 } // namespace piejam::audio::engine

@@ -39,16 +39,12 @@ public:
             audio::samplerate_t const samplerate,
             processors::stream_processor_factory& stream_proc_factory,
             std::string_view const&)
-        : m_left_stream_proc(stream_proc_factory.make_processor(
+        : m_stream_proc(stream_proc_factory.make_processor(
                   fx_mod.streams->at(static_cast<fx::stream_key>(
-                          fx::scope_stream_key::left)),
+                          fx::scope_stream_key::left_right)),
+                  2,
                   stream_capacity(samplerate),
-                  "scope_left"))
-        , m_right_stream_proc(stream_proc_factory.make_processor(
-                  fx_mod.streams->at(static_cast<fx::stream_key>(
-                          fx::scope_stream_key::right)),
-                  stream_capacity(samplerate),
-                  "scope_right"))
+                  "scope"))
     {
     }
 
@@ -61,15 +57,14 @@ public:
     void connect(audio::engine::graph&) const override {}
 
 private:
-    std::shared_ptr<audio::engine::processor> m_left_stream_proc;
-    std::shared_ptr<audio::engine::processor> m_right_stream_proc;
+    std::shared_ptr<audio::engine::processor> m_stream_proc;
 
     std::array<audio::engine::graph_endpoint, 2> m_inputs{
-            audio::engine::graph_endpoint{*m_left_stream_proc, 0},
-            audio::engine::graph_endpoint{*m_right_stream_proc, 0}};
+            audio::engine::graph_endpoint{*m_stream_proc, 0},
+            audio::engine::graph_endpoint{*m_stream_proc, 1}};
     std::array<audio::engine::graph_endpoint, 2> m_outputs{
-            audio::engine::graph_endpoint{*m_left_stream_proc, 0},
-            audio::engine::graph_endpoint{*m_right_stream_proc, 0}};
+            audio::engine::graph_endpoint{*m_stream_proc, 0},
+            audio::engine::graph_endpoint{*m_stream_proc, 1}};
 };
 
 } // namespace

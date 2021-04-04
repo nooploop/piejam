@@ -14,11 +14,14 @@ stream_processor_factory::~stream_processor_factory() = default;
 auto
 stream_processor_factory::make_processor(
         audio_stream_id const id,
-        std::size_t const capacity,
+        std::size_t const num_channels,
+        std::size_t const capacity_per_channel,
         std::string_view const& name) -> std::shared_ptr<processor_t>
 {
-    auto proc =
-            std::make_shared<audio::engine::stream_processor>(capacity, name);
+    auto proc = std::make_shared<audio::engine::stream_processor>(
+            num_channels,
+            capacity_per_channel,
+            name);
     BOOST_VERIFY(m_procs.emplace(id, proc).second);
     return proc;
 }

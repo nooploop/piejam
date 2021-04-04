@@ -70,9 +70,7 @@ make_scope_module(
                                      scope_parameter_key::resolution),
                              add_resolution_param()}},
             .streams = module_streams{
-                    {static_cast<stream_key>(scope_stream_key::left),
-                     streams.add()},
-                    {static_cast<stream_key>(scope_stream_key::right),
+                    {static_cast<stream_key>(scope_stream_key::left_right),
                      streams.add()}}};
 }
 

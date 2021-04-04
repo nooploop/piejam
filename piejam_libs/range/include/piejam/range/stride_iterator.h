@@ -181,4 +181,16 @@ private:
     difference_type m_stride{};
 };
 
+template <class Iterator>
+stride_iterator(
+        Iterator const&,
+        typename std::iterator_traits<Iterator>::difference_type)
+        -> stride_iterator<Iterator>;
+
+template <class Iterator>
+stride_iterator(
+        Iterator&&,
+        typename std::iterator_traits<Iterator>::difference_type)
+        -> stride_iterator<Iterator>;
+
 } // namespace piejam::range
