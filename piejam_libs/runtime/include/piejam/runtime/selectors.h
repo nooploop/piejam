@@ -179,10 +179,10 @@ auto make_fx_module_can_move_left_selector(fx::module_id) -> selector<bool>;
 auto make_fx_module_can_move_right_selector(fx::module_id) -> selector<bool>;
 auto make_fx_parameter_name_selector(fx::parameter_id)
         -> selector<boxed_string>;
-auto make_fx_parameter_id_selector(fx::module_id, fx::parameter_key)
-        -> selector<fx::parameter_id>;
 auto make_fx_parameter_value_string_selector(fx::parameter_id)
         -> selector<std::string>;
+auto make_fx_module_streams_selector(fx::module_id)
+        -> selector<box<fx::module_streams>>;
 
 auto make_bool_parameter_value_selector(bool_parameter_id) -> selector<bool>;
 auto make_float_parameter_value_selector(float_parameter_id) -> selector<float>;

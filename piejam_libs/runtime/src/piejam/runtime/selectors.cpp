@@ -661,24 +661,6 @@ make_fx_parameter_name_selector(fx::parameter_id const fx_param_id)
 }
 
 auto
-make_fx_parameter_id_selector(
-        fx::module_id const fx_mod_id,
-        fx::parameter_key const fx_param_key) -> selector<fx::parameter_id>
-{
-    return [fx_mod_id, fx_param_key](state const& st) -> fx::parameter_id {
-        if (fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id))
-        {
-            if (auto it = fx_mod->parameters->find(fx_param_key);
-                it != fx_mod->parameters->end())
-            {
-                return it->second;
-            }
-        }
-        return {};
-    };
-}
-
-auto
 make_fx_parameter_value_string_selector(fx::parameter_id const param_id)
         -> selector<std::string>
 {
@@ -694,6 +676,17 @@ make_fx_parameter_value_string_selector(fx::parameter_id const param_id)
                     param_id);
         }
         return {};
+    };
+}
+
+auto
+make_fx_module_streams_selector(fx::module_id fx_mod_id)
+        -> selector<box<fx::module_streams>>
+{
+    return [fx_mod_id](state const& st) -> box<fx::module_streams> {
+        static box<fx::module_streams> s_empty;
+        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
+        return fx_mod ? fx_mod->streams : s_empty;
     };
 }
 

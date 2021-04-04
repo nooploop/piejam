@@ -17,11 +17,12 @@ class FxModule : public SubscribableModel
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(bool bypassed READ bypassed NOTIFY bypassedChanged FINAL)
-    Q_PROPERTY(QAbstractListModel* parameters READ parameters CONSTANT)
+    Q_PROPERTY(QAbstractListModel* parameters READ parameters CONSTANT FINAL)
     Q_PROPERTY(
             bool canMoveLeft READ canMoveLeft NOTIFY canMoveLeftChanged FINAL)
     Q_PROPERTY(bool canMoveRight READ canMoveRight NOTIFY canMoveRightChanged
                        FINAL)
+    Q_PROPERTY(QAbstractListModel* streams READ streams CONSTANT FINAL)
 
 public:
     enum class Type
@@ -77,6 +78,16 @@ public:
     }
 
     auto parameters() noexcept -> FxParametersList* { return &m_parameters; }
+    auto parameters() const noexcept -> FxParametersList const*
+    {
+        return &m_parameters;
+    }
+
+    auto streams() noexcept -> AudioStreamProviderList* { return &m_streams; }
+    auto streams() const noexcept -> AudioStreamProviderList const*
+    {
+        return &m_streams;
+    }
 
     Q_INVOKABLE virtual void toggleBypass() = 0;
     Q_INVOKABLE virtual void deleteModule() = 0;
@@ -88,6 +99,7 @@ signals:
     void bypassedChanged();
     void canMoveLeftChanged();
     void canMoveRightChanged();
+    void streamsChanged();
 
 private:
     QString m_name;
@@ -95,6 +107,7 @@ private:
     FxParametersList m_parameters;
     bool m_canMoveLeft{};
     bool m_canMoveRight{};
+    AudioStreamProviderList m_streams;
 };
 
 } // namespace piejam::gui::model

@@ -11,6 +11,7 @@
 #include <piejam/app/gui/model/Info.h>
 #include <piejam/app/gui/model/MidiInputSettings.h>
 #include <piejam/app/gui/model/Mixer.h>
+#include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxParameter.h>
@@ -59,6 +60,7 @@ Factory::Factory(
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
     qRegisterMetaType<piejam::gui::model::MidiAssignable*>();
+    qRegisterMetaType<piejam::gui::model::AudioStreamProvider*>();
 
     qmlRegisterUncreatableType<piejam::gui::model::MixerChannelEdit>(
             "PieJam.Models",

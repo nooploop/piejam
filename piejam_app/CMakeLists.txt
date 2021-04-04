@@ -39,6 +39,10 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameterKeyId.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxStream.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxStream.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxStreamKeyId.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/Info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/MidiAssignable.cpp

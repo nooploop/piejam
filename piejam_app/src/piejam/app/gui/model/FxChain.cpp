@@ -8,6 +8,7 @@
 #include <piejam/app/gui/model/FxModule.h>
 #include <piejam/app/gui/model/FxParameter.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
+#include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::app::gui::model

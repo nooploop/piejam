@@ -5,9 +5,10 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/box.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/runtime/fx/fwd.h>
+
+#include <memory>
 
 namespace piejam::app::gui::model
 {
@@ -19,6 +20,7 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::fx::module_id);
+    ~FxModule();
 
     void toggleBypass() override;
     void deleteModule() override;
@@ -28,9 +30,8 @@ public:
 private:
     void onSubscribe() override;
 
-    runtime::fx::module_id const m_fx_mod_id;
-
-    box<runtime::fx::module_parameters> m_param_ids;
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace piejam::app::gui::model

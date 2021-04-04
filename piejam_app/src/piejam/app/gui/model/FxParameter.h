@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include <piejam/app/gui/model/FxParameterKeyId.h>
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/gui/model/FxParameter.h>
-#include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/parameters.h>
 
 namespace piejam::app::gui::model
 {
@@ -18,7 +17,7 @@ public:
     FxParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::fx::parameter_id);
+            FxParameterKeyId const&);
     ~FxParameter();
 
     void changeValue(double) override;
@@ -29,9 +28,8 @@ public:
 private:
     void onSubscribe() override;
 
-    runtime::fx::parameter_id m_fx_param_id;
-
-    std::unique_ptr<piejam::gui::model::MidiAssignable> m_midi;
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace piejam::app::gui::model
