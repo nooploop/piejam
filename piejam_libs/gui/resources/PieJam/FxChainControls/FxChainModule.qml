@@ -176,7 +176,8 @@ Item {
             ScopeView {
                 id: scopeView
 
-                model: streams
+                parameters: root.parameters
+                streams: root.streams
             }
         }
     }

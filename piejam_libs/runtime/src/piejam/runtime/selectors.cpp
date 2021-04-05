@@ -540,27 +540,6 @@ const selector<mixer::channel_id> select_fx_chain_channel([](state const& st) {
 });
 
 static auto
-get_fx_module_info_gui_model(fx::instance_id const& instance_id)
-{
-    return std::visit(
-            overload{
-                    [](fx::internal const fx_type) {
-                        switch (fx_type)
-                        {
-                            case fx::internal::scope:
-                                return fx_module_info::gui_model::scope;
-
-                            default:
-                                return fx_module_info::gui_model::generic;
-                        }
-                    },
-                    [](auto const&) {
-                        return fx_module_info::gui_model::generic;
-                    }},
-            instance_id);
-}
-
-static auto
 get_fx_chain_module_infos(
         mixer::channels_t const& mixer_channels,
         mixer::channel_id const channel_id,
@@ -575,9 +554,8 @@ get_fx_chain_module_infos(
                     auto fx_mod = fx_modules.find(fx_mod_id);
                     return fx_module_info{
                             .fx_mod_id = fx_mod_id,
-                            .gui = fx_mod ? get_fx_module_info_gui_model(
-                                                    fx_mod->fx_instance_id)
-                                          : fx_module_info::gui_model::generic};
+                            .instance_id = fx_mod ? fx_mod->fx_instance_id
+                                                  : fx::instance_id{}};
                 });
     }
 

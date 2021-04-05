@@ -9,5 +9,6 @@ import QtQuick.Controls.Material 2.15
 Item {
     id: root
 
-    property var model: []
+    property var parameters: []
+    property var streams: []
 }

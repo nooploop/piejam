@@ -44,7 +44,8 @@ FxChain::onSubscribe()
                                     return std::make_unique<FxModule>(
                                             dispatch(),
                                             state_change_subscriber(),
-                                            fx_mod_info.fx_mod_id);
+                                            fx_mod_info.fx_mod_id,
+                                            fx_mod_info.instance_id);
                                 }});
 
                 m_impl->fx_chain = fx_chain;

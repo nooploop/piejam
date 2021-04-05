@@ -19,7 +19,8 @@ public:
     FxModule(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::fx::module_id);
+            runtime::fx::module_id,
+            runtime::fx::instance_id);
     ~FxModule();
 
     void toggleBypass() override;

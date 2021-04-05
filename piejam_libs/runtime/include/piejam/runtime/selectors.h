@@ -157,14 +157,8 @@ extern const selector<mixer::channel_id> select_fx_chain_channel;
 
 struct fx_module_info
 {
-    enum class gui_model
-    {
-        generic,
-        scope
-    };
-
     fx::module_id fx_mod_id;
-    gui_model gui;
+    fx::instance_id instance_id;
 
     bool operator==(fx_module_info const&) const noexcept = default;
 };
