@@ -691,6 +691,17 @@ make_fx_module_streams_selector(fx::module_id fx_mod_id)
 }
 
 auto
+make_audio_stream_selector(audio_stream_id stream_id)
+        -> selector<audio_stream_buffer>
+{
+    return [stream_id](state const& st) -> audio_stream_buffer {
+        static audio_stream_buffer s_empty;
+        auto* stream = st.streams.find(stream_id);
+        return stream ? *stream : s_empty;
+    };
+}
+
+auto
 make_bool_parameter_value_selector(bool_parameter_id const param_id)
         -> selector<bool>
 {

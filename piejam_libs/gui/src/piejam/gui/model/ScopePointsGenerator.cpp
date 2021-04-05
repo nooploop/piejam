@@ -6,6 +6,8 @@
 
 #include <QPointF>
 
+#include <boost/assert.hpp>
+
 #include <algorithm>
 #include <numeric>
 
@@ -15,33 +17,48 @@ namespace piejam::gui::model
 void
 ScopePointsGenerator::update(std::span<float const> const& samples)
 {
-    std::vector<QPointF> result;
+    BOOST_ASSERT(samples.size() % 2 == 0);
+    if (samples.empty())
+        return;
 
-    m_unprocessed.insert(m_unprocessed.end(), samples.begin(), samples.end());
+    std::vector<QPointF> resultLeft, resultRight;
+    std::size_t const resultCapacity = samples.size() / m_samplesPerPoint + 1;
+    resultLeft.reserve(resultCapacity);
+    resultRight.reserve(resultCapacity);
 
-    std::size_t samplesProcessed = 0;
-    for (; (samplesProcessed + m_samplesPerPoint) < m_unprocessed.size();
-         samplesProcessed += m_samplesPerPoint)
+    for (std::size_t i = 0; i < samples.size(); i += 2)
     {
-        result.emplace_back(std::accumulate(
-                std::next(m_unprocessed.begin(), samplesProcessed),
-                std::next(
-                        m_unprocessed.end(),
-                        samplesProcessed + m_samplesPerPoint),
-                QPointF(),
-                [](QPointF const& p, float const sample) {
-                    return QPointF(
-                            std::max(p.x(), static_cast<qreal>(sample)),
-                            std::min(p.y(), static_cast<qreal>(sample)));
-                }));
+        float const leftSample = samples[i];
+        float const rightSample = samples[i + 1];
+
+        m_accLeftRight.first.min =
+                std::min(m_accLeftRight.first.min, leftSample);
+        m_accLeftRight.first.max =
+                std::max(m_accLeftRight.first.max, leftSample);
+        m_accLeftRight.second.min =
+                std::min(m_accLeftRight.second.min, rightSample);
+        m_accLeftRight.second.max =
+                std::max(m_accLeftRight.second.max, rightSample);
+
+        ++m_accNumSamples;
+
+        if (m_accNumSamples >= m_samplesPerPoint)
+        {
+            resultLeft.emplace_back(
+                    m_accLeftRight.first.min,
+                    m_accLeftRight.first.max);
+            resultLeft.emplace_back(
+                    m_accLeftRight.second.min,
+                    m_accLeftRight.second.max);
+
+            m_accLeftRight = {};
+            m_accNumSamples = 0;
+        }
     }
 
-    if (samplesProcessed)
-        m_unprocessed.erase(
-                m_unprocessed.begin(),
-                std::next(m_unprocessed.begin(), samplesProcessed));
-
-    emit pointsAdded(result);
+    BOOST_ASSERT(resultLeft.size() == resultRight.size());
+    if (!resultLeft.empty())
+        emit pointsAdded(resultLeft, resultRight);
 }
 
 } // namespace piejam::gui::model

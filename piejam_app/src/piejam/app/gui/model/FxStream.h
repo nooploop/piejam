@@ -8,6 +8,8 @@
 #include <piejam/app/gui/model/Subscribable.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
 
+#include <memory>
+
 namespace piejam::app::gui::model
 {
 
@@ -19,9 +21,13 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             FxStreamKeyId const&);
+    ~FxStream();
 
 private:
     void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace piejam::app::gui::model

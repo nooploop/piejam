@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2021 Dimitrij Kotrev
-
-SPDX-License-Identifier: CC0-1.0
--->
-
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
@@ -62,5 +56,6 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/midi-port.svg</file>
         <file>images/icons/pencil.svg</file>
         <file>PieJam/FxChainControls/ParametersListView.qml</file>
+        <file>PieJam/FxChainControls/ScopeView.qml</file>
     </qresource>
 </RCC>

@@ -33,9 +33,17 @@ public:
 
     Q_ENUM(Type)
 
-    Q_PROPERTY(Type type READ type CONSTANT FINAL)
+    Q_PROPERTY(Type type READ type NOTIFY typeChanged FINAL)
 
-    virtual auto type() const noexcept -> Type { return Type::Generic; }
+    auto type() const noexcept -> Type { return m_type; }
+    void setType(Type x)
+    {
+        if (m_type != x)
+        {
+            m_type = x;
+            emit typeChanged();
+        }
+    }
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
@@ -95,6 +103,7 @@ public:
     Q_INVOKABLE virtual void moveRight() = 0;
 
 signals:
+    void typeChanged();
     void nameChanged();
     void bypassedChanged();
     void canMoveLeftChanged();
@@ -102,6 +111,7 @@ signals:
     void streamsChanged();
 
 private:
+    Type m_type;
     QString m_name;
     bool m_bypassed{};
     FxParametersList m_parameters;

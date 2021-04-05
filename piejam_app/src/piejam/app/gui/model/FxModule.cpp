@@ -49,8 +49,9 @@ fxStreamKeyIds(runtime::fx::module_streams const& streams)
 
 struct FxModule::Impl
 {
-    runtime::fx::module_id const fx_mod_id;
-    box<runtime::fx::module_parameters> param_ids;
+    runtime::fx::module_id const fxModId;
+
+    box<runtime::fx::module_parameters> paramIds;
     box<runtime::fx::module_streams> streams;
 };
 
@@ -68,30 +69,29 @@ FxModule::~FxModule() = default;
 void
 FxModule::onSubscribe()
 {
-    observe(runtime::selectors::make_fx_module_name_selector(m_impl->fx_mod_id),
+    observe(runtime::selectors::make_fx_module_name_selector(m_impl->fxModId),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
 
-    observe(runtime::selectors::make_fx_module_bypass_selector(
-                    m_impl->fx_mod_id),
+    observe(runtime::selectors::make_fx_module_bypass_selector(m_impl->fxModId),
             [this](bool const x) { setBypassed(x); });
 
     observe(runtime::selectors::make_fx_module_can_move_left_selector(
-                    m_impl->fx_mod_id),
+                    m_impl->fxModId),
             [this](bool const x) { setCanMoveLeft(x); });
 
     observe(runtime::selectors::make_fx_module_can_move_right_selector(
-                    m_impl->fx_mod_id),
+                    m_impl->fxModId),
             [this](bool const x) { setCanMoveRight(x); });
 
     observe(runtime::selectors::make_fx_module_parameters_selector(
-                    m_impl->fx_mod_id),
-            [this](box<runtime::fx::module_parameters> const& param_ids) {
+                    m_impl->fxModId),
+            [this](box<runtime::fx::module_parameters> const& paramIds) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
-                                fxParameterKeyIds(*m_impl->param_ids),
-                                fxParameterKeyIds(*param_ids)),
+                                fxParameterKeyIds(*m_impl->paramIds),
+                                fxParameterKeyIds(*paramIds)),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *parameters(),
                                 [this](FxParameterKeyId const& paramKeyId) {
@@ -101,16 +101,16 @@ FxModule::onSubscribe()
                                             paramKeyId);
                                 }});
 
-                m_impl->param_ids = param_ids;
+                m_impl->paramIds = paramIds;
             });
 
     observe(runtime::selectors::make_fx_module_streams_selector(
-                    m_impl->fx_mod_id),
-            [this](box<runtime::fx::module_streams> const& mod_streams) {
+                    m_impl->fxModId),
+            [this](box<runtime::fx::module_streams> const& moduleStreams) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
                                 fxStreamKeyIds(*m_impl->streams),
-                                fxStreamKeyIds(*mod_streams)),
+                                fxStreamKeyIds(*moduleStreams)),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *streams(),
                                 [this](FxStreamKeyId const& streamKeyId) {
@@ -120,7 +120,7 @@ FxModule::onSubscribe()
                                             streamKeyId);
                                 }});
 
-                m_impl->streams = mod_streams;
+                m_impl->streams = moduleStreams;
             });
 }
 
@@ -128,7 +128,7 @@ void
 FxModule::toggleBypass()
 {
     runtime::actions::toggle_fx_module_bypass action;
-    action.fx_mod_id = m_impl->fx_mod_id;
+    action.fx_mod_id = m_impl->fxModId;
     dispatch(action);
 }
 
@@ -136,7 +136,7 @@ void
 FxModule::deleteModule()
 {
     runtime::actions::delete_fx_module action;
-    action.fx_mod_id = m_impl->fx_mod_id;
+    action.fx_mod_id = m_impl->fxModId;
     dispatch(action);
 }
 
@@ -146,7 +146,7 @@ FxModule::moveLeft()
     BOOST_ASSERT(canMoveLeft());
 
     runtime::actions::move_fx_module_left action;
-    action.fx_mod_id = m_impl->fx_mod_id;
+    action.fx_mod_id = m_impl->fxModId;
     dispatch(action);
 }
 
@@ -156,7 +156,7 @@ FxModule::moveRight()
     BOOST_ASSERT(canMoveRight());
 
     runtime::actions::move_fx_module_right action;
-    action.fx_mod_id = m_impl->fx_mod_id;
+    action.fx_mod_id = m_impl->fxModId;
     dispatch(action);
 }
 

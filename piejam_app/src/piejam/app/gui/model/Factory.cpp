@@ -15,6 +15,7 @@
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/FxScope.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/gui/model/MidiDeviceConfig.h>
 #include <piejam/gui/model/MixerChannel.h>
@@ -68,6 +69,12 @@ Factory::Factory(
             0,
             "MixerChannelEdit",
             "Not creatable");
+
+    qmlRegisterType<piejam::gui::model::FxScope>(
+            "PieJam.Models",
+            1,
+            0,
+            "FxScope");
 }
 
 Factory::~Factory() = default;

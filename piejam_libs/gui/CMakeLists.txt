@@ -36,6 +36,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxParameter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxScope.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/GenericListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MidiAssignable.h
@@ -52,6 +53,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/qt_log.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioInputOutputSettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/BusConfig.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/ScopePointsGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StringList.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp

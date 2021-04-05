@@ -7,12 +7,15 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
+import PieJam.Models 1.0
+
 Item {
     id: root
 
     property alias name: nameLabel.text
     property alias type: moduleContent.currentIndex
-    property alias parameters: parametersList.model
+    property var parameters: []
+    property var streams: []
     property bool bypassed: false
     property alias moveLeftEnabled: moveLeftButton.enabled
     property alias moveRightEnabled: moveRightButton.enabled
@@ -166,10 +169,14 @@ Item {
 
             ParametersListView {
                 id: parametersList
+
+                model: root.parameters
             }
 
-            Label {
-                text: "scope"
+            ScopeView {
+                id: scopeView
+
+                model: streams
             }
         }
     }

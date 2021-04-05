@@ -4,20 +4,37 @@
 
 #include <piejam/app/gui/model/FxStream.h>
 
+#include <piejam/gui/model/AudioStreamListener.h>
+#include <piejam/runtime/selectors.h>
+
 namespace piejam::app::gui::model
 {
+
+struct FxStream::Impl
+{
+    FxStreamKeyId fxStreamKeyId;
+};
 
 FxStream::FxStream(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxStreamKeyId const&)
+        FxStreamKeyId const& fxStreamKeyId)
     : Subscribable(store_dispatch, state_change_subscriber)
+    , m_impl(std::make_unique<Impl>(fxStreamKeyId))
 {
 }
+
+FxStream::~FxStream() = default;
 
 void
 FxStream::onSubscribe()
 {
+    observe(runtime::selectors::make_audio_stream_selector(
+                    m_impl->fxStreamKeyId.id),
+            [this](runtime::audio_stream_buffer const& buf) {
+                if (auto l = listener())
+                    l->update(*buf);
+            });
 }
 
 } // namespace piejam::app::gui::model

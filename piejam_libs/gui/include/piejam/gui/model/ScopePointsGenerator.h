@@ -37,12 +37,22 @@ public:
     void update(std::span<float const> const&) override;
 
 signals:
-    void pointsAdded(std::vector<QPointF> const&);
+    void pointsAdded(
+            std::vector<QPointF> const& left,
+            std::vector<QPointF> const& right);
     void samplesPerPointChanged();
 
 private:
     int m_samplesPerPoint{1};
-    std::vector<float> m_unprocessed;
+
+    struct Point
+    {
+        float min{};
+        float max{};
+    };
+
+    std::pair<Point, Point> m_accLeftRight;
+    int m_accNumSamples{};
 };
 
 } // namespace piejam::gui::model
