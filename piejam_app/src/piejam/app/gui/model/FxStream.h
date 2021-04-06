@@ -23,6 +23,8 @@ public:
             FxStreamKeyId const&);
     ~FxStream();
 
+    void requestUpdate() override;
+
 private:
     void onSubscribe() override;
 

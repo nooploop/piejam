@@ -14,8 +14,8 @@ class AudioStreamProvider : public SubscribableModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(AudioStreamListener* listener READ listener WRITE setListener
-                       NOTIFY listenerChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::AudioStreamListener* listener READ listener
+                       WRITE setListener NOTIFY listenerChanged FINAL)
 
 public:
     auto listener() const noexcept -> AudioStreamListener*
@@ -31,6 +31,8 @@ public:
             emit listenerChanged();
         }
     }
+
+    Q_INVOKABLE virtual void requestUpdate() = 0;
 
 signals:
 
