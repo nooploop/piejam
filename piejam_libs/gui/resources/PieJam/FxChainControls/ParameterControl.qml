@@ -39,7 +39,6 @@ Item {
         width: sliderRect.implicitWidth
 
         anchors.top: parent.top
-        anchors.topMargin: 4
         anchors.horizontalCenter: parent.horizontalCenter
 
         backgroundColor: Material.color(Material.Grey, Material.Shade800)

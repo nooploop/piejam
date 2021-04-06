@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/AudioStreamListener.h>
+#include <piejam/gui/model/ScopePoint.h>
 
 #include <boost/assert.hpp>
 
@@ -13,7 +14,7 @@
 namespace piejam::gui::model
 {
 
-class ScopePointsGenerator final : public AudioStreamListener
+class ScopePointsAccumulator final : public AudioStreamListener
 {
     Q_OBJECT
 
@@ -38,20 +39,15 @@ public:
 
 signals:
     void pointsAdded(
-            std::vector<QPointF> const& left,
-            std::vector<QPointF> const& right);
+            std::vector<ScopePoint> const& left,
+            std::vector<ScopePoint> const& right);
     void samplesPerPointChanged();
 
 private:
     int m_samplesPerPoint{1};
 
-    struct Point
-    {
-        float min{};
-        float max{};
-    };
-
-    std::pair<Point, Point> m_accLeftRight;
+    ScopePoint m_accLeft;
+    ScopePoint m_accRight;
     int m_accNumSamples{};
 };
 

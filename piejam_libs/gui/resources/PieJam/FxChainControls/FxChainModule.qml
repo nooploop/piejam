@@ -13,7 +13,7 @@ Item {
     id: root
 
     property alias name: nameLabel.text
-    property alias type: moduleContent.currentIndex
+    property int type: 0
     property var parameters: []
     property var streams: []
     property bool bypassed: false
@@ -42,7 +42,7 @@ Item {
                         nameLabel.implicitWidth +
                         swapButton.width +
                         deleteButton.width +
-                        20, parametersList.width) + 2 * frame.padding
+                        20, moduleContent.width) + 2 * frame.padding
         height: bypassButton.height + 2 * frame.padding
 
         Button {
@@ -161,23 +161,38 @@ Item {
             onClicked: deleteButtonClicked()
         }
 
-        StackLayout {
+        Component {
+            id: genericDelegate
+
+            ParametersListView {
+                model: root.parameters
+            }
+        }
+
+        Component {
+            id: scopeDelegate
+
+            ScopeView {
+                parameters: root.parameters
+                streams: root.streams
+            }
+        }
+
+        Loader {
             id: moduleContent
 
             anchors.top: nameLabel.bottom
+            anchors.topMargin: 4
             anchors.bottom: parent.bottom
 
-            ParametersListView {
-                id: parametersList
+            sourceComponent: {
+                switch (root.type) {
+                case 0:
+                    return genericDelegate
 
-                model: root.parameters
-            }
-
-            ScopeView {
-                id: scopeView
-
-                parameters: root.parameters
-                streams: root.streams
+                case 1:
+                    return scopeDelegate
+                }
             }
         }
     }

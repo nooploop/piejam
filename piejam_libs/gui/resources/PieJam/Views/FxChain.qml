@@ -54,6 +54,7 @@ ViewPane {
                 name: model.item.name
                 type: model.item.type
                 parameters: model.item.parameters
+                streams: model.item.streams
                 moveLeftEnabled: model.item.canMoveLeft
                 moveRightEnabled: model.item.canMoveRight
 

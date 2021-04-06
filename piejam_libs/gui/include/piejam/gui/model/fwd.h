@@ -42,7 +42,9 @@ class AudioStreamListener;
 class AudioStreamProvider;
 using AudioStreamProviderList = GenericListModel<AudioStreamProvider>;
 
-class ScopePointsGenerator;
+class ScopeLines;
+struct ScopePoint;
+class ScopePointsAccumulator;
 
 class MidiDeviceConfig;
 using MidiDeviceList = GenericListModel<MidiDeviceConfig>;

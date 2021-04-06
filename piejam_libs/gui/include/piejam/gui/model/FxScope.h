@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <piejam/gui/model/ScopeLines.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <QObject>
-#include <QPointF>
 
 #include <memory>
 
@@ -24,48 +24,38 @@ class FxScope : public QObject
                        NOTIFY samplesPerPointChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
-    Q_PROPERTY(std::vector<QPointF> leftPoints READ leftPoints NOTIFY
-                       leftPointsChanged FINAL)
-    Q_PROPERTY(std::vector<QPointF> rightPoints READ rightPoints NOTIFY
-                       rightPointsChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeLines* leftLines READ leftLines NOTIFY
+                       leftLinesChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeLines* rightLines READ rightLines NOTIFY
+                       rightLinesChanged FINAL)
 
 public:
     FxScope(QObject* parent = nullptr);
     ~FxScope();
 
-    auto streamListener() const noexcept -> AudioStreamListener*;
+    auto streamListener() noexcept -> AudioStreamListener*;
 
-    auto samplesPerPoint() const noexcept -> int { return m_samplesPerPoint; }
+    auto samplesPerPoint() const noexcept -> int;
     void setSamplesPerPoint(int);
 
-    auto viewSize() const noexcept -> int { return m_viewSize; }
+    auto viewSize() const noexcept -> int;
     void setViewSize(int);
 
-    auto leftPoints() const noexcept -> std::vector<QPointF> const&
-    {
-        return m_leftPoints;
-    }
-
-    auto rightPoints() const noexcept -> std::vector<QPointF> const&
-    {
-        return m_rightPoints;
-    }
+    auto leftLines() noexcept -> ScopeLines*;
+    auto rightLines() noexcept -> ScopeLines*;
 
     Q_INVOKABLE void clear();
 
 signals:
     void samplesPerPointChanged();
     void viewSizeChanged();
-    void leftPointsChanged();
-    void rightPointsChanged();
+    void leftLinesChanged();
+    void rightLinesChanged();
     void syncedChanged();
 
 private:
-    std::unique_ptr<ScopePointsGenerator> m_streamListener;
-    int m_samplesPerPoint{1};
-    int m_viewSize{};
-    std::vector<QPointF> m_leftPoints;
-    std::vector<QPointF> m_rightPoints;
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model
