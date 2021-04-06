@@ -14,6 +14,7 @@ target_sources(piejam_algorithm INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/for_each_visit.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/index_of.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/set_intersection_to_vector.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/shift_push_back.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/string_join.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/transform_to_vector.h
 )
