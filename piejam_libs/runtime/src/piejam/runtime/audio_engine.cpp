@@ -724,16 +724,16 @@ audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
 auto
 audio_engine::get_stream(audio_stream_id const id) const -> audio_stream_buffer
 {
-    audio_stream_buffer result;
+    std::vector<float> result;
 
     if (auto proc = m_impl->stream_procs.find_processor(id))
     {
         proc->consume([&result](std::span<float const> data) {
-            result = std::vector<float>(data.begin(), data.end());
+            result.insert(result.end(), data.begin(), data.end());
         });
     }
 
-    return result;
+    return audio_stream_buffer(std::move(result));
 }
 
 bool
