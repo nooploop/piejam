@@ -49,19 +49,20 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
         geometry->allocate(m_lines->get().size() * 2);
     }
 
-    auto setVertex =
-            [height = size().height()](auto& v, float const x, float const y) {
-                v.set(x, ((y + 1) / 2.f) * height);
-            };
+    auto setVertex = [height = size().height() / 2.f](
+                             QSGGeometry::Point2D& v,
+                             float const x,
+                             float const y) { v.set(x, (y + 1) * height); };
 
     float const* y0 = m_lines->get().y0().data();
     float const* y1 = m_lines->get().y1().data();
 
     QSGGeometry::Point2D* vertices = geometry->vertexDataAsPoint2D();
-    for (int i = 0, e = m_lines->get().size(); i < e; ++i, ++y0, ++y1)
+    for (int i = 0, e = m_lines->get().size(); i < e;
+         ++i, ++y0, ++y1, vertices += 2)
     {
-        setVertex(vertices[i * 2], i, *y0);
-        setVertex(vertices[i * 2 + 1], i, *y1);
+        setVertex(vertices[0], i, *y0);
+        setVertex(vertices[1], i, *y1);
     }
 
     node->markDirty(QSGNode::DirtyGeometry);
