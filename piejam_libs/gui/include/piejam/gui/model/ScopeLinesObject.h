@@ -16,15 +16,10 @@ class ScopeLinesObject final : public QObject
     Q_OBJECT
 
 public:
+    auto get() noexcept -> ScopeLines& { return m_lines; }
     auto get() const noexcept -> ScopeLines const& { return m_lines; }
-    void set(ScopeLines const& x)
-    {
-        if (m_lines != x)
-        {
-            m_lines = x;
-            emit changed();
-        }
-    }
+
+    void update() { emit changed(); }
 
 signals:
     void changed();
