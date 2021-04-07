@@ -26,7 +26,7 @@ struct with_boxed_result<F, R, std::tuple<Args...>>
 {
     F f;
 
-    auto operator()(Args... args) const -> box<R>
+    auto operator()(Args... args) const -> piejam::box<R>
     {
         return {std::invoke(f, args...)};
     }

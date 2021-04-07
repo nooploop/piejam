@@ -6,6 +6,8 @@
 
 #include <piejam/audio/engine/stream_processor.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::processors
 {
 

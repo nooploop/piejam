@@ -15,6 +15,8 @@
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::components
 {
 
