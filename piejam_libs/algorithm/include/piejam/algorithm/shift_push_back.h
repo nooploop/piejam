@@ -11,14 +11,14 @@ namespace piejam::algorithm
 {
 
 template <class Target, class Source>
-auto
+constexpr auto
 shift_push_back(Target&& target, Source&& source)
 {
     auto const count = std::min(std::size(target), std::size(source));
     std::shift_left(std::begin(target), std::end(target), count);
     std::copy(
             std::next(std::begin(source), std::size(source) - count),
-            source.end(),
+            std::end(source),
             std::next(std::begin(target), std::size(target) - count));
 }
 
