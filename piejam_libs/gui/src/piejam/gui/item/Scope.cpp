@@ -31,7 +31,7 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
 
         geometry = new QSGGeometry(
                 QSGGeometry::defaultAttributes_Point2D(),
-                m_lines->lines().size() * 2);
+                m_lines->get().size() * 2);
         geometry->setLineWidth(1);
         geometry->setDrawingMode(QSGGeometry::DrawLines);
         node->setGeometry(geometry);
@@ -46,18 +46,22 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
     {
         node = static_cast<QSGGeometryNode*>(oldNode);
         geometry = node->geometry();
-        geometry->allocate(m_lines->lines().size() * 2);
+        geometry->allocate(m_lines->get().size() * 2);
     }
 
-    auto setVertex = [height = size().height()](auto& v, auto const& p) {
-        v.set(p.x(), ((std::clamp(-p.y(), -1., 1.) + 1) / 2.f) * height);
-    };
+    auto setVertex =
+            [height = size().height()](auto& v, float const x, float const y) {
+                v.set(x, ((y + 1) / 2.f) * height);
+            };
+
+    float const* y0 = m_lines->get().y0().data();
+    float const* y1 = m_lines->get().y1().data();
 
     QSGGeometry::Point2D* vertices = geometry->vertexDataAsPoint2D();
-    for (int i = 0, e = m_lines->lines().size(); i < e; ++i)
+    for (int i = 0, e = m_lines->get().size(); i < e; ++i, ++y0, ++y1)
     {
-        setVertex(vertices[i * 2], m_lines->lines()[i].p1());
-        setVertex(vertices[i * 2 + 1], m_lines->lines()[i].p2());
+        setVertex(vertices[i * 2], i, *y0);
+        setVertex(vertices[i * 2 + 1], i, *y1);
     }
 
     node->markDirty(QSGNode::DirtyGeometry);
@@ -66,7 +70,7 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
 }
 
 void
-Scope::setLines(model::ScopeLines* x)
+Scope::setLines(model::ScopeLinesObject* x)
 {
     if (m_lines != x)
     {
@@ -76,7 +80,7 @@ Scope::setLines(model::ScopeLines* x)
 
         m_linesChangedConnection =
                 connect(m_lines,
-                        &model::ScopeLines::linesChanged,
+                        &model::ScopeLinesObject::changed,
                         this,
                         &Scope::update);
     }

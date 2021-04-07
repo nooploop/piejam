@@ -5,6 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQml 2.15
 
 import PieJam.Items 1.0 as PJItems
 import PieJam.Models 1.0
@@ -37,7 +38,11 @@ Item {
 
                 viewSize: leftScope.width
                 samplesPerPoint: 480
+
+                Component.onDestruction: if (model.item) model.item.listener = null
             }
+
+            onVisibleChanged: fxScope.clear();
 
             PJItems.Scope {
                 id: leftScope
@@ -63,9 +68,11 @@ Item {
             }
 
             Binding {
+                when: visible
                 target: model.item
                 property: "listener"
                 value: fxScope.streamListener
+                restoreMode: Binding.RestoreBinding
             }
 
             Binding {

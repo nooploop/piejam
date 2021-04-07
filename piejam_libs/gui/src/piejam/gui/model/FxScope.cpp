@@ -4,72 +4,35 @@
 
 #include <piejam/gui/model/FxScope.h>
 
-#include <piejam/algorithm/shift_push_back.h>
-#include <piejam/gui/model/ScopePointsAccumulator.h>
-#include <piejam/range/indices.h>
-
-#include <algorithm>
+#include <piejam/gui/model/ScopeLines.h>
+#include <piejam/gui/model/ScopeLinesAccumulator.h>
 
 namespace piejam::gui::model
 {
 
-namespace
-{
-
-auto
-toScopeLines(std::vector<ScopePoint> const& scopePoints) -> QVector<QLineF>
-{
-    QVector<QLineF> result;
-    result.reserve(scopePoints.size() * 2);
-
-    for (std::size_t i : range::indices(scopePoints))
-    {
-        auto const& sp = scopePoints[i];
-        result.push_back(QLineF(i, sp.min, i, sp.max));
-    }
-
-    return result;
-}
-
-} // namespace
-
 struct FxScope::Impl
 {
-    ScopePointsAccumulator streamListener;
+    ScopeLinesAccumulator streamListener;
     int samplesPerPoint{1};
     int viewSize{};
-    std::vector<ScopePoint> leftScopePoints;
-    ScopeLines leftLines;
-    std::vector<ScopePoint> rightScopePoints;
-    ScopeLines rightLines;
+    ScopeLines leftScopeLines;
+    ScopeLinesObject leftLines;
+    ScopeLines rightScopeLines;
+    ScopeLinesObject rightLines;
 };
 
 FxScope::FxScope(QObject* parent)
     : QObject(parent)
     , m_impl(std::make_unique<Impl>())
 {
-    connect(&m_impl->leftLines,
-            &ScopeLines::linesChanged,
-            this,
-            &FxScope::leftLinesChanged);
-
-    connect(&m_impl->rightLines,
-            &ScopeLines::linesChanged,
-            this,
-            &FxScope::rightLinesChanged);
-
     connect(&m_impl->streamListener,
-            &ScopePointsAccumulator::pointsAdded,
-            [this](auto const& addedLeft, auto const& addedRight) {
-                algorithm::shift_push_back(m_impl->leftScopePoints, addedLeft);
-                m_impl->leftLines.setLines(
-                        toScopeLines(m_impl->leftScopePoints));
+            &ScopeLinesAccumulator::linesAdded,
+            [this](ScopeLines const& addedLeft, ScopeLines const& addedRight) {
+                m_impl->leftScopeLines.shift_push_back(addedLeft);
+                m_impl->leftLines.set(m_impl->leftScopeLines);
 
-                algorithm::shift_push_back(
-                        m_impl->rightScopePoints,
-                        addedRight);
-                m_impl->rightLines.setLines(
-                        toScopeLines(m_impl->rightScopePoints));
+                m_impl->rightScopeLines.shift_push_back(addedRight);
+                m_impl->rightLines.set(m_impl->rightScopeLines);
             });
 }
 
@@ -92,7 +55,7 @@ FxScope::setSamplesPerPoint(int const x)
 {
     if (m_impl->samplesPerPoint != x)
     {
-        m_impl->streamListener.setSamplesPerPoint(x);
+        m_impl->streamListener.setSamplesPerLine(x);
         m_impl->samplesPerPoint = x;
 
         emit samplesPerPointChanged();
@@ -118,13 +81,13 @@ FxScope::setViewSize(int const x)
 }
 
 auto
-FxScope::leftLines() noexcept -> ScopeLines*
+FxScope::leftLines() noexcept -> ScopeLinesObject*
 {
     return &m_impl->leftLines;
 }
 
 auto
-FxScope::rightLines() noexcept -> ScopeLines*
+FxScope::rightLines() noexcept -> ScopeLinesObject*
 {
     return &m_impl->rightLines;
 }
@@ -132,11 +95,13 @@ FxScope::rightLines() noexcept -> ScopeLines*
 void
 FxScope::clear()
 {
-    m_impl->leftScopePoints = std::vector<ScopePoint>(m_impl->viewSize);
-    m_impl->leftLines.setLines(toScopeLines(m_impl->leftScopePoints));
+    m_impl->leftScopeLines.clear();
+    m_impl->leftScopeLines.resize(m_impl->viewSize);
+    m_impl->leftLines.set(m_impl->leftScopeLines);
 
-    m_impl->rightScopePoints = std::vector<ScopePoint>(m_impl->viewSize);
-    m_impl->rightLines.setLines(toScopeLines(m_impl->rightScopePoints));
+    m_impl->rightScopeLines.clear();
+    m_impl->rightScopeLines.resize(m_impl->viewSize);
+    m_impl->rightLines.set(m_impl->rightScopeLines);
 }
 
 } // namespace piejam::gui::model

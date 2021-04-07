@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/ScopeLines.h>
+#include <piejam/gui/model/ScopeLinesObject.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <QObject>
@@ -24,10 +24,10 @@ class FxScope : public QObject
                        NOTIFY samplesPerPointChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::ScopeLines* leftLines READ leftLines NOTIFY
-                       leftLinesChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::ScopeLines* rightLines READ rightLines NOTIFY
-                       rightLinesChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* leftLines READ leftLines
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* rightLines READ rightLines
+                       CONSTANT FINAL)
 
 public:
     FxScope(QObject* parent = nullptr);
@@ -41,16 +41,14 @@ public:
     auto viewSize() const noexcept -> int;
     void setViewSize(int);
 
-    auto leftLines() noexcept -> ScopeLines*;
-    auto rightLines() noexcept -> ScopeLines*;
+    auto leftLines() noexcept -> ScopeLinesObject*;
+    auto rightLines() noexcept -> ScopeLinesObject*;
 
     Q_INVOKABLE void clear();
 
 signals:
     void samplesPerPointChanged();
     void viewSizeChanged();
-    void leftLinesChanged();
-    void rightLinesChanged();
     void syncedChanged();
 
 private:

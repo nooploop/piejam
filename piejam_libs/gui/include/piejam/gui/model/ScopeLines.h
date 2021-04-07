@@ -4,38 +4,70 @@
 
 #pragma once
 
-#include <QLineF>
-#include <QObject>
-#include <QVector>
+#include <piejam/algorithm/shift_push_back.h>
+
+#include <boost/assert.hpp>
+
+#include <vector>
 
 namespace piejam::gui::model
 {
 
-class ScopeLines final : public QObject
+//! \invariant y0.size() == y1.size()
+class ScopeLines
 {
-    Q_OBJECT
-
-    Q_PROPERTY(
-            QVector<QLineF> lines READ lines WRITE setLines NOTIFY linesChanged)
-
 public:
-    auto lines() const noexcept -> QVector<QLineF> const& { return m_lines; }
-    void setLines(QVector<QLineF> const& x)
+    bool empty() const noexcept { return m_y0.empty(); }
+    auto size() const noexcept -> std::size_t { return m_y0.size(); }
+
+    constexpr auto y0() const noexcept -> std::vector<float> const&
     {
-        if (m_lines != x)
-        {
-            m_lines = x;
-            emit linesChanged();
-        }
+        return m_y0;
     }
 
-signals:
-    void linesChanged();
+    constexpr auto y1() const noexcept -> std::vector<float> const&
+    {
+        return m_y1;
+    }
+
+    void clear()
+    {
+        m_y0.clear();
+        m_y1.clear();
+    }
+
+    void resize(std::size_t const sz)
+    {
+        m_y0.resize(sz);
+        m_y1.resize(sz);
+    }
+
+    void reserve(std::size_t const capacity)
+    {
+        m_y0.reserve(capacity);
+        m_y1.reserve(capacity);
+    }
+
+    void push_back(float const y0, float const y1)
+    {
+        BOOST_ASSERT(-1.f <= y0 && y0 <= 1.f);
+        BOOST_ASSERT(-1.f <= y1 && y1 <= 1.f);
+
+        m_y0.emplace_back(y0);
+        m_y1.emplace_back(y1);
+    }
+
+    void shift_push_back(ScopeLines const& other)
+    {
+        algorithm::shift_push_back(m_y0, other.m_y0);
+        algorithm::shift_push_back(m_y1, other.m_y1);
+    }
+
+    bool operator==(ScopeLines const&) const noexcept = default;
 
 private:
-    QVector<QLineF> m_lines;
+    std::vector<float> m_y0;
+    std::vector<float> m_y1;
 };
 
 } // namespace piejam::gui::model
-
-Q_DECLARE_METATYPE(piejam::gui::model::ScopeLines*)

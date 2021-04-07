@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/ScopeLines.h>
+#include <piejam/gui/model/ScopeLinesObject.h>
 
 #include <QQuickItem>
 
@@ -17,7 +17,7 @@ class Scope : public QQuickItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::ScopeLines* lines READ lines WRITE setLines
+    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* lines READ lines WRITE setLines
                        NOTIFY linesChanged)
 
     QML_ELEMENT
@@ -25,8 +25,8 @@ class Scope : public QQuickItem
 public:
     Scope(QQuickItem* parent = nullptr);
 
-    auto lines() noexcept -> model::ScopeLines* { return m_lines; }
-    void setLines(model::ScopeLines*);
+    auto lines() noexcept -> model::ScopeLinesObject* { return m_lines; }
+    void setLines(model::ScopeLinesObject*);
 
     auto updatePaintNode(QSGNode*, UpdatePaintNodeData*) -> QSGNode* override;
 
@@ -34,7 +34,7 @@ signals:
     void linesChanged();
 
 private:
-    model::ScopeLines* m_lines{};
+    model::ScopeLinesObject* m_lines{};
     QMetaObject::Connection m_linesChangedConnection;
 };
 
