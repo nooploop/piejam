@@ -25,6 +25,14 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
     QSGGeometryNode* node = nullptr;
     QSGGeometry* geometry = nullptr;
 
+    auto setVertexX = [](QSGGeometry::Point2D* vertices, int vertexCount) {
+        for (int i = 0, e = vertexCount / 2; i < e; ++i, vertices += 2)
+        {
+            vertices[0].x = i;
+            vertices[1].x = i;
+        }
+    };
+
     if (!oldNode)
     {
         node = new QSGGeometryNode;
@@ -32,6 +40,7 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
         geometry = new QSGGeometry(
                 QSGGeometry::defaultAttributes_Point2D(),
                 m_lines->get().size() * 2);
+        setVertexX(geometry->vertexDataAsPoint2D(), geometry->vertexCount());
         geometry->setLineWidth(1);
         geometry->setDrawingMode(QSGGeometry::DrawLines);
         node->setGeometry(geometry);
@@ -46,23 +55,29 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
     {
         node = static_cast<QSGGeometryNode*>(oldNode);
         geometry = node->geometry();
-        geometry->allocate(m_lines->get().size() * 2);
+        if (static_cast<std::size_t>(geometry->vertexCount()) !=
+            m_lines->get().size() * 2)
+        {
+            geometry->allocate(m_lines->get().size() * 2);
+            setVertexX(
+                    geometry->vertexDataAsPoint2D(),
+                    geometry->vertexCount());
+        }
     }
 
-    auto setVertex = [height = size().height() / 2.f](
-                             QSGGeometry::Point2D& v,
-                             float const x,
-                             float const y) { v.set(x, (y + 1) * height); };
+    auto setVertexY = [height = size().height() /
+                                2.f](QSGGeometry::Point2D& v, float const y) {
+        v.y = (1 - y) * height;
+    };
 
-    float const* y0 = m_lines->get().y0().data();
-    float const* y1 = m_lines->get().y1().data();
+    float const* yData = m_lines->get().ys().data();
 
     QSGGeometry::Point2D* vertices = geometry->vertexDataAsPoint2D();
     for (int i = 0, e = m_lines->get().size(); i < e;
-         ++i, ++y0, ++y1, vertices += 2)
+         ++i, yData += 2, vertices += 2)
     {
-        setVertex(vertices[0], i, *y0);
-        setVertex(vertices[1], i, *y1);
+        setVertexY(vertices[0], yData[0]);
+        setVertexY(vertices[1], yData[1]);
     }
 
     node->markDirty(QSGNode::DirtyGeometry);
@@ -79,11 +94,18 @@ Scope::setLines(model::ScopeLinesObject* x)
         emit linesChanged();
         update();
 
-        m_linesChangedConnection =
-                connect(m_lines,
-                        &model::ScopeLinesObject::changed,
-                        this,
-                        &Scope::update);
+        if (m_lines)
+        {
+            m_linesChangedConnection =
+                    connect(m_lines,
+                            &model::ScopeLinesObject::changed,
+                            this,
+                            &Scope::update);
+        }
+        else
+        {
+            m_linesChangedConnection = {};
+        }
     }
 }
 
