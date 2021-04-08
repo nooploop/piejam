@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/engine/audio_stream_buffer.h>
+#include <piejam/audio/engine/audio_spsc_ring_buffer.h>
 #include <piejam/audio/engine/named_processor.h>
 
 #include <string_view>
@@ -38,7 +38,7 @@ public:
 
 private:
     std::size_t m_num_channels;
-    audio_stream_buffer m_buffer;
+    audio_spsc_ring_buffer m_buffer;
     std::vector<float> m_interleave_buffer;
 };
 

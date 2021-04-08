@@ -10,9 +10,6 @@
 #include <piejam/range/iota.h>
 #include <piejam/range/stride_iterator.h>
 
-#include <boost/hof/always.hpp>
-#include <boost/lockfree/spsc_queue.hpp>
-
 namespace piejam::audio::engine
 {
 

@@ -6,6 +6,8 @@
 
 #include <piejam/thread/cache_line_size.h>
 
+#include <boost/assert.hpp>
+
 #include <atomic>
 #include <concepts>
 #include <span>
@@ -14,53 +16,51 @@
 namespace piejam::audio::engine
 {
 
-class audio_stream_buffer
+class audio_spsc_ring_buffer
 {
 public:
-    audio_stream_buffer(std::size_t const size)
-        : m_buffer(size + 1)
-        , m_capacity(size + 1)
+    audio_spsc_ring_buffer(std::size_t const size)
+        : m_capacity(size + 1)
+        , m_buffer(m_capacity)
+
     {
     }
 
     auto write(std::span<float const> const& data) -> std::size_t
     {
+        BOOST_ASSERT(!data.empty());
+
         std::size_t const write_index =
                 m_write_index.load(std::memory_order_relaxed);
         std::size_t const read_index =
                 m_read_index.load(std::memory_order_acquire);
 
-        if (write_index + 1 == read_index)
+        std::size_t const available =
+                write_available(write_index, read_index, m_capacity);
+
+        if (available == 0)
             return 0;
 
-        std::size_t const write_size = std::min(
-                data.size(),
-                write_available(write_index, read_index, m_capacity));
+        std::size_t const write_size = std::min(data.size(), available);
+        BOOST_ASSERT(write_size > 0);
 
         std::size_t new_write_index = write_index + write_size;
 
+        auto data_end = std::next(data.begin(), write_size);
+        auto write_out = std::next(m_buffer.begin(), write_index);
         if (new_write_index > m_capacity)
         {
-            auto const middle =
+            auto const data_middle =
                     std::next(data.begin(), m_capacity - write_index);
 
-            std::copy(
-                    data.begin(),
-                    middle,
-                    std::next(m_buffer.begin(), write_index));
-            std::copy(
-                    middle,
-                    std::next(data.begin(), write_size),
-                    m_buffer.begin());
+            std::copy(data.begin(), data_middle, std::move(write_out));
+            std::copy(data_middle, std::move(data_end), m_buffer.begin());
 
             new_write_index -= m_capacity;
         }
         else
         {
-            std::copy(
-                    data.begin(),
-                    std::next(data.begin(), write_size),
-                    std::next(m_buffer.begin(), write_index));
+            std::copy(data.begin(), std::move(data_end), std::move(write_out));
 
             if (new_write_index == m_capacity)
                 new_write_index = 0;
@@ -81,20 +81,16 @@ public:
         if (write_index == read_index)
             return;
 
+        auto read_begin = std::next(m_buffer.begin(), read_index);
+        auto read_end = std::next(m_buffer.begin(), write_index);
         if (write_index < read_index)
         {
-            f(std::span(
-                    std::next(m_buffer.begin(), read_index),
-                    m_buffer.end()));
-            f(std::span(
-                    m_buffer.begin(),
-                    std::next(m_buffer.begin(), write_index)));
+            f(std::span(std::move(read_begin), m_buffer.end()));
+            f(std::span(m_buffer.begin(), std::move(read_end)));
         }
         else
         {
-            f(std::span(
-                    std::next(m_buffer.begin(), read_index),
-                    std::next(m_buffer.begin(), write_index)));
+            f(std::span(std::move(read_begin), std::move(read_end)));
         }
 
         m_read_index.store(write_index, std::memory_order_release);
@@ -110,10 +106,10 @@ private:
         return write_index >= read_index ? avail + max_size : avail;
     }
 
+    std::size_t const m_capacity;
     alignas(thread::cache_line_size) std::atomic_size_t m_write_index{};
     alignas(thread::cache_line_size) std::atomic_size_t m_read_index{};
     alignas(thread::cache_line_size) std::vector<float> m_buffer;
-    std::size_t const m_capacity;
 };
 
 } // namespace piejam::audio::engine

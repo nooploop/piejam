@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/engine/audio_stream_buffer.h>
+#include <piejam/audio/engine/audio_spsc_ring_buffer.h>
 
 #include <gtest/gtest.h>
 
@@ -12,31 +12,40 @@
 namespace piejam::audio::engine::test
 {
 
-TEST(audio_stream_buffer, write_all_samples_if_enough_space)
+TEST(audio_spsc_ring_buffer, write_all_samples_if_enough_space)
 {
-    audio_stream_buffer buf(8);
+    audio_spsc_ring_buffer buf(8);
 
     EXPECT_EQ(4u, buf.write(std::array{0.f, 1.f, 2.f, 3.f}));
 }
 
-TEST(audio_stream_buffer, write_only_until_max_capacity)
+TEST(audio_spsc_ring_buffer, write_only_until_max_capacity)
 {
-    audio_stream_buffer buf(2);
+    audio_spsc_ring_buffer buf(2);
 
     EXPECT_EQ(2u, buf.write(std::array{0.f, 1.f, 2.f, 3.f}));
 }
 
-TEST(audio_stream_buffer, write_only_until_max_capacity_on_consecutive_writes)
+TEST(audio_spsc_ring_buffer,
+     write_only_until_max_capacity_on_consecutive_writes_on_border)
 {
-    audio_stream_buffer buf(6);
+    audio_spsc_ring_buffer buf(4);
+
+    EXPECT_EQ(4u, buf.write(std::array{0.f, 1.f, 2.f, 3.f}));
+    EXPECT_EQ(0u, buf.write(std::array{0.f, 1.f, 2.f, 3.f}));
+}
+
+TEST(audio_spsc_ring_buffer, write_only_until_max_capacity_on_consecutive_writes)
+{
+    audio_spsc_ring_buffer buf(6);
 
     EXPECT_EQ(4u, buf.write(std::array{0.f, 1.f, 2.f, 3.f}));
     EXPECT_EQ(2u, buf.write(std::array{0.f, 1.f, 2.f, 3.f}));
 }
 
-TEST(audio_stream_buffer, consume_from_empty_does_nothing)
+TEST(audio_spsc_ring_buffer, consume_from_empty_does_nothing)
 {
-    audio_stream_buffer buf(8);
+    audio_spsc_ring_buffer buf(8);
 
     std::array data{0.f, 1.f, 2.f, 3.f};
 
@@ -51,9 +60,9 @@ TEST(audio_stream_buffer, consume_from_empty_does_nothing)
     EXPECT_EQ(1u, num_calls);
 }
 
-TEST(audio_stream_buffer, consume_on_border_will_call_the_functor_twice)
+TEST(audio_spsc_ring_buffer, consume_on_border_will_call_the_functor_twice)
 {
-    audio_stream_buffer buf(6);
+    audio_spsc_ring_buffer buf(6);
 
     ASSERT_EQ(4u, buf.write(std::array{0.f, 0.f, 0.f, 0.f}));
     buf.consume([](auto const&) {});
@@ -81,10 +90,10 @@ TEST(audio_stream_buffer, consume_on_border_will_call_the_functor_twice)
     EXPECT_EQ(2u, num_calls);
 }
 
-TEST(audio_stream_buffer,
+TEST(audio_spsc_ring_buffer,
      write_to_full_capacity_consume_on_border_will_call_the_functor_twice)
 {
-    audio_stream_buffer buf(6);
+    audio_spsc_ring_buffer buf(6);
 
     ASSERT_EQ(4u, buf.write(std::array{0.f, 0.f, 0.f, 0.f}));
     buf.consume([](auto const&) {});
