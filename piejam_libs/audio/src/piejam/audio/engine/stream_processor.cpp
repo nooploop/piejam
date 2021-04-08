@@ -56,8 +56,6 @@ stream_processor::stream_1(process_context const& ctx)
                         m_buffer.write(buffer);
                     }},
             ctx.inputs[0].get().as_variant());
-
-    ctx.results[0] = ctx.inputs[0];
 }
 
 void
@@ -66,9 +64,6 @@ stream_processor::stream_2(process_context const& ctx)
     std::span out{m_interleave_buffer.data(), 2 * ctx.buffer_size};
 
     interleave(ctx.inputs[0].get(), ctx.inputs[1].get(), out);
-
-    ctx.results[0] = ctx.inputs[0];
-    ctx.results[1] = ctx.inputs[1];
 
     m_buffer.write(out);
 }
@@ -99,8 +94,6 @@ stream_processor::stream_n(process_context const& ctx)
                                             m_num_channels));
                         }},
                 in.get().as_variant());
-
-        ctx.results[ch] = in;
     }
 
     m_buffer.write(

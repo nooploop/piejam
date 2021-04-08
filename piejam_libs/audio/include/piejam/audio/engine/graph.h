@@ -31,7 +31,14 @@ public:
 
     void add_event_wire(graph_endpoint const& src, graph_endpoint const& dst);
 
+    void remove_wire(wires_t::const_iterator const&);
     void remove_event_wire(wires_t::const_iterator const&);
+
+    template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
+    void remove_wires_if(P&& p)
+    {
+        std::erase_if(m_wires, boost::hof::unpack(std::forward<P>(p)));
+    }
 
     template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
     void remove_event_wires_if(P&& p)

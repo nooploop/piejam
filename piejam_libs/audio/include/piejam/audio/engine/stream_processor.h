@@ -23,7 +23,7 @@ public:
     auto type_name() const -> std::string_view override { return "stream"; }
 
     auto num_inputs() const -> std::size_t override { return m_num_channels; }
-    auto num_outputs() const -> std::size_t override { return m_num_channels; }
+    auto num_outputs() const -> std::size_t override { return 0; }
 
     auto event_inputs() const -> event_ports override { return {}; }
     auto event_outputs() const -> event_ports override { return {}; }

@@ -62,6 +62,12 @@ graph::add_event_wire(const graph_endpoint& src, const graph_endpoint& dst)
 }
 
 void
+graph::remove_wire(wires_t::const_iterator const& it)
+{
+    m_wires.erase(it);
+}
+
+void
 graph::remove_event_wire(wires_t::const_iterator const& it)
 {
     m_event_wires.erase(it);
