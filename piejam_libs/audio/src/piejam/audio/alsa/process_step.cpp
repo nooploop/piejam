@@ -13,10 +13,10 @@
 #include <piejam/audio/pcm_format.h>
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/pcm_sample_type.h>
-#include <piejam/audio/table.h>
 #include <piejam/audio/types.h>
 #include <piejam/numeric/rolling_mean.h>
 #include <piejam/range/iota.h>
+#include <piejam/range/table_view.h>
 #include <piejam/system/device.h>
 
 #include <sound/asound.h>

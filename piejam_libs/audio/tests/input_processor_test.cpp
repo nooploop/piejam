@@ -10,14 +10,12 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/slice.h>
 
-#include <piejam/container/table.h>
-
 #include <gtest/gtest.h>
 
 namespace piejam::audio::engine::test
 {
 
-TEST(input_processor, input_table_is_propagated_to_outputs)
+TEST(input_processor, input_is_propagated_to_outputs)
 {
     std::vector<float> data({2.f, 3.f, 5.f, 7.f});
     input_processor sut;

@@ -222,7 +222,6 @@ target_link_libraries(piejam_runtime
     piejam_audio
     piejam_midi
     piejam_functional
-    piejam_container
     piejam_reselect
     nlohmann_json
     PRIVATE

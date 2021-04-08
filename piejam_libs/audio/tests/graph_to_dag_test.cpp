@@ -14,7 +14,6 @@
 #include <piejam/audio/engine/graph_to_dag.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/thread_context.h>
-#include <piejam/container/table.h>
 
 #include <gtest/gtest.h>
 

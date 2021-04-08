@@ -123,7 +123,7 @@ target_include_directories(piejam_audio
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE ${CMAKE_SOURCE_DIR}/libs/xsimd/include)
 target_link_libraries(piejam_audio
-    PUBLIC piejam_algorithm piejam_container piejam_functional piejam_system piejam_numeric piejam_thread
+    PUBLIC piejam_algorithm piejam_functional piejam_system piejam_numeric piejam_thread
     PRIVATE fmt spdlog::spdlog piejam_range)
 
 add_subdirectory(benchmarks)

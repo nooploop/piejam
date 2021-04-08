@@ -10,14 +10,14 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/slice.h>
 
-#include <piejam/container/table.h>
+#include <xsimd/memory/xsimd_alignment.hpp>
 
 #include <gtest/gtest.h>
 
 namespace piejam::audio::engine::test
 {
 
-TEST(output_processor, input_table_is_propagated_to_outputs)
+TEST(output_processor, input_is_propagated_to_outputs)
 {
     std::vector<float> data({0.f, 0.f});
     output_processor sut;
