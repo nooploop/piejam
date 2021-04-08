@@ -37,7 +37,16 @@ public:
     }
 
 private:
-    std::size_t m_num_channels;
+    using stream_fn_t = void (stream_processor::*)(process_context const&);
+
+    void stream_1(process_context const&);
+    void stream_2(process_context const&);
+    void stream_n(process_context const&);
+    static auto get_stream_fn(std::size_t num_channels) -> stream_fn_t;
+
+    std::size_t const m_num_channels;
+    stream_fn_t const m_stream_fn;
+
     audio_spsc_ring_buffer m_buffer;
     std::vector<float> m_interleave_buffer;
 };

@@ -4,6 +4,7 @@
 
 #include <piejam/audio/engine/slice_algorithms.h>
 
+#include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
 namespace piejam::audio::engine::test
@@ -94,6 +95,62 @@ TEST(slice_algorithms_multiply, multiply_buffer_by_one_will_result_in_buffer)
     auto res_buffer = res.buffer();
     EXPECT_EQ(buf.data(), res_buffer.data());
     EXPECT_EQ(buf.size(), res_buffer.size());
+}
+
+TEST(slice_interleave_2_slices, both_constant)
+{
+    slice<float> l(1.f);
+    slice<float> r(-1.f);
+    std::array<float, 6> out{};
+    interleave(l, r, {out});
+
+    using testing::ElementsAre;
+    using testing::Matches;
+
+    EXPECT_TRUE(Matches(ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
+}
+
+TEST(slice_interleave_2_slices, buffer_and_constant)
+{
+    std::array<float, 3> buf{1.f, 1.f, 1.f};
+    slice<float> l(buf);
+    slice<float> r(-1.f);
+    std::array<float, 6> out{};
+    interleave(l, r, {out});
+
+    using testing::ElementsAre;
+    using testing::Matches;
+
+    EXPECT_TRUE(Matches(ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
+}
+
+TEST(slice_interleave_2_slices, constant_and_buffer)
+{
+    std::array<float, 3> buf{-1.f, -1.f, -1.f};
+    slice<float> l(1.f);
+    slice<float> r(buf);
+    std::array<float, 6> out{};
+    interleave(l, r, {out});
+
+    using testing::ElementsAre;
+    using testing::Matches;
+
+    EXPECT_TRUE(Matches(ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
+}
+
+TEST(slice_interleave_2_slices, two_buffer)
+{
+    std::array<float, 3> l_buf{1.f, 1.f, 1.f};
+    std::array<float, 3> r_buf{-1.f, -1.f, -1.f};
+    slice<float> l(l_buf);
+    slice<float> r(r_buf);
+    std::array<float, 6> out{};
+    interleave(l, r, {out});
+
+    using testing::ElementsAre;
+    using testing::Matches;
+
+    EXPECT_TRUE(Matches(ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
 }
 
 } // namespace piejam::audio::engine::test

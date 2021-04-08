@@ -46,7 +46,6 @@ struct slice_add
             BOOST_ASSERT(boost::alignment::is_aligned(
                     m_out.data(),
                     XSIMD_DEFAULT_ALIGNMENT));
-            BOOST_ASSERT(l_buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
             xsimd::transform(
                     l_buf.begin(),
                     l_buf.end(),
@@ -81,7 +80,6 @@ struct slice_add
         BOOST_ASSERT(boost::alignment::is_aligned(
                 m_out.data(),
                 XSIMD_DEFAULT_ALIGNMENT));
-        BOOST_ASSERT(l_buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
         xsimd::transform(
                 l_buf.begin(),
                 l_buf.end(),
@@ -123,7 +121,6 @@ struct slice_multiply
             BOOST_ASSERT(boost::alignment::is_aligned(
                     m_out.data(),
                     XSIMD_DEFAULT_ALIGNMENT));
-            BOOST_ASSERT(l_buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
             xsimd::transform(
                     l_buf.begin(),
                     l_buf.end(),
@@ -158,7 +155,6 @@ struct slice_multiply
         BOOST_ASSERT(boost::alignment::is_aligned(
                 m_out.data(),
                 XSIMD_DEFAULT_ALIGNMENT));
-        BOOST_ASSERT(l_buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
         xsimd::transform(
                 l_buf.begin(),
                 l_buf.end(),
@@ -289,7 +285,6 @@ struct slice_transform
         BOOST_ASSERT(boost::alignment::is_aligned(
                 m_out.data(),
                 XSIMD_DEFAULT_ALIGNMENT));
-        BOOST_ASSERT(buf.size_bytes() % XSIMD_DEFAULT_ALIGNMENT == 0);
         xsimd::transform(buf.begin(), buf.end(), m_out.begin(), m_f);
         return m_out;
     }
@@ -297,6 +292,80 @@ struct slice_transform
 private:
     std::span<T> const m_out;
     F m_f;
+};
+
+template <class T>
+struct slice_interleave
+{
+    constexpr slice_interleave(std::span<T> const& out) noexcept
+        : m_out(out)
+    {
+    }
+
+    constexpr void operator()(T const l_c, T const r_c) const
+    {
+        BOOST_ASSERT(m_out.size() % 2 == 0);
+        for (auto o = m_out.data(), e = m_out.data() + m_out.size(); o < e;
+             o += 2)
+        {
+            o[0] = l_c;
+            o[1] = r_c;
+        }
+    }
+
+    constexpr void
+    operator()(typename slice<T>::span_t const& l_buf, T const r_c) const
+    {
+        BOOST_ASSERT(m_out.size() == l_buf.size() * 2);
+
+        for (auto i = l_buf.data(),
+                  o = m_out.data(),
+                  e = m_out.data() + m_out.size();
+             o < e;
+             ++i, o += 2)
+        {
+            o[0] = *i;
+            o[1] = r_c;
+        }
+    }
+
+    constexpr void
+    operator()(T const l_c, typename slice<T>::span_t const& r_buf) const
+    {
+        BOOST_ASSERT(m_out.size() == r_buf.size() * 2);
+
+        for (auto i = r_buf.data(),
+                  o = m_out.data(),
+                  e = m_out.data() + m_out.size();
+             o < e;
+             ++i, o += 2)
+        {
+            o[0] = l_c;
+            o[1] = *i;
+        }
+    }
+
+    constexpr void operator()(
+            typename slice<T>::span_t const& l_buf,
+            typename slice<T>::span_t const& r_buf) const
+    {
+        BOOST_ASSERT(l_buf.size() == r_buf.size());
+        BOOST_ASSERT(m_out.size() == l_buf.size() + r_buf.size());
+
+        for (auto i = l_buf.data(),
+                  j = r_buf.data(),
+                  o = m_out.data(),
+                  e = m_out.data() + m_out.size();
+             o < e;
+             ++i, ++j, o += 2)
+        {
+            o[0] = *i;
+            o[1] = *j;
+        }
+    }
+
+private:
+    std::span<T> const m_out;
 };
 
 } // namespace detail
@@ -356,6 +425,16 @@ subslice(
         std::size_t const size) noexcept -> slice<T>
 {
     return std::visit(detail::subslice<T>(offset, size), s.as_variant());
+}
+
+template <class T>
+constexpr auto
+interleave(
+        slice<T> const& s1,
+        slice<T> const& s2,
+        std::span<T> const& out) noexcept
+{
+    std::visit(detail::slice_interleave(out), s1.as_variant(), s2.as_variant());
 }
 
 } // namespace piejam::audio::engine
