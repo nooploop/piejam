@@ -17,8 +17,8 @@ class Scope : public QQuickItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* lines READ lines WRITE setLines
-                       NOTIFY linesChanged)
+    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* lines READ lines WRITE
+                       setLines NOTIFY linesChanged FINAL)
 
     QML_ELEMENT
 
@@ -34,8 +34,13 @@ signals:
     void linesChanged();
 
 private:
+    void updateTransformMatrix(QSGTransformNode&);
+    auto updateGeometry(QSGNode*) -> QSGNode*;
+
     model::ScopeLinesObject* m_lines{};
+
     QMetaObject::Connection m_linesChangedConnection;
+    bool m_updateTransformMatrix{};
 };
 
 } // namespace piejam::gui::item
