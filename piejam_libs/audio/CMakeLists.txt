@@ -34,6 +34,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_algorithms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_endpoint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_to_dag.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/identity_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/level_meter_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/lockstep_events.h
@@ -101,6 +102,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph_algorithms.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph_to_dag.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/identity_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/input_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/level_meter_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/mix_processor.cpp

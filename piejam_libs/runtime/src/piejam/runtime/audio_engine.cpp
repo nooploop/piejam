@@ -806,7 +806,8 @@ audio_engine::rebuild(
 
     connect_solo_groups(new_graph, comps, solo_groups);
 
-    audio::engine::bypass_event_identity_processors(new_graph);
+    audio::engine::remove_event_identity_processors(new_graph);
+    audio::engine::remove_identity_processors(new_graph);
 
     if (!m_impl->process.swap_executor(
                 audio::engine::graph_to_dag(new_graph).make_runnable(

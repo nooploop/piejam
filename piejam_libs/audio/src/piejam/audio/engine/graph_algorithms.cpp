@@ -7,6 +7,7 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/event_identity_processor.h>
 #include <piejam/audio/engine/graph.h>
+#include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/functional/compare.h>
@@ -153,7 +154,7 @@ connect_stereo_components(
 }
 
 void
-bypass_event_identity_processors(graph& g)
+remove_event_identity_processors(graph& g)
 {
     auto starts_in_identity = [](auto const& w) {
         return is_event_identity_processor(w.first.proc);
@@ -180,6 +181,37 @@ bypass_event_identity_processors(graph& g)
     g.remove_event_wires_if([](auto const& src, auto const& dst) {
         return is_event_identity_processor(src.proc) ||
                is_event_identity_processor(dst.proc);
+    });
+}
+
+void
+remove_identity_processors(graph& g)
+{
+    auto starts_in_identity = [](auto const& w) {
+        return is_identity_processor(w.first.proc);
+    };
+
+    auto it = std::ranges::find_if(g.wires(), starts_in_identity);
+    while (it != g.wires().end())
+    {
+        auto it_ends = std::ranges::find_if(
+                g.wires(),
+                [p = &it->first.proc.get()](auto const& w) {
+                    return &w.second.proc.get() == p;
+                });
+
+        auto out_wire = *it;
+        g.remove_wire(it);
+
+        if (it_ends != g.wires().end())
+            g.add_wire(it_ends->first, out_wire.second);
+
+        it = std::ranges::find_if(g.wires(), starts_in_identity);
+    }
+
+    g.remove_wires_if([](auto const& src, auto const& dst) {
+        return is_identity_processor(src.proc) ||
+               is_identity_processor(dst.proc);
     });
 }
 

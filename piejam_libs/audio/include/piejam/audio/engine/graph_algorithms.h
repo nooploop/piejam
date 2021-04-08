@@ -44,6 +44,7 @@ void connect_stereo_components(
         component const& dst,
         std::vector<std::unique_ptr<processor>>& mixers);
 
-void bypass_event_identity_processors(graph&);
+void remove_event_identity_processors(graph&);
+void remove_identity_processors(graph&);
 
 } // namespace piejam::audio::engine

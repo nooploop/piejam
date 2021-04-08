@@ -90,7 +90,7 @@ TEST(bypass_event_identity_processors, identity_without_output)
     g.add_event_wire({src, 0}, {ident, 0});
 
     ASSERT_EQ(1, g.event_wires().size());
-    bypass_event_identity_processors(g);
+    remove_event_identity_processors(g);
     EXPECT_TRUE(g.event_wires().empty());
 }
 
@@ -109,7 +109,7 @@ TEST(bypass_event_identity_processors, identity_without_input)
     g.add_event_wire({ident, 0}, {dst, 0});
 
     ASSERT_EQ(1, g.event_wires().size());
-    bypass_event_identity_processors(g);
+    remove_event_identity_processors(g);
     EXPECT_TRUE(g.event_wires().empty());
 }
 
@@ -133,7 +133,7 @@ TEST(bypass_event_identity_processors, identity_between_processors)
     g.add_event_wire({ident, 0}, {dst, 0});
 
     ASSERT_EQ(2, g.event_wires().size());
-    bypass_event_identity_processors(g);
+    remove_event_identity_processors(g);
     EXPECT_EQ(1, g.event_wires().size());
     EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst, 0}));
 }
@@ -161,7 +161,7 @@ TEST(bypass_event_identity_processors, identity_in_series_between_processors)
     g.add_event_wire({ident1, 0}, {ident2, 0});
 
     ASSERT_EQ(3, g.event_wires().size());
-    bypass_event_identity_processors(g);
+    remove_event_identity_processors(g);
     EXPECT_EQ(1, g.event_wires().size());
     EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst, 0}));
 }
@@ -192,7 +192,7 @@ TEST(bypass_event_identity_processors, two_outs_from_identity)
     g.add_event_wire({ident, 0}, {dst2, 0});
 
     ASSERT_EQ(3, g.event_wires().size());
-    bypass_event_identity_processors(g);
+    remove_event_identity_processors(g);
     EXPECT_EQ(2, g.event_wires().size());
     EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst1, 0}));
     EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst2, 0}));
@@ -227,7 +227,7 @@ TEST(bypass_event_identity_processors,
     g.add_event_wire({ident1, 0}, {dst2, 0});
 
     ASSERT_EQ(4, g.event_wires().size());
-    bypass_event_identity_processors(g);
+    remove_event_identity_processors(g);
     EXPECT_EQ(2, g.event_wires().size());
     EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst1, 0}));
     EXPECT_TRUE(has_event_wire(g, {src, 0}, {dst2, 0}));
