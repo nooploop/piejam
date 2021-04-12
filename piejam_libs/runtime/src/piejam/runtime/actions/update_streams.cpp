@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/state.h>
 
+#include <boost/assert.hpp>
+
 namespace piejam::runtime::actions
 {
 
@@ -17,6 +19,7 @@ update_streams::reduce(state const& st) const -> state
     for (auto&& [id, buffer] : streams)
     {
         new_st.streams.update(id, [&buffer](audio_stream_buffer& stored) {
+            BOOST_ASSERT(stored->num_channels() == buffer->num_channels());
             stored = buffer;
         });
     }

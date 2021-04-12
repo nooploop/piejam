@@ -489,8 +489,19 @@ audio_engine_middleware::process_engine_action(
 
         for (auto const& id : a.streams)
         {
-            if (auto buffer = m_engine->get_stream(id); !buffer->empty())
-                next_action.streams.emplace(id, std::move(buffer));
+            auto const& st = get_state();
+            if (audio_stream_buffer const* stream = st.streams.find(id))
+            {
+                if (auto buffer = m_engine->get_stream(id); !buffer.empty())
+                {
+                    next_action.streams.emplace(
+                            id,
+                            audio_stream_buffer(
+                                    std::in_place,
+                                    std::move(buffer),
+                                    stream->get().num_channels()));
+                }
+            }
         }
 
         if (!next_action.streams.empty())

@@ -25,11 +25,11 @@ struct pcm_io_config;
 template <class T>
 struct pair;
 
-template <class T, std::size_t NumChannels = 0>
+template <class T, std::size_t NumChannels>
 struct frame_iterator;
-template <class T, std::size_t NumChannels = 0>
+template <class T, std::size_t NumChannels>
 struct interleaved_view;
-template <class T, std::size_t NumChannels = 0>
+template <class T, std::size_t NumChannels>
 class interleaved_vector;
 
 } // namespace piejam::audio

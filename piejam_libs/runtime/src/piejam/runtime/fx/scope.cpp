@@ -71,7 +71,7 @@ make_scope_module(
                              add_resolution_param()}},
             .streams = module_streams{
                     {static_cast<stream_key>(scope_stream_key::left_right),
-                     streams.add()}}};
+                     streams.add(audio_stream_buffer(std::in_place, 2))}}};
 }
 
 } // namespace piejam::runtime::fx

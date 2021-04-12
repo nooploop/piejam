@@ -16,6 +16,15 @@ template <class T, std::size_t NumChannels = 0>
 class interleaved_vector
 {
 public:
+    constexpr interleaved_vector() noexcept
+            requires(NumChannels != 0) = default;
+
+    constexpr interleaved_vector(std::size_t const num_channels) noexcept
+        : m_num_channels(num_channels)
+    {
+        BOOST_ASSERT(interleaved_vector::num_channels() > 0);
+    }
+
     constexpr interleaved_vector(std::vector<T> vec) requires(NumChannels != 0)
         : m_vec(std::move(vec))
     {
@@ -35,6 +44,8 @@ public:
     {
         return NumChannels == 0 ? m_num_channels : NumChannels;
     }
+
+    constexpr bool empty() const noexcept { return m_vec.empty(); }
 
     constexpr auto begin() noexcept -> frame_iterator<T, NumChannels>
     {
@@ -77,6 +88,9 @@ public:
     {
         return {begin(), end()};
     }
+
+    constexpr auto data() const noexcept -> std::span<T const> { return m_vec; }
+    constexpr auto data() noexcept -> std::span<T> { return m_vec; }
 
 private:
     std::size_t m_num_channels{NumChannels};

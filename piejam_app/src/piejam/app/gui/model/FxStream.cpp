@@ -33,8 +33,8 @@ FxStream::onSubscribe()
     observe(runtime::selectors::make_audio_stream_selector(
                     m_impl->fxStreamKeyId.id),
             [this](runtime::audio_stream_buffer const& buf) {
-                if (auto l = listener())
-                    l->update(*buf);
+                if (auto l = listener(); l && !buf->empty())
+                    l->update(buf->data());
             });
 }
 

@@ -46,7 +46,7 @@ public:
 
     auto get_learned_midi() const -> std::optional<midi::external_event>;
 
-    auto get_stream(audio_stream_id) const -> audio_stream_buffer;
+    auto get_stream(audio_stream_id) const -> std::vector<float>;
 
     [[nodiscard]] bool
     rebuild(mixer::channels_t const&,

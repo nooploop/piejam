@@ -722,7 +722,7 @@ audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
 }
 
 auto
-audio_engine::get_stream(audio_stream_id const id) const -> audio_stream_buffer
+audio_engine::get_stream(audio_stream_id const id) const -> std::vector<float>
 {
     std::vector<float> result;
 
@@ -733,7 +733,7 @@ audio_engine::get_stream(audio_stream_id const id) const -> audio_stream_buffer
         });
     }
 
-    return audio_stream_buffer(std::move(result));
+    return result;
 }
 
 bool

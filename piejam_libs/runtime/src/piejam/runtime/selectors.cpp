@@ -673,7 +673,7 @@ make_audio_stream_selector(audio_stream_id stream_id)
         -> selector<audio_stream_buffer>
 {
     return [stream_id](state const& st) -> audio_stream_buffer {
-        static audio_stream_buffer s_empty;
+        static audio_stream_buffer s_empty(std::in_place, 1);
         auto* stream = st.streams.find(stream_id);
         return stream ? *stream : s_empty;
     };
