@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 namespace piejam::audio
 {
 
@@ -22,5 +24,12 @@ struct pcm_io_config;
 
 template <class T>
 struct pair;
+
+template <class T, std::size_t NumChannels = 0>
+struct frame_iterator;
+template <class T, std::size_t NumChannels = 0>
+struct interleaved_view;
+template <class T, std::size_t NumChannels = 0>
+class interleaved_vector;
 
 } // namespace piejam::audio

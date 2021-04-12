@@ -16,10 +16,13 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/event_input_buffers_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_output_buffers_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/frame_iterator_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_algorithms_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_to_dag_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/input_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/interleaved_vector_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/interleaved_view_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/level_meter_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/level_meter_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lockstep_events_test.cpp
