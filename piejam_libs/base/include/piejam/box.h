@@ -7,6 +7,7 @@
 #include <piejam/scope_guard.h>
 
 #include <memory>
+#include <utility>
 
 namespace piejam
 {
@@ -37,11 +38,38 @@ struct box_weak_eq
 };
 
 template <class T, class Eq>
+class box;
+
+template <class>
+struct is_box : std::false_type
+{
+};
+
+template <class U, class EqU>
+struct is_box<box<U, EqU>> : std::true_type
+{
+};
+
+template <class B>
+constexpr bool is_box_v = is_box<B>::value;
+
+template <class T, class Eq>
 class box
 {
 public:
+    box()
+        : box(std::in_place, T{})
+    {
+    }
+
+    template <std::convertible_to<T const> U>
+    box(U&& v) requires(!is_box_v<std::decay_t<U>>)
+        : box(std::in_place, std::forward<U>(v))
+    {
+    }
+
     template <class... Args>
-    box(Args&&... args)
+    box(std::in_place_t, Args&&... args)
         : m_value(std::make_shared<T const>(std::forward<Args>(args)...))
     {
     }
@@ -53,8 +81,8 @@ public:
     auto operator*() const noexcept -> T const& { return *m_value; }
     auto operator->() const noexcept -> T const* { return m_value.get(); }
 
-    template <std::convertible_to<T> U>
-    auto operator=(U&& value) -> box&
+    template <std::convertible_to<T const> U>
+    auto operator=(U&& value) -> box& requires(!is_box_v<std::decay_t<U>>)
     {
         m_value = std::make_shared<T const>(std::forward<U>(value));
         return *this;

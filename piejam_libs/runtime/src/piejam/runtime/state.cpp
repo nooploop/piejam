@@ -337,7 +337,7 @@ insert_missing_ladspa_fx_module(
                     std::next(fx_chain.begin(), insert_pos),
                     st.fx_modules.add(fx::module{
                             .fx_instance_id = id,
-                            .name = name,
+                            .name = std::string(name),
                             .parameters = {},
                             .streams = {}}));
         });

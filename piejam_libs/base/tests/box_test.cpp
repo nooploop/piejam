@@ -42,7 +42,7 @@ TEST(box, assign_operator)
 TEST(box, cast_operator)
 {
     box<int> x(5);
-    int const& y = x;
+    int const& y = static_cast<int const&>(x);
     EXPECT_EQ(5, y);
 }
 
@@ -132,6 +132,21 @@ TEST(box, update_with_return_value)
 
     EXPECT_EQ(7, sut.get());
     EXPECT_EQ(5, res);
+}
+
+TEST(unique_box, copy_and_eq)
+{
+    unique_box<std::vector<float>> v(std::vector<float>{1, 2, 3});
+    auto w = v;
+    EXPECT_EQ(v, w);
+}
+
+TEST(unique_box, assign_and_eq)
+{
+    unique_box<std::vector<float>> v(std::vector<float>{1, 2, 3});
+    unique_box<std::vector<float>> w;
+    w = v;
+    EXPECT_EQ(v, w);
 }
 
 } // namespace piejam::test
