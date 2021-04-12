@@ -43,10 +43,18 @@ ScopeLinesAccumulator::update(std::span<float const> const& samples)
         float const leftSample = samples[i];
         float const rightSample = samples[i + 1];
 
-        m_accLeftY0 = std::min(m_accLeftY0, leftSample);
-        m_accLeftY1 = std::max(m_accLeftY1, leftSample);
-        m_accRightY0 = std::min(m_accRightY0, rightSample);
-        m_accRightY1 = std::max(m_accRightY1, rightSample);
+        if (m_accNumSamples) [[likely]]
+        {
+            m_accLeftY0 = std::min(m_accLeftY0, leftSample);
+            m_accLeftY1 = std::max(m_accLeftY1, leftSample);
+            m_accRightY0 = std::min(m_accRightY0, rightSample);
+            m_accRightY1 = std::max(m_accRightY1, rightSample);
+        }
+        else
+        {
+            m_accLeftY0 = m_accLeftY1 = leftSample;
+            m_accRightY0 = m_accRightY1 = rightSample;
+        }
 
         ++m_accNumSamples;
 
@@ -59,10 +67,6 @@ ScopeLinesAccumulator::update(std::span<float const> const& samples)
             resultLeft.push_back(clip(m_accLeftY0), clip(m_accLeftY1));
             resultRight.push_back(clip(m_accRightY0), clip(m_accRightY1));
 
-            m_accLeftY0 = {};
-            m_accLeftY1 = {};
-            m_accRightY0 = {};
-            m_accRightY1 = {};
             m_accNumSamples = 0;
         }
     }
