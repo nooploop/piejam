@@ -1,11 +1,15 @@
-#include <piejam/audio/interleaved_vector.h>
+// PieJam - An audio mixer for Raspberry Pi.
+// SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include <piejam/range/interleaved_vector.h>
 
 #include <gtest/gtest.h>
 
 #include <algorithm>
 #include <array>
 
-namespace piejam::audio::test
+namespace piejam::range::test
 {
 
 TEST(interleaved_vector, static_create_and_iterate)
@@ -25,4 +29,4 @@ TEST(interleaved_vector, static_create_and_iterate)
     EXPECT_EQ(ivec.end(), it);
 }
 
-} // namespace piejam::audio::test
+} // namespace piejam::range::test

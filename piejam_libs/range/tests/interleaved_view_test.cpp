@@ -2,13 +2,13 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/interleaved_view.h>
+#include <piejam/range/interleaved_view.h>
 
 #include <gtest/gtest.h>
 
 #include <array>
 
-namespace piejam::audio::test
+namespace piejam::range::test
 {
 
 TEST(interleaved_view, concept_check)
@@ -28,4 +28,4 @@ TEST(interleaved_view, begin_end_for_static)
     EXPECT_EQ(it_end->data(), buf.data() + buf.size());
 }
 
-} // namespace piejam::audio::test
+} // namespace piejam::range::test

@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/frame_iterator.h>
+#include <piejam/range/frame_iterator.h>
 
 #include <gtest/gtest.h>
 
-namespace piejam::audio::test
+namespace piejam::range::test
 {
 
 TEST(frame_iterator, static_assert_test)
@@ -46,4 +46,4 @@ TEST(frame_iterator, static_non_const_to_runtime_const)
     EXPECT_EQ(-1.f, (*it)[1]);
 }
 
-} // namespace piejam::audio::test
+} // namespace piejam::range::test

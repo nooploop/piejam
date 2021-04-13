@@ -10,7 +10,7 @@
 #include <concepts>
 #include <span>
 
-namespace piejam::audio
+namespace piejam::range
 {
 
 template <std::size_t NumChannels>

@@ -222,13 +222,13 @@ target_link_libraries(piejam_runtime
     piejam_audio
     piejam_midi
     piejam_functional
+    piejam_range
     piejam_reselect
     nlohmann_json
     PRIVATE
     fmt
     spdlog::spdlog
-    piejam_algorithm
-    piejam_range)
+    piejam_algorithm)
 
 add_subdirectory(benchmarks)
 add_subdirectory(tests)

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <piejam/audio/frame_iterator.h>
-#include <piejam/audio/interleaved_view.h>
+#include <piejam/range/frame_iterator.h>
+#include <piejam/range/interleaved_view.h>
 
 #include <vector>
 
-namespace piejam::audio
+namespace piejam::range
 {
 
 template <class T, std::size_t NumChannels = 0>
