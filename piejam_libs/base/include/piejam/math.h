@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cmath>
+#include <concepts>
 #include <limits>
 
 namespace piejam::math
@@ -17,12 +18,24 @@ pow3(T const x) noexcept -> T
     return x * x * x;
 }
 
+template <std::floating_point T>
 constexpr auto
-to_dB(float l) -> float
+to_dB(T const l) -> T
 {
-    static_assert(std::numeric_limits<float>::is_iec559, "IEEE 754 required");
-    return l == 0.f ? -std::numeric_limits<float>::infinity()
-                    : (std::log(l) / std::log(10.f)) * 20.f;
+    static_assert(std::numeric_limits<T>::is_iec559, "IEEE 754 required");
+    constexpr auto const fact = T{20} / std::log(T{10});
+    return l == T{} ? -std::numeric_limits<T>::infinity() : std::log(l) * fact;
+}
+
+template <class T>
+constexpr auto
+clamp(T v, T const min, T const max) -> T requires(std::is_arithmetic_v<T>)
+{
+    if (v < min)
+        v = min;
+    if (v > max)
+        v = max;
+    return v;
 }
 
 } // namespace piejam::math
