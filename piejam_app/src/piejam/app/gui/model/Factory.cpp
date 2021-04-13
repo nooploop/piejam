@@ -73,6 +73,13 @@ Factory::Factory(
             "MixerChannelEdit",
             "Not creatable");
 
+    qmlRegisterUncreatableType<piejam::gui::model::FxModule>(
+            "PieJam.Models",
+            1,
+            0,
+            "FxModule",
+            "Not createable");
+
     qmlRegisterType<piejam::gui::model::FxScope>(
             "PieJam.Models",
             1,

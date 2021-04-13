@@ -187,10 +187,10 @@ Item {
 
             sourceComponent: {
                 switch (root.type) {
-                case 0:
+                case FxModule.Type.Generic:
                     return genericDelegate
 
-                case 1:
+                case FxModule.Type.Scope:
                     return scopeDelegate
                 }
             }
