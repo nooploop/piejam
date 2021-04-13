@@ -7,6 +7,8 @@
 #include <piejam/gui/model/ScopeLines.h>
 #include <piejam/gui/model/ScopeLinesAccumulator.h>
 
+#include <array>
+
 namespace piejam::gui::model
 {
 
@@ -15,8 +17,7 @@ struct FxScope::Impl
     ScopeLinesAccumulator streamListener;
     int samplesPerPoint{1};
     int viewSize{};
-    ScopeLinesObject leftLines;
-    ScopeLinesObject rightLines;
+    std::array<ScopeLinesObject, 2> lines;
 };
 
 FxScope::FxScope(QObject* parent)
@@ -25,12 +26,10 @@ FxScope::FxScope(QObject* parent)
 {
     connect(&m_impl->streamListener,
             &ScopeLinesAccumulator::linesAdded,
-            [this](ScopeLines const& addedLeft, ScopeLines const& addedRight) {
-                m_impl->leftLines.get().shift_push_back(addedLeft);
-                m_impl->leftLines.update();
-
-                m_impl->rightLines.get().shift_push_back(addedRight);
-                m_impl->rightLines.update();
+            [this](std::size_t const channel, ScopeLines const& addedLines) {
+                BOOST_ASSERT(channel < 2);
+                m_impl->lines[channel].get().shift_push_back(addedLines);
+                m_impl->lines[channel].update();
             });
 }
 
@@ -81,25 +80,24 @@ FxScope::setViewSize(int const x)
 auto
 FxScope::leftLines() noexcept -> ScopeLinesObject*
 {
-    return &m_impl->leftLines;
+    return &m_impl->lines[0];
 }
 
 auto
 FxScope::rightLines() noexcept -> ScopeLinesObject*
 {
-    return &m_impl->rightLines;
+    return &m_impl->lines[1];
 }
 
 void
 FxScope::clear()
 {
-    m_impl->leftLines.get().clear();
-    m_impl->leftLines.get().resize(m_impl->viewSize);
-    m_impl->leftLines.update();
-
-    m_impl->rightLines.get().clear();
-    m_impl->rightLines.get().resize(m_impl->viewSize);
-    m_impl->rightLines.update();
+    for (auto& obj : m_impl->lines)
+    {
+        obj.get().clear();
+        obj.get().resize(m_impl->viewSize);
+        obj.update();
+    }
 }
 
 } // namespace piejam::gui::model

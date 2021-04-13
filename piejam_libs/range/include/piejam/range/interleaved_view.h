@@ -17,6 +17,8 @@ struct interleaved_view
 {
     using iterator = frame_iterator<T, NumChannels>;
 
+    constexpr interleaved_view() noexcept = default;
+
     constexpr interleaved_view(iterator first, iterator last) noexcept
         : m_begin(std::move(first))
         , m_end(std::move(last))
@@ -77,4 +79,4 @@ private:
     iterator m_end;
 };
 
-} // namespace piejam::audio
+} // namespace piejam::range

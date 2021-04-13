@@ -34,7 +34,7 @@ FxStream::onSubscribe()
                     m_impl->fxStreamKeyId.id),
             [this](runtime::audio_stream_buffer const& buf) {
                 if (auto l = listener(); l && !buf->empty())
-                    l->update(buf->data());
+                    l->update(buf->frames());
             });
 }
 

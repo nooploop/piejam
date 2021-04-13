@@ -14,6 +14,7 @@ namespace piejam::range::test
 TEST(interleaved_view, concept_check)
 {
     static_assert(std::ranges::random_access_range<interleaved_view<float, 2>>);
+    static_assert(std::ranges::sized_range<interleaved_view<float, 0>>);
 }
 
 TEST(interleaved_view, begin_end_for_static)

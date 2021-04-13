@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <QObject>
+#include <piejam/range/fwd.h>
 
-#include <span>
+#include <QObject>
 
 namespace piejam::gui::model
 {
@@ -16,7 +16,7 @@ class AudioStreamListener : public QObject
     Q_OBJECT
 
 public:
-    virtual void update(std::span<float const> const&) = 0;
+    virtual void update(range::interleaved_view<float const, 0> const&) = 0;
 };
 
 } // namespace piejam::gui::model

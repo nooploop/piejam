@@ -23,19 +23,23 @@ public:
     auto samplesPerLine() const noexcept -> int { return m_samplesPerPoint; }
     void setSamplesPerLine(int x);
 
-    void update(std::span<float const> const&) override;
+    void update(range::interleaved_view<float const, 0> const&) override;
 
 signals:
-    void linesAdded(ScopeLines const& left, ScopeLines const& right);
     void samplesPerLineChanged();
+
+    void linesAdded(std::size_t channel, ScopeLines const&);
 
 private:
     int m_samplesPerPoint{1};
 
-    float m_accLeftY0{};
-    float m_accLeftY1{};
-    float m_accRightY0{};
-    float m_accRightY1{};
+    struct Acc
+    {
+        float y0;
+        float y1;
+    };
+
+    std::vector<Acc> m_acc;
     int m_accNumSamples{};
 };
 

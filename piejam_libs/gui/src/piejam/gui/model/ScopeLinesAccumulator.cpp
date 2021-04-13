@@ -5,6 +5,9 @@
 #include <piejam/gui/model/ScopeLinesAccumulator.h>
 
 #include <piejam/gui/model/ScopeLines.h>
+#include <piejam/math.h>
+#include <piejam/range/indices.h>
+#include <piejam/range/interleaved_view.h>
 
 #include <boost/assert.hpp>
 
@@ -26,54 +29,74 @@ ScopeLinesAccumulator::setSamplesPerLine(int x)
     }
 }
 
-void
-ScopeLinesAccumulator::update(std::span<float const> const& samples)
+static constexpr auto
+clip(float const v) -> float
 {
-    BOOST_ASSERT(samples.size() % 2 == 0);
-    if (samples.empty())
+    return math::clamp(v, -1.f, 1.f);
+}
+
+void
+ScopeLinesAccumulator::update(
+        range::interleaved_view<float const> const& stream)
+{
+    if (stream.empty())
         return;
 
-    ScopeLines resultLeft, resultRight;
-    std::size_t const resultCapacity = samples.size() / m_samplesPerPoint + 1;
-    resultLeft.reserve(resultCapacity);
-    resultRight.reserve(resultCapacity);
-
-    for (std::size_t i = 0, e = samples.size(); i < e; i += 2)
+    if (m_acc.size() != stream.num_channels())
     {
-        float const leftSample = samples[i];
-        float const rightSample = samples[i + 1];
+        m_acc.resize(stream.num_channels());
+        m_accNumSamples = 0;
+    }
 
+    if (m_acc.size() == 0)
+        return;
+
+    std::vector<ScopeLines> result(m_acc.size());
+    std::ranges::for_each(
+            result,
+            [resultCapacity = stream.size() / m_samplesPerPoint + 1](
+                    auto& scopeLines) { scopeLines.reserve(resultCapacity); });
+
+    for (auto const frame : stream)
+    {
         if (m_accNumSamples) [[likely]]
         {
-            m_accLeftY0 = std::min(m_accLeftY0, leftSample);
-            m_accLeftY1 = std::max(m_accLeftY1, leftSample);
-            m_accRightY0 = std::min(m_accRightY0, rightSample);
-            m_accRightY1 = std::max(m_accRightY1, rightSample);
+            for (std::size_t i = 0; i < frame.size(); ++i)
+            {
+                auto& acc = m_acc[i];
+                float const sample = frame[i];
+                acc.y0 = std::min(acc.y0, sample);
+                acc.y1 = std::max(acc.y1, sample);
+            }
         }
         else
         {
-            m_accLeftY0 = m_accLeftY1 = leftSample;
-            m_accRightY0 = m_accRightY1 = rightSample;
+            for (std::size_t i = 0; i < frame.size(); ++i)
+            {
+                float const sample = frame[i];
+                m_acc[i] = Acc{.y0 = sample, .y1 = sample};
+            }
         }
 
         ++m_accNumSamples;
 
         if (m_accNumSamples >= m_samplesPerPoint)
         {
-            constexpr auto clip = [](float x) {
-                return std::clamp(x, -1.f, 1.f);
-            };
-
-            resultLeft.push_back(clip(m_accLeftY0), clip(m_accLeftY1));
-            resultRight.push_back(clip(m_accRightY0), clip(m_accRightY1));
+            for (std::size_t i = 0; i < frame.size(); ++i)
+            {
+                auto const& acc = m_acc[i];
+                result[i].push_back(clip(acc.y0), clip(acc.y1));
+            }
 
             m_accNumSamples = 0;
         }
     }
 
-    BOOST_ASSERT(resultLeft.size() == resultRight.size());
-    if (!resultLeft.empty())
-        emit linesAdded(resultLeft, resultRight);
+    if (result[0].empty())
+        return;
+
+    for (std::size_t i : range::indices(result))
+        emit linesAdded(i, result[i]);
 }
 
 } // namespace piejam::gui::model

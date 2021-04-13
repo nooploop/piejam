@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 namespace piejam::range
 {
 
@@ -15,5 +17,12 @@ class strided_span;
 
 template <class T>
 class table_view;
+
+template <class T, std::size_t NumChannels>
+struct frame_iterator;
+template <class T, std::size_t NumChannels>
+struct interleaved_view;
+template <class T, std::size_t NumChannels>
+class interleaved_vector;
 
 } // namespace piejam::range
