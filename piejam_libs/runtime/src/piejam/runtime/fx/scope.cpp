@@ -11,6 +11,7 @@
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_maps_access.h>
+#include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
 
@@ -29,7 +30,7 @@ make_scope_module(audio_streams_cache& streams) -> module
             .name = "Scope"s,
             .parameters = fx::module_parameters{},
             .streams = module_streams{
-                    {static_cast<stream_key>(scope_stream_key::left_right),
+                    {to_underlying(scope_stream_key::left_right),
                      streams.add(audio_stream_buffer(std::in_place, 2))}}};
 }
 

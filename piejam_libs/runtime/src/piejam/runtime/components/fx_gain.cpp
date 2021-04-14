@@ -11,6 +11,7 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter_processor_factory.h>
+#include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
 
@@ -32,8 +33,8 @@ public:
             std::string_view const& name)
         : m_gain_input_proc(processors::make_parameter_processor(
                   proc_factory,
-                  fx_mod.parameters->at(static_cast<std::size_t>(
-                          fx::gain_parameter_key::gain)),
+                  fx_mod.parameters->at(
+                          to_underlying(fx::gain_parameter_key::gain)),
                   fmt::format("gain {}", name)))
         , m_amplifier(audio::components::make_stereo_amplifier(
                   fmt::format("amp {}", name)))

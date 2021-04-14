@@ -10,6 +10,7 @@
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_maps_access.h>
+#include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
 
@@ -63,8 +64,7 @@ make_gain_module(parameters_t& fx_params, parameter_maps& params) -> module
             .name = "Gain"s,
             .parameters =
                     fx::module_parameters{
-                            {static_cast<parameter_key>(
-                                     gain_parameter_key::gain),
+                            {to_underlying(gain_parameter_key::gain),
                              add_param(
                                      runtime::parameter::float_{
                                              .default_value = gain_defaults::

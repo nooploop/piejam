@@ -14,6 +14,7 @@
 #include <piejam/runtime/fx/scope.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/runtime/processors/stream_processor_factory.h>
+#include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
 
@@ -30,6 +31,7 @@ namespace
 constexpr auto
 stream_capacity(audio::samplerate_t const samplerate) -> std::size_t
 {
+    // 3 x 17ms
     return static_cast<std::size_t>((samplerate / 1000.f) * 17 * 3);
 }
 
@@ -42,8 +44,8 @@ public:
             processors::stream_processor_factory& stream_proc_factory,
             std::string_view const&)
         : m_stream_proc(stream_proc_factory.make_processor(
-                  fx_mod.streams->at(static_cast<fx::stream_key>(
-                          fx::scope_stream_key::left_right)),
+                  fx_mod.streams->at(
+                          to_underlying(fx::scope_stream_key::left_right)),
                   2,
                   stream_capacity(samplerate),
                   "scope"))
