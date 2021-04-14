@@ -4,21 +4,18 @@
 
 #pragma once
 
-#include <algorithm>
-#include <iterator>
-#include <type_traits>
+#include <ranges>
 #include <vector>
 
 namespace piejam::algorithm
 {
 
-template <class Range, class F>
+template <class F>
 auto
-transform_to_vector(Range const& rng, F&& f)
+transform_to_vector(std::ranges::range auto const& rng, F&& f)
 {
-    std::vector<std::decay_t<decltype(f(*std::begin(rng)))>> result;
-    std::ranges::transform(rng, std::back_inserter(result), std::forward<F>(f));
-    return result;
+    auto transformed = std::views::transform(rng, std::forward<F>(f));
+    return std::vector(transformed.begin(), transformed.end());
 }
 
 } // namespace piejam::algorithm
