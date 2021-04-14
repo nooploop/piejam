@@ -23,7 +23,7 @@ Item {
         id: fxScope
 
         viewSize: leftScope.width
-        samplesPerPoint: 480
+        samplesPerPoint: resolutionSlider.value
     }
 
     onContentChanged: {
@@ -39,14 +39,16 @@ Item {
     ColumnLayout {
         id: scopesLayout
 
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: resolutionSlider.top
 
         PJItems.Scope {
             id: leftScope
 
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumHeight: scopesLayout.height / 2
 
             lines: fxScope.leftLines
         }
@@ -56,10 +58,22 @@ Item {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumHeight: scopesLayout.height / 2
 
             lines: fxScope.rightLines
         }
+    }
+
+    Slider {
+        id: resolutionSlider
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        from: 1
+        to: 1920
+        stepSize: 1
+        value: 480
     }
 
     Timer {

@@ -152,13 +152,9 @@ make_fx_gain(
 }
 
 static auto
-make_fx_scope(
-        fx::modules_t& fx_modules,
-        fx::parameters_t& fx_params,
-        parameter_maps& params,
-        audio_streams_cache& streams)
+make_fx_scope(fx::modules_t& fx_modules, audio_streams_cache& streams)
 {
-    return fx_modules.add(fx::make_scope_module(fx_params, params, streams));
+    return fx_modules.add(fx::make_scope_module(streams));
 }
 
 static void
@@ -252,11 +248,7 @@ insert_internal_fx_module(
             break;
 
         case fx::internal::scope:
-            fx_mod_id = make_fx_scope(
-                    st.fx_modules,
-                    fx_params,
-                    st.params,
-                    st.streams);
+            fx_mod_id = make_fx_scope(st.fx_modules, st.streams);
             break;
     }
 
