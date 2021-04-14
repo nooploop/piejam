@@ -6,38 +6,48 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
-ListView {
+Item {
     id: root
 
-    orientation: Qt.Horizontal
+    property var content: null
 
-    spacing: 4
+    implicitWidth: listView.contentWidth
 
-    implicitWidth: contentWidth
+    ListView {
+        id: listView
 
-    delegate: ParameterControl {
-        name: model.item.name
-        value: model.item.value
-        valueText: model.item.valueString
-        switchValue: model.item.switchValue
+        width: contentWidth
 
-        sliderMin: model.item.stepped ? model.item.minValue : 0.0
-        sliderMax: model.item.stepped ? model.item.maxValue : 1.0
-        sliderStep: model.item.stepped ? 1.0 : 0.0
+        orientation: Qt.Horizontal
 
-        isSwitch: model.item.isSwitch
+        spacing: 4
 
-        midi.model: model.item.midi
+        model: if (root.content) root.content.parameters
 
-        height: root.height
+        delegate: ParameterControl {
+            name: model.item.name
+            value: model.item.value
+            valueText: model.item.valueString
+            switchValue: model.item.switchValue
 
-        onSliderMoved: model.item.changeValue(newValue)
-        onSwitchToggled: model.item.changeSwitchValue(newValue)
+            sliderMin: model.item.stepped ? model.item.minValue : 0.0
+            sliderMax: model.item.stepped ? model.item.maxValue : 1.0
+            sliderStep: model.item.stepped ? 1.0 : 0.0
 
-        Binding {
-            target: model.item
-            property: "subscribed"
-            value: visible
+            isSwitch: model.item.isSwitch
+
+            midi.model: model.item.midi
+
+            height: root.height
+
+            onSliderMoved: model.item.changeValue(newValue)
+            onSwitchToggled: model.item.changeSwitchValue(newValue)
+
+            Binding {
+                target: model.item
+                property: "subscribed"
+                value: visible
+            }
         }
     }
 }

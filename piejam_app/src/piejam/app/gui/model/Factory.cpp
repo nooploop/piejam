@@ -16,6 +16,7 @@
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/FxModule.h>
+#include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/FxParameter.h>
 #include <piejam/gui/model/FxScope.h>
 #include <piejam/gui/model/MidiAssignable.h>
@@ -65,6 +66,7 @@ Factory::Factory(
     qRegisterMetaType<piejam::gui::model::MidiAssignable*>();
     qRegisterMetaType<piejam::gui::model::AudioStreamProvider*>();
     qRegisterMetaType<piejam::gui::model::AudioStreamListener*>();
+    qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
 
     qmlRegisterUncreatableType<piejam::gui::model::MixerChannelEdit>(
             "PieJam.Models",
@@ -73,11 +75,11 @@ Factory::Factory(
             "MixerChannelEdit",
             "Not creatable");
 
-    qmlRegisterUncreatableType<piejam::gui::model::FxModule>(
+    qmlRegisterUncreatableType<piejam::gui::model::FxModuleContent>(
             "PieJam.Models",
             1,
             0,
-            "FxModule",
+            "FxModuleContent",
             "Not createable");
 
     qmlRegisterType<piejam::gui::model::FxScope>(

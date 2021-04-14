@@ -6,6 +6,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
+import QtQml 2.15
 
 import PieJam.Models 1.0
 
@@ -13,12 +14,11 @@ Item {
     id: root
 
     property alias name: nameLabel.text
-    property int type: 0
-    property var parameters: []
-    property var streams: []
+    property int type: FxModuleContent.Type.Generic
     property bool bypassed: false
     property alias moveLeftEnabled: moveLeftButton.enabled
     property alias moveRightEnabled: moveRightButton.enabled
+    property var content: null
 
     signal bypassButtonClicked()
     signal swapButtonClicked()
@@ -165,7 +165,7 @@ Item {
             id: genericDelegate
 
             ParametersListView {
-                model: root.parameters
+                content: root.content
             }
         }
 
@@ -173,8 +173,8 @@ Item {
             id: scopeDelegate
 
             ScopeView {
-                parameters: root.parameters
-                streams: root.streams
+                content: root.content
+                bypassed: root.bypassed
             }
         }
 
@@ -186,12 +186,21 @@ Item {
             anchors.bottom: parent.bottom
 
             sourceComponent: {
-                switch (root.type) {
-                case FxModule.Type.Generic:
-                    return genericDelegate
+                if (root.content) {
+                    switch (root.content.type) {
+                    case FxModuleContent.Type.Generic:
+                        return genericDelegate
 
-                case FxModule.Type.Scope:
-                    return scopeDelegate
+                    case FxModuleContent.Type.Scope:
+                        return scopeDelegate
+                    default:
+                        console.log("unknown content type")
+                        return null
+                    }
+                }
+                else
+                {
+                    return null
                 }
             }
         }

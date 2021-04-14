@@ -13,11 +13,6 @@
 namespace piejam::runtime::fx
 {
 
-parameter_value_to_string::parameter_value_to_string() noexcept
-    : m_to_string([](float x) { return fmt::format("{:.2f}", x); })
-{
-}
-
 parameter_value_to_string::parameter_value_to_string(float_to_string f) noexcept
     : m_to_string(f)
 {
@@ -34,6 +29,29 @@ parameter_value_to_string::parameter_value_to_string(bool_to_string f) noexcept
     : m_to_string(f)
 {
     BOOST_ASSERT(f);
+}
+
+auto
+make_default_float_parameter_value_to_string() noexcept
+        -> parameter_value_to_string
+{
+    return parameter_value_to_string(
+            [](float x) { return fmt::format("{:.2f}", x); });
+}
+
+auto
+make_default_int_parameter_value_to_string() noexcept
+        -> parameter_value_to_string
+{
+    return parameter_value_to_string([](int x) { return std::to_string(x); });
+}
+
+auto
+make_default_bool_parameter_value_to_string() noexcept
+        -> parameter_value_to_string
+{
+    using namespace std::string_literals;
+    return parameter_value_to_string([](bool x) { return x ? "on"s : "off"s; });
 }
 
 namespace

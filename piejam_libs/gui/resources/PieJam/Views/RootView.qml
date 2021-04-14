@@ -98,7 +98,7 @@ Item {
         FxChain {
             id: fxChainPane
 
-            model: root.modelFactory.fxChain
+            chainModel: root.modelFactory.fxChain
             browser: root.modelFactory.fxBrowser
         }
     }

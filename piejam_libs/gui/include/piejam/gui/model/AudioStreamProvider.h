@@ -4,8 +4,11 @@
 
 #pragma once
 
+#include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+
+#include <QPointer>
 
 namespace piejam::gui::model
 {
@@ -39,7 +42,7 @@ signals:
     void listenerChanged();
 
 private:
-    AudioStreamListener* m_listener{};
+    QPointer<AudioStreamListener> m_listener{};
 };
 
 } // namespace piejam::gui::model

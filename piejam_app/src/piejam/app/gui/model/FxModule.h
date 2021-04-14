@@ -23,6 +23,8 @@ public:
             runtime::fx::instance_id);
     ~FxModule();
 
+    auto content() noexcept -> piejam::gui::model::FxModuleContent* override;
+
     void toggleBypass() override;
     void deleteModule() override;
     void moveLeft() override;

@@ -12,7 +12,7 @@ import "../MixerControls"
 ViewPane {
     id: root
 
-    property var model
+    property var chainModel
     property alias browser: fxBrowser.model
 
     StackView {
@@ -39,7 +39,7 @@ ViewPane {
             anchors.fill: parent
             anchors.margins: 8
 
-            model: root.model.modules
+            model: root.chainModel.modules
 
             clip: true
             orientation: ListView.Horizontal
@@ -52,9 +52,8 @@ ViewPane {
                 anchors.bottom: if (parent) parent.bottom
 
                 name: model.item.name
-                type: model.item.type
-                parameters: model.item.parameters
-                streams: model.item.streams
+                bypassed: model.item.bypassed
+                content: model.item.content
                 moveLeftEnabled: model.item.canMoveLeft
                 moveRightEnabled: model.item.canMoveRight
 
@@ -63,7 +62,10 @@ ViewPane {
                     fxBrowser.insertPosition = index
                     stack.push(fxBrowser)
                 }
-                onDeleteButtonClicked: model.item.deleteModule()
+                onDeleteButtonClicked: {
+                    model.item.subscribed = false
+                    model.item.deleteModule()
+                }
                 onAddButtonClicked: {
                     fxBrowser.addMode = FxBrowser.AddMode.Insert
                     fxBrowser.insertPosition = index + 1
@@ -116,8 +118,8 @@ ViewPane {
     }
 
     Binding {
-        when: root.model
-        target: root.model
+        when: root.chainModel
+        target: root.chainModel
         property: "subscribed"
         value: root.visible
     }

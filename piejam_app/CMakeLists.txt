@@ -35,11 +35,15 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxBrowserEntryLADSPA.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxChain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxChain.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxGenericModule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxGenericModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameterKeyId.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxScopeModule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxScopeModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxStream.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxStream.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxStreamKeyId.h

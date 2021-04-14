@@ -56,7 +56,8 @@ make_module_parameters(
                     parameter_id(id),
                     parameter{
                             .name = port_desc.name,
-                            .value_to_string = parameter_value_to_string()});
+                            .value_to_string =
+                                    make_default_float_parameter_value_to_string()});
 
             module_params.emplace(port_desc.index, id);
         }
@@ -76,7 +77,8 @@ make_module_parameters(
                     id,
                     parameter{
                             .name = port_desc.name,
-                            .value_to_string = parameter_value_to_string()});
+                            .value_to_string =
+                                    make_default_int_parameter_value_to_string()});
 
             module_params.emplace(port_desc.index, id);
         }
@@ -92,7 +94,8 @@ make_module_parameters(
                     id,
                     parameter{
                             .name = port_desc.name,
-                            .value_to_string = parameter_value_to_string()});
+                            .value_to_string =
+                                    make_default_bool_parameter_value_to_string()});
 
             module_params.emplace(port_desc.index, id);
         }

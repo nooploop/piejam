@@ -12,7 +12,7 @@ namespace piejam::app::gui::model
 
 struct FxStreamKeyId
 {
-    runtime::fx::stream_key key;
+    runtime::fx::stream_key key{};
     runtime::audio_stream_id id;
 
     constexpr bool

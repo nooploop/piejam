@@ -5,6 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 import QtQml 2.15
 
 import PieJam.Items 1.0 as PJItems
@@ -13,80 +14,58 @@ import PieJam.Models 1.0
 Item {
     id: root
 
-    property var parameters: []
-    property var streams: []
+    property var content: null
+    property bool bypassed: false
 
     implicitWidth: 636
 
-    ListView {
-        id: scopes
+    FxScope {
+        id: fxScope
+
+        viewSize: leftScope.width
+        samplesPerPoint: 480
+    }
+
+    onContentChanged: {
+        if (root.content) {
+            root.content.scopeStream.listener = fxScope.streamListener
+        }
+    }
+
+    onVisibleChanged: fxScope.clear()
+
+    onBypassedChanged: if (root.bypassed) fxScope.clear()
+
+    ColumnLayout {
+        id: scopesLayout
 
         anchors.fill: parent
 
-        boundsMovement: Flickable.StopAtBounds
-        boundsBehavior: Flickable.StopAtBounds
+        PJItems.Scope {
+            id: leftScope
 
-        model: streams
-        spacing: 4
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: scopesLayout.height / 2
 
-        delegate: Item {
-            width: scopes.width
-            height: scopes.height
-
-            FxScope {
-                id: fxScope
-
-                viewSize: leftScope.width
-                samplesPerPoint: 480
-
-                Component.onDestruction: if (model.item) model.item.listener = null
-            }
-
-            onVisibleChanged: fxScope.clear();
-
-            PJItems.Scope {
-                id: leftScope
-
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-
-                height: parent.height / 2
-
-                lines: fxScope.leftLines
-            }
-
-            PJItems.Scope {
-                id: rightScope
-
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.top: leftScope.bottom
-
-                lines: fxScope.rightLines
-            }
-
-            Binding {
-                when: visible
-                target: model.item
-                property: "listener"
-                value: fxScope.streamListener
-                restoreMode: Binding.RestoreBinding
-            }
-
-            Binding {
-                target: model.item
-                property: "subscribed"
-                value: visible
-            }
-
-            Timer {
-                interval: 16
-                running: visible
-                repeat: true
-                onTriggered: model.item.requestUpdate()
-            }
+            lines: fxScope.leftLines
         }
+
+        PJItems.Scope {
+            id: rightScope
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: scopesLayout.height / 2
+
+            lines: fxScope.rightLines
+        }
+    }
+
+    Timer {
+        interval: 16
+        running: visible && root.content
+        repeat: true
+        onTriggered: root.content.scopeStream.requestUpdate()
     }
 }
