@@ -6,8 +6,10 @@
 
 #include <piejam/range/strided_span.h>
 
+#include <boost/assert.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
+
 #include <algorithm>
-#include <cassert>
 
 namespace piejam::range
 {
@@ -18,6 +20,12 @@ class table_view
 public:
     template <class U>
     class major_index_iterator
+        : public boost::stl_interfaces::iterator_interface<
+                  major_index_iterator<U>,
+                  std::random_access_iterator_tag,
+                  strided_span<U>,
+                  strided_span<U> const&,
+                  strided_span<U> const*>
     {
     public:
         using iterator_category = std::random_access_iterator_tag;
@@ -41,40 +49,8 @@ public:
         {
             return m_stride;
         }
-        constexpr auto operator->() const noexcept -> pointer
-        {
-            return &m_stride;
-        }
 
-        constexpr auto operator[](difference_type const n) const noexcept
-                -> value_type
-        {
-            return {m_stride.data() + n * m_step,
-                    m_stride.size(),
-                    m_stride.stride()};
-        }
-
-        constexpr auto operator++() noexcept -> major_index_iterator<U>&
-        {
-            m_stride = {
-                    m_stride.data() + m_step,
-                    m_stride.size(),
-                    m_stride.stride()};
-            return *this;
-        }
-
-        constexpr auto operator++(int) noexcept -> major_index_iterator<U>
-        {
-            auto copy = *this;
-            m_stride = {
-                    m_stride.data() + m_step,
-                    m_stride.size(),
-                    m_stride.stride()};
-            return copy;
-        }
-
-        constexpr auto operator+=(difference_type const n) noexcept
-                -> major_index_iterator<U>&
+        auto operator+=(std::ptrdiff_t n) noexcept -> major_index_iterator&
         {
             m_stride = {
                     m_stride.data() + n * m_step,
@@ -83,113 +59,12 @@ public:
             return *this;
         }
 
-        constexpr auto operator--() noexcept -> major_index_iterator<U>&
+        auto operator-(major_index_iterator const& other) const noexcept
         {
-            m_stride = {
-                    m_stride.data() - m_step,
-                    m_stride.size(),
-                    m_stride.stride()};
-            return *this;
-        }
-
-        constexpr auto operator--(int) noexcept -> major_index_iterator<U>
-        {
-            auto copy = *this;
-            m_stride = {
-                    m_stride.data() - m_step,
-                    m_stride.size(),
-                    m_stride.stride()};
-            return copy;
-        }
-
-        constexpr auto operator-=(difference_type const n) noexcept
-                -> major_index_iterator<U>&
-        {
-            m_stride = {
-                    m_stride.data() - n * m_step,
-                    m_stride.size(),
-                    m_stride.stride()};
-            return *this;
-        }
-
-        friend constexpr bool operator==(
-                major_index_iterator<U> const& lhs,
-                major_index_iterator<U> const& rhs) noexcept
-        {
-            assert(lhs.m_stride.size() == rhs.m_stride.size());
-            assert(lhs.m_stride.stride() == rhs.m_stride.stride());
-            assert(lhs.m_step == rhs.m_step);
-            return lhs.m_stride.data() == rhs.m_stride.data();
-        }
-
-        friend constexpr bool operator!=(
-                major_index_iterator<U> const& lhs,
-                major_index_iterator<U> const& rhs) noexcept
-        {
-            return !(lhs == rhs);
-        }
-
-        friend constexpr bool operator<(
-                major_index_iterator<U> const& lhs,
-                major_index_iterator<U> const& rhs) noexcept
-        {
-            assert(lhs.m_stride.size() == rhs.m_stride.size());
-            assert(lhs.m_stride.stride() == rhs.m_stride.stride());
-            assert(lhs.m_step == rhs.m_step);
-            return lhs.m_stride.data() < rhs.m_stride.data();
-        }
-
-        friend constexpr bool operator<=(
-                major_index_iterator<U> const& lhs,
-                major_index_iterator<U> const& rhs) noexcept
-        {
-            return lhs == rhs || lhs < rhs;
-        }
-
-        friend constexpr bool operator>(
-                major_index_iterator<U> const& lhs,
-                major_index_iterator<U> const& rhs) noexcept
-        {
-            return rhs < lhs;
-        }
-
-        friend constexpr bool operator>=(
-                major_index_iterator<U> const& lhs,
-                major_index_iterator<U> const& rhs) noexcept
-        {
-            return rhs <= lhs;
-        }
-
-        friend constexpr auto
-        operator+(major_index_iterator<U> it, difference_type const n) noexcept
-                -> major_index_iterator<U>
-        {
-            return it += n;
-        }
-
-        friend constexpr auto operator+(
-                difference_type const n,
-                major_index_iterator<U> const& it) noexcept
-                -> major_index_iterator<U>
-        {
-            return it + n;
-        }
-
-        friend constexpr auto
-        operator-(major_index_iterator<U> it, difference_type const n) noexcept
-                -> major_index_iterator<U>
-        {
-            return it -= n;
-        }
-
-        friend constexpr auto operator-(
-                major_index_iterator<U> const& lhs,
-                major_index_iterator<U> const& rhs) noexcept -> difference_type
-        {
-            assert(lhs.m_stride.size() == rhs.m_stride.size());
-            assert(lhs.m_stride.stride() == rhs.m_stride.stride());
-            assert(lhs.m_step == rhs.m_step);
-            return (lhs.m_stride.data() - rhs.m_stride.data()) / lhs.m_step;
+            BOOST_ASSERT(m_stride.size() == other.m_stride.size());
+            BOOST_ASSERT(m_stride.stride() == other.m_stride.stride());
+            BOOST_ASSERT(m_step == other.m_step);
+            return (m_stride.data() - other.m_stride.data()) / m_step;
         }
 
     private:
@@ -296,8 +171,8 @@ transform(
         table_view<U> const& dst,
         UnaryOperation&& op)
 {
-    assert(src.major_size() == dst.major_size());
-    assert(src.minor_size() == dst.minor_size());
+    BOOST_ASSERT(src.major_size() == dst.major_size());
+    BOOST_ASSERT(src.minor_size() == dst.minor_size());
 
     for (auto src_it = src.begin(), src_end = src.end(), dst_it = dst.begin();
          src_it != src_end;
