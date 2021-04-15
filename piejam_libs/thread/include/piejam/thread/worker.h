@@ -42,6 +42,7 @@ public:
             }
         })
     {
+        wait();
     }
 
     worker(worker const&) = delete;
