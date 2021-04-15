@@ -46,7 +46,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/process.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_job.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/select_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/single_event_input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice_algorithms.h
@@ -76,7 +75,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/process_thread.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/samplerates.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/smoother.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/table.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/types.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_pcm_io_descriptors.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_pcm_io_descriptors.h
@@ -111,7 +109,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/pan_balance_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/process.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/select_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/stream_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/ladspa/plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/ladspa/scan.cpp
