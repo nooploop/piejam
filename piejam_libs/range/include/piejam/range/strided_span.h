@@ -30,7 +30,7 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    constexpr strided_span() noexcept {}
+    constexpr strided_span() noexcept = default;
 
     constexpr strided_span(pointer ptr, size_type size, difference_type stride)
         : m_data(ptr)

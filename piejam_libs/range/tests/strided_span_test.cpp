@@ -8,9 +8,17 @@
 
 #include <algorithm>
 #include <array>
+#include <ranges>
 
 namespace piejam::range::test
 {
+
+TEST(strided_span, static_asserts)
+{
+    static_assert(std::ranges::random_access_range<strided_span<float>>);
+    static_assert(std::ranges::viewable_range<strided_span<float> const&>);
+    static_assert(std::ranges::sized_range<strided_span<float>>);
+}
 
 TEST(strided_span, default_ctor)
 {
