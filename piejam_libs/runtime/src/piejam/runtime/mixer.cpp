@@ -9,6 +9,7 @@
 #include <boost/hof/unpack.hpp>
 
 #include <algorithm>
+#include <ranges>
 
 namespace piejam::runtime::mixer
 {
@@ -16,22 +17,21 @@ namespace piejam::runtime::mixer
 namespace
 {
 
-using channel_ios_t = boost::container::flat_map<channel_id, channel_io_t>;
+using channels_io_t = boost::container::flat_map<channel_id, channel_io_t>;
 
 auto
-extract_bus_ios(channels_t const& channels) -> channel_ios_t
+extract_channels_io(channels_t const& channels) -> channels_io_t
 {
-    channel_ios_t result;
-    result.reserve(channels.size());
-
-    std::ranges::transform(
+    auto transformed = std::views::transform(
             channels,
-            std::inserter(result, result.end()),
             boost::hof::unpack([](auto const id, auto const& channel) {
                 return std::pair(id, channel_io_t(channel.in, channel.out));
             }));
 
-    return result;
+    return channels_io_t(
+            boost::container::ordered_unique_range,
+            transformed.begin(),
+            transformed.end());
 }
 
 struct io_graph_node
@@ -44,26 +44,26 @@ struct io_graph_node
 using io_graph = boost::container::flat_map<channel_id, io_graph_node>;
 
 auto
-make_bus_io_graph(channel_ios_t const& bus_ios) -> io_graph
+make_channels_io_graph(channels_io_t const& channels_io) -> io_graph
 {
     io_graph result;
-    result.reserve(bus_ios.size());
+    result.reserve(channels_io.size());
 
-    for (auto const& [id, bus_io] : bus_ios)
+    for (auto const& [id, ch_io] : channels_io)
     {
         result[id];
 
         if (channel_id const* const in_channel_id =
-                    std::get_if<channel_id>(&bus_io.in))
+                    std::get_if<channel_id>(&ch_io.in))
         {
             result[*in_channel_id].children.push_back(id);
         }
 
         if (channel_id const* const out_channel_id =
-                    std::get_if<channel_id>(&bus_io.out))
+                    std::get_if<channel_id>(&ch_io.out))
         {
             if (std::holds_alternative<std::nullptr_t>(
-                        bus_ios.at(*out_channel_id).in))
+                        channels_io.at(*out_channel_id).in))
             {
                 result[id].children.push_back(*out_channel_id);
             }
@@ -88,7 +88,6 @@ has_cycle(io_graph& g, channel_id const id)
 
     node.visited = true;
 
-    // für jeden Nachfolger w DFS(w)
     for (auto child : node.children)
         if (has_cycle(g, child))
             return true;
@@ -111,7 +110,7 @@ auto
 valid_io_channels(channels_t const& channels, channel_id const ch_id)
         -> std::vector<mixer::channel_id>
 {
-    auto const current = extract_bus_ios(channels);
+    auto test = extract_channels_io(channels);
 
     std::vector<mixer::channel_id> valid_ids;
     for (auto const& [id, bus] : channels)
@@ -119,11 +118,13 @@ valid_io_channels(channels_t const& channels, channel_id const ch_id)
         if (id == ch_id)
             continue;
 
-        auto test = current;
+        auto prev_id = test[ch_id].get(D);
         test[ch_id].get(D) = id;
 
-        if (!has_cycle(make_bus_io_graph(test)))
+        if (!has_cycle(make_channels_io_graph(test)))
             valid_ids.push_back(id);
+
+        test[ch_id].get(D) = prev_id;
     }
 
     return valid_ids;
@@ -134,21 +135,21 @@ valid_io_channels(channels_t const& channels, channel_id const ch_id)
 bool
 is_default_source_valid(channels_t const& channels, channel_id const ch_id)
 {
-    auto test = extract_bus_ios(channels);
+    auto test = extract_channels_io(channels);
     test[ch_id].in = nullptr; // default case
-    return !has_cycle(make_bus_io_graph(test));
+    return !has_cycle(make_channels_io_graph(test));
 }
 
 auto
 valid_source_channels(channels_t const& channels, channel_id const ch_id)
-        -> std::vector<mixer::channel_id>
+        -> std::vector<channel_id>
 {
     return valid_io_channels<io_direction::input>(channels, ch_id);
 }
 
 auto
 valid_target_channels(channels_t const& channels, channel_id const ch_id)
-        -> std::vector<mixer::channel_id>
+        -> std::vector<channel_id>
 {
     return valid_io_channels<io_direction::output>(channels, ch_id);
 }

@@ -51,9 +51,9 @@ struct state
 bool is_default_source_valid(channels_t const&, channel_id);
 
 auto valid_source_channels(channels_t const&, channel_id)
-        -> std::vector<mixer::channel_id>;
+        -> std::vector<channel_id>;
 
 auto valid_target_channels(channels_t const&, channel_id)
-        -> std::vector<mixer::channel_id>;
+        -> std::vector<channel_id>;
 
 } // namespace piejam::runtime::mixer
