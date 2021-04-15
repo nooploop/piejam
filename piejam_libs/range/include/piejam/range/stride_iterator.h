@@ -61,7 +61,7 @@ public:
     }
 
     [[nodiscard]] constexpr auto
-    operator[](difference_type const n) const noexcept -> value_type
+    operator[](difference_type const n) const noexcept -> reference
     {
         return m_it[n * m_stride];
     }

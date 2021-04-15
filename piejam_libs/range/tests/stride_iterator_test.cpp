@@ -11,6 +11,14 @@
 namespace piejam::range::test
 {
 
+TEST(stride_iterator, static_asserts)
+{
+    static_assert(std::random_access_iterator<stride_iterator<int const*>>);
+    static_assert(std::random_access_iterator<stride_iterator<int*>>);
+    static_assert(std::random_access_iterator<
+                  stride_iterator<std::array<int, 23>::iterator>>);
+}
+
 TEST(stride_iterator, pre_increment)
 {
     std::array arr{1, 2, 3, 4, 5, 6, 7};
