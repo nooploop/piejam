@@ -74,12 +74,19 @@ public:
     {
         m_smoother.set(value, m_smooth_length);
 
-        std::copy_n(
-                m_smoother.advance_iterator(),
-                ctx.buffer_size,
-                ctx.outputs[0].begin());
+        if (m_smoother.is_running())
+        {
+            std::copy_n(
+                    m_smoother.advance_iterator(),
+                    ctx.buffer_size,
+                    ctx.outputs[0].begin());
 
-        ctx.results[0] = ctx.outputs[0];
+            ctx.results[0] = ctx.outputs[0];
+        }
+        else
+        {
+            ctx.results[0] = m_smoother.current();
+        }
     }
 
     void process_event_slice(
