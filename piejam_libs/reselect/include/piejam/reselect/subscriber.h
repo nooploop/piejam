@@ -28,6 +28,12 @@ public:
     {
     }
 
+    template <class Value>
+    auto observe_once(selector<Value, State> const& sel) -> Value
+    {
+        return sel.get(m_get_state());
+    }
+
     template <class Value, class Handler>
     auto observe(selector<Value, State> sel, Handler&& handler) -> subscription
     {

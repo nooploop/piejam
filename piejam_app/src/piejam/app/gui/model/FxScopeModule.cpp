@@ -7,6 +7,7 @@
 #include <piejam/app/gui/model/FxStream.h>
 #include <piejam/runtime/fx/scope.h>
 #include <piejam/runtime/selectors.h>
+#include <piejam/to_underlying.h>
 
 #include <boost/container/flat_map.hpp>
 
@@ -27,26 +28,21 @@ FxScopeModule::FxScopeModule(
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(fx_mod_id))
 {
-    observe(runtime::selectors::make_fx_module_streams_selector(
-                    m_impl->fx_mod_id),
-            [this](box<runtime::fx::module_streams> const& streams) {
-                constexpr auto streamKey = static_cast<std::size_t>(
-                        runtime::fx::scope_stream_key::left_right);
-                auto const streamId = streams.get().at(streamKey);
-                FxStreamKeyId fxStreamKeyId{.key = streamKey, .id = streamId};
+    auto const streams =
+            observe_once(runtime::selectors::make_fx_module_streams_selector(
+                    m_impl->fx_mod_id));
 
-                if (!m_impl->scopeStream)
-                {
-                    m_impl->scopeStream = std::make_unique<FxStream>(
-                            dispatch(),
-                            this->state_change_subscriber(),
-                            fxStreamKeyId);
+    constexpr auto streamKey =
+            to_underlying(runtime::fx::scope_stream_key::left_right);
+    auto const streamId = streams.get().at(streamKey);
+    FxStreamKeyId fxStreamKeyId{.key = streamKey, .id = streamId};
 
-                    m_impl->scopeStream->setSubscribed(true);
+    m_impl->scopeStream = std::make_unique<FxStream>(
+            dispatch(),
+            this->state_change_subscriber(),
+            fxStreamKeyId);
 
-                    connect(*m_impl->scopeStream);
-                }
-            });
+    connect(*m_impl->scopeStream);
 }
 
 FxScopeModule::~FxScopeModule() = default;

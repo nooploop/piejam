@@ -37,6 +37,12 @@ protected:
 
     auto dispatch(runtime::action const& a) const { m_store_dispatch(a); }
 
+    template <class Value>
+    auto observe_once(runtime::selector<Value> const& sel)
+    {
+        return m_state_change_subscriber.observe_once(sel);
+    }
+
     template <class Value, class Handler>
     void observe(runtime::selector<Value> sel, Handler&& h)
     {
