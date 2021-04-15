@@ -23,7 +23,7 @@ Item {
         id: fxScope
 
         viewSize: leftScope.width
-        samplesPerPoint: resolutionSlider.value
+        samplesPerPoint: Math.pow(2, resolutionSlider.value)
     }
 
     onContentChanged: {
@@ -70,10 +70,10 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
 
-        from: 1
-        to: 1920
+        from: 0
+        to: 11
         stepSize: 1
-        value: 480
+        value: 8
     }
 
     Timer {
