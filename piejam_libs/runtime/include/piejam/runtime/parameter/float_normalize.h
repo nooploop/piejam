@@ -46,8 +46,8 @@ template <class DbInterval>
 constexpr auto
 to_normalized_db(float_ const&, float const value) -> float
 {
-    constexpr float const one_div_log_10_x_20 = 20.f / std::log(10.f);
-    float const value_db = std::log(value) * one_div_log_10_x_20;
+    constexpr float const twenty_div_log_10 = 20.f / std::log(10.f);
+    float const value_db = std::log(value) * twenty_div_log_10;
     return (value_db - DbInterval::min) / (DbInterval::max - DbInterval::min);
 }
 
