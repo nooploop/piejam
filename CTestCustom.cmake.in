@@ -1,0 +1,10 @@
+if("${PIEJAM_COVERAGE_ENABLED}" STREQUAL "ON")
+  set(CTEST_CUSTOM_PRE_TEST "${PIEJAM_LCOV_PATH} -q --zerocounters  --directory ."
+                            "${PIEJAM_LCOV_PATH} -q --directory . -b ${CMAKE_SOURCE_DIR}/piejam_libs --no-external --capture --initial --rc lcov_branch_coverage=1 --output-file coverage_base.info")
+  set(CTEST_CUSTOM_POST_TEST "${PIEJAM_LCOV_PATH} -q --directory . -b ${CMAKE_SOURCE_DIR}/piejam_libs --no-external --capture --rc lcov_branch_coverage=1 --output-file coverage_test.info"
+                             "${PIEJAM_LCOV_PATH} -q --add-tracefile coverage_base.info --add-tracefile coverage_test.info --rc lcov_branch_coverage=1 --output-file coverage_temp.info"
+                             "${PIEJAM_LCOV_PATH} -q --remove coverage_temp.info '*moc_*.cpp' --rc lcov_branch_coverage=1 --output-file coverage_temp1.info"
+                             "${PIEJAM_LCOV_PATH} -q --remove coverage_temp1.info '*qrc_*.cpp' --rc lcov_branch_coverage=1 --output-file coverage_temp2.info"
+                             "${PIEJAM_LCOV_PATH} -q --remove coverage_temp2.info '*/tests/*' --rc lcov_branch_coverage=1 --output-file coverage.info"
+                             "${PIEJAM_GENHTML_PATH} -q --branch-coverage --output-directory coverage coverage.info")
+endif()

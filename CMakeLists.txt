@@ -11,11 +11,23 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(PIEJAM_BUILD_AUDIO_TEST "Build pjaudiotest" OFF)
 option(PIEJAM_BENCHMARKS "Build benchmarks" OFF)
+option(PIEJAM_COVERAGE "Enable test coverage" OFF)
 option(PIEJAM_TESTS "Build tests" OFF)
 
 if(PIEJAM_TESTS)
     enable_testing()
 endif()
+
+find_program(PIEJAM_LCOV_PATH lcov)
+find_program(PIEJAM_GENHTML_PATH genhtml)
+if(PIEJAM_COVERAGE AND PIEJAM_LCOV_PATH AND PIEJAM_GENHTML_PATH)
+    set(PIEJAM_COVERAGE_ENABLED ON)
+    add_compile_options(--coverage)
+    add_link_options(--coverage)
+else()
+    set(PIEJAM_COVERAGE_ENABLED OFF)
+endif()
+configure_file("CTestCustom.cmake.in" "CTestCustom.cmake")
 
 find_package(Boost)
 find_package(spdlog)
