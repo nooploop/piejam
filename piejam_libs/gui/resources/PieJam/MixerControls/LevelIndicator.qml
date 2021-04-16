@@ -4,8 +4,6 @@
 
 import QtQuick 2.13
 
-import "../Util/MathExt.js" as MathExt
-
 Item {
     id: root
 
@@ -29,6 +27,6 @@ Item {
         x: 0
         y: 0
         width: root.width
-        height: MathExt.clamp((1 - level) * parent.height, 0, parent.height)
+        height: (1 - level) * parent.height
     }
 }
