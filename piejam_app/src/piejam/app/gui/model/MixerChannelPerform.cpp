@@ -5,6 +5,7 @@
 #include <piejam/app/gui/model/MixerChannelPerform.h>
 
 #include <piejam/app/gui/model/MidiAssignable.h>
+#include <piejam/math.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/actions/select_fx_chain_bus.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
@@ -69,6 +70,11 @@ MixerChannelPerform::MixerChannelPerform(
 
 MixerChannelPerform::~MixerChannelPerform() = default;
 
+static constexpr auto toLevel =
+        [min = math::dB_to_linear(-60.01f)](float const l) {
+            return math::linear_to_dB(l, min);
+        };
+
 void
 MixerChannelPerform::onSubscribe()
 {
@@ -105,7 +111,7 @@ MixerChannelPerform::onSubscribe()
     observe(runtime::selectors::make_level_parameter_value_selector(
                     m_impl->level),
             [this](runtime::stereo_level const& x) {
-                setLevel(x.left, x.right);
+                setLevel(toLevel(x.left), toLevel(x.right));
             });
 }
 

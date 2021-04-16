@@ -31,6 +31,14 @@ Item {
         DbScaleTick { position: privates.minPos; db: Number.NEGATIVE_INFINITY }
         DbScaleTick { position: 0.05; db: -60; dbStep: 6 }
         DbScaleTick { position: privates.maxPos; db: 0 }
+
+        function levelConv(db) {
+            const srcDelta = 60
+            const dstMin = MathExt.mapTo(0.05, privates.minPos, privates.maxPos, 0, 1)
+            const dstDelta = 1 - dstMin
+            const factor = dstDelta / srcDelta
+            return db < -60 ? 0 : (db + 60) * factor + dstMin
+        }
     }
 
     Gradient {
@@ -75,11 +83,8 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: root.indicatorPadding
 
-            level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelLeft)),
-                                 privates.minPos,
-                                 privates.maxPos,
-                                 0,
-                                 1)
+            // MathExt.mapTo(meterScaleData.dbToPosition(root.levelLeft), privates.minPos, privates.maxPos, 0, 1)
+            level: meterScaleData.levelConv(root.levelLeft)
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
@@ -96,11 +101,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: root.indicatorPadding
 
-            level: MathExt.mapTo(meterScaleData.dbToPosition(DbConvert.linToDb(root.levelRight)),
-                                 privates.minPos,
-                                 privates.maxPos,
-                                 0,
-                                 1)
+            level: meterScaleData.levelConv(root.levelRight)
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
