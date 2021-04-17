@@ -5,9 +5,6 @@
 [submodule "libs/nod"]
 	path = libs/nod
 	url = https://github.com/fr00b0/nod.git
-[submodule "libs/xsimd"]
-	path = libs/xsimd
-	url = ../../xtensor-stack/xsimd.git
 [submodule "libs/MIPP"]
 	path = libs/MIPP
 	url = https://github.com/aff3ct/MIPP.git
