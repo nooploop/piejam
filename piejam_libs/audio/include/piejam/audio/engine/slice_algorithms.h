@@ -6,11 +6,11 @@
 
 #include <piejam/audio/engine/slice.h>
 
-#include <xsimd/math/xsimd_basic_math.hpp>
-#include <xsimd/stl/algorithms.hpp>
+#include <piejam/audio/simd.h>
+#include <piejam/math.h>
 
-#include <boost/align/is_aligned.hpp>
 #include <boost/assert.hpp>
+#include <boost/hof/capture.hpp>
 
 #include <algorithm>
 
@@ -19,6 +19,8 @@ namespace piejam::audio::engine
 
 namespace detail
 {
+
+namespace bhof = boost::hof;
 
 template <class T>
 struct slice_add
@@ -40,17 +42,10 @@ struct slice_add
         if (r_c != T{})
         {
             BOOST_ASSERT(l_buf.size() == m_out.size());
-            BOOST_ASSERT(boost::alignment::is_aligned(
-                    l_buf.data(),
-                    XSIMD_DEFAULT_ALIGNMENT));
-            BOOST_ASSERT(boost::alignment::is_aligned(
+            simd::transform(
+                    l_buf,
                     m_out.data(),
-                    XSIMD_DEFAULT_ALIGNMENT));
-            xsimd::transform(
-                    l_buf.begin(),
-                    l_buf.end(),
-                    m_out.begin(),
-                    [r_c](auto&& x) { return r_c + x; });
+                    bhof::capture(mipp::Reg<T>(r_c))(std::plus<>{}));
 
             return m_out;
         }
@@ -71,21 +66,7 @@ struct slice_add
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
-        BOOST_ASSERT(boost::alignment::is_aligned(
-                l_buf.data(),
-                XSIMD_DEFAULT_ALIGNMENT));
-        BOOST_ASSERT(boost::alignment::is_aligned(
-                r_buf.data(),
-                XSIMD_DEFAULT_ALIGNMENT));
-        BOOST_ASSERT(boost::alignment::is_aligned(
-                m_out.data(),
-                XSIMD_DEFAULT_ALIGNMENT));
-        xsimd::transform(
-                l_buf.begin(),
-                l_buf.end(),
-                r_buf.begin(),
-                m_out.begin(),
-                std::plus<>{});
+        simd::transform(l_buf, r_buf.data(), m_out.data(), std::plus<>{});
         return m_out;
     }
 
@@ -115,17 +96,10 @@ struct slice_multiply
         else if (r_c != T{1})
         {
             BOOST_ASSERT(l_buf.size() == m_out.size());
-            BOOST_ASSERT(boost::alignment::is_aligned(
-                    l_buf.data(),
-                    XSIMD_DEFAULT_ALIGNMENT));
-            BOOST_ASSERT(boost::alignment::is_aligned(
+            simd::transform(
+                    l_buf,
                     m_out.data(),
-                    XSIMD_DEFAULT_ALIGNMENT));
-            xsimd::transform(
-                    l_buf.begin(),
-                    l_buf.end(),
-                    m_out.begin(),
-                    [r_c](auto&& x) { return r_c * x; });
+                    bhof::capture(mipp::Reg<T>(r_c))(std::multiplies<>{}));
 
             return m_out;
         }
@@ -146,21 +120,7 @@ struct slice_multiply
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
-        BOOST_ASSERT(boost::alignment::is_aligned(
-                l_buf.data(),
-                XSIMD_DEFAULT_ALIGNMENT));
-        BOOST_ASSERT(boost::alignment::is_aligned(
-                r_buf.data(),
-                XSIMD_DEFAULT_ALIGNMENT));
-        BOOST_ASSERT(boost::alignment::is_aligned(
-                m_out.data(),
-                XSIMD_DEFAULT_ALIGNMENT));
-        xsimd::transform(
-                l_buf.begin(),
-                l_buf.end(),
-                r_buf.begin(),
-                m_out.begin(),
-                std::multiplies<>{});
+        simd::transform(l_buf, r_buf.data(), m_out.data(), std::multiplies<>{});
         return m_out;
     }
 
@@ -169,41 +129,42 @@ private:
 };
 
 template <class T>
-struct slice_clip
+struct slice_clamp
 {
-    constexpr slice_clip(T min, T max, std::span<T> const& out) noexcept
+    constexpr slice_clamp(
+            T const min,
+            T const max,
+            std::span<T> const& out) noexcept
         : m_min(min)
         , m_max(max)
         , m_out(out)
     {
         BOOST_ASSERT(min <= max);
+        BOOST_ASSERT(simd::is_aligned(out.data()));
     }
 
     constexpr auto operator()(T const c) const -> slice<T>
     {
-        return std::clamp(c, m_min, m_max);
+        return math::clamp(c, m_min, m_max);
     }
 
     constexpr auto operator()(typename slice<T>::span_t const& buf) const
             -> slice<T>
     {
-        xsimd::transform(
-                buf.begin(),
-                buf.end(),
-                m_out.begin(),
-                [min = m_min, max = m_max](auto&& x) {
-                    using x_t = std::decay_t<decltype(x)>;
-                    return xsimd::clip(
-                            std::forward<decltype(x)>(x),
-                            x_t{min},
-                            x_t{max});
+        BOOST_ASSERT(simd::is_aligned(buf.data()));
+        simd::transform(
+                buf,
+                m_out.data(),
+                [min = mipp::Reg<T>(m_min),
+                 max = mipp::Reg<T>(m_max)](auto&& x) {
+                    return simd::clamp(std::forward<decltype(x)>(x), min, max);
                 });
         return m_out;
     }
 
 private:
-    T m_min;
-    T m_max;
+    T const m_min;
+    T const m_max;
     std::span<T> const m_out;
 };
 
@@ -279,13 +240,7 @@ struct slice_transform
             -> slice<T>
     {
         BOOST_ASSERT(buf.size() == m_out.size());
-        BOOST_ASSERT(boost::alignment::is_aligned(
-                buf.data(),
-                XSIMD_DEFAULT_ALIGNMENT));
-        BOOST_ASSERT(boost::alignment::is_aligned(
-                m_out.data(),
-                XSIMD_DEFAULT_ALIGNMENT));
-        xsimd::transform(buf.begin(), buf.end(), m_out.begin(), m_f);
+        simd::transform(buf, m_out.data(), m_f);
         return m_out;
     }
 
@@ -350,18 +305,8 @@ struct slice_interleave
             typename slice<T>::span_t const& r_buf) const
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
-        BOOST_ASSERT(m_out.size() == l_buf.size() + r_buf.size());
-
-        for (auto i = l_buf.data(),
-                  j = r_buf.data(),
-                  o = m_out.data(),
-                  e = m_out.data() + m_out.size();
-             o < e;
-             ++i, ++j, o += 2)
-        {
-            o[0] = *i;
-            o[1] = *j;
-        }
+        BOOST_ASSERT(m_out.size() == 2 * l_buf.size());
+        simd::interleave(l_buf, r_buf.data(), m_out.data());
     }
 
 private:
@@ -394,10 +339,12 @@ multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
 
 template <class T>
 constexpr auto
-clip(slice<T> const& s, T min, T max, std::span<T> const& out) noexcept
-        -> slice<T>
+clamp(slice<T> const& s,
+      T const min,
+      T const max,
+      std::span<T> const& out) noexcept -> slice<T>
 {
-    return std::visit(detail::slice_clip<T>(min, max, out), s.as_variant());
+    return std::visit(detail::slice_clamp<T>(min, max, out), s.as_variant());
 }
 
 template <class T>

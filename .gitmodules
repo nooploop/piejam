@@ -8,3 +8,6 @@
 [submodule "libs/xsimd"]
 	path = libs/xsimd
 	url = ../../xtensor-stack/xsimd.git
+[submodule "libs/MIPP"]
+	path = libs/MIPP
+	url = https://github.com/aff3ct/MIPP.git

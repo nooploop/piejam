@@ -9,6 +9,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/slice.h>
+#include <piejam/audio/simd.h>
 
 #include <gtest/gtest.h>
 
@@ -20,7 +21,7 @@ TEST(input_processor, input_is_propagated_to_outputs)
     std::vector<float> data({2.f, 3.f, 5.f, 7.f});
     input_processor sut;
 
-    std::array<float, 4> out_buf{};
+    alignas(mipp::RequiredAlignment) std::array<float, 4> out_buf{};
     std::vector<std::span<float>> outputs{out_buf};
     std::vector<audio_slice> results(1);
     auto converter =

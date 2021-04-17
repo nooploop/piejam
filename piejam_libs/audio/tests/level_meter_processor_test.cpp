@@ -9,6 +9,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/slice.h>
+#include <piejam/audio/simd.h>
 
 #include <gtest/gtest.h>
 
@@ -22,7 +23,7 @@ namespace piejam::audio::engine::test
 struct level_meter_processor_test : ::testing::Test
 {
     level_meter_processor sut{4800};
-    std::array<float, 2> in_buf{};
+    alignas(mipp::RequiredAlignment) std::array<float, 4> in_buf{};
     std::vector<audio_slice> in_buf_spans{in_buf};
     std::vector<std::reference_wrapper<audio_slice const>> in_bufs{
             in_buf_spans.begin(),
@@ -51,10 +52,10 @@ TEST_F(level_meter_processor_test, new_peak_is_meassured_from_input_buffer)
 TEST_F(level_meter_processor_test,
        second_sample_with_higher_level_will_be_the_new_peak)
 {
-    in_buf[0] = .7f;
-    in_buf[1] = .8f;
+    in_buf[2] = .7f;
+    in_buf[3] = .8f;
 
-    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, 2});
+    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, in_buf.size()});
 
     ASSERT_EQ(1u, ev_out_bufs.get<float>(0).size());
     EXPECT_FLOAT_EQ(.8f, ev_out_bufs.get<float>(0).begin()->value());
@@ -63,10 +64,10 @@ TEST_F(level_meter_processor_test,
 TEST_F(level_meter_processor_test,
        second_sample_with_lower_level_than_decayed_level_has_no_impact_on_peak)
 {
-    in_buf[0] = .7f;
-    in_buf[1] = .5f;
+    in_buf[2] = .7f;
+    in_buf[3] = .5f;
 
-    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, 2});
+    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, in_buf.size()});
 
     ASSERT_EQ(1u, ev_out_bufs.get<float>(0).size());
     EXPECT_LT(ev_out_bufs.get<float>(0).begin()->value(), .7f);

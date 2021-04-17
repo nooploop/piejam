@@ -7,6 +7,8 @@
 #include <piejam/audio/engine/audio_spsc_ring_buffer.h>
 #include <piejam/audio/engine/named_processor.h>
 
+#include <mipp.h>
+
 #include <string_view>
 
 namespace piejam::audio::engine
@@ -48,7 +50,7 @@ private:
     stream_fn_t const m_stream_fn;
 
     audio_spsc_ring_buffer m_buffer;
-    std::vector<float> m_interleave_buffer;
+    mipp::vector<float> m_interleave_buffer;
 };
 
 } // namespace piejam::audio::engine

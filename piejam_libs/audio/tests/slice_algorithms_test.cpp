@@ -4,6 +4,8 @@
 
 #include <piejam/audio/engine/slice_algorithms.h>
 
+#include <piejam/audio/simd.h>
+
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
@@ -37,11 +39,12 @@ TEST(slice_algorithms_add, adding_zero_to_buffer_will_result_in_the_buffer)
 
 TEST(slice_algorithms_add, adding_non_zero_to_buffer_will_write_to_out)
 {
-    slice<int> x{1};
-    std::array buf{2, 3, 5, 7};
-    slice<int> y(buf);
-    decltype(buf) out{};
-    std::array expected{3, 4, 6, 8};
+    slice<float> x{1.f};
+    alignas(mipp::RequiredAlignment)
+            std::array buf{2.f, 3.f, 5.f, 7.f, 11.f, 13.f, 17.f, 19.f};
+    slice<float> y(buf);
+    alignas(mipp::RequiredAlignment) decltype(buf) out{};
+    std::array expected{3.f, 4.f, 6.f, 8.f, 12.f, 14.f, 18.f, 20.f};
 
     auto res = add(x, y, {out});
 
@@ -54,12 +57,14 @@ TEST(slice_algorithms_add, adding_non_zero_to_buffer_will_write_to_out)
 
 TEST(slice_algorithms_add, adding_buffers_will_write_to_out)
 {
-    std::array buf_x{2, 3, 5, 7};
-    slice<int> x{buf_x};
-    std::array buf_y{3, 4, 5, 9};
-    slice<int> y{buf_y};
-    decltype(buf_x) out{};
-    std::array expected{5, 7, 10, 16};
+    alignas(mipp::RequiredAlignment)
+            std::array buf_x{2.f, 3.f, 5.f, 7.f, 2.f, 3.f, 5.f, 7.f};
+    slice<float> x{buf_x};
+    alignas(mipp::RequiredAlignment)
+            std::array buf_y{3.f, 4.f, 5.f, 9.f, 3.f, 4.f, 5.f, 9.f};
+    slice<float> y{buf_y};
+    alignas(mipp::RequiredAlignment) decltype(buf_x) out{};
+    std::array expected{5.f, 7.f, 10.f, 16.f, 5.f, 7.f, 10.f, 16.f};
 
     auto res = add(x, y, {out});
 
@@ -73,7 +78,7 @@ TEST(slice_algorithms_add, adding_buffers_will_write_to_out)
 TEST(slice_algorithms_multiply,
      multiply_buffer_by_zero_will_result_in_zero_constant)
 {
-    std::array buf{2, 3, 5, 7};
+    alignas(mipp::RequiredAlignment) std::array buf{2, 3, 5, 7};
     slice<int> x(buf);
     slice<int> y;
 
@@ -85,7 +90,7 @@ TEST(slice_algorithms_multiply,
 
 TEST(slice_algorithms_multiply, multiply_buffer_by_one_will_result_in_buffer)
 {
-    std::array buf{2, 3, 5, 7};
+    alignas(mipp::RequiredAlignment) std::array buf{2, 3, 5, 7};
     slice<int> x(buf);
     slice<int> y(1);
 
@@ -140,17 +145,55 @@ TEST(slice_interleave_2_slices, constant_and_buffer)
 
 TEST(slice_interleave_2_slices, two_buffer)
 {
-    std::array<float, 3> l_buf{1.f, 1.f, 1.f};
-    std::array<float, 3> r_buf{-1.f, -1.f, -1.f};
+    alignas(mipp::RequiredAlignment) std::array<float, 8> l_buf;
+    l_buf.fill(1.f);
+    alignas(mipp::RequiredAlignment) std::array<float, 8> r_buf;
+    r_buf.fill(-1.f);
     slice<float> l(l_buf);
     slice<float> r(r_buf);
-    std::array<float, 6> out{};
+    alignas(mipp::RequiredAlignment) std::array<float, 16> out{};
     interleave(l, r, {out});
+
+    bool left{true};
+    for (auto const v : out)
+    {
+        EXPECT_EQ(left ? 1.f : -1.f, v);
+        left = !left;
+    }
+}
+
+TEST(slice_clamp, constant)
+{
+    slice<float> l(1.5f);
+    auto l_res = engine::clamp(l, -1.f, 1.f, {});
+    ASSERT_TRUE(l_res.is_constant());
+    EXPECT_EQ(1.f, l_res.constant());
+
+    slice<float> r(-1.5f);
+    auto r_res = engine::clamp(r, -1.f, 1.f, {});
+    ASSERT_TRUE(r_res.is_constant());
+    EXPECT_EQ(-1.f, r_res.constant());
+
+    slice<float> m(0.5f);
+    auto m_res = engine::clamp(m, -1.f, 1.f, {});
+    ASSERT_TRUE(m_res.is_constant());
+    EXPECT_EQ(0.5f, m_res.constant());
+}
+
+TEST(slice_clamp, buffer)
+{
+    alignas(mipp::RequiredAlignment)
+            std::array buf{-1.5f, 1.5f, 0.5f, 23.f, -17.f, 0.23f, 0.f, -0.25f};
+    slice<float> s(buf);
+    auto res = engine::clamp(s, -1.f, 1.f, {buf});
+    ASSERT_TRUE(res.is_buffer());
+    EXPECT_EQ(buf.size(), res.buffer().size());
+    EXPECT_EQ(buf.data(), res.buffer().data());
 
     using testing::ElementsAre;
     using testing::Matches;
-
-    EXPECT_TRUE(Matches(ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
+    EXPECT_TRUE(Matches(
+            ElementsAre(-1.f, 1.f, 0.5f, 1.f, -1.f, 0.23f, 0.f, -0.25f))(buf));
 }
 
 } // namespace piejam::audio::engine::test

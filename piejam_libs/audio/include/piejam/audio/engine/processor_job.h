@@ -10,7 +10,7 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/period_sizes.h>
 
-#include <xsimd/xsimd.hpp>
+#include <mipp.h>
 
 #include <array>
 #include <functional>
@@ -44,10 +44,7 @@ public:
 
 private:
     processor& m_proc;
-    std::vector<
-            output_buffer_t,
-            xsimd::aligned_allocator<output_buffer_t, XSIMD_DEFAULT_ALIGNMENT>>
-            m_output_buffers;
+    mipp::vector<output_buffer_t> m_output_buffers;
 
     std::vector<std::reference_wrapper<audio_slice const>> m_inputs;
     std::vector<std::span<float>> m_outputs;

@@ -7,8 +7,8 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
 #include <piejam/audio/engine/thread_context.h>
+#include <piejam/audio/simd.h>
 
-#include <boost/align/is_aligned.hpp>
 #include <boost/assert.hpp>
 
 #include <algorithm>
@@ -34,9 +34,7 @@ processor_job::processor_job(processor& proc)
 {
     BOOST_ASSERT((std::ranges::all_of(
             m_output_buffers,
-            [](auto p) {
-                return boost::alignment::is_aligned(p, XSIMD_DEFAULT_ALIGNMENT);
-            },
+            simd::is_aligned,
             [](auto const& b) { return b.data(); })));
     for (event_port const& port : m_proc.event_inputs())
         m_event_inputs.add(port);

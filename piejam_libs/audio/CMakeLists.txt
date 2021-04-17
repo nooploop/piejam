@@ -74,6 +74,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/process_function.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/process_thread.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/samplerates.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/simd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/smoother.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/types.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_pcm_io_descriptors.cpp
@@ -116,11 +117,11 @@ add_library(piejam_audio STATIC
 
 target_compile_options(piejam_audio PRIVATE -Wall -Wextra -Werror -pedantic-errors)
 target_include_directories(piejam_audio
-    SYSTEM INTERFACE ${CMAKE_SOURCE_DIR}/libs/xsimd/include
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE ${CMAKE_SOURCE_DIR}/libs/xsimd/include)
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_audio
-    PUBLIC piejam_algorithm piejam_functional piejam_system piejam_numeric piejam_thread
+    INTERFACE mipp)
+target_link_libraries(piejam_audio
+    PUBLIC piejam_algorithm piejam_functional piejam_system piejam_numeric piejam_thread mipp
     PRIVATE fmt spdlog::spdlog piejam_range)
 
 add_subdirectory(benchmarks)

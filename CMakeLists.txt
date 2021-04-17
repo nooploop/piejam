@@ -36,6 +36,10 @@ find_package(fmt)
 add_library(nod INTERFACE)
 target_include_directories(nod SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/libs/nod/include)
 
+add_library(mipp INTERFACE)
+target_include_directories(mipp SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/libs/MIPP/src)
+target_compile_definitions(mipp INTERFACE MIPP_ALIGNED_LOADS)
+
 set(PIEJAM_QML_IMPORT_PATHS "")
 
 add_subdirectory(piejam_libs)
