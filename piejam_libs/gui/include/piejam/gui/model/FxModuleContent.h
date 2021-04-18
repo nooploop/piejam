@@ -18,7 +18,8 @@ public:
     enum class Type
     {
         Generic = 0,
-        Scope
+        Scope,
+        Spectrum
     };
 
     Q_ENUM(Type)

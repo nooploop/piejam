@@ -10,7 +10,8 @@ namespace piejam::runtime::fx
 enum class internal : unsigned
 {
     gain,
-    scope
+    scope,
+    spectrum
 };
 
 } // namespace piejam::runtime::fx

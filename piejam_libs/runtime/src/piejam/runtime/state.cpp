@@ -12,6 +12,7 @@
 #include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/scope.h>
+#include <piejam/runtime/fx/spectrum.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
@@ -157,6 +158,12 @@ make_fx_scope(fx::modules_t& fx_modules, audio_streams_cache& streams)
     return fx_modules.add(fx::make_scope_module(streams));
 }
 
+static auto
+make_fx_spectrum(fx::modules_t& fx_modules, audio_streams_cache& streams)
+{
+    return fx_modules.add(fx::make_spectrum_module(streams));
+}
+
 static void
 apply_parameter_values(
         std::vector<fx::parameter_value_assignment> const& values,
@@ -249,6 +256,10 @@ insert_internal_fx_module(
 
         case fx::internal::scope:
             fx_mod_id = make_fx_scope(st.fx_modules, st.streams);
+            break;
+
+        case fx::internal::spectrum:
+            fx_mod_id = make_fx_spectrum(st.fx_modules, st.streams);
             break;
     }
 

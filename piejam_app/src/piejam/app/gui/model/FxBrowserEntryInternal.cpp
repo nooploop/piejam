@@ -36,6 +36,11 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
             setName(tr("Oscilloscope"));
             setDescription(tr("Observe audio signal."));
             break;
+
+        case runtime::fx::internal::spectrum:
+            setName(tr("Spectrum Analyzer"));
+            setDescription(tr("Analyze frequency content of a signal."));
+            break;
     }
 }
 
