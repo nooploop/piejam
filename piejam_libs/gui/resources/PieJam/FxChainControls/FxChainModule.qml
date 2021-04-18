@@ -132,6 +132,8 @@ Item {
 
             anchors.left: swapButton.right
             anchors.leftMargin: 4
+            anchors.right: deleteButton.left
+            anchors.rightMargin: 4
 
             padding: 4
             verticalAlignment: Text.AlignVCenter

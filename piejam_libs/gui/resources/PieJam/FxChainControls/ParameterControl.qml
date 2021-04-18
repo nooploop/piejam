@@ -37,9 +37,14 @@ Item {
         text: "name"
 
         width: sliderRect.implicitWidth
+        height: 40
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
+
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        wrapMode: Text.WordWrap
 
         backgroundColor: Material.color(Material.Grey, Material.Shade800)
     }
@@ -62,7 +67,7 @@ Item {
 
             text: "value"
 
-            width: 72
+            width: 80
 
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
