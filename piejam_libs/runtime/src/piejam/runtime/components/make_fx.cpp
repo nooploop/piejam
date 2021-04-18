@@ -39,11 +39,7 @@ make_internal_fx(
             return components::make_fx_gain(fx_mod, param_procs, name);
 
         case fx::internal::scope:
-            return components::make_fx_scope(
-                    fx_mod,
-                    samplerate,
-                    stream_procs,
-                    name);
+            return components::make_fx_scope(fx_mod, samplerate, stream_procs);
 
         default:
             BOOST_ASSERT_MSG(false, "unknown internal fx");
