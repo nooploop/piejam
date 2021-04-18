@@ -27,7 +27,7 @@ make_scope_module(audio_streams_cache& streams) -> module
 
     return module{
             .fx_instance_id = internal::scope,
-            .name = "Scope"s,
+            .name = "Oscilloscope"s,
             .parameters = fx::module_parameters{},
             .streams = module_streams{
                     {to_underlying(scope_stream_key::left_right),

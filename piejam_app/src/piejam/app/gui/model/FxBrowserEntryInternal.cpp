@@ -33,7 +33,7 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
             break;
 
         case runtime::fx::internal::scope:
-            setName(tr("Scope"));
+            setName(tr("Oscilloscope"));
             setDescription(tr("Observe audio signal."));
             break;
     }
