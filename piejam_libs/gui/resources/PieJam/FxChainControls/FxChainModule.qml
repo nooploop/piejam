@@ -180,6 +180,15 @@ Item {
             }
         }
 
+        Component {
+            id: spectrumDelegate
+
+            SpectrumView {
+                content: root.content
+                bypassed: root.bypassed
+            }
+        }
+
         Loader {
             id: moduleContent
 
@@ -195,6 +204,10 @@ Item {
 
                     case FxModuleContent.Type.Scope:
                         return scopeDelegate
+
+                    case FxModuleContent.Type.Spectrum:
+                        return spectrumDelegate
+
                     default:
                         console.log("unknown content type")
                         return null

@@ -47,6 +47,8 @@ class ScopeLinesObject;
 class ScopeLines;
 class ScopeLinesAccumulator;
 
+class SpectrumData;
+
 class MidiDeviceConfig;
 using MidiDeviceList = GenericListModel<MidiDeviceConfig>;
 

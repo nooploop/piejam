@@ -63,5 +63,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/pencil.svg</file>
         <file>PieJam/FxChainControls/ParametersListView.qml</file>
         <file>PieJam/FxChainControls/ScopeView.qml</file>
+        <file>PieJam/FxChainControls/SpectrumView.qml</file>
+        <file>PieJam/FxChainControls/StereoChannelSelector.qml</file>
     </qresource>
 </RCC>

@@ -4,21 +4,17 @@
 
 #pragma once
 
-#include <piejam/range/fwd.h>
-
-#include <QObject>
+#include <span>
 
 namespace piejam::gui::model
 {
 
-class AudioStreamListener : public QObject
+struct SpectrumDataPoint
 {
-    Q_OBJECT
-
-public:
-    using Stream = range::dynamic_interleaved_view<float const>;
-
-    virtual void update(Stream const&) = 0;
+    float frequency_Hz{};
+    float level_dB{};
 };
+
+using SpectrumDataPoints = std::span<SpectrumDataPoint const>;
 
 } // namespace piejam::gui::model

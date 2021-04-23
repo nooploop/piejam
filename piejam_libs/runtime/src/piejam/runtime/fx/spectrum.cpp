@@ -23,7 +23,7 @@ make_spectrum_module(audio_streams_cache& streams) -> module
 
     return module{
             .fx_instance_id = internal::spectrum,
-            .name = "Spectrum Analyzer"s,
+            .name = "Spectrum"s,
             .parameters = fx::module_parameters{},
             .streams = module_streams{
                     {to_underlying(spectrum_stream_key::left_right),
