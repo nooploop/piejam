@@ -29,6 +29,9 @@ Item {
 
         spectrumDataA: content.dataA
         spectrumDataB: content.dataB
+
+        spectrumColorA: Material.color(Material.Pink)
+        spectrumColorB: Material.color(Material.Blue)
     }
 
     Repeater {
@@ -63,6 +66,8 @@ Item {
         name: "A"
         active: content.activeA
         channel: content.channelA
+
+        Material.accent: Material.Pink
 
         onActiveToggled: root.content.changeActiveA(!active)
         onChannelSelected: root.content.changeChannelA(ch)

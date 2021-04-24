@@ -42,6 +42,12 @@ class Spectrum : public QQuickItem
             piejam::gui::model::SpectrumData* spectrumDataB READ spectrumDataB
                     WRITE setSpectrumDataB NOTIFY spectrumDataBChanged FINAL)
 
+    Q_PROPERTY(QColor spectrumColorA READ spectrumColorA WRITE setSpectrumColorA
+                       NOTIFY spectrumColorAChanged FINAL)
+
+    Q_PROPERTY(QColor spectrumColorB READ spectrumColorB WRITE setSpectrumColorB
+                       NOTIFY spectrumColorBChanged FINAL)
+
     QML_ELEMENT
 
 public:
@@ -57,6 +63,12 @@ public:
     auto spectrumDataB() const noexcept -> model::SpectrumData*;
     void setSpectrumDataB(model::SpectrumData*);
 
+    auto spectrumColorA() const noexcept -> QColor const&;
+    void setSpectrumColorA(QColor const&);
+
+    auto spectrumColorB() const noexcept -> QColor const&;
+    void setSpectrumColorB(QColor const&);
+
     auto updatePaintNode(QSGNode*, UpdatePaintNodeData*) -> QSGNode* override;
 
 signals:
@@ -64,10 +76,16 @@ signals:
     void frequencyLabelsChanged();
     void spectrumDataAChanged();
     void spectrumDataBChanged();
+    void spectrumColorAChanged();
+    void spectrumColorBChanged();
 
 private:
-    auto updateDataNode(QSGNode*, std::vector<QPointF> const&, bool& dirtyFlag)
-            -> QSGNode*;
+    auto updateDataNode(
+            QSGNode*,
+            std::vector<QPointF> const&,
+            QColor const&,
+            bool& dirtyGeometryFlag,
+            bool& dirtyMaterialFlag) -> QSGNode*;
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;

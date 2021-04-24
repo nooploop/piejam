@@ -48,7 +48,7 @@ Item {
             width: buttons.buttonWidth
             height: buttons.buttonHeight
 
-            Material.accent: root.active ? Material.Pink : Material.Grey
+            Material.accent: if (!root.active) Material.Grey
 
             text: qsTr("L")
             autoExclusive: true
@@ -64,7 +64,7 @@ Item {
             width: buttons.buttonWidth
             height: buttons.buttonHeight
 
-            Material.accent: root.active ? Material.Pink : Material.Grey
+            Material.accent: if (!root.active) Material.Grey
 
             text: qsTr("R")
             autoExclusive: true
@@ -80,7 +80,7 @@ Item {
             width: buttons.buttonWidth
             height: buttons.buttonHeight
 
-            Material.accent: root.active ? Material.Pink : Material.Grey
+            Material.accent: if (!root.active) Material.Grey
 
             text: qsTr("M")
             autoExclusive: true
@@ -96,7 +96,7 @@ Item {
             width: buttons.buttonWidth
             height: buttons.buttonHeight
 
-            Material.accent: root.active ? Material.Pink : Material.Grey
+            Material.accent: if (!root.active) Material.Grey
 
             text: qsTr("S")
             autoExclusive: true
