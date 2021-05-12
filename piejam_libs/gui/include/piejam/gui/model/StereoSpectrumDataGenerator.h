@@ -20,6 +20,7 @@ public:
     StereoSpectrumDataGenerator();
     ~StereoSpectrumDataGenerator();
 
+    void setSampleRate(unsigned);
     void setActive(bool active);
     void setChannel(StereoChannel);
 

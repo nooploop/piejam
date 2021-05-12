@@ -12,6 +12,7 @@ namespace piejam::gui::model
 struct SpectrumDataPoint
 {
     float frequency_Hz{};
+    float level_linear{};
     float level_dB{};
 };
 

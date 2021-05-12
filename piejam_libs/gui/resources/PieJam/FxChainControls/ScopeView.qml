@@ -9,7 +9,7 @@ import QtQuick.Layouts 1.15
 import QtQml 2.15
 
 import PieJam.Items 1.0 as PJItems
-import PieJam.Models 1.0
+import PieJam.Models 1.0 as PJModels
 
 Item {
     id: root
@@ -19,7 +19,7 @@ Item {
 
     implicitWidth: 636
 
-    FxScope {
+    PJModels.FxScope {
         id: fxScope
 
         viewSize: leftScope.width

@@ -81,5 +81,6 @@ target_link_libraries(piejam_gui
     spdlog::spdlog
     piejam_base
     piejam_range
-    piejam_algorithm)
+    piejam_algorithm
+    piejam_numeric)
 target_compile_options(piejam_gui PRIVATE -Wall -Wextra -Werror -pedantic-errors)

@@ -6,6 +6,7 @@
 
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/in_interval.h>
+#include <piejam/math.h>
 
 #include <QSGFlatColorMaterial>
 #include <QSGGeometry>
@@ -37,13 +38,14 @@ struct FrequencyScale final
 
     constexpr auto frequencyToPosition(float const f) noexcept -> float
     {
-        BOOST_ASSERT(minFrequency <= f && f <= maxFrequency);
-
         constexpr auto minLog10 = std::log10(minFrequency);
         constexpr auto maxLog10 = std::log10(maxFrequency);
         constexpr auto diffLog10 = maxLog10 - minLog10;
 
-        return ((std::log10(f) - minLog10) / diffLog10) * size;
+        return ((std::log10(math::clamp(f, minFrequency, maxFrequency)) -
+                 minLog10) /
+                diffLog10) *
+               size;
     }
 };
 
@@ -61,7 +63,8 @@ struct LevelScale final
     constexpr auto levelToPosition(float const level) noexcept -> float
     {
         constexpr auto diff = maxLevel - minLevel;
-        return ((level - minLevel) / diff) * size;
+        return ((math::clamp(level, minLevel, maxLevel) - minLevel) / diff) *
+               size;
     }
 };
 
@@ -111,15 +114,9 @@ struct Spectrum::Impl
 
         for (auto const& dataPoint : dataPoints)
         {
-            if (FrequencyScale::inRange(dataPoint.frequency_Hz) &&
-                LevelScale::inRange(dataPoint.level_dB))
-            {
-                result.emplace_back(
-                        frequencyScale.frequencyToPosition(
-                                dataPoint.frequency_Hz),
-                        height -
-                                levelScale.levelToPosition(dataPoint.level_dB));
-            }
+            result.emplace_back(
+                    frequencyScale.frequencyToPosition(dataPoint.frequency_Hz),
+                    height - levelScale.levelToPosition(dataPoint.level_dB));
         }
 
         return result;
@@ -333,7 +330,7 @@ Spectrum::updateDataNode(
                 dataSize);
 
         geometry->setDrawingMode(QSGGeometry::DrawLineStrip);
-        geometry->setLineWidth(3);
+        geometry->setLineWidth(2);
         geometryNode->setGeometry(geometry);
         geometryNode->setFlag(QSGNode::OwnsGeometry);
 

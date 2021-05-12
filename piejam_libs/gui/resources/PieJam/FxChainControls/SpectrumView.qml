@@ -9,7 +9,7 @@ import QtQuick.Layouts 1.15
 import QtQml 2.15
 
 import PieJam.Items 1.0 as PJItems
-import PieJam.Models 1.0
+import PieJam.Models 1.0 as PJModels
 
 Item {
     id: root
@@ -27,8 +27,8 @@ Item {
         anchors.top: parent.top
         anchors.bottom: channelASelector.top
 
-        spectrumDataA: content.dataA
-        spectrumDataB: content.dataB
+        spectrumDataA: root.content ? root.content.dataA : null
+        spectrumDataB: root.content ? root.content.dataB : null
 
         spectrumColorA: Material.color(Material.Pink)
         spectrumColorB: Material.color(Material.Blue)
@@ -64,8 +64,8 @@ Item {
         id: channelASelector
 
         name: "A"
-        active: content.activeA
-        channel: content.channelA
+        active: root.content ? root.content.activeA : false
+        channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
 
         Material.accent: Material.Pink
 

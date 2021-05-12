@@ -25,6 +25,8 @@ public:
     void requestUpdate() override;
 
 private:
+    void onSubscribe() override;
+
     void onActiveAChanged() override;
     void onActiveBChanged() override;
     void onChannelAChanged() override;
