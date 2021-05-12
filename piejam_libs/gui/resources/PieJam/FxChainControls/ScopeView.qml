@@ -22,7 +22,7 @@ Item {
     PJModels.FxScope {
         id: fxScope
 
-        viewSize: leftScope.width
+        viewSize: scope.width
         samplesPerPoint: Math.pow(2, resolutionSlider.value)
     }
 
@@ -36,31 +36,19 @@ Item {
 
     onBypassedChanged: if (root.bypassed) fxScope.clear()
 
-    ColumnLayout {
-        id: scopesLayout
+    PJItems.Scope {
+        id: scope
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: resolutionSlider.top
 
-        PJItems.Scope {
-            id: leftScope
+        linesA: fxScope.leftLines
+        linesAColor: Material.color(Material.Pink)
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            lines: fxScope.leftLines
-        }
-
-        PJItems.Scope {
-            id: rightScope
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            lines: fxScope.rightLines
-        }
+        linesB: fxScope.rightLines
+        linesBColor: Material.color(Material.Blue)
     }
 
     Slider {
@@ -68,12 +56,28 @@ Item {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: channelASelector.top
 
         from: 0
         to: 11
         stepSize: 1
         value: 8
+    }
+
+    StereoChannelSelector {
+        id: channelASelector
+
+        name: "A"
+        active: root.content ? root.content.activeA : false
+        channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
+
+        Material.accent: Material.Pink
+
+        onActiveToggled: root.content.changeActiveA(!active)
+        onChannelSelected: root.content.changeChannelA(ch)
+
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
     }
 
     Timer {

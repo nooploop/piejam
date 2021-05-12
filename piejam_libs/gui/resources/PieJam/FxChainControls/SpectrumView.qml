@@ -27,11 +27,11 @@ Item {
         anchors.top: parent.top
         anchors.bottom: channelASelector.top
 
-        spectrumDataA: root.content ? root.content.dataA : null
-        spectrumDataB: root.content ? root.content.dataB : null
+        spectrumAData: root.content ? root.content.dataA : null
+        spectrumAColor: Material.color(Material.Pink)
 
-        spectrumColorA: Material.color(Material.Pink)
-        spectrumColorB: Material.color(Material.Blue)
+        spectrumBData: root.content ? root.content.dataB : null
+        spectrumBColor: Material.color(Material.Blue)
     }
 
     Repeater {

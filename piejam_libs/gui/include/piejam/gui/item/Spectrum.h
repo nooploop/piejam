@@ -36,17 +36,17 @@ class Spectrum : public QQuickItem
                        frequencyLabelsChanged FINAL)
 
     Q_PROPERTY(
-            piejam::gui::model::SpectrumData* spectrumDataA READ spectrumDataA
-                    WRITE setSpectrumDataA NOTIFY spectrumDataAChanged FINAL)
+            piejam::gui::model::SpectrumData* spectrumAData READ spectrumAData
+                    WRITE setSpectrumAData NOTIFY spectrumADataChanged FINAL)
     Q_PROPERTY(
-            piejam::gui::model::SpectrumData* spectrumDataB READ spectrumDataB
-                    WRITE setSpectrumDataB NOTIFY spectrumDataBChanged FINAL)
+            piejam::gui::model::SpectrumData* spectrumBData READ spectrumBData
+                    WRITE setSpectrumBData NOTIFY spectrumBDataChanged FINAL)
 
-    Q_PROPERTY(QColor spectrumColorA READ spectrumColorA WRITE setSpectrumColorA
-                       NOTIFY spectrumColorAChanged FINAL)
+    Q_PROPERTY(QColor spectrumAColor READ spectrumAColor WRITE setSpectrumAColor
+                       NOTIFY spectrumAColorChanged FINAL)
 
-    Q_PROPERTY(QColor spectrumColorB READ spectrumColorB WRITE setSpectrumColorB
-                       NOTIFY spectrumColorBChanged FINAL)
+    Q_PROPERTY(QColor spectrumBColor READ spectrumBColor WRITE setSpectrumBColor
+                       NOTIFY spectrumBColorChanged FINAL)
 
     QML_ELEMENT
 
@@ -57,27 +57,27 @@ public:
     auto levelLabels() const -> QVariantList;
     auto frequencyLabels() const -> QVariantList;
 
-    auto spectrumDataA() const noexcept -> model::SpectrumData*;
-    void setSpectrumDataA(model::SpectrumData*);
+    auto spectrumAData() const noexcept -> model::SpectrumData*;
+    void setSpectrumAData(model::SpectrumData*);
 
-    auto spectrumDataB() const noexcept -> model::SpectrumData*;
-    void setSpectrumDataB(model::SpectrumData*);
+    auto spectrumBData() const noexcept -> model::SpectrumData*;
+    void setSpectrumBData(model::SpectrumData*);
 
-    auto spectrumColorA() const noexcept -> QColor const&;
-    void setSpectrumColorA(QColor const&);
+    auto spectrumAColor() const noexcept -> QColor const&;
+    void setSpectrumAColor(QColor const&);
 
-    auto spectrumColorB() const noexcept -> QColor const&;
-    void setSpectrumColorB(QColor const&);
+    auto spectrumBColor() const noexcept -> QColor const&;
+    void setSpectrumBColor(QColor const&);
 
     auto updatePaintNode(QSGNode*, UpdatePaintNodeData*) -> QSGNode* override;
 
 signals:
     void levelLabelsChanged();
     void frequencyLabelsChanged();
-    void spectrumDataAChanged();
-    void spectrumDataBChanged();
-    void spectrumColorAChanged();
-    void spectrumColorBChanged();
+    void spectrumADataChanged();
+    void spectrumBDataChanged();
+    void spectrumAColorChanged();
+    void spectrumBColorChanged();
 
 private:
     auto updateDataNode(

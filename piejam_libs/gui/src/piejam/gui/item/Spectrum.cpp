@@ -190,18 +190,18 @@ Spectrum::levelLabels() const -> QVariantList
 }
 
 auto
-Spectrum::spectrumDataA() const noexcept -> model::SpectrumData*
+Spectrum::spectrumAData() const noexcept -> model::SpectrumData*
 {
     return m_impl->spectrumDataA;
 }
 
 void
-Spectrum::setSpectrumDataA(model::SpectrumData* const x)
+Spectrum::setSpectrumAData(model::SpectrumData* const x)
 {
     if (m_impl->spectrumDataA != x)
     {
         m_impl->spectrumDataA = x;
-        emit spectrumDataAChanged();
+        emit spectrumADataChanged();
 
         if (m_impl->spectrumDataA)
         {
@@ -228,18 +228,18 @@ Spectrum::setSpectrumDataA(model::SpectrumData* const x)
 }
 
 auto
-Spectrum::spectrumDataB() const noexcept -> model::SpectrumData*
+Spectrum::spectrumBData() const noexcept -> model::SpectrumData*
 {
     return m_impl->spectrumDataB;
 }
 
 void
-Spectrum::setSpectrumDataB(model::SpectrumData* const x)
+Spectrum::setSpectrumBData(model::SpectrumData* const x)
 {
     if (m_impl->spectrumDataB != x)
     {
         m_impl->spectrumDataB = x;
-        emit spectrumDataAChanged();
+        emit spectrumADataChanged();
 
         if (m_impl->spectrumDataB)
         {
@@ -266,18 +266,18 @@ Spectrum::setSpectrumDataB(model::SpectrumData* const x)
 }
 
 auto
-Spectrum::spectrumColorA() const noexcept -> QColor const&
+Spectrum::spectrumAColor() const noexcept -> QColor const&
 {
     return m_impl->spectrumColorA;
 }
 
 void
-Spectrum::setSpectrumColorA(QColor const& c)
+Spectrum::setSpectrumAColor(QColor const& c)
 {
     if (m_impl->spectrumColorA != c)
     {
         m_impl->spectrumColorA = c;
-        emit spectrumColorAChanged();
+        emit spectrumAColorChanged();
 
         m_impl->spectrumColorADirty = true;
         update();
@@ -285,18 +285,18 @@ Spectrum::setSpectrumColorA(QColor const& c)
 }
 
 auto
-Spectrum::spectrumColorB() const noexcept -> QColor const&
+Spectrum::spectrumBColor() const noexcept -> QColor const&
 {
     return m_impl->spectrumColorB;
 }
 
 void
-Spectrum::setSpectrumColorB(QColor const& c)
+Spectrum::setSpectrumBColor(QColor const& c)
 {
     if (m_impl->spectrumColorB != c)
     {
         m_impl->spectrumColorB = c;
-        emit spectrumColorBChanged();
+        emit spectrumBColorChanged();
 
         m_impl->spectrumColorBDirty = true;
         update();
