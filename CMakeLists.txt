@@ -29,9 +29,19 @@ else()
 endif()
 configure_file("CTestCustom.cmake.in" "CTestCustom.cmake")
 
-find_package(Boost)
-find_package(spdlog)
-find_package(fmt)
+find_package(Boost REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(fmt REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(FFTW3 REQUIRED fftw3f)
+
+add_library(FFTW::Float INTERFACE IMPORTED)
+set_target_properties(FFTW::Float
+    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${FFTW3_INCLUDE_DIRS}"
+    INTERFACE_LINK_LIBRARIES "${FFTW3_LINK_LIBRARIES}"
+    INTERFACE_COMPILE_OPTIONS "${FFTW3_CFLAGS}"
+    )
 
 add_library(nod INTERFACE)
 target_include_directories(nod SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/libs/nod/include)
