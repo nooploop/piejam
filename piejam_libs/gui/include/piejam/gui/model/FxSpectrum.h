@@ -36,7 +36,6 @@ public:
         {
             m_activeA = active;
             emit activeAChanged();
-            onActiveAChanged();
         }
     }
 
@@ -48,7 +47,6 @@ public:
         {
             m_channelA = x;
             emit channelAChanged();
-            onChannelAChanged();
         }
     }
 
@@ -62,7 +60,6 @@ public:
         {
             m_activeB = active;
             emit activeBChanged();
-            onActiveBChanged();
         }
     }
 
@@ -74,7 +71,6 @@ public:
         {
             m_channelB = x;
             emit channelBChanged();
-            onChannelBChanged();
         }
     }
 
@@ -82,17 +78,17 @@ public:
 
     Q_INVOKABLE virtual void requestUpdate() = 0;
 
+    Q_INVOKABLE void clear()
+    {
+        m_spectrumDataA.clear();
+        m_spectrumDataB.clear();
+    }
+
 signals:
     void activeAChanged();
     void activeBChanged();
     void channelAChanged();
     void channelBChanged();
-
-protected:
-    virtual void onActiveAChanged() {}
-    virtual void onActiveBChanged() {}
-    virtual void onChannelAChanged() {}
-    virtual void onChannelBChanged() {}
 
 private:
     bool m_activeA{true};

@@ -4,56 +4,146 @@
 
 #pragma once
 
+#include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/ScopeLinesObject.h>
+#include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <QObject>
 
-#include <memory>
-
 namespace piejam::gui::model
 {
 
-class FxScope : public QObject
+class FxScope : public FxModuleContent
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::AudioStreamListener* streamListener READ
-                       streamListener CONSTANT FINAL)
     Q_PROPERTY(int samplesPerPoint READ samplesPerPoint WRITE setSamplesPerPoint
                        NOTIFY samplesPerPointChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* leftLines READ leftLines
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* rightLines READ rightLines
-                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataA READ dataA CONSTANT)
+    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataB READ dataB CONSTANT)
+    Q_PROPERTY(bool activeA READ activeA NOTIFY activeAChanged FINAL)
+    Q_PROPERTY(bool activeB READ activeB NOTIFY activeBChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::StereoChannel channelA READ channelA NOTIFY
+                       channelAChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::StereoChannel channelB READ channelB NOTIFY
+                       channelBChanged FINAL)
 
 public:
-    FxScope(QObject* parent = nullptr);
-    ~FxScope();
+    auto type() const noexcept -> Type override final { return Type::Scope; }
 
-    auto streamListener() noexcept -> AudioStreamListener*;
+    auto samplesPerPoint() const noexcept -> int { return m_samplesPerPoint; }
+    void setSamplesPerPoint(int const x)
+    {
+        if (m_samplesPerPoint != x)
+        {
+            m_samplesPerPoint = x;
+            emit samplesPerPointChanged();
+        }
+    }
 
-    auto samplesPerPoint() const noexcept -> int;
-    void setSamplesPerPoint(int);
+    auto viewSize() const noexcept -> int { return m_viewSize; }
+    void setViewSize(int const x)
+    {
+        if (m_viewSize != x)
+        {
+            m_viewSize = x;
+            emit viewSizeChanged();
 
-    auto viewSize() const noexcept -> int;
-    void setViewSize(int);
+            clear();
+        }
+    }
 
-    auto leftLines() noexcept -> ScopeLinesObject*;
-    auto rightLines() noexcept -> ScopeLinesObject*;
+    bool activeA() const noexcept { return m_activeA; }
 
-    Q_INVOKABLE void clear();
+    Q_INVOKABLE void changeActiveA(bool const active)
+    {
+        if (m_activeA != active)
+        {
+            m_activeA = active;
+            emit activeAChanged();
+
+            clear();
+        }
+    }
+
+    auto channelA() const noexcept -> StereoChannel { return m_channelA; }
+
+    Q_INVOKABLE void changeChannelA(piejam::gui::model::StereoChannel const x)
+    {
+        if (m_channelA != x)
+        {
+            m_channelA = x;
+            emit channelAChanged();
+        }
+    }
+
+    auto dataA() noexcept -> ScopeLinesObject* { return &m_linesA; }
+
+    bool activeB() const noexcept { return m_activeB; }
+
+    Q_INVOKABLE void changeActiveB(bool const active)
+    {
+        if (m_activeB != active)
+        {
+            m_activeB = active;
+            emit activeBChanged();
+
+            clear();
+        }
+    }
+
+    auto channelB() const noexcept -> StereoChannel { return m_channelB; }
+
+    Q_INVOKABLE void changeChannelB(piejam::gui::model::StereoChannel const x)
+    {
+        if (m_channelB != x)
+        {
+            m_channelB = x;
+            emit channelBChanged();
+        }
+    }
+
+    auto dataB() noexcept -> ScopeLinesObject* { return &m_linesB; }
+
+    Q_INVOKABLE virtual void requestUpdate() = 0;
+
+    Q_INVOKABLE void clear()
+    {
+        m_linesA.get().clear();
+
+        if (m_activeA)
+            m_linesA.get().resize(m_viewSize);
+
+        m_linesA.update();
+
+        m_linesB.get().clear();
+
+        if (m_activeB)
+            m_linesB.get().resize(m_viewSize);
+
+        m_linesB.update();
+    }
 
 signals:
     void samplesPerPointChanged();
     void viewSizeChanged();
-    void syncedChanged();
+    void activeAChanged();
+    void activeBChanged();
+    void channelAChanged();
+    void channelBChanged();
 
 private:
-    struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    int m_samplesPerPoint{1};
+    int m_viewSize{};
+    bool m_activeA{true};
+    StereoChannel m_channelA{StereoChannel::Left};
+    ScopeLinesObject m_linesA;
+    bool m_activeB{false};
+    StereoChannel m_channelB{StereoChannel::Right};
+    ScopeLinesObject m_linesB;
 };
 
 } // namespace piejam::gui::model

@@ -27,6 +27,12 @@ public:
         emit changed();
     }
 
+    void clear()
+    {
+        m_dataPoints.clear();
+        emit changed();
+    }
+
 signals:
     void changed();
 

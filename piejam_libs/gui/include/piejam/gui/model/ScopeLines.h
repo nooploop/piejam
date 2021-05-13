@@ -26,7 +26,7 @@ public:
     }
 
     void clear() { m_data.clear(); }
-    void resize(std::size_t const sz) { m_data.resize(sz * 2); }
+    void resize(std::size_t const sz) { m_data.resize(sz * 2, 0.f); }
     void reserve(std::size_t const capacity) { m_data.reserve(capacity * 2); }
 
     void push_back(float const y0, float const y1)

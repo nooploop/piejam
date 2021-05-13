@@ -34,6 +34,8 @@ Item {
         spectrumBColor: Material.color(Material.Blue)
     }
 
+    onBypassedChanged: if (root.bypassed && root.content) root.content.clear()
+
     Repeater {
         model: spectrum.levelLabels
 
@@ -73,6 +75,22 @@ Item {
         onChannelSelected: root.content.changeChannelA(ch)
 
         anchors.left: parent.left
+        anchors.bottom: parent.bottom
+    }
+
+    StereoChannelSelector {
+        id: channelBSelector
+
+        name: "B"
+        active: root.content ? root.content.activeB : false
+        channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
+
+        Material.accent: Material.Blue
+
+        onActiveToggled: root.content.changeActiveB(!active)
+        onChannelSelected: root.content.changeChannelB(ch)
+
+        anchors.right: parent.right
         anchors.bottom: parent.bottom
     }
 

@@ -19,22 +19,9 @@ Item {
 
     implicitWidth: 636
 
-    PJModels.FxScope {
-        id: fxScope
+    onVisibleChanged: if (root.content) root.content.clear()
 
-        viewSize: scope.width
-        samplesPerPoint: Math.pow(2, resolutionSlider.value)
-    }
-
-    onContentChanged: {
-        if (root.content) {
-            root.content.scopeStream.listener = fxScope.streamListener
-        }
-    }
-
-    onVisibleChanged: fxScope.clear()
-
-    onBypassedChanged: if (root.bypassed) fxScope.clear()
+    onBypassedChanged: if (root.bypassed && root.content) root.content.clear()
 
     PJItems.Scope {
         id: scope
@@ -44,11 +31,27 @@ Item {
         anchors.top: parent.top
         anchors.bottom: resolutionSlider.top
 
-        linesA: fxScope.leftLines
+        linesA: root.content ? root.content.dataA : null
         linesAColor: Material.color(Material.Pink)
 
-        linesB: fxScope.rightLines
+        linesB: root.content ? root.content.dataB : null
         linesBColor: Material.color(Material.Blue)
+
+        Binding {
+            when: root.content
+            target: root.content
+            property: "viewSize"
+            value: scope.width
+            restoreMode: Binding.RestoreBinding
+        }
+
+        Binding {
+            when: root.content
+            target: root.content
+            property: "samplesPerPoint"
+            value: Math.pow(2, resolutionSlider.value)
+            restoreMode: Binding.RestoreBinding
+        }
     }
 
     Slider {
@@ -80,10 +83,26 @@ Item {
         anchors.bottom: parent.bottom
     }
 
+    StereoChannelSelector {
+        id: channelBSelector
+
+        name: "B"
+        active: root.content ? root.content.activeB : false
+        channel: root.content ? root.content.channelB : PJModels.StereoChannel.Left
+
+        Material.accent: Material.Blue
+
+        onActiveToggled: root.content.changeActiveB(!active)
+        onChannelSelected: root.content.changeChannelB(ch)
+
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+    }
+
     Timer {
         interval: 16
         running: visible && root.content
         repeat: true
-        onTriggered: root.content.scopeStream.requestUpdate()
+        onTriggered: root.content.requestUpdate()
     }
 }

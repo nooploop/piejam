@@ -22,7 +22,8 @@ struct FxSpectrum::Impl
     piejam::gui::model::StereoSpectrumDataGenerator dataGeneratorA;
     piejam::gui::model::StereoSpectrumDataGenerator dataGeneratorB;
 
-    std::unique_ptr<piejam::gui::model::AudioStreamProvider> stream;
+    std::unique_ptr<piejam::gui::model::AudioStreamProvider> streamA;
+    std::unique_ptr<piejam::gui::model::AudioStreamProvider> streamB;
 };
 
 FxSpectrum::FxSpectrum(
@@ -41,14 +42,14 @@ FxSpectrum::FxSpectrum(
     auto const streamId = streams.get().at(streamKey);
     FxStreamKeyId fxStreamKeyId{.key = streamKey, .id = streamId};
 
-    m_impl->stream = std::make_unique<FxStream>(
+    m_impl->streamA = std::make_unique<FxStream>(
             dispatch(),
             this->state_change_subscriber(),
             fxStreamKeyId);
 
-    connect(*m_impl->stream);
+    connect(*m_impl->streamA);
 
-    m_impl->stream->setListener(&m_impl->dataGeneratorA);
+    m_impl->streamA->setListener(&m_impl->dataGeneratorA);
     m_impl->dataGeneratorA.setActive(activeA());
     m_impl->dataGeneratorA.setChannel(channelA());
 
@@ -59,6 +60,14 @@ FxSpectrum::FxSpectrum(
                 dataA()->set(dataPoints);
             });
 
+    m_impl->streamB = std::make_unique<FxStream>(
+            dispatch(),
+            this->state_change_subscriber(),
+            fxStreamKeyId);
+
+    connect(*m_impl->streamB);
+
+    m_impl->streamB->setListener(&m_impl->dataGeneratorB);
     m_impl->dataGeneratorB.setActive(activeB());
     m_impl->dataGeneratorB.setChannel(channelB());
 
@@ -68,6 +77,22 @@ FxSpectrum::FxSpectrum(
             [this](piejam::gui::model::SpectrumDataPoints const& dataPoints) {
                 dataB()->set(dataPoints);
             });
+
+    QObject::connect(this, &FxSpectrum::activeAChanged, [this]() {
+        m_impl->dataGeneratorA.setActive(activeA());
+    });
+
+    QObject::connect(this, &FxSpectrum::channelAChanged, [this]() {
+        m_impl->dataGeneratorA.setChannel(channelA());
+    });
+
+    QObject::connect(this, &FxSpectrum::activeBChanged, [this]() {
+        m_impl->dataGeneratorB.setActive(activeB());
+    });
+
+    QObject::connect(this, &FxSpectrum::channelBChanged, [this]() {
+        m_impl->dataGeneratorB.setChannel(channelB());
+    });
 }
 
 FxSpectrum::~FxSpectrum() = default;
@@ -84,31 +109,7 @@ FxSpectrum::onSubscribe()
 void
 FxSpectrum::requestUpdate()
 {
-    m_impl->stream->requestUpdate();
-}
-
-void
-FxSpectrum::onActiveAChanged()
-{
-    m_impl->dataGeneratorA.setActive(activeA());
-}
-
-void
-FxSpectrum::onActiveBChanged()
-{
-    m_impl->dataGeneratorB.setActive(activeB());
-}
-
-void
-FxSpectrum::onChannelAChanged()
-{
-    m_impl->dataGeneratorA.setChannel(channelA());
-}
-
-void
-FxSpectrum::onChannelBChanged()
-{
-    m_impl->dataGeneratorB.setChannel(channelB());
+    m_impl->streamA->requestUpdate();
 }
 
 } // namespace piejam::app::gui::model

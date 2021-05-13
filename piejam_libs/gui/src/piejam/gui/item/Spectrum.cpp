@@ -83,10 +83,10 @@ std::array s_levelLabels{-80.f, -60.f, -40.f, -20.f, 0.f};
 struct Spectrum::Impl
 {
     bool scaleIsDirty{true};
-    bool spectrumDataADirty{};
-    bool spectrumDataBDirty{};
-    bool spectrumColorADirty{};
-    bool spectrumColorBDirty{};
+    bool spectrumDataADirty{true};
+    bool spectrumDataBDirty{true};
+    bool spectrumColorADirty{true};
+    bool spectrumColorBDirty{true};
 
     FrequencyScale frequencyScale;
     decltype(s_frequencyTicks) frequencyPositions;

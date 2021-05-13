@@ -5,7 +5,7 @@
 #include <piejam/app/gui/model/FxModule.h>
 
 #include <piejam/app/gui/model/FxGenericModule.h>
-#include <piejam/app/gui/model/FxScopeModule.h>
+#include <piejam/app/gui/model/FxScope.h>
 #include <piejam/app/gui/model/FxSpectrum.h>
 #include <piejam/functional/overload.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
@@ -43,7 +43,7 @@ makeModuleContent(
                         switch (fx_type)
                         {
                             case runtime::fx::internal::scope:
-                                return std::make_unique<FxScopeModule>(
+                                return std::make_unique<FxScope>(
                                         store_dispatch,
                                         state_change_subscriber,
                                         fx_mod_id);

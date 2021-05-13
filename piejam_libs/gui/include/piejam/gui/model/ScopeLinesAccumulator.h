@@ -5,9 +5,10 @@
 #pragma once
 
 #include <piejam/gui/model/AudioStreamListener.h>
+#include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/fwd.h>
 
-#include <span>
+#include <memory>
 
 namespace piejam::gui::model
 {
@@ -16,31 +17,22 @@ class ScopeLinesAccumulator final : public AudioStreamListener
 {
     Q_OBJECT
 
-    Q_PROPERTY(int samplesPerLine READ samplesPerLine WRITE setSamplesPerLine
-                       NOTIFY samplesPerLineChanged FINAL)
-
 public:
-    auto samplesPerLine() const noexcept -> int { return m_samplesPerPoint; }
-    void setSamplesPerLine(int x);
+    ScopeLinesAccumulator();
+    ~ScopeLinesAccumulator();
 
-    void update(range::interleaved_view<float const, 0> const&) override;
+    void setSamplesPerLine(int x);
+    void setActive(bool active);
+    void setChannel(StereoChannel);
+
+    void update(Stream const&) override;
 
 signals:
-    void samplesPerLineChanged();
-
-    void linesAdded(std::size_t channel, ScopeLines const&);
+    void generated(ScopeLines const&);
 
 private:
-    int m_samplesPerPoint{1};
-
-    struct Acc
-    {
-        float y0;
-        float y1;
-    };
-
-    std::vector<Acc> m_acc;
-    int m_accNumSamples{};
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

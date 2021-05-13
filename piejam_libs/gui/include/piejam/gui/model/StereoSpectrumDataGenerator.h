@@ -13,7 +13,7 @@
 namespace piejam::gui::model
 {
 
-class StereoSpectrumDataGenerator : public AudioStreamListener
+class StereoSpectrumDataGenerator final : public AudioStreamListener
 {
     Q_OBJECT
 public:

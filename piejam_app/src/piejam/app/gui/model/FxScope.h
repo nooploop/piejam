@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/app/gui/model/Subscribable.h>
-#include <piejam/gui/model/FxSpectrum.h>
+#include <piejam/gui/model/FxScope.h>
 #include <piejam/runtime/fx/fwd.h>
 
 #include <memory>
@@ -13,14 +13,13 @@
 namespace piejam::app::gui::model
 {
 
-class FxSpectrum final : public Subscribable<piejam::gui::model::FxSpectrum>
+class FxScope final : public Subscribable<piejam::gui::model::FxScope>
 {
 public:
-    FxSpectrum(
-            runtime::store_dispatch,
+    FxScope(runtime::store_dispatch,
             runtime::subscriber&,
             runtime::fx::module_id);
-    ~FxSpectrum();
+    ~FxScope();
 
     void requestUpdate() override;
 

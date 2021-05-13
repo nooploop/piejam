@@ -128,11 +128,11 @@ ScopePointMaterial::createShader() const -> QSGMaterialShader*
 
 struct Scope::Impl
 {
-    bool transformMatrixDirty{};
-    bool linesADirty{};
-    bool linesBDirty{};
-    bool linesAColorDirty{};
-    bool linesBColorDirty{};
+    bool transformMatrixDirty{true};
+    bool linesADirty{true};
+    bool linesBDirty{true};
+    bool linesAColorDirty{true};
+    bool linesBColorDirty{true};
 
     model::ScopeLinesObject* linesA{};
     model::ScopeLinesObject* linesB{};
@@ -186,6 +186,7 @@ Scope::setLinesA(model::ScopeLinesObject* x)
             m_impl->linesAChangedConnection = {};
         }
 
+        m_impl->linesADirty = true;
         update();
     }
 }
@@ -219,6 +220,7 @@ Scope::setLinesB(model::ScopeLinesObject* x)
             m_impl->linesBChangedConnection = {};
         }
 
+        m_impl->linesBDirty = true;
         update();
     }
 }

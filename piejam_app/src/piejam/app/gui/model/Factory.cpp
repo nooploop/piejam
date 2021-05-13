@@ -71,6 +71,8 @@ Factory::Factory(
     qRegisterMetaType<piejam::gui::model::AudioStreamProvider*>();
     qRegisterMetaType<piejam::gui::model::AudioStreamListener*>();
     qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
+    qRegisterMetaType<piejam::gui::model::FxScope*>();
+    qRegisterMetaType<piejam::gui::model::ScopeLinesObject*>();
     qRegisterMetaType<piejam::gui::model::FxSpectrum*>();
     qRegisterMetaType<piejam::gui::model::SpectrumData*>();
 
@@ -89,12 +91,6 @@ Factory::Factory(
             0,
             "FxModuleContent",
             "Not createable");
-
-    qmlRegisterType<piejam::gui::model::FxScope>(
-            "PieJam.Models",
-            1,
-            0,
-            "FxScope");
 
     qmlRegisterType<piejam::gui::item::Scope>("PieJam.Items", 1, 0, "Scope");
     qmlRegisterType<piejam::gui::item::Spectrum>(

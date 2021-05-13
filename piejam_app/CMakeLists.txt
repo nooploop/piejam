@@ -42,8 +42,8 @@ add_executable(piejam_app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxParameterKeyId.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxScopeModule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxScopeModule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxScope.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxScope.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxSpectrum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxSpectrum.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/app/gui/model/FxStream.cpp
