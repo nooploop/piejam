@@ -96,9 +96,9 @@ FxScope::FxScope(
         m_impl->accumulatorB.setChannel(channelB());
     });
 
-    QObject::connect(this, &FxScope::samplesPerPointChanged, [this]() {
-        m_impl->accumulatorA.setSamplesPerLine(samplesPerPoint());
-        m_impl->accumulatorB.setSamplesPerLine(samplesPerPoint());
+    QObject::connect(this, &FxScope::samplesPerLineChanged, [this]() {
+        m_impl->accumulatorA.setSamplesPerLine(samplesPerLine());
+        m_impl->accumulatorB.setSamplesPerLine(samplesPerLine());
     });
 }
 

@@ -18,8 +18,8 @@ class FxScope : public FxModuleContent
 {
     Q_OBJECT
 
-    Q_PROPERTY(int samplesPerPoint READ samplesPerPoint WRITE setSamplesPerPoint
-                       NOTIFY samplesPerPointChanged FINAL)
+    Q_PROPERTY(int samplesPerLine READ samplesPerLine WRITE setSamplesPerLine
+                       NOTIFY samplesPerLineChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
     Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataA READ dataA CONSTANT)
@@ -34,13 +34,13 @@ class FxScope : public FxModuleContent
 public:
     auto type() const noexcept -> Type override final { return Type::Scope; }
 
-    auto samplesPerPoint() const noexcept -> int { return m_samplesPerPoint; }
-    void setSamplesPerPoint(int const x)
+    auto samplesPerLine() const noexcept -> int { return m_samplesPerLine; }
+    void setSamplesPerLine(int const x)
     {
-        if (m_samplesPerPoint != x)
+        if (m_samplesPerLine != x)
         {
-            m_samplesPerPoint = x;
-            emit samplesPerPointChanged();
+            m_samplesPerLine = x;
+            emit samplesPerLineChanged();
         }
     }
 
@@ -128,7 +128,7 @@ public:
     }
 
 signals:
-    void samplesPerPointChanged();
+    void samplesPerLineChanged();
     void viewSizeChanged();
     void activeAChanged();
     void activeBChanged();
@@ -136,7 +136,7 @@ signals:
     void channelBChanged();
 
 private:
-    int m_samplesPerPoint{1};
+    int m_samplesPerLine{1};
     int m_viewSize{};
     bool m_activeA{true};
     StereoChannel m_channelA{StereoChannel::Left};
