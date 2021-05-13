@@ -4,15 +4,16 @@
 
 #pragma once
 
+#include <concepts>
 #include <ranges>
 #include <vector>
 
 namespace piejam::algorithm
 {
 
-template <class F>
+template <std::ranges::range Range, class F>
 auto
-transform_to_vector(std::ranges::range auto const& rng, F&& f)
+transform_to_vector(Range const& rng, F&& f)
 {
     auto transformed = std::views::transform(rng, std::forward<F>(f));
     return std::vector(transformed.begin(), transformed.end());
