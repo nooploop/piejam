@@ -13,13 +13,13 @@
 namespace piejam::gui::model
 {
 
-class ScopeLinesAccumulator final : public AudioStreamListener
+class ScopeLinesGenerator final : public AudioStreamListener
 {
     Q_OBJECT
 
 public:
-    ScopeLinesAccumulator();
-    ~ScopeLinesAccumulator();
+    ScopeLinesGenerator();
+    ~ScopeLinesGenerator();
 
     void setSamplesPerLine(int x);
     void setActive(bool active);

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/ScopeLinesAccumulator.h>
+#include <piejam/gui/model/ScopeLinesGenerator.h>
 
 #include <piejam/gui/model/ScopeLines.h>
 #include <piejam/math.h>
@@ -88,7 +88,7 @@ private:
 
 } // namespace
 
-struct ScopeLinesAccumulator::Impl
+struct ScopeLinesGenerator::Impl
 {
     int samplesPerPoint{1};
     bool active{};
@@ -130,15 +130,15 @@ struct ScopeLinesAccumulator::Impl
     void updateGenerator() { generator = makeGenerator(); }
 };
 
-ScopeLinesAccumulator::ScopeLinesAccumulator()
+ScopeLinesGenerator::ScopeLinesGenerator()
     : m_impl(std::make_unique<Impl>())
 {
 }
 
-ScopeLinesAccumulator::~ScopeLinesAccumulator() = default;
+ScopeLinesGenerator::~ScopeLinesGenerator() = default;
 
 void
-ScopeLinesAccumulator::setSamplesPerLine(int const samplesPerLine)
+ScopeLinesGenerator::setSamplesPerLine(int const samplesPerLine)
 {
     if (samplesPerLine <= 0)
         throw std::invalid_argument("samplesPerPoint must be positive");
@@ -151,7 +151,7 @@ ScopeLinesAccumulator::setSamplesPerLine(int const samplesPerLine)
 }
 
 void
-ScopeLinesAccumulator::setActive(bool const active)
+ScopeLinesGenerator::setActive(bool const active)
 {
     if (m_impl->active != active)
     {
@@ -161,7 +161,7 @@ ScopeLinesAccumulator::setActive(bool const active)
 }
 
 void
-ScopeLinesAccumulator::setChannel(StereoChannel const channel)
+ScopeLinesGenerator::setChannel(StereoChannel const channel)
 {
     if (m_impl->channel != channel)
     {
@@ -171,7 +171,7 @@ ScopeLinesAccumulator::setChannel(StereoChannel const channel)
 }
 
 void
-ScopeLinesAccumulator::update(Stream const& stream)
+ScopeLinesGenerator::update(Stream const& stream)
 {
     if (auto lines = m_impl->generator(stream))
         generated(*lines);

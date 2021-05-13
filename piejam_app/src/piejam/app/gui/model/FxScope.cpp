@@ -5,7 +5,7 @@
 #include <piejam/app/gui/model/FxScope.h>
 
 #include <piejam/app/gui/model/FxStream.h>
-#include <piejam/gui/model/ScopeLinesAccumulator.h>
+#include <piejam/gui/model/ScopeLinesGenerator.h>
 #include <piejam/runtime/fx/scope.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
@@ -19,8 +19,8 @@ struct FxScope::Impl
 {
     runtime::fx::module_id fx_mod_id;
 
-    piejam::gui::model::ScopeLinesAccumulator accumulatorA;
-    piejam::gui::model::ScopeLinesAccumulator accumulatorB;
+    piejam::gui::model::ScopeLinesGenerator accumulatorA;
+    piejam::gui::model::ScopeLinesGenerator accumulatorB;
 
     std::unique_ptr<piejam::gui::model::AudioStreamProvider> streamA;
     std::unique_ptr<piejam::gui::model::AudioStreamProvider> streamB;
@@ -55,7 +55,7 @@ FxScope::FxScope(
 
     QObject::connect(
             &m_impl->accumulatorA,
-            &piejam::gui::model::ScopeLinesAccumulator::generated,
+            &piejam::gui::model::ScopeLinesGenerator::generated,
             [this](piejam::gui::model::ScopeLines const& addedLines) {
                 dataA()->get().shift_push_back(addedLines);
                 dataA()->update();
@@ -74,7 +74,7 @@ FxScope::FxScope(
 
     QObject::connect(
             &m_impl->accumulatorB,
-            &piejam::gui::model::ScopeLinesAccumulator::generated,
+            &piejam::gui::model::ScopeLinesGenerator::generated,
             [this](piejam::gui::model::ScopeLines const& addedLines) {
                 dataB()->get().shift_push_back(addedLines);
                 dataB()->update();

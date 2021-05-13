@@ -45,7 +45,7 @@ using AudioStreamProviderList = GenericListModel<AudioStreamProvider>;
 
 class ScopeLinesObject;
 class ScopeLines;
-class ScopeLinesAccumulator;
+class ScopeLinesGenerator;
 
 class SpectrumData;
 
