@@ -25,7 +25,14 @@ class AudioInputOutputSettings : public SubscribableModel
 
 public:
     auto channels() -> QStringList { return m_channels; }
-    void setChannels(QStringList const& channels);
+    void setChannels(QStringList const& channels)
+    {
+        if (m_channels != channels)
+        {
+            m_channels = channels;
+            emit channelsChanged();
+        }
+    }
 
     auto busConfigs() -> BusConfigsList* { return &m_busConfigs; }
 
