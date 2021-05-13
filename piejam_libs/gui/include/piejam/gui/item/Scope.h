@@ -23,11 +23,11 @@ class Scope : public QQuickItem
     Q_PROPERTY(piejam::gui::model::ScopeLinesObject* linesB READ linesB WRITE
                        setLinesB NOTIFY linesBChanged FINAL)
 
-    Q_PROPERTY(QColor linesAColor READ linesAColor WRITE setLinesAColor NOTIFY
-                       linesAColorChanged FINAL)
+    Q_PROPERTY(QColor colorA READ colorA WRITE setColorA NOTIFY colorAChanged
+                       FINAL)
 
-    Q_PROPERTY(QColor linesBColor READ linesBColor WRITE setLinesBColor NOTIFY
-                       linesBColorChanged FINAL)
+    Q_PROPERTY(QColor colorB READ colorB WRITE setColorB NOTIFY colorBChanged
+                       FINAL)
 
     QML_ELEMENT
 
@@ -41,19 +41,19 @@ public:
     auto linesB() const noexcept -> model::ScopeLinesObject*;
     void setLinesB(model::ScopeLinesObject*);
 
-    auto linesAColor() const noexcept -> QColor const&;
-    void setLinesAColor(QColor const&);
+    auto colorA() const noexcept -> QColor const&;
+    void setColorA(QColor const&);
 
-    auto linesBColor() const noexcept -> QColor const&;
-    void setLinesBColor(QColor const&);
+    auto colorB() const noexcept -> QColor const&;
+    void setColorB(QColor const&);
 
     auto updatePaintNode(QSGNode*, UpdatePaintNodeData*) -> QSGNode* override;
 
 signals:
     void linesAChanged();
     void linesBChanged();
-    void linesAColorChanged();
-    void linesBColorChanged();
+    void colorAChanged();
+    void colorBChanged();
 
 private:
     void updateTransformMatrix(QSGTransformNode&);

@@ -32,10 +32,10 @@ Item {
         anchors.bottom: resolutionSlider.top
 
         linesA: root.content ? root.content.dataA : null
-        linesAColor: Material.color(Material.Pink)
+        colorA: Material.color(Material.Pink)
 
         linesB: root.content ? root.content.dataB : null
-        linesBColor: Material.color(Material.Blue)
+        colorB: Material.color(Material.Blue)
 
         Binding {
             when: root.content
