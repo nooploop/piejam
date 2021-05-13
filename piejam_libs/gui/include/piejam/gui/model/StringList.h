@@ -17,13 +17,26 @@ class StringList final : public QObject
     Q_PROPERTY(int focused READ focused NOTIFY focusedChanged FINAL)
 
 public:
-    StringList(QObject* parent = nullptr);
-
     auto elements() const -> QStringList const& { return m_elements; }
-    void setElements(QStringList const&);
+    void setElements(QStringList const& x)
+    {
+        if (m_elements != x)
+        {
+            m_elements = x;
+            emit elementsChanged();
+            emit focusedChanged();
+        }
+    }
 
     auto focused() const -> int { return m_focused; }
-    void setFocused(int);
+    void setFocused(int const x)
+    {
+        if (m_focused != x)
+        {
+            m_focused = x;
+            emit focusedChanged();
+        }
+    }
 
 signals:
 
