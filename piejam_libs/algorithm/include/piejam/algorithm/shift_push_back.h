@@ -6,11 +6,12 @@
 
 #include <algorithm>
 #include <iterator>
+#include <ranges>
 
 namespace piejam::algorithm
 {
 
-template <class Target, class Source>
+template <std::ranges::forward_range Target, std::ranges::sized_range Source>
 constexpr auto
 shift_push_back(Target&& target, Source&& source)
 {

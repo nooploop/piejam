@@ -11,6 +11,7 @@ add_executable(piejam_algorithm_test
     ${CMAKE_CURRENT_SOURCE_DIR}/contains_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/edit_script_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/index_of_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/shift_push_back_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/transform_to_vector_test.cpp
 )
 target_link_libraries(piejam_algorithm_test gtest gtest_main piejam_algorithm)
