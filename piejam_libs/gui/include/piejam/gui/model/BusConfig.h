@@ -25,28 +25,69 @@ public:
     using SubscribableModel::SubscribableModel;
 
     auto name() const noexcept -> QString const& { return m_name; }
-    void setName(QString const&);
+    void setName(QString const& x)
+    {
+        if (m_name != x)
+        {
+            m_name = x;
+            emit nameChanged();
+        }
+    }
+
     Q_INVOKABLE virtual void changeName(QString const&) = 0;
 
     auto mono() const noexcept -> bool { return m_mono; }
-    void setMono(bool);
+    void setMono(bool const x)
+    {
+        if (m_mono != x)
+        {
+            m_mono = x;
+            emit monoChanged();
+        }
+    }
 
     auto monoChannel() const noexcept -> unsigned { return m_monoChannel; }
-    void setMonoChannel(unsigned);
+    void setMonoChannel(unsigned const x)
+    {
+        if (m_monoChannel != x)
+        {
+            m_monoChannel = x;
+            emit monoChannelChanged();
+        }
+    }
+
     Q_INVOKABLE virtual void changeMonoChannel(unsigned) = 0;
 
     auto stereoLeftChannel() const noexcept -> unsigned
     {
         return m_stereoLeftChannel;
     }
-    void setStereoLeftChannel(unsigned);
+
+    void setStereoLeftChannel(unsigned const x)
+    {
+        if (m_stereoLeftChannel != x)
+        {
+            m_stereoLeftChannel = x;
+            emit stereoLeftChannelChanged();
+        }
+    }
+
     Q_INVOKABLE virtual void changeStereoLeftChannel(unsigned) = 0;
 
     auto stereoRightChannel() const noexcept -> unsigned
     {
         return m_stereoRightChannel;
     }
-    void setStereoRightChannel(unsigned);
+
+    void setStereoRightChannel(unsigned const x)
+    {
+        if (m_stereoRightChannel != x)
+        {
+            m_stereoRightChannel = x;
+            emit stereoRightChannelChanged();
+        }
+    }
+
     Q_INVOKABLE virtual void changeStereoRightChannel(unsigned) = 0;
 
     Q_INVOKABLE virtual void deleteBus() = 0;
