@@ -43,22 +43,6 @@ public:
     {
     }
 
-    static constexpr auto frameValue(std::span<float const, 2> const& frame)
-            -> float
-    {
-        switch (SC)
-        {
-            case StereoChannel::Left:
-                return frame[0];
-            case StereoChannel::Right:
-                return frame[1];
-            case StereoChannel::Middle:
-                return frame[0] + frame[1];
-            case StereoChannel::Side:
-                return frame[0] - frame[1];
-        }
-    }
-
     auto operator()(AudioStreamListener::Stream const& stream)
             -> std::optional<ScopeLines>
     {
@@ -68,24 +52,24 @@ public:
 
         for (auto const frame : stereoView)
         {
-            float const sample = frameValue(frame);
+            float const sample = frameValue<SC>(frame);
 
             if (m_accNumSamples) [[likely]]
             {
-                m_acc.y0 = std::min(m_acc.y0, sample);
-                m_acc.y1 = std::max(m_acc.y1, sample);
+                m_accY0 = std::min(m_accY0, sample);
+                m_accY1 = std::max(m_accY1, sample);
             }
             else
             {
-                m_acc.y0 = sample;
-                m_acc.y1 = sample;
+                m_accY0 = sample;
+                m_accY1 = sample;
             }
 
             ++m_accNumSamples;
 
             if (m_accNumSamples >= m_samplesPerPoint)
             {
-                result.push_back(clip(m_acc.y0), clip(m_acc.y1));
+                result.push_back(clip(m_accY0), clip(m_accY1));
 
                 m_accNumSamples = 0;
             }
@@ -97,13 +81,8 @@ public:
 private:
     int m_samplesPerPoint{1};
 
-    struct Acc
-    {
-        float y0;
-        float y1;
-    };
-
-    Acc m_acc;
+    float m_accY0{};
+    float m_accY1{};
     int m_accNumSamples{};
 };
 
@@ -114,44 +93,41 @@ struct ScopeLinesAccumulator::Impl
     int samplesPerPoint{1};
     bool active{};
     StereoChannel channel{StereoChannel::Left};
-    std::function<std::optional<ScopeLines>(AudioStreamListener::Stream const&)>
-            generator{InactiveGenerator{}};
 
-    void updateGenerator()
+    using Generate = std::function<std::optional<ScopeLines>(
+            AudioStreamListener::Stream const&)>;
+    Generate generator{InactiveGenerator{}};
+
+    auto makeGenerator() const -> Generate
     {
         if (active)
         {
             switch (channel)
             {
                 case StereoChannel::Left:
-                    generator = Generator<StereoChannel::Left>{samplesPerPoint};
-                    break;
+                    return Generator<StereoChannel::Left>{samplesPerPoint};
 
                 case StereoChannel::Right:
-                    generator =
-                            Generator<StereoChannel::Right>{samplesPerPoint};
-                    break;
+                    return Generator<StereoChannel::Right>{samplesPerPoint};
 
                 case StereoChannel::Middle:
-                    generator =
-                            Generator<StereoChannel::Middle>{samplesPerPoint};
-                    break;
+                    return Generator<StereoChannel::Middle>{samplesPerPoint};
 
                 case StereoChannel::Side:
-                    generator = Generator<StereoChannel::Side>{samplesPerPoint};
-                    break;
+                    return Generator<StereoChannel::Side>{samplesPerPoint};
 
                 default:
                     BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
-                    generator = InactiveGenerator{};
-                    break;
+                    return InactiveGenerator{};
             }
         }
         else
         {
-            generator = InactiveGenerator{};
+            return InactiveGenerator{};
         }
     }
+
+    void updateGenerator() { generator = makeGenerator(); }
 };
 
 ScopeLinesAccumulator::ScopeLinesAccumulator()

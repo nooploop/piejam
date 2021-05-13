@@ -49,22 +49,6 @@ public:
             m_dataPoints[i].frequency_Hz = i * m_binSize;
     }
 
-    static constexpr auto frameValue(std::span<float const, 2> const& frame)
-            -> float
-    {
-        switch (SC)
-        {
-            case StereoChannel::Left:
-                return frame[0];
-            case StereoChannel::Right:
-                return frame[1];
-            case StereoChannel::Middle:
-                return frame[0] + frame[1];
-            case StereoChannel::Side:
-                return frame[0] - frame[1];
-        }
-    }
-
     static constexpr auto envelope(float const prev, float const in) noexcept
             -> float
     {
@@ -83,7 +67,7 @@ public:
         std::ranges::transform(
                 stream.channels_cast<2>(),
                 std::back_inserter(m_streamBuffer),
-                &frameValue);
+                &frameValue<SC>);
 
         algorithm::shift_push_back(m_dftPrepareBuffer, m_streamBuffer);
 
@@ -129,9 +113,10 @@ struct StereoSpectrumDataGenerator::Impl
     unsigned sampleRate{48000};
     bool active{};
     StereoChannel channel{StereoChannel::Left};
-    std::function<std::optional<SpectrumDataPoints>(
-            AudioStreamListener::Stream const&)>
-            generator{Generator<StereoChannel::Left>{sampleRate}};
+
+    using Generate = std::function<std::optional<SpectrumDataPoints>(
+            AudioStreamListener::Stream const&)>;
+    Generate generator{InactiveGenerator{}};
 
     void updateGenerator()
     {
