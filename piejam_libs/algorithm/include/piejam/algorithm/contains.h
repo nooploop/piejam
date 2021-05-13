@@ -5,19 +5,25 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <iterator>
+#include <ranges>
 
 namespace piejam::algorithm
 {
 
-template <class Range, class T>
+template <
+        std::ranges::range Range,
+        std::convertible_to<std::ranges::range_value_t<Range>> T>
 constexpr auto
 contains(Range const& rng, T&& value) -> bool
 {
     return std::ranges::find(rng, std::forward<T>(value)) != std::end(rng);
 }
 
-template <class Range, class Predicate>
+template <
+        std::ranges::range Range,
+        std::predicate<std::ranges::range_reference_t<Range>> Predicate>
 constexpr auto
 contains_if(Range const& rng, Predicate&& p) -> bool
 {

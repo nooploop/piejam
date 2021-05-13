@@ -8,6 +8,7 @@ endif()
 
 find_package(GTest REQUIRED)
 add_executable(piejam_algorithm_test
+    ${CMAKE_CURRENT_SOURCE_DIR}/contains_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/edit_script_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/index_of_test.cpp
 )
