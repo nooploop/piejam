@@ -13,7 +13,7 @@
 namespace piejam::audio
 {
 
-inline constexpr std::array preferred_samplerates{
+inline constexpr std::array preferred_sample_rates{
         11025u,
         12000u,
         22050u,
@@ -25,7 +25,7 @@ inline constexpr std::array preferred_samplerates{
         176400u,
         192000u};
 
-using samplerates_t = boost::container::
-        static_vector<samplerate_t, preferred_samplerates.size()>;
+using sample_rates_t = boost::container::
+        static_vector<sample_rate_t, preferred_sample_rates.size()>;
 
 } // namespace piejam::audio

@@ -47,7 +47,7 @@ struct state
     selected_device input;
     selected_device output;
 
-    audio::samplerate_t samplerate{};
+    audio::sample_rate_t sample_rate{};
     audio::period_size_t period_size{};
     audio::period_count_t period_count{};
 
@@ -79,10 +79,10 @@ struct state
 
 auto make_initial_state() -> state;
 
-auto samplerates(
+auto sample_rates(
         box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params) -> audio::samplerates_t;
-auto samplerates_from_state(state const&) -> audio::samplerates_t;
+        box<audio::pcm_hw_params> output_hw_params) -> audio::sample_rates_t;
+auto sample_rates_from_state(state const&) -> audio::sample_rates_t;
 
 auto period_sizes(
         box<audio::pcm_hw_params> input_hw_params,

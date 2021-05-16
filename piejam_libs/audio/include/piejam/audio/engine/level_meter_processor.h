@@ -17,7 +17,7 @@ class level_meter_processor final : public named_processor
 {
 public:
     level_meter_processor(
-            unsigned samplerate,
+            unsigned sample_rate,
             std::string_view const& name = {});
 
     auto type_name() const -> std::string_view override

@@ -96,19 +96,19 @@ set_intersection(Vector const& in, Vector const& out)
 }
 
 auto
-samplerates(
+sample_rates(
         box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params) -> audio::samplerates_t
+        box<audio::pcm_hw_params> output_hw_params) -> audio::sample_rates_t
 {
     return set_intersection(
-            input_hw_params->samplerates,
-            output_hw_params->samplerates);
+            input_hw_params->sample_rates,
+            output_hw_params->sample_rates);
 }
 
 auto
-samplerates_from_state(state const& state) -> audio::samplerates_t
+sample_rates_from_state(state const& state) -> audio::sample_rates_t
 {
-    return samplerates(state.input.hw_params, state.output.hw_params);
+    return sample_rates(state.input.hw_params, state.output.hw_params);
 }
 
 auto

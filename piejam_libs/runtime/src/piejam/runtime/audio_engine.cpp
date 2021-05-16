@@ -114,7 +114,7 @@ void
 make_mixer_components(
         component_map& comps,
         component_map& prev_comps,
-        unsigned const samplerate,
+        unsigned const sample_rate,
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         parameter_processor_factory& param_procs)
@@ -150,7 +150,7 @@ make_mixer_components(
                     out_key,
                     components::make_mixer_channel_output(
                             bus,
-                            samplerate,
+                            sample_rate,
                             param_procs));
         }
     }
@@ -180,7 +180,7 @@ make_fx_chain_components(
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
-        audio::samplerate_t const samplerate)
+        audio::sample_rate_t const sample_rate)
 {
     auto get_fx_param_name =
             [&fx_params](fx::parameter_id id) -> std::string_view {
@@ -204,7 +204,7 @@ make_fx_chain_components(
                     ladspa_fx_proc_factory,
                     param_procs,
                     stream_procs,
-                    samplerate);
+                    sample_rate);
             if (comp)
             {
                 comps.insert(fx_mod_id, std::move(comp));
@@ -650,10 +650,10 @@ struct audio_engine::impl
 
 audio_engine::audio_engine(
         std::span<thread::worker> const& workers,
-        audio::samplerate_t const samplerate,
+        audio::sample_rate_t const sample_rate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels)
-    : m_samplerate(samplerate)
+    : m_sample_rate(sample_rate)
     , m_impl(std::make_unique<impl>(
               workers,
               num_device_input_channels,
@@ -755,7 +755,7 @@ audio_engine::rebuild(
     make_mixer_components(
             comps,
             m_impl->comps,
-            m_samplerate,
+            m_sample_rate,
             mixer_channels,
             device_buses,
             m_impl->param_procs);
@@ -767,7 +767,7 @@ audio_engine::rebuild(
             m_impl->param_procs,
             m_impl->stream_procs,
             ladspa_fx_proc_factory,
-            m_samplerate);
+            m_sample_rate);
     auto const solo_groups = runtime::solo_groups(mixer_channels);
     make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 

@@ -36,7 +36,7 @@
 #include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
-#include <piejam/runtime/actions/select_samplerate.h>
+#include <piejam/runtime/actions/select_sample_rate.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/actions/update_parameter_values.h>
 #include <piejam/runtime/actions/update_streams.h>
@@ -76,7 +76,7 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
     selected_device input;
     selected_device output;
 
-    audio::samplerate_t samplerate{};
+    audio::sample_rate_t sample_rate{};
     audio::period_size_t period_size{};
     audio::period_count_t period_count{};
 
@@ -87,7 +87,7 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
         new_st.pcm_devices = pcm_devices;
         new_st.input = input;
         new_st.output = output;
-        new_st.samplerate = samplerate;
+        new_st.sample_rate = sample_rate;
         new_st.period_size = period_size;
         new_st.period_count = period_count;
 
@@ -192,7 +192,7 @@ make_update_devices_action(
         box<audio::pcm_io_descriptors> current_devices,
         std::size_t const input_index,
         std::size_t const output_index,
-        audio::samplerate_t const samplerate,
+        audio::sample_rate_t const sample_rate,
         audio::period_size_t const period_size,
         audio::period_count_t const period_count) -> update_devices
 {
@@ -239,21 +239,21 @@ make_update_devices_action(
         return it != values.end() ? *it : 0;
     };
 
-    next_action.samplerate = next_value(
+    next_action.sample_rate = next_value(
             next_action.input.hw_params,
             next_action.output.hw_params,
-            &samplerates,
-            samplerate);
+            &sample_rates,
+            sample_rate);
 
-    if (next_action.samplerate != 0)
+    if (next_action.sample_rate != 0)
     {
         next_action.input.hw_params = device_manager.hw_params(
                 new_devices->inputs[next_action.input.index],
-                &next_action.samplerate,
+                &next_action.sample_rate,
                 nullptr);
         next_action.output.hw_params = device_manager.hw_params(
                 new_devices->outputs[next_action.output.index],
-                &next_action.samplerate,
+                &next_action.sample_rate,
                 nullptr);
     }
 
@@ -267,11 +267,11 @@ make_update_devices_action(
     {
         next_action.input.hw_params = device_manager.hw_params(
                 new_devices->inputs[next_action.input.index],
-                &next_action.samplerate,
+                &next_action.sample_rate,
                 &next_action.period_size);
         next_action.output.hw_params = device_manager.hw_params(
                 new_devices->outputs[next_action.output.index],
-                &next_action.samplerate,
+                &next_action.sample_rate,
                 &next_action.period_size);
     }
 
@@ -305,7 +305,7 @@ audio_engine_middleware::process_device_action(
                     [&](auto const& d) {
                         return d.name == a.conf.output_device_name;
                     }),
-            a.conf.samplerate,
+            a.conf.sample_rate,
             a.conf.period_size,
             a.conf.period_count));
 
@@ -324,7 +324,7 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
             current_state.pcm_devices,
             current_state.input.index,
             current_state.output.index,
-            current_state.samplerate,
+            current_state.sample_rate,
             current_state.period_size,
             current_state.period_count));
 }
@@ -342,7 +342,7 @@ audio_engine_middleware::process_device_action(
             current_state.pcm_devices,
             action.input ? action.index : current_state.input.index,
             action.input ? current_state.output.index : action.index,
-            current_state.samplerate,
+            current_state.sample_rate,
             current_state.period_size,
             current_state.period_count));
 }
@@ -350,11 +350,11 @@ audio_engine_middleware::process_device_action(
 template <>
 void
 audio_engine_middleware::process_device_action(
-        actions::select_samplerate const& action)
+        actions::select_sample_rate const& action)
 {
     state const& current_state = get_state();
 
-    auto const srs = samplerates_from_state(current_state);
+    auto const srs = sample_rates_from_state(current_state);
     if (action.index < srs.size())
     {
         next(make_update_devices_action(
@@ -385,7 +385,7 @@ audio_engine_middleware::process_device_action(
                 current_state.pcm_devices,
                 current_state.input.index,
                 current_state.output.index,
-                current_state.samplerate,
+                current_state.sample_rate,
                 pss[action.index],
                 current_state.period_count));
     }
@@ -407,7 +407,7 @@ audio_engine_middleware::process_device_action(
                 current_state.pcm_devices,
                 current_state.input.index,
                 current_state.output.index,
-                current_state.samplerate,
+                current_state.sample_rate,
                 current_state.period_size,
                 pcs[action.index]));
     }
@@ -564,7 +564,7 @@ audio_engine_middleware::open_device()
     auto const& st = get_state();
 
     if (st.input.index == npos || st.output.index == npos ||
-        st.samplerate == 0 || st.period_size == 0 || st.period_count == 0)
+        st.sample_rate == 0 || st.period_size == 0 || st.period_count == 0)
         return;
 
     try
@@ -582,7 +582,7 @@ audio_engine_middleware::open_device()
                                 st.output.hw_params->format,
                                 st.output.hw_params->num_channels},
                         audio::pcm_process_config{
-                                st.samplerate,
+                                st.sample_rate,
                                 st.period_size,
                                 st.period_count}});
         m_device.swap(device);
@@ -604,7 +604,7 @@ audio_engine_middleware::start_engine()
 
         m_engine = std::make_unique<audio_engine>(
                 m_workers,
-                state.samplerate,
+                state.sample_rate,
                 state.input.hw_params->num_channels,
                 state.output.hw_params->num_channels);
 
@@ -634,7 +634,7 @@ audio_engine_middleware::rebuild()
                 st.fx_modules,
                 st.fx_parameters,
                 st.params,
-                [this, sr = st.samplerate](fx::ladspa_instance_id id) {
+                [this, sr = st.sample_rate](fx::ladspa_instance_id id) {
                     return m_ladspa_fx_processor_factory(id, sr);
                 },
                 m_midi_controller->make_input_event_handler(),

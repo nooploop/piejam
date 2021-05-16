@@ -12,9 +12,9 @@
 namespace piejam::runtime::actions
 {
 
-struct select_samplerate final
-    : ui::cloneable_action<select_samplerate, action>
-    , visitable_device_action<select_samplerate>
+struct select_sample_rate final
+    : ui::cloneable_action<select_sample_rate, action>
+    , visitable_device_action<select_sample_rate>
 {
     std::size_t index{};
 

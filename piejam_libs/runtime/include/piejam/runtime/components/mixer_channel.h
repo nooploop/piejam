@@ -24,7 +24,7 @@ auto make_mixer_channel_input(
 
 auto make_mixer_channel_output(
         mixer::channel const&,
-        audio::samplerate_t,
+        audio::sample_rate_t,
         parameter_processor_factory&,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;

@@ -25,7 +25,7 @@ public:
 
     virtual auto control_inputs() const -> std::span<port_descriptor const> = 0;
 
-    virtual auto make_processor(samplerate_t) const
+    virtual auto make_processor(sample_rate_t) const
             -> std::unique_ptr<engine::processor> = 0;
 };
 

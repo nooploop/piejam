@@ -55,12 +55,12 @@ ladspa_manager::control_inputs(ladspa_instance_id const& id) const
 auto
 ladspa_manager::make_processor(
         ladspa_instance_id const& id,
-        audio::samplerate_t samplerate) const
+        audio::sample_rate_t sample_rate) const
         -> std::unique_ptr<audio::engine::processor>
 {
     if (auto it = m_instances.find(id); it != m_instances.end())
     {
-        return it->second->make_processor(samplerate);
+        return it->second->make_processor(sample_rate);
     }
 
     return {};

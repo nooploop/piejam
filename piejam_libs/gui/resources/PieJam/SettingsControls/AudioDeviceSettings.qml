@@ -13,7 +13,7 @@ Item {
     // model:
     //   .inputDevices : StringList
     //   .outputDevices : StringList
-    //   .samplerates : StringList
+    //   .sampleRates : StringList
     //   .periodSizes : StringList
     //   selectInputDevice(index)
     //   selectOutputDevice(index)
@@ -64,7 +64,7 @@ Item {
     }
 
     ComboBoxSetting {
-        id: samplerateSetting
+        id: sampleRateSetting
 
         anchors.left: parent.left
         anchors.leftMargin: 8
@@ -73,11 +73,11 @@ Item {
         anchors.top: outputSetting.bottom
         anchors.topMargin: 6
 
-        model: root.model.samplerates.elements
-        currentIndex: root.model.samplerates.focused
+        model: root.model.sampleRates.elements
+        currentIndex: root.model.sampleRates.focused
 
-        nameLabelText: qsTr("Samplerate:")
-        unselectedText: qsTr("Select samplerate...")
+        nameLabelText: qsTr("Sample rate:")
+        unselectedText: qsTr("Select sample rate...")
 
         onOptionSelected: root.model.selectSamplerate(index)
     }
@@ -89,7 +89,7 @@ Item {
         anchors.leftMargin: 8
         anchors.right: parent.right
         anchors.rightMargin: 8
-        anchors.top: samplerateSetting.bottom
+        anchors.top: sampleRateSetting.bottom
         anchors.topMargin: 6
 
         model: root.model.periodSizes.elements

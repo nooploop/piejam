@@ -15,7 +15,7 @@ struct device_action_visitor
               apply_app_config,
               refresh_devices,
               initiate_device_selection,
-              select_samplerate,
+              select_sample_rate,
               select_period_size,
               select_period_count,
               activate_midi_device,

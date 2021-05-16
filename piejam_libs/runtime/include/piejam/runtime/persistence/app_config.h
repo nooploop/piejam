@@ -29,7 +29,7 @@ struct app_config
 {
     std::string input_device_name;
     std::string output_device_name;
-    audio::samplerate_t samplerate{};
+    audio::sample_rate_t sample_rate{};
     audio::period_size_t period_size{};
     audio::period_count_t period_count{};
 

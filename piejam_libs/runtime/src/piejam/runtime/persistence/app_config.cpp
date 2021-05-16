@@ -42,7 +42,7 @@ static auto const s_key_version = "version";
 static auto const s_key_audio_settings = "audio_settings";
 static auto const s_key_input_device_name = "input_device_name"s;
 static auto const s_key_output_device_name = "output_device_name";
-static auto const s_key_samplerate = "samplerate";
+static auto const s_key_sample_rate = "sample_rate";
 static auto const s_key_period_size = "period_size";
 static auto const s_key_period_count = "period_count";
 static auto const s_key_input_configs = "input_configs";
@@ -80,7 +80,7 @@ to_json(nlohmann::json& j, app_config const& conf)
          {s_key_audio_settings,
           {{s_key_input_device_name, conf.input_device_name},
            {s_key_output_device_name, conf.output_device_name},
-           {s_key_samplerate, conf.samplerate},
+           {s_key_sample_rate, conf.sample_rate},
            {s_key_period_size, conf.period_size},
            {s_key_period_count, conf.period_count},
            {s_key_input_configs, conf.input_bus_config},
@@ -95,7 +95,7 @@ from_json(nlohmann::json const& j, app_config& conf)
     auto const& audio_settings = j.at(s_key_audio_settings);
     audio_settings.at(s_key_input_device_name).get_to(conf.input_device_name);
     audio_settings.at(s_key_output_device_name).get_to(conf.output_device_name);
-    audio_settings.at(s_key_samplerate).get_to(conf.samplerate);
+    audio_settings.at(s_key_sample_rate).get_to(conf.sample_rate);
     audio_settings.at(s_key_period_size).get_to(conf.period_size);
     audio_settings.at(s_key_period_count).get_to(conf.period_count);
     audio_settings.at(s_key_input_configs).get_to(conf.input_bus_config);

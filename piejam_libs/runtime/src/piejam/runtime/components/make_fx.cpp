@@ -30,7 +30,7 @@ make_internal_fx(
         fx::module const& fx_mod,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
-        audio::samplerate_t const samplerate,
+        audio::sample_rate_t const sample_rate,
         std::string_view const& name)
         -> std::unique_ptr<audio::engine::component>
 {
@@ -40,12 +40,12 @@ make_internal_fx(
             return components::make_fx_gain(fx_mod, param_procs, name);
 
         case fx::internal::scope:
-            return components::make_fx_scope(fx_mod, samplerate, stream_procs);
+            return components::make_fx_scope(fx_mod, sample_rate, stream_procs);
 
         case fx::internal::spectrum:
             return components::make_fx_spectrum(
                     fx_mod,
-                    samplerate,
+                    sample_rate,
                     stream_procs);
 
         default:
@@ -62,7 +62,7 @@ make_fx(fx::module const& fx_mod,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
-        audio::samplerate_t const samplerate,
+        audio::sample_rate_t const sample_rate,
         std::string_view const& name)
         -> std::unique_ptr<audio::engine::component>
 {
@@ -75,7 +75,7 @@ make_fx(fx::module const& fx_mod,
                                 fx_mod,
                                 param_procs,
                                 stream_procs,
-                                samplerate,
+                                sample_rate,
                                 name);
                     },
                     [&](fx::ladspa_instance_id id)

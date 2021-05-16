@@ -21,10 +21,10 @@ namespace
 {
 
 constexpr auto
-stream_capacity(audio::samplerate_t const samplerate) -> std::size_t
+stream_capacity(audio::sample_rate_t const sample_rate) -> std::size_t
 {
     // 3 x 17ms
-    return static_cast<std::size_t>((samplerate / 1000.f) * 17 * 3);
+    return static_cast<std::size_t>((sample_rate / 1000.f) * 17 * 3);
 }
 
 } // namespace
@@ -32,7 +32,7 @@ stream_capacity(audio::samplerate_t const samplerate) -> std::size_t
 auto
 make_fx_spectrum(
         fx::module const& fx_mod,
-        audio::samplerate_t const samplerate,
+        audio::sample_rate_t const sample_rate,
         processors::stream_processor_factory& stream_proc_factory)
         -> std::unique_ptr<audio::engine::component>
 {
@@ -40,7 +40,7 @@ make_fx_spectrum(
             fx_mod.streams->at(
                     to_underlying(fx::spectrum_stream_key::left_right)),
             stream_proc_factory,
-            stream_capacity(samplerate),
+            stream_capacity(sample_rate),
             "spectrum");
 }
 

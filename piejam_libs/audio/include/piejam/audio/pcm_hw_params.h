@@ -6,7 +6,7 @@
 
 #include <piejam/audio/period_counts.h>
 #include <piejam/audio/period_sizes.h>
-#include <piejam/audio/samplerates.h>
+#include <piejam/audio/sample_rates.h>
 
 #include <boost/container/static_vector.hpp>
 
@@ -20,7 +20,7 @@ struct pcm_hw_params
     bool interleaved{};
     pcm_format format{};
     unsigned num_channels{};
-    samplerates_t samplerates;
+    sample_rates_t sample_rates;
     period_sizes_t period_sizes;
     period_counts_t period_counts;
 

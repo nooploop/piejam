@@ -7,7 +7,7 @@
 namespace piejam::audio
 {
 
-using samplerate_t = unsigned;
+using sample_rate_t = unsigned;
 using period_size_t = unsigned;
 using period_count_t = unsigned;
 

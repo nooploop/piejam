@@ -100,7 +100,7 @@ FxSpectrum::~FxSpectrum() = default;
 void
 FxSpectrum::onSubscribe()
 {
-    observe(runtime::selectors::select_samplerate, [this](auto const& srs) {
+    observe(runtime::selectors::select_sample_rate, [this](auto const& srs) {
         m_impl->dataGeneratorA.setSampleRate(srs.second);
         m_impl->dataGeneratorB.setSampleRate(srs.second);
     });

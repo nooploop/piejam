@@ -17,7 +17,7 @@ namespace piejam::runtime::components
 
 auto make_fx_spectrum(
         fx::module const&,
-        audio::samplerate_t,
+        audio::sample_rate_t,
         processors::stream_processor_factory&)
         -> std::unique_ptr<audio::engine::component>;
 

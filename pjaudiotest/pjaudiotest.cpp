@@ -28,7 +28,7 @@ main(int argc, char* argv[]) -> int
     if (argc != 6)
     {
         std::cout << fmt::format(
-                             "Usage: {} <input> <output> <samplerate> "
+                             "Usage: {} <input> <output> <sample_rate> "
                              "<period_size> <affinity>",
                              argv[0])
                   << std::endl;
@@ -41,7 +41,7 @@ main(int argc, char* argv[]) -> int
 
         piejam::runtime::state audio_state;
         audio_state.pcm_devices = audio_device_manager->io_descriptors();
-        audio_state.samplerate = boost::lexical_cast<unsigned>(argv[3]);
+        audio_state.sample_rate = boost::lexical_cast<unsigned>(argv[3]);
         audio_state.period_size = boost::lexical_cast<unsigned>(argv[4]);
         piejam::runtime::audio_engine_middleware audio_engine(
                 piejam::runtime::middleware_functors(

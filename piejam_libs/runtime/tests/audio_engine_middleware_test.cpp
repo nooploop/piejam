@@ -9,7 +9,7 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/select_period_size.h>
-#include <piejam/runtime/actions/select_samplerate.h>
+#include <piejam/runtime/actions/select_sample_rate.h>
 #include <piejam/runtime/audio_engine_middleware.h>
 #include <piejam/runtime/midi_input_controller.h>
 #include <piejam/runtime/state.h>
@@ -52,23 +52,23 @@ TEST_F(audio_engine_middleware_test,
 }
 
 TEST_F(audio_engine_middleware_test,
-       select_samplerate_is_ignored_if_index_is_not_in_current_samplerates)
+       select_sample_rate_is_ignored_if_index_is_not_in_current_sample_rates)
 {
     using namespace testing;
 
     state st;
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
 
-    actions::select_samplerate action;
+    actions::select_sample_rate action;
     sut(action);
 }
 
-TEST_F(audio_engine_middleware_test, select_samplerate_will_change_samplerate)
+TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
 {
     using namespace testing;
 
     audio::pcm_hw_params const default_hw_params{
-            .samplerates = {44100u, 48000u},
+            .sample_rates = {44100u, 48000u},
             .period_sizes = {},
             .period_counts = {}};
 
@@ -87,13 +87,13 @@ TEST_F(audio_engine_middleware_test, select_samplerate_will_change_samplerate)
     EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(default_hw_params));
 
-    actions::select_samplerate action;
+    actions::select_sample_rate action;
     action.index = 1;
 
-    ASSERT_EQ(0u, st.samplerate);
+    ASSERT_EQ(0u, st.sample_rate);
     sut(action);
 
-    EXPECT_EQ(48000u, st.samplerate);
+    EXPECT_EQ(48000u, st.sample_rate);
 }
 
 TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
@@ -101,7 +101,7 @@ TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
     using namespace testing;
 
     audio::pcm_hw_params const default_hw_params{
-            .samplerates = {44100u, 48000u},
+            .sample_rates = {44100u, 48000u},
             .period_sizes = {64u, 128u},
             .period_counts = {}};
 
@@ -135,7 +135,7 @@ TEST_F(audio_engine_middleware_test,
     using namespace testing;
 
     piejam::audio::pcm_hw_params hw_params{
-            .samplerates = {44100},
+            .sample_rates = {44100},
             .period_sizes = {128},
             .period_counts = {2}};
 

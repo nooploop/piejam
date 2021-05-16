@@ -18,7 +18,7 @@ struct pcm_device_config
 
 struct pcm_process_config
 {
-    unsigned samplerate{};
+    unsigned sample_rate{};
     unsigned period_size{};
     unsigned period_count{};
 };

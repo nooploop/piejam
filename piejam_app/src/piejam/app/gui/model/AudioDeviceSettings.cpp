@@ -12,7 +12,7 @@
 #include <piejam/runtime/actions/refresh_devices.h>
 #include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
-#include <piejam/runtime/actions/select_samplerate.h>
+#include <piejam/runtime/actions/select_sample_rate.h>
 #include <piejam/runtime/selectors.h>
 
 #include <boost/hof/compose.hpp>
@@ -76,14 +76,14 @@ AudioDeviceSettings::onSubscribe()
                         static_cast<int>(output_devices.second));
             });
 
-    observe(selectors::select_samplerate,
-            [this](selectors::samplerate const& samplerate) {
+    observe(selectors::select_sample_rate,
+            [this](selectors::sample_rate const& sample_rate) {
                 auto const index = algorithm::index_of(
-                        *samplerate.first,
-                        samplerate.second);
+                        *sample_rate.first,
+                        sample_rate.second);
 
-                samplerates()->setElements(to_QStringList(*samplerate.first));
-                samplerates()->setFocused(static_cast<int>(index));
+                sampleRates()->setElements(to_QStringList(*sample_rate.first));
+                sampleRates()->setFocused(static_cast<int>(index));
             });
 
     observe(selectors::select_period_size,
@@ -138,7 +138,7 @@ AudioDeviceSettings::selectOutputDevice(unsigned const index)
 void
 AudioDeviceSettings::selectSamplerate(unsigned const index)
 {
-    runtime::actions::select_samplerate action;
+    runtime::actions::select_sample_rate action;
     action.index = index;
     dispatch(action);
 }

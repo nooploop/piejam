@@ -402,7 +402,7 @@ process_step::process_step(
               m_io_config.out_config,
               m_io_config.process_config.period_size))
     , m_cpu_load_mean_acc(
-              io_config.process_config.samplerate /
+              io_config.process_config.sample_rate /
               io_config.process_config.period_size) // 1sec window
 {
     m_xruns.store(0, std::memory_order_relaxed);
@@ -450,7 +450,7 @@ process_step::operator()() -> std::error_condition
 
     cpu_load_meter cpu_load_meter(
             m_io_config.process_config.period_size,
-            m_io_config.process_config.samplerate);
+            m_io_config.process_config.sample_rate);
 
     m_process_function(m_io_config.process_config.period_size);
 

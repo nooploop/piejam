@@ -24,11 +24,11 @@
 namespace piejam::runtime::selectors
 {
 
-const selector<samplerate> select_samplerate(
-        [get_samplerates = memo(boxify_result(&runtime::samplerates))](
-                state const& st) -> samplerate {
-            return {get_samplerates(st.input.hw_params, st.output.hw_params),
-                    st.samplerate};
+const selector<sample_rate> select_sample_rate(
+        [get_sample_rates = memo(boxify_result(&runtime::sample_rates))](
+                state const& st) -> sample_rate {
+            return {get_sample_rates(st.input.hw_params, st.output.hw_params),
+                    st.sample_rate};
         });
 
 const selector<period_size> select_period_size(
@@ -46,8 +46,8 @@ const selector<period_count> select_period_count(
         });
 
 const selector<float> select_buffer_latency([](state const& st) {
-    return st.samplerate
-                   ? (st.period_size * st.period_count * 1000.f) / st.samplerate
+    return st.sample_rate
+                   ? (st.period_size * st.period_count * 1000.f) / st.sample_rate
                    : 0.f;
 });
 

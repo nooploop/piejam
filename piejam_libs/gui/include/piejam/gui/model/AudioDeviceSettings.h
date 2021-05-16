@@ -20,8 +20,8 @@ class AudioDeviceSettings : public SubscribableModel
                        inputDevicesChanged FINAL)
     Q_PROPERTY(StringList* outputDevices READ outputDevices NOTIFY
                        outputDevicesChanged FINAL)
-    Q_PROPERTY(StringList* samplerates READ samplerates NOTIFY
-                       sampleratesChanged FINAL)
+    Q_PROPERTY(StringList* sampleRates READ sampleRates NOTIFY
+                       sampleRatesChanged FINAL)
     Q_PROPERTY(StringList* periodSizes READ periodSizes NOTIFY
                        periodSizesChanged FINAL)
     Q_PROPERTY(StringList* periodCounts READ periodCounts NOTIFY
@@ -32,7 +32,7 @@ class AudioDeviceSettings : public SubscribableModel
 public:
     auto inputDevices() -> StringList* { return &m_inputDevices; }
     auto outputDevices() -> StringList* { return &m_outputDevices; }
-    auto samplerates() -> StringList* { return &m_samplerates; }
+    auto sampleRates() -> StringList* { return &m_sampleRates; }
     auto periodSizes() -> StringList* { return &m_periodSizes; }
     auto periodCounts() -> StringList* { return &m_periodCounts; }
 
@@ -56,7 +56,7 @@ public:
 signals:
     void inputDevicesChanged();
     void outputDevicesChanged();
-    void sampleratesChanged();
+    void sampleRatesChanged();
     void periodSizesChanged();
     void periodCountsChanged();
     void bufferLatencyChanged();
@@ -64,7 +64,7 @@ signals:
 private:
     StringList m_inputDevices;
     StringList m_outputDevices;
-    StringList m_samplerates;
+    StringList m_sampleRates;
     StringList m_periodSizes;
     StringList m_periodCounts;
     double m_bufferLatency{};

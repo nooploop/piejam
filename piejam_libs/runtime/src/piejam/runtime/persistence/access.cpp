@@ -71,7 +71,7 @@ save_app_config(
                 state.output.index != npos
                         ? state.pcm_devices->outputs[state.output.index].name
                         : std::string();
-        conf.samplerate = state.samplerate;
+        conf.sample_rate = state.sample_rate;
         conf.period_size = state.period_size;
         conf.period_count = state.period_count;
 

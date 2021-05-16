@@ -610,11 +610,11 @@ public:
         return m_ports.input.control;
     }
 
-    auto make_processor(samplerate_t samplerate) const
+    auto make_processor(sample_rate_t sample_rate) const
             -> std::unique_ptr<engine::processor> override
     {
         if (LADSPA_Handle handle =
-                    m_ladspa_desc->instantiate(m_ladspa_desc, samplerate))
+                    m_ladspa_desc->instantiate(m_ladspa_desc, sample_rate))
         {
             return std::make_unique<processor>(
                     plugin_instance(*m_ladspa_desc, handle),

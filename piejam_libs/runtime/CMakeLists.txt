@@ -40,7 +40,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_fx_chain_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_period_count.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_period_size.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_samplerate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_sample_rate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_device_bus_name.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_float_parameter_normalized.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_parameter_value.h
@@ -165,7 +165,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_fx_chain_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_period_count.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_period_size.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_samplerate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_sample_rate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_device_bus_name.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_float_parameter_normalized.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_parameter_value.cpp

@@ -16,16 +16,16 @@ namespace piejam::audio::engine
 {
 
 static constexpr auto
-level_meter_decay_time(unsigned const samplerate) -> std::size_t
+level_meter_decay_time(unsigned const sample_rate) -> std::size_t
 {
-    return samplerate / 10;
+    return sample_rate / 10;
 }
 
 level_meter_processor::level_meter_processor(
-        unsigned const samplerate,
+        unsigned const sample_rate,
         std::string_view const& name)
     : engine::named_processor(name)
-    , m_lm(level_meter_decay_time(samplerate))
+    , m_lm(level_meter_decay_time(sample_rate))
 {
 }
 

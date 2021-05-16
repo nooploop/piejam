@@ -10,7 +10,7 @@
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/period_sizes.h>
-#include <piejam/audio/samplerates.h>
+#include <piejam/audio/sample_rates.h>
 #include <piejam/system/device.h>
 
 #include <spdlog/spdlog.h>
@@ -61,8 +61,8 @@ test_interval_value(
         snd_pcm_hw_params const& params,
         unsigned ival_index)
 {
-    return [&fd, &params, ival_index](unsigned samplerate) {
-        return test_interval_value(fd, params, ival_index, samplerate);
+    return [&fd, &params, ival_index](unsigned sample_rate) {
+        return test_interval_value(fd, params, ival_index, sample_rate);
     };
 }
 
@@ -225,7 +225,7 @@ pcm_to_alsa_format(pcm_format pf) -> unsigned
 auto
 get_hw_params(
         pcm_descriptor const& pcm,
-        samplerate_t const* const samplerate,
+        sample_rate_t const* const sample_rate,
         period_size_t const* const period_size) -> pcm_hw_params
 {
     pcm_hw_params result;
@@ -277,16 +277,16 @@ get_hw_params(
     result.num_channels =
             get_interval(hw_params, SNDRV_PCM_HW_PARAM_CHANNELS).max;
 
-    BOOST_ASSERT(result.samplerates.empty());
+    BOOST_ASSERT(result.sample_rates.empty());
     std::ranges::copy_if(
-            preferred_samplerates,
-            std::back_inserter(result.samplerates),
+            preferred_sample_rates,
+            std::back_inserter(result.sample_rates),
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_RATE));
 
-    if (samplerate)
+    if (sample_rate)
     {
-        BOOST_ASSERT(algorithm::contains(result.samplerates, *samplerate));
-        set_interval_value(hw_params, SNDRV_PCM_HW_PARAM_RATE, *samplerate);
+        BOOST_ASSERT(algorithm::contains(result.sample_rates, *sample_rate));
+        set_interval_value(hw_params, SNDRV_PCM_HW_PARAM_RATE, *sample_rate);
     }
 
     BOOST_ASSERT(result.period_sizes.empty());
@@ -341,7 +341,7 @@ set_hw_params(
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_RATE,
-            process_config.samplerate);
+            process_config.sample_rate);
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_PERIOD_SIZE,

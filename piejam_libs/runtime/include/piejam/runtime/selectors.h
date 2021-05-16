@@ -7,7 +7,7 @@
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/period_counts.h>
 #include <piejam/audio/period_sizes.h>
-#include <piejam/audio/samplerates.h>
+#include <piejam/audio/sample_rates.h>
 #include <piejam/audio/types.h>
 #include <piejam/box.h>
 #include <piejam/boxed_string.h>
@@ -33,8 +33,8 @@ namespace piejam::runtime::selectors
 template <class Value>
 using selector = reselect::selector<Value, state>;
 
-using samplerate = std::pair<box<audio::samplerates_t>, audio::samplerate_t>;
-extern const selector<samplerate> select_samplerate;
+using sample_rate = std::pair<box<audio::sample_rates_t>, audio::sample_rate_t>;
+extern const selector<sample_rate> select_sample_rate;
 
 using period_size = std::pair<box<audio::period_sizes_t>, audio::period_size_t>;
 extern const selector<period_size> select_period_size;
