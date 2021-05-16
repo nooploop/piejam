@@ -6,7 +6,6 @@
 
 #include <piejam/algorithm/contains.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
-#include <piejam/functional/overload.h>
 #include <piejam/indexed_access.h>
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/ladspa.h>
@@ -17,6 +16,7 @@
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
 
+#include <boost/hof/match.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 
@@ -177,7 +177,7 @@ apply_parameter_values(
         {
             auto const& fx_param_id = it->second;
             std::visit(
-                    overload{
+                    boost::hof::match(
                             [&params](float_parameter_id id, float v) {
                                 set_parameter_value(params, id, v);
                             },
@@ -187,7 +187,7 @@ apply_parameter_values(
                             [&params](bool_parameter_id id, bool v) {
                                 set_parameter_value(params, id, v);
                             },
-                            [](auto&&, auto&&) { BOOST_ASSERT(false); }},
+                            [](auto&&, auto&&) { BOOST_ASSERT(false); }),
                     fx_param_id,
                     value);
         }

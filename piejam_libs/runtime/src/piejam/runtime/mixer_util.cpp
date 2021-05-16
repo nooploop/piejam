@@ -5,9 +5,10 @@
 #include <piejam/runtime/mixer_util.h>
 
 #include <piejam/entity_id.h>
-#include <piejam/functional/overload.h>
 #include <piejam/runtime/device_io.h>
 #include <piejam/runtime/mixer.h>
+
+#include <boost/hof/match.hpp>
 
 namespace piejam::runtime
 {
@@ -23,11 +24,11 @@ mixer_channel_input_type(
         return audio::bus_type::stereo;
 
     return std::visit(
-            overload{
+            boost::hof::match(
                     [&device_buses](device_io::bus_id const device_bus_id) {
                         return device_buses[device_bus_id].bus_type;
                     },
-                    [](auto&&) { return audio::bus_type::stereo; }},
+                    [](auto&&) { return audio::bus_type::stereo; }),
             bus->in);
 }
 

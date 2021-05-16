@@ -7,7 +7,6 @@
 #include <piejam/app/gui/model/FxGenericModule.h>
 #include <piejam/app/gui/model/FxScope.h>
 #include <piejam/app/gui/model/FxSpectrum.h>
-#include <piejam/functional/overload.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/fx_chain_actions.h>
 #include <piejam/runtime/actions/move_fx_module.h>
@@ -16,6 +15,7 @@
 #include <piejam/runtime/selectors.h>
 
 #include <boost/assert.hpp>
+#include <boost/hof/match.hpp>
 
 namespace piejam::app::gui::model
 {
@@ -36,7 +36,7 @@ makeModuleContent(
         -> std::unique_ptr<piejam::gui::model::FxModuleContent>
 {
     return std::visit(
-            overload{
+            boost::hof::match(
                     [&](runtime::fx::internal fx_type)
                             -> std::unique_ptr<
                                     piejam::gui::model::FxModuleContent> {
@@ -68,7 +68,7 @@ makeModuleContent(
                                 store_dispatch,
                                 state_change_subscriber,
                                 fx_mod_id);
-                    }},
+                    }),
             fx_instance_id);
 }
 

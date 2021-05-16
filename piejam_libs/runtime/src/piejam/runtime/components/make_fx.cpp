@@ -7,7 +7,6 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/entity_id.h>
-#include <piejam/functional/overload.h>
 #include <piejam/runtime/components/fx_gain.h>
 #include <piejam/runtime/components/fx_ladspa.h>
 #include <piejam/runtime/components/fx_scope.h>
@@ -17,6 +16,7 @@
 #include <piejam/runtime/fx/module.h>
 
 #include <boost/assert.hpp>
+#include <boost/hof/match.hpp>
 
 namespace piejam::runtime::components
 {
@@ -67,7 +67,7 @@ make_fx(fx::module const& fx_mod,
         -> std::unique_ptr<audio::engine::component>
 {
     return std::visit(
-            overload{
+            boost::hof::match(
                     [&](fx::internal fx_type)
                             -> std::unique_ptr<audio::engine::component> {
                         return make_internal_fx(
@@ -91,7 +91,7 @@ make_fx(fx::module const& fx_mod,
                     [](fx::unavailable_ladspa_id const&)
                             -> std::unique_ptr<audio::engine::component> {
                         return nullptr;
-                    }},
+                    }),
             fx_mod.fx_instance_id);
 }
 

@@ -10,7 +10,6 @@ target_sources(piejam_functional INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/deref.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/get.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/memo.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/overload.h
 )
 
 target_include_directories(piejam_functional INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

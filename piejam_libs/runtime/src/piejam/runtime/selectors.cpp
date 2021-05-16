@@ -7,7 +7,6 @@
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/boxify_result.h>
 #include <piejam/functional/memo.h>
-#include <piejam/functional/overload.h>
 #include <piejam/npos.h>
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -17,6 +16,7 @@
 #include <piejam/runtime/solo_group.h>
 #include <piejam/runtime/state.h>
 
+#include <boost/hof/match.hpp>
 #include <boost/hof/unpack.hpp>
 
 #include <cassert>
@@ -46,9 +46,9 @@ const selector<period_count> select_period_count(
         });
 
 const selector<float> select_buffer_latency([](state const& st) {
-    return st.sample_rate
-                   ? (st.period_size * st.period_count * 1000.f) / st.sample_rate
-                   : 0.f;
+    return st.sample_rate ? (st.period_size * st.period_count * 1000.f) /
+                                    st.sample_rate
+                          : 0.f;
 });
 
 const selector<input_devices>
@@ -225,7 +225,7 @@ get_mixer_channel_selected_input(
         return selected_route{selected_route::state_t::invalid, s_mix};
 
     return std::visit(
-            overload{
+            boost::hof::match(
                     [](std::nullptr_t) {
                         return selected_route{
                                 .state = selected_route::state_t::valid,
@@ -249,7 +249,7 @@ get_mixer_channel_selected_input(
                         return selected_route{
                                 .state = selected_route::state_t::invalid,
                                 .name = name};
-                    }},
+                    }),
             bus->in);
 }
 
@@ -280,7 +280,7 @@ get_mixer_channel_selected_output(
         return selected_route{selected_route::state_t::invalid, s_none};
 
     return std::visit(
-            overload{
+            boost::hof::match(
                     [](std::nullptr_t) {
                         return selected_route{
                                 .state = selected_route::state_t::valid,
@@ -318,7 +318,7 @@ get_mixer_channel_selected_output(
                         return selected_route{
                                 .state = selected_route::state_t::invalid,
                                 .name = name};
-                    }},
+                    }),
             bus->out);
 }
 

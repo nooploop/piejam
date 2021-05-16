@@ -7,7 +7,6 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/app/gui/model/FxBrowserEntryInternal.h>
 #include <piejam/app/gui/model/FxBrowserEntryLADSPA.h>
-#include <piejam/functional/overload.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/runtime/selectors.h>
 

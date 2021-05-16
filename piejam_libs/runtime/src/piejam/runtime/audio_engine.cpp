@@ -20,7 +20,6 @@
 #include <piejam/audio/engine/stream_processor.h>
 #include <piejam/audio/engine/value_io_processor.h>
 #include <piejam/audio/engine/value_sink_processor.h>
-#include <piejam/functional/overload.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/range/indices.h>
@@ -49,6 +48,7 @@
 
 #include <fmt/format.h>
 
+#include <boost/hof/match.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 
 #include <algorithm>
@@ -343,7 +343,7 @@ connect_mixer_input(
 {
     boost::ignore_unused(channels);
     std::visit(
-            overload{
+            boost::hof::match(
                     [](std::nullptr_t) {},
                     [&](device_io::bus_id const device_bus_id) {
                         device_io::bus const& device_bus =
@@ -376,7 +376,7 @@ connect_mixer_input(
                                 mb_in,
                                 mixer_procs);
                     },
-                    [](boxed_string const&) {}},
+                    [](boxed_string const&) {}),
             bus.in);
 }
 
@@ -393,7 +393,7 @@ connect_mixer_output(
         audio::engine::component& mb_out)
 {
     std::visit(
-            overload{
+            boost::hof::match(
                     [](std::nullptr_t) {},
                     [&](device_io::bus_id const device_bus_id) {
                         device_io::bus const& device_bus =
@@ -455,7 +455,7 @@ connect_mixer_output(
                                     mixer_procs);
                         }
                     },
-                    [](boxed_string const&) {}},
+                    [](boxed_string const&) {}),
             bus.out);
 }
 

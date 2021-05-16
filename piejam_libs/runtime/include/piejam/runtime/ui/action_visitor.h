@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/functional/overload.h>
+#include <boost/hof/match.hpp>
 
 #include <tuple>
 #include <utility>
@@ -102,9 +102,9 @@ template <class IVisitor, class... Fs>
 auto
 make_action_visitor(Fs&&... fs)
 {
-    using F = decltype(overload{std::forward<Fs>(fs)...});
+    using F = decltype(boost::hof::match(std::forward<Fs>(fs)...));
     return detail::to_action_visitor_t<F, IVisitor>(
-            overload{std::forward<Fs>(fs)...});
+            boost::hof::match(std::forward<Fs>(fs)...));
 }
 
 } // namespace piejam::runtime::ui

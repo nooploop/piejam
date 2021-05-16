@@ -7,7 +7,8 @@
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/functional/overload.h>
+
+#include <boost/hof/match.hpp>
 
 #include <algorithm>
 #include <span>
@@ -35,13 +36,13 @@ level_meter_processor::process(engine::process_context const& ctx)
     verify_process_context(*this, ctx);
 
     std::visit(
-            overload{
+            boost::hof::match(
                     [this, bs = ctx.buffer_size](float const c) {
                         std::fill_n(std::back_inserter(m_lm), bs, c);
                     },
                     [this](std::span<float const> const& buffer) {
                         std::ranges::copy(buffer, std::back_inserter(m_lm));
-                    }},
+                    }),
             ctx.inputs[0].get().as_variant());
 
     ctx.event_outputs.get<float>(0).insert(0, m_lm.get());

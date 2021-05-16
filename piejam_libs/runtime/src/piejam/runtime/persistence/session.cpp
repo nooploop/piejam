@@ -4,7 +4,6 @@
 
 #include <piejam/runtime/persistence/session.h>
 
-#include <piejam/functional/overload.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/persistence/midi_assignment.h>
@@ -12,6 +11,7 @@
 #include <nlohmann/json.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/hof/match.hpp>
 
 #include <fstream>
 
@@ -79,13 +79,13 @@ void
 to_json(nlohmann::json& j, session::fx_plugin const& fx_plug)
 {
     std::visit(
-            overload{
+            boost::hof::match(
                     [&j](session::internal_fx const& fx) {
                         j = {{s_key_internal, fx}};
                     },
                     [&j](session::ladspa_plugin const& ladspa_plug) {
                         j = {{s_key_ladspa, ladspa_plug}};
-                    }},
+                    }),
             fx_plug.as_variant());
 }
 

@@ -6,7 +6,6 @@
 
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/entity_id_hash.h>
-#include <piejam/functional/overload.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
@@ -19,6 +18,7 @@
 #include <spdlog/spdlog.h>
 
 #include <boost/assert.hpp>
+#include <boost/hof/match.hpp>
 
 #include <algorithm>
 #include <filesystem>
@@ -257,7 +257,7 @@ static auto
 export_mixer_io(state const& st, mixer::io_address_t const& addr)
 {
     return std::visit(
-            overload{
+            boost::hof::match(
                     [](std::nullptr_t) {
                         return session::mixer_io{
                                 .type = session::mixer_io_type::default_,
@@ -281,7 +281,7 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,
                                 .name = name};
-                    }},
+                    }),
             addr);
 }
 

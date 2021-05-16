@@ -7,11 +7,11 @@
 #include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/period_sizes.h>
-#include <piejam/functional/overload.h>
 #include <piejam/range/iota.h>
 #include <piejam/range/stride_iterator.h>
 
 #include <boost/assert.hpp>
+#include <boost/hof/match.hpp>
 
 namespace piejam::audio::engine
 {
@@ -41,7 +41,7 @@ void
 stream_processor::stream_1(process_context const& ctx)
 {
     std::visit(
-            overload{
+            boost::hof::match(
                     [this,
                      buffer_size = ctx.buffer_size](float const constant) {
                         std::ranges::fill_n(
@@ -54,7 +54,7 @@ stream_processor::stream_1(process_context const& ctx)
                     },
                     [this](std::span<float const> const& buffer) {
                         m_buffer.write(buffer);
-                    }},
+                    }),
             ctx.inputs[0].get().as_variant());
 }
 
@@ -76,7 +76,7 @@ stream_processor::stream_n(process_context const& ctx)
         auto const& in = ctx.inputs[ch];
 
         std::visit(
-                overload{
+                boost::hof::match(
                         [this, ch, buffer_size = ctx.buffer_size](
                                 float const constant) {
                             std::ranges::fill_n(
@@ -92,7 +92,7 @@ stream_processor::stream_n(process_context const& ctx)
                                     range::stride_iterator(
                                             m_interleave_buffer.data() + ch,
                                             m_num_channels));
-                        }},
+                        }),
                 in.get().as_variant());
     }
 
