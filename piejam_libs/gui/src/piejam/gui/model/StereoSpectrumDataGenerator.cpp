@@ -23,7 +23,7 @@ namespace piejam::gui::model
 namespace
 {
 
-constexpr std::size_t s_dft_size{1024};
+constexpr std::size_t s_dft_size{2048};
 numeric::dft s_dft{s_dft_size};
 
 struct InactiveGenerator
@@ -39,11 +39,11 @@ template <StereoChannel SC>
 class Generator
 {
 public:
-    Generator(unsigned const m_sampleRate)
-        : m_sampleRate(static_cast<float>(m_sampleRate))
+    Generator(unsigned const sampleRate)
+        : m_sampleRate(static_cast<float>(sampleRate))
         , m_window(algorithm::transform_to_vector(
                   range::iota(s_dft_size),
-                  &numeric::window::hamming<s_dft_size>))
+                  &numeric::window::hann<s_dft_size>))
     {
         for (std::size_t const i : range::iota(s_dft.output_size()))
             m_dataPoints[i].frequency_Hz = i * m_binSize;
@@ -86,7 +86,7 @@ public:
         {
             m_dataPoints[i].level_linear = envelope(
                     m_dataPoints[i].level_linear,
-                    std::abs(spectrum[i]) * 2.f / s_dft_size);
+                    std::abs(spectrum[i]) * (2.f / s_dft_size));
             m_dataPoints[i].level_dB =
                     math::linear_to_dB(m_dataPoints[i].level_linear);
         }

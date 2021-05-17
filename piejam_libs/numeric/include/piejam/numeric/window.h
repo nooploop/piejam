@@ -25,4 +25,19 @@ hamming(std::size_t const n) noexcept -> float
     return hamming(n, Size);
 }
 
+constexpr auto
+hann(std::size_t const n, std::size_t const size) noexcept -> float
+{
+    constexpr float const two_pi = 2.f * std::numbers::pi_v<float>;
+    float const two_pi_div_size_minus_1 = two_pi / (size - 1);
+    return 0.5f - 0.5f * std::cos(two_pi_div_size_minus_1 * n);
+}
+
+template <std::size_t Size>
+constexpr auto
+hann(std::size_t const n) noexcept -> float
+{
+    return hann(n, Size);
+}
+
 } // namespace piejam::numeric::window
