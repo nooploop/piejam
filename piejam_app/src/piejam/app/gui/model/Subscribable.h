@@ -9,6 +9,13 @@
 #include <piejam/runtime/store_dispatch.h>
 #include <piejam/runtime/subscriber.h>
 
+#include <QTimerEvent>
+
+#include <boost/assert.hpp>
+#include <boost/core/ignore_unused.hpp>
+
+#include <functional>
+
 namespace piejam::app::gui::model
 {
 
@@ -53,18 +60,45 @@ protected:
                 std::forward<Handler>(h));
     }
 
+    template <class F>
+    void requestUpdates(std::chrono::milliseconds t, F&& f)
+    {
+        BOOST_ASSERT(!m_updateTimerId);
+        m_requestUpdate = std::forward<F>(f);
+        m_updateTimerId = Model::startTimer(t);
+    }
+
     virtual void onSubscribe() {}
 
 private:
     void subscribe() override { onSubscribe(); }
-    void unsubscribe() override { m_subs.erase(m_subs_id); }
+    void unsubscribe() override
+    {
+        m_subs.erase(m_subs_id);
+
+        if (m_updateTimerId)
+        {
+            Model::killTimer(m_updateTimerId);
+            m_updateTimerId = 0;
+        }
+    }
+
+    void timerEvent(QTimerEvent* const event) override final
+    {
+        BOOST_ASSERT(event->timerId() == m_updateTimerId);
+        BOOST_ASSERT(m_requestUpdate);
+        boost::ignore_unused(event);
+        m_requestUpdate();
+    }
 
     runtime::store_dispatch m_store_dispatch;
     runtime::subscriber& m_state_change_subscriber;
     runtime::subscriptions_manager m_subs;
-    bool m_subscribed{};
     runtime::subscription_id const m_subs_id{
             runtime::subscription_id::generate()};
+
+    int m_updateTimerId{};
+    std::function<void()> m_requestUpdate;
 };
 
 } // namespace piejam::app::gui::model

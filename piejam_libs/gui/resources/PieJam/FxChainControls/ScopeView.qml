@@ -99,10 +99,11 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    Timer {
-        interval: 16
-        running: visible && root.content
-        repeat: true
-        onTriggered: root.content.requestUpdate()
+    Binding {
+        when: root.content
+        target: root.content
+        property: "subscribed"
+        value: root.visible
+        restoreMode: Binding.RestoreBinding
     }
 }

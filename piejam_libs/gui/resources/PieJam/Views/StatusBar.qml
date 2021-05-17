@@ -172,13 +172,6 @@ Item {
         }
     }
 
-    Timer {
-        interval: 40
-        running: root.visible
-        repeat: true
-        onTriggered: root.model.requestUpdate()
-    }
-
     Binding {
         when: root.model
         target: root.model

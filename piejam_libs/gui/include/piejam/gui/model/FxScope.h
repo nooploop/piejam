@@ -108,8 +108,6 @@ public:
 
     auto dataB() noexcept -> ScopeLinesObject* { return &m_linesB; }
 
-    Q_INVOKABLE virtual void requestUpdate() = 0;
-
     Q_INVOKABLE void clear()
     {
         m_linesA.get().clear();

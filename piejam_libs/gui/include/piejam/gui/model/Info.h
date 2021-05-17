@@ -95,8 +95,6 @@ public:
 
     auto logMessage() const -> QString { return m_logMessage; }
 
-    virtual Q_INVOKABLE void requestUpdate() = 0;
-
 signals:
 
     void audioLoadChanged();

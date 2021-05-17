@@ -22,8 +22,6 @@ public:
             runtime::fx::module_id);
     ~FxSpectrum();
 
-    void requestUpdate() override;
-
 private:
     void onSubscribe() override;
 

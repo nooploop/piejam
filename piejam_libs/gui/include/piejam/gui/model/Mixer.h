@@ -37,7 +37,6 @@ signals:
 
 private:
     MixerChannelsList m_inputChannels;
-    MixerChannelsList m_outputChannels;
 };
 
 } // namespace piejam::gui::model

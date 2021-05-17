@@ -21,8 +21,6 @@ public:
             runtime::fx::module_id);
     ~FxScope();
 
-    void requestUpdate() override;
-
 private:
     void onSubscribe() override;
 

@@ -76,8 +76,6 @@ public:
 
     auto dataB() noexcept -> SpectrumData* { return &m_spectrumDataB; }
 
-    Q_INVOKABLE virtual void requestUpdate() = 0;
-
     Q_INVOKABLE void clear()
     {
         m_spectrumDataA.clear();

@@ -104,12 +104,11 @@ FxSpectrum::onSubscribe()
         m_impl->dataGeneratorA.setSampleRate(srs.second);
         m_impl->dataGeneratorB.setSampleRate(srs.second);
     });
-}
 
-void
-FxSpectrum::requestUpdate()
-{
-    m_impl->streamA->requestUpdate();
+    requestUpdates(std::chrono::milliseconds{16}, [this]() {
+        m_impl->streamA->requestUpdate();
+        // no need to update streamB, since it points to same stream as streamA
+    });
 }
 
 } // namespace piejam::app::gui::model

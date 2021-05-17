@@ -43,12 +43,10 @@ Info::onSubscribe()
 
     observe(runtime::selectors::select_midi_learning,
             [this](bool const midi_learning) { setMidiLearn(midi_learning); });
-}
 
-void
-Info::requestUpdate()
-{
-    dispatch(runtime::actions::request_info_update{});
+    requestUpdates(std::chrono::milliseconds{40}, [this]() {
+        dispatch(runtime::actions::request_info_update{});
+    });
 }
 
 } // namespace piejam::app::gui::model

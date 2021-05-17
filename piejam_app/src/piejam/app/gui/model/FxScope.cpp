@@ -107,12 +107,9 @@ FxScope::~FxScope() = default;
 void
 FxScope::onSubscribe()
 {
-}
-
-void
-FxScope::requestUpdate()
-{
-    m_impl->streamA->requestUpdate();
+    requestUpdates(std::chrono::milliseconds{16}, [this]() {
+        m_impl->streamA->requestUpdate();
+    });
 }
 
 } // namespace piejam::app::gui::model

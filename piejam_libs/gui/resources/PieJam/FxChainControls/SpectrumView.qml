@@ -43,7 +43,7 @@ Item {
             x: spectrum.width - implicitWidth - 4
             y: modelData.position
 
-            font.pointSize: 7
+            font.pointSize: 6
 
             text: modelData.value + " dB"
         }
@@ -56,7 +56,7 @@ Item {
             x: modelData.position + 2
             y: spectrum.height - implicitHeight
 
-            font.pointSize: 7
+            font.pointSize: 6
 
             text: modelData.value >= 1000 ? (modelData.value / 1000) + " kHz" : modelData.value + " Hz"
         }
@@ -94,10 +94,11 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    Timer {
-        interval: 16
-        running: visible && root.content
-        repeat: true
-        onTriggered: root.content.requestUpdate()
+    Binding {
+        when: root.content
+        target: root.content
+        property: "subscribed"
+        value: root.visible
+        restoreMode: Binding.RestoreBinding
     }
 }
