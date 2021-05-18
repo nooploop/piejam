@@ -29,6 +29,7 @@ More [documentation](https://piejam.readthedocs.io/en/stable/)
 ![Usage example](doc/images/usage.png "Usage example")
 
 ## ChangeLog
+* v0.6.0 - New modules: Oscilloscope and Spectrum Analyzer
 * v0.5.0 - MIDI CC parameter control. Flexible routing.
 * v0.4.0 - Fx chain and LADSPA fx plugins support.
 * v0.3.0 - Mute and solo. Modular audio engine.
