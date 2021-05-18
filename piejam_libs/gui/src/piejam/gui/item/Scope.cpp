@@ -173,17 +173,18 @@ Scope::setLinesA(model::ScopeLinesObject* x)
 
         if (m_impl->linesA)
         {
-            m_impl->linesAChangedConnection =
-                    connect(m_impl->linesA,
-                            &model::ScopeLinesObject::changed,
-                            [this]() {
-                                m_impl->linesADirty = true;
-                                update();
-                            });
+            m_impl->linesAChangedConnection = QObject::connect(
+                    m_impl->linesA,
+                    &model::ScopeLinesObject::changed,
+                    this,
+                    [this]() {
+                        m_impl->linesADirty = true;
+                        update();
+                    });
         }
         else
         {
-            m_impl->linesAChangedConnection = {};
+            QObject::disconnect(m_impl->linesAChangedConnection);
         }
 
         m_impl->linesADirty = true;
@@ -207,17 +208,18 @@ Scope::setLinesB(model::ScopeLinesObject* x)
 
         if (m_impl->linesB)
         {
-            m_impl->linesBChangedConnection =
-                    connect(m_impl->linesB,
-                            &model::ScopeLinesObject::changed,
-                            [this]() {
-                                m_impl->linesBDirty = true;
-                                update();
-                            });
+            m_impl->linesBChangedConnection = QObject::connect(
+                    m_impl->linesB,
+                    &model::ScopeLinesObject::changed,
+                    this,
+                    [this]() {
+                        m_impl->linesBDirty = true;
+                        update();
+                    });
         }
         else
         {
-            m_impl->linesBChangedConnection = {};
+            QObject::disconnect(m_impl->linesBChangedConnection);
         }
 
         m_impl->linesBDirty = true;

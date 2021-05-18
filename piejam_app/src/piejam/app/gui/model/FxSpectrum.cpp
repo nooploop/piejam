@@ -56,6 +56,7 @@ FxSpectrum::FxSpectrum(
     QObject::connect(
             &m_impl->dataGeneratorA,
             &piejam::gui::model::StereoSpectrumDataGenerator::generated,
+            this,
             [this](piejam::gui::model::SpectrumDataPoints const& dataPoints) {
                 dataA()->set(dataPoints);
             });
@@ -74,23 +75,24 @@ FxSpectrum::FxSpectrum(
     QObject::connect(
             &m_impl->dataGeneratorB,
             &piejam::gui::model::StereoSpectrumDataGenerator::generated,
+            this,
             [this](piejam::gui::model::SpectrumDataPoints const& dataPoints) {
                 dataB()->set(dataPoints);
             });
 
-    QObject::connect(this, &FxSpectrum::activeAChanged, [this]() {
+    QObject::connect(this, &FxSpectrum::activeAChanged, this, [this]() {
         m_impl->dataGeneratorA.setActive(activeA());
     });
 
-    QObject::connect(this, &FxSpectrum::channelAChanged, [this]() {
+    QObject::connect(this, &FxSpectrum::channelAChanged, this, [this]() {
         m_impl->dataGeneratorA.setChannel(channelA());
     });
 
-    QObject::connect(this, &FxSpectrum::activeBChanged, [this]() {
+    QObject::connect(this, &FxSpectrum::activeBChanged, this, [this]() {
         m_impl->dataGeneratorB.setActive(activeB());
     });
 
-    QObject::connect(this, &FxSpectrum::channelBChanged, [this]() {
+    QObject::connect(this, &FxSpectrum::channelBChanged, this, [this]() {
         m_impl->dataGeneratorB.setChannel(channelB());
     });
 }

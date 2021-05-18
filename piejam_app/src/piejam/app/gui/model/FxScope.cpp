@@ -56,6 +56,7 @@ FxScope::FxScope(
     QObject::connect(
             &m_impl->accumulatorA,
             &piejam::gui::model::ScopeLinesGenerator::generated,
+            this,
             [this](piejam::gui::model::ScopeLines const& addedLines) {
                 dataA()->get().shift_push_back(addedLines);
                 dataA()->update();
@@ -75,28 +76,29 @@ FxScope::FxScope(
     QObject::connect(
             &m_impl->accumulatorB,
             &piejam::gui::model::ScopeLinesGenerator::generated,
+            this,
             [this](piejam::gui::model::ScopeLines const& addedLines) {
                 dataB()->get().shift_push_back(addedLines);
                 dataB()->update();
             });
 
-    QObject::connect(this, &FxScope::activeAChanged, [this]() {
+    QObject::connect(this, &FxScope::activeAChanged, this, [this]() {
         m_impl->accumulatorA.setActive(activeA());
     });
 
-    QObject::connect(this, &FxScope::channelAChanged, [this]() {
+    QObject::connect(this, &FxScope::channelAChanged, this, [this]() {
         m_impl->accumulatorA.setChannel(channelA());
     });
 
-    QObject::connect(this, &FxScope::activeBChanged, [this]() {
+    QObject::connect(this, &FxScope::activeBChanged, this, [this]() {
         m_impl->accumulatorB.setActive(activeB());
     });
 
-    QObject::connect(this, &FxScope::channelBChanged, [this]() {
+    QObject::connect(this, &FxScope::channelBChanged, this, [this]() {
         m_impl->accumulatorB.setChannel(channelB());
     });
 
-    QObject::connect(this, &FxScope::samplesPerLineChanged, [this]() {
+    QObject::connect(this, &FxScope::samplesPerLineChanged, this, [this]() {
         m_impl->accumulatorA.setSamplesPerLine(samplesPerLine());
         m_impl->accumulatorB.setSamplesPerLine(samplesPerLine());
     });

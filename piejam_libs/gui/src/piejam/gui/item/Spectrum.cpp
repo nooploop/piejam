@@ -208,6 +208,7 @@ Spectrum::setSpectrumAData(model::SpectrumData* const x)
             m_impl->spectrumDataAChangedConnection = QObject::connect(
                     m_impl->spectrumDataA,
                     &piejam::gui::model::SpectrumData::changed,
+                    this,
                     [this]() {
                         m_impl->spectrumA = m_impl->calcSpectrum(
                                 m_impl->spectrumDataA->get(),
@@ -218,7 +219,7 @@ Spectrum::setSpectrumAData(model::SpectrumData* const x)
         }
         else
         {
-            m_impl->spectrumDataAChangedConnection = {};
+            QObject::disconnect(m_impl->spectrumDataAChangedConnection);
         }
 
         m_impl->spectrumA.clear();
@@ -246,6 +247,7 @@ Spectrum::setSpectrumBData(model::SpectrumData* const x)
             m_impl->spectrumDataBChangedConnection = QObject::connect(
                     m_impl->spectrumDataB,
                     &piejam::gui::model::SpectrumData::changed,
+                    this,
                     [this]() {
                         m_impl->spectrumB = m_impl->calcSpectrum(
                                 m_impl->spectrumDataB->get(),
@@ -256,7 +258,7 @@ Spectrum::setSpectrumBData(model::SpectrumData* const x)
         }
         else
         {
-            m_impl->spectrumDataBChangedConnection = {};
+            QObject::disconnect(m_impl->spectrumDataBChangedConnection);
         }
 
         m_impl->spectrumB.clear();
