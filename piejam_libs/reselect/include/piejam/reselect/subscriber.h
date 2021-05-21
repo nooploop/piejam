@@ -40,11 +40,11 @@ public:
         auto last = std::make_shared<Value>(sel.get(m_get_state()));
         std::invoke(std::forward<Handler>(handler), *last);
         auto token = std::make_shared<subscription::token>();
-        return subscription{
-                .m_conn = m_observer.connect([sel = std::move(sel),
-                                              handler,
-                                              token = std::weak_ptr(token),
-                                              last](State const& st) mutable {
+        return subscription(
+                m_observer.connect([sel = std::move(sel),
+                                    handler,
+                                    token = std::weak_ptr(token),
+                                    last](State const& st) mutable {
                     auto alive = token.lock();
                     if (!alive)
                         return;
@@ -56,7 +56,7 @@ public:
                         *last = current;
                     }
                 }),
-                .token = token};
+                token);
     }
 
     void notify(State const& st) { m_observer(st); }

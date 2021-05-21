@@ -6,6 +6,7 @@
 
 #include <piejam/audio/engine/event_buffer.h>
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <typeindex>

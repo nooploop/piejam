@@ -11,6 +11,7 @@
 
 #include <fmt/format.h>
 
+#include <ranges>
 #include <vector>
 
 namespace piejam::runtime::processors

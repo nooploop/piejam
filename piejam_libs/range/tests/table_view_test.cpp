@@ -188,7 +188,7 @@ TEST(table_view_as_const, data_stays_same)
 
 TEST(table_view_as_const, types_converts_to_const)
 {
-    table_view<float> tv;
+    table_view<float> tv{};
     auto ctv = as_const(tv);
     static_assert(std::is_same_v<table_view<float const>, decltype(ctv)>);
 
