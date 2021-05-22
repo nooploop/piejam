@@ -12,6 +12,7 @@ import "../Controls"
 Item {
     id: root
 
+    property alias record: recordButton.checked
     property alias solo: soloButton.checked
     property alias mute: muteButton.checked
 

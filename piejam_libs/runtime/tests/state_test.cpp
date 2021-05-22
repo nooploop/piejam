@@ -62,7 +62,8 @@ TEST_F(state_with_one_mixer_input,
 {
     ASSERT_EQ(1u, sut.mixer_state.inputs->size());
     ASSERT_EQ(2u, size<float_parameter>(sut.params));
-    ASSERT_EQ(2u, size<bool_parameter>(sut.params));
+    ASSERT_EQ(3u, size<bool_parameter>(sut.params));
+    ASSERT_EQ(0u, size<int_parameter>(sut.params));
     ASSERT_EQ(1u, size<stereo_level_parameter>(sut.params));
 
     remove_mixer_channel(sut, bus_id);

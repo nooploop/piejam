@@ -122,6 +122,17 @@ make_mixer_channel_pan_balance_parameter_selector(
 }
 
 auto
+make_mixer_channel_record_parameter_selector(mixer::channel_id const channel_id)
+        -> selector<bool_parameter_id>
+{
+    return [channel_id](state const& st) {
+        mixer::channel const* const channel =
+                st.mixer_state.channels.find(channel_id);
+        return channel ? channel->record : bool_parameter_id{};
+    };
+}
+
+auto
 make_mixer_channel_mute_parameter_selector(mixer::channel_id const channel_id)
         -> selector<bool_parameter_id>
 {

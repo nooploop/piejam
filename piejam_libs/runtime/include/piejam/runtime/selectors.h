@@ -66,6 +66,8 @@ auto make_mixer_channel_volume_parameter_selector(mixer::channel_id)
         -> selector<float_parameter_id>;
 auto make_mixer_channel_pan_balance_parameter_selector(mixer::channel_id)
         -> selector<float_parameter_id>;
+auto make_mixer_channel_record_parameter_selector(mixer::channel_id)
+        -> selector<bool_parameter_id>;
 auto make_mixer_channel_mute_parameter_selector(mixer::channel_id)
         -> selector<bool_parameter_id>;
 auto make_mixer_channel_solo_parameter_selector(mixer::channel_id)

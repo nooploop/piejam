@@ -96,6 +96,7 @@ Item {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
+            record: root.model ? root.model.record : false
             mute: root.model ? root.model.mute : false
             solo: root.model ? root.model.solo : false
 

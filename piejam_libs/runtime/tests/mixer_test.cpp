@@ -43,6 +43,7 @@ TEST(mixer_valid_io, test2)
             channel{.in = bus1,
                     .volume = {},
                     .pan_balance = {},
+                    .record = {},
                     .mute = {},
                     .solo = {},
                     .level = {}});

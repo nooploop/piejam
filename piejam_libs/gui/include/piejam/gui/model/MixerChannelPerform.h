@@ -20,6 +20,7 @@ class MixerChannelPerform : public SubscribableModel
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
     Q_PROPERTY(double panBalance READ panBalance NOTIFY panBalanceChanged FINAL)
+    Q_PROPERTY(bool record READ record NOTIFY recordChanged FINAL)
     Q_PROPERTY(bool mute READ mute NOTIFY muteChanged FINAL)
     Q_PROPERTY(bool solo READ solo NOTIFY soloChanged FINAL)
     Q_PROPERTY(
@@ -98,6 +99,18 @@ public:
 
     Q_INVOKABLE virtual void changePanBalance(double) = 0;
 
+    auto record() const noexcept -> bool { return m_record; }
+    void setRecord(bool x)
+    {
+        if (m_record != x)
+        {
+            m_record = x;
+            emit recordChanged();
+        }
+    }
+
+    Q_INVOKABLE virtual void changeRecord(bool) = 0;
+
     auto mute() const noexcept -> bool { return m_mute; }
     void setMute(bool const x)
     {
@@ -147,6 +160,7 @@ signals:
     void levelLeftChanged();
     void levelRightChanged();
     void panBalanceChanged();
+    void recordChanged();
     void muteChanged();
     void soloChanged();
     void mutedBySoloChanged();
@@ -158,6 +172,7 @@ private:
     double m_levelLeft{};
     double m_levelRight{};
     double m_panBalance{};
+    bool m_record{};
     bool m_mute{};
     bool m_solo{};
     bool m_mutedBySolo{};

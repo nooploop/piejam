@@ -22,6 +22,7 @@ struct MixerChannelPerform::Impl
     runtime::mixer::channel_id busId;
     runtime::float_parameter_id volume;
     runtime::float_parameter_id panBalance;
+    runtime::bool_parameter_id record;
     runtime::bool_parameter_id mute;
     runtime::bool_parameter_id solo;
     runtime::stereo_level_parameter_id level;
@@ -46,6 +47,9 @@ MixerChannelPerform::MixerChannelPerform(
                       runtime::selectors::
                               make_mixer_channel_pan_balance_parameter_selector(
                                       id)),
+              observe_once(
+                      runtime::selectors::
+                              make_mixer_channel_record_parameter_selector(id)),
               observe_once(
                       runtime::selectors::
                               make_mixer_channel_mute_parameter_selector(id)),
@@ -116,6 +120,10 @@ MixerChannelPerform::onSubscribe()
             [this](float x) { setPanBalance(x); });
 
     observe(runtime::selectors::make_bool_parameter_value_selector(
+                    m_impl->record),
+            [this](bool x) { setRecord(x); });
+
+    observe(runtime::selectors::make_bool_parameter_value_selector(
                     m_impl->mute),
             [this](bool x) { setMute(x); });
 
@@ -147,6 +155,12 @@ MixerChannelPerform::changePanBalance(double value)
     dispatch(runtime::actions::set_float_parameter(
             m_impl->panBalance,
             static_cast<float>(value)));
+}
+
+void
+MixerChannelPerform::changeRecord(bool value)
+{
+    dispatch(runtime::actions::set_bool_parameter(m_impl->record, value));
 }
 
 void

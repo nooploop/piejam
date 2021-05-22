@@ -31,6 +31,7 @@ struct channel
 
     float_parameter_id volume;
     float_parameter_id pan_balance;
+    bool_parameter_id record;
     bool_parameter_id mute;
     bool_parameter_id solo;
     stereo_level_parameter_id level;

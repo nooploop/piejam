@@ -30,6 +30,7 @@ public:
 
     void changeVolume(double) override;
     void changePanBalance(double) override;
+    void changeRecord(bool) override;
     void changeMute(bool) override;
     void changeSolo(bool) override;
     void focusFxChain() override;

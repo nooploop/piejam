@@ -83,6 +83,10 @@ make_initial_state() -> state
     st.mixer_state.channels.update(
             st.mixer_state.main,
             [](mixer::channel& bus) { bus.out = nullptr; });
+    set_parameter_value(
+            st.params,
+            st.mixer_state.channels[st.mixer_state.main].record,
+            true);
     return st;
 }
 
@@ -480,6 +484,9 @@ add_mixer_channel(state& st, std::string name) -> mixer::channel_id
                             .to_normalized = &parameter::to_normalized_linear,
                             .from_normalized =
                                     &parameter::from_normalized_linear}),
+            .record = add_parameter(
+                    st.params,
+                    parameter::bool_{.default_value = false}),
             .mute = add_parameter(
                     st.params,
                     parameter::bool_{.default_value = false}),
@@ -501,6 +508,7 @@ remove_mixer_channel(state& st, mixer::channel_id const channel_id)
 
     remove_parameter(st, bus.volume);
     remove_parameter(st, bus.pan_balance);
+    remove_parameter(st, bus.record);
     remove_parameter(st, bus.mute);
     remove_parameter(st, bus.solo);
     remove_parameter(st, bus.level);
