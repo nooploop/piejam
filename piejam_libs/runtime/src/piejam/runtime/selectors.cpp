@@ -93,43 +93,66 @@ make_device_bus_list_selector(io_direction const bd)
     }
 }
 
-static auto
-make_channel_info(
-        mixer::channels_t const& channels,
-        mixer::channel_id const channel_id) -> mixer_channel_info
+const selector<boxed_vector<mixer::channel_id>> select_mixer_input_channels(
+        [](state const& st) { return st.mixer_state.inputs; });
+
+const selector<mixer::channel_id> select_mixer_main_channel(
+        [](state const& st) { return st.mixer_state.main; });
+
+auto
+make_mixer_channel_volume_parameter_selector(mixer::channel_id const channel_id)
+        -> selector<float_parameter_id>
 {
-    mixer::channel const& bus = channels[channel_id];
-    return mixer_channel_info{
-            .channel_id = channel_id,
-            .volume = bus.volume,
-            .pan_balance = bus.pan_balance,
-            .mute = bus.mute,
-            .solo = bus.solo,
-            .level = bus.level};
+    return [channel_id](state const& st) {
+        mixer::channel const* const channel =
+                st.mixer_state.channels.find(channel_id);
+        return channel ? channel->volume : float_parameter_id{};
+    };
 }
 
-static auto
-make_channel_infos(
-        mixer::channels_t const& channels,
-        box<mixer::channel_ids_t> const& channel_ids)
-        -> boxed_vector<mixer_channel_info>
+auto
+make_mixer_channel_pan_balance_parameter_selector(
+        mixer::channel_id const channel_id) -> selector<float_parameter_id>
 {
-    return algorithm::transform_to_vector(
-            *channel_ids,
-            [&channels](auto&& bus_id) {
-                return make_channel_info(channels, bus_id);
-            });
+    return [channel_id](state const& st) {
+        mixer::channel const* const channel =
+                st.mixer_state.channels.find(channel_id);
+        return channel ? channel->pan_balance : float_parameter_id{};
+    };
 }
 
-const selector<boxed_vector<mixer_channel_info>> select_mixer_channel_infos(
-        [get_infos = memo(&make_channel_infos)](state const& st) {
-            return get_infos(st.mixer_state.channels, st.mixer_state.inputs);
-        });
+auto
+make_mixer_channel_mute_parameter_selector(mixer::channel_id const channel_id)
+        -> selector<bool_parameter_id>
+{
+    return [channel_id](state const& st) {
+        mixer::channel const* const channel =
+                st.mixer_state.channels.find(channel_id);
+        return channel ? channel->mute : bool_parameter_id{};
+    };
+}
 
-const selector<box<mixer_channel_info>> select_mixer_main_channel_info(
-        [get = memo(boxify_result(&make_channel_info))](state const& st) {
-            return get(st.mixer_state.channels, st.mixer_state.main);
-        });
+auto
+make_mixer_channel_solo_parameter_selector(mixer::channel_id const channel_id)
+        -> selector<bool_parameter_id>
+{
+    return [channel_id](state const& st) {
+        mixer::channel const* const channel =
+                st.mixer_state.channels.find(channel_id);
+        return channel ? channel->solo : bool_parameter_id{};
+    };
+}
+
+auto
+make_mixer_channel_level_parameter_selector(mixer::channel_id const channel_id)
+        -> selector<stereo_level_parameter_id>
+{
+    return [channel_id](state const& st) {
+        mixer::channel const* const channel =
+                st.mixer_state.channels.find(channel_id);
+        return channel ? channel->level : stereo_level_parameter_id{};
+    };
+}
 
 static auto
 make_mixer_device_routes(

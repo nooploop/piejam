@@ -19,23 +19,13 @@ struct MixerChannel::Impl
 MixerChannel::MixerChannel(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::mixer::channel_id const id,
-        runtime::float_parameter_id const volume,
-        runtime::float_parameter_id const pan_balance,
-        runtime::bool_parameter_id const mute,
-        runtime::bool_parameter_id const solo,
-        runtime::stereo_level_parameter_id const level)
+        runtime::mixer::channel_id const id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
               std::make_unique<MixerChannelPerform>(
                       store_dispatch,
                       state_change_subscriber,
-                      id,
-                      volume,
-                      pan_balance,
-                      mute,
-                      solo,
-                      level),
+                      id),
               std::make_unique<MixerChannelEdit>(
                       store_dispatch,
                       state_change_subscriber,

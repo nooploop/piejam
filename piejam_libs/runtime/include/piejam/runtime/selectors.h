@@ -58,22 +58,20 @@ auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 auto make_device_bus_list_selector(io_direction)
         -> selector<box<device_io::bus_list_t>>;
 
-struct mixer_channel_info
-{
-    mixer::channel_id channel_id;
-    float_parameter_id volume;
-    float_parameter_id pan_balance;
-    bool_parameter_id mute;
-    bool_parameter_id solo;
-    stereo_level_parameter_id level;
+extern const selector<boxed_vector<mixer::channel_id>>
+        select_mixer_input_channels;
+extern const selector<mixer::channel_id> select_mixer_main_channel;
 
-    constexpr bool
-    operator==(mixer_channel_info const&) const noexcept = default;
-};
-
-extern const selector<boxed_vector<mixer_channel_info>>
-        select_mixer_channel_infos;
-extern const selector<box<mixer_channel_info>> select_mixer_main_channel_info;
+auto make_mixer_channel_volume_parameter_selector(mixer::channel_id)
+        -> selector<float_parameter_id>;
+auto make_mixer_channel_pan_balance_parameter_selector(mixer::channel_id)
+        -> selector<float_parameter_id>;
+auto make_mixer_channel_mute_parameter_selector(mixer::channel_id)
+        -> selector<bool_parameter_id>;
+auto make_mixer_channel_solo_parameter_selector(mixer::channel_id)
+        -> selector<bool_parameter_id>;
+auto make_mixer_channel_level_parameter_selector(mixer::channel_id)
+        -> selector<stereo_level_parameter_id>;
 
 struct mixer_device_route
 {

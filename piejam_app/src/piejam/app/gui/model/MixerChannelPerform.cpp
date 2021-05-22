@@ -35,36 +35,54 @@ struct MixerChannelPerform::Impl
 MixerChannelPerform::MixerChannelPerform(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::mixer::channel_id const id,
-        runtime::float_parameter_id const volume,
-        runtime::float_parameter_id const panBalance,
-        runtime::bool_parameter_id const mute,
-        runtime::bool_parameter_id const solo,
-        runtime::stereo_level_parameter_id const level)
+        runtime::mixer::channel_id const id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
               id,
-              volume,
-              panBalance,
-              mute,
-              solo,
-              level,
+              observe_once(
+                      runtime::selectors::
+                              make_mixer_channel_volume_parameter_selector(id)),
+              observe_once(
+                      runtime::selectors::
+                              make_mixer_channel_pan_balance_parameter_selector(
+                                      id)),
+              observe_once(
+                      runtime::selectors::
+                              make_mixer_channel_mute_parameter_selector(id)),
+              observe_once(
+                      runtime::selectors::
+                              make_mixer_channel_solo_parameter_selector(id)),
+              observe_once(
+                      runtime::selectors::
+                              make_mixer_channel_level_parameter_selector(id)),
               std::make_unique<MidiAssignable>(
                       store_dispatch,
                       state_change_subscriber,
-                      volume),
+                      observe_once(
+                              runtime::selectors::
+                                      make_mixer_channel_volume_parameter_selector(
+                                              id))),
               std::make_unique<MidiAssignable>(
                       store_dispatch,
                       state_change_subscriber,
-                      panBalance),
+                      observe_once(
+                              runtime::selectors::
+                                      make_mixer_channel_pan_balance_parameter_selector(
+                                              id))),
               std::make_unique<MidiAssignable>(
                       store_dispatch,
                       state_change_subscriber,
-                      mute),
+                      observe_once(
+                              runtime::selectors::
+                                      make_mixer_channel_mute_parameter_selector(
+                                              id))),
               std::make_unique<MidiAssignable>(
                       store_dispatch,
                       state_change_subscriber,
-                      solo)))
+                      observe_once(
+                              runtime::selectors::
+                                      make_mixer_channel_solo_parameter_selector(
+                                              id)))))
 {
 }
 

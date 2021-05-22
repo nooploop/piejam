@@ -25,12 +25,7 @@ public:
     MixerChannelPerform(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::mixer::channel_id,
-            runtime::float_parameter_id volume,
-            runtime::float_parameter_id panBalance,
-            runtime::bool_parameter_id mute,
-            runtime::bool_parameter_id solo,
-            runtime::stereo_level_parameter_id level);
+            runtime::mixer::channel_id);
     ~MixerChannelPerform();
 
     void changeVolume(double) override;
