@@ -28,7 +28,7 @@ Item {
             id: infoMessageLabel
 
             anchors.left: parent.left
-            anchors.right: midiLearn.left
+            anchors.right: recordButton.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.margins: 6
@@ -46,6 +46,20 @@ Item {
                 color: Material.background
                 radius: 4
             }
+        }
+
+        Button {
+            id: recordButton
+
+            width: 48
+
+            anchors.right: midiLearn.left
+            anchors.rightMargin: 6
+
+            checkable: true
+            Material.accent: Material.Red
+
+            text: "REC"
         }
 
         Button {

@@ -21,49 +21,61 @@ Item {
     signal soloToggled()
     signal muteToggled()
 
-    Button {
-        id: soloButton
+    Row {
+        anchors.fill: parent
 
-        width: 32
-        height: 40
+        spacing: 6
 
-        anchors.right: muteButton.left
-        anchors.rightMargin: 6
+        Button {
+            id: recordButton
 
-        text: qsTr("S")
-        checkable: true
-        Material.accent: Material.Yellow
+            width: 32
+            height: 40
 
-        onToggled: root.soloToggled()
-
-        MidiAssignArea {
-            id: midiAssignSolo
-
-            anchors.fill: parent
-            anchors.topMargin: 1
-            anchors.bottomMargin: 1
+            text: qsTr("R")
+            checkable: true
+            Material.accent: Material.Red
         }
-    }
 
-    Button {
-        id: muteButton
+        Button {
+            id: soloButton
 
-        width: 32
-        height: 40
+            width: 32
+            height: 40
 
-        anchors.right: parent.right
+            text: qsTr("S")
+            checkable: true
+            Material.accent: Material.Yellow
 
-        text: qsTr("M")
-        checkable: true
+            onToggled: root.soloToggled()
 
-        onToggled: root.muteToggled()
+            MidiAssignArea {
+                id: midiAssignSolo
 
-        MidiAssignArea {
-            id: midiAssignMute
+                anchors.fill: parent
+                anchors.topMargin: 1
+                anchors.bottomMargin: 1
+            }
+        }
 
-            anchors.fill: parent
-            anchors.topMargin: 1
-            anchors.bottomMargin: 1
+        Button {
+            id: muteButton
+
+            width: 32
+            height: 40
+
+            text: qsTr("M")
+            checkable: true
+
+            onToggled: root.muteToggled()
+
+            MidiAssignArea {
+                id: midiAssignMute
+
+                anchors.fill: parent
+                anchors.topMargin: 1
+                anchors.bottomMargin: 1
+            }
         }
     }
 }
