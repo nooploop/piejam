@@ -141,10 +141,10 @@ recorder_middleware::process_recorder_action(actions::update_streams const& a)
         if (auto it = m_impl->open_streams.find(stream_id);
             it != m_impl->open_streams.end())
         {
-            auto const num_frames = std::ranges::distance(*buffer);
+            auto const num_frames = buffer->num_frames();
             auto const written =
-                    it->second.writef(buffer->data().data(), num_frames);
-            if (written < num_frames)
+                    it->second.writef(buffer->samples().data(), num_frames);
+            if (static_cast<std::size_t>(written) < num_frames)
                 spdlog::warn(
                         "Could not write {} frames: {}",
                         num_frames - written,

@@ -66,6 +66,11 @@ struct interleaved_view
         return NumChannels;
     }
 
+    constexpr auto num_frames() const noexcept -> std::size_t
+    {
+        return std::distance(m_begin, m_end);
+    }
+
     template <std::size_t ToNumChannels>
     constexpr auto channels_cast() const noexcept
             -> interleaved_view<T, ToNumChannels> requires(NumChannels == 0)

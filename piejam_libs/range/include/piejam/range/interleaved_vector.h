@@ -89,12 +89,21 @@ public:
         return {begin(), end()};
     }
 
-    constexpr auto data() const noexcept -> std::span<T const> { return m_vec; }
-    constexpr auto data() noexcept -> std::span<T> { return m_vec; }
+    constexpr auto num_frames() const noexcept -> std::size_t
+    {
+        return m_vec.size() / m_num_channels;
+    }
+
+    constexpr auto samples() const noexcept -> std::span<T const>
+    {
+        return m_vec;
+    }
+
+    constexpr auto samples() noexcept -> std::span<T> { return m_vec; }
 
 private:
     std::size_t m_num_channels{NumChannels};
     std::vector<T> m_vec;
 };
 
-} // namespace piejam::audio
+} // namespace piejam::range
