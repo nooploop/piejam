@@ -745,8 +745,6 @@ audio_engine::rebuild(
 {
     component_map comps;
 
-    processors::stream_processor_factory stream_procs;
-
     make_mixer_components(
             comps,
             m_impl->comps,
@@ -822,9 +820,7 @@ audio_engine::rebuild(
     m_impl->comps = std::move(comps);
 
     m_impl->param_procs.clear_expired();
-
-    stream_procs.takeover(m_impl->stream_procs);
-    m_impl->stream_procs = std::move(stream_procs);
+    m_impl->stream_procs.clear_expired();
 
     std::ofstream("graph.dot")
             << audio::engine::export_graph_as_dot(m_impl->graph) << std::endl;

@@ -31,7 +31,7 @@ public:
 
     auto find_processor(audio_stream_id) const -> std::shared_ptr<processor_t>;
 
-    void takeover(stream_processor_factory&);
+    void clear_expired();
 
 private:
     processor_map m_procs;

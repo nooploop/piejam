@@ -7,6 +7,7 @@
 #include <piejam/audio/engine/stream_processor.h>
 
 #include <boost/assert.hpp>
+#include <boost/hof/unpack.hpp>
 
 namespace piejam::runtime::processors
 {
@@ -37,13 +38,11 @@ stream_processor_factory::find_processor(audio_stream_id const id) const
 }
 
 void
-stream_processor_factory::takeover(stream_processor_factory& other)
+stream_processor_factory::clear_expired()
 {
-    for (auto [id, proc] : other.m_procs)
-    {
-        if (!proc.expired())
-            BOOST_VERIFY(m_procs.emplace(id, proc).second);
-    }
+    std::erase_if(m_procs, boost::hof::unpack([](auto, auto const proc) {
+                      return proc.expired();
+                  }));
 }
 
 } // namespace piejam::runtime::processors
