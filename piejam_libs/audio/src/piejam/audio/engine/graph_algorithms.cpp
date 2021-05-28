@@ -154,6 +154,13 @@ connect_stereo_components(
 }
 
 void
+connect_stereo_components(graph& g, component const& src, processor& dst)
+{
+    g.add_wire(src.outputs()[0], graph_endpoint{.proc = dst, .port = 0});
+    g.add_wire(src.outputs()[1], graph_endpoint{.proc = dst, .port = 1});
+}
+
+void
 remove_event_identity_processors(graph& g)
 {
     auto starts_in_identity = [](auto const& w) {

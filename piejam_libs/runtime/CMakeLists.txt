@@ -223,7 +223,6 @@ add_library(piejam_runtime STATIC
 )
 
 find_package(nlohmann_json REQUIRED)
-find_package(SndFile REQUIRED)
 
 target_compile_options(piejam_runtime PRIVATE -Wall -Wextra -Werror -pedantic-errors)
 target_include_directories(piejam_runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

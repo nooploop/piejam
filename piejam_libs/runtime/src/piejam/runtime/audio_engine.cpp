@@ -77,21 +77,21 @@ struct mixer_input_key
     mixer::channel_id channel_id;
     mixer::io_address_t route;
 
-    bool operator==(mixer_input_key const&) const noexcept = default;
+    constexpr bool operator==(mixer_input_key const&) const noexcept = default;
 };
 
 struct mixer_output_key
 {
     mixer::channel_id channel_id;
 
-    bool operator==(mixer_output_key const&) const noexcept = default;
+    constexpr bool operator==(mixer_output_key const&) const noexcept = default;
 };
 
 struct solo_group_key
 {
     mixer::channel_id owner;
 
-    bool operator==(solo_group_key const&) const noexcept = default;
+    constexpr bool operator==(solo_group_key const&) const noexcept = default;
 };
 
 using processor_map = dynamic_key_object_map<audio::engine::processor>;
@@ -110,6 +110,10 @@ using value_output_processor_ptr =
 
 using get_device_processor_f =
         std::function<audio::engine::processor&(std::size_t)>;
+
+using recorders_t = std::unordered_map<
+        mixer::channel_id,
+        std::shared_ptr<audio::engine::processor>>;
 
 void
 make_mixer_components(
@@ -280,6 +284,35 @@ make_midi_assignment_processors(
 }
 
 auto
+make_recorder_processors(
+        recorder_streams_t const& recorder_streams,
+        processors::stream_processor_factory& stream_procs,
+        std::size_t const frames_capacity)
+{
+    recorders_t recorders;
+
+    for (auto const& [channel_id, stream_id] : recorder_streams)
+    {
+        if (auto proc = stream_procs.find_processor(stream_id))
+        {
+            recorders.emplace(channel_id, std::move(proc));
+        }
+        else
+        {
+            recorders.emplace(
+                    channel_id,
+                    stream_procs.make_processor(
+                            stream_id,
+                            2,
+                            frames_capacity,
+                            "recorder"));
+        }
+    }
+
+    return recorders;
+}
+
+auto
 connect_fx_chain(
         audio::engine::graph& g,
         std::vector<audio::engine::component*> const& fx_chain_comps,
@@ -302,6 +335,7 @@ connect_mixer_channel_with_fx_chain(
         audio::engine::component& mb_in,
         fx::chain_t const& fx_chain,
         audio::engine::component& mb_out,
+        std::shared_ptr<audio::engine::processor> const& recorder,
         std::vector<processor_ptr>& mixer_procs)
 {
     auto fx_chain_comps = algorithm::transform_to_vector(
@@ -314,6 +348,9 @@ connect_mixer_channel_with_fx_chain(
     if (fx_chain_comps.empty())
     {
         connect_stereo_components(g, mb_in, mb_out, mixer_procs);
+
+        if (recorder)
+            connect_stereo_components(g, mb_in, *recorder);
     }
     else
     {
@@ -328,6 +365,9 @@ connect_mixer_channel_with_fx_chain(
                 *fx_chain_comps.back(),
                 mb_out,
                 mixer_procs);
+
+        if (recorder)
+            connect_stereo_components(g, *fx_chain_comps.back(), *recorder);
     }
 }
 
@@ -468,6 +508,7 @@ make_graph(
         std::span<audio::engine::input_processor> const& input_procs,
         std::span<audio::engine::output_processor> const& output_procs,
         std::span<processor_ptr> const& output_clip_procs,
+        recorders_t const& recorders,
         std::vector<processor_ptr>& mixer_procs)
 {
     audio::engine::graph g;
@@ -476,6 +517,10 @@ make_graph(
     {
         auto* mb_in = comps.find(mixer_input_key{id, bus.in});
         auto* mb_out = comps.find(mixer_output_key{id});
+
+        std::shared_ptr<audio::engine::processor> recorder;
+        if (auto it = recorders.find(id); it != recorders.end())
+            recorder = it->second;
 
         BOOST_ASSERT(mb_in);
         BOOST_ASSERT(mb_out);
@@ -499,6 +544,7 @@ make_graph(
                 *mb_in,
                 bus.fx_chain,
                 *mb_out,
+                recorder,
                 mixer_procs);
 
         connect_mixer_output(
@@ -646,6 +692,8 @@ struct audio_engine::impl
     parameter_processor_factory param_procs;
     processors::stream_processor_factory stream_procs;
 
+    recorders_t recorders;
+
     audio::engine::graph graph;
 };
 
@@ -782,6 +830,13 @@ audio_engine::rebuild(
                                  midi::external_event>>("midi_learned")
                        : nullptr;
 
+    recorders_t recorders;
+    if (st.recording)
+        recorders = make_recorder_processors(
+                st.recorder_streams,
+                m_impl->stream_procs,
+                st.sample_rate * 3);
+
     std::vector<processor_ptr> output_clip_procs(
             m_impl->output_clip_procs.size());
     std::vector<processor_ptr> mixers;
@@ -793,6 +848,7 @@ audio_engine::rebuild(
             m_impl->input_procs,
             m_impl->output_procs,
             output_clip_procs,
+            recorders,
             mixers);
 
     connect_midi(
@@ -818,6 +874,7 @@ audio_engine::rebuild(
     m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
     m_impl->procs = std::move(procs);
     m_impl->comps = std::move(comps);
+    m_impl->recorders = std::move(recorders);
 
     m_impl->param_procs.clear_expired();
     m_impl->stream_procs.clear_expired();

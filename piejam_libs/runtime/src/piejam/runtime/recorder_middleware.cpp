@@ -64,19 +64,23 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
 
     BOOST_ASSERT(!st.recording);
 
+    next(a);
+
+    auto const& recorder_streams = *get_state().recorder_streams;
+    if (recorder_streams.empty())
+        return;
+
     auto take_dir = m_impl->recordings_dir /
                     fmt::format("session_{:04}", st.rec_session) /
                     fmt::format("take_{:04}", st.rec_take);
 
     if (!std::filesystem::create_directories(take_dir))
     {
-        spdlog::error("Could not create recordings directory.");
+        spdlog::error(
+                "Could not create recordings directory: {}",
+                std::strerror(errno));
         return;
     }
-
-    next(a);
-
-    auto const& recorder_streams = *get_state().recorder_streams;
 
     impl::open_streams_t open_streams;
     open_streams.reserve(recorder_streams.size());
@@ -88,20 +92,36 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
         BOOST_ASSERT(channel);
         BOOST_ASSERT(channel->record);
 
-        auto filename = take_dir / fmt::format("{}.flac", *channel->name);
+        auto filename = take_dir / fmt::format("{}.wav", *channel->name);
 
-        open_streams.emplace(
-                std::piecewise_construct,
-                std::forward_as_tuple(stream_id),
-                std::forward_as_tuple(
-                        filename.string(),
-                        SFM_WRITE,
-                        SF_FORMAT_FLAC,
-                        2,
-                        static_cast<int>(st.sample_rate)));
+        auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
+        if (SndfileHandle::formatCheck(
+                    format,
+                    2,
+                    static_cast<int>(st.sample_rate)))
+        {
+            SndfileHandle sndfile(
+                    filename.string(),
+                    SFM_WRITE,
+                    format,
+                    2,
+                    static_cast<int>(st.sample_rate));
+
+            if (sndfile)
+                open_streams.emplace(stream_id, std::move(sndfile));
+            else
+                spdlog::error(
+                        "Could not create file for recording: {}",
+                        sndfile.strError());
+        }
+        else
+        {
+            spdlog::error(
+                    "Could not create file for recording: Invalid file "
+                    "format.");
+        }
     }
 
-    BOOST_ASSERT(m_impl->open_streams.empty());
     m_impl->open_streams = std::move(open_streams);
 }
 
@@ -121,9 +141,14 @@ recorder_middleware::process_recorder_action(actions::update_streams const& a)
         if (auto it = m_impl->open_streams.find(stream_id);
             it != m_impl->open_streams.end())
         {
-            it->second.write(
-                    buffer->data().data(),
-                    std::ranges::distance(*buffer));
+            auto const num_frames = std::ranges::distance(*buffer);
+            auto const written =
+                    it->second.writef(buffer->data().data(), num_frames);
+            if (written < num_frames)
+                spdlog::warn(
+                        "Could not write {} frames: {}",
+                        num_frames - written,
+                        it->second.strError());
         }
     }
 

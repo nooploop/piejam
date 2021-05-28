@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/actions/recorder_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
@@ -16,6 +17,7 @@ namespace piejam::runtime::actions
 struct start_recording final
     : ui::cloneable_action<start_recording, action>
     , visitable_recorder_action<start_recording>
+    , visitable_engine_action<start_recording>
 {
     auto reduce(state const&) const -> state override;
 };
@@ -23,6 +25,7 @@ struct start_recording final
 struct stop_recording final
     : ui::cloneable_action<stop_recording, action>
     , visitable_recorder_action<stop_recording>
+    , visitable_engine_action<stop_recording>
 {
     auto reduce(state const&) const -> state override;
 };
