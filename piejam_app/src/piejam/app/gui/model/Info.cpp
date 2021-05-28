@@ -6,6 +6,7 @@
 
 #include <piejam/log/generic_log_sink.h>
 #include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/runtime/actions/recording.h>
 #include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/selectors.h>
 
@@ -34,6 +35,9 @@ Info::Info(
 void
 Info::onSubscribe()
 {
+    observe(runtime::selectors::select_recording,
+            [this](bool const x) { setRecording(x); });
+
     observe(runtime::selectors::select_xruns, [this](std::size_t const xruns) {
         setXRuns(static_cast<unsigned>(xruns));
     });
@@ -47,6 +51,21 @@ Info::onSubscribe()
     requestUpdates(std::chrono::milliseconds{40}, [this]() {
         dispatch(runtime::actions::request_info_update{});
     });
+}
+
+void
+Info::changeRecording(bool const rec)
+{
+    emit recordingChanged();
+
+    if (rec)
+    {
+        dispatch(runtime::actions::start_recording{});
+    }
+    else
+    {
+        dispatch(runtime::actions::stop_recording{});
+    }
 }
 
 } // namespace piejam::app::gui::model

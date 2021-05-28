@@ -59,7 +59,11 @@ Item {
             checkable: true
             Material.accent: Material.Red
 
+            checked: root.model.recording
+
             text: "REC"
+
+            onClicked: root.model.changeRecording(checked)
         }
 
         Button {

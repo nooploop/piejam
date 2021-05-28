@@ -55,6 +55,8 @@ apply_app_config::reduce(state const& st) const -> state
             conf.output_bus_config,
             new_st.output.hw_params->num_channels);
 
+    new_st.rec_session = conf.rec_session;
+
     return new_st;
 }
 

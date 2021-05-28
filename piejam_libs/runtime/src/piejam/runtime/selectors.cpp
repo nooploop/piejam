@@ -825,6 +825,10 @@ const selector<fx::registry> select_fx_registry([](state const& st) {
     return st.fx_registry;
 });
 
+const selector<bool> select_recording([](state const& st) {
+    return st.recording;
+});
+
 const selector<std::size_t> select_xruns([](state const& st) {
     return st.xruns;
 });

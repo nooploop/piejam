@@ -198,6 +198,8 @@ extern const selector<bool> select_midi_learning;
 
 extern const selector<fx::registry> select_fx_registry;
 
+extern const selector<bool> select_recording;
+
 extern const selector<std::size_t> select_xruns;
 extern const selector<float> select_cpu_load;
 

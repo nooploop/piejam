@@ -25,6 +25,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/mixer_actions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/move_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/persistence_action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/recorder_action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/recording.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_devices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/refresh_midi_devices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/reload_missing_plugins.h
@@ -116,6 +118,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/mute_solo_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/stream_processor_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/recorder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/recorder_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/solo_group.h
@@ -150,6 +154,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/mixer_actions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/move_fx_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/recording.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_midi_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/reload_missing_plugins.cpp
@@ -209,6 +214,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/midi_to_parameter_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/mute_solo_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/stream_processor_factory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/recorder_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/selectors.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/solo_group.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/state.cpp
@@ -217,6 +223,7 @@ add_library(piejam_runtime STATIC
 )
 
 find_package(nlohmann_json REQUIRED)
+find_package(SndFile REQUIRED)
 
 target_compile_options(piejam_runtime PRIVATE -Wall -Wextra -Werror -pedantic-errors)
 target_include_directories(piejam_runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -234,7 +241,8 @@ target_link_libraries(piejam_runtime
     PRIVATE
     fmt
     spdlog::spdlog
-    piejam_algorithm)
+    piejam_algorithm
+    SndFile::sndfile)
 
 add_subdirectory(benchmarks)
 add_subdirectory(tests)

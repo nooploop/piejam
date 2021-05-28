@@ -31,6 +31,7 @@
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/move_fx_module.h>
+#include <piejam/runtime/actions/recording.h>
 #include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/request_streams_update.h>
 #include <piejam/runtime/actions/select_bus_channel.h>

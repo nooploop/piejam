@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/actions/recorder_action.h>
 #include <piejam/runtime/audio_stream.h>
+#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
@@ -14,10 +15,11 @@
 namespace piejam::runtime::actions
 {
 
-struct update_streams final : ui::cloneable_action<update_streams, action>
+struct update_streams final
+    : ui::cloneable_action<update_streams, action>
+    , visitable_recorder_action<update_streams>
 {
-    boost::container::flat_map<audio_stream_id, audio_stream_buffer>
-            streams;
+    boost::container::flat_map<audio_stream_id, audio_stream_buffer> streams;
 
     auto reduce(state const&) const -> state;
 };

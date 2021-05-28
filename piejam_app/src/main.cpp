@@ -20,6 +20,7 @@
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/load_app_config.h>
 #include <piejam/runtime/actions/load_session.h>
+#include <piejam/runtime/actions/recording.h>
 #include <piejam/runtime/actions/refresh_devices.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
 #include <piejam/runtime/actions/save_app_config.h>
@@ -32,6 +33,7 @@
 #include <piejam/runtime/midi_control_middleware.h>
 #include <piejam/runtime/midi_input_controller.h>
 #include <piejam/runtime/persistence_middleware.h>
+#include <piejam/runtime/recorder_middleware.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/store.h>
 #include <piejam/runtime/subscriber.h>
@@ -98,6 +100,7 @@ main(int argc, char* argv[]) -> int
     locs.home_dir = QStandardPaths::writableLocation(
                             QStandardPaths::StandardLocation::HomeLocation)
                             .toStdString();
+    locs.rec_dir = locs.home_dir / "recordings";
 
     QGuiApplication app(argc, argv);
 
@@ -119,6 +122,18 @@ main(int argc, char* argv[]) -> int
                 std::forward<decltype(get_state)>(get_state),
                 std::forward<decltype(dispatch)>(dispatch),
                 std::forward<decltype(next)>(next));
+    });
+
+    store.apply_middleware([rec_dir = locs.rec_dir](
+                                   auto&& get_state,
+                                   auto&& dispatch,
+                                   auto&& next) {
+        return redux::make_middleware<piejam::runtime::recorder_middleware>(
+                runtime::middleware_functors(
+                        std::forward<decltype(get_state)>(get_state),
+                        std::forward<decltype(dispatch)>(dispatch),
+                        std::forward<decltype(next)>(next)),
+                rec_dir);
     });
 
     store.apply_middleware([audio_device_manager = audio_device_manager.get(),
@@ -241,6 +256,9 @@ main(int argc, char* argv[]) -> int
     auto timer = new QTimer(&app);
     QObject::connect(timer, &QTimer::timeout, [&]() {
         store.dispatch(runtime::actions::refresh_midi_devices{});
+
+        store.dispatch(
+                piejam::runtime::actions::request_recorder_streams_update());
 
         model_factory.info()->setCpuTemp(system::cpu_temp());
 

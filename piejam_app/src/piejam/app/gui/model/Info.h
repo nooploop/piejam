@@ -15,6 +15,8 @@ class Info final : public Subscribable<piejam::gui::model::Info>
 public:
     Info(runtime::store_dispatch, runtime::subscriber&);
 
+    void changeRecording(bool) override;
+
 private:
     void onSubscribe() override;
 };

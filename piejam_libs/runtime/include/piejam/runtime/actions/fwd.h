@@ -16,6 +16,7 @@ struct device_action;
 struct engine_action;
 struct midi_control_action;
 struct persistence_action;
+struct recorder_action;
 
 struct renotify;
 
@@ -49,6 +50,8 @@ struct request_parameters_update;
 struct request_info_update;
 struct request_streams_update;
 
+struct update_streams;
+
 struct set_device_bus_name;
 
 template <class>
@@ -76,11 +79,15 @@ struct save_app_config;
 struct load_session;
 struct save_session;
 
+struct start_recording;
+struct stop_recording;
+
 // visitors
 
 struct device_action_visitor;
 struct engine_action_visitor;
 struct midi_control_action_visitor;
 struct persistence_action_visitor;
+struct recorder_action_visitor;
 
 } // namespace piejam::runtime::actions

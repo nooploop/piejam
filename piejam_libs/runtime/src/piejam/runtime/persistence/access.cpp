@@ -100,6 +100,8 @@ save_app_config(
 
         conf.enabled_midi_input_devices = enabled_midi_input_devices;
 
+        conf.rec_session = state.rec_session + 1;
+
         persistence::save_app_config(out, conf);
     }
     catch (std::exception const& err)

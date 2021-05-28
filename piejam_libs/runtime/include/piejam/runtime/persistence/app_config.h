@@ -37,6 +37,8 @@ struct app_config
     std::vector<bus_config> output_bus_config;
 
     std::vector<std::string> enabled_midi_input_devices;
+
+    std::size_t rec_session{};
 };
 
 void to_json(nlohmann::json&, app_config const&);

@@ -13,6 +13,7 @@
 #include <piejam/entity_id_hash.h>
 #include <piejam/io_direction.h>
 #include <piejam/npos.h>
+#include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/device_io.h>
 #include <piejam/runtime/fx/ladspa_instances.h>
@@ -29,8 +30,8 @@
 #include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/parameter_maps.h>
 #include <piejam/runtime/parameters.h>
+#include <piejam/runtime/recorder.h>
 #include <piejam/runtime/selected_device.h>
-#include <piejam/runtime/audio_stream.h>
 
 #include <functional>
 #include <optional>
@@ -72,6 +73,11 @@ struct state
 
     box<midi_assignments_map> midi_assignments;
     std::optional<midi_assignment_id> midi_learning{};
+
+    bool recording{};
+    unique_box<recorder_streams_t> recorder_streams;
+    std::size_t rec_session{};
+    std::size_t rec_take{};
 
     std::size_t xruns{};
     float cpu_load{};

@@ -13,6 +13,7 @@ struct locations
 {
     std::filesystem::path config_dir;
     std::filesystem::path home_dir;
+    std::filesystem::path rec_dir;
 };
 
 } // namespace piejam::runtime

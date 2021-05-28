@@ -49,6 +49,7 @@ static auto const s_key_input_configs = "input_configs";
 static auto const s_key_output_configs = "output_configs";
 static auto const s_key_enabled_midi_input_devices =
         "enabled_midi_input_devices";
+static auto const s_key_rec_session = "rec_session";
 
 static auto
 get_version(nlohmann::json const& conf) -> unsigned
@@ -85,8 +86,8 @@ to_json(nlohmann::json& j, app_config const& conf)
            {s_key_period_count, conf.period_count},
            {s_key_input_configs, conf.input_bus_config},
            {s_key_output_configs, conf.output_bus_config},
-           {s_key_enabled_midi_input_devices,
-            conf.enabled_midi_input_devices}}}};
+           {s_key_enabled_midi_input_devices, conf.enabled_midi_input_devices},
+           {s_key_rec_session, conf.rec_session}}}};
 }
 
 void
@@ -102,6 +103,7 @@ from_json(nlohmann::json const& j, app_config& conf)
     audio_settings.at(s_key_output_configs).get_to(conf.output_bus_config);
     audio_settings.at(s_key_enabled_midi_input_devices)
             .get_to(conf.enabled_midi_input_devices);
+    audio_settings.at(s_key_rec_session).get_to(conf.rec_session);
 }
 
 using upgrade_function = void (*)(nlohmann::json&);

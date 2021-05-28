@@ -24,6 +24,7 @@ class Info : public SubscribableModel
     Q_PROPERTY(unsigned xruns READ xruns NOTIFY xrunsChanged FINAL)
     Q_PROPERTY(QList<float> cpuLoad READ cpuLoad NOTIFY cpuLoadChanged FINAL)
     Q_PROPERTY(int cpuTemp READ cpuTemp NOTIFY cpuTempChanged FINAL)
+    Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged FINAL)
     Q_PROPERTY(bool midiLearn READ midiLearn NOTIFY midiLearnChanged FINAL)
     Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
     Q_PROPERTY(
@@ -70,6 +71,18 @@ public:
         }
     }
 
+    auto recording() const noexcept -> bool { return m_recording; }
+    void setRecording(bool x)
+    {
+        if (m_recording != x)
+        {
+            m_recording = x;
+            emit recordingChanged();
+        }
+    }
+
+    Q_INVOKABLE virtual void changeRecording(bool) = 0;
+
     auto midiLearn() const noexcept -> bool { return m_midiLearn; }
     void setMidiLearn(bool x)
     {
@@ -101,6 +114,7 @@ signals:
     void xrunsChanged();
     void cpuLoadChanged();
     void cpuTempChanged();
+    void recordingChanged();
     void midiLearnChanged();
     void logDataChanged();
     void logMessageChanged();
@@ -110,6 +124,7 @@ private:
     unsigned m_xruns{};
     QList<float> m_cpuLoad;
     int m_cpuTemp{};
+    bool m_recording{};
     bool m_midiLearn{};
     QStringList m_logData;
     QString m_logMessage;
