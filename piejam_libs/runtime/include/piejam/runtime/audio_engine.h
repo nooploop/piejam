@@ -9,12 +9,8 @@
 #include <piejam/audio/types.h>
 #include <piejam/midi/fwd.h>
 #include <piejam/runtime/audio_stream.h>
-#include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
-#include <piejam/runtime/midi_assignment.h>
-#include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/stereo_level.h>
 #include <piejam/thread/fwd.h>
 
@@ -49,15 +45,9 @@ public:
     auto get_stream(audio_stream_id) const -> std::vector<float>;
 
     [[nodiscard]] bool
-    rebuild(mixer::channels_t const&,
-            device_io::buses_t const&,
-            fx::modules_t const&,
-            fx::parameters_t const& fx_params,
-            parameter_maps const&,
+    rebuild(state const&,
             fx::simple_ladspa_processor_factory const&,
-            std::unique_ptr<midi::input_event_handler>,
-            bool midi_learn,
-            midi_assignments_map const&);
+            std::unique_ptr<midi::input_event_handler>);
 
     void init_process(
             std::span<audio::pcm_input_buffer_converter const> const&,

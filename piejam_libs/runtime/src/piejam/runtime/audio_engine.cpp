@@ -43,6 +43,7 @@
 #include <piejam/runtime/processors/midi_to_parameter_processor.h>
 #include <piejam/runtime/processors/stream_processor_factory.h>
 #include <piejam/runtime/solo_group.h>
+#include <piejam/runtime/state.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/worker.h>
 
@@ -738,15 +739,9 @@ audio_engine::get_stream(audio_stream_id const id) const -> std::vector<float>
 
 bool
 audio_engine::rebuild(
-        mixer::channels_t const& mixer_channels,
-        device_io::buses_t const& device_buses,
-        fx::modules_t const& fx_modules,
-        fx::parameters_t const& fx_params,
-        parameter_maps const& params,
+        state const& st,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
-        std::unique_ptr<midi::input_event_handler> midi_in,
-        bool midi_learn,
-        midi_assignments_map const& assignments)
+        std::unique_ptr<midi::input_event_handler> midi_in)
 {
     component_map comps;
 
@@ -756,29 +751,34 @@ audio_engine::rebuild(
             comps,
             m_impl->comps,
             m_sample_rate,
-            mixer_channels,
-            device_buses,
+            st.mixer_state.channels,
+            st.device_io_state.buses,
             m_impl->param_procs);
     make_fx_chain_components(
             comps,
             m_impl->comps,
-            fx_modules,
-            fx_params,
+            st.fx_modules,
+            st.fx_parameters,
             m_impl->param_procs,
             m_impl->stream_procs,
             ladspa_fx_proc_factory,
             m_sample_rate);
-    auto const solo_groups = runtime::solo_groups(mixer_channels);
+    auto const solo_groups = runtime::solo_groups(st.mixer_state.channels);
     make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 
-    m_impl->param_procs.initialize([&params](auto const id) {
-        return find_parameter_value(params, id);
+    m_impl->param_procs.initialize([&st](auto const id) {
+        return find_parameter_value(st.params, id);
     });
 
     processor_map procs;
 
+    bool const midi_learn = static_cast<bool>(st.midi_learning);
     make_midi_processors(std::move(midi_in), midi_learn, procs);
-    make_midi_assignment_processors(assignments, params, procs, m_impl->procs);
+    make_midi_assignment_processors(
+            st.midi_assignments,
+            st.params,
+            procs,
+            m_impl->procs);
     auto midi_learn_output_proc =
             midi_learn ? std::make_unique<audio::engine::value_io_processor<
                                  midi::external_event>>("midi_learned")
@@ -790,8 +790,8 @@ audio_engine::rebuild(
 
     auto new_graph = make_graph(
             comps,
-            mixer_channels,
-            device_buses,
+            st.mixer_state.channels,
+            st.device_io_state.buses,
             m_impl->input_procs,
             m_impl->output_procs,
             output_clip_procs,
@@ -802,7 +802,7 @@ audio_engine::rebuild(
             procs,
             midi_learn_output_proc.get(),
             m_impl->param_procs,
-            assignments);
+            st.midi_assignments);
 
     connect_solo_groups(new_graph, comps, solo_groups);
 
