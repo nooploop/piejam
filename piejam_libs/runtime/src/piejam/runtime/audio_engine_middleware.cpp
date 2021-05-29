@@ -156,6 +156,9 @@ audio_engine_middleware::operator()(action const& action)
 {
     if (auto a = dynamic_cast<actions::device_action const*>(&action))
     {
+        if (get_state().recording)
+            process_engine_action(actions::stop_recording{});
+
         close_device();
 
         auto v = ui::make_action_visitor<actions::device_action_visitor>(
