@@ -103,6 +103,7 @@ Item {
             muteMidi.model: root.model ? root.model.muteMidi : null
             soloMidi.model: root.model ? root.model.soloMidi : null
 
+            onRecordToggled: root.model.changeRecord(!root.model.record)
             onMuteToggled: root.model.changeMute(!root.model.mute)
             onSoloToggled: root.model.changeSolo(!root.model.solo)
         }

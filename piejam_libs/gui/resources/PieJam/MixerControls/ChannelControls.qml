@@ -19,6 +19,7 @@ Item {
     property alias muteMidi: midiAssignMute
     property alias soloMidi: midiAssignSolo
 
+    signal recordToggled()
     signal soloToggled()
     signal muteToggled()
 
@@ -36,6 +37,8 @@ Item {
             text: qsTr("R")
             checkable: true
             Material.accent: Material.Red
+
+            onToggled: root.recordToggled()
         }
 
         Button {
