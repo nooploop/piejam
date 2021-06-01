@@ -151,37 +151,6 @@ audio_engine_middleware::audio_engine_middleware(
 
 audio_engine_middleware::~audio_engine_middleware() = default;
 
-void
-audio_engine_middleware::operator()(action const& action)
-{
-    if (auto a = dynamic_cast<actions::device_action const*>(&action))
-    {
-        if (get_state().recording)
-            process_engine_action(actions::stop_recording{});
-
-        close_device();
-
-        auto v = ui::make_action_visitor<actions::device_action_visitor>(
-                [this](auto&& a) { process_device_action(a); });
-
-        a->visit(v);
-
-        open_device();
-        start_engine();
-    }
-    else if (auto a = dynamic_cast<actions::engine_action const*>(&action))
-    {
-        auto v = ui::make_action_visitor<actions::engine_action_visitor>(
-                [this](auto&& a) { process_engine_action(a); });
-
-        a->visit(v);
-    }
-    else
-    {
-        next(action);
-    }
-}
-
 template <class Action>
 void
 audio_engine_middleware::process_device_action(Action const& a)
@@ -515,6 +484,21 @@ audio_engine_middleware::process_engine_action(
 
 template <>
 void
+audio_engine_middleware::process_engine_action(actions::stop_recording const& a)
+{
+    actions::request_streams_update streams_update;
+    for (auto const& [channel_id, stream_id] : *get_state().recorder_streams)
+        streams_update.streams.emplace(stream_id);
+
+    if (!streams_update.streams.empty())
+        process_engine_action(streams_update);
+
+    next(a);
+    rebuild();
+}
+
+template <>
+void
 audio_engine_middleware::process_engine_action(
         actions::request_info_update const&)
 {
@@ -640,6 +624,37 @@ audio_engine_middleware::rebuild()
                 m_midi_controller->make_input_event_handler()))
     {
         spdlog::error("audio_engine_middleware: graph rebuilding failed");
+    }
+}
+
+void
+audio_engine_middleware::operator()(action const& action)
+{
+    if (auto a = dynamic_cast<actions::device_action const*>(&action))
+    {
+        if (get_state().recording)
+            process_engine_action(actions::stop_recording{});
+
+        close_device();
+
+        auto v = ui::make_action_visitor<actions::device_action_visitor>(
+                [this](auto&& a) { process_device_action(a); });
+
+        a->visit(v);
+
+        open_device();
+        start_engine();
+    }
+    else if (auto a = dynamic_cast<actions::engine_action const*>(&action))
+    {
+        auto v = ui::make_action_visitor<actions::engine_action_visitor>(
+                [this](auto&& a) { process_engine_action(a); });
+
+        a->visit(v);
+    }
+    else
+    {
+        next(action);
     }
 }
 
