@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2021 Dimitrij Kotrev
-
-SPDX-License-Identifier: CC0-1.0
--->
-
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
@@ -64,7 +58,8 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/FxChainControls/ScopeView.qml</file>
         <file>PieJam/FxChainControls/SpectrumView.qml</file>
         <file>PieJam/FxChainControls/StereoChannelSelector.qml</file>
-        <file>PieJam/Views/DiskSpaceIndicator.qml</file>
         <file>images/icons/micro-sd.svg</file>
+        <file>PieJam/Controls/DiskSpaceIndicator.qml</file>
+        <file>PieJam/Controls/InfoReadout.qml</file>
     </qresource>
 </RCC>
