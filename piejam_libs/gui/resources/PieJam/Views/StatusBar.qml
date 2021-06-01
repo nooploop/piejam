@@ -91,7 +91,7 @@ Item {
         Rectangle {
             id: readoutLabel
 
-            width: 64
+            width: 96
 
             anchors.right: parent.right
             anchors.top: parent.top
@@ -101,12 +101,19 @@ Item {
             color: Material.background
             radius: 4
 
+            DiskSpaceIndicator {
+                id: diskUsage
+
+                anchors.left: parent.left
+
+                usage: root.model.diskUsage
+            }
+
             Label {
                 id: audioLoadLabel
 
                 height: 16
 
-                anchors.left: parent.left
                 anchors.right: xrunsLabel.left
                 anchors.top: parent.top
 
@@ -162,7 +169,7 @@ Item {
             CpuLoadMeter {
                 id: cpuLoadMeter
 
-                anchors.left: parent.left
+                anchors.left: diskUsage.right
                 anchors.right: tempLabel.left
                 anchors.top: audioLoadLabel.bottom
                 anchors.bottom: parent.bottom

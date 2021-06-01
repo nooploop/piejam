@@ -29,6 +29,7 @@ class Info : public SubscribableModel
     Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
     Q_PROPERTY(
             QString logMessage READ logMessage NOTIFY logMessageChanged FINAL)
+    Q_PROPERTY(int diskUsage READ diskUsage NOTIFY diskUsageChanged FINAL)
 
 public:
     auto audioLoad() const noexcept -> double { return m_audioLoad; }
@@ -108,6 +109,16 @@ public:
 
     auto logMessage() const -> QString { return m_logMessage; }
 
+    auto diskUsage() const noexcept -> int { return m_diskUsage; }
+    void setDiskUsage(int const x)
+    {
+        if (m_diskUsage != x)
+        {
+            m_diskUsage = x;
+            emit diskUsageChanged();
+        }
+    }
+
 signals:
 
     void audioLoadChanged();
@@ -118,6 +129,7 @@ signals:
     void midiLearnChanged();
     void logDataChanged();
     void logMessageChanged();
+    void diskUsageChanged();
 
 private:
     double m_audioLoad{};
@@ -128,6 +140,7 @@ private:
     bool m_midiLearn{};
     QStringList m_logData;
     QString m_logMessage;
+    int m_diskUsage{};
 };
 
 } // namespace piejam::gui::model

@@ -6,6 +6,7 @@ add_library(piejam_system STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/avg_cpu_load_tracker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/cpu_load.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/cpu_temp.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/disk_usage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/dll.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/device.h

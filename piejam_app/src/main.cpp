@@ -43,6 +43,7 @@
 #include <piejam/runtime/ui/thunk_action.h>
 #include <piejam/system/avg_cpu_load_tracker.h>
 #include <piejam/system/cpu_temp.h>
+#include <piejam/system/disk_usage.h>
 #include <piejam/thread/affinity.h>
 
 #include <QQuickStyle>
@@ -267,6 +268,9 @@ main(int argc, char* argv[]) -> int
         model_factory.info()->setCpuLoad(QList<float>(
                 cpu_load_per_core.begin(),
                 cpu_load_per_core.end()));
+
+        model_factory.info()->setDiskUsage(static_cast<int>(
+                std::round(system::disk_usage(locs.home_dir) * 100)));
     });
     timer->start(std::chrono::seconds(1));
 

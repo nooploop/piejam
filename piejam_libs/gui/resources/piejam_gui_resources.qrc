@@ -64,5 +64,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/FxChainControls/ScopeView.qml</file>
         <file>PieJam/FxChainControls/SpectrumView.qml</file>
         <file>PieJam/FxChainControls/StereoChannelSelector.qml</file>
+        <file>PieJam/Views/DiskSpaceIndicator.qml</file>
+        <file>images/icons/micro-sd.svg</file>
     </qresource>
 </RCC>
