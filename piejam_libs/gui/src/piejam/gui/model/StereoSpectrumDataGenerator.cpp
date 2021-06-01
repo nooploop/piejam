@@ -40,13 +40,13 @@ class Generator
 {
 public:
     Generator(unsigned const sampleRate)
-        : m_sampleRate(static_cast<float>(sampleRate))
-        , m_window(algorithm::transform_to_vector(
+        : m_window(algorithm::transform_to_vector(
                   range::iota(s_dft_size),
                   &numeric::window::hann<s_dft_size>))
     {
+        float const binSize = sampleRate / s_dft_size;
         for (std::size_t const i : range::iota(s_dft.output_size()))
-            m_dataPoints[i].frequency_Hz = i * m_binSize;
+            m_dataPoints[i].frequency_Hz = i * binSize;
     }
 
     static constexpr auto envelope(float const prev, float const in) noexcept
@@ -95,9 +95,6 @@ public:
     }
 
 private:
-    float m_sampleRate{48000};
-    float m_binSize{m_sampleRate / s_dft_size};
-
     std::vector<float> m_streamBuffer{};
     std::vector<float> m_dftPrepareBuffer{std::vector<float>(s_dft_size)};
     std::vector<float> m_dftInputBuffer{std::vector<float>(s_dft_size)};
