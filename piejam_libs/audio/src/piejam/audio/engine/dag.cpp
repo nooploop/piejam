@@ -4,6 +4,7 @@
 
 #include <piejam/audio/engine/dag.h>
 
+#include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/thread_context.h>
@@ -70,7 +71,8 @@ private:
             std::ranges::transform(
                     children,
                     std::back_inserter(nodes[parent_id].children),
-                    [&nodes](dag::task_id_t const child_id) {
+                    [&nodes](dag::task_id_t const child_id)
+                    {
                         BOOST_ASSERT(nodes.count(child_id));
                         return std::ref(nodes[child_id]);
                     });
@@ -242,6 +244,8 @@ private:
             , m_buffer_size(buffer_size)
             , m_run_queues(run_queues)
             , m_initial_tasks(initial_tasks)
+            , m_steal_indices(
+                      make_steal_indices(worker_index, m_run_queues.size()))
         {
         }
 
@@ -261,11 +265,8 @@ private:
                 }
                 else
                 {
-                    std::size_t const num_queues = m_run_queues.size();
-                    for (std::size_t i = 1; i < num_queues; ++i)
+                    for (std::size_t const steal_index : m_steal_indices)
                     {
-                        std::size_t const steal_index =
-                                (m_worker_index + i) % num_queues;
                         if (node* n = m_run_queues[steal_index].steal())
                         {
                             while (n)
@@ -314,6 +315,16 @@ private:
             return next;
         }
 
+        static auto make_steal_indices(
+                std::size_t const worker_index,
+                std::size_t const num_queues) -> std::vector<std::size_t>
+        {
+            return algorithm::transform_to_vector(
+                    std::views::iota(std::size_t{1}, num_queues),
+                    [=](std::size_t i)
+                    { return (worker_index + i) % num_queues; });
+        }
+
         std::size_t m_worker_index;
         audio::engine::event_buffer_memory m_event_memory;
         audio::engine::thread_context m_thread_context{
@@ -322,6 +333,10 @@ private:
         std::atomic_size_t& m_buffer_size;
         std::span<job_deque_t> m_run_queues;
         std::vector<node*> const& m_initial_tasks;
+        std::vector<std::size_t> m_steal_indices;
+
+        static_assert(std::atomic_size_t::is_always_lock_free);
+        static_assert(std::atomic_long::is_always_lock_free);
     };
 
     using workers_t = std::vector<dag_worker>;
@@ -384,9 +399,8 @@ is_descendent(
 
     return std::ranges::any_of(
             t.at(parent),
-            [&t, descendent](dag::task_id_t const child) {
-                return is_descendent(t, child, descendent);
-            });
+            [&t, descendent](dag::task_id_t const child)
+            { return is_descendent(t, child, descendent); });
 }
 
 } // namespace
