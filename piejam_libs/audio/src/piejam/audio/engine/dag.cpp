@@ -50,7 +50,7 @@ protected:
 
     static void init_node_for_process(node& n)
     {
-        n.parents_to_process.store(n.num_parents, std::memory_order_relaxed);
+        n.parents_to_process.store(n.num_parents, std::memory_order_release);
     }
 
     using nodes_t = std::unordered_map<dag::task_id_t, node>;
@@ -290,16 +290,10 @@ private:
 
             n.task(m_thread_context);
 
-            BOOST_VERIFY(
-                    0 <
-                    m_nodes_to_process.fetch_sub(1, std::memory_order_acq_rel));
-
             node* next{};
             for (node& child : n.children)
             {
-                if (1 == child.parents_to_process.fetch_sub(
-                                 1,
-                                 std::memory_order_acq_rel))
+                if (1 == child.parents_to_process.fetch_sub(1))
                 {
                     if (next)
                     {
@@ -311,6 +305,8 @@ private:
                     }
                 }
             }
+
+            BOOST_VERIFY(0 < m_nodes_to_process.fetch_sub(1));
 
             return next;
         }
