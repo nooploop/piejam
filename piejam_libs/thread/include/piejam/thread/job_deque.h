@@ -69,7 +69,7 @@ public:
 
     void push(Job* const job) noexcept
     {
-        bottom_index const bottom = m_bottom.load(std::memory_order_relaxed);
+        bottom_index const bottom = m_bottom.load(std::memory_order_acquire);
         BOOST_ASSERT(bottom < Capacity);
         m_jobs[bottom] = job;
         m_bottom.store(bottom + 1, std::memory_order_release);
@@ -77,7 +77,7 @@ public:
 
     auto pop() noexcept -> Job*
     {
-        bottom_index const bottom = m_bottom.load(std::memory_order_relaxed);
+        bottom_index const bottom = m_bottom.load(std::memory_order_acquire);
         if (bottom == 0)
             return nullptr;
 
@@ -99,10 +99,7 @@ public:
 
         if (newBottom == top.index)
         {
-            if (m_top.compare_exchange_strong(
-                        top,
-                        newTop,
-                        std::memory_order_acq_rel))
+            if (m_top.compare_exchange_strong(top, newTop))
                 return job;
         }
 
@@ -114,7 +111,7 @@ public:
     {
         top_index top = m_top.load(std::memory_order_acquire);
 
-        if (m_bottom.load(std::memory_order_relaxed) <= top.index)
+        if (m_bottom.load(std::memory_order_acquire) <= top.index)
             return nullptr;
 
         Job* const job = m_jobs[top.index];
@@ -123,10 +120,7 @@ public:
         newTop.index = top.index + 1;
         newTop.tag = top.tag + 1;
 
-        if (m_top.compare_exchange_strong(
-                    top,
-                    newTop,
-                    std::memory_order_acq_rel))
+        if (m_top.compare_exchange_strong(top, newTop))
             return job;
 
         return nullptr;
