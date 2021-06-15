@@ -54,12 +54,14 @@ void
 Mixer::onSubscribe()
 {
     observe(runtime::selectors::select_mixer_input_channels,
-            [this](boxed_vector<runtime::mixer::channel_id> const& bus_infos) {
+            [this](boxed_vector<runtime::mixer::channel_id> const& bus_infos)
+            {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->inputs, *bus_infos),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *inputChannels(),
-                                [this](auto const& channel_id) {
+                                [this](auto const& channel_id)
+                                {
                                     return std::make_unique<MixerChannel>(
                                             dispatch(),
                                             state_change_subscriber(),
@@ -79,6 +81,7 @@ Mixer::addChannel(QString const& newChannelName)
 {
     runtime::actions::add_mixer_channel action;
     action.name = newChannelName.toStdString();
+    action.auto_assign_input = true;
     dispatch(action);
 }
 
