@@ -94,6 +94,11 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
 
         auto filename = take_dir / fmt::format("{}.wav", *channel->name);
 
+        std::size_t file_num{};
+        while (std::filesystem::exists(filename))
+            filename = take_dir /
+                       fmt::format("{} ({}).wav", *channel->name, ++file_num);
+
         auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
         if (SndfileHandle::formatCheck(
                     format,
