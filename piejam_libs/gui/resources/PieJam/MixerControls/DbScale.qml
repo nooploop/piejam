@@ -17,7 +17,7 @@ Canvas {
     property DbScaleData scaleData: DbScaleData {}
     property int horizontalOrientation: DbScale.Orientation.Left
     property bool enableText: true
-    property var backgroundColor: Qt.rgba(0, 0, 0, 1)
+    property color backgroundColor: Qt.rgba(0, 0, 0, 1)
 
     implicitWidth: enableText ? 32 : 12
 
