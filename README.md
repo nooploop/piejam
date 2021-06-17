@@ -24,11 +24,13 @@ More [documentation](https://piejam.readthedocs.io/en/stable/)
 * Fx chain per mixer channel
 * Support for LADSPA plugins
 * Parameter control through MIDI CC
+* Recorder
 
 #### Usage example
 ![Usage example](doc/images/usage.png "Usage example")
 
 ## ChangeLog
+* v0.7.0 - Recorder
 * v0.6.0 - New modules: Oscilloscope and Spectrum Analyzer
 * v0.5.0 - MIDI CC parameter control. Flexible routing.
 * v0.4.0 - Fx chain and LADSPA fx plugins support.
