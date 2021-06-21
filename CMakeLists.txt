@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-project(piejam VERSION 0.1.0)
+project(piejam VERSION 0.7.0)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
@@ -16,6 +16,9 @@ option(PIEJAM_TESTS "Build tests" OFF)
 
 if(PIEJAM_TESTS)
     enable_testing()
+    find_package(GTest REQUIRED)
+    add_library(gtest_driver INTERFACE)
+    target_link_libraries(gtest_driver INTERFACE gtest gtest_main pthread)
 endif()
 
 find_program(PIEJAM_LCOV_PATH lcov)
