@@ -14,33 +14,6 @@
 namespace piejam::gui::qt_log
 {
 
-template <class... Args>
-static void
-log_fn(QtMsgType type, char const* const pattern, Args const&... args)
-{
-    switch (type)
-    {
-        case QtDebugMsg:
-            spdlog::debug(pattern, std::forward<Args const>(args)...);
-            break;
-        case QtInfoMsg:
-            spdlog::info(pattern, std::forward<Args const>(args)...);
-            break;
-        case QtWarningMsg:
-            spdlog::warn(pattern, std::forward<Args const>(args)...);
-            break;
-        case QtCriticalMsg:
-            spdlog::critical(pattern, std::forward<Args const>(args)...);
-            break;
-        case QtFatalMsg:
-            spdlog::error(pattern, std::forward<Args const>(args)...);
-            break;
-        default:
-            BOOST_ASSERT_MSG(false, "unhandled QtMsgType");
-            break;
-    }
-}
-
 void
 log_message_handler(
         QtMsgType type,
@@ -48,15 +21,34 @@ log_message_handler(
         QString const& msg)
 {
     QByteArray localMsg = msg.toLocal8Bit();
+    auto const msgData = localMsg.constData();
     char const* const file = context.file ? context.file : "";
+    int const line = context.line;
     char const* const function = context.function ? context.function : "";
 
-    log_fn(type,
-           "{} ({}:{}, {})",
-           localMsg.constData(),
-           file,
-           context.line,
-           function);
+    constexpr auto const pattern = "{} ({}:{}, {})";
+
+    switch (type)
+    {
+        case QtDebugMsg:
+            spdlog::debug(pattern, msgData, file, line, function);
+            break;
+        case QtInfoMsg:
+            spdlog::info(pattern, msgData, file, line, function);
+            break;
+        case QtWarningMsg:
+            spdlog::warn(pattern, msgData, file, line, function);
+            break;
+        case QtCriticalMsg:
+            spdlog::critical(pattern, msgData, file, line, function);
+            break;
+        case QtFatalMsg:
+            spdlog::error(pattern, msgData, file, line, function);
+            break;
+        default:
+            BOOST_ASSERT_MSG(false, "unhandled QtMsgType");
+            break;
+    }
 }
 
 void
