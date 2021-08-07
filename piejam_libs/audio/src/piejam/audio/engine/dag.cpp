@@ -165,16 +165,14 @@ public:
                   event_memory_size,
                   m_nodes_to_process,
                   m_buffer_size,
-                  m_run_queues,
-                  m_initial_tasks[0])
+                  m_run_queues)
         , m_worker_threads(worker_threads)
         , m_workers(make_workers(
                   worker_threads.size(),
                   event_memory_size,
                   m_nodes_to_process,
                   m_buffer_size,
-                  m_run_queues,
-                  m_initial_tasks))
+                  m_run_queues))
         , m_worker_tasks(make_worker_tasks(m_workers))
     {
         if (std::ranges::any_of(
@@ -236,14 +234,12 @@ private:
                 std::size_t const event_memory_size,
                 std::atomic_size_t& nodes_to_process,
                 std::atomic_size_t& buffer_size,
-                std::span<job_deque_t> const& run_queues,
-                std::vector<node*> const& initial_tasks)
+                std::span<job_deque_t> const& run_queues)
             : m_worker_index(worker_index)
             , m_event_memory(event_memory_size)
             , m_nodes_to_process(nodes_to_process)
             , m_buffer_size(buffer_size)
             , m_run_queues(run_queues)
-            , m_initial_tasks(initial_tasks)
             , m_steal_indices(
                       make_steal_indices(worker_index, m_run_queues.size()))
         {
@@ -317,7 +313,7 @@ private:
         {
             return algorithm::transform_to_vector(
                     std::views::iota(std::size_t{1}, num_queues),
-                    [=](std::size_t i)
+                    [=](std::size_t i) -> std::size_t
                     { return (worker_index + i) % num_queues; });
         }
 
@@ -328,7 +324,6 @@ private:
         std::atomic_size_t& m_nodes_to_process;
         std::atomic_size_t& m_buffer_size;
         std::span<job_deque_t> m_run_queues;
-        std::vector<node*> const& m_initial_tasks;
         std::vector<std::size_t> m_steal_indices;
 
         static_assert(std::atomic_size_t::is_always_lock_free);
@@ -342,8 +337,7 @@ private:
             std::size_t const event_memory_size,
             std::atomic_size_t& nodes_to_process,
             std::atomic_size_t& buffer_size,
-            std::span<job_deque_t> const& run_queues,
-            std::vector<std::vector<node*>> const& initial_tasks) -> workers_t
+            std::span<job_deque_t> const& run_queues) -> workers_t
     {
         workers_t workers;
         workers.reserve(num_workers);
@@ -355,8 +349,7 @@ private:
                     event_memory_size,
                     nodes_to_process,
                     buffer_size,
-                    run_queues,
-                    initial_tasks[i]);
+                    run_queues);
         }
 
         return workers;
