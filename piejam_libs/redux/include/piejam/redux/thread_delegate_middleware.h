@@ -15,7 +15,8 @@ namespace piejam::redux
 {
 
 template <class DelegateMethod, class Action>
-requires cloneable<Action> class thread_delegate_middleware
+    requires cloneable<Action>
+class thread_delegate_middleware
 {
 public:
     thread_delegate_middleware(

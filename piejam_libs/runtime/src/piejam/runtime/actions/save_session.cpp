@@ -9,7 +9,8 @@
 namespace piejam::runtime::actions
 {
 
-auto save_session::reduce(state const& st) const -> state
+auto
+save_session::reduce(state const& st) const -> state
 {
     return st;
 }

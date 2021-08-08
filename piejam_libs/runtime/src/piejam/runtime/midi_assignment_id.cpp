@@ -9,7 +9,8 @@
 namespace piejam::runtime
 {
 
-bool is_valid_midi_assignment_id(midi_assignment_id const& id) noexcept
+bool
+is_valid_midi_assignment_id(midi_assignment_id const& id) noexcept
 {
     return std::visit([](auto const& pid) { return pid.valid(); }, id);
 }

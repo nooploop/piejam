@@ -10,6 +10,7 @@
 namespace piejam::runtime::actions
 {
 
-auto set_float_parameter_normalized(float_parameter_id, float norm_value) -> thunk_action;
+auto set_float_parameter_normalized(float_parameter_id, float norm_value)
+        -> thunk_action;
 
 } // namespace piejam::runtime::actions

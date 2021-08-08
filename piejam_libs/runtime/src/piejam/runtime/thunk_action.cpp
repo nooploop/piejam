@@ -6,13 +6,9 @@
 
 #include <piejam/runtime/state.h>
 
-namespace piejam::runtime
+namespace piejam::runtime::ui
 {
-
-namespace ui {
 
 template struct thunk_action<state>;
 
-} // namespace ui
-
-} // namespace piejam::runtime
+} // namespace piejam::runtime::ui

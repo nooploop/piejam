@@ -26,10 +26,7 @@ public:
     {
     }
 
-    auto type_name() const -> std::string_view override
-    {
-        return "value_sink";
-    }
+    auto type_name() const -> std::string_view override { return "value_sink"; }
 
     auto num_inputs() const -> std::size_t override { return 0; }
     auto num_outputs() const -> std::size_t override { return 0; }

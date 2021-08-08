@@ -10,7 +10,8 @@ namespace piejam::redux
 {
 
 template <class MW, class... Args>
-auto make_middleware(Args&&... args)
+auto
+make_middleware(Args&&... args)
 {
     auto m = std::make_shared<MW>(std::forward<Args>(args)...);
     return [m = std::move(m)](auto const& action) { (*m)(action); };

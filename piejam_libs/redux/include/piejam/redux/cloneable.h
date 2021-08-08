@@ -15,8 +15,7 @@ concept cloneable = requires(T const& x)
 {
     {
         x.clone()
-    }
-    ->std::same_as<std::unique_ptr<T>>;
+        } -> std::same_as<std::unique_ptr<T>>;
 };
 
 } // namespace piejam::redux

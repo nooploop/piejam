@@ -33,7 +33,7 @@ public:
 
     ~subscription() = default;
 
-    auto operator=(subscription &&) -> subscription& = delete;
+    auto operator=(subscription&&) -> subscription& = delete;
     auto operator=(subscription const&) -> subscription& = delete;
 
 private:

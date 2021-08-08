@@ -8,7 +8,6 @@
 
 namespace piejam::redux
 {
-
 namespace
 {
 
@@ -59,5 +58,4 @@ TEST_F(thunk_middleware_test, invoke_thunk)
 }
 
 } // namespace
-
 } // namespace piejam::redux

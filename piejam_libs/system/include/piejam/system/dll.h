@@ -47,7 +47,7 @@ public:
     dll(dll const&) = delete;
     ~dll();
 
-    auto operator=(dll &&) -> dll&;
+    auto operator=(dll&&) -> dll&;
     auto operator=(dll const&) -> dll& = delete;
 
     operator bool() const noexcept { return m_handle; }

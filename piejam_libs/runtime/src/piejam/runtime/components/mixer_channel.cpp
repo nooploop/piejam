@@ -154,7 +154,10 @@ make_mixer_channel_output(
         std::string_view const& /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<mixer_channel_output>(sample_rate, channel, param_procs);
+    return std::make_unique<mixer_channel_output>(
+            sample_rate,
+            channel,
+            param_procs);
 }
 
 } // namespace piejam::runtime::components

@@ -14,7 +14,8 @@ namespace piejam::redux
 {
 
 template <class Action>
-requires cloneable<Action> class queueing_middleware
+    requires cloneable<Action>
+class queueing_middleware
 {
 public:
     template <class Next>

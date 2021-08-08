@@ -73,14 +73,14 @@ struct interleaved_view
 
     template <std::size_t ToNumChannels>
     constexpr auto channels_cast() const noexcept
-            -> interleaved_view<T, ToNumChannels> requires(NumChannels == 0)
+            -> interleaved_view<T, ToNumChannels>
+        requires(NumChannels == 0)
     {
         BOOST_ASSERT(m_begin.num_channels() == ToNumChannels);
         return interleaved_view<T, ToNumChannels>(m_begin, m_end);
     }
 
-private:
-    iterator m_begin;
+private : iterator m_begin;
     iterator m_end;
 };
 

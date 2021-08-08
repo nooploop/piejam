@@ -12,8 +12,9 @@
 namespace piejam::audio::engine
 {
 
-auto
-make_clip_processor(float min = -1.f, float max = 1.f, std::string_view const& name = {})
-        -> std::unique_ptr<processor>;
+auto make_clip_processor(
+        float min = -1.f,
+        float max = 1.f,
+        std::string_view const& name = {}) -> std::unique_ptr<processor>;
 
 } // namespace piejam::audio::engine

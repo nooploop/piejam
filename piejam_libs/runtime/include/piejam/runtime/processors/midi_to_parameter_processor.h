@@ -22,4 +22,3 @@ auto make_midi_cc_to_parameter_processor(bool_parameter const&)
         -> std::unique_ptr<audio::engine::processor>;
 
 } // namespace piejam::runtime::processors
-

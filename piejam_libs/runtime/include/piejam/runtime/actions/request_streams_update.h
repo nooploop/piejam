@@ -5,8 +5,8 @@
 #pragma once
 
 #include <piejam/runtime/actions/engine_action.h>
-#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/audio_stream.h>
+#include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 

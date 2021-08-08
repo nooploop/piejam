@@ -26,4 +26,4 @@ TEST(type_traits, is_nothrow_default_constructible)
                   default_ctor_except>);
 }
 
-} // namespace piejam::meta::test
+} // namespace piejam::test

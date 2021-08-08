@@ -8,7 +8,6 @@
 
 namespace piejam::redux
 {
-
 namespace
 {
 
@@ -62,5 +61,4 @@ TEST_F(batch_middleware_test, invoke_batched_actions_in_sequence)
 }
 
 } // namespace
-
 } // namespace piejam::redux

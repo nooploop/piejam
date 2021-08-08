@@ -9,7 +9,8 @@
 namespace piejam::runtime::actions
 {
 
-auto load_app_config::reduce(state const& st) const -> state
+auto
+load_app_config::reduce(state const& st) const -> state
 {
     return st;
 }

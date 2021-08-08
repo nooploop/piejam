@@ -35,7 +35,8 @@ TEST(audio_spsc_ring_buffer,
     EXPECT_EQ(0u, buf.write(std::array{0.f, 1.f, 2.f, 3.f}));
 }
 
-TEST(audio_spsc_ring_buffer, write_only_until_max_capacity_on_consecutive_writes)
+TEST(audio_spsc_ring_buffer,
+     write_only_until_max_capacity_on_consecutive_writes)
 {
     audio_spsc_ring_buffer buf(6);
 

@@ -97,4 +97,4 @@ private:
     value_type m_frame;
 };
 
-} // namespace piejam::audio
+} // namespace piejam::range

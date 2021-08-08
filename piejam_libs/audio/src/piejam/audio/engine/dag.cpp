@@ -71,8 +71,7 @@ private:
             std::ranges::transform(
                     children,
                     std::back_inserter(nodes[parent_id].children),
-                    [&nodes](dag::task_id_t const child_id)
-                    {
+                    [&nodes](dag::task_id_t const child_id) {
                         BOOST_ASSERT(nodes.count(child_id));
                         return std::ref(nodes[child_id]);
                     });
@@ -313,8 +312,9 @@ private:
         {
             return algorithm::transform_to_vector(
                     std::views::iota(std::size_t{1}, num_queues),
-                    [=](std::size_t i) -> std::size_t
-                    { return (worker_index + i) % num_queues; });
+                    [=](std::size_t i) -> std::size_t {
+                        return (worker_index + i) % num_queues;
+                    });
         }
 
         std::size_t m_worker_index;
@@ -388,8 +388,9 @@ is_descendent(
 
     return std::ranges::any_of(
             t.at(parent),
-            [&t, descendent](dag::task_id_t const child)
-            { return is_descendent(t, child, descendent); });
+            [&t, descendent](dag::task_id_t const child) {
+                return is_descendent(t, child, descendent);
+            });
 }
 
 } // namespace

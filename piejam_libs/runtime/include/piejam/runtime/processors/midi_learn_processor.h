@@ -11,7 +11,6 @@
 namespace piejam::runtime::processors
 {
 
-auto make_midi_learn_processor()
-        -> std::unique_ptr<audio::engine::processor>;
+auto make_midi_learn_processor() -> std::unique_ptr<audio::engine::processor>;
 
 } // namespace piejam::runtime::processors
