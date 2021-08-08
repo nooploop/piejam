@@ -6,8 +6,6 @@
 
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/gui/model/GenericListModel.h>
-#include <piejam/runtime/store_dispatch.h>
-#include <piejam/runtime/subscriber.h>
 
 namespace piejam::gui
 {
