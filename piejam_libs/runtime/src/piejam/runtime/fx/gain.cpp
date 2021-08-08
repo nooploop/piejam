@@ -48,16 +48,22 @@ make_gain_module(parameters_t& fx_params, parameter_maps& params) -> module
 {
     using namespace std::string_literals;
 
-    auto add_param = [&](auto&& p, auto&& name) {
-        auto id = add_parameter(params, std::forward<decltype(p)>(p));
-        fx_params.emplace(
-                id,
-                parameter{
-                        .name = std::forward<decltype(name)>(name),
-                        .value_to_string =
-                                parameter_value_to_string(&to_dB_string)});
-        return id;
-    };
+    auto gain_param_id = add_parameter(
+            params,
+            runtime::parameter::float_{
+                    .default_value = gain_defaults::default_value,
+                    .min = gain_defaults::min,
+                    .max = gain_defaults::max,
+                    .to_normalized =
+                            runtime::parameter::to_normalized_db<dB_ival>,
+                    .from_normalized =
+                            &runtime::parameter::from_normalized_db<dB_ival>});
+    fx_params.emplace(
+            gain_param_id,
+            parameter{
+                    .name = "Gain"s,
+                    .value_to_string =
+                            parameter_value_to_string(&to_dB_string)});
 
     return module{
             .fx_instance_id = internal::gain,
@@ -65,21 +71,7 @@ make_gain_module(parameters_t& fx_params, parameter_maps& params) -> module
             .parameters =
                     fx::module_parameters{
                             {to_underlying(gain_parameter_key::gain),
-                             add_param(
-                                     runtime::parameter::float_{
-                                             .default_value = gain_defaults::
-                                                     default_value,
-                                             .min = gain_defaults::min,
-                                             .max = gain_defaults::max,
-                                             .to_normalized =
-                                                     runtime::parameter::
-                                                             to_normalized_db<
-                                                                     dB_ival>,
-                                             .from_normalized =
-                                                     &runtime::parameter::
-                                                             from_normalized_db<
-                                                                     dB_ival>},
-                                     "Gain"s)}},
+                             gain_param_id}},
             .streams = {}};
 }
 
