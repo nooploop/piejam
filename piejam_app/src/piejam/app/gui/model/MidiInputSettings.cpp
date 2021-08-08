@@ -23,12 +23,14 @@ void
 MidiInputSettings::onSubscribe()
 {
     observe(runtime::selectors::select_midi_input_devices,
-            [this](boxed_vector<midi::device_id_t> const& devs) {
+            [this](boxed_vector<midi::device_id_t> const& devs)
+            {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_devices, *devs),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *devices(),
-                                [this](midi::device_id_t device_id) {
+                                [this](midi::device_id_t device_id)
+                                {
                                     return std::make_unique<MidiDeviceConfig>(
                                             dispatch(),
                                             state_change_subscriber(),

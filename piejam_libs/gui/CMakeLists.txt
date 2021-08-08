@@ -60,11 +60,13 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SubscribableModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/register_types.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/qt_log.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Spectrum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/ScopeLinesGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StereoSpectrumDataGenerator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/register_types.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
 )
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
