@@ -41,7 +41,7 @@ reload_missing_plugins() -> thunk_action
                             unavail.plugin_id,
                             *fx_mod.name,
                             unavail.parameter_values,
-                            unavail.midi_assigns));
+                            unavail.midi_assignments));
                 }
             }
         }

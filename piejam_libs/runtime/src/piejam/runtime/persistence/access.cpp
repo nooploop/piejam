@@ -201,7 +201,7 @@ export_fx_plugin(
     plug.id = unavail.plugin_id;
     plug.name = fx_mod.name;
     plug.preset = unavail.parameter_values;
-    plug.midi = unavail.midi_assigns;
+    plug.midi = unavail.midi_assignments;
     return plug;
 }
 

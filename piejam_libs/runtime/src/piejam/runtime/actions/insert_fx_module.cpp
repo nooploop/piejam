@@ -23,7 +23,7 @@ insert_internal_fx_module::reduce(state const& st) const -> state
             position,
             type,
             initial_values,
-            midi_assigns);
+            midi_assignments);
 
     return new_st;
 }
@@ -47,7 +47,7 @@ insert_ladspa_fx_module::reduce(state const& st) const -> state
             plugin_desc,
             control_inputs,
             initial_values,
-            midi_assigns);
+            midi_assignments);
 
     return new_st;
 }

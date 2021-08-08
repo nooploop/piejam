@@ -60,7 +60,7 @@ ladspa_fx_middleware::process_ladspa_fx_action(
             next_action.plugin_desc = *plugin_desc;
             next_action.control_inputs = m_ladspa_control.control_inputs(id);
             next_action.initial_values = a.initial_values;
-            next_action.midi_assigns = a.midi_assigns;
+            next_action.midi_assignments = a.midi_assignments;
 
             next(next_action);
 
@@ -78,7 +78,7 @@ ladspa_fx_middleware::process_ladspa_fx_action(
     next_action.unavailable_ladspa = fx::unavailable_ladspa{
             .plugin_id = a.plugin_id,
             .parameter_values = a.initial_values,
-            .midi_assigns = a.midi_assigns};
+            .midi_assignments = a.midi_assignments};
     next_action.name = a.name;
     next(next_action);
 }

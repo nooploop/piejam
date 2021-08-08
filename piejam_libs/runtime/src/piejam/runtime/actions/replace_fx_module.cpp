@@ -101,7 +101,7 @@ make_replace_fx_module_action(
     insert_action->plugin_id = plugin_id;
     insert_action->name = name;
     insert_action->initial_values = initial_values;
-    insert_action->midi_assigns = midi_assigns;
+    insert_action->midi_assignments = midi_assigns;
     batch.push_back(std::move(insert_action));
 
     return batch;

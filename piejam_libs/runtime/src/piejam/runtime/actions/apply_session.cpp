@@ -39,7 +39,7 @@ struct make_add_fx_module_action
         action->position = npos;
         action->type = fx.type;
         action->initial_values = fx.preset;
-        action->midi_assigns = fx.midi;
+        action->midi_assignments = fx.midi;
         return action;
     }
 
@@ -52,7 +52,7 @@ struct make_add_fx_module_action
         action->plugin_id = ladspa_plug.id;
         action->name = ladspa_plug.name;
         action->initial_values = ladspa_plug.preset;
-        action->midi_assigns = ladspa_plug.midi;
+        action->midi_assignments = ladspa_plug.midi;
         return action;
     }
 };
