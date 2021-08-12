@@ -7,12 +7,16 @@
 #include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/StereoChannel.h>
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
+
+#include <memory>
 
 namespace piejam::gui::model
 {
 
-class FxSpectrum : public FxModuleContent
+class FxSpectrum final : public Subscribable<FxModuleContent>
 {
     Q_OBJECT
 
@@ -26,6 +30,12 @@ class FxSpectrum : public FxModuleContent
                        channelBChanged FINAL)
 
 public:
+    FxSpectrum(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::fx::module_id);
+    ~FxSpectrum();
+
     auto type() const noexcept -> Type override final { return Type::Spectrum; }
 
     bool activeA() const noexcept { return m_activeA; }
@@ -89,6 +99,11 @@ signals:
     void channelBChanged();
 
 private:
+    void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
+
     bool m_activeA{true};
     StereoChannel m_channelA{StereoChannel::Left};
     SpectrumData m_spectrumDataA;

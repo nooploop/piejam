@@ -4,13 +4,17 @@
 
 #pragma once
 
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
+
+#include <memory>
 
 namespace piejam::gui::model
 {
 
-class FxModule : public SubscribableModel
+class FxModule : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -24,6 +28,13 @@ class FxModule : public SubscribableModel
                        CONSTANT FINAL)
 
 public:
+    FxModule(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::fx::module_id,
+            runtime::fx::instance_id);
+    ~FxModule();
+
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
     {
@@ -64,12 +75,12 @@ public:
         }
     }
 
-    virtual auto content() noexcept -> FxModuleContent* = 0;
+    auto content() noexcept -> FxModuleContent*;
 
-    Q_INVOKABLE virtual void toggleBypass() = 0;
-    Q_INVOKABLE virtual void deleteModule() = 0;
-    Q_INVOKABLE virtual void moveLeft() = 0;
-    Q_INVOKABLE virtual void moveRight() = 0;
+    Q_INVOKABLE void toggleBypass();
+    Q_INVOKABLE void deleteModule();
+    Q_INVOKABLE void moveLeft();
+    Q_INVOKABLE void moveRight();
 
 signals:
     void nameChanged();
@@ -78,6 +89,11 @@ signals:
     void canMoveRightChanged();
 
 private:
+    void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
+
     QString m_name;
     bool m_bypassed{};
     bool m_canMoveLeft{};

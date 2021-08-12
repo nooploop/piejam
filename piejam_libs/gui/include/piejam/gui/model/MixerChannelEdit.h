@@ -4,15 +4,19 @@
 
 #pragma once
 
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 #include <QStringList>
+
+#include <memory>
 
 namespace piejam::gui::model
 {
 
-class MixerChannelEdit : public SubscribableModel
+class MixerChannelEdit final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -44,7 +48,11 @@ class MixerChannelEdit : public SubscribableModel
                        outputChannelsChanged FINAL)
 
 public:
-    using SubscribableModel::SubscribableModel;
+    MixerChannelEdit(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::mixer::channel_id);
+    ~MixerChannelEdit();
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
@@ -56,7 +64,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeName(QString const&) = 0;
+    Q_INVOKABLE void changeName(QString const&);
 
     auto canMoveLeft() const noexcept -> bool { return m_canMoveLeft; }
     void setCanMoveLeft(bool const x)
@@ -68,7 +76,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void moveLeft() = 0;
+    Q_INVOKABLE void moveLeft();
 
     auto canMoveRight() const noexcept -> bool { return m_canMoveRight; }
     void setCanMoveRight(bool const x)
@@ -80,9 +88,9 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void moveRight() = 0;
+    Q_INVOKABLE void moveRight();
 
-    Q_INVOKABLE virtual void deleteChannel() = 0;
+    Q_INVOKABLE void deleteChannel();
 
     bool defaultInputIsValid() const noexcept { return m_defaultInputIsValid; }
     void setDefaultInputIsValid(bool x)
@@ -149,9 +157,9 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeInputToMix() = 0;
-    Q_INVOKABLE virtual void changeInputToDevice(unsigned index) = 0;
-    Q_INVOKABLE virtual void changeInputToChannel(unsigned index) = 0;
+    Q_INVOKABLE void changeInputToMix();
+    Q_INVOKABLE void changeInputToDevice(unsigned index);
+    Q_INVOKABLE void changeInputToChannel(unsigned index);
 
     enum class SelectedOutputState
     {
@@ -213,9 +221,9 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeOutputToNone() = 0;
-    Q_INVOKABLE virtual void changeOutputToDevice(unsigned index) = 0;
-    Q_INVOKABLE virtual void changeOutputToChannel(unsigned index) = 0;
+    Q_INVOKABLE void changeOutputToNone();
+    Q_INVOKABLE void changeOutputToDevice(unsigned index);
+    Q_INVOKABLE void changeOutputToChannel(unsigned index);
 
 signals:
 
@@ -233,6 +241,11 @@ signals:
     void outputChannelsChanged();
 
 private:
+    void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
+
     QString m_name;
     bool m_canMoveLeft{};
     bool m_canMoveRight{};

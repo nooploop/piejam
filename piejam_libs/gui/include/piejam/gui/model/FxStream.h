@@ -4,26 +4,25 @@
 
 #pragma once
 
+#include <piejam/gui/model/AudioStreamProvider.h>
+#include <piejam/gui/model/FxStreamKeyId.h>
 #include <piejam/gui/model/Subscribable.h>
-#include <piejam/gui/model/SubscribableModel.h>
-#include <piejam/gui/model/fwd.h>
 
 #include <memory>
 
 namespace piejam::gui::model
 {
 
-class MidiInputSettings final : public Subscribable<SubscribableModel>
+class FxStream final : public Subscribable<AudioStreamProvider>
 {
-    Q_OBJECT
-
-    Q_PROPERTY(QAbstractListModel* devices READ devices CONSTANT)
-
 public:
-    MidiInputSettings(runtime::store_dispatch, runtime::subscriber&);
-    ~MidiInputSettings();
+    FxStream(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            FxStreamKeyId const&);
+    ~FxStream();
 
-    auto devices() -> MidiDeviceList*;
+    void requestUpdate() override;
 
 private:
     void onSubscribe() override;

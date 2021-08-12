@@ -4,13 +4,20 @@
 
 #pragma once
 
+#include <piejam/audio/types.h>
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+#include <piejam/runtime/device_io_fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/parameters.h>
+
+#include <memory>
 
 namespace piejam::gui::model
 {
 
-class MixerChannelPerform : public SubscribableModel
+class MixerChannelPerform final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -36,7 +43,11 @@ class MixerChannelPerform : public SubscribableModel
                        CONSTANT FINAL)
 
 public:
-    using SubscribableModel::SubscribableModel;
+    MixerChannelPerform(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::mixer::channel_id);
+    ~MixerChannelPerform();
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
@@ -68,7 +79,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeVolume(double) = 0;
+    Q_INVOKABLE void changeVolume(double);
 
     auto levelLeft() const noexcept -> double { return m_levelLeft; }
     auto levelRight() const noexcept -> double { return m_levelRight; }
@@ -97,7 +108,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changePanBalance(double) = 0;
+    Q_INVOKABLE void changePanBalance(double);
 
     auto record() const noexcept -> bool { return m_record; }
     void setRecord(bool x)
@@ -109,7 +120,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeRecord(bool) = 0;
+    Q_INVOKABLE void changeRecord(bool);
 
     auto mute() const noexcept -> bool { return m_mute; }
     void setMute(bool const x)
@@ -121,7 +132,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeMute(bool) = 0;
+    Q_INVOKABLE void changeMute(bool);
 
     auto solo() const noexcept -> bool { return m_solo; }
     void setSolo(bool const x)
@@ -133,7 +144,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeSolo(bool) = 0;
+    Q_INVOKABLE void changeSolo(bool);
 
     auto mutedBySolo() const noexcept -> bool { return m_mutedBySolo; }
     void setMutedBySolo(bool const x)
@@ -145,12 +156,12 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void focusFxChain() = 0;
+    Q_INVOKABLE void focusFxChain();
 
-    virtual auto volumeMidi() const -> MidiAssignable* = 0;
-    virtual auto panMidi() const -> MidiAssignable* = 0;
-    virtual auto muteMidi() const -> MidiAssignable* = 0;
-    virtual auto soloMidi() const -> MidiAssignable* = 0;
+    auto volumeMidi() const -> MidiAssignable*;
+    auto panMidi() const -> MidiAssignable*;
+    auto muteMidi() const -> MidiAssignable*;
+    auto soloMidi() const -> MidiAssignable*;
 
 signals:
 
@@ -166,6 +177,11 @@ signals:
     void mutedBySoloChanged();
 
 private:
+    void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
+
     QString m_name;
     bool m_mono{};
     double m_volume{1.};

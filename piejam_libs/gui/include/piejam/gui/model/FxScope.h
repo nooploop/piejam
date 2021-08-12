@@ -7,14 +7,18 @@
 #include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/ScopeLinesObject.h>
 #include <piejam/gui/model/StereoChannel.h>
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
 
 #include <QObject>
+
+#include <memory>
 
 namespace piejam::gui::model
 {
 
-class FxScope : public FxModuleContent
+class FxScope final : public Subscribable<FxModuleContent>
 {
     Q_OBJECT
 
@@ -32,6 +36,11 @@ class FxScope : public FxModuleContent
                        channelBChanged FINAL)
 
 public:
+    FxScope(runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::fx::module_id);
+    ~FxScope();
+
     auto type() const noexcept -> Type override final { return Type::Scope; }
 
     auto samplesPerLine() const noexcept -> int { return m_samplesPerLine; }
@@ -134,6 +143,11 @@ signals:
     void channelBChanged();
 
 private:
+    void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
+
     int m_samplesPerLine{1};
     int m_viewSize{};
     bool m_activeA{true};

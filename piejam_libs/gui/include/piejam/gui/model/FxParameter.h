@@ -4,13 +4,15 @@
 
 #pragma once
 
+#include <piejam/gui/model/FxParameterKeyId.h>
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
 namespace piejam::gui::model
 {
 
-class FxParameter : public SubscribableModel
+class FxParameter final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -31,7 +33,11 @@ class FxParameter : public SubscribableModel
             piejam::gui::model::MidiAssignable* midi READ midi CONSTANT FINAL)
 
 public:
-    using SubscribableModel::SubscribableModel;
+    FxParameter(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            piejam::gui::model::FxParameterKeyId const&);
+    ~FxParameter();
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
@@ -53,7 +59,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeValue(double) = 0;
+    Q_INVOKABLE void changeValue(double);
 
     auto valueString() const noexcept -> QString const&
     {
@@ -119,9 +125,9 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeSwitchValue(bool) = 0;
+    Q_INVOKABLE void changeSwitchValue(bool);
 
-    virtual auto midi() const -> MidiAssignable* = 0;
+    auto midi() const -> MidiAssignable*;
 
 signals:
     void nameChanged();
@@ -134,6 +140,11 @@ signals:
     void switchValueChanged();
 
 private:
+    void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
+
     QString m_name;
     double m_value{};
     QString m_valueString;

@@ -5,16 +5,16 @@
 #pragma once
 
 #include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <memory>
-#include <vector>
 
 namespace piejam::gui::model
 {
 
-class Mixer : public SubscribableModel
+class Mixer final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -23,19 +23,27 @@ class Mixer : public SubscribableModel
                        NOTIFY mainChannelChanged FINAL)
 
 public:
+    Mixer(runtime::store_dispatch, runtime::subscriber&);
+    ~Mixer();
+
     auto inputChannels() -> MixerChannelsList* { return &m_inputChannels; }
 
-    virtual auto mainChannel() const -> MixerChannel* = 0;
+    auto mainChannel() const -> MixerChannel*;
 
-    virtual Q_INVOKABLE void addChannel(QString const& newChannelName) = 0;
+    Q_INVOKABLE void addChannel(QString const& newChannelName);
 
-    virtual Q_INVOKABLE void requestLevelsUpdate() = 0;
+    Q_INVOKABLE void requestLevelsUpdate();
 
 signals:
 
     void mainChannelChanged();
 
 private:
+    void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> const m_impl;
+
     MixerChannelsList m_inputChannels;
 };
 

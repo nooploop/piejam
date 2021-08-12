@@ -4,12 +4,14 @@
 
 #pragma once
 
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/midi/device_id.h>
 
 namespace piejam::gui::model
 {
 
-class MidiDeviceConfig : public SubscribableModel
+class MidiDeviceConfig final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -17,7 +19,10 @@ class MidiDeviceConfig : public SubscribableModel
     Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged FINAL)
 
 public:
-    using SubscribableModel::SubscribableModel;
+    MidiDeviceConfig(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            midi::device_id_t);
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
@@ -39,7 +44,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeEnabled(bool x) = 0;
+    Q_INVOKABLE void changeEnabled(bool x);
 
 signals:
 
@@ -47,6 +52,10 @@ signals:
     void enabledChanged();
 
 private:
+    void onSubscribe() override;
+
+    midi::device_id_t m_device_id;
+
     QString m_name;
     bool m_enabled{};
 };

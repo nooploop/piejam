@@ -2,13 +2,12 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/app/gui/model/Factory.h>
 #include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
+#include <piejam/gui/model/Factory.h>
 #include <piejam/gui/model/Info.h>
 #include <piejam/gui/qt_log.h>
-#include <piejam/gui/register_types.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/device_update.h>
 #include <piejam/midi/input_event_handler.h>
@@ -224,15 +223,11 @@ main(int argc, char* argv[]) -> int
 
     store.dispatch(runtime::actions::scan_ladspa_fx_plugins("/usr/lib/ladspa"));
 
-    gui::register_types();
-
-    app::gui::model::Factory modelFactory(store, state_change_subscriber);
+    gui::model::Factory modelFactory(store, state_change_subscriber);
 
     QQmlApplicationEngine engine;
     engine.addImportPath("qrc:/");
-    engine.rootContext()->setContextProperty(
-            "g_modelFactory",
-            static_cast<gui::model::Factory*>(&modelFactory));
+    engine.rootContext()->setContextProperty("g_modelFactory", &modelFactory);
 
     engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
     if (engine.rootObjects().isEmpty())

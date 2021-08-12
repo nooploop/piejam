@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 
 #include <QList>
@@ -11,12 +12,11 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace piejam::gui::model
 {
 
-class Info : public SubscribableModel
+class Info final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -32,6 +32,8 @@ class Info : public SubscribableModel
     Q_PROPERTY(int diskUsage READ diskUsage NOTIFY diskUsageChanged FINAL)
 
 public:
+    Info(runtime::store_dispatch, runtime::subscriber&);
+
     auto audioLoad() const noexcept -> double { return m_audioLoad; }
     void setAudioLoad(double audioLoad)
     {
@@ -82,7 +84,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeRecording(bool) = 0;
+    Q_INVOKABLE void changeRecording(bool);
 
     auto midiLearn() const noexcept -> bool { return m_midiLearn; }
     void setMidiLearn(bool x)
@@ -132,6 +134,8 @@ signals:
     void diskUsageChanged();
 
 private:
+    void onSubscribe() override;
+
     double m_audioLoad{};
     unsigned m_xruns{};
     QList<float> m_cpuLoad;

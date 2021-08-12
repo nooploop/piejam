@@ -4,12 +4,14 @@
 
 #pragma once
 
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/runtime/device_io_fwd.h>
 
 namespace piejam::gui::model
 {
 
-class BusConfig : public SubscribableModel
+class BusConfig final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -22,7 +24,10 @@ class BusConfig : public SubscribableModel
                        stereoRightChannelChanged FINAL)
 
 public:
-    using SubscribableModel::SubscribableModel;
+    BusConfig(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::device_io::bus_id);
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
@@ -34,7 +39,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeName(QString const&) = 0;
+    Q_INVOKABLE void changeName(QString const&);
 
     auto mono() const noexcept -> bool { return m_mono; }
     void setMono(bool const x)
@@ -56,7 +61,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeMonoChannel(unsigned) = 0;
+    Q_INVOKABLE void changeMonoChannel(unsigned);
 
     auto stereoLeftChannel() const noexcept -> unsigned
     {
@@ -72,7 +77,7 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeStereoLeftChannel(unsigned) = 0;
+    Q_INVOKABLE void changeStereoLeftChannel(unsigned);
 
     auto stereoRightChannel() const noexcept -> unsigned
     {
@@ -88,9 +93,9 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void changeStereoRightChannel(unsigned) = 0;
+    Q_INVOKABLE void changeStereoRightChannel(unsigned);
 
-    Q_INVOKABLE virtual void deleteBus() = 0;
+    Q_INVOKABLE void deleteBus();
 
 signals:
 
@@ -101,6 +106,10 @@ signals:
     void stereoRightChannelChanged();
 
 private:
+    void onSubscribe() override;
+
+    runtime::device_io::bus_id m_bus_id;
+
     QString m_name;
     bool m_mono{true};
     unsigned m_monoChannel{};

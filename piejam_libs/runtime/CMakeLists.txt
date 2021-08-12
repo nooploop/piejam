@@ -228,19 +228,20 @@ target_compile_options(piejam_runtime PRIVATE -Wall -Wextra -Werror -pedantic-er
 target_include_directories(piejam_runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_runtime
     PUBLIC
-    piejam_redux
-    piejam_numeric
-    piejam_thread
     piejam_audio
     piejam_midi
-    piejam_functional
     piejam_range
+    piejam_redux
     piejam_reselect
-    nlohmann_json
+
     PRIVATE
+    piejam_algorithm
+    piejam_functional
+    piejam_numeric
+    piejam_thread
+    nlohmann_json
     fmt
     spdlog::spdlog
-    piejam_algorithm
     SndFile::sndfile)
 
 add_subdirectory(benchmarks)

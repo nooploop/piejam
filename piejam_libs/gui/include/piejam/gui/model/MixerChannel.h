@@ -4,15 +4,19 @@
 
 #pragma once
 
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 #include <QStringList>
+
+#include <memory>
 
 namespace piejam::gui::model
 {
 
-class MixerChannel : public SubscribableModel
+class MixerChannel final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -22,10 +26,20 @@ class MixerChannel : public SubscribableModel
             piejam::gui::model::MixerChannelEdit* edit READ edit CONSTANT FINAL)
 
 public:
-    using SubscribableModel::SubscribableModel;
+    MixerChannel(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::mixer::channel_id);
+    ~MixerChannel();
 
-    virtual auto perform() const -> MixerChannelPerform* = 0;
-    virtual auto edit() const -> MixerChannelEdit* = 0;
+    auto perform() const -> MixerChannelPerform*;
+    auto edit() const -> MixerChannelEdit*;
+
+private:
+    void onSubscribe() override;
+
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model
