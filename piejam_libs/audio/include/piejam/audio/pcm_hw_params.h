@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include <piejam/audio/period_counts.h>
-#include <piejam/audio/period_sizes.h>
-#include <piejam/audio/sample_rates.h>
-
-#include <boost/container/static_vector.hpp>
+#include <piejam/audio/period_count.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
 
 namespace piejam::audio
 {

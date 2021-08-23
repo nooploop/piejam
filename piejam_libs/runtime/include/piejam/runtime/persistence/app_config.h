@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <piejam/audio/period_count.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/audio/types.h>
 #include <piejam/runtime/channel_index_pair.h>
 
@@ -29,9 +32,9 @@ struct app_config
 {
     std::string input_device_name;
     std::string output_device_name;
-    audio::sample_rate_t sample_rate{};
-    audio::period_size_t period_size{};
-    audio::period_count_t period_count{};
+    audio::sample_rate sample_rate{};
+    audio::period_size period_size{};
+    audio::period_count period_count{};
 
     std::vector<bus_config> input_bus_config;
     std::vector<bus_config> output_bus_config;

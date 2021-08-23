@@ -81,9 +81,9 @@ to_json(nlohmann::json& j, app_config const& conf)
          {s_key_audio_settings,
           {{s_key_input_device_name, conf.input_device_name},
            {s_key_output_device_name, conf.output_device_name},
-           {s_key_sample_rate, conf.sample_rate},
-           {s_key_period_size, conf.period_size},
-           {s_key_period_count, conf.period_count},
+           {s_key_sample_rate, conf.sample_rate.get()},
+           {s_key_period_size, conf.period_size.get()},
+           {s_key_period_count, conf.period_count.get()},
            {s_key_input_configs, conf.input_bus_config},
            {s_key_output_configs, conf.output_bus_config},
            {s_key_enabled_midi_input_devices, conf.enabled_midi_input_devices},
@@ -96,9 +96,12 @@ from_json(nlohmann::json const& j, app_config& conf)
     auto const& audio_settings = j.at(s_key_audio_settings);
     audio_settings.at(s_key_input_device_name).get_to(conf.input_device_name);
     audio_settings.at(s_key_output_device_name).get_to(conf.output_device_name);
-    audio_settings.at(s_key_sample_rate).get_to(conf.sample_rate);
-    audio_settings.at(s_key_period_size).get_to(conf.period_size);
-    audio_settings.at(s_key_period_count).get_to(conf.period_count);
+    conf.sample_rate = audio::sample_rate(
+            audio_settings.at(s_key_sample_rate).get<unsigned>());
+    conf.period_size = audio::period_size(
+            audio_settings.at(s_key_period_size).get<unsigned>());
+    conf.period_count = audio::period_count(
+            audio_settings.at(s_key_period_count).get<unsigned>());
     audio_settings.at(s_key_input_configs).get_to(conf.input_bus_config);
     audio_settings.at(s_key_output_configs).get_to(conf.output_bus_config);
     audio_settings.at(s_key_enabled_midi_input_devices)

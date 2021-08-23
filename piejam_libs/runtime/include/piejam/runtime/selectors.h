@@ -5,9 +5,9 @@
 #pragma once
 
 #include <piejam/audio/pcm_descriptor.h>
-#include <piejam/audio/period_counts.h>
-#include <piejam/audio/period_sizes.h>
-#include <piejam/audio/sample_rates.h>
+#include <piejam/audio/period_count.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/audio/types.h>
 #include <piejam/box.h>
 #include <piejam/boxed_string.h>
@@ -33,14 +33,14 @@ namespace piejam::runtime::selectors
 template <class Value>
 using selector = reselect::selector<Value, state>;
 
-using sample_rate = std::pair<box<audio::sample_rates_t>, audio::sample_rate_t>;
+using sample_rate = std::pair<box<audio::sample_rates_t>, audio::sample_rate>;
 extern const selector<sample_rate> select_sample_rate;
 
-using period_size = std::pair<box<audio::period_sizes_t>, audio::period_size_t>;
+using period_size = std::pair<box<audio::period_sizes_t>, audio::period_size>;
 extern const selector<period_size> select_period_size;
 
 using period_count =
-        std::pair<box<audio::period_counts_t>, audio::period_count_t>;
+        std::pair<box<audio::period_counts_t>, audio::period_count>;
 extern const selector<period_count> select_period_count;
 
 extern const selector<float> select_buffer_latency;

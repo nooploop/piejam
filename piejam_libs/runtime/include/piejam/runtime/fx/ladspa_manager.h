@@ -29,7 +29,8 @@ public:
     auto control_inputs(ladspa_instance_id const&) const
             -> std::span<audio::ladspa::port_descriptor const> override;
 
-    auto make_processor(ladspa_instance_id const&, audio::sample_rate_t) const
+    auto
+    make_processor(ladspa_instance_id const&, audio::sample_rate const&) const
             -> std::unique_ptr<audio::engine::processor>;
 
 private:

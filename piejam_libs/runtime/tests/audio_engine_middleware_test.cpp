@@ -7,6 +7,9 @@
 
 #include <piejam/audio/device.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/period_count.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_sample_rate.h>
@@ -68,7 +71,8 @@ TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
     using namespace testing;
 
     audio::pcm_hw_params const default_hw_params{
-            .sample_rates = {44100u, 48000u},
+            .sample_rates =
+                    {audio::sample_rate(44100u), audio::sample_rate(48000u)},
             .period_sizes = {},
             .period_counts = {}};
 
@@ -90,10 +94,10 @@ TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
     actions::select_sample_rate action;
     action.index = 1;
 
-    ASSERT_EQ(0u, st.sample_rate);
+    ASSERT_EQ(audio::sample_rate(), st.sample_rate);
     sut(action);
 
-    EXPECT_EQ(48000u, st.sample_rate);
+    EXPECT_EQ(audio::sample_rate(48000u), st.sample_rate);
 }
 
 TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
@@ -101,8 +105,9 @@ TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
     using namespace testing;
 
     audio::pcm_hw_params const default_hw_params{
-            .sample_rates = {44100u, 48000u},
-            .period_sizes = {64u, 128u},
+            .sample_rates =
+                    {audio::sample_rate(44100u), audio::sample_rate(48000u)},
+            .period_sizes = {audio::period_size(64u), audio::period_size(128u)},
             .period_counts = {}};
 
     state st;
@@ -123,10 +128,10 @@ TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
     actions::select_period_size action;
     action.index = 1;
 
-    ASSERT_EQ(0u, st.period_size);
+    ASSERT_EQ(audio::period_size(), st.period_size);
     sut(action);
 
-    EXPECT_EQ(128u, st.period_size);
+    EXPECT_EQ(audio::period_size(128u), st.period_size);
 }
 
 TEST_F(audio_engine_middleware_test,
@@ -135,9 +140,9 @@ TEST_F(audio_engine_middleware_test,
     using namespace testing;
 
     piejam::audio::pcm_hw_params hw_params{
-            .sample_rates = {44100},
-            .period_sizes = {128},
-            .period_counts = {2}};
+            .sample_rates = {audio::sample_rate(44100u)},
+            .period_sizes = {audio::period_size(128u)},
+            .period_counts = {audio::period_count(2u)}};
 
     state st;
     st.input.index = 0;

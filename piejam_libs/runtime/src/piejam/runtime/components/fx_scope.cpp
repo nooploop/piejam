@@ -5,6 +5,7 @@
 #include <piejam/runtime/components/fx_scope.h>
 
 #include <piejam/audio/engine/component.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/runtime/components/stereo_stream.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/scope.h>
@@ -21,10 +22,10 @@ namespace
 {
 
 constexpr auto
-stream_capacity(audio::sample_rate_t const sample_rate) -> std::size_t
+stream_capacity(audio::sample_rate const sample_rate) -> std::size_t
 {
     // 3 x 17ms
-    return static_cast<std::size_t>((sample_rate / 1000.f) * 17 * 3);
+    return static_cast<std::size_t>((sample_rate.as_float() / 1000.f) * 17 * 3);
 }
 
 } // namespace
@@ -32,7 +33,7 @@ stream_capacity(audio::sample_rate_t const sample_rate) -> std::size_t
 auto
 make_fx_scope(
         fx::module const& fx_mod,
-        audio::sample_rate_t const sample_rate,
+        audio::sample_rate const& sample_rate,
         processors::stream_processor_factory& stream_proc_factory)
         -> std::unique_ptr<audio::engine::component>
 {

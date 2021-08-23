@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/audio/engine/fwd.h>
-#include <piejam/audio/types.h>
+#include <piejam/audio/fwd.h>
 
 #include <memory>
 #include <span>
@@ -25,7 +25,7 @@ public:
 
     virtual auto control_inputs() const -> std::span<port_descriptor const> = 0;
 
-    virtual auto make_processor(sample_rate_t) const
+    virtual auto make_processor(sample_rate const&) const
             -> std::unique_ptr<engine::processor> = 0;
 };
 

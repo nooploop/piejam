@@ -95,7 +95,14 @@ static auto
 set_intersection(Vector const& in, Vector const& out)
 {
     Vector result;
-    std::ranges::set_intersection(in, out, std::back_inserter(result));
+    auto proj = [](auto const& x) { return x.get(); };
+    std::ranges::set_intersection(
+            in,
+            out,
+            std::back_inserter(result),
+            {},
+            proj,
+            proj);
     return result;
 }
 

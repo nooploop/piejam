@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/audio/engine/fwd.h>
-#include <piejam/audio/types.h>
+#include <piejam/audio/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 
 #include <functional>
@@ -14,8 +14,10 @@
 namespace piejam::runtime::fx
 {
 
-using ladspa_processor_factory = std::function<std::unique_ptr<
-        audio::engine::processor>(ladspa_instance_id, audio::sample_rate_t)>;
+using ladspa_processor_factory =
+        std::function<std::unique_ptr<audio::engine::processor>(
+                ladspa_instance_id,
+                audio::sample_rate const&)>;
 
 using simple_ladspa_processor_factory =
         std::function<std::unique_ptr<audio::engine::processor>(

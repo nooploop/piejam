@@ -100,17 +100,14 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
                        fmt::format("{} ({}).wav", *channel->name, ++file_num);
 
         auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
-        if (SndfileHandle::formatCheck(
-                    format,
-                    2,
-                    static_cast<int>(st.sample_rate)))
+        if (SndfileHandle::formatCheck(format, 2, st.sample_rate.as_int()))
         {
             SndfileHandle sndfile(
                     filename.string(),
                     SFM_WRITE,
                     format,
                     2,
-                    static_cast<int>(st.sample_rate));
+                    st.sample_rate.as_int());
 
             if (sndfile)
                 open_streams.emplace(stream_id, std::move(sndfile));

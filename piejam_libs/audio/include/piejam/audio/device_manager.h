@@ -5,7 +5,6 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
-#include <piejam/audio/types.h>
 
 #include <memory>
 
@@ -19,7 +18,7 @@ public:
 
     virtual auto io_descriptors() -> pcm_io_descriptors = 0;
     virtual auto
-    hw_params(pcm_descriptor const&, sample_rate_t const*, period_size_t const*)
+    hw_params(pcm_descriptor const&, sample_rate const*, period_size const*)
             -> pcm_hw_params = 0;
 
     virtual auto make_device(

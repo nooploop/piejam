@@ -6,6 +6,7 @@
 
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/named_processor.h>
+#include <piejam/audio/fwd.h>
 #include <piejam/audio/level_peak_meter.h>
 
 #include <atomic>
@@ -17,7 +18,7 @@ class level_meter_processor final : public named_processor
 {
 public:
     level_meter_processor(
-            unsigned sample_rate,
+            sample_rate const&,
             std::string_view const& name = {});
 
     auto type_name() const -> std::string_view override

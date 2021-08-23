@@ -41,8 +41,10 @@ main(int argc, char* argv[]) -> int
 
         piejam::runtime::state audio_state;
         audio_state.pcm_devices = audio_device_manager->io_descriptors();
-        audio_state.sample_rate = boost::lexical_cast<unsigned>(argv[3]);
-        audio_state.period_size = boost::lexical_cast<unsigned>(argv[4]);
+        audio_state.sample_rate = piejam::audio::sample_rate(
+                boost::lexical_cast<unsigned>(argv[3]));
+        audio_state.period_size = piejam::audio::period_size(
+                boost::lexical_cast<unsigned>(argv[4]));
         piejam::runtime::audio_engine_middleware audio_engine(
                 piejam::runtime::middleware_functors(
                         [&audio_state]() -> piejam::runtime::state const& {

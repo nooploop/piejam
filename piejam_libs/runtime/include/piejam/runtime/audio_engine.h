@@ -27,7 +27,7 @@ class audio_engine
 public:
     audio_engine(
             std::span<thread::worker> const& workers,
-            audio::sample_rate_t,
+            audio::sample_rate const&,
             unsigned num_device_input_channels,
             unsigned num_device_output_channels);
     ~audio_engine();
@@ -56,8 +56,6 @@ public:
     void process(std::size_t buffer_size) noexcept;
 
 private:
-    audio::sample_rate_t const m_sample_rate;
-
     struct impl;
     std::unique_ptr<impl> const m_impl;
 };

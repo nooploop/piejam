@@ -20,6 +20,7 @@
 #include <piejam/audio/engine/stream_processor.h>
 #include <piejam/audio/engine/value_io_processor.h>
 #include <piejam/audio/engine/value_sink_processor.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/range/indices.h>
@@ -119,7 +120,7 @@ void
 make_mixer_components(
         component_map& comps,
         component_map& prev_comps,
-        unsigned const sample_rate,
+        audio::sample_rate const& sample_rate,
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         parameter_processor_factory& param_procs)
@@ -185,7 +186,7 @@ make_fx_chain_components(
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
-        audio::sample_rate_t const sample_rate)
+        audio::sample_rate const& sample_rate)
 {
     auto get_fx_param_name =
             [&fx_params](fx::parameter_id id) -> std::string_view {
@@ -663,10 +664,12 @@ make_io_processors(std::size_t num_channels)
 
 struct audio_engine::impl
 {
-    impl(std::span<thread::worker> const& workers,
+    impl(audio::sample_rate const& sr,
+         std::span<thread::worker> const& workers,
          std::size_t num_device_input_channels,
          std::size_t num_device_output_channels)
-        : worker_threads(workers)
+        : sample_rate(sr)
+        , worker_threads(workers)
         , input_procs(make_io_processors<audio::engine::input_processor>(
                   num_device_input_channels))
         , output_procs(make_io_processors<audio::engine::output_processor>(
@@ -675,6 +678,8 @@ struct audio_engine::impl
                   std::vector<processor_ptr>(num_device_output_channels))
     {
     }
+
+    audio::sample_rate sample_rate;
 
     audio::engine::process process;
     std::span<thread::worker> worker_threads;
@@ -699,11 +704,11 @@ struct audio_engine::impl
 
 audio_engine::audio_engine(
         std::span<thread::worker> const& workers,
-        audio::sample_rate_t const sample_rate,
+        audio::sample_rate const& sample_rate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels)
-    : m_sample_rate(sample_rate)
-    , m_impl(std::make_unique<impl>(
+    : m_impl(std::make_unique<impl>(
+              sample_rate,
               workers,
               num_device_input_channels,
               num_device_output_channels))
@@ -796,7 +801,7 @@ audio_engine::rebuild(
     make_mixer_components(
             comps,
             m_impl->comps,
-            m_sample_rate,
+            m_impl->sample_rate,
             st.mixer_state.channels,
             st.device_io_state.buses,
             m_impl->param_procs);
@@ -808,7 +813,7 @@ audio_engine::rebuild(
             m_impl->param_procs,
             m_impl->stream_procs,
             ladspa_fx_proc_factory,
-            m_sample_rate);
+            m_impl->sample_rate);
     auto const solo_groups = runtime::solo_groups(st.mixer_state.channels);
     make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 
@@ -835,7 +840,7 @@ audio_engine::rebuild(
         recorders = make_recorder_processors(
                 st.recorder_streams,
                 m_impl->stream_procs,
-                st.sample_rate * 3);
+                st.sample_rate.get() * 3);
 
     std::vector<processor_ptr> output_clip_procs(
             m_impl->output_clip_procs.size());

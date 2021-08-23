@@ -9,6 +9,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/slice.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/audio/simd.h>
 
 #include <gtest/gtest.h>
@@ -22,7 +23,7 @@ namespace piejam::audio::engine::test
 
 struct level_meter_processor_test : ::testing::Test
 {
-    level_meter_processor sut{4800};
+    level_meter_processor sut{sample_rate(48000)};
     alignas(mipp::RequiredAlignment) std::array<float, 4> in_buf{};
     std::vector<audio_slice> in_buf_spans{in_buf};
     std::vector<std::reference_wrapper<audio_slice const>> in_bufs{

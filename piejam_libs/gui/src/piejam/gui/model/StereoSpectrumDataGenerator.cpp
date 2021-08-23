@@ -6,6 +6,7 @@
 
 #include <piejam/algorithm/shift_push_back.h>
 #include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/math.h>
 #include <piejam/numeric/dft.h>
 #include <piejam/numeric/window.h>
@@ -39,12 +40,12 @@ template <StereoChannel SC>
 class Generator
 {
 public:
-    Generator(unsigned const sampleRate)
+    Generator(audio::sample_rate const& sampleRate)
         : m_window(algorithm::transform_to_vector(
                   range::iota(s_dft_size),
                   &numeric::window::hann<s_dft_size>))
     {
-        float const binSize = sampleRate / s_dft_size;
+        float const binSize = sampleRate.as_float() / s_dft_size;
         for (std::size_t const i : range::iota(s_dft.output_size()))
             m_dataPoints[i].frequency_Hz = i * binSize;
     }
@@ -107,7 +108,7 @@ private:
 
 struct StereoSpectrumDataGenerator::Impl
 {
-    unsigned sampleRate{48000};
+    audio::sample_rate sampleRate{48000};
     bool active{};
     StereoChannel channel{StereoChannel::Left};
 
@@ -158,7 +159,7 @@ StereoSpectrumDataGenerator::StereoSpectrumDataGenerator()
 StereoSpectrumDataGenerator::~StereoSpectrumDataGenerator() = default;
 
 void
-StereoSpectrumDataGenerator::setSampleRate(unsigned const sampleRate)
+StereoSpectrumDataGenerator::setSampleRate(audio::sample_rate const& sampleRate)
 {
     if (m_impl->sampleRate != sampleRate)
     {

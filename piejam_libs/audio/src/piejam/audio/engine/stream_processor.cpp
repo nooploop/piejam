@@ -6,7 +6,7 @@
 
 #include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/audio/period_sizes.h>
+#include <piejam/audio/period_size.h>
 #include <piejam/range/iota.h>
 #include <piejam/range/stride_iterator.h>
 
@@ -24,7 +24,7 @@ stream_processor::stream_processor(
     , m_num_channels(num_channels)
     , m_stream_fn(get_stream_fn(num_channels))
     , m_buffer(num_channels * capacity_per_channel)
-    , m_interleave_buffer(num_channels * max_period_size)
+    , m_interleave_buffer(num_channels * max_period_size.get())
 {
     BOOST_ASSERT(m_num_channels > 0);
 }

@@ -27,8 +27,8 @@ public:
 
     auto hw_params(
             pcm_descriptor const& d,
-            sample_rate_t const* const sample_rate,
-            period_size_t const* const period_size) -> pcm_hw_params
+            sample_rate const* const sample_rate,
+            period_size const* const period_size) -> pcm_hw_params
     {
         return alsa::get_hw_params(d, sample_rate, period_size);
     }

@@ -7,7 +7,7 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/audio/period_sizes.h>
+#include <piejam/audio/period_size.h>
 
 #include <boost/assert.hpp>
 

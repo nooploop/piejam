@@ -8,7 +8,7 @@
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/period_sizes.h>
+#include <piejam/audio/period_size.h>
 
 #include <mipp.h>
 
@@ -26,7 +26,7 @@ class thread_context;
 class processor_job final
 {
 public:
-    using output_buffer_t = std::array<float, max_period_size>;
+    using output_buffer_t = std::array<float, max_period_size.get()>;
 
     processor_job(processor& proc);
 

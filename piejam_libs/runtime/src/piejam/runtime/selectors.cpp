@@ -46,9 +46,10 @@ const selector<period_count> select_period_count(
         });
 
 const selector<float> select_buffer_latency([](state const& st) {
-    return st.sample_rate ? (st.period_size * st.period_count * 1000.f) /
-                                    st.sample_rate
-                          : 0.f;
+    return st.sample_rate.get() != 0
+                   ? (st.period_size.get() * st.period_count.get() * 1000.f) /
+                             st.sample_rate.as_float()
+                   : 0.f;
 });
 
 const selector<input_devices>

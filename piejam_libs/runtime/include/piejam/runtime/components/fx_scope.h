@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/audio/engine/fwd.h>
-#include <piejam/audio/types.h>
+#include <piejam/audio/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 
@@ -17,7 +17,7 @@ namespace piejam::runtime::components
 
 auto make_fx_scope(
         fx::module const&,
-        audio::sample_rate_t,
+        audio::sample_rate const&,
         processors::stream_processor_factory&)
         -> std::unique_ptr<audio::engine::component>;
 

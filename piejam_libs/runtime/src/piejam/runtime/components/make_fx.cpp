@@ -6,6 +6,7 @@
 
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/components/fx_gain.h>
 #include <piejam/runtime/components/fx_ladspa.h>
@@ -30,7 +31,7 @@ make_internal_fx(
         fx::module const& fx_mod,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
-        audio::sample_rate_t const sample_rate,
+        audio::sample_rate const& sample_rate,
         std::string_view const& name)
         -> std::unique_ptr<audio::engine::component>
 {
@@ -62,7 +63,7 @@ make_fx(fx::module const& fx_mod,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
-        audio::sample_rate_t const sample_rate,
+        audio::sample_rate const& sample_rate,
         std::string_view const& name)
         -> std::unique_ptr<audio::engine::component>
 {

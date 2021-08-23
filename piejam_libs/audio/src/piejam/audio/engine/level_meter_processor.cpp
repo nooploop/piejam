@@ -7,6 +7,7 @@
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
+#include <piejam/audio/sample_rate.h>
 
 #include <boost/hof/match.hpp>
 
@@ -23,10 +24,10 @@ level_meter_decay_time(unsigned const sample_rate) -> std::size_t
 }
 
 level_meter_processor::level_meter_processor(
-        unsigned const sample_rate,
+        sample_rate const& sample_rate,
         std::string_view const& name)
     : engine::named_processor(name)
-    , m_lm(level_meter_decay_time(sample_rate))
+    , m_lm(level_meter_decay_time(sample_rate.get()))
 {
 }
 

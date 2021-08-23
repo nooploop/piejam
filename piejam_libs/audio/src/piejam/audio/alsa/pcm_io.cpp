@@ -34,15 +34,15 @@ open_pcm(
 
         set_hw_params(fd, device_config, process_config);
 
-        unsigned const buffer_size =
-                process_config.period_size * process_config.period_count;
+        unsigned const buffer_size = process_config.period_size.get() *
+                                     process_config.period_count.get();
         snd_pcm_sw_params sw_params{};
         sw_params.proto = SNDRV_PCM_VERSION;
         sw_params.tstamp_mode = SNDRV_PCM_TSTAMP_ENABLE;
         sw_params.tstamp_type = SNDRV_PCM_TSTAMP_TYPE_MONOTONIC_RAW;
         sw_params.period_step = 1;
         sw_params.sleep_min = 0;
-        sw_params.avail_min = process_config.period_size;
+        sw_params.avail_min = process_config.period_size.get();
         sw_params.xfer_align = 1;
         sw_params.start_threshold = buffer_size;
         sw_params.stop_threshold = buffer_size;

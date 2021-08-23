@@ -77,9 +77,9 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
     selected_device input;
     selected_device output;
 
-    audio::sample_rate_t sample_rate{};
-    audio::period_size_t period_size{};
-    audio::period_count_t period_count{};
+    audio::sample_rate sample_rate{};
+    audio::period_size period_size{};
+    audio::period_count period_count{};
 
     auto reduce(state const& st) const -> state override
     {
@@ -165,9 +165,9 @@ make_update_devices_action(
         box<audio::pcm_io_descriptors> current_devices,
         std::size_t const input_index,
         std::size_t const output_index,
-        audio::sample_rate_t const sample_rate,
-        audio::period_size_t const period_size,
-        audio::period_count_t const period_count) -> update_devices
+        audio::sample_rate const& sample_rate,
+        audio::period_size const& period_size,
+        audio::period_count const& period_count) -> update_devices
 {
     update_devices next_action;
     next_action.pcm_devices = new_devices;
@@ -209,7 +209,7 @@ make_update_devices_action(
                 input_hw_params,
                 output_hw_params);
         auto const it = algorithm::find_or_get_first(values, current);
-        return it != values.end() ? *it : 0;
+        return it != values.end() ? *it : decltype(*it){};
     };
 
     next_action.sample_rate = next_value(
@@ -218,7 +218,7 @@ make_update_devices_action(
             &sample_rates,
             sample_rate);
 
-    if (next_action.sample_rate != 0)
+    if (next_action.sample_rate.valid())
     {
         next_action.input.hw_params = device_manager.hw_params(
                 new_devices->inputs[next_action.input.index],
@@ -236,7 +236,7 @@ make_update_devices_action(
             &period_sizes,
             period_size);
 
-    if (next_action.period_size != 0)
+    if (next_action.period_size.valid())
     {
         next_action.input.hw_params = device_manager.hw_params(
                 new_devices->inputs[next_action.input.index],
@@ -552,7 +552,8 @@ audio_engine_middleware::open_device()
     auto const& st = get_state();
 
     if (st.input.index == npos || st.output.index == npos ||
-        st.sample_rate == 0 || st.period_size == 0 || st.period_count == 0)
+        st.sample_rate.invalid() || st.period_size.invalid() ||
+        st.period_count.invalid())
         return;
 
     try

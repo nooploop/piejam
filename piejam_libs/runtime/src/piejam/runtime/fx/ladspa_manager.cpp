@@ -7,6 +7,7 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/ladspa/plugin.h>
 #include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id_hash.h>
 
 #include <spdlog/spdlog.h>
@@ -55,7 +56,7 @@ ladspa_manager::control_inputs(ladspa_instance_id const& id) const
 auto
 ladspa_manager::make_processor(
         ladspa_instance_id const& id,
-        audio::sample_rate_t sample_rate) const
+        audio::sample_rate const& sample_rate) const
         -> std::unique_ptr<audio::engine::processor>
 {
     if (auto it = m_instances.find(id); it != m_instances.end())

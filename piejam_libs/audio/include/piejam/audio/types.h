@@ -7,10 +7,6 @@
 namespace piejam::audio
 {
 
-using sample_rate_t = unsigned;
-using period_size_t = unsigned;
-using period_count_t = unsigned;
-
 enum class bus_type : bool
 {
     mono,

@@ -11,6 +11,7 @@
 #include <piejam/audio/engine/level_meter_processor.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/pair.h>
+#include <piejam/audio/sample_rate.h>
 
 #include <fmt/format.h>
 
@@ -25,7 +26,7 @@ namespace
 class stereo_level_meter final : public engine::component
 {
 public:
-    stereo_level_meter(sample_rate_t sample_rate, std::string_view name)
+    stereo_level_meter(sample_rate const& sample_rate, std::string_view name)
         : m_left_lm_proc(std::make_unique<engine::level_meter_processor>(
                   sample_rate,
                   fmt::format("{} L", name)))
@@ -77,7 +78,7 @@ private:
 } // namespace
 
 auto
-make_stereo_level_meter(sample_rate_t sample_rate, std::string_view name)
+make_stereo_level_meter(sample_rate const& sample_rate, std::string_view name)
         -> std::unique_ptr<engine::component>
 {
     return std::make_unique<stereo_level_meter>(sample_rate, name);

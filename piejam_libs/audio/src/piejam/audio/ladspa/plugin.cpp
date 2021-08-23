@@ -12,7 +12,8 @@
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
-#include <piejam/audio/period_sizes.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/npos.h>
 #include <piejam/range/indices.h>
 #include <piejam/range/iota.h>
@@ -530,7 +531,8 @@ private:
     std::vector<unsigned long> m_output_port_indices{};
     std::vector<engine::event_port> m_event_inputs;
     std::vector<engine::event_port> m_event_outputs;
-    std::vector<std::array<float, max_period_size>> m_constant_audio_inputs;
+    std::vector<std::array<float, max_period_size.get()>>
+            m_constant_audio_inputs;
     std::vector<control_input> m_control_inputs;
     std::vector<float> m_control_outputs;
 };
@@ -610,11 +612,12 @@ public:
         return m_ports.input.control;
     }
 
-    auto make_processor(sample_rate_t sample_rate) const
+    auto make_processor(sample_rate const& sample_rate) const
             -> std::unique_ptr<engine::processor> override
     {
-        if (LADSPA_Handle handle =
-                    m_ladspa_desc->instantiate(m_ladspa_desc, sample_rate))
+        if (LADSPA_Handle handle = m_ladspa_desc->instantiate(
+                    m_ladspa_desc,
+                    sample_rate.get()))
         {
             return std::make_unique<processor>(
                     plugin_instance(*m_ladspa_desc, handle),

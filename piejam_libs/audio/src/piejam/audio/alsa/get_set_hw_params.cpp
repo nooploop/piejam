@@ -9,8 +9,8 @@
 #include <piejam/audio/pcm_format.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/pcm_io_config.h>
-#include <piejam/audio/period_sizes.h>
-#include <piejam/audio/sample_rates.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/system/device.h>
 
 #include <spdlog/spdlog.h>
@@ -31,7 +31,7 @@ test_interval_value(
         system::device& fd,
         snd_pcm_hw_params params,
         unsigned ival_index,
-        unsigned value) -> bool
+        unsigned const value) -> bool
 {
     params.rmask = (1u << ival_index);
     params.cmask = 0u;
@@ -61,8 +61,8 @@ test_interval_value(
         snd_pcm_hw_params const& params,
         unsigned ival_index)
 {
-    return [&fd, &params, ival_index](unsigned sample_rate) {
-        return test_interval_value(fd, params, ival_index, sample_rate);
+    return [&fd, &params, ival_index](unsigned const value) -> bool {
+        return test_interval_value(fd, params, ival_index, value);
     };
 }
 
@@ -225,8 +225,8 @@ pcm_to_alsa_format(pcm_format pf) -> unsigned
 auto
 get_hw_params(
         pcm_descriptor const& pcm,
-        sample_rate_t const* const sample_rate,
-        period_size_t const* const period_size) -> pcm_hw_params
+        sample_rate const* const sample_rate,
+        period_size const* const period_size) -> pcm_hw_params
 {
     pcm_hw_params result;
 
@@ -281,19 +281,24 @@ get_hw_params(
     std::ranges::copy_if(
             preferred_sample_rates,
             std::back_inserter(result.sample_rates),
-            test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_RATE));
+            test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_RATE),
+            &audio::sample_rate::get);
 
     if (sample_rate)
     {
         BOOST_ASSERT(algorithm::contains(result.sample_rates, *sample_rate));
-        set_interval_value(hw_params, SNDRV_PCM_HW_PARAM_RATE, *sample_rate);
+        set_interval_value(
+                hw_params,
+                SNDRV_PCM_HW_PARAM_RATE,
+                sample_rate->get());
     }
 
     BOOST_ASSERT(result.period_sizes.empty());
     std::ranges::copy_if(
             preferred_period_sizes,
             std::back_inserter(result.period_sizes),
-            test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIOD_SIZE));
+            test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIOD_SIZE),
+            &audio::period_size::get);
 
     if (period_size)
     {
@@ -301,14 +306,15 @@ get_hw_params(
         set_interval_value(
                 hw_params,
                 SNDRV_PCM_HW_PARAM_PERIOD_SIZE,
-                *period_size);
+                period_size->get());
     }
 
     BOOST_ASSERT(result.period_counts.empty());
     std::ranges::copy_if(
             preferred_period_counts,
             std::back_inserter(result.period_counts),
-            test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIODS));
+            test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIODS),
+            &audio::period_count::get);
 
     return result;
 }
@@ -341,15 +347,15 @@ set_hw_params(
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_RATE,
-            process_config.sample_rate);
+            process_config.sample_rate.get());
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_PERIOD_SIZE,
-            process_config.period_size);
+            process_config.period_size.get());
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_PERIODS,
-            process_config.period_count);
+            process_config.period_count.get());
 
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_PARAMS, hw_params))
         throw std::system_error(err);

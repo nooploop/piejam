@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/engine/fwd.h>
+#include <piejam/audio/fwd.h>
 #include <piejam/audio/types.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
@@ -24,7 +25,7 @@ auto make_mixer_channel_input(
 
 auto make_mixer_channel_output(
         mixer::channel const&,
-        audio::sample_rate_t,
+        audio::sample_rate const&,
         parameter_processor_factory&,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;

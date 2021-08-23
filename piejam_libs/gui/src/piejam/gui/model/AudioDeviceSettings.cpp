@@ -45,7 +45,7 @@ toQStringList(Vector const& l) -> QStringList
     std::ranges::transform(
             l,
             std::back_inserter(result),
-            [](auto const x) -> QString { return QString::number(x); });
+            [](auto const& x) -> QString { return QString::number(x.get()); });
     return result;
 }
 

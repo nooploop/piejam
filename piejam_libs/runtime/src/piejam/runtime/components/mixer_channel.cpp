@@ -70,7 +70,7 @@ class mixer_channel_output final : public audio::engine::component
 {
 public:
     mixer_channel_output(
-            audio::sample_rate_t const sample_rate,
+            audio::sample_rate const& sample_rate,
             mixer::channel const& bus,
             parameter_processor_factory& param_procs)
         : m_volume_input_proc(param_procs.make_processor(bus.volume, "volume"))
@@ -149,7 +149,7 @@ make_mixer_channel_input(
 auto
 make_mixer_channel_output(
         mixer::channel const& channel,
-        audio::sample_rate_t const sample_rate,
+        audio::sample_rate const& sample_rate,
         parameter_processor_factory& param_procs,
         std::string_view const& /*name*/)
         -> std::unique_ptr<audio::engine::component>

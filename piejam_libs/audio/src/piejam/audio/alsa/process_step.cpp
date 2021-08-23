@@ -108,11 +108,11 @@ struct interleaved_reader final : pcm_reader
     interleaved_reader(
             system::device& fd,
             std::size_t const num_channels,
-            std::size_t const period_size)
+            audio::period_size const& period_size)
         : m_fd(fd)
         , m_num_channels(num_channels)
         , m_period_size(period_size)
-        , m_read_buffer(num_channels * period_size)
+        , m_read_buffer(num_channels * period_size.get())
         , m_converter(algorithm::transform_to_vector(
                   range::iota(num_channels),
                   [this](std::size_t const channel) {
@@ -132,7 +132,7 @@ struct interleaved_reader final : pcm_reader
         range::table_view<pcm_sample_t<F>> non_interleaved(
                 m_read_buffer.data(),
                 m_num_channels,
-                m_period_size,
+                m_period_size.get(),
                 1,
                 m_num_channels);
 
@@ -154,7 +154,7 @@ struct interleaved_reader final : pcm_reader
         if (auto err =
                     readi(m_fd,
                           m_read_buffer.data(),
-                          m_period_size,
+                          m_period_size.get(),
                           m_num_channels))
             return err;
 
@@ -169,7 +169,7 @@ struct interleaved_reader final : pcm_reader
 private:
     system::device& m_fd;
     std::size_t m_num_channels;
-    std::size_t m_period_size;
+    period_size m_period_size;
     std::vector<pcm_sample_t<F>> m_read_buffer;
     std::vector<converter_f> m_converter;
 };
@@ -178,7 +178,7 @@ auto
 make_reader(
         system::device& fd,
         pcm_device_config const& config,
-        std::size_t const period_size) -> std::unique_ptr<pcm_reader>
+        audio::period_size const& period_size) -> std::unique_ptr<pcm_reader>
 {
     if (!fd)
         return std::make_unique<dummy_reader>();
@@ -240,11 +240,11 @@ struct interleaved_writer final : pcm_writer
     interleaved_writer(
             system::device& fd,
             std::size_t const num_channels,
-            std::size_t const period_size)
+            audio::period_size const& period_size)
         : m_fd(fd)
         , m_num_channels(num_channels)
         , m_period_size(period_size)
-        , m_write_buffer(num_channels * period_size)
+        , m_write_buffer(num_channels * period_size.get())
         , m_converter(algorithm::transform_to_vector(
                   range::iota(num_channels),
                   [this](std::size_t const channel) {
@@ -274,7 +274,7 @@ struct interleaved_writer final : pcm_writer
         range::table_view<pcm_sample_t<F>> non_interleaved(
                 m_write_buffer.data(),
                 m_num_channels,
-                m_period_size,
+                m_period_size.get(),
                 1,
                 m_num_channels);
 
@@ -292,7 +292,7 @@ struct interleaved_writer final : pcm_writer
         range::table_view<pcm_sample_t<F>> non_interleaved(
                 m_write_buffer.data(),
                 m_num_channels,
-                m_period_size,
+                m_period_size.get(),
                 1,
                 m_num_channels);
 
@@ -311,7 +311,7 @@ struct interleaved_writer final : pcm_writer
         return writei(
                 m_fd,
                 m_write_buffer.data(),
-                m_period_size,
+                m_period_size.get(),
                 m_num_channels);
     }
 
@@ -323,7 +323,7 @@ struct interleaved_writer final : pcm_writer
 private:
     system::device& m_fd;
     std::size_t m_num_channels;
-    std::size_t m_period_size;
+    period_size m_period_size;
     std::vector<pcm_sample_t<F>> m_write_buffer;
     std::vector<converter_f> m_converter;
 };
@@ -332,7 +332,7 @@ auto
 make_writer(
         system::device& fd,
         pcm_device_config const& config,
-        std::size_t const period_size) -> std::unique_ptr<pcm_writer>
+        audio::period_size const& period_size) -> std::unique_ptr<pcm_writer>
 {
     if (!fd)
         return std::make_unique<dummy_writer>();
@@ -402,8 +402,8 @@ process_step::process_step(
               m_io_config.out_config,
               m_io_config.process_config.period_size))
     , m_cpu_load_mean_acc(
-              io_config.process_config.sample_rate /
-              io_config.process_config.period_size) // 1sec window
+              io_config.process_config.sample_rate.get() /
+              io_config.process_config.period_size.get()) // 1sec window
 {
     m_xruns.store(0, std::memory_order_relaxed);
 
@@ -428,7 +428,8 @@ process_step::operator()() -> std::error_condition
         {
             m_writer->clear();
 
-            for (unsigned i = 0; i < m_io_config.process_config.period_count;
+            for (unsigned i = 0;
+                 i < m_io_config.process_config.period_count.get();
                  ++i)
             {
                 if (auto err = m_writer->transfer())
@@ -449,10 +450,10 @@ process_step::operator()() -> std::error_condition
     auto err = m_reader->transfer();
 
     cpu_load_meter cpu_load_meter(
-            m_io_config.process_config.period_size,
+            m_io_config.process_config.period_size.get(),
             m_io_config.process_config.sample_rate);
 
-    m_process_function(m_io_config.process_config.period_size);
+    m_process_function(m_io_config.process_config.period_size.get());
 
     m_cpu_load.store(
             m_cpu_load_mean_acc(cpu_load_meter.stop()),

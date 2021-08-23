@@ -70,10 +70,11 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_hw_params.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_io_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_sample_type.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/period_sizes.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/period_count.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/period_size.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/process_function.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/process_thread.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/sample_rates.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/sample_rate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/simd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/smoother.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/types.h

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/audio/fwd.h>
 #include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/SpectrumDataPoint.h>
 #include <piejam/gui/model/StereoChannel.h>
@@ -20,7 +21,7 @@ public:
     StereoSpectrumDataGenerator();
     ~StereoSpectrumDataGenerator();
 
-    void setSampleRate(unsigned);
+    void setSampleRate(audio::sample_rate const&);
     void setActive(bool active);
     void setChannel(StereoChannel);
 

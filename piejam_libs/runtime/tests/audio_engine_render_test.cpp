@@ -25,7 +25,7 @@ namespace piejam::runtime::test
 
 struct audio_engine_render_test : public ::testing::Test
 {
-    audio::sample_rate_t const sample_rate{48000};
+    audio::sample_rate const sample_rate{48000};
     std::size_t const buffer_size{1024};
     std::vector<float> audio_in_left{std::vector<float>(buffer_size)};
     std::vector<float> audio_in_right{std::vector<float>(buffer_size)};
@@ -59,8 +59,7 @@ struct audio_engine_render_test : public ::testing::Test
     {
         std::ranges::generate(audio_in_left, [this]() -> float {
             return std::sin(
-                    (sine_wave_pos++ / static_cast<float>(sample_rate)) *
-                    M_PI_2);
+                    (sine_wave_pos++ / sample_rate.as_float()) * M_PI_2);
         });
     }
 

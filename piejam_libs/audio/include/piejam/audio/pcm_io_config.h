@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <piejam/audio/period_count.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
+
 namespace piejam::audio
 {
 
@@ -18,9 +22,9 @@ struct pcm_device_config
 
 struct pcm_process_config
 {
-    unsigned sample_rate{};
-    unsigned period_size{};
-    unsigned period_count{};
+    audio::sample_rate sample_rate{};
+    audio::period_size period_size{};
+    audio::period_count period_count{};
 };
 
 struct pcm_io_config

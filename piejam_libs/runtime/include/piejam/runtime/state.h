@@ -7,6 +7,9 @@
 #include <piejam/audio/ladspa/fwd.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
+#include <piejam/audio/period_count.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/audio/types.h>
 #include <piejam/box.h>
 #include <piejam/boxed_vector.h>
@@ -48,9 +51,9 @@ struct state
     selected_device input;
     selected_device output;
 
-    audio::sample_rate_t sample_rate{};
-    audio::period_size_t period_size{};
-    audio::period_count_t period_count{};
+    audio::sample_rate sample_rate{};
+    audio::period_size period_size{};
+    audio::period_count period_count{};
 
     device_io::state device_io_state;
 

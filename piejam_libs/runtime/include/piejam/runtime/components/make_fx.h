@@ -22,7 +22,7 @@ make_fx(fx::module const&,
         fx::simple_ladspa_processor_factory const&,
         parameter_processor_factory&,
         processors::stream_processor_factory&,
-        audio::sample_rate_t,
+        audio::sample_rate const&,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;
 

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/audio/fwd.h>
+
 #include <chrono>
 
 namespace piejam::audio
@@ -12,7 +14,7 @@ namespace piejam::audio
 class cpu_load_meter
 {
 public:
-    cpu_load_meter(std::size_t num_frames, unsigned sample_rate);
+    cpu_load_meter(std::size_t num_frames, sample_rate const&);
 
     auto stop() -> float;
 
