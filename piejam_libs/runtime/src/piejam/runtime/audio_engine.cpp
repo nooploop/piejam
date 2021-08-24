@@ -840,7 +840,7 @@ audio_engine::rebuild(
         recorders = make_recorder_processors(
                 st.recorder_streams,
                 m_impl->stream_procs,
-                st.sample_rate.get() * 3);
+                st.sample_rate.to_samples(std::chrono::seconds(3)));
 
     std::vector<processor_ptr> output_clip_procs(
             m_impl->output_clip_procs.size());

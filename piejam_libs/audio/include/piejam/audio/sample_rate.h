@@ -7,6 +7,7 @@
 #include <boost/container/static_vector.hpp>
 
 #include <array>
+#include <chrono>
 
 namespace piejam::audio
 {
@@ -33,6 +34,25 @@ public:
     constexpr auto as_float() const noexcept -> float
     {
         return static_cast<float>(m_value);
+    }
+
+    template <class Rep = float>
+    constexpr auto to_nanoseconds(std::size_t const samples) const noexcept
+            -> std::chrono::duration<Rep, std::nano>
+    {
+        return std::chrono::duration<Rep, std::nano>(
+                (static_cast<Rep>(samples) / static_cast<Rep>(m_value)) *
+                static_cast<Rep>(std::nano::den));
+    }
+
+    template <class Rep, class Period>
+    constexpr auto
+    to_samples(std::chrono::duration<Rep, Period> const& dur) const noexcept
+            -> std::size_t
+    {
+        return static_cast<std::size_t>(
+                m_value *
+                (dur / std::chrono::duration<double, std::ratio<1>>(1)));
     }
 
     constexpr auto operator==(sample_rate const&) const noexcept

@@ -18,18 +18,6 @@
 namespace piejam::runtime::components
 {
 
-namespace
-{
-
-constexpr auto
-stream_capacity(audio::sample_rate const sample_rate) -> std::size_t
-{
-    // 3 x 17ms
-    return static_cast<std::size_t>((sample_rate.as_float() / 1000.f) * 17 * 3);
-}
-
-} // namespace
-
 auto
 make_fx_spectrum(
         fx::module const& fx_mod,
@@ -41,7 +29,7 @@ make_fx_spectrum(
             fx_mod.streams->at(
                     to_underlying(fx::spectrum_stream_key::left_right)),
             stream_proc_factory,
-            stream_capacity(sample_rate),
+            sample_rate.to_samples(std::chrono::milliseconds(17 * 3)),
             "spectrum");
 }
 
