@@ -43,6 +43,7 @@ private:
 
     void stream_1(process_context const&);
     void stream_2(process_context const&);
+    void stream_4(process_context const&);
     void stream_n(process_context const&);
     static auto get_stream_fn(std::size_t num_channels) -> stream_fn_t;
 

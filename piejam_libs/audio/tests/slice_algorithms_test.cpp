@@ -211,6 +211,61 @@ TEST(slice_interleave_2_slices, two_buffer)
             8.f))(out));
 }
 
+TEST(slice_interleave_4_slices, four_buffer)
+{
+    alignas(mipp::RequiredAlignment)
+            std::array buf1{1.f, 2.f, 3.f, 4.f, 1.f, 1.f, 1.f, 1.f};
+    alignas(mipp::RequiredAlignment)
+            std::array buf2{5.f, 6.f, 7.f, 8.f, 2.f, 2.f, 2.f, 2.f};
+    alignas(mipp::RequiredAlignment)
+            std::array buf3{-1.f, -2.f, -3.f, -4.f, 3.f, 3.f, 3.f, 3.f};
+    alignas(mipp::RequiredAlignment)
+            std::array buf4{-5.f, -6.f, -7.f, -8.f, 4.f, 4.f, 4.f, 4.f};
+    slice<float> s1(buf1);
+    slice<float> s2(buf2);
+    slice<float> s3(buf3);
+    slice<float> s4(buf4);
+    alignas(mipp::RequiredAlignment) std::array<float, buf1.size() * 4> out{};
+    interleave(s1, s2, s3, s4, {out});
+
+    using testing::ElementsAre;
+    using testing::Matches;
+
+    EXPECT_TRUE(Matches(ElementsAre(
+            1.f,
+            5.f,
+            -1.f,
+            -5.f,
+            2.f,
+            6.f,
+            -2.f,
+            -6.f,
+            3.f,
+            7.f,
+            -3.f,
+            -7.f,
+            4.f,
+            8.f,
+            -4.f,
+            -8.f,
+            1.f,
+            2.f,
+            3.f,
+            4.f,
+            1.f,
+            2.f,
+            3.f,
+            4.f,
+            1.f,
+            2.f,
+            3.f,
+            4.f,
+            1.f,
+            2.f,
+            3.f,
+            4.f))(out));
+}
+
 TEST(slice_clamp, constant)
 {
     slice<float> l(1.5f);

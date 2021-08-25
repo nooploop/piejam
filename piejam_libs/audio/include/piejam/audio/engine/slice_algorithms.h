@@ -263,6 +263,17 @@ struct slice_interleave
         simd::interleave(std::forward<I1>(l), std::forward<I2>(r), m_out);
     }
 
+    template <class I1, class I2, class I3, class I4>
+    constexpr void operator()(I1&& i1, I2&& i2, I3&& i3, I4&& i4) const noexcept
+    {
+        simd::interleave(
+                std::forward<I1>(i1),
+                std::forward<I2>(i2),
+                std::forward<I3>(i3),
+                std::forward<I4>(i4),
+                m_out);
+    }
+
 private:
     std::span<T> const m_out;
 };
@@ -336,6 +347,23 @@ interleave(
         std::span<T> const& out) noexcept
 {
     std::visit(detail::slice_interleave(out), s1.as_variant(), s2.as_variant());
+}
+
+template <class T>
+constexpr auto
+interleave(
+        slice<T> const& s1,
+        slice<T> const& s2,
+        slice<T> const& s3,
+        slice<T> const& s4,
+        std::span<T> const& out) noexcept
+{
+    std::visit(
+            detail::slice_interleave(out),
+            s1.as_variant(),
+            s2.as_variant(),
+            s3.as_variant(),
+            s4.as_variant());
 }
 
 } // namespace piejam::audio::engine

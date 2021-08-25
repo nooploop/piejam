@@ -69,6 +69,21 @@ stream_processor::stream_2(process_context const& ctx)
 }
 
 void
+stream_processor::stream_4(process_context const& ctx)
+{
+    std::span out{m_interleave_buffer.data(), 4 * ctx.buffer_size};
+
+    interleave(
+            ctx.inputs[0].get(),
+            ctx.inputs[1].get(),
+            ctx.inputs[2].get(),
+            ctx.inputs[3].get(),
+            out);
+
+    m_buffer.write(out);
+}
+
+void
 stream_processor::stream_n(process_context const& ctx)
 {
     for (std::size_t const ch : range::iota(m_num_channels))
@@ -110,6 +125,9 @@ stream_processor::get_stream_fn(std::size_t const num_channels) -> stream_fn_t
 
         case 2:
             return &stream_processor::stream_2;
+
+        case 4:
+            return &stream_processor::stream_4;
 
         default:
             return &stream_processor::stream_n;
