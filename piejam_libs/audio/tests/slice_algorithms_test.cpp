@@ -106,60 +106,109 @@ TEST(slice_interleave_2_slices, both_constant)
 {
     slice<float> l(1.f);
     slice<float> r(-1.f);
-    std::array<float, 6> out{};
+    std::array<float, 8> out{};
     interleave(l, r, {out});
 
     using testing::ElementsAre;
     using testing::Matches;
 
-    EXPECT_TRUE(Matches(ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
+    EXPECT_TRUE(Matches(
+            ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
 }
 
 TEST(slice_interleave_2_slices, buffer_and_constant)
 {
-    std::array<float, 3> buf{1.f, 1.f, 1.f};
+    alignas(mipp::RequiredAlignment)
+            std::array buf{1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f};
     slice<float> l(buf);
     slice<float> r(-1.f);
-    std::array<float, 6> out{};
+    alignas(mipp::RequiredAlignment) std::array<float, buf.size() * 2> out{};
     interleave(l, r, {out});
 
     using testing::ElementsAre;
     using testing::Matches;
 
-    EXPECT_TRUE(Matches(ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
+    EXPECT_TRUE(Matches(ElementsAre(
+            1.f,
+            -1.f,
+            2.f,
+            -1.f,
+            3.f,
+            -1.f,
+            4.f,
+            -1.f,
+            5.f,
+            -1.f,
+            6.f,
+            -1.f,
+            7.f,
+            -1.f,
+            8.f,
+            -1.f))(out));
 }
 
 TEST(slice_interleave_2_slices, constant_and_buffer)
 {
-    std::array<float, 3> buf{-1.f, -1.f, -1.f};
+    alignas(mipp::RequiredAlignment)
+            std::array buf{1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f};
     slice<float> l(1.f);
     slice<float> r(buf);
-    std::array<float, 6> out{};
+    alignas(mipp::RequiredAlignment) std::array<float, buf.size() * 2> out{};
     interleave(l, r, {out});
 
     using testing::ElementsAre;
     using testing::Matches;
 
-    EXPECT_TRUE(Matches(ElementsAre(1.f, -1.f, 1.f, -1.f, 1.f, -1.f))(out));
+    EXPECT_TRUE(Matches(ElementsAre(
+            1.f,
+            1.f,
+            1.f,
+            2.f,
+            1.f,
+            3.f,
+            1.f,
+            4.f,
+            1.f,
+            5.f,
+            1.f,
+            6.f,
+            1.f,
+            7.f,
+            1.f,
+            8.f))(out));
 }
 
 TEST(slice_interleave_2_slices, two_buffer)
 {
-    alignas(mipp::RequiredAlignment) std::array<float, 8> l_buf;
-    l_buf.fill(1.f);
-    alignas(mipp::RequiredAlignment) std::array<float, 8> r_buf;
-    r_buf.fill(-1.f);
+    alignas(mipp::RequiredAlignment)
+            std::array l_buf{1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f};
+    alignas(mipp::RequiredAlignment)
+            std::array r_buf{1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f};
     slice<float> l(l_buf);
     slice<float> r(r_buf);
-    alignas(mipp::RequiredAlignment) std::array<float, 16> out{};
+    alignas(mipp::RequiredAlignment) std::array<float, l_buf.size() * 2> out{};
     interleave(l, r, {out});
 
-    bool left{true};
-    for (auto const v : out)
-    {
-        EXPECT_EQ(left ? 1.f : -1.f, v);
-        left = !left;
-    }
+    using testing::ElementsAre;
+    using testing::Matches;
+
+    EXPECT_TRUE(Matches(ElementsAre(
+            1.f,
+            1.f,
+            2.f,
+            2.f,
+            3.f,
+            3.f,
+            4.f,
+            4.f,
+            5.f,
+            5.f,
+            6.f,
+            6.f,
+            7.f,
+            7.f,
+            8.f,
+            8.f))(out));
 }
 
 TEST(slice_clamp, constant)

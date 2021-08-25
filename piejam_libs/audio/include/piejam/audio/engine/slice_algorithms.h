@@ -257,56 +257,10 @@ struct slice_interleave
     {
     }
 
-    constexpr void operator()(T const l_c, T const r_c) const
+    template <class I1, class I2>
+    constexpr void operator()(I1&& l, I2&& r) const noexcept
     {
-        BOOST_ASSERT(m_out.size() % 2 == 0);
-        for (auto o = m_out.data(), e = m_out.data() + m_out.size(); o < e;
-             o += 2)
-        {
-            o[0] = l_c;
-            o[1] = r_c;
-        }
-    }
-
-    constexpr void
-    operator()(typename slice<T>::span_t const& l_buf, T const r_c) const
-    {
-        BOOST_ASSERT(m_out.size() == l_buf.size() * 2);
-
-        for (auto i = l_buf.data(),
-                  o = m_out.data(),
-                  e = m_out.data() + m_out.size();
-             o < e;
-             ++i, o += 2)
-        {
-            o[0] = *i;
-            o[1] = r_c;
-        }
-    }
-
-    constexpr void
-    operator()(T const l_c, typename slice<T>::span_t const& r_buf) const
-    {
-        BOOST_ASSERT(m_out.size() == r_buf.size() * 2);
-
-        for (auto i = r_buf.data(),
-                  o = m_out.data(),
-                  e = m_out.data() + m_out.size();
-             o < e;
-             ++i, o += 2)
-        {
-            o[0] = l_c;
-            o[1] = *i;
-        }
-    }
-
-    constexpr void operator()(
-            typename slice<T>::span_t const& l_buf,
-            typename slice<T>::span_t const& r_buf) const
-    {
-        BOOST_ASSERT(l_buf.size() == r_buf.size());
-        BOOST_ASSERT(m_out.size() == 2 * l_buf.size());
-        simd::interleave(l_buf, r_buf.data(), m_out.data());
+        simd::interleave(std::forward<I1>(l), std::forward<I2>(r), m_out);
     }
 
 private:
