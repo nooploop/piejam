@@ -105,6 +105,8 @@ public:
         }
     }
 
+    Q_INVOKABLE QString intValueToString(int value);
+
     auto isSwitch() const noexcept -> bool { return m_isSwitch; }
     void setIsSwitch(bool x)
     {

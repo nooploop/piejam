@@ -88,6 +88,20 @@ FxParameter::onSubscribe()
             });
 }
 
+QString
+FxParameter::intValueToString(int value)
+{
+    if (auto id = std::get_if<runtime::int_parameter_id>(&m_impl->param.id))
+    {
+        return QString::fromStdString(observe_once(
+                runtime::selectors::make_fx_parameter_value_string_selector(
+                        *id,
+                        value)));
+    }
+
+    return QString::number(value);
+}
+
 void
 FxParameter::changeValue(double value)
 {
