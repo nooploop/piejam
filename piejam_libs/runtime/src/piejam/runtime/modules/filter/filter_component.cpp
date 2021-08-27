@@ -36,9 +36,6 @@ namespace
 
 struct coefficients
 {
-    using lp2_tag = std::integral_constant<type, type::lp2>;
-    using hp2_tag = std::integral_constant<type, type::hp2>;
-
     using coeffs_t = audio::dsp::biquad<float>::coefficients;
 
     type tp{type::bypass};
@@ -72,9 +69,14 @@ calc_Q(float const res) noexcept -> float
     return res * (10.f - sqrt_half) + sqrt_half;
 }
 
+using lp2_tag = std::integral_constant<type, type::lp2>;
+using hp2_tag = std::integral_constant<type, type::hp2>;
+using lp4_tag = std::integral_constant<type, type::lp4>;
+using hp4_tag = std::integral_constant<type, type::hp4>;
+
 constexpr auto
 make_coefficients(
-        coefficients::lp2_tag tag,
+        lp2_tag tag,
         float const cutoff,
         float const res,
         float const inv_sr) noexcept
@@ -91,7 +93,7 @@ make_coefficients(
 
 constexpr auto
 make_coefficients(
-        coefficients::hp2_tag tag,
+        hp2_tag tag,
         float const cutoff,
         float const res,
         float const inv_sr) noexcept
@@ -105,6 +107,32 @@ make_coefficients(
             .tp = tag,
             .coeffs =
                     {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = -2.f * a0, .a2 = a0}};
+}
+
+constexpr auto
+make_coefficients(
+        lp4_tag tag,
+        float const cutoff,
+        float const res,
+        float const inv_sr) noexcept
+{
+    // same coefficients as for lp2, just replace the type
+    auto coeffs = make_coefficients(lp2_tag{}, cutoff, res, inv_sr);
+    coeffs.tp = tag;
+    return coeffs;
+}
+
+constexpr auto
+make_coefficients(
+        hp4_tag tag,
+        float const cutoff,
+        float const res,
+        float const inv_sr) noexcept
+{
+    // same coefficients as for hp2, just replace the type
+    auto coeffs = make_coefficients(hp2_tag{}, cutoff, res, inv_sr);
+    coeffs.tp = tag;
+    return coeffs;
 }
 
 auto
@@ -126,14 +154,28 @@ make_coefficent_converter_processor(audio::sample_rate const& sample_rate)
                 {
                     case to_underlying(type::lp2):
                         return make_coefficients(
-                                coefficients::lp2_tag{},
+                                lp2_tag{},
                                 cutoff,
                                 res,
                                 inv_sr);
 
                     case to_underlying(type::hp2):
                         return make_coefficients(
-                                coefficients::hp2_tag{},
+                                hp2_tag{},
+                                cutoff,
+                                res,
+                                inv_sr);
+
+                    case to_underlying(type::lp4):
+                        return make_coefficients(
+                                lp4_tag{},
+                                cutoff,
+                                res,
+                                inv_sr);
+
+                    case to_underlying(type::hp4):
+                        return make_coefficients(
+                                hp4_tag{},
                                 cutoff,
                                 res,
                                 inv_sr);
@@ -204,7 +246,8 @@ public:
                                             from_offset),
                                     to_offset - from_offset,
                                     [this, c]() {
-                                        return m_biquad.process(c);
+                                        return m_biquad_second.process(
+                                                m_biquad_first.process(c));
                                     });
                         },
                         [this, &ctx, from_offset, to_offset](
@@ -216,7 +259,8 @@ public:
                                             ctx.outputs[0].begin(),
                                             from_offset),
                                     [this](float const x0) {
-                                        return m_biquad.process(x0);
+                                        return m_biquad_second.process(
+                                                m_biquad_first.process(x0));
                                     });
                         }),
                 ctx.inputs[0].get().as_variant());
@@ -228,12 +272,19 @@ public:
             coefficients const& value)
     {
         m_type = value.tp;
-        m_biquad.coeffs = value.coeffs;
+
+        m_biquad_first.coeffs = value.coeffs;
+
+        if (m_type == type::lp4 || m_type == type::hp4)
+            m_biquad_second.coeffs = value.coeffs;
+        else
+            m_biquad_second.coeffs = {};
     }
 
 private:
     type m_type{type::bypass};
-    audio::dsp::biquad<float> m_biquad;
+    audio::dsp::biquad<float> m_biquad_first;
+    audio::dsp::biquad<float> m_biquad_second;
 };
 
 class component final : public audio::engine::component

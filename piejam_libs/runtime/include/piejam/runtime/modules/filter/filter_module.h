@@ -16,7 +16,9 @@ enum class type
 {
     bypass,
     lp2,
+    lp4,
     hp2,
+    hp4
 };
 
 enum class parameter_key : fx::parameter_key

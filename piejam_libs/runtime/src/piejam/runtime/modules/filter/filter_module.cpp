@@ -32,6 +32,10 @@ to_type_string(int const n) -> std::string
             return "LP2";
         case to_underlying(type::hp2):
             return "HP2";
+        case to_underlying(type::lp4):
+            return "LP4";
+        case to_underlying(type::hp4):
+            return "HP4";
 
         default:
             return "Pass";
@@ -89,7 +93,7 @@ make_module(
             runtime::parameter::int_{
                     .default_value = to_underlying(type::lp2),
                     .min = 0,
-                    .max = 3});
+                    .max = 4});
 
     fx_params.emplace(
             type_param_id,
