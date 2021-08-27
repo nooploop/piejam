@@ -49,10 +49,12 @@ public:
     {
         verify_process_context(*this, ctx);
 
-        process_sliced_on_events(ctx);
+        ctx.results[0] = ctx.outputs[0];
+
+        process_sliced(ctx);
     }
 
-    void process_without_events(process_context const& ctx)
+    void process_buffer(process_context const& ctx)
     {
         if (m_smoother.is_running())
         {
@@ -60,8 +62,6 @@ public:
                     m_smoother.advance_iterator(),
                     ctx.buffer_size,
                     ctx.outputs[0].begin());
-
-            ctx.results[0] = ctx.outputs[0];
         }
         else
         {
@@ -69,49 +69,33 @@ public:
         }
     }
 
-    void
-    process_with_starting_event(process_context const& ctx, float const value)
-    {
-        m_smoother.set(value, m_smooth_length);
-
-        if (m_smoother.is_running())
-        {
-            std::copy_n(
-                    m_smoother.advance_iterator(),
-                    ctx.buffer_size,
-                    ctx.outputs[0].begin());
-
-            ctx.results[0] = ctx.outputs[0];
-        }
-        else
-        {
-            ctx.results[0] = m_smoother.current();
-        }
-    }
-
-    void process_event_slice(
+    void process_slice(
             process_context const& ctx,
             std::size_t const from_offset,
-            std::size_t const to_offset,
-            float const next_value)
+            std::size_t const to_offset)
     {
-        std::copy_n(
-                m_smoother.advance_iterator(),
-                to_offset - from_offset,
-                std::next(ctx.outputs[0].begin(), from_offset));
-        m_smoother.set(next_value, m_smooth_length);
+        if (m_smoother.is_running())
+        {
+            std::copy_n(
+                    m_smoother.advance_iterator(),
+                    to_offset - from_offset,
+                    std::next(ctx.outputs[0].begin(), from_offset));
+        }
+        else
+        {
+            std::fill_n(
+                    std::next(ctx.outputs[0].begin(), from_offset),
+                    to_offset - from_offset,
+                    m_smoother.current());
+        }
     }
 
-    void process_final_slice(
-            process_context const& ctx,
-            std::size_t const from_offset)
+    void process_event_value(
+            process_context const&,
+            std::size_t /*offset*/,
+            float const value)
     {
-        std::copy_n(
-                m_smoother.advance_iterator(),
-                ctx.buffer_size - from_offset,
-                std::next(ctx.outputs[0].begin(), from_offset));
-
-        ctx.results[0] = ctx.outputs[0];
+        m_smoother.set(value, m_smooth_length);
     }
 
 private:

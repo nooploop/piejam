@@ -177,48 +177,23 @@ public:
     {
         verify_process_context(*this, ctx);
 
-        process_sliced_on_events(ctx);
         ctx.results[0] = ctx.outputs[0];
+
+        process_sliced(ctx);
     }
 
-    void process_without_events(audio::engine::process_context const& ctx)
+    void process_buffer(audio::engine::process_context const& ctx)
     {
-        std::visit(
-                boost::hof::match(
-                        [this, &ctx](float const c) {
-                            std::ranges::generate_n(
-                                    ctx.outputs[0].begin(),
-                                    ctx.buffer_size,
-                                    [this, c]() {
-                                        return m_biquad.process(c);
-                                    });
-                        },
-                        [this,
-                         &ctx](audio::engine::audio_slice::span_t const& buf) {
-                            std::ranges::transform(
-                                    buf,
-                                    ctx.outputs[0].begin(),
-                                    [this](float const x0) {
-                                        return m_biquad.process(x0);
-                                    });
-                        }),
-                ctx.inputs[0].get().as_variant());
+        if (m_type == type::bypass)
+            ctx.results[0] = ctx.inputs[0];
+        else
+            process_slice(ctx, 0, ctx.buffer_size);
     }
 
-    void process_with_starting_event(
-            audio::engine::process_context const& ctx,
-            coefficients const& value)
-    {
-        m_biquad.coeffs = value.coeffs;
-
-        process_without_events(ctx);
-    }
-
-    void process_event_slice(
+    void process_slice(
             audio::engine::process_context const& ctx,
             std::size_t const from_offset,
-            std::size_t const to_offset,
-            coefficients const& next_value)
+            std::size_t const to_offset)
     {
         std::visit(
                 boost::hof::match(
@@ -245,43 +220,19 @@ public:
                                     });
                         }),
                 ctx.inputs[0].get().as_variant());
-
-        m_biquad.coeffs = next_value.coeffs;
     }
 
-    void process_final_slice(
-            audio::engine::process_context const& ctx,
-            std::size_t const from_offset)
+    void process_event_value(
+            audio::engine::process_context const& /*ctx*/,
+            std::size_t const /*offset*/,
+            coefficients const& value)
     {
-        std::visit(
-                boost::hof::match(
-                        [this, &ctx, from_offset](float const c) {
-                            std::ranges::generate_n(
-                                    std::next(
-                                            ctx.outputs[0].begin(),
-                                            from_offset),
-                                    ctx.buffer_size - from_offset,
-                                    [this, c]() {
-                                        return m_biquad.process(c);
-                                    });
-                        },
-                        [this, &ctx, from_offset](
-                                audio::engine::audio_slice::span_t const& buf) {
-                            std::ranges::transform(
-                                    std::next(buf.begin(), from_offset),
-                                    buf.end(),
-                                    std::next(
-                                            ctx.outputs[0].begin(),
-                                            from_offset),
-                                    [this](float const x0) {
-                                        return m_biquad.process(x0);
-                                    });
-                        }),
-                ctx.inputs[0].get().as_variant());
+        m_type = value.tp;
+        m_biquad.coeffs = value.coeffs;
     }
 
 private:
-    //    type m_type{type::bypass};
+    type m_type{type::bypass};
     audio::dsp::biquad<float> m_biquad;
 };
 
