@@ -175,6 +175,8 @@ auto make_fx_parameter_name_selector(fx::parameter_id)
         -> selector<boxed_string>;
 auto make_fx_parameter_value_string_selector(fx::parameter_id)
         -> selector<std::string>;
+auto make_fx_parameter_value_string_selector(fx::parameter_id, int)
+        -> selector<std::string>;
 auto make_fx_module_streams_selector(fx::module_id)
         -> selector<box<fx::module_streams>>;
 auto make_audio_stream_selector(audio_stream_id)

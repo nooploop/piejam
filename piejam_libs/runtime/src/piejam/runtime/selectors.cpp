@@ -693,6 +693,21 @@ make_fx_parameter_value_string_selector(fx::parameter_id const param_id)
 }
 
 auto
+make_fx_parameter_value_string_selector(
+        fx::parameter_id const param_id,
+        int const value) -> selector<std::string>
+{
+    return [=](state const& st) -> std::string {
+        if (auto it = st.fx_parameters->find(param_id);
+            it != st.fx_parameters->end())
+        {
+            return it->second.value_to_string(value);
+        }
+        return std::to_string(value);
+    };
+}
+
+auto
 make_fx_module_streams_selector(fx::module_id fx_mod_id)
         -> selector<box<fx::module_streams>>
 {
