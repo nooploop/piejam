@@ -63,10 +63,6 @@ private:
 };
 
 inline constexpr std::array preferred_sample_rates{
-        sample_rate(11025u),
-        sample_rate(12000u),
-        sample_rate(22050u),
-        sample_rate(24000u),
         sample_rate(44100u),
         sample_rate(48000u),
         sample_rate(88200u),
