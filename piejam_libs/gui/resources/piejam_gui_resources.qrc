@@ -60,6 +60,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/autorenew.svg</file>
         <file>images/icons/midi-port.svg</file>
         <file>images/icons/pencil.svg</file>
+        <file>PieJam/FxChainControls/EnumButtonGroup.qml</file>
         <file>PieJam/FxChainControls/ParametersListView.qml</file>
         <file>PieJam/FxChainControls/ScopeView.qml</file>
         <file>PieJam/FxChainControls/SpectrumView.qml</file>
