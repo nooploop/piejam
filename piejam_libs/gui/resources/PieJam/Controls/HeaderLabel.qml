@@ -9,7 +9,7 @@ import QtQuick.Controls.Material 2.13
 Label {
     id: root
 
-    property var backgroundColor: Material.primaryColor
+    property color backgroundColor: Material.primaryColor
 
     padding: 2
     leftPadding: 4
