@@ -41,9 +41,6 @@ class Generator
 {
 public:
     Generator(audio::sample_rate const& sampleRate)
-        : m_window(algorithm::transform_to_vector(
-                  range::iota(s_dft_size),
-                  &numeric::window::hann<s_dft_size>))
     {
         float const binSize = sampleRate.as_float() / s_dft_size;
         for (std::size_t const i : range::iota(s_dft.output_size()))
@@ -60,10 +57,8 @@ public:
     auto operator()(AudioStreamListener::Stream const& stream)
             -> std::optional<SpectrumDataPoints>
     {
-        auto const numFrames = std::distance(stream.begin(), stream.end());
-
         m_streamBuffer.clear();
-        m_streamBuffer.reserve(numFrames);
+        m_streamBuffer.reserve(stream.num_frames());
 
         std::ranges::transform(
                 stream.channels_cast<2>(),
@@ -99,7 +94,9 @@ private:
     std::vector<float> m_streamBuffer{};
     std::vector<float> m_dftPrepareBuffer{std::vector<float>(s_dft_size)};
     std::vector<float> m_dftInputBuffer{std::vector<float>(s_dft_size)};
-    std::vector<float> m_window{};
+    std::vector<float> m_window{algorithm::transform_to_vector(
+            range::iota(s_dft_size),
+            &numeric::window::hann<s_dft_size>)};
     std::vector<SpectrumDataPoint> m_dataPoints{
             std::vector<SpectrumDataPoint>(s_dft.output_size())};
 };
