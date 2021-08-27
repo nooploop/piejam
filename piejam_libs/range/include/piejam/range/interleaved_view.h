@@ -47,7 +47,7 @@ struct interleaved_view
             interleaved_view<U, NumChannels> const&
                     other) requires(std::is_convertible_v<U*, T*>)
         : m_begin(other.begin())
-        , m_end(other.begin())
+        , m_end(other.end())
     {
     }
 
