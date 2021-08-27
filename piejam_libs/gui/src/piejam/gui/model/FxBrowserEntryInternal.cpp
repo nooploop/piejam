@@ -32,6 +32,11 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
             setDescription(tr("Amplify or attenuate a signal."));
             break;
 
+        case runtime::fx::internal::filter:
+            setName(tr("Filter"));
+            setDescription(tr("Filter a signal."));
+            break;
+
         case runtime::fx::internal::scope:
             setName(tr("Oscilloscope"));
             setDescription(tr("Observe audio signal."));

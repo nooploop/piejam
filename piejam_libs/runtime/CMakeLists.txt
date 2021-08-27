@@ -60,8 +60,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/solo_switch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/stereo_stream.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io_fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io_fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/dynamic_key_object_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/fwd.h
@@ -91,6 +91,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_util.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_normalize.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/fwd.h
@@ -200,6 +202,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_input_controller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer_util.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_component.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/parameter_maps.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp

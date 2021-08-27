@@ -18,6 +18,7 @@ public:
     enum class Type
     {
         Generic = 0,
+        Filter,
         Scope,
         Spectrum
     };

@@ -12,6 +12,7 @@
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/scope.h>
 #include <piejam/runtime/fx/spectrum.h>
+#include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
@@ -164,6 +165,17 @@ make_fx_gain(
 }
 
 static auto
+make_fx_filter(
+        fx::modules_t& fx_modules,
+        fx::parameters_t& fx_params,
+        parameter_maps& params,
+        audio_streams_cache& streams)
+{
+    return fx_modules.add(
+            modules::filter::make_module(fx_params, params, streams));
+}
+
+static auto
 make_fx_scope(fx::modules_t& fx_modules, audio_streams_cache& streams)
 {
     return fx_modules.add(fx::make_scope_module(streams));
@@ -263,6 +275,14 @@ insert_internal_fx_module(
     {
         case fx::internal::gain:
             fx_mod_id = make_fx_gain(st.fx_modules, fx_params, st.params);
+            break;
+
+        case fx::internal::filter:
+            fx_mod_id = make_fx_filter(
+                    st.fx_modules,
+                    fx_params,
+                    st.params,
+                    st.streams);
             break;
 
         case fx::internal::scope:

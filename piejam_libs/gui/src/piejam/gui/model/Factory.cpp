@@ -13,6 +13,7 @@
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChain.h>
+#include <piejam/gui/model/FxFilter.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/FxParameter.h>
@@ -54,6 +55,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::MixerChannelEdit*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
+    qRegisterMetaType<piejam::gui::model::FxParameter*>();
     qRegisterMetaType<piejam::gui::model::FxChain*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
@@ -65,6 +67,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::ScopeLinesObject*>();
     qRegisterMetaType<piejam::gui::model::FxSpectrum*>();
     qRegisterMetaType<piejam::gui::model::SpectrumData*>();
+    qRegisterMetaType<piejam::gui::model::FxFilter*>();
 
     qRegisterMetaType<piejam::gui::item::SpectrumScaleLabel>();
 

@@ -15,6 +15,7 @@
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/modules/filter/filter_component.h>
 
 #include <boost/assert.hpp>
 #include <boost/hof/match.hpp>
@@ -40,6 +41,14 @@ make_internal_fx(
         case fx::internal::gain:
             return components::make_fx_gain(fx_mod, param_procs, name);
 
+        case fx::internal::filter:
+            return modules::filter::make_component(
+                    fx_mod,
+                    sample_rate,
+                    param_procs,
+                    stream_procs,
+                    name);
+
         case fx::internal::scope:
             return components::make_fx_scope(fx_mod, sample_rate, stream_procs);
 
@@ -48,11 +57,10 @@ make_internal_fx(
                     fx_mod,
                     sample_rate,
                     stream_procs);
-
-        default:
-            BOOST_ASSERT_MSG(false, "unknown internal fx");
-            return nullptr;
     }
+
+    BOOST_ASSERT_MSG(false, "Unknown internal fx");
+    return nullptr;
 }
 
 } // namespace

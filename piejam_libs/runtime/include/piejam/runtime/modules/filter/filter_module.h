@@ -1,0 +1,37 @@
+// PieJam - An audio mixer for Raspberry Pi.
+// SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#pragma once
+
+#include <piejam/runtime/audio_stream.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/parameters.h>
+
+namespace piejam::runtime::modules::filter
+{
+
+enum class type
+{
+    bypass,
+    lp2,
+    hp2,
+};
+
+enum class parameter_key : fx::parameter_key
+{
+    type,
+    cutoff,
+    resonance
+};
+
+enum class stream_key : fx::stream_key
+{
+    in_out
+};
+
+auto make_module(fx::parameters_t&, parameter_maps&, audio_streams_cache&)
+        -> fx::module;
+
+} // namespace piejam::runtime::modules::filter

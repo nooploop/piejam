@@ -69,7 +69,7 @@ make_gain_module(parameters_t& fx_params, parameter_maps& params) -> module
             .fx_instance_id = internal::gain,
             .name = "Gain"s,
             .parameters =
-                    fx::module_parameters{
+                    module_parameters{
                             {to_underlying(gain_parameter_key::gain),
                              gain_param_id}},
             .streams = {}};

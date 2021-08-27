@@ -38,6 +38,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryInternal.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryLADSPA.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChain.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxFilter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxGenericModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleContent.h
@@ -63,6 +64,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataPoint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StereoChannel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StereoSpectrumDataGenerator.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StreamChannelsBisector.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Subscribable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SubscribableModel.h
@@ -78,6 +80,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryInternal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryLADSPA.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxChain.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxGenericModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxParameter.cpp
@@ -94,6 +97,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelPerform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/ScopeLinesGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StereoSpectrumDataGenerator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StreamChannelsBisector.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
 )
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

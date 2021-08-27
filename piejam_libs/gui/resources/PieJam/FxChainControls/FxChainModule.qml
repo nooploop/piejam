@@ -172,6 +172,15 @@ Item {
         }
 
         Component {
+            id: filterDelegate
+
+            FilterView {
+                content: root.content
+                bypassed: root.bypassed
+            }
+        }
+
+        Component {
             id: scopeDelegate
 
             ScopeView {
@@ -201,6 +210,9 @@ Item {
                     switch (root.content.type) {
                     case FxModuleContent.Type.Generic:
                         return genericDelegate
+
+                    case FxModuleContent.Type.Filter:
+                        return filterDelegate
 
                     case FxModuleContent.Type.Scope:
                         return scopeDelegate

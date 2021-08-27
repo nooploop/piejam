@@ -4,6 +4,7 @@
 
 #include <piejam/gui/model/FxModule.h>
 
+#include <piejam/gui/model/FxFilter.h>
 #include <piejam/gui/model/FxGenericModule.h>
 #include <piejam/gui/model/FxScope.h>
 #include <piejam/gui/model/FxSpectrum.h>
@@ -41,6 +42,12 @@ makeModuleContent(
                             -> std::unique_ptr<FxModuleContent> {
                         switch (fx_type)
                         {
+                            case runtime::fx::internal::filter:
+                                return std::make_unique<FxFilter>(
+                                        store_dispatch,
+                                        state_change_subscriber,
+                                        fx_mod_id);
+
                             case runtime::fx::internal::scope:
                                 return std::make_unique<FxScope>(
                                         store_dispatch,
