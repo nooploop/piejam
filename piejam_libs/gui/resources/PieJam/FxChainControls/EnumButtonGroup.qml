@@ -18,7 +18,7 @@ Repeater {
 
     anchors.fill: parent
 
-    model: root.paramModel ? root.paramModel.maxValue - root.paramModel.minValue : 0
+    model: root.paramModel ? root.paramModel.maxValue - root.paramModel.minValue + 1 : 0
 
     delegate: Button {
         property int value: modelData + root.paramModel.minValue
