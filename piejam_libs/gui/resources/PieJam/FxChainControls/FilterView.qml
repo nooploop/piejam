@@ -11,6 +11,8 @@ import QtQml 2.15
 import PieJam.Items 1.0 as PJItems
 import PieJam.Models 1.0 as PJModels
 
+import "../Controls"
+
 Item {
     id: root
 
@@ -32,6 +34,14 @@ Item {
             paramModel: root.content ? root.content.filterType : null
             buttonHeight: 46
         }
+    }
+
+    MidiAssignArea {
+        id: midiAssign
+
+        anchors.fill: typeButtons
+
+        model: root.content ? root.content.filterType.midi : null
     }
 
     Row {

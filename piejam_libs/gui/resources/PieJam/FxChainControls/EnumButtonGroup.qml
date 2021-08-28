@@ -7,9 +7,6 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.13
 import QtQuick.Layouts 1.13
 
-import ".."
-import "../Controls"
-
 Repeater {
     id: root
 
@@ -17,8 +14,6 @@ Repeater {
     property var names: []
     property int buttonWidth: 64
     property int buttonHeight: 48
-
-    anchors.fill: parent
 
     model: root.paramModel ? root.paramModel.maxValue - root.paramModel.minValue + 1 : 0
 
