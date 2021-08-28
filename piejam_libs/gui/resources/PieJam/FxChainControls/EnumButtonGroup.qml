@@ -15,6 +15,8 @@ Repeater {
 
     property var paramModel: null
     property var names: []
+    property int buttonWidth: 64
+    property int buttonHeight: 48
 
     anchors.fill: parent
 
@@ -22,6 +24,9 @@ Repeater {
 
     delegate: Button {
         property int value: modelData + root.paramModel.minValue
+
+        width: root.buttonWidth
+        height: root.buttonHeight
 
         text: root.paramModel.intValueToString(value)
 

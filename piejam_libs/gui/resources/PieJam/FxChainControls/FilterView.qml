@@ -30,6 +30,7 @@ Item {
             id: filterButtons
 
             paramModel: root.content ? root.content.filterType : null
+            buttonHeight: 46
         }
     }
 
