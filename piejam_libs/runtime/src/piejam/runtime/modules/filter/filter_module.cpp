@@ -30,12 +30,18 @@ to_type_string(int const n) -> std::string
     {
         case to_underlying(type::lp2):
             return "LP2";
-        case to_underlying(type::hp2):
-            return "HP2";
         case to_underlying(type::lp4):
             return "LP4";
+        case to_underlying(type::bp2):
+            return "BP2";
+        case to_underlying(type::bp4):
+            return "BP4";
+        case to_underlying(type::hp2):
+            return "HP2";
         case to_underlying(type::hp4):
             return "HP4";
+        case to_underlying(type::br):
+            return "BR";
 
         default:
             return "Pass";
@@ -64,7 +70,7 @@ to_cutoff_string(float const f)
 
 struct resonance_defaults
 {
-    static constexpr float default_value{0.f};
+    static constexpr float default_value{.5f};
     static constexpr float min{0.f};
     static constexpr float max{1.f};
 };
@@ -93,7 +99,7 @@ make_module(
             runtime::parameter::int_{
                     .default_value = to_underlying(type::lp2),
                     .min = 0,
-                    .max = 4});
+                    .max = 7});
 
     fx_params.emplace(
             type_param_id,

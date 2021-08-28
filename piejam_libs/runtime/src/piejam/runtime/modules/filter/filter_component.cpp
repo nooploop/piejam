@@ -42,37 +42,76 @@ struct coefficients
     coeffs_t coeffs;
 };
 
-static constexpr auto
-calc_b2(float const phi, float const Q) noexcept -> float
+constexpr auto
+calc_b2_lp_hp(float const phi, float const Q) noexcept -> float
 {
     float const two_Q = 2.f * Q;
     float const sin_phi = std::sin(phi);
     return (two_Q - sin_phi) / (two_Q + sin_phi);
 }
 
-static constexpr auto
+constexpr auto
+calc_b2_bp_br(float const phi, float const Q) noexcept -> float
+{
+    constexpr float const pi_div_four = std::numbers::pi_v<float> / 4.f;
+    return std::tan(pi_div_four - phi / (2.f * Q));
+}
+
+constexpr auto
 calc_b1(float const phi, float const b2) -> float
 {
     return -(1 + b2) * std::cos(phi);
 }
 
-static constexpr auto
+constexpr auto
 calc_phi(float const freq_c, float const inv_sr) noexcept -> float
 {
-    return 2.f * std::numbers::pi * freq_c * inv_sr;
+    return 2.f * std::numbers::pi_v<float> * freq_c * inv_sr;
 }
 
-static constexpr auto
-calc_Q(float const res) noexcept -> float
+constexpr auto
+calc_Q(float const res, float const min_Q, float const max_Q)
 {
-    constexpr float const sqrt_half = std::sqrt(.5f);
-    return res * (10.f - sqrt_half) + sqrt_half;
+    return res * (max_Q - min_Q) + min_Q;
+}
+
+constexpr auto
+calc_Q_lp_hp(float const res) noexcept -> float
+{
+    return calc_Q(res, std::sqrt(.5f), 10.f);
+}
+
+constexpr auto
+calc_min_Q_bp(float const inv_sr) -> float
+{
+    return std::ceil(20000.f * 4.f * inv_sr);
+}
+
+constexpr auto
+calc_min_Q_br(float const cutoff, float const inv_sr) noexcept -> float
+{
+    return std::ceil(cutoff * 4.f * inv_sr);
+}
+
+constexpr auto
+calc_Q_bp(float const res, float const min_Q) -> float
+{
+    return calc_Q(res, min_Q, 25.f);
+}
+
+constexpr auto
+calc_Q_br(float const res, float const min_Q) -> float
+{
+    return calc_Q(res, min_Q, 4.f);
 }
 
 using lp2_tag = std::integral_constant<type, type::lp2>;
-using hp2_tag = std::integral_constant<type, type::hp2>;
 using lp4_tag = std::integral_constant<type, type::lp4>;
+using bp2_tag = std::integral_constant<type, type::bp2>;
+using bp4_tag = std::integral_constant<type, type::bp4>;
+using hp2_tag = std::integral_constant<type, type::hp2>;
 using hp4_tag = std::integral_constant<type, type::hp4>;
+using br_tag = std::integral_constant<type, type::br>;
 
 constexpr auto
 make_coefficients(
@@ -82,31 +121,13 @@ make_coefficients(
         float const inv_sr) noexcept
 {
     float const phi = calc_phi(cutoff, inv_sr);
-    float const Q = calc_Q(res);
-    float const b2 = calc_b2(phi, Q);
+    float const Q = calc_Q_lp_hp(res);
+    float const b2 = calc_b2_lp_hp(phi, Q);
     float const b1 = calc_b1(phi, b2);
     float const a0 = .25f * (1.f + b1 + b2);
     return coefficients{
             .tp = tag,
             .coeffs = {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = 2.f * a0, .a2 = a0}};
-}
-
-constexpr auto
-make_coefficients(
-        hp2_tag tag,
-        float const cutoff,
-        float const res,
-        float const inv_sr) noexcept
-{
-    float const phi = calc_phi(cutoff, inv_sr);
-    float const Q = calc_Q(res);
-    float const b2 = calc_b2(phi, Q);
-    float const b1 = calc_b1(phi, b2);
-    float const a0 = .25f * (1.f - b1 + b2);
-    return coefficients{
-            .tp = tag,
-            .coeffs =
-                    {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = -2.f * a0, .a2 = a0}};
 }
 
 constexpr auto
@@ -124,6 +145,56 @@ make_coefficients(
 
 constexpr auto
 make_coefficients(
+        bp2_tag tag,
+        float const cutoff,
+        float const res,
+        float const inv_sr,
+        float const min_Q) noexcept
+{
+    float const phi = calc_phi(cutoff, inv_sr);
+    float const Q = calc_Q_bp(res, min_Q);
+    float const b2 = calc_b2_bp_br(phi, Q);
+    float const b1 = calc_b1(phi, b2);
+    float const a0 = .5f * (1.f - b2);
+    return coefficients{
+            .tp = tag,
+            .coeffs = {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = 0.f, .a2 = -a0}};
+}
+
+constexpr auto
+make_coefficients(
+        bp4_tag tag,
+        float const cutoff,
+        float const res,
+        float const inv_sr,
+        float const min_Q) noexcept
+{
+    // same coefficients as for bp2, just replace the type
+    auto coeffs = make_coefficients(bp2_tag{}, cutoff, res, inv_sr, min_Q);
+    coeffs.tp = tag;
+    return coeffs;
+}
+
+constexpr auto
+make_coefficients(
+        hp2_tag tag,
+        float const cutoff,
+        float const res,
+        float const inv_sr) noexcept
+{
+    float const phi = calc_phi(cutoff, inv_sr);
+    float const Q = calc_Q_lp_hp(res);
+    float const b2 = calc_b2_lp_hp(phi, Q);
+    float const b1 = calc_b1(phi, b2);
+    float const a0 = .25f * (1.f - b1 + b2);
+    return coefficients{
+            .tp = tag,
+            .coeffs =
+                    {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = -2.f * a0, .a2 = a0}};
+}
+
+constexpr auto
+make_coefficients(
         hp4_tag tag,
         float const cutoff,
         float const res,
@@ -133,6 +204,24 @@ make_coefficients(
     auto coeffs = make_coefficients(hp2_tag{}, cutoff, res, inv_sr);
     coeffs.tp = tag;
     return coeffs;
+}
+
+constexpr auto
+make_coefficients(
+        br_tag tag,
+        float const cutoff,
+        float const res,
+        float const inv_sr) noexcept
+{
+    float const phi = calc_phi(cutoff, inv_sr);
+    float const min_Q = calc_min_Q_br(cutoff, inv_sr);
+    float const Q = calc_Q_br(res, min_Q);
+    float const b2 = calc_b2_bp_br(phi, Q);
+    float const b1 = calc_b1(phi, b2);
+    float const a0 = .5f * (1.f + b2);
+    return coefficients{
+            .tp = tag,
+            .coeffs = {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = b1, .a2 = a0}};
 }
 
 auto
@@ -146,7 +235,8 @@ make_coefficent_converter_processor(audio::sample_rate const& sample_rate)
             s_cutoff_name,
             s_res_name};
     return audio::engine::make_event_converter_processor(
-            [inv_sr = 1.f / sample_rate.as_float()](
+            [inv_sr = 1.f / sample_rate.as_float(),
+             min_Q_bp = calc_min_Q_bp(1.f / sample_rate.as_float())](
                     int const type,
                     float const cutoff,
                     float const res) {
@@ -159,16 +249,32 @@ make_coefficent_converter_processor(audio::sample_rate const& sample_rate)
                                 res,
                                 inv_sr);
 
-                    case to_underlying(type::hp2):
+                    case to_underlying(type::lp4):
                         return make_coefficients(
-                                hp2_tag{},
+                                lp4_tag{},
                                 cutoff,
                                 res,
                                 inv_sr);
 
-                    case to_underlying(type::lp4):
+                    case to_underlying(type::bp2):
                         return make_coefficients(
-                                lp4_tag{},
+                                bp2_tag{},
+                                cutoff,
+                                res,
+                                inv_sr,
+                                min_Q_bp);
+
+                    case to_underlying(type::bp4):
+                        return make_coefficients(
+                                bp4_tag{},
+                                cutoff,
+                                res,
+                                inv_sr,
+                                min_Q_bp);
+
+                    case to_underlying(type::hp2):
+                        return make_coefficients(
+                                hp2_tag{},
                                 cutoff,
                                 res,
                                 inv_sr);
@@ -179,6 +285,9 @@ make_coefficent_converter_processor(audio::sample_rate const& sample_rate)
                                 cutoff,
                                 res,
                                 inv_sr);
+
+                    case to_underlying(type::br):
+                        return make_coefficients(br_tag{}, cutoff, res, inv_sr);
 
                     default:
                         return coefficients{};
@@ -275,7 +384,7 @@ public:
 
         m_biquad_first.coeffs = value.coeffs;
 
-        if (m_type == type::lp4 || m_type == type::hp4)
+        if (m_type == type::lp4 || m_type == type::bp4 || m_type == type::hp4)
             m_biquad_second.coeffs = value.coeffs;
         else
             m_biquad_second.coeffs = {};

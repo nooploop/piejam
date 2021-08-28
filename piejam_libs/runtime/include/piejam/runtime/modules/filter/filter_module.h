@@ -17,8 +17,11 @@ enum class type
     bypass,
     lp2,
     lp4,
+    bp2,
+    bp4,
     hp2,
-    hp4
+    hp4,
+    br
 };
 
 enum class parameter_key : fx::parameter_key
