@@ -16,6 +16,7 @@
 #include <piejam/audio/engine/stream_processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/math.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/parameter_processor_factory.h>
@@ -42,67 +43,70 @@ struct coefficients
     coeffs_t coeffs;
 };
 
+template <std::floating_point T>
 constexpr auto
-calc_b2_lp_hp(float const phi, float const Q) noexcept -> float
+calc_b2_lp_hp(T const phi, T const Q) noexcept -> T
 {
-    float const two_Q = 2.f * Q;
-    float const sin_phi = std::sin(phi);
+    T const two_Q = T{2} * Q;
+    T const sin_phi = std::sin(phi);
     return (two_Q - sin_phi) / (two_Q + sin_phi);
 }
 
+template <std::floating_point T>
 constexpr auto
-calc_b2_bp_br(float const phi, float const Q) noexcept -> float
+calc_b2_bp_br(T const phi, T const Q) noexcept -> T
 {
-    constexpr float const pi_div_four = std::numbers::pi_v<float> / 4.f;
-    return std::tan(pi_div_four - phi / (2.f * Q));
+    constexpr T const pi_div_four = std::numbers::pi_v<T> / T{4};
+    return std::tan(pi_div_four - phi / (T{2} * Q));
 }
 
+template <std::floating_point T>
 constexpr auto
-calc_b1(float const phi, float const b2) -> float
+calc_b1(T const phi, T const b2) noexcept -> T
 {
-    return -(1 + b2) * std::cos(phi);
+    return -(T{1} + b2) * std::cos(phi);
 }
 
+template <std::floating_point T>
 constexpr auto
-calc_phi(float const freq_c, float const inv_sr) noexcept -> float
+calc_phi(T const freq_c, T const inv_sr) noexcept -> T
 {
-    return 2.f * std::numbers::pi_v<float> * freq_c * inv_sr;
+    return T{2} * std::numbers::pi_v<T> * freq_c * inv_sr;
 }
 
+template <std::floating_point T>
 constexpr auto
-calc_Q(float const res, float const min_Q, float const max_Q)
+calc_Q(T const res, T const min_Q, T const max_Q) noexcept -> T
 {
-    return res * (max_Q - min_Q) + min_Q;
+    return math::linear_map(res, T{0}, T{1}, min_Q, max_Q);
 }
 
+template <std::floating_point T>
 constexpr auto
-calc_Q_lp_hp(float const res) noexcept -> float
+calc_Q_lp_hp(T const res) noexcept -> T
 {
-    return calc_Q(res, std::sqrt(.5f), 10.f);
+    return calc_Q(res, std::sqrt(T{.5f}), T{10});
 }
 
+template <std::floating_point T>
 constexpr auto
-calc_min_Q_bp(float const inv_sr) -> float
+calc_min_Q_bp_br(T const cutoff, T const inv_sr) noexcept -> T
 {
-    return std::ceil(20000.f * 4.f * inv_sr);
+    return std::ceil(cutoff * T{4} * inv_sr);
 }
 
+template <std::floating_point T>
 constexpr auto
-calc_min_Q_br(float const cutoff, float const inv_sr) noexcept -> float
+calc_Q_bp(T const res, T const min_Q) noexcept -> T
 {
-    return std::ceil(cutoff * 4.f * inv_sr);
+    return calc_Q(res, min_Q, T{25});
 }
 
+template <std::floating_point T>
 constexpr auto
-calc_Q_bp(float const res, float const min_Q) -> float
+calc_Q_br(T const res, T const min_Q) noexcept -> T
 {
-    return calc_Q(res, min_Q, 25.f);
-}
-
-constexpr auto
-calc_Q_br(float const res, float const min_Q) -> float
-{
-    return calc_Q(res, min_Q, 4.f);
+    return calc_Q(res, min_Q, T{4});
 }
 
 using lp2_tag = std::integral_constant<type, type::lp2>;
@@ -148,10 +152,10 @@ make_coefficients(
         bp2_tag tag,
         float const cutoff,
         float const res,
-        float const inv_sr,
-        float const min_Q) noexcept
+        float const inv_sr) noexcept
 {
     float const phi = calc_phi(cutoff, inv_sr);
+    float const min_Q = calc_min_Q_bp_br(cutoff, inv_sr);
     float const Q = calc_Q_bp(res, min_Q);
     float const b2 = calc_b2_bp_br(phi, Q);
     float const b1 = calc_b1(phi, b2);
@@ -166,11 +170,10 @@ make_coefficients(
         bp4_tag tag,
         float const cutoff,
         float const res,
-        float const inv_sr,
-        float const min_Q) noexcept
+        float const inv_sr) noexcept
 {
     // same coefficients as for bp2, just replace the type
-    auto coeffs = make_coefficients(bp2_tag{}, cutoff, res, inv_sr, min_Q);
+    auto coeffs = make_coefficients(bp2_tag{}, cutoff, res, inv_sr);
     coeffs.tp = tag;
     return coeffs;
 }
@@ -214,7 +217,7 @@ make_coefficients(
         float const inv_sr) noexcept
 {
     float const phi = calc_phi(cutoff, inv_sr);
-    float const min_Q = calc_min_Q_br(cutoff, inv_sr);
+    float const min_Q = calc_min_Q_bp_br(cutoff, inv_sr);
     float const Q = calc_Q_br(res, min_Q);
     float const b2 = calc_b2_bp_br(phi, Q);
     float const b1 = calc_b1(phi, b2);
@@ -235,8 +238,7 @@ make_coefficent_converter_processor(audio::sample_rate const& sample_rate)
             s_cutoff_name,
             s_res_name};
     return audio::engine::make_event_converter_processor(
-            [inv_sr = 1.f / sample_rate.as_float(),
-             min_Q_bp = calc_min_Q_bp(1.f / sample_rate.as_float())](
+            [inv_sr = 1.f / sample_rate.as_float()](
                     int const type,
                     float const cutoff,
                     float const res) {
@@ -261,16 +263,14 @@ make_coefficent_converter_processor(audio::sample_rate const& sample_rate)
                                 bp2_tag{},
                                 cutoff,
                                 res,
-                                inv_sr,
-                                min_Q_bp);
+                                inv_sr);
 
                     case to_underlying(type::bp4):
                         return make_coefficients(
                                 bp4_tag{},
                                 cutoff,
                                 res,
-                                inv_sr,
-                                min_Q_bp);
+                                inv_sr);
 
                     case to_underlying(type::hp2):
                         return make_coefficients(

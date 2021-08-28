@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/math.h>
 #include <piejam/runtime/parameter/float_.h>
 
 #include <cmath>
@@ -14,20 +15,24 @@ namespace piejam::runtime::parameter
 inline constexpr auto
 to_normalized_linear(float_ const& p, float const value) -> float
 {
-    return (value - p.min) / (p.max - p.min);
+    return math::linear_map(value, p.min, p.max, 0.f, 1.f);
 }
 
 inline constexpr auto
 from_normalized_linear(float_ const& p, float const norm_value) -> float
 {
-    return norm_value * (p.max - p.min) + p.min;
+    return math::linear_map(norm_value, 0.f, 1.f, p.min, p.max);
 }
 
 inline constexpr auto
 to_normalized_log(float_ const& p, float const value) -> float
 {
-    float const log_min = std::log(p.min);
-    return (log_min - std::log(value)) / (log_min - std::log(p.max));
+    return math::linear_map(
+            std::log(value),
+            std::log(p.min),
+            std::log(p.max),
+            0.f,
+            1.f);
 }
 
 inline constexpr auto

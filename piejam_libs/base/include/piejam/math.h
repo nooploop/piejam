@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <boost/assert.hpp>
+
 #include <cmath>
 #include <concepts>
 #include <limits>
@@ -46,6 +48,18 @@ clamp(T v, T const min, T const max) -> T requires(std::is_arithmetic_v<T>)
     if (v > max)
         v = max;
     return v;
+}
+
+template <std::floating_point T>
+constexpr auto
+linear_map(
+        T const v,
+        T const src_lo,
+        T const src_hi,
+        T const dst_lo,
+        T const dst_hi) -> T
+{
+    return ((v - src_lo) / (src_hi - src_lo)) * (dst_hi - dst_lo) + dst_lo;
 }
 
 } // namespace piejam::math
