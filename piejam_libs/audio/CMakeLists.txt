@@ -18,6 +18,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/dsp/biquad.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/dsp/biquad_filter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/dsp/envelope_follower.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/audio_slice.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/audio_spsc_ring_buffer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/clip_processor.h
