@@ -115,6 +115,21 @@ Item {
                 text: modelData.value >= 1000 ? (modelData.value / 1000) + " kHz" : modelData.value + " Hz"
             }
         }
+
+        XYPad {
+            anchors.fill: parent
+
+            posX: root.content ? root.content.cutoff.value : 0
+            posY: root.content ? 1 - root.content.resonance.value : 0
+
+            onPosChanged: {
+                if (root.content)
+                    root.content.cutoff.changeValue(x)
+
+                if (root.content)
+                    root.content.resonance.changeValue(1 - y)
+            }
+        }
     }
 
     onBypassedChanged: if (root.bypassed && root.content) root.content.clear()
