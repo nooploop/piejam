@@ -4,7 +4,7 @@
 
 #include <piejam/runtime/modules/filter/filter_component.h>
 
-#include <piejam/audio/dsp/biquad.h>
+#include <piejam/audio/dsp/biquad_filter.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/event_converter_processor.h>
 #include <piejam/audio/engine/graph.h>
@@ -16,6 +16,7 @@
 #include <piejam/audio/engine/stream_processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/integral_constant.h>
 #include <piejam/math.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
@@ -25,6 +26,7 @@
 
 #include <boost/container/flat_map.hpp>
 #include <boost/hof/match.hpp>
+#include <boost/mp11/map.hpp>
 
 #include <cmath>
 #include <numbers>
@@ -43,188 +45,52 @@ struct coefficients
     coeffs_t coeffs;
 };
 
-template <std::floating_point T>
-constexpr auto
-calc_b2_lp_hp(T const phi, T const Q) noexcept -> T
-{
-    T const two_Q = T{2} * Q;
-    T const sin_phi = std::sin(phi);
-    return (two_Q - sin_phi) / (two_Q + sin_phi);
-}
+using lp2_tag = make_integral_constant<type::lp2>;
+using lp4_tag = make_integral_constant<type::lp4>;
+using bp2_tag = make_integral_constant<type::bp2>;
+using bp4_tag = make_integral_constant<type::bp4>;
+using hp2_tag = make_integral_constant<type::hp2>;
+using hp4_tag = make_integral_constant<type::hp4>;
+using br_tag = make_integral_constant<type::br>;
 
-template <std::floating_point T>
-constexpr auto
-calc_b2_bp_br(T const phi, T const Q) noexcept -> T
-{
-    constexpr T const pi_div_four = std::numbers::pi_v<T> / T{4};
-    return std::tan(pi_div_four - phi / (T{2} * Q));
-}
+namespace biqflt = audio::dsp::biquad_filter;
 
-template <std::floating_point T>
-constexpr auto
-calc_b1(T const phi, T const b2) noexcept -> T
-{
-    return -(T{1} + b2) * std::cos(phi);
-}
+using tag_make_coefficients_map = boost::mp11::mp_list<
+        std::pair<
+                lp2_tag,
+                make_integral_constant<&biqflt::make_lp_coefficients<float>>>,
+        std::pair<
+                lp4_tag,
+                make_integral_constant<&biqflt::make_lp_coefficients<float>>>,
+        std::pair<
+                bp2_tag,
+                make_integral_constant<&biqflt::make_bp_coefficients<float>>>,
+        std::pair<
+                bp4_tag,
+                make_integral_constant<&biqflt::make_bp_coefficients<float>>>,
+        std::pair<
+                hp2_tag,
+                make_integral_constant<&biqflt::make_hp_coefficients<float>>>,
+        std::pair<
+                hp4_tag,
+                make_integral_constant<&biqflt::make_hp_coefficients<float>>>,
+        std::pair<
+                br_tag,
+                make_integral_constant<&biqflt::make_br_coefficients<float>>>>;
 
-template <std::floating_point T>
-constexpr auto
-calc_phi(T const freq_c, T const inv_sr) noexcept -> T
-{
-    return T{2} * std::numbers::pi_v<T> * freq_c * inv_sr;
-}
-
-template <std::floating_point T>
-constexpr auto
-calc_Q(T const res, T const min_Q, T const max_Q) noexcept -> T
-{
-    return math::linear_map(res, T{0}, T{1}, min_Q, max_Q);
-}
-
-template <std::floating_point T>
-constexpr auto
-calc_Q_lp_hp(T const res) noexcept -> T
-{
-    return calc_Q(res, std::sqrt(T{.5f}), T{10});
-}
-
-template <std::floating_point T>
-constexpr auto
-calc_min_Q_bp_br(T const cutoff, T const inv_sr) noexcept -> T
-{
-    return std::ceil(cutoff * T{4} * inv_sr);
-}
-
-template <std::floating_point T>
-constexpr auto
-calc_Q_bp(T const res, T const min_Q) noexcept -> T
-{
-    return calc_Q(res, min_Q, T{25});
-}
-
-template <std::floating_point T>
-constexpr auto
-calc_Q_br(T const res, T const min_Q) noexcept -> T
-{
-    return calc_Q(res, min_Q, T{4});
-}
-
-using lp2_tag = std::integral_constant<type, type::lp2>;
-using lp4_tag = std::integral_constant<type, type::lp4>;
-using bp2_tag = std::integral_constant<type, type::bp2>;
-using bp4_tag = std::integral_constant<type, type::bp4>;
-using hp2_tag = std::integral_constant<type, type::hp2>;
-using hp4_tag = std::integral_constant<type, type::hp4>;
-using br_tag = std::integral_constant<type, type::br>;
-
+template <class Tag>
 constexpr auto
 make_coefficients(
-        lp2_tag tag,
+        Tag tag,
         float const cutoff,
         float const res,
         float const inv_sr) noexcept
 {
-    float const phi = calc_phi(cutoff, inv_sr);
-    float const Q = calc_Q_lp_hp(res);
-    float const b2 = calc_b2_lp_hp(phi, Q);
-    float const b1 = calc_b1(phi, b2);
-    float const a0 = .25f * (1.f + b1 + b2);
+    using make_t = typename boost::mp11::
+            mp_map_find<tag_make_coefficients_map, Tag>::second_type;
     return coefficients{
             .tp = tag,
-            .coeffs = {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = 2.f * a0, .a2 = a0}};
-}
-
-constexpr auto
-make_coefficients(
-        lp4_tag tag,
-        float const cutoff,
-        float const res,
-        float const inv_sr) noexcept
-{
-    // same coefficients as for lp2, just replace the type
-    auto coeffs = make_coefficients(lp2_tag{}, cutoff, res, inv_sr);
-    coeffs.tp = tag;
-    return coeffs;
-}
-
-constexpr auto
-make_coefficients(
-        bp2_tag tag,
-        float const cutoff,
-        float const res,
-        float const inv_sr) noexcept
-{
-    float const phi = calc_phi(cutoff, inv_sr);
-    float const min_Q = calc_min_Q_bp_br(cutoff, inv_sr);
-    float const Q = calc_Q_bp(res, min_Q);
-    float const b2 = calc_b2_bp_br(phi, Q);
-    float const b1 = calc_b1(phi, b2);
-    float const a0 = .5f * (1.f - b2);
-    return coefficients{
-            .tp = tag,
-            .coeffs = {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = 0.f, .a2 = -a0}};
-}
-
-constexpr auto
-make_coefficients(
-        bp4_tag tag,
-        float const cutoff,
-        float const res,
-        float const inv_sr) noexcept
-{
-    // same coefficients as for bp2, just replace the type
-    auto coeffs = make_coefficients(bp2_tag{}, cutoff, res, inv_sr);
-    coeffs.tp = tag;
-    return coeffs;
-}
-
-constexpr auto
-make_coefficients(
-        hp2_tag tag,
-        float const cutoff,
-        float const res,
-        float const inv_sr) noexcept
-{
-    float const phi = calc_phi(cutoff, inv_sr);
-    float const Q = calc_Q_lp_hp(res);
-    float const b2 = calc_b2_lp_hp(phi, Q);
-    float const b1 = calc_b1(phi, b2);
-    float const a0 = .25f * (1.f - b1 + b2);
-    return coefficients{
-            .tp = tag,
-            .coeffs =
-                    {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = -2.f * a0, .a2 = a0}};
-}
-
-constexpr auto
-make_coefficients(
-        hp4_tag tag,
-        float const cutoff,
-        float const res,
-        float const inv_sr) noexcept
-{
-    // same coefficients as for hp2, just replace the type
-    auto coeffs = make_coefficients(hp2_tag{}, cutoff, res, inv_sr);
-    coeffs.tp = tag;
-    return coeffs;
-}
-
-constexpr auto
-make_coefficients(
-        br_tag tag,
-        float const cutoff,
-        float const res,
-        float const inv_sr) noexcept
-{
-    float const phi = calc_phi(cutoff, inv_sr);
-    float const min_Q = calc_min_Q_bp_br(cutoff, inv_sr);
-    float const Q = calc_Q_br(res, min_Q);
-    float const b2 = calc_b2_bp_br(phi, Q);
-    float const b1 = calc_b1(phi, b2);
-    float const a0 = .5f * (1.f + b2);
-    return coefficients{
-            .tp = tag,
-            .coeffs = {.b2 = b2, .b1 = b1, .a0 = a0, .a1 = b1, .a2 = a0}};
+            .coeffs = make_t::value(cutoff, res, inv_sr)};
 }
 
 auto
