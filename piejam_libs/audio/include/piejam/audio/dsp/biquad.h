@@ -5,6 +5,7 @@
 #pragma once
 
 #include <concepts>
+#include <utility>
 
 namespace piejam::audio::dsp
 {
@@ -21,6 +22,16 @@ public:
         T a1{};
         T a2{};
     } coeffs;
+
+    constexpr biquad() noexcept = default;
+    constexpr biquad(coefficients const& c)
+        : coeffs(c)
+    {
+    }
+    constexpr biquad(coefficients&& c)
+        : coeffs(std::move(c))
+    {
+    }
 
     constexpr auto process(T const x0) noexcept -> float
     {

@@ -41,7 +41,7 @@ template <std::floating_point T>
 constexpr auto
 calc_min_Q_bp_br(T const cutoff, T const inv_sr) noexcept -> T
 {
-    return std::ceil(cutoff * T{4} * inv_sr);
+    return cutoff * T{4} * inv_sr;
 }
 
 template <std::floating_point T>
