@@ -7,8 +7,11 @@ if(NOT PIEJAM_TESTS)
 endif()
 
 add_executable(piejam_algorithm_test
+    ${CMAKE_CURRENT_SOURCE_DIR}/all_of_adjacent_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/contains_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/edit_script_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/escape_html_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/for_each_adjacent_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/index_of_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/shift_push_back_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/transform_to_vector_test.cpp

@@ -5,6 +5,7 @@
 add_library(piejam_algorithm INTERFACE)
 
 target_sources(piejam_algorithm INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/all_of_adjacent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/concat.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/contains.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/algorithm/edit_script.h

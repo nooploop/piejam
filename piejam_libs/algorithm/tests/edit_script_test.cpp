@@ -6,6 +6,8 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/hof/match.hpp>
+
 #include <string>
 #include <vector>
 
@@ -122,6 +124,23 @@ TEST(edit_script, replace_with_multiple)
                     edit_script_insertion{1, 'e'},
                     edit_script_insertion{2, 'f'},
             }));
+}
+
+TEST(edit_script, apply_edit_script)
+{
+    std::string src("abc");
+    std::string dst("acd");
+
+    apply_edit_script(
+            edit_script(src, dst),
+            boost::hof::match(
+                    [](edit_script_deletion const& del) {
+                        EXPECT_EQ(1, del.pos);
+                    },
+                    [](edit_script_insertion<char> const& ins) {
+                        EXPECT_EQ(2, ins.pos);
+                        EXPECT_EQ('d', ins.value);
+                    }));
 }
 
 } // namespace piejam::algorithm::test
