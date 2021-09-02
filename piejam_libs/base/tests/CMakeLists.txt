@@ -11,6 +11,7 @@ add_executable(piejam_base_test
     ${CMAKE_CURRENT_SOURCE_DIR}/boxify_result_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/decay_tuple_elements_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/entity_map_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/indexed_access_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/type_traits_test.cpp
 )
 target_link_libraries(piejam_base_test gtest_driver piejam_base)

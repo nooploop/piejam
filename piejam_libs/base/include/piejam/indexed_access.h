@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <boost/assert.hpp>
+
 #include <iterator>
 
 namespace piejam
@@ -13,6 +15,8 @@ template <class Container, class T>
 auto
 insert_at(Container&& c, std::size_t const index, T&& value)
 {
+    BOOST_ASSERT(index <= c.size());
+
     return std::forward<Container>(c).insert(
             std::next(std::begin(std::forward<Container>(c)), index),
             std::forward<T>(value));
@@ -22,6 +26,8 @@ template <class Container>
 auto
 erase_at(Container&& c, std::size_t const index)
 {
+    BOOST_ASSERT(index < c.size());
+
     return std::forward<Container>(c).erase(
             std::next(std::begin(std::forward<Container>(c)), index));
 }
