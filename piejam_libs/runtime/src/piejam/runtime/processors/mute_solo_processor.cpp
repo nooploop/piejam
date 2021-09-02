@@ -5,8 +5,6 @@
 #include <piejam/runtime/processors/mute_solo_processor.h>
 
 #include <piejam/audio/engine/event_converter_processor.h>
-#include <piejam/entity_id.h>
-#include <piejam/npos.h>
 
 namespace piejam::runtime::processors
 {
@@ -15,7 +13,7 @@ auto
 make_mute_solo_processor(std::string_view const& name)
         -> std::unique_ptr<audio::engine::processor>
 {
-    static std::array s_input_names{
+    static constexpr std::array const s_input_names{
             std::string_view("mute"),
             std::string_view("muted_by_solo")};
     return std::unique_ptr<audio::engine::processor>{
@@ -23,7 +21,7 @@ make_mute_solo_processor(std::string_view const& name)
                     [](bool mute, bool muted_by_solo) -> float {
                         return !(mute || muted_by_solo);
                     },
-                    std::span(s_input_names),
+                    s_input_names,
                     "gain",
                     name)};
 }

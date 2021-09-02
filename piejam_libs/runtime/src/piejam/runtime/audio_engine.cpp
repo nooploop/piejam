@@ -102,11 +102,7 @@ using processor_ptr = std::unique_ptr<audio::engine::processor>;
 using component_ptr = std::unique_ptr<audio::engine::component>;
 
 template <class T>
-using value_input_processor_ptr =
-        std::unique_ptr<audio::engine::value_io_processor<T>>;
-
-template <class T>
-using value_output_processor_ptr =
+using value_io_processor_ptr =
         std::unique_ptr<audio::engine::value_io_processor<T>>;
 
 using get_device_processor_f =
@@ -689,7 +685,7 @@ struct audio_engine::impl
 
     std::vector<processor_ptr> output_clip_procs;
     std::vector<processor_ptr> mixer_procs;
-    value_output_processor_ptr<midi::external_event> midi_learn_output_proc;
+    value_io_processor_ptr<midi::external_event> midi_learn_output_proc;
 
     processor_map procs;
     component_map comps;

@@ -52,10 +52,9 @@ public:
     auto event_inputs() const -> event_ports override { return {}; }
     auto event_outputs() const -> event_ports override
     {
-        static std::array<audio::engine::event_port, 1> s_event_outs{
-                audio::engine::event_port(
-                        std::in_place_type<midi::external_event>,
-                        "ext_midi")};
+        static std::array const s_event_outs{audio::engine::event_port(
+                std::in_place_type<midi::external_event>,
+                "ext_midi")};
 
         return s_event_outs;
     }

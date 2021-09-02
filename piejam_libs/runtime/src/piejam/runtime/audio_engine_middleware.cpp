@@ -624,7 +624,7 @@ audio_engine_middleware::rebuild()
                 },
                 m_midi_controller->make_input_event_handler()))
     {
-        spdlog::error("audio_engine_middleware: graph rebuilding failed");
+        spdlog::error("Rebuilding audio engine graph failed.");
     }
 }
 

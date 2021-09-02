@@ -29,17 +29,16 @@ public:
 
     auto event_inputs() const -> event_ports override
     {
-        static std::array<audio::engine::event_port, 1> s_ports{
-                audio::engine::event_port(
-                        std::in_place_type<midi::external_event>,
-                        "event_in")};
+        static std::array const s_ports{audio::engine::event_port(
+                std::in_place_type<midi::external_event>,
+                "event_in")};
 
         return s_ports;
     }
 
     auto event_outputs() const -> event_ports override
     {
-        static std::array<audio::engine::event_port, 2> s_ports{
+        static std::array const s_ports{
                 audio::engine::event_port(
                         std::in_place_type<midi::external_event>,
                         "learned"),
@@ -62,14 +61,15 @@ public:
         {
             auto& learned = ctx.event_outputs.get<midi::external_event>(0);
 
+            if (!in.empty())
+            {
+                auto const& ev = *in.begin();
+                learned.insert(ev.offset(), ev.value());
+                m_learning = false;
+            }
+
             for (auto const& ev : in)
             {
-                if (m_learning)
-                {
-                    learned.insert(ev.offset(), ev.value());
-                    m_learning = false;
-                }
-
                 out.insert(ev.offset(), ev.value());
             }
         }

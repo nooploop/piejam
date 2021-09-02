@@ -14,10 +14,16 @@ add_executable(piejam_runtime_test
     ${CMAKE_CURRENT_SOURCE_DIR}/ladspa_fx_control_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/ladspa_fx_middleware_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware_functors_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/midi_assignment_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/midi_control_middleware_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/midi_input_controller_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/midi_input_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/midi_learn_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/midi_to_parameter_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mute_solo_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mixer_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/parameter_map_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/stream_processor_factory_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/state_test.cpp
 )
 target_link_libraries(piejam_runtime_test gtest_driver gmock piejam_runtime)
