@@ -33,8 +33,8 @@ public:
     {
     }
 
-    auto inputs() const -> endpoints override { return m_inputs; }
-    auto outputs() const -> endpoints override { return m_outputs; }
+    auto inputs() const -> endpoints override { return m_amp_comp->inputs(); }
+    auto outputs() const -> endpoints override { return m_amp_comp->outputs(); }
 
     auto event_inputs() const -> endpoints override { return m_event_inputs; }
     auto event_outputs() const -> endpoints override { return {}; }
@@ -51,10 +51,6 @@ private:
     std::unique_ptr<engine::processor> m_pan_proc;
     std::unique_ptr<engine::component> m_amp_comp;
 
-    std::array<engine::graph_endpoint, 2> m_inputs{
-            {m_amp_comp->inputs()[0], m_amp_comp->inputs()[1]}};
-    std::array<engine::graph_endpoint, 2> m_outputs{
-            {m_amp_comp->outputs()[0], m_amp_comp->outputs()[1]}};
     std::array<engine::graph_endpoint, 1> m_event_inputs{{{*m_pan_proc, 0}}};
 };
 

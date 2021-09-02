@@ -8,6 +8,8 @@
 #include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/engine/named_processor.h>
 
+#include <boost/assert.hpp>
+
 #include <array>
 #include <memory>
 

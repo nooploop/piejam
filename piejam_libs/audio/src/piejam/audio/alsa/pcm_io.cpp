@@ -88,7 +88,7 @@ pcm_io::pcm_io(
 
 pcm_io::~pcm_io()
 {
-    if (is_running())
+    if (m_process_thread)
         stop();
 
     if (is_open())
@@ -144,8 +144,6 @@ pcm_io::start(
                     m_xruns,
                     init_process_function,
                     std::move(process_function)));
-
-    BOOST_ASSERT(m_process_thread->is_running());
 }
 
 void
@@ -153,9 +151,16 @@ pcm_io::stop()
 {
     BOOST_ASSERT(is_open());
     BOOST_ASSERT(m_process_thread);
-    BOOST_ASSERT(m_process_thread->is_running());
 
-    m_process_thread->stop();
+    if (m_process_thread->is_running())
+    {
+        m_process_thread->stop();
+    }
+    else if (auto err = m_process_thread->error())
+    {
+        spdlog::error("Process thread stopped with: {}", err.message());
+    }
+
     m_process_thread.reset();
 
     system::device& fd = m_input_fd ? m_input_fd : m_output_fd;

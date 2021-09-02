@@ -26,8 +26,8 @@ class event_to_audio_processor final
 {
 public:
     event_to_audio_processor(
-            std::string_view const& name,
-            std::size_t smooth_length)
+            std::size_t const smooth_length,
+            std::string_view const& name)
         : named_processor(name)
         , m_smooth_length(smooth_length)
     {
@@ -59,7 +59,7 @@ public:
         if (m_smoother.is_running())
         {
             std::copy_n(
-                    m_smoother.advance_iterator(),
+                    m_smoother.input_iterator(),
                     ctx.buffer_size,
                     ctx.outputs[0].begin());
         }
@@ -74,19 +74,16 @@ public:
             std::size_t const from_offset,
             std::size_t const to_offset)
     {
+        auto const n = to_offset - from_offset;
+        auto it_out = std::next(ctx.outputs[0].begin(), from_offset);
+
         if (m_smoother.is_running())
         {
-            std::copy_n(
-                    m_smoother.advance_iterator(),
-                    to_offset - from_offset,
-                    std::next(ctx.outputs[0].begin(), from_offset));
+            std::copy_n(m_smoother.input_iterator(), n, std::move(it_out));
         }
         else
         {
-            std::fill_n(
-                    std::next(ctx.outputs[0].begin(), from_offset),
-                    to_offset - from_offset,
-                    m_smoother.current());
+            std::fill_n(std::move(it_out), n, m_smoother.current());
         }
     }
 
@@ -107,10 +104,10 @@ private:
 
 auto
 make_event_to_audio_processor(
-        std::string_view const& name,
-        std::size_t const smooth_length) -> std::unique_ptr<processor>
+        std::size_t const smooth_length,
+        std::string_view const& name) -> std::unique_ptr<processor>
 {
-    return std::make_unique<event_to_audio_processor>(name, smooth_length);
+    return std::make_unique<event_to_audio_processor>(smooth_length, name);
 }
 
 } // namespace piejam::audio::engine

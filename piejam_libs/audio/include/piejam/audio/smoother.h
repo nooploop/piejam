@@ -35,14 +35,14 @@ public:
 
         constexpr auto operator++() noexcept -> iterator&
         {
-            m_smoother->advance(1);
+            m_smoother->advance();
             return *this;
         }
 
         constexpr auto operator++(int) noexcept -> iterator
         {
             auto copy = *this;
-            m_smoother->advance(1);
+            m_smoother->advance();
             return copy;
         }
 
@@ -83,36 +83,19 @@ public:
 
     constexpr auto operator*() const noexcept -> T { return m_current; }
 
-    constexpr auto operator++() noexcept -> smoother&
+    constexpr void advance() noexcept
     {
-        advance(1);
-        return *this;
-    }
-
-    constexpr auto operator++(int) noexcept -> smoother
-    {
-        auto copy = *this;
-        advance(1);
-        return copy;
-    }
-
-    constexpr void advance(std::size_t const frames) noexcept
-    {
-        std::size_t const frames_to_process =
-                std::min(frames, m_frames_to_smooth);
-        if (frames_to_process)
+        if (m_frames_to_smooth)
         {
-            m_current += m_inc * frames_to_process;
-            m_frames_to_smooth -= frames_to_process;
+            m_current += m_inc;
+            --m_frames_to_smooth;
 
             if (!m_frames_to_smooth)
-            {
                 m_current = m_target;
-            }
         }
     }
 
-    constexpr auto advance_iterator() noexcept -> iterator { return {*this}; }
+    constexpr auto input_iterator() noexcept -> iterator { return {*this}; }
 
     constexpr bool is_running() const noexcept
     {

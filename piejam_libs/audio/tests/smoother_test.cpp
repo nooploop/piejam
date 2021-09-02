@@ -33,9 +33,10 @@ TEST(smoother, pre_increment)
     smoother<float> sut;
     sut.set(1.f, 4);
 
-    auto res = ++sut;
+    auto it = sut.input_iterator();
+    ++it;
 
-    EXPECT_FLOAT_EQ(0.25f, *res);
+    EXPECT_FLOAT_EQ(0.25f, *it);
     EXPECT_FLOAT_EQ(0.25f, *sut);
 }
 
@@ -44,9 +45,9 @@ TEST(smoother, post_increment)
     smoother<float> sut;
     sut.set(1.f, 4);
 
-    auto res = sut++;
-
-    EXPECT_FLOAT_EQ(0.f, *res);
+    auto it = sut.input_iterator();
+    EXPECT_FLOAT_EQ(0.f, *it);
+    EXPECT_FLOAT_EQ(0.25f, *it++);
     EXPECT_FLOAT_EQ(0.25f, *sut);
 }
 
@@ -55,10 +56,12 @@ TEST(smoother, increment_to_target)
     smoother<float> sut;
     sut.set(1.f, 3);
 
-    ++sut;
-    ++sut;
-    ++sut;
+    auto it = sut.input_iterator();
+    ++it;
+    ++it;
+    ++it;
 
+    EXPECT_EQ(1.f, *it);
     EXPECT_EQ(1.f, *sut);
 }
 
@@ -67,11 +70,13 @@ TEST(smoother, increment_past_target)
     smoother<float> sut;
     sut.set(1.f, 3);
 
-    ++sut;
-    ++sut;
-    ++sut;
-    ++sut;
+    auto it = sut.input_iterator();
+    ++it;
+    ++it;
+    ++it;
+    ++it;
 
+    EXPECT_EQ(1.f, *it);
     EXPECT_EQ(1.f, *sut);
 }
 

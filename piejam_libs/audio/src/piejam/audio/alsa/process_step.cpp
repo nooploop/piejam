@@ -449,18 +449,20 @@ process_step::operator()() -> std::error_condition
 
     auto err = m_reader->transfer();
 
-    cpu_load_meter cpu_load_meter(
-            m_io_config.process_config.period_size.get(),
-            m_io_config.process_config.sample_rate);
-
-    m_process_function(m_io_config.process_config.period_size.get());
-
-    m_cpu_load.store(
-            m_cpu_load_mean_acc(cpu_load_meter.stop()),
-            std::memory_order_relaxed);
-
     if (!err)
+    {
+        cpu_load_meter cpu_load_meter(
+                m_io_config.process_config.period_size.get(),
+                m_io_config.process_config.sample_rate);
+
+        m_process_function(m_io_config.process_config.period_size.get());
+
+        m_cpu_load.store(
+                m_cpu_load_mean_acc(cpu_load_meter.stop()),
+                std::memory_order_relaxed);
+
         err = m_writer->transfer();
+    }
 
     if (err)
     {

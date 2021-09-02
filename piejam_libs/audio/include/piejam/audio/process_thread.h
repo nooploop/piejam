@@ -7,8 +7,6 @@
 #include <piejam/thread/configuration.h>
 #include <piejam/type_traits.h>
 
-#include <spdlog/spdlog.h>
-
 #include <boost/assert.hpp>
 
 #include <atomic>
@@ -33,11 +31,18 @@ public:
         return m_running.load(std::memory_order_relaxed);
     }
 
+    auto error() const -> std::error_condition const&
+    {
+        BOOST_ASSERT(!m_running);
+        return m_error;
+    }
+
     template <class Process>
     void start(thread::configuration const& conf, Process&& process)
     {
         BOOST_ASSERT(!m_running);
 
+        m_error = {};
         m_running = true;
         m_thread = std::thread(
                 [this,
@@ -45,11 +50,13 @@ public:
                  fprocess = std::forward<Process>(process)]() mutable {
                     conf.apply();
 
+                    static_assert(!std::is_reference_v<decltype(fprocess)>);
+
                     while (m_running.load(std::memory_order_relaxed))
                     {
                         if (std::error_condition err = fprocess())
                         {
-                            spdlog::error("process_thread: {}", err.message());
+                            m_error = err;
                             m_running.store(false, std::memory_order_relaxed);
                         }
                     }
@@ -64,6 +71,7 @@ public:
     }
 
 private:
+    std::error_condition m_error;
     std::atomic_bool m_running{};
     std::thread m_thread;
 };

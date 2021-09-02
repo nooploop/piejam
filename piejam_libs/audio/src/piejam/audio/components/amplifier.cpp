@@ -26,6 +26,7 @@ class mono_amplifier final : public engine::component
 public:
     mono_amplifier(std::string_view name)
         : m_gain_proc(engine::make_event_to_audio_processor(
+                  engine::default_event_to_audio_smooth_length,
                   fmt::format("{} gain", name)))
         , m_amp_proc(engine::make_multiply_processor(2, name))
     {
@@ -56,6 +57,7 @@ class stereo_amplifier final : public engine::component
 public:
     stereo_amplifier(std::string_view name)
         : m_gain_proc(engine::make_event_to_audio_processor(
+                  engine::default_event_to_audio_smooth_length,
                   fmt::format("{} gain", name)))
         , m_left_amp_proc(engine::make_multiply_processor(
                   2,
@@ -95,8 +97,10 @@ class stereo_split_amplifier final : public engine::component
 public:
     stereo_split_amplifier(std::string_view name)
         : m_left_gain_proc(engine::make_event_to_audio_processor(
+                  engine::default_event_to_audio_smooth_length,
                   fmt::format("{} gain L", name)))
         , m_right_gain_proc(engine::make_event_to_audio_processor(
+                  engine::default_event_to_audio_smooth_length,
                   fmt::format("{} gain R", name)))
         , m_left_amp_proc(engine::make_multiply_processor(
                   2,
