@@ -23,6 +23,7 @@ struct interleaved_view
         : m_begin(std::move(first))
         , m_end(std::move(last))
     {
+        BOOST_ASSERT(m_begin.num_channels() == m_end.num_channels());
     }
 
     constexpr interleaved_view(
