@@ -32,7 +32,7 @@ else()
 endif()
 configure_file("CTestCustom.cmake.in" "CTestCustom.cmake")
 
-find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(Boost COMPONENTS program_options)
 find_package(spdlog REQUIRED)
 find_package(fmt REQUIRED)
 
