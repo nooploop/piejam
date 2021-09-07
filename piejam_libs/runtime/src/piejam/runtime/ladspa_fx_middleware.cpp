@@ -51,7 +51,7 @@ ladspa_fx_middleware::process_ladspa_fx_action(
     if (auto plugin_desc =
                 find_ladspa_plugin_descriptor(st.fx_registry, a.plugin_id))
     {
-        if (auto id = m_ladspa_control.load(*plugin_desc))
+        if (auto id = m_ladspa_control.load(*plugin_desc); id.valid())
         {
             actions::insert_ladspa_fx_module next_action;
             next_action.fx_chain_id = a.fx_chain_id;

@@ -85,12 +85,11 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
     impl::open_streams_t open_streams;
     open_streams.reserve(recorder_streams.size());
 
-    for (auto const& [channel_id, stream_id] : recorder_streams)
+    for (auto const& [mixer_channel_id, stream_id] : recorder_streams)
     {
         mixer::channel const* const mixer_channel =
-                get_state().mixer_state.channels.find(channel_id);
+                get_state().mixer_state.channels.find(mixer_channel_id);
         BOOST_ASSERT(mixer_channel);
-        BOOST_ASSERT(mixer_channel->record);
 
         auto filename = take_dir / fmt::format("{}.wav", *mixer_channel->name);
 
