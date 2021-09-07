@@ -15,7 +15,7 @@ namespace piejam
 namespace detail
 {
 
-struct box_eq
+struct box_equal
 {
     template <class T>
     constexpr bool operator()(
@@ -26,7 +26,7 @@ struct box_eq
     }
 };
 
-struct box_weak_eq
+struct box_eq
 {
     template <class T>
     constexpr bool operator()(
@@ -45,8 +45,8 @@ struct is_box : std::false_type
 {
 };
 
-template <class U, class EqU>
-struct is_box<box<U, EqU>> : std::true_type
+template <class T, class Eq>
+struct is_box<box<T, Eq>> : std::true_type
 {
 };
 
@@ -113,9 +113,9 @@ private:
 } // namespace detail
 
 template <class T>
-using box = detail::box<T, detail::box_eq>;
+using box = detail::box<T, detail::box_equal>;
 
 template <class T>
-using unique_box = detail::box<T, detail::box_weak_eq>;
+using unique_box = detail::box<T, detail::box_eq>;
 
 } // namespace piejam
