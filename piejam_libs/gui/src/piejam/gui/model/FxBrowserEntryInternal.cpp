@@ -19,7 +19,7 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::fx::internal const fx_type)
-    : Subscribable(store_dispatch, state_change_subscriber)
+    : FxBrowserEntry(store_dispatch, state_change_subscriber)
     , m_fx_type(fx_type)
 {
     static QString s_section_internal{tr("Internal")};
@@ -52,26 +52,29 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
 void
 FxBrowserEntryInternal::onSubscribe()
 {
-    observe(runtime::selectors::select_fx_chain_channel,
-            [this](runtime::mixer::channel_id fx_chain_bus) {
-                m_fx_chain_channel = fx_chain_bus;
-            });
 }
 
 void
-FxBrowserEntryInternal::insertModule(unsigned pos)
+FxBrowserEntryInternal::insertModule(
+        unsigned const chainIndex,
+        unsigned const pos)
 {
     runtime::actions::insert_internal_fx_module action;
-    action.fx_chain_bus = m_fx_chain_channel;
+    action.fx_chain_id = chainIdFromIndex(chainIndex);
     action.position = pos;
     action.type = m_fx_type;
     dispatch(action);
 }
 
 void
-FxBrowserEntryInternal::replaceModule(unsigned pos)
+FxBrowserEntryInternal::replaceModule(
+        unsigned const chainIndex,
+        unsigned const pos)
 {
-    dispatch(runtime::actions::replace_fx_module(pos, m_fx_type));
+    dispatch(runtime::actions::replace_fx_module(
+            chainIdFromIndex(chainIndex),
+            pos,
+            m_fx_type));
 }
 
 } // namespace piejam::gui::model

@@ -87,17 +87,19 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
 
     for (auto const& [channel_id, stream_id] : recorder_streams)
     {
-        auto const* const channel =
+        mixer::channel const* const mixer_channel =
                 get_state().mixer_state.channels.find(channel_id);
-        BOOST_ASSERT(channel);
-        BOOST_ASSERT(channel->record);
+        BOOST_ASSERT(mixer_channel);
+        BOOST_ASSERT(mixer_channel->record);
 
-        auto filename = take_dir / fmt::format("{}.wav", *channel->name);
+        auto filename = take_dir / fmt::format("{}.wav", *mixer_channel->name);
 
         std::size_t file_num{};
         while (std::filesystem::exists(filename))
-            filename = take_dir /
-                       fmt::format("{} ({}).wav", *channel->name, ++file_num);
+            filename = take_dir / fmt::format(
+                                          "{} ({}).wav",
+                                          *mixer_channel->name,
+                                          ++file_num);
 
         auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
         if (SndfileHandle::formatCheck(format, 2, st.sample_rate.as_int()))

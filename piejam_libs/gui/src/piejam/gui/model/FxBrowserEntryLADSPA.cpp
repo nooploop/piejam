@@ -18,7 +18,7 @@ FxBrowserEntryLADSPA::FxBrowserEntryLADSPA(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         audio::ladspa::plugin_descriptor const& plugin_desc)
-    : Subscribable(store_dispatch, state_change_subscriber)
+    : FxBrowserEntry(store_dispatch, state_change_subscriber)
     , m_pd(plugin_desc)
 {
     static QString s_section_ladspa{tr("LADSPA")};
@@ -35,17 +35,15 @@ FxBrowserEntryLADSPA::FxBrowserEntryLADSPA(
 void
 FxBrowserEntryLADSPA::onSubscribe()
 {
-    observe(runtime::selectors::select_fx_chain_channel,
-            [this](runtime::mixer::channel_id fx_chain_bus) {
-                m_fx_chain_bus = fx_chain_bus;
-            });
 }
 
 void
-FxBrowserEntryLADSPA::insertModule(unsigned pos)
+FxBrowserEntryLADSPA::insertModule(
+        unsigned const chainIndex,
+        unsigned const pos)
 {
     runtime::actions::load_ladspa_fx_plugin action;
-    action.fx_chain_bus = m_fx_chain_bus;
+    action.fx_chain_id = chainIdFromIndex(chainIndex);
     action.position = pos;
     action.plugin_id = m_pd.id;
     action.name = m_pd.name;
@@ -53,9 +51,15 @@ FxBrowserEntryLADSPA::insertModule(unsigned pos)
 }
 
 void
-FxBrowserEntryLADSPA::replaceModule(unsigned pos)
+FxBrowserEntryLADSPA::replaceModule(
+        unsigned const chainIndex,
+        unsigned const pos)
 {
-    dispatch(runtime::actions::replace_fx_module(pos, m_pd.id, m_pd.name));
+    dispatch(runtime::actions::replace_fx_module(
+            chainIdFromIndex(chainIndex),
+            pos,
+            m_pd.id,
+            m_pd.name));
 }
 
 } // namespace piejam::gui::model

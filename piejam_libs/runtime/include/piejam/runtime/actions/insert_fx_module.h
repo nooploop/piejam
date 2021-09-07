@@ -26,7 +26,7 @@ struct insert_internal_fx_module final
     : ui::cloneable_action<insert_internal_fx_module, action>
     , visitable_engine_action<insert_internal_fx_module>
 {
-    mixer::channel_id fx_chain_bus;
+    mixer::channel_id fx_chain_id;
     std::size_t position{};
     fx::internal type{};
     std::vector<fx::parameter_value_assignment> initial_values;
@@ -39,7 +39,7 @@ struct load_ladspa_fx_plugin final
     : ui::cloneable_action<load_ladspa_fx_plugin, action>
     , visitable_ladspa_fx_action<load_ladspa_fx_plugin>
 {
-    mixer::channel_id fx_chain_bus;
+    mixer::channel_id fx_chain_id;
     std::size_t position{};
     audio::ladspa::plugin_id_t plugin_id;
     std::string name;
@@ -53,7 +53,7 @@ struct insert_ladspa_fx_module final
     : ui::cloneable_action<insert_ladspa_fx_module, action>
     , visitable_engine_action<insert_ladspa_fx_module>
 {
-    mixer::channel_id fx_chain_bus;
+    mixer::channel_id fx_chain_id;
     std::size_t position{};
     fx::ladspa_instance_id instance_id;
     audio::ladspa::plugin_descriptor plugin_desc;
@@ -67,7 +67,7 @@ struct insert_ladspa_fx_module final
 struct insert_missing_ladspa_fx_module final
     : ui::cloneable_action<insert_missing_ladspa_fx_module, action>
 {
-    mixer::channel_id fx_chain_bus;
+    mixer::channel_id fx_chain_id;
     std::size_t position{};
     fx::unavailable_ladspa unavailable_ladspa;
     std::string name;

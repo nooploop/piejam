@@ -92,13 +92,16 @@ Item {
 
             model: root.modelFactory.mixer
 
-            onFxButtonClicked: content.currentIndex = 3
+            onFxButtonClicked: {
+                fxChainPane.chainIndex = index
+                content.currentIndex = 3
+            }
         }
 
         FxChain {
             id: fxChainPane
 
-            chainModel: root.modelFactory.fxChain
+            chainModel: root.modelFactory.mixer.fxChains
             browser: root.modelFactory.fxBrowser
         }
     }

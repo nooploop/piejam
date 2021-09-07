@@ -255,8 +255,8 @@ get_mixer_channel_selected_input(
 {
     static std::string s_mix{"Mix"};
 
-    mixer::channel const* const bus = channels.find(channel_id);
-    if (!bus)
+    mixer::channel const* const mixer_channel = channels.find(channel_id);
+    if (!mixer_channel)
         return selected_route{selected_route::state_t::invalid, s_mix};
 
     return std::visit(
@@ -285,7 +285,7 @@ get_mixer_channel_selected_input(
                                 .state = selected_route::state_t::invalid,
                                 .name = name};
                     }),
-            bus->in);
+            mixer_channel->in);
 }
 
 auto
@@ -310,8 +310,8 @@ get_mixer_channel_selected_output(
 {
     static std::string s_none{"None"};
 
-    mixer::channel const* const bus = channels.find(channel_id);
-    if (!bus)
+    mixer::channel const* const mixer_channel = channels.find(channel_id);
+    if (!mixer_channel)
         return selected_route{selected_route::state_t::invalid, s_none};
 
     return std::visit(
@@ -354,7 +354,7 @@ get_mixer_channel_selected_output(
                                 .state = selected_route::state_t::invalid,
                                 .name = name};
                     }),
-            bus->out);
+            mixer_channel->out);
 }
 
 auto
@@ -393,8 +393,8 @@ make_mixer_channel_name_selector(mixer::channel_id const channel_id)
 {
     auto get_mixer_channel_name = [](mixer::channels_t const& channels,
                                      mixer::channel_id const channel_id) {
-        mixer::channel const* const bus = channels.find(channel_id);
-        return bus ? bus->name : boxed_string();
+        mixer::channel const* const mixer_channel = channels.find(channel_id);
+        return mixer_channel ? mixer_channel->name : boxed_string();
     };
 
     return [channel_id, get = memo(get_mixer_channel_name)](
@@ -570,10 +570,6 @@ make_muted_by_solo_selector(mixer::channel_id const mixer_channel_id)
     };
 }
 
-const selector<mixer::channel_id> select_fx_chain_channel([](state const& st) {
-    return st.fx_chain_channel;
-});
-
 static auto
 get_fx_chain_module_infos(
         mixer::channels_t const& mixer_channels,
@@ -581,10 +577,11 @@ get_fx_chain_module_infos(
         fx::modules_t const& fx_modules) -> boxed_vector<fx_module_info>
 {
     static boxed_vector<fx_module_info> s_empty_fx_chain;
-    if (mixer::channel const* const bus = mixer_channels.find(channel_id))
+    if (mixer::channel const* const mixer_channel =
+                mixer_channels.find(channel_id))
     {
         return algorithm::transform_to_vector(
-                *bus->fx_chain,
+                *mixer_channel->fx_chain,
                 [&fx_modules](fx::module_id const fx_mod_id) -> fx_module_info {
                     auto fx_mod = fx_modules.find(fx_mod_id);
                     return fx_module_info{
@@ -597,13 +594,15 @@ get_fx_chain_module_infos(
     return s_empty_fx_chain;
 }
 
-const selector<boxed_vector<fx_module_info>> select_current_fx_chain(
-        [get = memo(&get_fx_chain_module_infos)](state const& st) {
-            return get(
-                    st.mixer_state.channels,
-                    st.fx_chain_channel,
-                    st.fx_modules);
-        });
+auto
+make_fx_chain_selector(mixer::channel_id mixer_channel_id)
+        -> selector<boxed_vector<fx_module_info>>
+{
+    return [mixer_channel_id, get = memo(&get_fx_chain_module_infos)](
+                   state const& st) -> boxed_vector<fx_module_info> {
+        return get(st.mixer_state.channels, mixer_channel_id, st.fx_modules);
+    };
+}
 
 auto
 make_fx_module_name_selector(fx::module_id fx_mod_id) -> selector<boxed_string>
@@ -636,25 +635,28 @@ make_fx_module_parameters_selector(fx::module_id fx_mod_id)
 }
 
 auto
-make_fx_module_can_move_left_selector(fx::module_id fx_mod_id) -> selector<bool>
+make_fx_module_can_move_left_selector(
+        mixer::channel_id const fx_chain_id,
+        fx::module_id const fx_mod_id) -> selector<bool>
 {
-    return [fx_mod_id](state const& st) -> bool {
-        mixer::channel const* const bus =
-                st.mixer_state.channels.find(st.fx_chain_channel);
-        return bus && !bus->fx_chain->empty() &&
-               bus->fx_chain->front() != fx_mod_id;
+    return [=](state const& st) -> bool {
+        mixer::channel const* const mixer_channel =
+                st.mixer_state.channels.find(fx_chain_id);
+        return mixer_channel && !mixer_channel->fx_chain->empty() &&
+               mixer_channel->fx_chain->front() != fx_mod_id;
     };
 }
 
 auto
-make_fx_module_can_move_right_selector(fx::module_id fx_mod_id)
-        -> selector<bool>
+make_fx_module_can_move_right_selector(
+        mixer::channel_id const fx_chain_id,
+        fx::module_id const fx_mod_id) -> selector<bool>
 {
-    return [fx_mod_id](state const& st) -> bool {
-        mixer::channel const* const bus =
-                st.mixer_state.channels.find(st.fx_chain_channel);
-        return bus && !bus->fx_chain->empty() &&
-               bus->fx_chain->back() != fx_mod_id;
+    return [=](state const& st) -> bool {
+        mixer::channel const* const mixer_channel =
+                st.mixer_state.channels.find(fx_chain_id);
+        return mixer_channel && !mixer_channel->fx_chain->empty() &&
+               mixer_channel->fx_chain->back() != fx_mod_id;
     };
 }
 

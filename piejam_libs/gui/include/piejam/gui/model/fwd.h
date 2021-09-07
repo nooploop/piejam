@@ -16,6 +16,7 @@ class AudioDeviceSettings;
 class AudioInputOutputSettings;
 
 class FxChain;
+using FxChainList = GenericListModel<FxChain>;
 class FxModule;
 class FxModuleContent;
 using FxModulesList = GenericListModel<FxModule>;

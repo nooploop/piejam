@@ -8,6 +8,7 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 #include <memory>
 
@@ -31,6 +32,7 @@ public:
     FxModule(
             runtime::store_dispatch,
             runtime::subscriber&,
+            runtime::mixer::channel_id fx_chain_id,
             runtime::fx::module_id,
             runtime::fx::instance_id);
     ~FxModule();

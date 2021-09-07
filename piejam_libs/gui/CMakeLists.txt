@@ -77,6 +77,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/BusConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Factory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowser.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryInternal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryLADSPA.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxChain.cpp

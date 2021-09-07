@@ -17,9 +17,9 @@ move_fx_module_left::reduce(state const& st) const -> state
     auto new_st = st;
 
     new_st.mixer_state.channels.update(
-            st.fx_chain_channel,
-            [this](mixer::channel& bus) {
-                bus.fx_chain.update([this](fx::chain_t& fx_chain) {
+            fx_chain_id,
+            [this](mixer::channel& mixer_channel) {
+                mixer_channel.fx_chain.update([this](fx::chain_t& fx_chain) {
                     if (auto it = std::ranges::find(fx_chain, fx_mod_id);
                         it != fx_chain.end() && it != fx_chain.begin())
                     {
@@ -37,9 +37,9 @@ move_fx_module_right::reduce(state const& st) const -> state
     auto new_st = st;
 
     new_st.mixer_state.channels.update(
-            st.fx_chain_channel,
-            [this](mixer::channel& bus) {
-                bus.fx_chain.update([this](fx::chain_t& fx_chain) {
+            fx_chain_id,
+            [this](mixer::channel& mixer_channel) {
+                mixer_channel.fx_chain.update([this](fx::chain_t& fx_chain) {
                     if (auto it = std::ranges::find(fx_chain, fx_mod_id);
                         it != fx_chain.end() && std::next(it) != fx_chain.end())
                     {

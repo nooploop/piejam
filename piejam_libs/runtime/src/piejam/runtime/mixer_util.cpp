@@ -19,8 +19,8 @@ mixer_channel_input_type(
         mixer::channel_id const channel_id,
         device_io::buses_t const& device_buses) -> audio::bus_type
 {
-    mixer::channel const* const bus = channels.find(channel_id);
-    if (!bus)
+    mixer::channel const* const mixer_channel = channels.find(channel_id);
+    if (!mixer_channel)
         return audio::bus_type::stereo;
 
     return std::visit(
@@ -29,7 +29,7 @@ mixer_channel_input_type(
                         return device_buses[device_bus_id].bus_type;
                     },
                     [](auto&&) { return audio::bus_type::stereo; }),
-            bus->in);
+            mixer_channel->in);
 }
 
 } // namespace piejam::runtime

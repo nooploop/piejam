@@ -21,7 +21,7 @@ add_mixer_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    auto added_channel_id = runtime::add_mixer_channel(new_st, name);
+    auto added_mixer_channel_id = runtime::add_mixer_channel(new_st, name);
 
     if (auto_assign_input)
     {
@@ -31,17 +31,21 @@ add_mixer_channel::reduce(state const& st) const -> state
                     new_st.mixer_state.channels,
                     boost::hof::unpack([bus_id](
                                                mixer::channel_id,
-                                               mixer::channel const& ch) {
+                                               mixer::channel const&
+                                                       mixer_channel) {
                         return std::holds_alternative<device_io::bus_id>(
-                                       ch.in) &&
-                               std::get<device_io::bus_id>(ch.in) == bus_id;
+                                       mixer_channel.in) &&
+                               std::get<device_io::bus_id>(mixer_channel.in) ==
+                                       bus_id;
                     }));
 
             if (it == new_st.mixer_state.channels.end())
             {
                 new_st.mixer_state.channels.update(
-                        added_channel_id,
-                        [bus_id](mixer::channel& ch) { ch.in = bus_id; });
+                        added_mixer_channel_id,
+                        [bus_id](mixer::channel& mixer_channel) {
+                            mixer_channel.in = bus_id;
+                        });
                 break;
             }
         }
@@ -55,27 +59,29 @@ delete_mixer_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    runtime::remove_mixer_channel(new_st, channel_id);
+    runtime::remove_mixer_channel(new_st, mixer_channel_id);
 
     return new_st;
 }
 
 auto
-initiate_mixer_channel_deletion(mixer::channel_id channel_id) -> thunk_action
+initiate_mixer_channel_deletion(mixer::channel_id mixer_channel_id)
+        -> thunk_action
 {
     return [=](auto&& get_state, auto&& dispatch) {
         state const& st = get_state();
-        mixer::channel const& ch = st.mixer_state.channels[channel_id];
-        if (ch.fx_chain->empty())
+        mixer::channel const& mixer_channel =
+                st.mixer_state.channels[mixer_channel_id];
+        if (mixer_channel.fx_chain->empty())
         {
             delete_mixer_channel action;
-            action.channel_id = channel_id;
+            action.mixer_channel_id = mixer_channel_id;
             dispatch(action);
         }
         else
         {
             batch_action batch;
-            for (fx::module_id const fx_mod_id : *ch.fx_chain)
+            for (fx::module_id const fx_mod_id : *mixer_channel.fx_chain)
             {
                 auto delete_fx_mod = std::make_unique<delete_fx_module>();
                 delete_fx_mod->fx_mod_id = fx_mod_id;
@@ -83,7 +89,7 @@ initiate_mixer_channel_deletion(mixer::channel_id channel_id) -> thunk_action
             }
 
             auto action = std::make_unique<delete_mixer_channel>();
-            action->channel_id = channel_id;
+            action->mixer_channel_id = mixer_channel_id;
             batch.push_back(std::move(action));
 
             dispatch(batch);
@@ -96,9 +102,11 @@ set_mixer_channel_name::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.channels.update(channel_id, [this](mixer::channel& bus) {
-        bus.name = name;
-    });
+    new_st.mixer_state.channels.update(
+            channel_id,
+            [this](mixer::channel& mixer_channel) {
+                mixer_channel.name = name;
+            });
 
     return new_st;
 }
@@ -109,9 +117,12 @@ set_mixer_channel_route<D>::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    new_st.mixer_state.channels.update(channel_id, [this](mixer::channel& bus) {
-        (D == io_direction::input ? bus.in : bus.out) = route;
-    });
+    new_st.mixer_state.channels.update(
+            channel_id,
+            [this](mixer::channel& mixer_channel) {
+                (D == io_direction::input ? mixer_channel.in
+                                          : mixer_channel.out) = route;
+            });
 
     return new_st;
 }

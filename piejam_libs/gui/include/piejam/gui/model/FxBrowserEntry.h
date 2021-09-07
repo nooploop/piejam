@@ -4,12 +4,14 @@
 
 #pragma once
 
+#include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 namespace piejam::gui::model
 {
 
-class FxBrowserEntry : public SubscribableModel
+class FxBrowserEntry : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -20,7 +22,7 @@ class FxBrowserEntry : public SubscribableModel
     Q_PROPERTY(QString author READ author NOTIFY authorChanged FINAL)
 
 public:
-    using SubscribableModel::SubscribableModel;
+    using Subscribable<SubscribableModel>::Subscribable;
 
     auto name() const noexcept -> QString const& { return m_name; }
     void setName(QString const& x)
@@ -67,14 +69,19 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void insertModule(unsigned pos) = 0;
-    Q_INVOKABLE virtual void replaceModule(unsigned pos) = 0;
+    Q_INVOKABLE virtual void
+    insertModule(unsigned chainIndex, unsigned pos) = 0;
+    Q_INVOKABLE virtual void
+    replaceModule(unsigned chainIndex, unsigned pos) = 0;
 
 signals:
     void nameChanged();
     void sectionChanged();
     void descriptionChanged();
     void authorChanged();
+
+protected:
+    auto chainIdFromIndex(unsigned chainIndex) -> runtime::mixer::channel_id;
 
 private:
     QString m_name;

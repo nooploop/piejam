@@ -7,7 +7,6 @@
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/math.h>
 #include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/actions/select_fx_chain_bus.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
@@ -173,14 +172,6 @@ void
 MixerChannelPerform::changeSolo(bool value)
 {
     dispatch(runtime::actions::set_bool_parameter(m_impl->solo, value));
-}
-
-void
-MixerChannelPerform::focusFxChain()
-{
-    runtime::actions::select_fx_chain_bus action;
-    action.channel_id = m_impl->busId;
-    dispatch(action);
 }
 
 auto

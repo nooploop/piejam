@@ -14,7 +14,7 @@ ViewPane {
 
     property var model
 
-    signal fxButtonClicked()
+    signal fxButtonClicked(int index)
 
     Rectangle {
         id: leftBorderShadow
@@ -53,7 +53,7 @@ ViewPane {
 
         model: root.model.inputChannels
 
-        onFxButtonClicked: root.fxButtonClicked()
+        onFxButtonClicked: root.fxButtonClicked(index + 1)
 
         header: Item {
             width: 8
@@ -134,7 +134,7 @@ ViewPane {
         sourceComponent: ChannelStrip {
 
             perform.model: root.model.mainChannel.perform
-            perform.onFxButtonClicked: root.fxButtonClicked()
+            perform.onFxButtonClicked: root.fxButtonClicked(0)
 
             edit.model: root.model.mainChannel.edit
             edit.deletable: false

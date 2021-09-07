@@ -123,10 +123,7 @@ Item {
 
             padding: 6
 
-            onClicked: {
-                root.model.focusFxChain()
-                root.fxButtonClicked()
-            }
+            onClicked: root.fxButtonClicked()
         }
     }
 

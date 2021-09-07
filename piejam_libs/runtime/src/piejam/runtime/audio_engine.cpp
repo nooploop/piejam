@@ -121,27 +121,29 @@ make_mixer_components(
         device_io::buses_t const& device_buses,
         parameter_processor_factory& param_procs)
 {
-    for (auto const& [id, bus] : channels)
+    for (auto const& [mixer_channel_id, mixer_channel] : channels)
     {
-        mixer_input_key const in_key{id, bus.in};
+        mixer_input_key const in_key{mixer_channel_id, mixer_channel.in};
         if (auto comp = prev_comps.remove(in_key))
         {
             comps.insert(in_key, std::move(comp));
         }
         else
         {
-            audio::bus_type const bus_type =
-                    mixer_channel_input_type(channels, id, device_buses);
+            audio::bus_type const bus_type = mixer_channel_input_type(
+                    channels,
+                    mixer_channel_id,
+                    device_buses);
 
             comps.insert(
                     in_key,
                     components::make_mixer_channel_input(
-                            bus,
+                            mixer_channel,
                             bus_type,
                             param_procs));
         }
 
-        mixer_output_key const out_key{id};
+        mixer_output_key const out_key{mixer_channel_id};
         if (auto comp = prev_comps.remove(out_key))
         {
             comps.insert(out_key, std::move(comp));
@@ -151,7 +153,7 @@ make_mixer_components(
             comps.insert(
                     out_key,
                     components::make_mixer_channel_output(
-                            bus,
+                            mixer_channel,
                             sample_rate,
                             param_procs));
         }
@@ -376,7 +378,7 @@ connect_mixer_input(
         component_map const& comps,
         std::span<audio::engine::input_processor> const& input_procs,
         std::vector<processor_ptr>& mixer_procs,
-        mixer::channel const& bus,
+        mixer::channel const& mixer_channel,
         audio::engine::component& mb_in)
 {
     boost::ignore_unused(channels);
@@ -415,7 +417,7 @@ connect_mixer_input(
                                 mixer_procs);
                     },
                     [](boxed_string const&) {}),
-            bus.in);
+            mixer_channel.in);
 }
 
 void
@@ -427,7 +429,7 @@ connect_mixer_output(
         std::span<audio::engine::output_processor> const& output_procs,
         std::span<processor_ptr> const& output_clip_procs,
         std::vector<processor_ptr>& mixer_procs,
-        mixer::channel const& bus,
+        mixer::channel const& mixer_channel,
         audio::engine::component& mb_out)
 {
     std::visit(
@@ -494,7 +496,7 @@ connect_mixer_output(
                         }
                     },
                     [](boxed_string const&) {}),
-            bus.out);
+            mixer_channel.out);
 }
 
 auto
@@ -510,13 +512,14 @@ make_graph(
 {
     audio::engine::graph g;
 
-    for (auto const& [id, bus] : channels)
+    for (auto const& [mixer_channel_id, mixer_channel] : channels)
     {
-        auto* mb_in = comps.find(mixer_input_key{id, bus.in});
-        auto* mb_out = comps.find(mixer_output_key{id});
+        auto* mb_in =
+                comps.find(mixer_input_key{mixer_channel_id, mixer_channel.in});
+        auto* mb_out = comps.find(mixer_output_key{mixer_channel_id});
 
         std::shared_ptr<audio::engine::processor> recorder;
-        if (auto it = recorders.find(id); it != recorders.end())
+        if (auto it = recorders.find(mixer_channel_id); it != recorders.end())
             recorder = it->second;
 
         BOOST_ASSERT(mb_in);
@@ -532,14 +535,14 @@ make_graph(
                 comps,
                 input_procs,
                 mixer_procs,
-                bus,
+                mixer_channel,
                 *mb_in);
 
         connect_mixer_channel_with_fx_chain(
                 g,
                 comps,
                 *mb_in,
-                bus.fx_chain,
+                mixer_channel.fx_chain,
                 *mb_out,
                 recorder,
                 mixer_procs);
@@ -552,7 +555,7 @@ make_graph(
                 output_procs,
                 output_clip_procs,
                 mixer_procs,
-                bus,
+                mixer_channel,
                 *mb_out);
     }
 

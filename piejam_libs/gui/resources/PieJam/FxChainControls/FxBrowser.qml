@@ -20,6 +20,7 @@ Item {
     }
 
     property int addMode: FxBrowser.AddMode.Insert
+    property int chainIndex: 0
     property int insertPosition: 0
     property var model
 
@@ -28,6 +29,7 @@ Item {
 
     Frame {
         id: infoFrame
+
         anchors.left: fxListFrame.right
         anchors.right: parent.right
         anchors.top: parent.top
@@ -119,9 +121,9 @@ Item {
 
         onClicked: {
             if (root.addMode === FxBrowser.AddMode.Insert)
-                fxList.currentEntry.insertModule(root.insertPosition)
+                fxList.currentEntry.insertModule(root.chainIndex, root.insertPosition)
             else
-                fxList.currentEntry.replaceModule(root.insertPosition)
+                fxList.currentEntry.replaceModule(root.chainIndex, root.insertPosition)
             root.addClicked()
         }
     }

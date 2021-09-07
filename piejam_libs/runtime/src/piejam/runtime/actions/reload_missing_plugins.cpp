@@ -23,11 +23,11 @@ reload_missing_plugins() -> thunk_action
 
         state const& st = get_state();
 
-        for (auto&& [bus_id, bus] : st.mixer_state.channels)
+        for (auto&& [mixer_channel_id, mixer_channel] : st.mixer_state.channels)
         {
-            for (std::size_t fx_pos : range::indices(*bus.fx_chain))
+            for (std::size_t fx_pos : range::indices(*mixer_channel.fx_chain))
             {
-                auto&& fx_mod_id = (*bus.fx_chain)[fx_pos];
+                auto&& fx_mod_id = (*mixer_channel.fx_chain)[fx_pos];
                 auto const& fx_mod = st.fx_modules[fx_mod_id];
 
                 if (auto id = std::get_if<fx::unavailable_ladspa_id>(
@@ -36,7 +36,7 @@ reload_missing_plugins() -> thunk_action
                     auto const& unavail = st.fx_unavailable_ladspa_plugins[*id];
                     batch.append(actions::make_replace_fx_module_action(
                             st,
-                            bus_id,
+                            mixer_channel_id,
                             fx_pos,
                             unavail.plugin_id,
                             *fx_mod.name,

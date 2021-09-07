@@ -6,14 +6,13 @@
 
 #include <piejam/entity_id.h>
 #include <piejam/gui/model/FxBrowserEntry.h>
-#include <piejam/gui/model/Subscribable.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 
 namespace piejam::gui::model
 {
 
-class FxBrowserEntryInternal final : public Subscribable<FxBrowserEntry>
+class FxBrowserEntryInternal final : public FxBrowserEntry
 {
 public:
     FxBrowserEntryInternal(
@@ -21,14 +20,13 @@ public:
             runtime::subscriber&,
             runtime::fx::internal);
 
-    void insertModule(unsigned pos) override;
-    void replaceModule(unsigned pos) override;
+    void insertModule(unsigned chainIndex, unsigned pos) override;
+    void replaceModule(unsigned chainIndex, unsigned pos) override;
 
 private:
     void onSubscribe() override;
 
     runtime::fx::internal m_fx_type;
-    runtime::mixer::channel_id m_fx_chain_channel;
 };
 
 } // namespace piejam::gui::model

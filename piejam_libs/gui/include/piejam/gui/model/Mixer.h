@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -21,18 +20,21 @@ class Mixer final : public Subscribable<SubscribableModel>
     Q_PROPERTY(QAbstractListModel* inputChannels READ inputChannels CONSTANT)
     Q_PROPERTY(piejam::gui::model::MixerChannel* mainChannel READ mainChannel
                        NOTIFY mainChannelChanged FINAL)
+    Q_PROPERTY(QAbstractListModel* fxChains READ fxChains CONSTANT)
 
 public:
     Mixer(runtime::store_dispatch, runtime::subscriber&);
     ~Mixer();
 
-    auto inputChannels() -> MixerChannelsList* { return &m_inputChannels; }
+    auto inputChannels() -> MixerChannelsList*;
 
     auto mainChannel() const -> MixerChannel*;
 
     Q_INVOKABLE void addChannel(QString const& newChannelName);
 
     Q_INVOKABLE void requestLevelsUpdate();
+
+    auto fxChains() -> FxChainList*;
 
 signals:
 
@@ -43,8 +45,6 @@ private:
 
     struct Impl;
     std::unique_ptr<Impl> const m_impl;
-
-    MixerChannelsList m_inputChannels;
 };
 
 } // namespace piejam::gui::model

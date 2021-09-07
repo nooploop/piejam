@@ -14,12 +14,12 @@ solo_groups(mixer::channels_t const& channels) -> solo_groups_t
 {
     solo_groups_t result;
 
-    for (auto const& [id, channel] : channels)
+    for (auto const& [mixer_channel_id, mixer_channel] : channels)
     {
         if (mixer::channel_id const* const target =
-                    std::get_if<mixer::channel_id>(&channel.out))
+                    std::get_if<mixer::channel_id>(&mixer_channel.out))
         {
-            result[*target].emplace_back(channel.solo, id);
+            result[*target].emplace_back(mixer_channel.solo, mixer_channel_id);
         }
     }
 

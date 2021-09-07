@@ -153,8 +153,6 @@ auto make_midi_device_enabled_selector(midi::device_id_t) -> selector<bool>;
 
 auto make_muted_by_solo_selector(mixer::channel_id) -> selector<bool>;
 
-extern const selector<mixer::channel_id> select_fx_chain_channel;
-
 struct fx_module_info
 {
     fx::module_id fx_mod_id;
@@ -163,14 +161,17 @@ struct fx_module_info
     bool operator==(fx_module_info const&) const noexcept = default;
 };
 
-extern const selector<boxed_vector<fx_module_info>> select_current_fx_chain;
+auto make_fx_chain_selector(mixer::channel_id)
+        -> selector<boxed_vector<fx_module_info>>;
 
 auto make_fx_module_name_selector(fx::module_id) -> selector<boxed_string>;
 auto make_fx_module_bypass_selector(fx::module_id) -> selector<bool>;
 auto make_fx_module_parameters_selector(fx::module_id)
         -> selector<box<fx::module_parameters>>;
-auto make_fx_module_can_move_left_selector(fx::module_id) -> selector<bool>;
-auto make_fx_module_can_move_right_selector(fx::module_id) -> selector<bool>;
+auto make_fx_module_can_move_left_selector(mixer::channel_id, fx::module_id)
+        -> selector<bool>;
+auto make_fx_module_can_move_right_selector(mixer::channel_id, fx::module_id)
+        -> selector<bool>;
 auto make_fx_parameter_name_selector(fx::parameter_id)
         -> selector<boxed_string>;
 auto make_fx_parameter_value_string_selector(fx::parameter_id)

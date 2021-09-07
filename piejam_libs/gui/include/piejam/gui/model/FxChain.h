@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+#include <piejam/runtime/mixer_fwd.h>
 
 #include <memory>
 
@@ -21,18 +21,18 @@ class FxChain final : public Subscribable<SubscribableModel>
     Q_PROPERTY(QAbstractListModel* modules READ modules CONSTANT)
 
 public:
-    FxChain(runtime::store_dispatch, runtime::subscriber&);
+    FxChain(runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::mixer::channel_id fx_chain_id);
     ~FxChain();
 
-    auto modules() noexcept -> FxModulesList* { return &m_modules; }
+    auto modules() noexcept -> FxModulesList*;
 
 private:
     void onSubscribe() override;
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
-
-    FxModulesList m_modules;
 };
 
 } // namespace piejam::gui::model

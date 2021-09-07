@@ -34,7 +34,7 @@ struct delete_mixer_channel final
     : ui::cloneable_action<delete_mixer_channel, action>
     , visitable_engine_action<delete_mixer_channel>
 {
-    mixer::channel_id channel_id{};
+    mixer::channel_id mixer_channel_id{};
 
     auto reduce(state const&) const -> state override;
 };

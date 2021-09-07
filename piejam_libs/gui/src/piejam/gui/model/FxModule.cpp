@@ -23,6 +23,7 @@ namespace piejam::gui::model
 
 struct FxModule::Impl
 {
+    runtime::mixer::channel_id const fx_chain_id;
     runtime::fx::module_id const fx_mod_id;
 
     std::unique_ptr<FxModuleContent> content;
@@ -79,10 +80,12 @@ makeModuleContent(
 FxModule::FxModule(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
+        runtime::mixer::channel_id const fx_chain_id,
         runtime::fx::module_id const fx_mod_id,
         runtime::fx::instance_id const fx_instance_id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
+              fx_chain_id,
               fx_mod_id,
               makeModuleContent(
                       store_dispatch,
@@ -114,10 +117,12 @@ FxModule::onSubscribe()
             [this](bool const x) { setBypassed(x); });
 
     observe(runtime::selectors::make_fx_module_can_move_left_selector(
+                    m_impl->fx_chain_id,
                     m_impl->fx_mod_id),
             [this](bool const x) { setCanMoveLeft(x); });
 
     observe(runtime::selectors::make_fx_module_can_move_right_selector(
+                    m_impl->fx_chain_id,
                     m_impl->fx_mod_id),
             [this](bool const x) { setCanMoveRight(x); });
 }
@@ -144,6 +149,7 @@ FxModule::moveLeft()
     BOOST_ASSERT(canMoveLeft());
 
     runtime::actions::move_fx_module_left action;
+    action.fx_chain_id = m_impl->fx_chain_id;
     action.fx_mod_id = m_impl->fx_mod_id;
     dispatch(action);
 }
@@ -154,6 +160,7 @@ FxModule::moveRight()
     BOOST_ASSERT(canMoveRight());
 
     runtime::actions::move_fx_module_right action;
+    action.fx_chain_id = m_impl->fx_chain_id;
     action.fx_mod_id = m_impl->fx_mod_id;
     dispatch(action);
 }

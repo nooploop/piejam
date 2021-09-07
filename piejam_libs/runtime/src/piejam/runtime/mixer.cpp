@@ -113,16 +113,16 @@ valid_io_channels(channels_t const& channels, channel_id const ch_id)
     auto test = extract_channels_io(channels);
 
     std::vector<mixer::channel_id> valid_ids;
-    for (auto const& [id, bus] : channels)
+    for (auto const& [mixer_channel_id, mixer_channel] : channels)
     {
-        if (id == ch_id)
+        if (mixer_channel_id == ch_id)
             continue;
 
         auto prev_id = test[ch_id].get(D);
-        test[ch_id].get(D) = id;
+        test[ch_id].get(D) = mixer_channel_id;
 
         if (!has_cycle(make_channels_io_graph(test)))
-            valid_ids.push_back(id);
+            valid_ids.push_back(mixer_channel_id);
 
         test[ch_id].get(D) = prev_id;
     }

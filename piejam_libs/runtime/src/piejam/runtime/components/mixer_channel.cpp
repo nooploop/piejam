@@ -26,11 +26,11 @@ class mixer_channel_input final : public audio::engine::component
 {
 public:
     mixer_channel_input(
-            mixer::channel const& bus,
+            mixer::channel const& mixer_channel,
             audio::bus_type const bus_type,
             parameter_processor_factory& param_procs)
         : m_pan_balance_input_proc(param_procs.make_processor(
-                  bus.pan_balance,
+                  mixer_channel.pan_balance,
                   bus_type == audio::bus_type::mono ? "pan" : "balance"))
         , m_pan_balance(
                   bus_type == audio::bus_type::mono
@@ -71,15 +71,18 @@ class mixer_channel_output final : public audio::engine::component
 public:
     mixer_channel_output(
             audio::sample_rate const& sample_rate,
-            mixer::channel const& bus,
+            mixer::channel const& mixer_channel,
             parameter_processor_factory& param_procs)
-        : m_volume_input_proc(param_procs.make_processor(bus.volume, "volume"))
-        , m_mute_input_proc(param_procs.make_processor(bus.mute, "mute"))
+        : m_volume_input_proc(
+                  param_procs.make_processor(mixer_channel.volume, "volume"))
+        , m_mute_input_proc(
+                  param_procs.make_processor(mixer_channel.mute, "mute"))
         , m_volume_amp(audio::components::make_stereo_amplifier("volume"))
         , m_mute_solo(components::make_mute_solo())
         , m_level_meter(audio::components::make_stereo_level_meter(sample_rate))
-        , m_peak_level_proc(
-                  param_procs.make_processor(bus.level, "stereo_level"))
+        , m_peak_level_proc(param_procs.make_processor(
+                  mixer_channel.level,
+                  "stereo_level"))
     {
     }
 
@@ -137,18 +140,21 @@ private:
 
 auto
 make_mixer_channel_input(
-        mixer::channel const& bus,
+        mixer::channel const& mixer_channel,
         audio::bus_type const bus_type,
         parameter_processor_factory& param_procs,
         std::string_view const& /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<mixer_channel_input>(bus, bus_type, param_procs);
+    return std::make_unique<mixer_channel_input>(
+            mixer_channel,
+            bus_type,
+            param_procs);
 }
 
 auto
 make_mixer_channel_output(
-        mixer::channel const& channel,
+        mixer::channel const& mixer_channel,
         audio::sample_rate const& sample_rate,
         parameter_processor_factory& param_procs,
         std::string_view const& /*name*/)
@@ -156,7 +162,7 @@ make_mixer_channel_output(
 {
     return std::make_unique<mixer_channel_output>(
             sample_rate,
-            channel,
+            mixer_channel,
             param_procs);
 }
 

@@ -34,7 +34,6 @@ class Factory final : public QObject
 
     Q_PROPERTY(piejam::gui::model::Mixer* mixer READ mixer CONSTANT)
     Q_PROPERTY(piejam::gui::model::Info* info READ info CONSTANT)
-    Q_PROPERTY(piejam::gui::model::FxChain* fxChain READ fxChain CONSTANT)
     Q_PROPERTY(piejam::gui::model::FxBrowser* fxBrowser READ fxBrowser CONSTANT)
 
 public:
@@ -67,11 +66,6 @@ public:
 
     auto info() const -> piejam::gui::model::Info* { return m_info.get(); }
 
-    auto fxChain() const -> piejam::gui::model::FxChain*
-    {
-        return m_fxChain.get();
-    }
-
     auto fxBrowser() const -> piejam::gui::model::FxBrowser*
     {
         return m_fxBrowser.get();
@@ -90,7 +84,6 @@ private:
     std::unique_ptr<piejam::gui::model::MidiInputSettings> m_midiInputSettings;
     std::unique_ptr<piejam::gui::model::Mixer> m_mixer;
     std::unique_ptr<piejam::gui::model::Info> m_info;
-    std::unique_ptr<piejam::gui::model::FxChain> m_fxChain;
     std::unique_ptr<piejam::gui::model::FxBrowser> m_fxBrowser;
 };
 

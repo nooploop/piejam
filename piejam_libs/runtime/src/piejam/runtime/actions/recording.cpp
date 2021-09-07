@@ -26,12 +26,13 @@ start_recording::reduce(state const& st) const -> state
 
     recorder_streams_t recorder_streams;
 
-    for (auto const& [channel_id, channel] : new_st.mixer_state.channels)
+    for (auto const& [mixer_channel_id, mixer_channel] :
+         new_st.mixer_state.channels)
     {
-        if (get_parameter_value(st.params, channel.record))
+        if (get_parameter_value(st.params, mixer_channel.record))
         {
             auto stream_id = new_st.streams.add(2);
-            recorder_streams.emplace(channel_id, stream_id);
+            recorder_streams.emplace(mixer_channel_id, stream_id);
         }
     }
 
@@ -50,7 +51,7 @@ stop_recording::reduce(state const& st) const -> state
     new_st.recording = false;
     ++new_st.rec_take;
 
-    for (auto const& [channel_id, stream_id] : *new_st.recorder_streams)
+    for (auto const& [mixer_channel_id, stream_id] : *new_st.recorder_streams)
     {
         new_st.streams.remove(stream_id);
     }

@@ -7,13 +7,12 @@
 #include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/entity_id.h>
 #include <piejam/gui/model/FxBrowserEntry.h>
-#include <piejam/gui/model/Subscribable.h>
 #include <piejam/runtime/mixer_fwd.h>
 
 namespace piejam::gui::model
 {
 
-class FxBrowserEntryLADSPA final : public Subscribable<FxBrowserEntry>
+class FxBrowserEntryLADSPA final : public FxBrowserEntry
 {
 public:
     FxBrowserEntryLADSPA(
@@ -21,14 +20,13 @@ public:
             runtime::subscriber&,
             audio::ladspa::plugin_descriptor const&);
 
-    void insertModule(unsigned pos) override;
-    void replaceModule(unsigned pos) override;
+    void insertModule(unsigned chainIndex, unsigned pos) override;
+    void replaceModule(unsigned chainIndex, unsigned pos) override;
 
 private:
     void onSubscribe() override;
 
     audio::ladspa::plugin_descriptor m_pd;
-    runtime::mixer::channel_id m_fx_chain_bus;
 };
 
 } // namespace piejam::gui::model

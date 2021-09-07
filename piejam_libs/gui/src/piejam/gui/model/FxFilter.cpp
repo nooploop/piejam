@@ -134,10 +134,9 @@ FxFilter::~FxFilter() = default;
 void
 FxFilter::onSubscribe()
 {
-    observe(runtime::selectors::select_sample_rate, [this](auto const& srs) {
-        m_impl->dataGeneratorIn.setSampleRate(srs.second);
-        m_impl->dataGeneratorOut.setSampleRate(srs.second);
-    });
+    auto const& srs = observe_once(runtime::selectors::select_sample_rate);
+    m_impl->dataGeneratorIn.setSampleRate(srs.second);
+    m_impl->dataGeneratorOut.setSampleRate(srs.second);
 
     requestUpdates(std::chrono::milliseconds{16}, [this]() {
         m_impl->inOutStream->requestUpdate();

@@ -120,7 +120,6 @@ Factory::Factory(
               state_change_subscriber))
     , m_mixer(std::make_unique<Mixer>(dispatch, state_change_subscriber))
     , m_info(std::make_unique<Info>(dispatch, state_change_subscriber))
-    , m_fxChain(std::make_unique<FxChain>(dispatch, state_change_subscriber))
     , m_fxBrowser(
               std::make_unique<FxBrowser>(dispatch, state_change_subscriber))
 {

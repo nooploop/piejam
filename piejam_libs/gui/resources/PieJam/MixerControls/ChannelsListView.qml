@@ -9,7 +9,7 @@ import QtQuick.Controls.Material 2.15
 ListView {
     id: root
 
-    signal fxButtonClicked()
+    signal fxButtonClicked(int index)
 
     spacing: 2
     clip: true
@@ -23,7 +23,7 @@ ListView {
         anchors.bottom: if (parent) parent.bottom
 
         perform.model: model.item.perform
-        perform.onFxButtonClicked: root.fxButtonClicked()
+        perform.onFxButtonClicked: root.fxButtonClicked(model.index)
 
         edit.model: model.item.edit
     }

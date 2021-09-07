@@ -83,7 +83,7 @@ make_initial_state() -> state
     // reset the output to default back again
     st.mixer_state.channels.update(
             st.mixer_state.main,
-            [](mixer::channel& bus) { bus.out = nullptr; });
+            [](mixer::channel& mixer_channel) { mixer_channel.out = nullptr; });
     set_parameter_value(
             st.params,
             st.mixer_state.channels[st.mixer_state.main].record,
@@ -303,8 +303,8 @@ insert_internal_fx_module(
     apply_parameter_values(initial_assignments, fx_mod, st.params);
     apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
 
-    st.mixer_state.channels.update(bus_id, [&](mixer::channel& bus) {
-        bus.fx_chain = std::move(fx_chain);
+    st.mixer_state.channels.update(bus_id, [&](mixer::channel& mixer_channel) {
+        mixer_channel.fx_chain = std::move(fx_chain);
     });
 
     return fx_mod_id;
@@ -343,8 +343,8 @@ insert_ladspa_fx_module(
     apply_parameter_values(initial_values, fx_mod, st.params);
     apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
 
-    st.mixer_state.channels.update(bus_id, [&](mixer::channel& bus) {
-        bus.fx_chain = std::move(fx_chain);
+    st.mixer_state.channels.update(bus_id, [&](mixer::channel& mixer_channel) {
+        mixer_channel.fx_chain = std::move(fx_chain);
     });
 
     st.fx_ladspa_instances.update(
@@ -363,8 +363,8 @@ insert_missing_ladspa_fx_module(
 {
     BOOST_ASSERT(bus_id != mixer::channel_id{});
 
-    st.mixer_state.channels.update(bus_id, [&](mixer::channel& bus) {
-        bus.fx_chain.update([&](fx::chain_t& fx_chain) {
+    st.mixer_state.channels.update(bus_id, [&](mixer::channel& mixer_channel) {
+        mixer_channel.fx_chain.update([&](fx::chain_t& fx_chain) {
             auto id = st.fx_unavailable_ladspa_plugins.add(unavail);
             auto const insert_pos = std::min(position, fx_chain.size());
             fx_chain.emplace(
@@ -411,18 +411,20 @@ remove_parameter(state& st, parameter::id_t<P> id)
 }
 
 void
-remove_fx_module(state& st, fx::module_id id)
+remove_fx_module(state& st, fx::module_id const fx_mod_id)
 {
-    fx::module const& fx_mod = st.fx_modules[id];
+    fx::module const& fx_mod = st.fx_modules[fx_mod_id];
 
     auto it = find_mixer_channel_containing_fx_module(
             st.mixer_state.channels,
-            id);
+            fx_mod_id);
     BOOST_ASSERT(it != st.mixer_state.channels.end());
 
-    st.mixer_state.channels.update(it->first, [id](mixer::channel& bus) {
-        remove_erase(bus.fx_chain, id);
-    });
+    st.mixer_state.channels.update(
+            it->first,
+            [fx_mod_id](mixer::channel& mixer_channel) {
+                remove_erase(mixer_channel.fx_chain, fx_mod_id);
+            });
 
     fx::parameters_t fx_params = st.fx_parameters;
     for (auto&& [key, fx_param_id] : *fx_mod.parameters)
@@ -430,9 +432,10 @@ remove_fx_module(state& st, fx::module_id id)
         std::visit([&st](auto&& id) { remove_parameter(st, id); }, fx_param_id);
         fx_params.erase(fx_param_id);
     }
+
     st.fx_parameters = std::move(fx_params);
 
-    st.fx_modules.remove(id);
+    st.fx_modules.remove(fx_mod_id);
 
     if (auto id = std::get_if<fx::ladspa_instance_id>(&fx_mod.fx_instance_id))
     {
@@ -527,39 +530,38 @@ add_mixer_channel(state& st, std::string name) -> mixer::channel_id
 }
 
 void
-remove_mixer_channel(state& st, mixer::channel_id const channel_id)
+remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
 {
-    BOOST_ASSERT(channel_id != st.mixer_state.main);
+    BOOST_ASSERT(mixer_channel_id != st.mixer_state.main);
 
-    mixer::channel const& bus = st.mixer_state.channels[channel_id];
+    mixer::channel const& mixer_channel =
+            st.mixer_state.channels[mixer_channel_id];
 
-    remove_parameter(st, bus.volume);
-    remove_parameter(st, bus.pan_balance);
-    remove_parameter(st, bus.record);
-    remove_parameter(st, bus.mute);
-    remove_parameter(st, bus.solo);
-    remove_parameter(st, bus.level);
+    remove_parameter(st, mixer_channel.volume);
+    remove_parameter(st, mixer_channel.pan_balance);
+    remove_parameter(st, mixer_channel.record);
+    remove_parameter(st, mixer_channel.mute);
+    remove_parameter(st, mixer_channel.solo);
+    remove_parameter(st, mixer_channel.level);
 
     BOOST_ASSERT_MSG(
-            bus.fx_chain->empty(),
+            mixer_channel.fx_chain->empty(),
             "fx_chain should be emptied before");
 
-    if (st.fx_chain_channel == channel_id)
-        st.fx_chain_channel = {};
+    BOOST_ASSERT(algorithm::contains(*st.mixer_state.inputs, mixer_channel_id));
+    remove_erase(st.mixer_state.inputs, mixer_channel_id);
 
-    BOOST_ASSERT(algorithm::contains(*st.mixer_state.inputs, channel_id));
-    remove_erase(st.mixer_state.inputs, channel_id);
+    st.mixer_state.channels.remove(mixer_channel_id);
 
-    st.mixer_state.channels.remove(channel_id);
+    st.mixer_state.channels.update([mixer_channel_id](
+                                           mixer::channel_id,
+                                           mixer::channel& mixer_channel) {
+        if (mixer_channel.in == mixer::io_address_t(mixer_channel_id))
+            mixer_channel.in = {};
 
-    st.mixer_state.channels.update(
-            [channel_id](mixer::channel_id, mixer::channel& bus) {
-                if (bus.in == mixer::io_address_t(channel_id))
-                    bus.in = {};
-
-                if (bus.out == mixer::io_address_t(channel_id))
-                    bus.out = {};
-            });
+        if (mixer_channel.out == mixer::io_address_t(mixer_channel_id))
+            mixer_channel.out = {};
+    });
 }
 
 void

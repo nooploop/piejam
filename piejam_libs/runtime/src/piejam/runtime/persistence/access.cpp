@@ -76,14 +76,14 @@ save_app_config(
         conf.period_count = state.period_count;
 
         auto const buses_to_bus_configs =
-                [](auto const& chs, auto const& ch_ids, auto& configs) {
-                    configs.reserve(ch_ids.size());
+                [](auto const& buses, auto const& bus_ids, auto& configs) {
+                    configs.reserve(bus_ids.size());
                     std::ranges::transform(
-                            ch_ids,
+                            bus_ids,
                             std::back_inserter(configs),
-                            [&chs](device_io::bus_id const& ch_id)
+                            [&buses](device_io::bus_id const& ch_id)
                                     -> persistence::bus_config {
-                                device_io::bus const& bus = chs[ch_id];
+                                device_io::bus const& bus = buses[ch_id];
                                 return {bus.name, bus.bus_type, bus.channels};
                             });
                 };
@@ -225,20 +225,20 @@ export_fx_chain(state const& st, fx::chain_t const& fx_chain)
 }
 
 static auto
-export_mixer_midi(state const& st, mixer::channel const& bus)
+export_mixer_midi(state const& st, mixer::channel const& mixer_channel)
         -> persistence::session::mixer_midi
 {
     persistence::session::mixer_midi result;
 
-    if (auto it = st.midi_assignments->find(bus.volume);
+    if (auto it = st.midi_assignments->find(mixer_channel.volume);
         it != st.midi_assignments->end())
         result.volume = it->second;
 
-    if (auto it = st.midi_assignments->find(bus.pan_balance);
+    if (auto it = st.midi_assignments->find(mixer_channel.pan_balance);
         it != st.midi_assignments->end())
         result.pan = it->second;
 
-    if (auto it = st.midi_assignments->find(bus.mute);
+    if (auto it = st.midi_assignments->find(mixer_channel.mute);
         it != st.midi_assignments->end())
         result.mute = it->second;
 
@@ -246,12 +246,12 @@ export_mixer_midi(state const& st, mixer::channel const& bus)
 }
 
 static auto
-export_mixer_parameters(state const& st, mixer::channel const& bus)
+export_mixer_parameters(state const& st, mixer::channel const& mixer_channel)
 {
     session::mixer_parameters result;
-    result.volume = get_parameter_value(st.params, bus.volume);
-    result.pan = get_parameter_value(st.params, bus.pan_balance);
-    result.mute = get_parameter_value(st.params, bus.mute);
+    result.volume = get_parameter_value(st.params, mixer_channel.volume);
+    result.pan = get_parameter_value(st.params, mixer_channel.pan_balance);
+    result.mute = get_parameter_value(st.params, mixer_channel.mute);
     return result;
 }
 
@@ -266,11 +266,11 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 .name = {}};
                     },
                     [&st](mixer::channel_id const& channel_id) {
-                        mixer::channel const& channel =
+                        mixer::channel const& mixer_channel =
                                 st.mixer_state.channels[channel_id];
                         return session::mixer_io{
                                 .type = session::mixer_io_type::channel,
-                                .name = channel.name};
+                                .name = mixer_channel.name};
                     },
                     [&st](device_io::bus_id const& bus_id) {
                         device_io::bus const& bus =
@@ -288,15 +288,15 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
 }
 
 static auto
-export_mixer_channel(state const& st, mixer::channel const& bus)
+export_mixer_channel(state const& st, mixer::channel const& mixer_channel)
 {
     session::mixer_channel result;
-    result.name = bus.name;
-    result.fx_chain = export_fx_chain(st, *bus.fx_chain);
-    result.midi = export_mixer_midi(st, bus);
-    result.parameter = export_mixer_parameters(st, bus);
-    result.in = export_mixer_io(st, bus.in);
-    result.out = export_mixer_io(st, bus.out);
+    result.name = mixer_channel.name;
+    result.fx_chain = export_fx_chain(st, *mixer_channel.fx_chain);
+    result.midi = export_mixer_midi(st, mixer_channel);
+    result.parameter = export_mixer_parameters(st, mixer_channel);
+    result.in = export_mixer_io(st, mixer_channel.in);
+    result.out = export_mixer_io(st, mixer_channel.out);
     return result;
 }
 
@@ -306,8 +306,9 @@ export_mixer_channels(state const& st, mixer::channel_ids_t const& channel_ids)
     return algorithm::transform_to_vector(
             channel_ids,
             [&st](mixer::channel_id const channel_id) {
-                mixer::channel const& bus = st.mixer_state.channels[channel_id];
-                return export_mixer_channel(st, bus);
+                mixer::channel const& mixer_channel =
+                        st.mixer_state.channels[channel_id];
+                return export_mixer_channel(st, mixer_channel);
             });
 }
 

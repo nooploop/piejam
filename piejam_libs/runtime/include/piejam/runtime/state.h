@@ -72,8 +72,6 @@ struct state
 
     mixer::state mixer_state{};
 
-    mixer::channel_id fx_chain_channel{};
-
     box<midi_assignments_map> midi_assignments;
     std::optional<midi_assignment_id> midi_learning{};
 
@@ -139,7 +137,7 @@ void insert_missing_ladspa_fx_module(
         std::size_t position,
         fx::unavailable_ladspa const&,
         std::string_view const& name);
-void remove_fx_module(state&, fx::module_id id);
+void remove_fx_module(state&, fx::module_id fx_mod_id);
 
 void update_midi_assignments(state&, midi_assignments_map const&);
 

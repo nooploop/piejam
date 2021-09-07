@@ -19,7 +19,7 @@ insert_internal_fx_module::reduce(state const& st) const -> state
 
     runtime::insert_internal_fx_module(
             new_st,
-            fx_chain_bus,
+            fx_chain_id,
             position,
             type,
             initial_values,
@@ -41,7 +41,7 @@ insert_ladspa_fx_module::reduce(state const& st) const -> state
 
     runtime::insert_ladspa_fx_module(
             new_st,
-            fx_chain_bus,
+            fx_chain_id,
             position,
             instance_id,
             plugin_desc,
@@ -59,7 +59,7 @@ insert_missing_ladspa_fx_module::reduce(state const& st) const -> state
 
     runtime::insert_missing_ladspa_fx_module(
             new_st,
-            fx_chain_bus,
+            fx_chain_id,
             position,
             unavailable_ladspa,
             name);

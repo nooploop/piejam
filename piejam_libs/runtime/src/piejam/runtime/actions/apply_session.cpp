@@ -29,13 +29,13 @@ namespace
 
 struct make_add_fx_module_action
 {
-    mixer::channel_id fx_chain_bus;
+    mixer::channel_id fx_chain_id;
 
     auto operator()(persistence::session::internal_fx const& fx) const
             -> std::unique_ptr<action>
     {
         auto action = std::make_unique<actions::insert_internal_fx_module>();
-        action->fx_chain_bus = fx_chain_bus;
+        action->fx_chain_id = fx_chain_id;
         action->position = npos;
         action->type = fx.type;
         action->initial_values = fx.preset;
@@ -47,7 +47,7 @@ struct make_add_fx_module_action
             -> std::unique_ptr<action>
     {
         auto action = std::make_unique<actions::load_ladspa_fx_plugin>();
-        action->fx_chain_bus = fx_chain_bus;
+        action->fx_chain_id = fx_chain_id;
         action->position = npos;
         action->plugin_id = ladspa_plug.id;
         action->name = ladspa_plug.name;
@@ -68,12 +68,12 @@ make_add_fx_module_actions(
     BOOST_ASSERT(channel_ids.size() == mb_data.size());
     for (std::size_t i : range::indices(channel_ids))
     {
-        mixer::channel_id const fx_chain_bus = channel_ids[i];
-        BOOST_ASSERT(channels[fx_chain_bus].fx_chain->empty());
+        mixer::channel_id const fx_chain_id = channel_ids[i];
+        BOOST_ASSERT(channels[fx_chain_id].fx_chain->empty());
         for (auto const& fx_plug : mb_data[i].fx_chain)
         {
             batch.push_back(std::visit(
-                    make_add_fx_module_action{fx_chain_bus},
+                    make_add_fx_module_action{fx_chain_id},
                     fx_plug.as_variant()));
         }
     }
@@ -86,16 +86,16 @@ apply_mixer_midi(
         mixer::channel_id const channel_id,
         persistence::session::mixer_midi const& mixer_midi)
 {
-    mixer::channel const& bus = channels[channel_id];
+    mixer::channel const& mixer_channel = channels[channel_id];
 
     if (mixer_midi.volume)
-        action.assignments.emplace(bus.volume, *mixer_midi.volume);
+        action.assignments.emplace(mixer_channel.volume, *mixer_midi.volume);
 
     if (mixer_midi.pan)
-        action.assignments.emplace(bus.pan_balance, *mixer_midi.pan);
+        action.assignments.emplace(mixer_channel.pan_balance, *mixer_midi.pan);
 
     if (mixer_midi.mute)
-        action.assignments.emplace(bus.mute, *mixer_midi.mute);
+        action.assignments.emplace(mixer_channel.mute, *mixer_midi.mute);
 }
 
 void
@@ -114,17 +114,17 @@ apply_mixer_midi(
 void
 apply_mixer_parameters(
         batch_action& batch,
-        mixer::channel const& bus,
+        mixer::channel const& mixer_channel,
         persistence::session::mixer_parameters const& mixer_params)
 {
     batch.emplace_back<actions::set_float_parameter>(
-            bus.volume,
+            mixer_channel.volume,
             mixer_params.volume);
     batch.emplace_back<actions::set_float_parameter>(
-            bus.pan_balance,
+            mixer_channel.pan_balance,
             mixer_params.pan);
     batch.emplace_back<actions::set_bool_parameter>(
-            bus.mute,
+            mixer_channel.mute,
             mixer_params.mute);
 }
 
@@ -138,8 +138,8 @@ apply_mixer_parameters(
     BOOST_ASSERT(mb_data.size() == channel_ids.size());
     for (std::size_t const i : range::indices(channel_ids))
     {
-        mixer::channel const& bus = channels[channel_ids[i]];
-        apply_mixer_parameters(batch, bus, mb_data[i].parameter);
+        mixer::channel const& mixer_channel = channels[channel_ids[i]];
+        apply_mixer_parameters(batch, mixer_channel, mb_data[i].parameter);
     }
 }
 

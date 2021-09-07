@@ -54,7 +54,7 @@ ladspa_fx_middleware::process_ladspa_fx_action(
         if (auto id = m_ladspa_control.load(*plugin_desc))
         {
             actions::insert_ladspa_fx_module next_action;
-            next_action.fx_chain_bus = a.fx_chain_bus;
+            next_action.fx_chain_id = a.fx_chain_id;
             next_action.position = a.position;
             next_action.instance_id = id;
             next_action.plugin_desc = *plugin_desc;
@@ -68,12 +68,12 @@ ladspa_fx_middleware::process_ladspa_fx_action(
         }
         else
         {
-            spdlog::error("failed to load ladspa fx plugin: {}", a.name);
+            spdlog::error("Failed to load LADSPA fx plugin: {}", a.name);
         }
     }
 
     actions::insert_missing_ladspa_fx_module next_action;
-    next_action.fx_chain_bus = a.fx_chain_bus;
+    next_action.fx_chain_id = a.fx_chain_id;
     next_action.position = a.position;
     next_action.unavailable_ladspa = fx::unavailable_ladspa{
             .plugin_id = a.plugin_id,

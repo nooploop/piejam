@@ -156,8 +156,6 @@ public:
         }
     }
 
-    Q_INVOKABLE void focusFxChain();
-
     auto volumeMidi() const -> MidiAssignable*;
     auto panMidi() const -> MidiAssignable*;
     auto muteMidi() const -> MidiAssignable*;
