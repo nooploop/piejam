@@ -112,4 +112,14 @@ TEST(subscriber, renotify_when_a_new_observer_connected_while_notifying)
     EXPECT_EQ(1, handler2_called);
 }
 
+TEST(subscriber, observe_once_will_get_current_state)
+{
+    auto sel = selector<int, state>(&state::x);
+
+    state st{.x = 5};
+    subscriber<state> sut([&st]() -> state const& { return st; });
+
+    EXPECT_EQ(5, sut.observe_once(sel));
+}
+
 } // namespace piejam::reselect::test

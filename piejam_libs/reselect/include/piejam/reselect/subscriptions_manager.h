@@ -6,8 +6,6 @@
 
 #include <piejam/reselect/subscriber.h>
 
-#include <nod/nod.hpp>
-
 #include <unordered_map>
 
 namespace piejam::reselect
