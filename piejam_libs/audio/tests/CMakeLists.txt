@@ -35,6 +35,7 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/processor_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/slice_algorithms_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/smoother_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/stream_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/value_input_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/value_output_processor_test.cpp
 )

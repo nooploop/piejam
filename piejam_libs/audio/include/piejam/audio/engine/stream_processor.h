@@ -54,4 +54,9 @@ private:
     mipp::vector<float> m_interleave_buffer;
 };
 
+auto make_stream_processor(
+        std::size_t num_channels,
+        std::size_t capacity_per_channel,
+        std::string_view const& name = {}) -> std::unique_ptr<stream_processor>;
+
 } // namespace piejam::audio::engine
