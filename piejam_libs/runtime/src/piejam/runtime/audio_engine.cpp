@@ -19,7 +19,6 @@
 #include <piejam/audio/engine/process.h>
 #include <piejam/audio/engine/stream_processor.h>
 #include <piejam/audio/engine/value_io_processor.h>
-#include <piejam/audio/engine/value_sink_processor.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
@@ -68,7 +67,6 @@ namespace
 enum class engine_processors
 {
     midi_input,
-    midi_sink,
     midi_learn,
     midi_assign
 };
@@ -235,13 +233,6 @@ make_midi_processors(
                     engine_processors::midi_learn,
                     processors::make_midi_learn_processor());
         }
-        else
-        {
-            procs.insert(
-                    engine_processors::midi_sink,
-                    std::make_unique<audio::engine::value_sink_processor<
-                            midi::external_event>>("ext_midi_sink"));
-        }
     }
 }
 
@@ -259,13 +250,13 @@ make_midi_assignment_processors(
             engine_processors::midi_assign,
             processors::make_midi_assignment_processor(assignments));
 
-    for (auto const& [id, ass] : assignments)
+    for (auto const& [id, assignment] : assignments)
     {
         std::visit(
                 [&](auto const& param_id) {
                     auto const& param = get_parameter(params, param_id);
 
-                    std::tuple const proc_id{param_id, ass};
+                    std::tuple const proc_id{param_id, assignment};
                     if (auto proc = prev_procs.remove(proc_id))
                     {
                         procs.insert(proc_id, std::move(proc));
@@ -591,22 +582,16 @@ connect_midi(
     {
         g.add_event_wire({*midi_in_proc, 0}, {*midi_assign_proc, 0});
     }
-    else
-    {
-        auto* const midi_sink = procs.find(engine_processors::midi_sink);
-        BOOST_ASSERT(midi_sink);
-        g.add_event_wire({*midi_in_proc, 0}, {*midi_sink, 0});
-    }
 
     if (auto* const midi_assign_proc =
                 procs.find(engine_processors::midi_assign))
     {
         std::size_t out_index{};
-        for (auto const& [id, ass] : assignments)
+        for (auto const& [id, assignment] : assignments)
         {
             std::visit(
                     [&](auto const& param_id) {
-                        std::tuple const proc_id{param_id, ass};
+                        std::tuple const proc_id{param_id, assignment};
                         auto proc = procs.find(proc_id);
                         BOOST_ASSERT(proc);
 
