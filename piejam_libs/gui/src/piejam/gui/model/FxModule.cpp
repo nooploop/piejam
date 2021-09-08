@@ -33,10 +33,12 @@ auto
 makeModuleContent(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::fx::module_id const fx_mod_id,
-        runtime::fx::instance_id const fx_instance_id)
+        runtime::fx::module_id const fx_mod_id)
         -> std::unique_ptr<FxModuleContent>
 {
+    auto const fx_instance_id = state_change_subscriber.observe_once(
+            runtime::selectors::make_fx_module_instance_id_selector(fx_mod_id));
+
     return std::visit(
             boost::hof::match(
                     [&](runtime::fx::internal fx_type)
@@ -81,8 +83,7 @@ FxModule::FxModule(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const fx_chain_id,
-        runtime::fx::module_id const fx_mod_id,
-        runtime::fx::instance_id const fx_instance_id)
+        runtime::fx::module_id const fx_mod_id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
               fx_chain_id,
@@ -90,8 +91,7 @@ FxModule::FxModule(
               makeModuleContent(
                       store_dispatch,
                       state_change_subscriber,
-                      fx_mod_id,
-                      fx_instance_id)))
+                      fx_mod_id)))
 {
     connect(*m_impl->content);
 }

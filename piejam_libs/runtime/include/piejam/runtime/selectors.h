@@ -153,17 +153,10 @@ auto make_midi_device_enabled_selector(midi::device_id_t) -> selector<bool>;
 
 auto make_muted_by_solo_selector(mixer::channel_id) -> selector<bool>;
 
-struct fx_module_info
-{
-    fx::module_id fx_mod_id;
-    fx::instance_id instance_id;
+auto make_fx_chain_selector(mixer::channel_id) -> selector<box<fx::chain_t>>;
 
-    bool operator==(fx_module_info const&) const noexcept = default;
-};
-
-auto make_fx_chain_selector(mixer::channel_id)
-        -> selector<boxed_vector<fx_module_info>>;
-
+auto make_fx_module_instance_id_selector(fx::module_id)
+        -> selector<fx::instance_id>;
 auto make_fx_module_name_selector(fx::module_id) -> selector<boxed_string>;
 auto make_fx_module_bypass_selector(fx::module_id) -> selector<bool>;
 auto make_fx_module_parameters_selector(fx::module_id)

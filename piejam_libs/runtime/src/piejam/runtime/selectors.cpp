@@ -570,42 +570,31 @@ make_muted_by_solo_selector(mixer::channel_id const mixer_channel_id)
     };
 }
 
-static auto
-get_fx_chain_module_infos(
-        mixer::channels_t const& mixer_channels,
-        mixer::channel_id const channel_id,
-        fx::modules_t const& fx_modules) -> boxed_vector<fx_module_info>
-{
-    static boxed_vector<fx_module_info> s_empty_fx_chain;
-    if (mixer::channel const* const mixer_channel =
-                mixer_channels.find(channel_id))
-    {
-        return algorithm::transform_to_vector(
-                *mixer_channel->fx_chain,
-                [&fx_modules](fx::module_id const fx_mod_id) -> fx_module_info {
-                    auto fx_mod = fx_modules.find(fx_mod_id);
-                    return fx_module_info{
-                            .fx_mod_id = fx_mod_id,
-                            .instance_id = fx_mod ? fx_mod->fx_instance_id
-                                                  : fx::instance_id{}};
-                });
-    }
-
-    return s_empty_fx_chain;
-}
-
 auto
 make_fx_chain_selector(mixer::channel_id mixer_channel_id)
-        -> selector<boxed_vector<fx_module_info>>
+        -> selector<box<fx::chain_t>>
 {
-    return [mixer_channel_id, get = memo(&get_fx_chain_module_infos)](
-                   state const& st) -> boxed_vector<fx_module_info> {
-        return get(st.mixer_state.channels, mixer_channel_id, st.fx_modules);
+    return [mixer_channel_id](state const& st) -> box<fx::chain_t> {
+        static box<fx::chain_t> s_empty_fx_chain;
+        mixer::channel const* const mixer_channel =
+                st.mixer_state.channels.find(mixer_channel_id);
+        return mixer_channel ? mixer_channel->fx_chain : s_empty_fx_chain;
     };
 }
 
 auto
-make_fx_module_name_selector(fx::module_id fx_mod_id) -> selector<boxed_string>
+make_fx_module_instance_id_selector(fx::module_id const fx_mod_id)
+        -> selector<fx::instance_id>
+{
+    return [fx_mod_id](state const& st) -> fx::instance_id {
+        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
+        return fx_mod ? fx_mod->fx_instance_id : fx::instance_id();
+    };
+}
+
+auto
+make_fx_module_name_selector(fx::module_id const fx_mod_id)
+        -> selector<boxed_string>
 {
     return [fx_mod_id](state const& st) -> boxed_string {
         static boxed_string s_empty_name;
@@ -615,7 +604,7 @@ make_fx_module_name_selector(fx::module_id fx_mod_id) -> selector<boxed_string>
 }
 
 auto
-make_fx_module_bypass_selector(fx::module_id fx_mod_id) -> selector<bool>
+make_fx_module_bypass_selector(fx::module_id const fx_mod_id) -> selector<bool>
 {
     return [fx_mod_id](state const& st) -> bool {
         fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
@@ -624,7 +613,7 @@ make_fx_module_bypass_selector(fx::module_id fx_mod_id) -> selector<bool>
 }
 
 auto
-make_fx_module_parameters_selector(fx::module_id fx_mod_id)
+make_fx_module_parameters_selector(fx::module_id const fx_mod_id)
         -> selector<box<fx::module_parameters>>
 {
     return [fx_mod_id](state const& st) -> box<fx::module_parameters> {

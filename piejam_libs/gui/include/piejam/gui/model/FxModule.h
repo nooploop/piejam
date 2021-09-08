@@ -33,8 +33,7 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::channel_id fx_chain_id,
-            runtime::fx::module_id,
-            runtime::fx::instance_id);
+            runtime::fx::module_id);
     ~FxModule();
 
     auto name() const noexcept -> QString const& { return m_name; }
