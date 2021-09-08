@@ -100,6 +100,102 @@ TEST(slice_algorithms_multiply, multiply_buffer_by_one_will_result_in_buffer)
     auto res_buffer = res.buffer();
     EXPECT_EQ(buf.data(), res_buffer.data());
     EXPECT_EQ(buf.size(), res_buffer.size());
+
+    using testing::ElementsAre;
+    using testing::Matches;
+    EXPECT_TRUE(Matches(ElementsAre(2, 3, 5, 7))(buf));
+}
+
+TEST(slice_algorithms_multiply,
+     multiplying_two_constants_will_result_in_a_constant)
+{
+    slice<float> x(2.f);
+    slice<float> y(3.f);
+
+    auto res = multiply(x, y, {});
+
+    ASSERT_TRUE(res.is_constant());
+    EXPECT_FLOAT_EQ(6.f, res.constant());
+}
+
+TEST(slice_algorithms_multiply, multiply_buffer_by_non_zero_one_constant)
+{
+    alignas(mipp::RequiredAlignment) std::array buf{2.f, 3.f, 5.f, 7.f};
+    alignas(mipp::RequiredAlignment) std::array<float, buf.size()> out{};
+
+    auto res = multiply(
+            slice<float>(buf),
+            slice<float>(3.f),
+            std::span<float>(out));
+
+    ASSERT_TRUE(res.is_buffer());
+    EXPECT_EQ(out.data(), res.buffer().data());
+    EXPECT_EQ(out.size(), res.buffer().size());
+
+    using testing::ElementsAre;
+    using testing::Matches;
+    EXPECT_TRUE(Matches(ElementsAre(6.f, 9.f, 15.f, 21.f))(out));
+}
+
+TEST(slice_algorithms_multiply, multiply_non_zero_one_constant_by_buffer)
+{
+    alignas(mipp::RequiredAlignment) std::array buf{2.f, 3.f, 5.f, 7.f};
+    alignas(mipp::RequiredAlignment) std::array<float, buf.size()> out{};
+
+    auto res = multiply(
+            slice<float>(4.f),
+            slice<float>(buf),
+            std::span<float>(out));
+
+    ASSERT_TRUE(res.is_buffer());
+    EXPECT_EQ(out.data(), res.buffer().data());
+    EXPECT_EQ(out.size(), res.buffer().size());
+
+    using testing::ElementsAre;
+    using testing::Matches;
+    EXPECT_TRUE(Matches(ElementsAre(8.f, 12.f, 20.f, 28.f))(out));
+}
+
+TEST(slice_algorithms_multiply, mulitply_two_buffers)
+{
+    alignas(mipp::RequiredAlignment)
+            std::array buf1{2.f, 3.f, 5.f, 7.f, 4.f, 3.f, 2.f, 1.f};
+    alignas(mipp::RequiredAlignment)
+            std::array buf2{4.f, 5.f, 6.f, 7.f, 9.f, 9.f, 9.f, 9.f};
+    alignas(mipp::RequiredAlignment) std::array<float, buf1.size()> out{};
+
+    auto res = multiply(
+            slice<float>(buf1),
+            slice<float>(buf2),
+            std::span<float>(out));
+
+    ASSERT_TRUE(res.is_buffer());
+    EXPECT_EQ(out.data(), res.buffer().data());
+    EXPECT_EQ(out.size(), res.buffer().size());
+
+    using testing::ElementsAre;
+    using testing::Matches;
+    EXPECT_TRUE(Matches(
+            ElementsAre(8.f, 15.f, 30.f, 49.f, 36.f, 27.f, 18.f, 9.f))(out));
+}
+
+TEST(slice_algorithms_subslice, subslicing_constant_returns_just_the_constant)
+{
+    auto res = subslice(slice<float>(3.f), 3, 5);
+
+    ASSERT_TRUE(res.is_constant());
+    EXPECT_FLOAT_EQ(3.f, res.constant());
+}
+
+TEST(slice_algorithms_subslice, sublice_buffer)
+{
+    std::array buf{1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f};
+
+    auto res = subslice(slice<float>(buf), 3, 3);
+
+    ASSERT_TRUE(res.is_buffer());
+    EXPECT_EQ(buf.data() + 3, res.buffer().data());
+    EXPECT_EQ(3u, res.buffer().size());
 }
 
 TEST(slice_interleave_2_slices, both_constant)
