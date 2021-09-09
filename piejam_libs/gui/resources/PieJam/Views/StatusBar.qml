@@ -106,11 +106,9 @@ Item {
         }
     }
 
-    Binding {
-        when: root.model
+    ModelSubscription {
         target: root.model
-        property: "subscribed"
-        value: root.visible
+        subscribed: root.visible
     }
 
     Binding {

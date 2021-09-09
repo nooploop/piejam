@@ -4,7 +4,7 @@
 
 import QtQuick 2.15
 
-import QtQml 2.15
+import ".."
 
 Item {
     id: root
@@ -29,10 +29,9 @@ Item {
 
             height: root.height
 
-            Binding {
+            ModelSubscription {
                 target: model.item
-                property: "subscribed"
-                value: visible
+                subscribed: visible
             }
         }
     }

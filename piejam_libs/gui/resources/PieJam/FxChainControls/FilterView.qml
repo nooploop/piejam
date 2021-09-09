@@ -7,11 +7,10 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
-import QtQml 2.15
-
 import PieJam.Items 1.0 as PJItems
 import PieJam.Models 1.0 as PJModels
 
+import ".."
 import "../Controls"
 
 Item {
@@ -23,15 +22,13 @@ Item {
     implicitWidth: 636
 
     Column {
-        id: typeButtons
+        id: filterTypeButtons
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
 
         EnumButtonGroup {
-            id: filterButtons
-
             paramModel: root.content ? root.content.filterType : null
             buttonHeight: 46
         }
@@ -40,7 +37,7 @@ Item {
     MidiAssignArea {
         id: midiAssign
 
-        anchors.fill: typeButtons
+        anchors.fill: filterTypeButtons
 
         model: root.content ? root.content.filterType.midi : null
     }
@@ -78,7 +75,7 @@ Item {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: typeButtons.right
+        anchors.left: filterTypeButtons.right
         anchors.leftMargin: 8
         anchors.right: parameters.left
         anchors.rightMargin: 8
@@ -135,12 +132,8 @@ Item {
 
     onBypassedChanged: if (root.bypassed && root.content) root.content.clear()
 
-
-    Binding {
-        when: root.content
+    ModelSubscription {
         target: root.content
-        property: "subscribed"
-        value: root.visible
-        restoreMode: Binding.RestoreBinding
+        subscribed: root.visible
     }
 }

@@ -6,7 +6,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import QtQml 2.15
+import ".."
 
 Item {
     id: root
@@ -48,10 +48,9 @@ Item {
             onDeleteConfigClicked: model.item.deleteBus()
             onNameEdited: model.item.changeName(name)
 
-            Binding {
+            ModelSubscription {
                 target: model.item
-                property: "subscribed"
-                value: visible
+                subscribed: visible
             }
         }
     }
@@ -92,10 +91,8 @@ Item {
 
     }
 
-    Binding {
-        when: root.model
+    ModelSubscription {
         target: root.model
-        property: "subscribed"
-        value: root.visible
+        subscribed: root.visible
     }
 }

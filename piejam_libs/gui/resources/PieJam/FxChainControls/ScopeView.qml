@@ -12,6 +12,8 @@ import QtQml 2.15
 import PieJam.Items 1.0 as PJItems
 import PieJam.Models 1.0 as PJModels
 
+import ".."
+
 Item {
     id: root
 
@@ -89,7 +91,7 @@ Item {
 
         name: "B"
         active: root.content ? root.content.activeB : false
-        channel: root.content ? root.content.channelB : PJModels.StereoChannel.Left
+        channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
 
         Material.accent: Material.Blue
 
@@ -100,11 +102,8 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    Binding {
-        when: root.content
+    ModelSubscription {
         target: root.content
-        property: "subscribed"
-        value: root.visible
-        restoreMode: Binding.RestoreBinding
+        subscribed: root.visible
     }
 }

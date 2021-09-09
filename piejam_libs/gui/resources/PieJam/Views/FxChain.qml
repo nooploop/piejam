@@ -6,8 +6,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
-import QtQml 2.15
-
+import ".."
 import "../Controls"
 import "../FxChainControls"
 import "../MixerControls"
@@ -87,10 +86,9 @@ ViewPane {
                     onMoveRightButtonClicked: model.item.moveRight()
                     onBypassButtonClicked: model.item.toggleBypass()
 
-                    Binding {
+                    ModelSubscription {
                         target: model.item
-                        property: "subscribed"
-                        value: visible
+                        subscribed: visible
                     }
                 }
 
@@ -120,11 +118,9 @@ ViewPane {
                 }
             }
 
-            Binding {
-                when: root.chainModel
+            ModelSubscription {
                 target: model.item
-                property: "subscribed"
-                value: root.visible
+                subscribed: root.visible
             }
         }
     }

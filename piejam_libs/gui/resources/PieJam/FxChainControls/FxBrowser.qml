@@ -7,8 +7,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
-import QtQml 2.15
-
+import ".."
 import "../Controls"
 
 Item {
@@ -90,12 +89,9 @@ Item {
                     fxList.currentEntry = model.item
                 }
 
-                Binding {
-                    when: model.item
+                ModelSubscription {
                     target: model.item
-                    property: "subscribed"
-                    value: visible
-                    restoreMode: Binding.RestoreBinding
+                    subscribed: visible
                 }
             }
 
@@ -112,11 +108,14 @@ Item {
 
     Button {
         id: addButton
+
         width: 96
-        text: root.addMode === FxBrowser.AddMode.Insert ? qsTr("Insert") : qsTr("Replace")
+
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.margins: 8
+
+        text: root.addMode === FxBrowser.AddMode.Insert ? qsTr("Insert") : qsTr("Replace")
 
         enabled: fxList.currentIndex != -1
 
@@ -140,10 +139,8 @@ Item {
         onClicked: cancelClicked()
     }
 
-    Binding {
-        when: root.model
+    ModelSubscription {
         target: root.model
-        property: "subscribed"
-        value: root.visible
+        subscribed: root.visible
     }
 }

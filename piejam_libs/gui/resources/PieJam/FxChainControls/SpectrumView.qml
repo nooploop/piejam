@@ -7,10 +7,10 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
-import QtQml 2.15
-
 import PieJam.Items 1.0 as PJItems
 import PieJam.Models 1.0 as PJModels
+
+import ".."
 
 Item {
     id: root
@@ -95,11 +95,8 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    Binding {
-        when: root.content
+    ModelSubscription {
         target: root.content
-        property: "subscribed"
-        value: root.visible
-        restoreMode: Binding.RestoreBinding
+        subscribed: root.visible
     }
 }

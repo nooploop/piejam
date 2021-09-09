@@ -5,8 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-import QtQml 2.15
-
+import ".."
 import "../SettingsControls"
 
 Item {
@@ -196,10 +195,8 @@ Item {
         }
     }
 
-    Binding {
-        when: root.model
+    ModelSubscription {
         target: root.model
-        property: "subscribed"
-        value: root.visible
+        subscribed: root.visible
     }
 }

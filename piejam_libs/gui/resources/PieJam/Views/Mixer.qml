@@ -190,10 +190,8 @@ ViewPane {
         onTriggered: root.model.requestLevelsUpdate()
     }
 
-    Binding {
-        when: root.model
+    ModelSubscription {
         target: root.model
-        property: "subscribed"
-        value: root.visible
+        subscribed: root.visible
     }
 }
