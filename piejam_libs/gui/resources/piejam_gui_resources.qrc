@@ -69,7 +69,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/FxChainControls/FilterView.qml</file>
         <file>PieJam/FxChainControls/XYPad.qml</file>
         <file>PieJam/Controls/StackList.qml</file>
-        <file>PieJam/Util/Color.js</file>
+        <file>PieJam/Util/ColorExt.js</file>
         <file>PieJam/ModelSubscription.qml</file>
     </qresource>
 </RCC>

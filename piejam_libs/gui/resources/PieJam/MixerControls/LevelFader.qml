@@ -7,7 +7,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import ".."
-import "../Util/Color.js" as ColorUtil
+import "../Util/ColorExt.js" as ColorExt
 import "../Util/DbConvert.js" as DbConvert
 import "../Util/MathExt.js" as MathExt
 
@@ -55,7 +55,7 @@ Item {
             width: root.width
             height: 4
 
-            color: ColorUtil.setAlpha(Material.accentColor, 0.6)
+            color: ColorExt.setAlpha(Material.accentColor, 0.6)
         }
 
         onMoved: {
