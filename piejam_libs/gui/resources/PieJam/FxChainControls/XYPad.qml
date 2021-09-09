@@ -2,10 +2,9 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.13
-import QtQuick.Layouts 1.13
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 import "../Util/MathExt.js" as MathExt
 
@@ -17,52 +16,39 @@ Item {
 
     signal posChanged(real x, real y)
 
-    QtObject {
-        id: internal
-
-        function fromNormalized(v, wh)
-        {
-            return MathExt.mapTo(MathExt.clamp(v, 0, 1), 0, 1, 0, wh - 1)
-        }
-
-        function toNormalized(v, wh)
-        {
-            return MathExt.mapTo(MathExt.clamp(v, 0, wh - 1), 0, wh - 1, 0, 1);
-        }
-    }
-
     MouseArea {
         id: mouseArea
+
+        readonly property real xMax: mouseArea.width - 1
+        readonly property real yMax: mouseArea.height - 1
 
         anchors.fill: parent
         anchors.margins: 8
 
         preventStealing: true
 
-        onPressed: {
-            handle.x = MathExt.clamp(mouse.x, 0, mouseArea.width - 1)
-            handle.y = MathExt.clamp(mouse.y, 0, mouseArea.height - 1)
+        function changePos(mouseX, mouseY) {
+            handle.x = MathExt.clamp(mouseX, 0, mouseArea.xMax)
+            handle.y = MathExt.clamp(mouseY, 0, mouseArea.yMax)
 
-            root.posChanged(internal.toNormalized(handle.x, mouseArea.width),
-                            internal.toNormalized(handle.y, mouseArea.height))
+            root.posChanged(MathExt.toNormalized(handle.x, 0, mouseArea.xMax),
+                            MathExt.toNormalized(handle.y, 0, mouseArea.yMax))
+        }
+
+        onPressed: {
+            changePos(mouse.x, mouse.y)
 
             mouse.accepted = true
         }
 
-        onPositionChanged: {
-            handle.x = MathExt.clamp(mouse.x, 0, mouseArea.width - 1)
-            handle.y = MathExt.clamp(mouse.y, 0, mouseArea.height - 1)
+        onPositionChanged: changePos(mouse.x, mouse.y)
 
-            root.posChanged(internal.toNormalized(handle.x, mouseArea.width),
-                            internal.toNormalized(handle.y, mouseArea.height))
-        }
-
-        onWidthChanged: handle.x = internal.fromNormalized(root.posX, mouseArea.width)
-        onHeightChanged: handle.y = internal.fromNormalized(root.posY, mouseArea.height)
+        onXMaxChanged: handle.x = MathExt.fromNormalized(root.posX, 0, mouseArea.xMax)
+        onYMaxChanged: handle.y = MathExt.fromNormalized(root.posY, 0, mouseArea.yMax)
     }
 
-    onPosXChanged: handle.x = internal.fromNormalized(root.posX, mouseArea.width)
-    onPosYChanged: handle.y = internal.fromNormalized(root.posY, mouseArea.height)
+    onPosXChanged: handle.x = MathExt.fromNormalized(root.posX, 0, mouseArea.xMax)
+    onPosYChanged: handle.y = MathExt.fromNormalized(root.posY, 0, mouseArea.yMax)
 
     Rectangle {
         id: handle
@@ -72,9 +58,6 @@ Item {
 
         radius: 8
 
-        color: Qt.rgba(0, 0, 0, 0)
-
-        border.color: Material.color(Material.Yellow, Material.Shade400)
-        border.width: 2
+        color: Material.color(Material.Yellow, Material.Shade400)
     }
 }

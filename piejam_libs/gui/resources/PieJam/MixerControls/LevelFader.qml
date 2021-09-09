@@ -2,12 +2,12 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.13
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 import ".."
-import "../Controls/Color.js" as ColorUtil
+import "../Util/Color.js" as ColorUtil
 import "../Util/DbConvert.js" as DbConvert
 import "../Util/MathExt.js" as MathExt
 
@@ -27,7 +27,7 @@ Item {
         anchors.fill: parent
         padding: 6
 
-        value: MathExt.mapTo(dbScale.scaleData.dbToPosition(DbConvert.linToDb(root.volume)), privates.minPos, privates.maxPos, 0, 1)
+        value: MathExt.toNormalized(dbScale.scaleData.dbToPosition(DbConvert.linToDb(root.volume)), privates.minPos, privates.maxPos)
 
         orientation: Qt.Vertical
 
@@ -59,7 +59,7 @@ Item {
         }
 
         onMoved: {
-            var newVolume = dbScale.scaleData.dbAt(MathExt.mapTo(slider.value, 0, 1, privates.minPos, privates.maxPos))
+            var newVolume = dbScale.scaleData.dbAt(MathExt.fromNormalized(slider.value, privates.minPos, privates.maxPos))
             root.moved(DbConvert.dbToLin(newVolume))
             Info.quickTip = "<b>Volume:</b> " + newVolume.toFixed(1) + " dB"
         }

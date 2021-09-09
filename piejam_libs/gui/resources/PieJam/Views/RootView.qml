@@ -9,6 +9,8 @@ import QtQuick.Layouts 1.15
 import QtQuick.VirtualKeyboard 2.15
 import QtQuick.VirtualKeyboard.Settings 2.15
 
+import QtQml 2.15
+
 Item {
     id: root
 

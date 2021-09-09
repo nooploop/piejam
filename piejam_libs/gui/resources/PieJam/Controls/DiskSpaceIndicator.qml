@@ -4,7 +4,6 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
 import QtGraphicalEffects 1.15
 
 Item {
@@ -47,6 +46,7 @@ Item {
         text: root.usage != 100 ? root.usage + "%" : qsTr("FULL")
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 8
+
         color: Qt.lighter(Qt.rgba(root.usage / 100., (100 - root.usage) / 100., 0, 1))
     }
 }

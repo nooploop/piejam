@@ -10,7 +10,7 @@ Item {
     id: root
 
     property bool active: false
-    readonly property bool learning: privates.learningControl !== null
+    readonly property bool learning: privates.learningControl != null
 
     function start(ctrl) {
         console.assert(ctrl !== null)
@@ -21,7 +21,7 @@ Item {
     }
 
     function stop() {
-        if (privates.learningControl !== null) {
+        if (privates.learningControl != null) {
             privates.learningControl.stopLearn()
             privates.learningControl = null
         }

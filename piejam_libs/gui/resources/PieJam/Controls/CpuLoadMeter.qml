@@ -2,11 +2,10 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import QtQuick 2
-import QtQuick.Controls 2
-import QtQuick.Controls.Material 2
+import QtQuick 2.15
 
 Item {
+    id: root
 
     property alias model: statsList.model
 
@@ -23,9 +22,11 @@ Item {
         spacing: 1
 
         delegate: Rectangle {
+            y: statsList.height - height
+
             width: statsList.width / statsList.model.length - statsList.spacing
             height: modelData * statsList.height
-            y: statsList.height - height
+
             color: "#ff9900"
         }
     }

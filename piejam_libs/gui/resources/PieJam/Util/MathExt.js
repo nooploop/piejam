@@ -19,3 +19,13 @@ function toRad(deg) {
 function toDeg(rad) {
     return (rad / Math.PI) * 180
 }
+
+function fromNormalized(v, dstLo, dstHi)
+{
+    return mapTo(v, 0, 1, dstLo, dstHi)
+}
+
+function toNormalized(v, srcLo, srcHi)
+{
+    return mapTo(v, srcLo, srcHi, 0, 1);
+}

@@ -17,8 +17,6 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Views/Mixer.qml</file>
         <file>PieJam/Views/Power.qml</file>
         <file>PieJam/Views/ViewPane.qml</file>
-        <file>PieJam/Controls/Color.js</file>
-        <file>PieJam/Controls/LabeledKnob.qml</file>
         <file>PieJam/Views/MainWindow.qml</file>
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/Util/MathExt.js</file>
@@ -35,7 +33,6 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Util/DbConvert.js</file>
         <file>PieJam/FxChainControls/FxBrowser.qml</file>
         <file>PieJam/Controls/HeaderLabel.qml</file>
-        <file>PieJam/MixerControls/CompactLevelMeterFader.qml</file>
         <file>PieJam/Views/Settings.qml</file>
         <file>PieJam/SettingsControls/AudioSettings.qml</file>
         <file>PieJam/SettingsControls/MidiSettings.qml</file>
@@ -72,5 +69,6 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/FxChainControls/FilterView.qml</file>
         <file>PieJam/FxChainControls/XYPad.qml</file>
         <file>PieJam/Controls/StackList.qml</file>
+        <file>PieJam/Util/Color.js</file>
     </qresource>
 </RCC>

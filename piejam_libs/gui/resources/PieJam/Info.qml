@@ -4,7 +4,9 @@
 
 pragma Singleton
 
-import QtQuick 2
+import QtQuick 2.15
+
+import QtQml 2.15
 
 Item {
     id: root

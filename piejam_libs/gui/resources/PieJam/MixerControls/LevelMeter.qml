@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.13
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 import "../Util/DbConvert.js" as DbConvert
 import "../Util/MathExt.js" as MathExt
@@ -83,7 +83,6 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: root.indicatorPadding
 
-            // MathExt.mapTo(meterScaleData.dbToPosition(root.levelLeft), privates.minPos, privates.maxPos, 0, 1)
             level: meterScaleData.levelConv(root.levelLeft)
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
