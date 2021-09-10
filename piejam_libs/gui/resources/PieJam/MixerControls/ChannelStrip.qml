@@ -13,8 +13,6 @@ Item {
     implicitHeight: 400
 
     StackLayout {
-        id: stripsStack
-
         anchors.fill: parent
 
         currentIndex: MixerViewSettings.mode == MixerViewSettings.perform ? 0 : 1

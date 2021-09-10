@@ -14,7 +14,7 @@ Item {
     property alias volume: fader.volume
     property alias muted: meter.muted
 
-    property alias volumeMidi: midiAssign
+    property alias volumeMidi: midiAssign.model
 
     signal faderMoved(real newVolume)
 

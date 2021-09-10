@@ -79,7 +79,7 @@ Item {
 
             muted: root.model ? (root.model.mute || root.model.mutedBySolo) : false
 
-            volumeMidi.model: root.model ? root.model.volumeMidi : null
+            volumeMidi: root.model ? root.model.volumeMidi : null
 
             onFaderMoved: root.model.changeVolume(newVolume)
         }
@@ -97,8 +97,8 @@ Item {
             mute: root.model ? root.model.mute : false
             solo: root.model ? root.model.solo : false
 
-            muteMidi.model: root.model ? root.model.muteMidi : null
-            soloMidi.model: root.model ? root.model.soloMidi : null
+            muteMidi: root.model ? root.model.muteMidi : null
+            soloMidi: root.model ? root.model.soloMidi : null
 
             onRecordToggled: root.model.changeRecord(!root.model.record)
             onMuteToggled: root.model.changeMute(!root.model.mute)

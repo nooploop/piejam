@@ -15,8 +15,8 @@ Item {
     property alias solo: soloButton.checked
     property alias mute: muteButton.checked
 
-    property alias muteMidi: midiAssignMute
-    property alias soloMidi: midiAssignSolo
+    property alias muteMidi: midiAssignMute.model
+    property alias soloMidi: midiAssignSolo.model
 
     signal recordToggled()
     signal soloToggled()
