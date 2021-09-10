@@ -6,7 +6,7 @@ import QtQuick 2.15
 
 import "../Util/DbConvert.js" as DbConvert
 
-Canvas {
+Item {
     id: root
 
     enum Orientation {
@@ -15,39 +15,39 @@ Canvas {
     }
 
     property DbScaleData scaleData: DbScaleData {}
-    property int horizontalOrientation: DbScale.Orientation.Left
-    property bool enableText: true
+    property int orientation: DbScale.Orientation.Left
+    property bool withText: true
     property color backgroundColor: Qt.rgba(0, 0, 0, 1)
 
-    implicitWidth: enableText ? 32 : 12
+    implicitWidth: withText ? 32 : 12
 
-    onPaint: {
-        var ctx = getContext("2d");
-        ctx.fillStyle = backgroundColor;
-        ctx.fillRect(0, 0, width, height);
+    Canvas {
+        anchors.fill: parent
 
-        ctx.lineWidth = 1
-        ctx.strokeStyle = Qt.rgba(1, 1, 1, 1)
+        onPaint: {
+            var ctx = getContext("2d");
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, width, height);
 
-        privates.drawLines(ctx)
+            ctx.lineWidth = 1
+            ctx.strokeStyle = Qt.rgba(1, 1, 1, 1)
 
-        if (root.enableText) {
-            ctx.font = "10px sans-serif"
-            ctx.textAlign = "right"
-            privates.drawText(ctx)
+            drawLines(ctx)
+
+            if (root.withText) {
+                ctx.font = "10px sans-serif"
+                ctx.textAlign = "right"
+                drawText(ctx)
+            }
         }
-    }
-
-    QtObject {
-        id: privates
 
         function tickPos(pos) {
             return (1 - pos) * height
         }
 
         function drawLines(ctx) {
-            var lineX = horizontalOrientation === DbScale.Orientation.Left ? 2 : root.width - 2
-            var lineXE = horizontalOrientation === DbScale.Orientation.Left ? 10 : root.width - 10
+            var lineX = orientation === DbScale.Orientation.Left ? 2 : root.width - 2
+            var lineXE = orientation === DbScale.Orientation.Left ? 10 : root.width - 10
 
             ctx.beginPath()
 
@@ -80,8 +80,7 @@ Canvas {
         }
 
         function drawText(ctx) {
-            // then the text for every tick
-            var textX = root.horizontalOrientation === DbScale.Orientation.Left ? root.width - 2 : root.width - 12
+            var textX = root.orientation === DbScale.Orientation.Left ? root.width - 2 : root.width - 12
 
             for (var i = 0; i < scaleData.ticks.length; ++i) {
                 var t = scaleData.ticks[i]
@@ -104,7 +103,7 @@ Canvas {
         }
 
         function dbToPosition(db) {
-            return tickPos(scaleData.dbToPosition(db))
+            return tickPos(root.scaleData.dbToPosition(db))
         }
     }
 }

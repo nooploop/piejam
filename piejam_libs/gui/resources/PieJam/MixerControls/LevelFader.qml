@@ -36,7 +36,7 @@ Item {
 
             anchors.fill: parent
 
-            horizontalOrientation: DbScale.Orientation.Right
+            orientation: DbScale.Orientation.Right
             backgroundColor: Material.backgroundColor
 
             scaleData: DbScaleData {

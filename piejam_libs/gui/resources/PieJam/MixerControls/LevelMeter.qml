@@ -34,7 +34,7 @@ Item {
 
         function levelConv(db) {
             const srcDelta = 60
-            const dstMin = MathExt.mapTo(0.05, privates.minPos, privates.maxPos, 0, 1)
+            const dstMin = MathExt.toNormalized(0.05, privates.minPos, privates.maxPos)
             const dstDelta = 1 - dstMin
             const factor = dstDelta / srcDelta
             return db < -60 ? 0 : (db + 60) * factor + dstMin
@@ -45,9 +45,9 @@ Item {
         id: levelGradient
 
         GradientStop { position: 0; color: "#ff0000" }
-        GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-3),  privates.minPos, privates.maxPos, 0, 1); color: "#ffa500" }
-        GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-12), privates.minPos, privates.maxPos, 0, 1); color: "#ffff00" }
-        GradientStop { position: MathExt.mapTo(1 - meterScaleData.dbToPosition(-20), privates.minPos, privates.maxPos, 0, 1); color: "#7ee00d" }
+        GradientStop { position: MathExt.toNormalized(1 - meterScaleData.dbToPosition(-3),  privates.minPos, privates.maxPos); color: "#ffa500" }
+        GradientStop { position: MathExt.toNormalized(1 - meterScaleData.dbToPosition(-12), privates.minPos, privates.maxPos); color: "#ffff00" }
+        GradientStop { position: MathExt.toNormalized(1 - meterScaleData.dbToPosition(-20), privates.minPos, privates.maxPos); color: "#7ee00d" }
         GradientStop { position: 0.95; color: "#7ee00d" }
         GradientStop { position: 1; color: "#008000" }
     }
@@ -67,7 +67,7 @@ Item {
 
             height: parent.height
 
-            horizontalOrientation: DbScale.Orientation.Right
+            orientation: DbScale.Orientation.Right
             backgroundColor: Material.backgroundColor
 
             scaleData: meterScaleData
@@ -115,14 +115,14 @@ Item {
             backgroundColor: Material.backgroundColor
 
             scaleData: meterScaleData
-            enableText: false
+            withText: false
         }
     }
 
     QtObject {
         id: privates
 
-        property real minPos: root.height < root.indicatorPadding ? 0 : root.indicatorPadding / root.height
-        property real maxPos: root.height < root.indicatorPadding ? 1 : (root.height - root.indicatorPadding) / root.height
+        readonly property real minPos: root.height < root.indicatorPadding ? 0 : root.indicatorPadding / root.height
+        readonly property real maxPos: root.height < root.indicatorPadding ? 1 : (root.height - root.indicatorPadding) / root.height
     }
 }
