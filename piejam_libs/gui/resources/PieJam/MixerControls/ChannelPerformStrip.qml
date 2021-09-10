@@ -65,9 +65,7 @@ Item {
             }
         }
 
-        LevelMeterFader {
-            id: levelMeterFader
-
+        LevelMeterVolumeFader {
             anchors.right: parent.right
             anchors.left: parent.left
             anchors.bottom: channelControls.top

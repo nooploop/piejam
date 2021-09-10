@@ -30,7 +30,7 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    LevelFader {
+    VolumeFader {
         id: fader
 
         anchors.top: parent.top

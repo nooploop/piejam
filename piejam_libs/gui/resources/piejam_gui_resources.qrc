@@ -10,10 +10,10 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/MixerControls/DbScale.qml</file>
         <file>PieJam/MixerControls/DbScaleData.qml</file>
         <file>PieJam/MixerControls/DbScaleTick.qml</file>
-        <file>PieJam/MixerControls/LevelFader.qml</file>
+        <file>PieJam/MixerControls/VolumeFader.qml</file>
         <file>PieJam/MixerControls/LevelIndicator.qml</file>
         <file>PieJam/MixerControls/LevelMeter.qml</file>
-        <file>PieJam/MixerControls/LevelMeterFader.qml</file>
+        <file>PieJam/MixerControls/LevelMeterVolumeFader.qml</file>
         <file>PieJam/Views/Mixer.qml</file>
         <file>PieJam/Views/Power.qml</file>
         <file>PieJam/Views/ViewPane.qml</file>
