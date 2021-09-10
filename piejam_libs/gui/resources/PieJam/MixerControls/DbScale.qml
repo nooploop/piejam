@@ -18,6 +18,7 @@ Item {
     property int orientation: DbScale.Orientation.Left
     property bool withText: true
     property color backgroundColor: Qt.rgba(0, 0, 0, 1)
+    property real padding: 0
 
     implicitWidth: withText ? 32 : 12
 
@@ -42,7 +43,7 @@ Item {
         }
 
         function tickPos(pos) {
-            return (1 - pos) * height
+            return (1 - pos) * (height - 2 * padding) + padding
         }
 
         function drawLines(ctx) {

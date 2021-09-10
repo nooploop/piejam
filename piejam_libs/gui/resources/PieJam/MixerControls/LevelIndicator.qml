@@ -18,8 +18,6 @@ Item {
         id: backgroundRect
 
         anchors.fill: parent
-
-        border.width: 1
     }
 
     Rectangle {

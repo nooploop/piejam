@@ -6,18 +6,14 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
-import "../Util/DbConvert.js" as DbConvert
-import "../Util/MathExt.js" as MathExt
-
 Item {
     id: root
 
     property real levelLeft: 0
     property real levelRight: 0
     property bool muted: false
-    property int indicatorPadding: 6
 
-    implicitWidth: dbScaleLeft.width + indicatorLeft.width + indicatorRight.width + dbScaleRight.width
+    implicitWidth: dbScaleLeft.width + indicatorLeft.width + indicatorRight.width + dbScaleRight.width + 3 * controls.spacing
     implicitHeight: 300
 
     Rectangle {
@@ -28,15 +24,13 @@ Item {
     DbScaleData {
         id: meterScaleData
 
-        DbScaleTick { position: privates.minPos; db: Number.NEGATIVE_INFINITY }
+        DbScaleTick { position: 0; db: Number.NEGATIVE_INFINITY }
         DbScaleTick { position: 0.05; db: -60; dbStep: 6 }
-        DbScaleTick { position: privates.maxPos; db: 0 }
+        DbScaleTick { position: 1; db: 0 }
 
         function levelConv(db) {
-            const srcDelta = 60
-            const dstMin = MathExt.toNormalized(0.05, privates.minPos, privates.maxPos)
-            const dstDelta = 1 - dstMin
-            const factor = dstDelta / srcDelta
+            const dstMin = 0.05
+            const factor = (1 - dstMin) / 60
             return db < -60 ? 0 : (db + 60) * factor + dstMin
         }
     }
@@ -45,9 +39,9 @@ Item {
         id: levelGradient
 
         GradientStop { position: 0; color: "#ff0000" }
-        GradientStop { position: MathExt.toNormalized(1 - meterScaleData.dbToPosition(-3),  privates.minPos, privates.maxPos); color: "#ffa500" }
-        GradientStop { position: MathExt.toNormalized(1 - meterScaleData.dbToPosition(-12), privates.minPos, privates.maxPos); color: "#ffff00" }
-        GradientStop { position: MathExt.toNormalized(1 - meterScaleData.dbToPosition(-20), privates.minPos, privates.maxPos); color: "#7ee00d" }
+        GradientStop { position: 1 - meterScaleData.dbToPosition(-3); color: "#ffa500" }
+        GradientStop { position: 1 - meterScaleData.dbToPosition(-12); color: "#ffff00" }
+        GradientStop { position: 1 - meterScaleData.dbToPosition(-20); color: "#7ee00d" }
         GradientStop { position: 0.95; color: "#7ee00d" }
         GradientStop { position: 1; color: "#008000" }
     }
@@ -60,12 +54,18 @@ Item {
     }
 
     Row {
+        id: controls
+
         anchors.fill: parent
+
+        spacing: 1
 
         DbScale {
             id: dbScaleLeft
 
             height: parent.height
+
+            padding: 6
 
             orientation: DbScale.Orientation.Right
             backgroundColor: Material.backgroundColor
@@ -79,9 +79,9 @@ Item {
             width: 6
 
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: root.indicatorPadding
+            anchors.bottomMargin: 6
             anchors.top: parent.top
-            anchors.topMargin: root.indicatorPadding
+            anchors.topMargin: 6
 
             level: meterScaleData.levelConv(root.levelLeft)
 
@@ -96,9 +96,9 @@ Item {
             width: 6
 
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: root.indicatorPadding
+            anchors.bottomMargin: 6
             anchors.top: parent.top
-            anchors.topMargin: root.indicatorPadding
+            anchors.topMargin: 6
 
             level: meterScaleData.levelConv(root.levelRight)
 
@@ -112,17 +112,12 @@ Item {
 
             height: parent.height
 
+            padding: 6
+
             backgroundColor: Material.backgroundColor
 
             scaleData: meterScaleData
             withText: false
         }
-    }
-
-    QtObject {
-        id: privates
-
-        readonly property real minPos: root.height < root.indicatorPadding ? 0 : root.indicatorPadding / root.height
-        readonly property real maxPos: root.height < root.indicatorPadding ? 1 : (root.height - root.indicatorPadding) / root.height
     }
 }
