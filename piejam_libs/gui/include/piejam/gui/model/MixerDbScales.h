@@ -13,7 +13,7 @@
 namespace piejam::gui::model
 {
 
-class MixerScales : public QObject
+class MixerDbScales : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(piejam::gui::model::DbScaleData* levelMeterScale READ
@@ -21,8 +21,8 @@ class MixerScales : public QObject
     Q_PROPERTY(piejam::gui::model::DbScaleData* volumeFaderScale READ
                        volumeFaderScale CONSTANT)
 public:
-    MixerScales();
-    ~MixerScales();
+    MixerDbScales();
+    ~MixerDbScales();
 
     auto levelMeterScale() const noexcept -> DbScaleData*
     {
@@ -39,6 +39,6 @@ private:
     std::unique_ptr<DbScaleData> m_volumeFaderScale;
 };
 
-extern MixerScales g_mixerScales;
+extern MixerDbScales g_mixerDbScales;
 
 } // namespace piejam::gui::model

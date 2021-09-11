@@ -81,8 +81,8 @@ Item {
 
             volumeMidi: root.model ? root.model.volumeMidi : null
 
-            levelMeterScale: PJModels.MixerScales.levelMeterScale
-            volumeFaderScale: PJModels.MixerScales.volumeFaderScale
+            levelMeterScale: PJModels.MixerDbScales.levelMeterScale
+            volumeFaderScale: PJModels.MixerDbScales.volumeFaderScale
 
             onFaderMoved: root.model.changeVolume(newVolume)
         }

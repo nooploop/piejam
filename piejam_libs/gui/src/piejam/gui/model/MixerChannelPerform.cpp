@@ -6,7 +6,7 @@
 
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/MidiAssignable.h>
-#include <piejam/gui/model/MixerScales.h>
+#include <piejam/gui/model/MixerDbScales.h>
 #include <piejam/math.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
@@ -120,7 +120,7 @@ MixerChannelPerform::onSubscribe()
     observe(runtime::selectors::make_float_parameter_value_selector(
                     m_impl->volume),
             [this](float x) {
-                setVolume(g_mixerScales.volumeFaderScale()->dBToPosition(
+                setVolume(g_mixerDbScales.volumeFaderScale()->dBToPosition(
                         toVolume(x)));
             });
 
@@ -147,9 +147,9 @@ MixerChannelPerform::onSubscribe()
                     m_impl->level),
             [this](runtime::stereo_level const& x) {
                 setLevel(
-                        g_mixerScales.levelMeterScale()->dBToPosition(
+                        g_mixerDbScales.levelMeterScale()->dBToPosition(
                                 toLevel(x.left)),
-                        g_mixerScales.levelMeterScale()->dBToPosition(
+                        g_mixerDbScales.levelMeterScale()->dBToPosition(
                                 toLevel(x.right)));
             });
 }
@@ -160,7 +160,7 @@ MixerChannelPerform::changeVolume(double position)
     dispatch(runtime::actions::set_float_parameter(
             m_impl->volume,
             static_cast<float>(math::dB_to_linear(
-                    g_mixerScales.volumeFaderScale()->dBAt(position)))));
+                    g_mixerDbScales.volumeFaderScale()->dBAt(position)))));
 }
 
 void

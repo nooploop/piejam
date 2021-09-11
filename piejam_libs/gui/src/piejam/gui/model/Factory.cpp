@@ -28,7 +28,7 @@
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/model/MixerChannelEdit.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
-#include <piejam/gui/model/MixerScales.h>
+#include <piejam/gui/model/MixerDbScales.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/StringList.h>
@@ -103,12 +103,12 @@ runRegistration()
             "StereoChannel",
             "Not creatable as it is an enum type");
 
-    qmlRegisterSingletonInstance<piejam::gui::model::MixerScales>(
+    qmlRegisterSingletonInstance<piejam::gui::model::MixerDbScales>(
             "PieJam.Models",
             1,
             0,
-            "MixerScales",
-            &g_mixerScales);
+            "MixerDbScales",
+            &g_mixerDbScales);
 }
 
 Factory::Factory(

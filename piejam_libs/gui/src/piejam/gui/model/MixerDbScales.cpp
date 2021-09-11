@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/MixerScales.h>
+#include <piejam/gui/model/MixerDbScales.h>
 
 #include <piejam/gui/model/DbScaleData.h>
 
@@ -41,7 +41,7 @@ makeVolumeFaderScaleTick12to12(float const dB) noexcept -> DbScaleTick
             .dB = dB};
 }
 
-MixerScales::MixerScales()
+MixerDbScales::MixerDbScales()
     : m_levelMeterScale(std::make_unique<DbScaleData>(QVector<DbScaleTick>(
               {DbScaleTick{
                        .position = 0.f,
@@ -79,8 +79,8 @@ MixerScales::MixerScales()
 {
 }
 
-MixerScales::~MixerScales() = default;
+MixerDbScales::~MixerDbScales() = default;
 
-MixerScales g_mixerScales;
+MixerDbScales g_mixerDbScales;
 
 } // namespace piejam::gui::model
