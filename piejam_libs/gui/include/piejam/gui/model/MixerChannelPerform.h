@@ -156,10 +156,10 @@ public:
         }
     }
 
-    auto volumeMidi() const -> MidiAssignable*;
-    auto panMidi() const -> MidiAssignable*;
-    auto muteMidi() const -> MidiAssignable*;
-    auto soloMidi() const -> MidiAssignable*;
+    auto volumeMidi() const noexcept -> MidiAssignable*;
+    auto panMidi() const noexcept -> MidiAssignable*;
+    auto muteMidi() const noexcept -> MidiAssignable*;
+    auto soloMidi() const noexcept -> MidiAssignable*;
 
 signals:
 

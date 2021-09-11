@@ -8,8 +8,6 @@ SPDX-License-Identifier: CC0-1.0
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
         <file>PieJam/MixerControls/DbScale.qml</file>
-        <file>PieJam/MixerControls/DbScaleData.qml</file>
-        <file>PieJam/MixerControls/DbScaleTick.qml</file>
         <file>PieJam/MixerControls/VolumeFader.qml</file>
         <file>PieJam/MixerControls/LevelIndicator.qml</file>
         <file>PieJam/MixerControls/LevelMeter.qml</file>

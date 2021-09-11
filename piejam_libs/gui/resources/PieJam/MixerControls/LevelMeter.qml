@@ -12,6 +12,7 @@ Item {
     property real levelLeft: 0
     property real levelRight: 0
     property bool muted: false
+    property var scaleData
 
     implicitWidth: dbScaleLeft.width + indicatorLeft.width + indicatorRight.width + dbScaleRight.width + 3 * controls.spacing
     implicitHeight: 300
@@ -21,27 +22,13 @@ Item {
         color: Material.backgroundColor
     }
 
-    DbScaleData {
-        id: meterScaleData
-
-        DbScaleTick { position: 0; db: Number.NEGATIVE_INFINITY }
-        DbScaleTick { position: 0.05; db: -60; dbStep: 6 }
-        DbScaleTick { position: 1; db: 0 }
-
-        function levelConv(db) {
-            const dstMin = 0.05
-            const factor = (1 - dstMin) / 60
-            return db < -60 ? 0 : (db + 60) * factor + dstMin
-        }
-    }
-
     Gradient {
         id: levelGradient
 
         GradientStop { position: 0; color: "#ff0000" }
-        GradientStop { position: 1 - meterScaleData.dbToPosition(-3); color: "#ffa500" }
-        GradientStop { position: 1 - meterScaleData.dbToPosition(-12); color: "#ffff00" }
-        GradientStop { position: 1 - meterScaleData.dbToPosition(-20); color: "#7ee00d" }
+        GradientStop { position: 0.0475; color: "#ffa500" }
+        GradientStop { position: 0.19; color: "#ffff00" }
+        GradientStop { position: 0.285; color: "#7ee00d" }
         GradientStop { position: 0.95; color: "#7ee00d" }
         GradientStop { position: 1; color: "#008000" }
     }
@@ -70,7 +57,7 @@ Item {
             orientation: DbScale.Orientation.Right
             backgroundColor: Material.backgroundColor
 
-            scaleData: meterScaleData
+            scaleData: root.scaleData
         }
 
         LevelIndicator {
@@ -83,7 +70,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 6
 
-            level: meterScaleData.levelConv(root.levelLeft)
+            level: root.levelLeft
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
@@ -100,7 +87,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 6
 
-            level: meterScaleData.levelConv(root.levelRight)
+            level: root.levelRight
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
@@ -116,7 +103,7 @@ Item {
 
             backgroundColor: Material.backgroundColor
 
-            scaleData: meterScaleData
+            scaleData: root.scaleData
             withText: false
         }
     }

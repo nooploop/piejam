@@ -4,7 +4,9 @@
 
 #include <piejam/gui/model/MixerChannelPerform.h>
 
+#include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/MidiAssignable.h>
+#include <piejam/gui/model/MixerScales.h>
 #include <piejam/math.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
@@ -96,6 +98,11 @@ static constexpr auto toLevel =
             return math::linear_to_dB(l, min);
         };
 
+static constexpr auto toVolume =
+        [min = math::dB_to_linear(-60.01f)](float const v) {
+            return math::linear_to_dB(v, min);
+        };
+
 void
 MixerChannelPerform::onSubscribe()
 {
@@ -112,7 +119,10 @@ MixerChannelPerform::onSubscribe()
 
     observe(runtime::selectors::make_float_parameter_value_selector(
                     m_impl->volume),
-            [this](float x) { setVolume(x); });
+            [this](float x) {
+                setVolume(g_mixerScales.volumeFaderScale()->dBToPosition(
+                        toVolume(x)));
+            });
 
     observe(runtime::selectors::make_float_parameter_value_selector(
                     m_impl->panBalance),
@@ -136,16 +146,21 @@ MixerChannelPerform::onSubscribe()
     observe(runtime::selectors::make_level_parameter_value_selector(
                     m_impl->level),
             [this](runtime::stereo_level const& x) {
-                setLevel(toLevel(x.left), toLevel(x.right));
+                setLevel(
+                        g_mixerScales.levelMeterScale()->dBToPosition(
+                                toLevel(x.left)),
+                        g_mixerScales.levelMeterScale()->dBToPosition(
+                                toLevel(x.right)));
             });
 }
 
 void
-MixerChannelPerform::changeVolume(double value)
+MixerChannelPerform::changeVolume(double position)
 {
     dispatch(runtime::actions::set_float_parameter(
             m_impl->volume,
-            static_cast<float>(value)));
+            static_cast<float>(math::dB_to_linear(
+                    g_mixerScales.volumeFaderScale()->dBAt(position)))));
 }
 
 void
@@ -175,25 +190,25 @@ MixerChannelPerform::changeSolo(bool value)
 }
 
 auto
-MixerChannelPerform::volumeMidi() const -> MidiAssignable*
+MixerChannelPerform::volumeMidi() const noexcept -> MidiAssignable*
 {
     return m_impl->volumeMidi.get();
 }
 
 auto
-MixerChannelPerform::panMidi() const -> MidiAssignable*
+MixerChannelPerform::panMidi() const noexcept -> MidiAssignable*
 {
     return m_impl->panMidi.get();
 }
 
 auto
-MixerChannelPerform::muteMidi() const -> MidiAssignable*
+MixerChannelPerform::muteMidi() const noexcept -> MidiAssignable*
 {
     return m_impl->muteMidi.get();
 }
 
 auto
-MixerChannelPerform::soloMidi() const -> MidiAssignable*
+MixerChannelPerform::soloMidi() const noexcept -> MidiAssignable*
 {
     return m_impl->soloMidi.get();
 }

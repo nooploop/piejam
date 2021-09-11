@@ -14,6 +14,7 @@ Item {
     id: root
 
     property real volume
+    property var scaleData
 
     signal moved(real newVolume)
 
@@ -27,7 +28,7 @@ Item {
 
         padding: 6
 
-        value: dbScale.scaleData.dbToPosition(DbConvert.linToDb(root.volume))
+        value: root.volume
 
         orientation: Qt.Vertical
 
@@ -41,13 +42,7 @@ Item {
             orientation: DbScale.Orientation.Right
             backgroundColor: Material.backgroundColor
 
-            scaleData: DbScaleData {
-                DbScaleTick { position: 0; db: Number.NEGATIVE_INFINITY }
-                DbScaleTick { position: 0.05; db: -60; dbStep: 10 }
-                DbScaleTick { position: 0.35; db: -20; dbStep: 4 }
-                DbScaleTick { position: 0.45; db: -12; dbStep: 3 }
-                DbScaleTick { position: 1; db: 12 }
-            }
+            scaleData: root.scaleData
         }
 
         handle: Rectangle {
@@ -61,8 +56,8 @@ Item {
         }
 
         onMoved: {
-            var newVolume = dbScale.scaleData.dbAt(slider.value)
-            root.moved(DbConvert.dbToLin(newVolume))
+            var newVolume = root.scaleData.dBAt(slider.value)
+            root.moved(slider.value)
             Info.quickTip = "<b>Volume:</b> " + newVolume.toFixed(1) + " dB"
         }
     }

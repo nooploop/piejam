@@ -14,7 +14,7 @@ Item {
         Right
     }
 
-    property DbScaleData scaleData: DbScaleData {}
+    property var scaleData
     property int orientation: DbScale.Orientation.Left
     property bool withText: true
     property color backgroundColor: Qt.rgba(0, 0, 0, 1)
@@ -55,19 +55,12 @@ Item {
             ctx.moveTo(lineX, 0)
             ctx.lineTo(lineX, height)
 
-            for (var i = 0; i < scaleData.ticks.length; ++i) {
-                var t = scaleData.ticks[i]
-                var yt = dbToPosition(t.db)
+            var ticks = scaleData.ticks
+            for (var i = 0; i < ticks.length; ++i) {
+                var t = ticks[i]
+                var yt = tickPos(t.position)
 
                 drawTick(ctx, lineX, lineXE, yt)
-
-                if (t.dbStep !== 0) {
-                    console.assert(i !== scaleData.ticks.length)
-
-                    for (var j = t.db + t.dbStep, je = scaleData.ticks[i + 1].db; j < je; j += t.dbStep) {
-                        drawTick(ctx, lineX, lineXE, dbToPosition(j))
-                    }
-                }
             }
 
             ctx.moveTo(0, 0)
@@ -83,19 +76,12 @@ Item {
         function drawText(ctx) {
             var textX = root.orientation === DbScale.Orientation.Left ? root.width - 2 : root.width - 12
 
-            for (var i = 0; i < scaleData.ticks.length; ++i) {
-                var t = scaleData.ticks[i]
-                var yt = dbToPosition(t.db)
+            var ticks = scaleData.ticks
+            for (var i = 0; i < ticks.length; ++i) {
+                var t = ticks[i]
+                var yt = tickPos(t.position)
 
-                drawTickText(ctx, textX, yt, t.db)
-
-                if (t.dbStep !== 0) {
-                    console.assert(i !== scaleData.ticks.length)
-
-                    for (var j = t.db + t.dbStep, je = scaleData.ticks[i + 1].db; j < je; j += t.dbStep) {
-                        drawTickText(ctx, textX, dbToPosition(j), j)
-                    }
-                }
+                drawTickText(ctx, textX, yt, t.dB)
             }
         }
 

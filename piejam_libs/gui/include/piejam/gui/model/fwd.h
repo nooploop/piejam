@@ -28,6 +28,7 @@ class MixerChannel;
 using MixerChannelsList = GenericListModel<MixerChannel>;
 class MixerChannelPerform;
 class MixerChannelEdit;
+class DbScaleData;
 
 class BusConfig;
 using BusConfigsList = GenericListModel<BusConfig>;

@@ -6,6 +6,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
+import PieJam.Models 1.0 as PJModels
+
 import ".."
 import "../Controls"
 
@@ -78,6 +80,9 @@ Item {
             muted: root.model ? (root.model.mute || root.model.mutedBySolo) : false
 
             volumeMidi: root.model ? root.model.volumeMidi : null
+
+            levelMeterScale: PJModels.MixerScales.levelMeterScale
+            volumeFaderScale: PJModels.MixerScales.volumeFaderScale
 
             onFaderMoved: root.model.changeVolume(newVolume)
         }

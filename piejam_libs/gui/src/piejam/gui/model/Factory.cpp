@@ -11,6 +11,7 @@
 #include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/BusConfig.h>
+#include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChain.h>
 #include <piejam/gui/model/FxFilter.h>
@@ -27,6 +28,7 @@
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/model/MixerChannelEdit.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
+#include <piejam/gui/model/MixerScales.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/StringList.h>
@@ -54,6 +56,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::MixerChannel*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelEdit*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();
+    qRegisterMetaType<piejam::gui::model::DbScaleData*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::FxParameter*>();
     qRegisterMetaType<piejam::gui::model::FxChain*>();
@@ -99,6 +102,13 @@ runRegistration()
             0,
             "StereoChannel",
             "Not creatable as it is an enum type");
+
+    qmlRegisterSingletonInstance<piejam::gui::model::MixerScales>(
+            "PieJam.Models",
+            1,
+            0,
+            "MixerScales",
+            &g_mixerScales);
 }
 
 Factory::Factory(

@@ -16,6 +16,9 @@ Item {
 
     property alias volumeMidi: midiAssign.model
 
+    property alias levelMeterScale: meter.scaleData
+    property alias volumeFaderScale: fader.scaleData
+
     signal faderMoved(real newVolume)
 
     width: 142
