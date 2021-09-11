@@ -44,14 +44,7 @@ public:
     auto type() const noexcept -> Type override final { return Type::Scope; }
 
     auto samplesPerLine() const noexcept -> int { return m_samplesPerLine; }
-    void setSamplesPerLine(int const x)
-    {
-        if (m_samplesPerLine != x)
-        {
-            m_samplesPerLine = x;
-            emit samplesPerLineChanged();
-        }
-    }
+    void setSamplesPerLine(int const x);
 
     auto viewSize() const noexcept -> int { return m_viewSize; }
     void setViewSize(int const x)
@@ -67,53 +60,21 @@ public:
 
     bool activeA() const noexcept { return m_activeA; }
 
-    Q_INVOKABLE void changeActiveA(bool const active)
-    {
-        if (m_activeA != active)
-        {
-            m_activeA = active;
-            emit activeAChanged();
-
-            clear();
-        }
-    }
+    Q_INVOKABLE void changeActiveA(bool active);
 
     auto channelA() const noexcept -> StereoChannel { return m_channelA; }
 
-    Q_INVOKABLE void changeChannelA(piejam::gui::model::StereoChannel const x)
-    {
-        if (m_channelA != x)
-        {
-            m_channelA = x;
-            emit channelAChanged();
-        }
-    }
+    Q_INVOKABLE void changeChannelA(piejam::gui::model::StereoChannel);
 
     auto dataA() noexcept -> ScopeLinesObject* { return &m_linesA; }
 
     bool activeB() const noexcept { return m_activeB; }
 
-    Q_INVOKABLE void changeActiveB(bool const active)
-    {
-        if (m_activeB != active)
-        {
-            m_activeB = active;
-            emit activeBChanged();
-
-            clear();
-        }
-    }
+    Q_INVOKABLE void changeActiveB(bool active);
 
     auto channelB() const noexcept -> StereoChannel { return m_channelB; }
 
-    Q_INVOKABLE void changeChannelB(piejam::gui::model::StereoChannel const x)
-    {
-        if (m_channelB != x)
-        {
-            m_channelB = x;
-            emit channelBChanged();
-        }
-    }
+    Q_INVOKABLE void changeChannelB(piejam::gui::model::StereoChannel);
 
     auto dataB() noexcept -> ScopeLinesObject* { return &m_linesB; }
 

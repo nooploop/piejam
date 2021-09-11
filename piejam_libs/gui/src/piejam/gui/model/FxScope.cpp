@@ -81,27 +81,6 @@ FxScope::FxScope(
                 dataB()->get().shift_push_back(addedLines);
                 dataB()->update();
             });
-
-    QObject::connect(this, &FxScope::activeAChanged, this, [this]() {
-        m_impl->accumulatorA.setActive(activeA());
-    });
-
-    QObject::connect(this, &FxScope::channelAChanged, this, [this]() {
-        m_impl->accumulatorA.setChannel(channelA());
-    });
-
-    QObject::connect(this, &FxScope::activeBChanged, this, [this]() {
-        m_impl->accumulatorB.setActive(activeB());
-    });
-
-    QObject::connect(this, &FxScope::channelBChanged, this, [this]() {
-        m_impl->accumulatorB.setChannel(channelB());
-    });
-
-    QObject::connect(this, &FxScope::samplesPerLineChanged, this, [this]() {
-        m_impl->accumulatorA.setSamplesPerLine(samplesPerLine());
-        m_impl->accumulatorB.setSamplesPerLine(samplesPerLine());
-    });
 }
 
 FxScope::~FxScope() = default;
@@ -112,6 +91,66 @@ FxScope::onSubscribe()
     requestUpdates(std::chrono::milliseconds{16}, [this]() {
         m_impl->streamA->requestUpdate();
     });
+}
+
+void
+FxScope::setSamplesPerLine(int const x)
+{
+    if (m_samplesPerLine != x)
+    {
+        m_samplesPerLine = x;
+        m_impl->accumulatorA.setSamplesPerLine(x);
+        m_impl->accumulatorB.setSamplesPerLine(x);
+        emit samplesPerLineChanged();
+    }
+}
+
+void
+FxScope::changeActiveA(bool const active)
+{
+    if (m_activeA != active)
+    {
+        m_activeA = active;
+        m_impl->accumulatorA.setActive(active);
+        emit activeAChanged();
+
+        clear();
+    }
+}
+
+void
+FxScope::changeChannelA(piejam::gui::model::StereoChannel const x)
+{
+    if (m_channelA != x)
+    {
+        m_channelA = x;
+        m_impl->accumulatorA.setChannel(x);
+        emit channelAChanged();
+    }
+}
+
+void
+FxScope::changeActiveB(bool const active)
+{
+    if (m_activeB != active)
+    {
+        m_activeB = active;
+        m_impl->accumulatorB.setActive(active);
+        emit activeBChanged();
+
+        clear();
+    }
+}
+
+void
+FxScope::changeChannelB(piejam::gui::model::StereoChannel const x)
+{
+    if (m_channelB != x)
+    {
+        m_channelB = x;
+        m_impl->accumulatorB.setChannel(x);
+        emit channelBChanged();
+    }
 }
 
 } // namespace piejam::gui::model
