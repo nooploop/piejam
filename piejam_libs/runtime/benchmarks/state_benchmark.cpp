@@ -18,13 +18,13 @@ BM_copy_state_benchmark(benchmark::State& bench_state)
 {
     state st;
     auto in1 = add_mixer_channel(st, "In1yohohofoobarbaz");
-    insert_internal_fx_module(st, in1, npos, fx::internal::gain, {}, {});
+    insert_internal_fx_module(st, in1, npos, fx::internal::tool, {}, {});
     auto in2 = add_mixer_channel(st, "In2");
-    insert_internal_fx_module(st, in2, npos, fx::internal::gain, {}, {});
+    insert_internal_fx_module(st, in2, npos, fx::internal::tool, {}, {});
     auto in3 = add_mixer_channel(st, "In3");
-    insert_internal_fx_module(st, in3, npos, fx::internal::gain, {}, {});
+    insert_internal_fx_module(st, in3, npos, fx::internal::tool, {}, {});
     auto out = add_mixer_channel(st, "out");
-    insert_internal_fx_module(st, out, npos, fx::internal::gain, {}, {});
+    insert_internal_fx_module(st, out, npos, fx::internal::tool, {}, {});
 
     actions::finalize_ladspa_fx_plugin_scan ladspa_fx_scan;
     ladspa_fx_scan.plugins = audio::ladspa::scan_directory("/usr/lib/ladspa");
@@ -45,13 +45,13 @@ BM_get_bus_name_benchmark(benchmark::State& bench_state)
 {
     state st;
     auto in1 = add_mixer_channel(st, "In1");
-    insert_internal_fx_module(st, in1, npos, fx::internal::gain, {}, {});
+    insert_internal_fx_module(st, in1, npos, fx::internal::tool, {}, {});
     auto in2 = add_mixer_channel(st, "In2");
-    insert_internal_fx_module(st, in2, npos, fx::internal::gain, {}, {});
+    insert_internal_fx_module(st, in2, npos, fx::internal::tool, {}, {});
     auto in3 = add_mixer_channel(st, "In3");
-    insert_internal_fx_module(st, in3, npos, fx::internal::gain, {}, {});
+    insert_internal_fx_module(st, in3, npos, fx::internal::tool, {}, {});
     auto out = add_mixer_channel(st, "out");
-    insert_internal_fx_module(st, out, npos, fx::internal::gain, {}, {});
+    insert_internal_fx_module(st, out, npos, fx::internal::tool, {}, {});
 
     auto const get_name = selectors::make_mixer_channel_name_selector(in1);
 

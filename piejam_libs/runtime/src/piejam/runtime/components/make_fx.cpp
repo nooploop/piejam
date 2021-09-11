@@ -8,7 +8,6 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
-#include <piejam/runtime/components/fx_gain.h>
 #include <piejam/runtime/components/fx_ladspa.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/internal.h>
@@ -16,6 +15,7 @@
 #include <piejam/runtime/modules/filter/filter_component.h>
 #include <piejam/runtime/modules/scope/scope_component.h>
 #include <piejam/runtime/modules/spectrum/spectrum_component.h>
+#include <piejam/runtime/modules/tool/tool_component.h>
 
 #include <boost/assert.hpp>
 #include <boost/hof/match.hpp>
@@ -38,8 +38,8 @@ make_internal_fx(
 {
     switch (fx_type)
     {
-        case fx::internal::gain:
-            return components::make_fx_gain(fx_mod, param_procs, name);
+        case fx::internal::tool:
+            return modules::tool::make_component(fx_mod, param_procs, name);
 
         case fx::internal::filter:
             return modules::filter::make_component(

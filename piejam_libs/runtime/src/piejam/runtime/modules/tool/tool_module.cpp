@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/fx/gain.h>
+#include <piejam/runtime/modules/tool/tool_module.h>
 
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
@@ -16,7 +16,7 @@
 
 #include <boost/container/flat_map.hpp>
 
-namespace piejam::runtime::fx
+namespace piejam::runtime::modules::tool
 {
 
 namespace
@@ -44,7 +44,7 @@ to_dB_string(float x) -> std::string
 } // namespace
 
 auto
-make_gain_module(parameters_t& fx_params, parameter_maps& params) -> module
+make_module(fx::parameters_t& fx_params, parameter_maps& params) -> fx::module
 {
     using namespace std::string_literals;
 
@@ -60,19 +60,19 @@ make_gain_module(parameters_t& fx_params, parameter_maps& params) -> module
                             &runtime::parameter::from_normalized_db<dB_ival>});
     fx_params.emplace(
             gain_param_id,
-            parameter{
+            fx::parameter{
                     .name = "Gain"s,
                     .value_to_string =
-                            parameter_value_to_string(&to_dB_string)});
+                            fx::parameter_value_to_string(&to_dB_string)});
 
-    return module{
-            .fx_instance_id = internal::gain,
-            .name = "Gain"s,
+    return fx::module{
+            .fx_instance_id = fx::internal::tool,
+            .name = "Tool"s,
             .parameters =
-                    module_parameters{
-                            {to_underlying(gain_parameter_key::gain),
+                    fx::module_parameters{
+                            {to_underlying(parameter_key::gain),
                              gain_param_id}},
             .streams = {}};
 }
 
-} // namespace piejam::runtime::fx
+} // namespace piejam::runtime::modules::tool

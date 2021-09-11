@@ -27,8 +27,8 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
 
     switch (fx_type)
     {
-        case runtime::fx::internal::gain:
-            setName(tr("Gain"));
+        case runtime::fx::internal::tool:
+            setName(tr("Tool"));
             setDescription(tr("Amplify or attenuate a signal."));
             break;
 

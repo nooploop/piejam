@@ -2,14 +2,14 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/components/fx_gain.h>
+#include <piejam/runtime/modules/tool/tool_component.h>
 
 #include <piejam/audio/components/amplifier.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
-#include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
+#include <piejam/runtime/modules/tool/tool_module.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/to_underlying.h>
 
@@ -19,7 +19,7 @@
 
 #include <array>
 
-namespace piejam::runtime::components
+namespace piejam::runtime::modules::tool
 {
 
 namespace
@@ -33,8 +33,7 @@ public:
             std::string_view const& name)
         : m_gain_input_proc(processors::make_parameter_processor(
                   proc_factory,
-                  fx_mod.parameters->at(
-                          to_underlying(fx::gain_parameter_key::gain)),
+                  fx_mod.parameters->at(to_underlying(parameter_key::gain)),
                   fmt::format("gain {}", name)))
         , m_amplifier(audio::components::make_stereo_amplifier(
                   fmt::format("amp {}", name)))
@@ -72,7 +71,7 @@ private:
 } // namespace
 
 auto
-make_fx_gain(
+make_component(
         fx::module const& fx_mod,
         parameter_processor_factory& proc_factory,
         std::string_view const& name)
@@ -81,4 +80,4 @@ make_fx_gain(
     return std::make_unique<fx_gain>(fx_mod, proc_factory, name);
 }
 
-} // namespace piejam::runtime::components
+} // namespace piejam::runtime::modules::tool

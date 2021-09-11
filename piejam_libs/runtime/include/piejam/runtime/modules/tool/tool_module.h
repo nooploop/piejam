@@ -8,14 +8,14 @@
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/parameters.h>
 
-namespace piejam::runtime::fx
+namespace piejam::runtime::modules::tool
 {
 
-enum class gain_parameter_key : parameter_key
+enum class parameter_key : fx::parameter_key
 {
     gain
 };
 
-auto make_gain_module(parameters_t&, parameter_maps&) -> module;
+auto make_module(fx::parameters_t&, parameter_maps&) -> fx::module;
 
-} // namespace piejam::runtime::fx
+} // namespace piejam::runtime::modules::tool

@@ -7,12 +7,12 @@
 #include <piejam/algorithm/contains.h>
 #include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/indexed_access.h>
-#include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
+#include <piejam/runtime/modules/tool/tool_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
@@ -156,12 +156,12 @@ period_counts_from_state(state const& state) -> audio::period_counts_t
 }
 
 static auto
-make_fx_gain(
+make_fx_tool(
         fx::modules_t& fx_modules,
         fx::parameters_t& fx_params,
         parameter_maps& params)
 {
-    return fx_modules.add(fx::make_gain_module(fx_params, params));
+    return fx_modules.add(modules::tool::make_module(fx_params, params));
 }
 
 static auto
@@ -273,8 +273,8 @@ insert_internal_fx_module(
     fx::module_id fx_mod_id;
     switch (fx_type)
     {
-        case fx::internal::gain:
-            fx_mod_id = make_fx_gain(st.fx_modules, fx_params, st.params);
+        case fx::internal::tool:
+            fx_mod_id = make_fx_tool(st.fx_modules, fx_params, st.params);
             break;
 
         case fx::internal::filter:

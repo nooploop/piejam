@@ -11,13 +11,13 @@
 #include <memory>
 #include <string_view>
 
-namespace piejam::runtime::components
+namespace piejam::runtime::modules::tool
 {
 
-auto make_fx_gain(
+auto make_component(
         fx::module const&,
         parameter_processor_factory&,
         std::string_view const& name = {})
         -> std::unique_ptr<audio::engine::component>;
 
-} // namespace piejam::runtime::components
+} // namespace piejam::runtime::modules::tool

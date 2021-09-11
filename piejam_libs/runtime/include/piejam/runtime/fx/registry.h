@@ -26,7 +26,7 @@ inline auto
 make_internal_fx_registry_entries()
 {
     return std::vector<registry::item>{
-            {internal::gain},
+            {internal::tool},
             {internal::filter},
             {internal::scope},
             {internal::spectrum}};

@@ -23,7 +23,7 @@ namespace fx
 
 NLOHMANN_JSON_SERIALIZE_ENUM(
         internal,
-        {{internal::gain, "gain"},
+        {{internal::tool, "tool"},
          {internal::filter, "filter"},
          {internal::scope, "scope"},
          {internal::spectrum, "spectrum"}})

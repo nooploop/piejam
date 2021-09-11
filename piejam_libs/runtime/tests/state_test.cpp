@@ -83,7 +83,7 @@ struct state_with_one_fx : testing::Test
                   sut,
                   bus_id,
                   0,
-                  fx::internal::gain,
+                  fx::internal::tool,
                   {},
                   {}))
     {
