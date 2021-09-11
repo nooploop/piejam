@@ -92,8 +92,23 @@ struct slice_multiply
             -> slice<T>
     {
         if (r_c == T{})
+        {
             return T{};
-        else if (r_c != T{1})
+        }
+        else if (r_c == T{-1})
+        {
+            BOOST_ASSERT(l_buf.size() == m_out.size());
+            simd::transform(
+                    l_buf,
+                    m_out.data(),
+                    bhof::capture(mipp::Reg<T>(T{}))(std::minus<>{}));
+            return m_out;
+        }
+        else if (r_c == T{1})
+        {
+            return l_buf;
+        }
+        else
         {
             BOOST_ASSERT(l_buf.size() == m_out.size());
             simd::transform(
@@ -103,8 +118,6 @@ struct slice_multiply
 
             return m_out;
         }
-        else
-            return l_buf;
     }
 
     constexpr auto

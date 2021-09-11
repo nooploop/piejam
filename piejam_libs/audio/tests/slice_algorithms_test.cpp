@@ -137,6 +137,26 @@ TEST(slice_algorithms_multiply, multiply_buffer_by_non_zero_one_constant)
     EXPECT_TRUE(Matches(ElementsAre(6.f, 9.f, 15.f, 21.f))(out));
 }
 
+TEST(slice_algorithms_multiply, multiply_buffer_by_minus_one_inverts_sign)
+{
+    alignas(mipp::RequiredAlignment) std::array buf{2.f, -3.f, 5.f, -7.f};
+    alignas(mipp::RequiredAlignment) std::array<float, buf.size()> out{};
+
+    auto res = multiply(
+            slice<float>(buf),
+            slice<float>(-1.f),
+            std::span<float>(out));
+
+    ASSERT_TRUE(res.is_buffer());
+    EXPECT_EQ(out.data(), res.buffer().data());
+    EXPECT_EQ(out.size(), res.buffer().size());
+
+    EXPECT_FLOAT_EQ(-2.f, out[0]);
+    EXPECT_FLOAT_EQ(3.f, out[1]);
+    EXPECT_FLOAT_EQ(-5.f, out[2]);
+    EXPECT_FLOAT_EQ(7.f, out[3]);
+}
+
 TEST(slice_algorithms_multiply, multiply_non_zero_one_constant_by_buffer)
 {
     alignas(mipp::RequiredAlignment) std::array buf{2.f, 3.f, 5.f, 7.f};
