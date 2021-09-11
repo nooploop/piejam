@@ -86,6 +86,24 @@ Item {
         spectrumBData: root.content ? root.content.dataOut : null
         spectrumBColor: Material.color(Material.Blue)
 
+        // HACK: we reuse the level labels positions for resonance percentage labels
+        // Since levels go from 0 to -80 in 20dB steps, this comes extremely handy
+        // to split up the resonance percentage axis in 20% steps.
+        Repeater {
+            model: spectrum.levelLabels
+
+            delegate: Label {
+                id: resLabel
+
+                x: 1
+                y: modelData.position
+
+                font.pointSize: 6
+
+                text: (100 + modelData.value) + "%"
+            }
+        }
+
         Repeater {
             model: spectrum.levelLabels
 
