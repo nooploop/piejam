@@ -11,6 +11,8 @@ StackLayout {
     property alias model: creator.model
     property alias delegate: creator.delegate
 
+    property var currentItem: 0 <= currentIndex && currentIndex < root.children.length ? root.children[currentIndex] : null
+
     Repeater {
         id: creator
 

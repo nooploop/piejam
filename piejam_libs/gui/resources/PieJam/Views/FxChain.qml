@@ -42,6 +42,10 @@ ViewPane {
 
             property var modelItem: model.item
 
+            function positionViewAtIndex(index, positionMode) {
+                fxModules.positionViewAtIndex(index, positionMode)
+            }
+
             ListView {
                 id: fxModules
 
@@ -131,6 +135,11 @@ ViewPane {
         visible: false
 
         onCancelClicked: stack.pop()
-        onAddClicked: stack.pop()
+        onAddClicked: {
+            stack.pop()
+
+            if (fxChains.currentItem)
+                fxChains.currentItem.positionViewAtIndex(fxBrowser.insertPosition, ListView.Contain)
+        }
     }
 }
