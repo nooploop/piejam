@@ -98,7 +98,7 @@ Item {
                 x: 1
                 y: modelData.position
 
-                font.pointSize: 6
+                font.pointSize: 5
 
                 text: (100 + modelData.value) + "%"
             }
@@ -113,7 +113,7 @@ Item {
                 x: spectrum.width - levelLabel.implicitWidth - 4
                 y: modelData.position
 
-                font.pointSize: 6
+                font.pointSize: 5
 
                 text: modelData.value + " dB"
             }
@@ -126,7 +126,7 @@ Item {
                 x: modelData.position + 2
                 y: spectrum.height - implicitHeight
 
-                font.pointSize: 6
+                font.pointSize: 5
 
                 text: modelData.value >= 1000 ? (modelData.value / 1000) + " kHz" : modelData.value + " Hz"
             }
