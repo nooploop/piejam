@@ -12,13 +12,13 @@
 #include <memory>
 #include <string_view>
 
-namespace piejam::runtime::components
+namespace piejam::runtime::modules::scope
 {
 
-auto make_fx_spectrum(
+auto make_component(
         fx::module const&,
         audio::sample_rate const&,
         processors::stream_processor_factory&)
         -> std::unique_ptr<audio::engine::component>;
 
-} // namespace piejam::runtime::components
+} // namespace piejam::runtime::modules::scope

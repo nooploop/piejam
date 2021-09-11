@@ -10,12 +10,12 @@
 #include <piejam/entity_id.h>
 #include <piejam/runtime/components/fx_gain.h>
 #include <piejam/runtime/components/fx_ladspa.h>
-#include <piejam/runtime/components/fx_scope.h>
-#include <piejam/runtime/components/fx_spectrum.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/modules/filter/filter_component.h>
+#include <piejam/runtime/modules/scope/scope_component.h>
+#include <piejam/runtime/modules/spectrum/spectrum_component.h>
 
 #include <boost/assert.hpp>
 #include <boost/hof/match.hpp>
@@ -50,10 +50,13 @@ make_internal_fx(
                     name);
 
         case fx::internal::scope:
-            return components::make_fx_scope(fx_mod, sample_rate, stream_procs);
+            return modules::scope::make_component(
+                    fx_mod,
+                    sample_rate,
+                    stream_procs);
 
         case fx::internal::spectrum:
-            return components::make_fx_spectrum(
+            return modules::spectrum::make_component(
                     fx_mod,
                     sample_rate,
                     stream_procs);

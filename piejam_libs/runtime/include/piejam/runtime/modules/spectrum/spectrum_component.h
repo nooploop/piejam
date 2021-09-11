@@ -12,10 +12,10 @@
 #include <memory>
 #include <string_view>
 
-namespace piejam::runtime::components
+namespace piejam::runtime::modules::spectrum
 {
 
-auto make_fx_scope(
+auto make_component(
         fx::module const&,
         audio::sample_rate const&,
         processors::stream_processor_factory&)

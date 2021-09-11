@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/fx/spectrum.h>
+#include <piejam/runtime/modules/scope/scope_module.h>
 
 #include <piejam/entity_map.h>
 #include <piejam/runtime/fx/internal.h>
@@ -13,21 +13,21 @@
 
 #include <boost/container/flat_map.hpp>
 
-namespace piejam::runtime::fx
+namespace piejam::runtime::modules::scope
 {
 
 auto
-make_spectrum_module(audio_streams_cache& streams) -> module
+make_module(audio_streams_cache& streams) -> fx::module
 {
     using namespace std::string_literals;
 
-    return module{
-            .fx_instance_id = internal::spectrum,
-            .name = "Spectrum"s,
+    return fx::module{
+            .fx_instance_id = fx::internal::scope,
+            .name = "Oscilloscope"s,
             .parameters = fx::module_parameters{},
-            .streams = module_streams{
-                    {to_underlying(spectrum_stream_key::left_right),
+            .streams = fx::module_streams{
+                    {to_underlying(stream_key::left_right),
                      streams.add(audio_stream_buffer(std::in_place, 2))}}};
 }
 
-} // namespace piejam::runtime::fx
+} // namespace piejam::runtime::modules::scope

@@ -10,9 +10,9 @@
 #include <piejam/runtime/fx/gain.h>
 #include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
-#include <piejam/runtime/fx/scope.h>
-#include <piejam/runtime/fx/spectrum.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
+#include <piejam/runtime/modules/scope/scope_module.h>
+#include <piejam/runtime/modules/spectrum/spectrum_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
@@ -178,13 +178,13 @@ make_fx_filter(
 static auto
 make_fx_scope(fx::modules_t& fx_modules, audio_streams_cache& streams)
 {
-    return fx_modules.add(fx::make_scope_module(streams));
+    return fx_modules.add(modules::scope::make_module(streams));
 }
 
 static auto
 make_fx_spectrum(fx::modules_t& fx_modules, audio_streams_cache& streams)
 {
-    return fx_modules.add(fx::make_spectrum_module(streams));
+    return fx_modules.add(modules::spectrum::make_module(streams));
 }
 
 static void

@@ -53,8 +53,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/channel_index_pair.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_gain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_ladspa.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_scope.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_spectrum.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mixer_channel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/solo_switch.h
@@ -75,8 +73,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter_assignment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/registry.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/scope.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/spectrum.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/unavailable_ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
@@ -92,6 +88,10 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_util.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/scope/scope_component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/scope/scope_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/spectrum/spectrum_component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/spectrum/spectrum_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_normalize.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/fwd.h
@@ -181,8 +181,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/batch_action.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_gain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_ladspa.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_scope.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_spectrum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/make_fx.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mixer_channel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
@@ -192,8 +190,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/parameter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/scope.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/spectrum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_assignment_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_control_middleware.cpp
@@ -202,6 +198,10 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer_util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_component.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/scope/scope_component.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/scope/scope_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/spectrum/spectrum_component.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/spectrum/spectrum_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/parameter_maps.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp

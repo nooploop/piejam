@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/components/fx_scope.h>
+#include <piejam/runtime/components/stereo_stream.h>
 
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>

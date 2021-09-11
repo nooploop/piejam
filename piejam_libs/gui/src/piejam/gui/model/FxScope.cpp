@@ -6,7 +6,7 @@
 
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/ScopeLinesGenerator.h>
-#include <piejam/runtime/fx/scope.h>
+#include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
 
@@ -38,7 +38,7 @@ FxScope::FxScope(
                     m_impl->fx_mod_id));
 
     constexpr auto streamKey =
-            to_underlying(runtime::fx::scope_stream_key::left_right);
+            to_underlying(runtime::modules::scope::stream_key::left_right);
     auto const streamId = streams.get().at(streamKey);
     FxStreamKeyId fxStreamKeyId{.key = streamKey, .id = streamId};
 

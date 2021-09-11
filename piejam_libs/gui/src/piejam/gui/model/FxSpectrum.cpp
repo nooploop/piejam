@@ -6,7 +6,7 @@
 
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/StereoSpectrumDataGenerator.h>
-#include <piejam/runtime/fx/spectrum.h>
+#include <piejam/runtime/modules/spectrum/spectrum_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
 
@@ -38,7 +38,7 @@ FxSpectrum::FxSpectrum(
                     m_impl->fx_mod_id));
 
     constexpr auto streamKey =
-            to_underlying(runtime::fx::spectrum_stream_key::left_right);
+            to_underlying(runtime::modules::spectrum::stream_key::left_right);
     auto const streamId = streams.get().at(streamKey);
     FxStreamKeyId fxStreamKeyId{.key = streamKey, .id = streamId};
 
