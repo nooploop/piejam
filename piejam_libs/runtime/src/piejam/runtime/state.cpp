@@ -315,7 +315,7 @@ insert_ladspa_fx_module(
         state& st,
         mixer::channel_id const bus_id,
         std::size_t const position,
-        fx::ladspa_instance_id const instance_id,
+        ladspa::instance_id const instance_id,
         ladspa::plugin_descriptor const& plugin_desc,
         std::span<ladspa::port_descriptor const> const& control_inputs,
         std::vector<fx::parameter_value_assignment> const& initial_values,
@@ -437,7 +437,7 @@ remove_fx_module(state& st, fx::module_id const fx_mod_id)
 
     st.fx_modules.remove(fx_mod_id);
 
-    if (auto id = std::get_if<fx::ladspa_instance_id>(&fx_mod.fx_instance_id))
+    if (auto id = std::get_if<ladspa::instance_id>(&fx_mod.fx_instance_id))
     {
         st.fx_ladspa_instances.update([id](fx::ladspa_instances& instances) {
             instances.erase(*id);

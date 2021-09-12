@@ -55,7 +55,7 @@ struct insert_ladspa_fx_module final
 {
     mixer::channel_id fx_chain_id;
     std::size_t position{};
-    fx::ladspa_instance_id instance_id;
+    ladspa::instance_id instance_id;
     ladspa::plugin_descriptor plugin_desc;
     std::span<ladspa::port_descriptor const> control_inputs;
     std::vector<fx::parameter_value_assignment> initial_values;

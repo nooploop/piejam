@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <piejam/ladspa/fwd.h>
 #include <piejam/entity_id_hash.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 
 #include <unordered_map>
@@ -13,7 +13,7 @@
 namespace piejam::runtime::fx
 {
 
-using ladspa_instances = std::
-        unordered_map<ladspa_instance_id, ladspa::plugin_descriptor>;
+using ladspa_instances =
+        std::unordered_map<ladspa::instance_id, ladspa::plugin_descriptor>;
 
 } // namespace piejam::runtime::fx

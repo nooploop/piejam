@@ -174,9 +174,9 @@ static auto
 export_fx_plugin(
         state const& st,
         fx::module const& fx_mod,
-        fx::ladspa_instance_id const id) -> session::fx_plugin
+        ladspa::instance_id const id) -> session::fx_plugin
 {
-    BOOST_ASSERT(std::get<fx::ladspa_instance_id>(fx_mod.fx_instance_id) == id);
+    BOOST_ASSERT(std::get<ladspa::instance_id>(fx_mod.fx_instance_id) == id);
 
     session::ladspa_plugin plug;
     auto const& pd = st.fx_ladspa_instances->at(id);

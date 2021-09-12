@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/fwd.h>
+
 namespace piejam::ladspa
 {
 
@@ -13,5 +15,8 @@ struct plugin_descriptor;
 struct port_descriptor;
 
 class plugin;
+
+struct instance_id_tag;
+using instance_id = entity_id<instance_id_tag>;
 
 } // namespace piejam::ladspa

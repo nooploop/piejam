@@ -18,10 +18,10 @@ public:
     virtual ~ladspa_control() = default;
 
     virtual auto load(ladspa::plugin_descriptor const&)
-            -> ladspa_instance_id = 0;
-    virtual void unload(ladspa_instance_id const&) = 0;
+            -> ladspa::instance_id = 0;
+    virtual void unload(ladspa::instance_id const&) = 0;
 
-    virtual auto control_inputs(ladspa_instance_id const&) const
+    virtual auto control_inputs(ladspa::instance_id const&) const
             -> std::span<ladspa::port_descriptor const> = 0;
 };
 

@@ -90,7 +90,7 @@ make_fx(fx::module const& fx_mod,
                                 sample_rate,
                                 name);
                     },
-                    [&](fx::ladspa_instance_id id)
+                    [&](ladspa::instance_id id)
                             -> std::unique_ptr<audio::engine::component> {
                         return modules::ladspa_fx::make_component(
                                 fx_mod,

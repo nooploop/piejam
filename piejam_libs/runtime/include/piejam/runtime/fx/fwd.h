@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/parameters.h>
 
@@ -24,15 +25,12 @@ namespace piejam::runtime::fx
 
 enum class internal : unsigned;
 
-struct ladspa_instance_id_tag;
-using ladspa_instance_id = entity_id<ladspa_instance_id_tag>;
-
 struct unavailable_ladspa;
 using unavailable_ladspa_id = entity_id<unavailable_ladspa>;
 using unavailable_ladspa_plugins = entity_map<unavailable_ladspa>;
 
 using instance_id =
-        std::variant<internal, ladspa_instance_id, unavailable_ladspa_id>;
+        std::variant<internal, ladspa::instance_id, unavailable_ladspa_id>;
 
 class ladspa_control;
 class ladspa_manager;

@@ -14,14 +14,14 @@ namespace piejam::runtime::test
 struct ladspa_fx_control_mock : public fx::ladspa_control
 {
     MOCK_METHOD(
-            fx::ladspa_instance_id,
+            ladspa::instance_id,
             load,
             (ladspa::plugin_descriptor const&));
-    MOCK_METHOD(void, unload, (fx::ladspa_instance_id const&));
+    MOCK_METHOD(void, unload, (ladspa::instance_id const&));
     MOCK_METHOD(
             std::span<ladspa::port_descriptor const>,
             control_inputs,
-            (fx::ladspa_instance_id const&),
+            (ladspa::instance_id const&),
             (const));
 };
 

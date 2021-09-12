@@ -96,8 +96,8 @@ ladspa_fx_middleware::process_ladspa_fx_action(
 
     next(a);
 
-    if (fx::ladspa_instance_id const* const instance_id =
-                std::get_if<fx::ladspa_instance_id>(&fx_instance_id))
+    if (ladspa::instance_id const* const instance_id =
+                std::get_if<ladspa::instance_id>(&fx_instance_id))
     {
         m_ladspa_control.unload(*instance_id);
     }

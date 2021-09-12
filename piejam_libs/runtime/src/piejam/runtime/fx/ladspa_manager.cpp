@@ -18,13 +18,12 @@ namespace piejam::runtime::fx
 ladspa_manager::~ladspa_manager() = default;
 
 auto
-ladspa_manager::load(ladspa::plugin_descriptor const& pd)
-        -> ladspa_instance_id
+ladspa_manager::load(ladspa::plugin_descriptor const& pd) -> ladspa::instance_id
 {
     try
     {
         auto plugin = ladspa::load(pd);
-        auto id = entity_id<ladspa_instance_id_tag>::generate();
+        auto id = entity_id<ladspa::instance_id_tag>::generate();
         m_instances.emplace(id, std::move(plugin));
         return id;
     }
@@ -36,13 +35,13 @@ ladspa_manager::load(ladspa::plugin_descriptor const& pd)
 }
 
 void
-ladspa_manager::unload(ladspa_instance_id const& id)
+ladspa_manager::unload(ladspa::instance_id const& id)
 {
     m_instances.erase(id);
 }
 
 auto
-ladspa_manager::control_inputs(ladspa_instance_id const& id) const
+ladspa_manager::control_inputs(ladspa::instance_id const& id) const
         -> std::span<ladspa::port_descriptor const>
 {
     if (auto it = m_instances.find(id); it != m_instances.end())
@@ -55,7 +54,7 @@ ladspa_manager::control_inputs(ladspa_instance_id const& id) const
 
 auto
 ladspa_manager::make_processor(
-        ladspa_instance_id const& id,
+        ladspa::instance_id const& id,
         audio::sample_rate const& sample_rate) const
         -> std::unique_ptr<audio::engine::processor>
 {

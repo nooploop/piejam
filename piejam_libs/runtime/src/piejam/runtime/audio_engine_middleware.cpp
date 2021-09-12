@@ -619,7 +619,7 @@ audio_engine_middleware::rebuild()
     auto const& st = get_state();
     if (!m_engine->rebuild(
                 st,
-                [this, sr = st.sample_rate](fx::ladspa_instance_id id) {
+                [this, sr = st.sample_rate](ladspa::instance_id id) {
                     return m_ladspa_fx_processor_factory(id, sr);
                 },
                 m_midi_controller->make_input_event_handler()))

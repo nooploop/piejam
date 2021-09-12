@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/ladspa/fwd.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/period_count.h>
@@ -15,6 +14,7 @@
 #include <piejam/boxed_vector.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/io_direction.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/channel_index_pair.h>
@@ -126,7 +126,7 @@ void insert_ladspa_fx_module(
         state&,
         mixer::channel_id,
         std::size_t position,
-        fx::ladspa_instance_id,
+        ladspa::instance_id,
         ladspa::plugin_descriptor const&,
         std::span<ladspa::port_descriptor const> const& control_inputs,
         std::vector<fx::parameter_value_assignment> const& initial_values,

@@ -117,7 +117,7 @@ TEST_F(ladspa_fx_middleware_test,
     st.fx_registry.entries = std::vector<fx::registry::item>{plugin_desc};
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
 
-    auto instance_id = fx::ladspa_instance_id::generate();
+    auto instance_id = ladspa::instance_id::generate();
     EXPECT_CALL(lfx_ctrl_mock, load(plugin_desc)).WillOnce(Return(instance_id));
     EXPECT_CALL(lfx_ctrl_mock, control_inputs(instance_id));
     EXPECT_CALL(
