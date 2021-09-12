@@ -5,17 +5,16 @@
 #pragma once
 
 #include <piejam/ladspa/fwd.h>
-#include <piejam/runtime/fx/fwd.h>
 
 #include <span>
 
-namespace piejam::runtime::fx
+namespace piejam::ladspa
 {
 
-class ladspa_control
+class instance_manager
 {
 public:
-    virtual ~ladspa_control() = default;
+    virtual ~instance_manager() = default;
 
     virtual auto load(ladspa::plugin_descriptor const&)
             -> ladspa::instance_id = 0;
@@ -25,4 +24,4 @@ public:
             -> std::span<ladspa::port_descriptor const> = 0;
 };
 
-} // namespace piejam::runtime::fx
+} // namespace piejam::ladspa

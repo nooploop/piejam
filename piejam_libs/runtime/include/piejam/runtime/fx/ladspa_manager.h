@@ -7,8 +7,8 @@
 #include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/types.h>
 #include <piejam/ladspa/fwd.h>
+#include <piejam/ladspa/instance_manager.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/ladspa_control.h>
 
 #include <map>
 #include <memory>
@@ -17,7 +17,7 @@
 namespace piejam::runtime::fx
 {
 
-class ladspa_manager final : public ladspa_control
+class ladspa_manager final : public ladspa::instance_manager
 {
 public:
     ~ladspa_manager();

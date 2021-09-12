@@ -4,10 +4,10 @@
 
 #include <piejam/runtime/ladspa_fx_middleware.h>
 
+#include <piejam/ladspa/instance_manager.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/ladspa_fx_action.h>
-#include <piejam/runtime/fx/ladspa_control.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/action.h>
 
@@ -18,7 +18,7 @@ namespace piejam::runtime
 
 ladspa_fx_middleware::ladspa_fx_middleware(
         middleware_functors mw_fs,
-        fx::ladspa_control& ladspa_control)
+        ladspa::instance_manager& ladspa_control)
     : middleware_functors(std::move(mw_fs))
     , m_ladspa_control(ladspa_control)
 {

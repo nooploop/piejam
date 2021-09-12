@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/fx/ladspa_control.h>
+#include <piejam/ladspa/instance_manager.h>
 
 #include <piejam/entity_id.h>
 
@@ -11,12 +11,9 @@
 namespace piejam::runtime::test
 {
 
-struct ladspa_fx_control_mock : public fx::ladspa_control
+struct ladspa_instance_manager_mock : public ladspa::instance_manager
 {
-    MOCK_METHOD(
-            ladspa::instance_id,
-            load,
-            (ladspa::plugin_descriptor const&));
+    MOCK_METHOD(ladspa::instance_id, load, (ladspa::plugin_descriptor const&));
     MOCK_METHOD(void, unload, (ladspa::instance_id const&));
     MOCK_METHOD(
             std::span<ladspa::port_descriptor const>,

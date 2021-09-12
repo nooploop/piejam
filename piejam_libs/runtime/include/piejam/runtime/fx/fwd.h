@@ -32,7 +32,6 @@ using unavailable_ladspa_plugins = entity_map<unavailable_ladspa>;
 using instance_id =
         std::variant<internal, ladspa::instance_id, unavailable_ladspa_id>;
 
-class ladspa_control;
 class ladspa_manager;
 
 struct parameter;

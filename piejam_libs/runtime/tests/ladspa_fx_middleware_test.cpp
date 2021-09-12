@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "ladspa_fx_control_mock.h"
+#include "ladspa_instance_manager_mock.h"
 #include "middleware_functors_mock.h"
 
 #include <piejam/ladspa/port_descriptor.h>
@@ -20,7 +20,7 @@ namespace piejam::runtime::test
 struct ladspa_fx_middleware_test : testing::Test
 {
     testing::StrictMock<middleware_functors_mock> mf_mock;
-    testing::StrictMock<ladspa_fx_control_mock> lfx_ctrl_mock;
+    testing::StrictMock<ladspa_instance_manager_mock> lfx_ctrl_mock;
 };
 
 TEST_F(ladspa_fx_middleware_test, unknown_action_is_passed_to_next)
