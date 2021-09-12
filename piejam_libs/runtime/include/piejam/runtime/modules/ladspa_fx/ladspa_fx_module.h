@@ -12,7 +12,7 @@
 #include <span>
 #include <string>
 
-namespace piejam::runtime::modules::ladspa
+namespace piejam::runtime::modules::ladspa_fx
 {
 
 auto make_module(

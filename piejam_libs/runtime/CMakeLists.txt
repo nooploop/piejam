@@ -84,8 +84,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_util.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa/ladspa_component.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa/ladspa_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/scope/scope_component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/scope/scope_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/spectrum/spectrum_component.h
@@ -194,8 +194,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer_util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_component.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_module.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa/ladspa_component.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa/ladspa_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa_fx/ladspa_fx_component.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa_fx/ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/scope/scope_component.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/scope/scope_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/spectrum/spectrum_component.cpp

@@ -5,11 +5,11 @@
 #include <piejam/runtime/state.h>
 
 #include <piejam/algorithm/contains.h>
-#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/indexed_access.h>
+#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
-#include <piejam/runtime/modules/ladspa/ladspa_module.h>
+#include <piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
 #include <piejam/runtime/modules/tool/tool_module.h>
@@ -330,7 +330,7 @@ insert_ladspa_fx_module(
 
     fx_chain.emplace(
             std::next(fx_chain.begin(), insert_pos),
-            st.fx_modules.add(modules::ladspa::make_module(
+            st.fx_modules.add(modules::ladspa_fx::make_module(
                     instance_id,
                     plugin_desc.name,
                     control_inputs,

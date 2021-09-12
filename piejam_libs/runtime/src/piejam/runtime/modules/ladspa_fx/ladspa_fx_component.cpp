@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/modules/ladspa/ladspa_component.h>
+#include <piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h>
 
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/event_identity_processor.h>
@@ -20,7 +20,7 @@
 #include <array>
 #include <vector>
 
-namespace piejam::runtime::modules::ladspa
+namespace piejam::runtime::modules::ladspa_fx
 {
 
 namespace
@@ -189,7 +189,7 @@ auto
 make_component(
         fx::module const& fx_mod,
         fx::get_parameter_name const& get_fx_param_name,
-        fx_ladspa_processor_factory const& fx_ladspa_proc_factory,
+        processor_factory const& fx_ladspa_proc_factory,
         parameter_processor_factory& param_proc_factory)
         -> std::unique_ptr<audio::engine::component>
 {
@@ -220,4 +220,4 @@ make_component(
     return nullptr;
 }
 
-} // namespace piejam::runtime::modules::ladspa
+} // namespace piejam::runtime::modules::ladspa_fx

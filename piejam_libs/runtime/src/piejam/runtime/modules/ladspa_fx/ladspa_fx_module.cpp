@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/modules/ladspa/ladspa_module.h>
+#include <piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h>
 
 #include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/fx/module.h>
@@ -15,7 +15,7 @@
 
 #include <boost/container/flat_map.hpp>
 
-namespace piejam::runtime::modules::ladspa
+namespace piejam::runtime::modules::ladspa_fx
 {
 
 static auto
@@ -119,4 +119,4 @@ make_module(
             .streams = {}};
 }
 
-} // namespace piejam::runtime::modules::ladspa
+} // namespace piejam::runtime::modules::ladspa_fx
