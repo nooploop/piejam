@@ -16,12 +16,11 @@ class instance_manager
 public:
     virtual ~instance_manager() = default;
 
-    virtual auto load(ladspa::plugin_descriptor const&)
-            -> ladspa::instance_id = 0;
-    virtual void unload(ladspa::instance_id const&) = 0;
+    virtual auto load(plugin_descriptor const&) -> instance_id = 0;
+    virtual void unload(instance_id const&) = 0;
 
-    virtual auto control_inputs(ladspa::instance_id const&) const
-            -> std::span<ladspa::port_descriptor const> = 0;
+    virtual auto control_inputs(instance_id const&) const
+            -> std::span<port_descriptor const> = 0;
 };
 
 } // namespace piejam::ladspa

@@ -11,10 +11,12 @@ endif()
 add_library(piejam_ladspa STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/ladspa/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/ladspa/instance_manager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/ladspa/instance_manager_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/ladspa/plugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/ladspa/plugin_descriptor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/ladspa/port_descriptor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/ladspa/scan.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/ladspa/instance_manager_processor_factory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/ladspa/plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/ladspa/scan.cpp
 )

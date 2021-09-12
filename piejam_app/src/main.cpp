@@ -7,6 +7,7 @@
 #include <piejam/gui/model/Factory.h>
 #include <piejam/gui/model/Info.h>
 #include <piejam/gui/qt_log.h>
+#include <piejam/ladspa/instance_manager_processor_factory.h>
 #include <piejam/ladspa/plugin.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/device_update.h>
@@ -27,7 +28,6 @@
 #include <piejam/runtime/actions/save_session.h>
 #include <piejam/runtime/actions/scan_ladspa_fx_plugins.h>
 #include <piejam/runtime/audio_engine_middleware.h>
-#include <piejam/runtime/fx/ladspa_manager.h>
 #include <piejam/runtime/ladspa_fx_middleware.h>
 #include <piejam/runtime/locations.h>
 #include <piejam/runtime/midi_control_middleware.h>
@@ -109,7 +109,7 @@ main(int argc, char* argv[]) -> int
 
     auto audio_device_manager = audio::make_device_manager();
     auto midi_device_manager = midi::make_device_manager();
-    runtime::fx::ladspa_manager ladspa_manager;
+    ladspa::instance_manager_processor_factory ladspa_manager;
 
     runtime::store store(
             [](auto const& st, auto const& a) { return a.reduce(st); },

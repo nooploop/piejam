@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/fx/ladspa_manager.h>
+#include <piejam/ladspa/instance_manager_processor_factory.h>
 
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/sample_rate.h>
@@ -12,18 +12,20 @@
 
 #include <spdlog/spdlog.h>
 
-namespace piejam::runtime::fx
+namespace piejam::ladspa
 {
 
-ladspa_manager::~ladspa_manager() = default;
+instance_manager_processor_factory::~instance_manager_processor_factory() =
+        default;
 
 auto
-ladspa_manager::load(ladspa::plugin_descriptor const& pd) -> ladspa::instance_id
+instance_manager_processor_factory::load(plugin_descriptor const& pd)
+        -> instance_id
 {
     try
     {
         auto plugin = ladspa::load(pd);
-        auto id = entity_id<ladspa::instance_id_tag>::generate();
+        auto id = entity_id<instance_id_tag>::generate();
         m_instances.emplace(id, std::move(plugin));
         return id;
     }
@@ -35,14 +37,14 @@ ladspa_manager::load(ladspa::plugin_descriptor const& pd) -> ladspa::instance_id
 }
 
 void
-ladspa_manager::unload(ladspa::instance_id const& id)
+instance_manager_processor_factory::unload(instance_id const& id)
 {
     m_instances.erase(id);
 }
 
 auto
-ladspa_manager::control_inputs(ladspa::instance_id const& id) const
-        -> std::span<ladspa::port_descriptor const>
+instance_manager_processor_factory::control_inputs(instance_id const& id) const
+        -> std::span<port_descriptor const>
 {
     if (auto it = m_instances.find(id); it != m_instances.end())
     {
@@ -53,8 +55,8 @@ ladspa_manager::control_inputs(ladspa::instance_id const& id) const
 }
 
 auto
-ladspa_manager::make_processor(
-        ladspa::instance_id const& id,
+instance_manager_processor_factory::make_processor(
+        instance_id const& id,
         audio::sample_rate const& sample_rate) const
         -> std::unique_ptr<audio::engine::processor>
 {
@@ -66,4 +68,4 @@ ladspa_manager::make_processor(
     return {};
 }
 
-} // namespace piejam::runtime::fx
+} // namespace piejam::ladspa

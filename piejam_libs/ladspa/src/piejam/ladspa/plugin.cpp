@@ -273,25 +273,24 @@ struct to_event_port
 {
     std::string_view name;
 
-    auto operator()(ladspa::float_port const&) const
-            -> audio::engine::event_port
+    auto operator()(float_port const&) const -> audio::engine::event_port
     {
         return audio::engine::event_port(std::in_place_type<float>, name);
     }
 
-    auto operator()(ladspa::int_port const&) const -> audio::engine::event_port
+    auto operator()(int_port const&) const -> audio::engine::event_port
     {
         return audio::engine::event_port(std::in_place_type<int>, name);
     }
 
-    auto operator()(ladspa::bool_port const&) const -> audio::engine::event_port
+    auto operator()(bool_port const&) const -> audio::engine::event_port
     {
         return audio::engine::event_port(std::in_place_type<bool>, name);
     }
 };
 
 auto
-to_event_ports(std::span<ladspa::port_descriptor const> descs)
+to_event_ports(std::span<port_descriptor const> descs)
 {
     return algorithm::transform_to_vector(
             descs,
@@ -383,10 +382,10 @@ public:
     processor(
             plugin_instance instance,
             std::string_view name,
-            std::span<ladspa::port_descriptor const> audio_inputs,
-            std::span<ladspa::port_descriptor const> audio_outputs,
-            std::span<ladspa::port_descriptor const> control_inputs,
-            std::span<ladspa::port_descriptor const> control_outputs)
+            std::span<port_descriptor const> audio_inputs,
+            std::span<port_descriptor const> audio_outputs,
+            std::span<port_descriptor const> control_inputs,
+            std::span<port_descriptor const> control_outputs)
         : m_instance(std::move(instance))
         , m_name(name)
         , m_input_port_indices(audio_inputs.size())
@@ -398,12 +397,12 @@ public:
         std::ranges::transform(
                 audio_inputs,
                 m_input_port_indices.begin(),
-                &ladspa::port_descriptor::index);
+                &port_descriptor::index);
 
         std::ranges::transform(
                 audio_outputs,
                 m_output_port_indices.begin(),
-                &ladspa::port_descriptor::index);
+                &port_descriptor::index);
 
         m_control_inputs.reserve(control_inputs.size());
         for (auto const& pd : control_inputs)

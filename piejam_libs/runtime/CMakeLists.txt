@@ -63,7 +63,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/get_parameter_name.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/internal.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_instances.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter.h
@@ -184,7 +183,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/solo_switch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/stereo_stream.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/parameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_assignment_id.cpp

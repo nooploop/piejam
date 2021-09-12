@@ -11,12 +11,12 @@
 #include <piejam/audio/device.h>
 #include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/pcm_io_config.h>
 #include <piejam/ladspa/plugin.h>
 #include <piejam/ladspa/plugin_descriptor.h>
+#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
@@ -43,7 +43,6 @@
 #include <piejam/runtime/actions/update_streams.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/fx/ladspa_manager.h>
 #include <piejam/runtime/midi_input_controller.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
