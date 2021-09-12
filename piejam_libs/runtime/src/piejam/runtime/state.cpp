@@ -5,11 +5,11 @@
 #include <piejam/runtime/state.h>
 
 #include <piejam/algorithm/contains.h>
-#include <piejam/audio/ladspa/port_descriptor.h>
+#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/indexed_access.h>
-#include <piejam/runtime/fx/ladspa.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
+#include <piejam/runtime/modules/ladspa/ladspa_module.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
 #include <piejam/runtime/modules/tool/tool_module.h>
@@ -316,8 +316,8 @@ insert_ladspa_fx_module(
         mixer::channel_id const bus_id,
         std::size_t const position,
         fx::ladspa_instance_id const instance_id,
-        audio::ladspa::plugin_descriptor const& plugin_desc,
-        std::span<audio::ladspa::port_descriptor const> const& control_inputs,
+        ladspa::plugin_descriptor const& plugin_desc,
+        std::span<ladspa::port_descriptor const> const& control_inputs,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
 {
@@ -330,7 +330,7 @@ insert_ladspa_fx_module(
 
     fx_chain.emplace(
             std::next(fx_chain.begin(), insert_pos),
-            st.fx_modules.add(fx::make_ladspa_module(
+            st.fx_modules.add(modules::ladspa::make_module(
                     instance_id,
                     plugin_desc.name,
                     control_inputs,

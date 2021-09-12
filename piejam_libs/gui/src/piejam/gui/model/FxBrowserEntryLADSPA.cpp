@@ -17,7 +17,7 @@ namespace piejam::gui::model
 FxBrowserEntryLADSPA::FxBrowserEntryLADSPA(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        audio::ladspa::plugin_descriptor const& plugin_desc)
+        ladspa::plugin_descriptor const& plugin_desc)
     : FxBrowserEntry(store_dispatch, state_change_subscriber)
     , m_pd(plugin_desc)
 {

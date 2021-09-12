@@ -5,7 +5,7 @@
 #include "ladspa_fx_control_mock.h"
 #include "middleware_functors_mock.h"
 
-#include <piejam/audio/ladspa/port_descriptor.h>
+#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/ladspa_fx_middleware.h>
 #include <piejam/runtime/state.h>
@@ -54,7 +54,7 @@ TEST_F(ladspa_fx_middleware_test,
     state st;
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
 
-    audio::ladspa::plugin_id_t const plug_id{23};
+    ladspa::plugin_id_t const plug_id{23};
 
     EXPECT_CALL(
             mf_mock,
@@ -78,10 +78,10 @@ TEST_F(ladspa_fx_middleware_test,
 
     ladspa_fx_middleware sut(make_middleware_functors(mf_mock), lfx_ctrl_mock);
 
-    audio::ladspa::plugin_id_t const plug_id{23};
+    ladspa::plugin_id_t const plug_id{23};
 
     state st;
-    audio::ladspa::plugin_descriptor plugin_desc{.id = plug_id};
+    ladspa::plugin_descriptor plugin_desc{.id = plug_id};
     st.fx_registry.entries = std::vector<fx::registry::item>{plugin_desc};
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
 
@@ -110,10 +110,10 @@ TEST_F(ladspa_fx_middleware_test,
 
     ladspa_fx_middleware sut(make_middleware_functors(mf_mock), lfx_ctrl_mock);
 
-    audio::ladspa::plugin_id_t const plug_id{23};
+    ladspa::plugin_id_t const plug_id{23};
 
     state st;
-    audio::ladspa::plugin_descriptor plugin_desc{.id = plug_id};
+    ladspa::plugin_descriptor plugin_desc{.id = plug_id};
     st.fx_registry.entries = std::vector<fx::registry::item>{plugin_desc};
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
 

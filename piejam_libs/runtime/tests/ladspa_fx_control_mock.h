@@ -16,10 +16,10 @@ struct ladspa_fx_control_mock : public fx::ladspa_control
     MOCK_METHOD(
             fx::ladspa_instance_id,
             load,
-            (audio::ladspa::plugin_descriptor const&));
+            (ladspa::plugin_descriptor const&));
     MOCK_METHOD(void, unload, (fx::ladspa_instance_id const&));
     MOCK_METHOD(
-            std::span<audio::ladspa::port_descriptor const>,
+            std::span<ladspa::port_descriptor const>,
             control_inputs,
             (fx::ladspa_instance_id const&),
             (const));

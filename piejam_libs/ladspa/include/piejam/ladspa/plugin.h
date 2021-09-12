@@ -10,7 +10,7 @@
 #include <memory>
 #include <span>
 
-namespace piejam::audio::ladspa
+namespace piejam::ladspa
 {
 
 struct plugin_descriptor;
@@ -25,10 +25,10 @@ public:
 
     virtual auto control_inputs() const -> std::span<port_descriptor const> = 0;
 
-    virtual auto make_processor(sample_rate const&) const
-            -> std::unique_ptr<engine::processor> = 0;
+    virtual auto make_processor(audio::sample_rate const&) const
+            -> std::unique_ptr<audio::engine::processor> = 0;
 };
 
 auto load(plugin_descriptor const&) -> std::unique_ptr<plugin>;
 
-} // namespace piejam::audio::ladspa
+} // namespace piejam::ladspa

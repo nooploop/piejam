@@ -5,10 +5,10 @@
 #include <piejam/runtime/fx/ladspa_manager.h>
 
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/ladspa/plugin.h>
-#include <piejam/audio/ladspa/plugin_descriptor.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id_hash.h>
+#include <piejam/ladspa/plugin.h>
+#include <piejam/ladspa/plugin_descriptor.h>
 
 #include <spdlog/spdlog.h>
 
@@ -18,12 +18,12 @@ namespace piejam::runtime::fx
 ladspa_manager::~ladspa_manager() = default;
 
 auto
-ladspa_manager::load(audio::ladspa::plugin_descriptor const& pd)
+ladspa_manager::load(ladspa::plugin_descriptor const& pd)
         -> ladspa_instance_id
 {
     try
     {
-        auto plugin = audio::ladspa::load(pd);
+        auto plugin = ladspa::load(pd);
         auto id = entity_id<ladspa_instance_id_tag>::generate();
         m_instances.emplace(id, std::move(plugin));
         return id;
@@ -43,7 +43,7 @@ ladspa_manager::unload(ladspa_instance_id const& id)
 
 auto
 ladspa_manager::control_inputs(ladspa_instance_id const& id) const
-        -> std::span<audio::ladspa::port_descriptor const>
+        -> std::span<ladspa::port_descriptor const>
 {
     if (auto it = m_instances.find(id); it != m_instances.end())
     {

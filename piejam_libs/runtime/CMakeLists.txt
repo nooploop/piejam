@@ -51,7 +51,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_engine_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/audio_stream.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/channel_index_pair.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/fx_ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mixer_channel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/solo_switch.h
@@ -63,7 +62,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/get_parameter_name.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/internal.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_instances.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_processor_factory.h
@@ -86,6 +84,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_util.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa/ladspa_component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa/ladspa_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/scope/scope_component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/scope/scope_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/spectrum/spectrum_component.h
@@ -179,13 +179,11 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/batch_action.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/fx_ladspa.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/make_fx.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mixer_channel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/solo_switch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/stereo_stream.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/ladspa_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/parameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx_middleware.cpp
@@ -196,6 +194,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer_util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_component.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa/ladspa_component.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa/ladspa_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/scope/scope_component.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/scope/scope_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/spectrum/spectrum_component.cpp
@@ -231,6 +231,7 @@ target_include_directories(piejam_runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc
 target_link_libraries(piejam_runtime
     PUBLIC
     piejam_audio
+    piejam_ladspa
     piejam_midi
     piejam_range
     piejam_redux

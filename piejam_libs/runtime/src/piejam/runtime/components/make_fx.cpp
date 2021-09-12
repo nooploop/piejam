@@ -8,11 +8,11 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
-#include <piejam/runtime/components/fx_ladspa.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/modules/filter/filter_component.h>
+#include <piejam/runtime/modules/ladspa/ladspa_component.h>
 #include <piejam/runtime/modules/scope/scope_component.h>
 #include <piejam/runtime/modules/spectrum/spectrum_component.h>
 #include <piejam/runtime/modules/tool/tool_component.h>
@@ -92,7 +92,7 @@ make_fx(fx::module const& fx_mod,
                     },
                     [&](fx::ladspa_instance_id id)
                             -> std::unique_ptr<audio::engine::component> {
-                        return components::make_fx_ladspa(
+                        return modules::ladspa::make_component(
                                 fx_mod,
                                 get_fx_param_name,
                                 [&, id]() {

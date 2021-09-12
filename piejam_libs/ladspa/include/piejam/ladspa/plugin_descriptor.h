@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/ladspa/fwd.h>
 
 #include <filesystem>
 #include <string>
 #include <vector>
 
-namespace piejam::audio::ladspa
+namespace piejam::ladspa
 {
 
 struct plugin_descriptor
@@ -38,4 +38,4 @@ operator!=(plugin_descriptor const& l, plugin_descriptor const& r)
     return l.id != r.id;
 }
 
-} // namespace piejam::audio::ladspa
+} // namespace piejam::ladspa

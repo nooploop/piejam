@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/ladspa/scan.h>
+#include <piejam/ladspa/scan.h>
 #include <piejam/reselect/selector.h>
 #include <piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h>
 #include <piejam/runtime/selectors.h>
@@ -27,7 +27,7 @@ BM_copy_state_benchmark(benchmark::State& bench_state)
     insert_internal_fx_module(st, out, npos, fx::internal::tool, {}, {});
 
     actions::finalize_ladspa_fx_plugin_scan ladspa_fx_scan;
-    ladspa_fx_scan.plugins = audio::ladspa::scan_directory("/usr/lib/ladspa");
+    ladspa_fx_scan.plugins = ladspa::scan_directory("/usr/lib/ladspa");
     st = ladspa_fx_scan.reduce(st);
 
     for (auto _ : bench_state)

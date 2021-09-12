@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/runtime/fx/fwd.h>
 
@@ -14,6 +14,6 @@ namespace piejam::runtime::fx
 {
 
 using ladspa_instances = std::
-        unordered_map<ladspa_instance_id, audio::ladspa::plugin_descriptor>;
+        unordered_map<ladspa_instance_id, ladspa::plugin_descriptor>;
 
 } // namespace piejam::runtime::fx

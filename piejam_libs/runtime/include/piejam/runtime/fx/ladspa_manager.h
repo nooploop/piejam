@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/audio/engine/fwd.h>
-#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/audio/types.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/ladspa_control.h>
@@ -22,19 +22,19 @@ class ladspa_manager final : public ladspa_control
 public:
     ~ladspa_manager();
 
-    auto load(audio::ladspa::plugin_descriptor const&)
+    auto load(ladspa::plugin_descriptor const&)
             -> ladspa_instance_id override;
     void unload(ladspa_instance_id const&) override;
 
     auto control_inputs(ladspa_instance_id const&) const
-            -> std::span<audio::ladspa::port_descriptor const> override;
+            -> std::span<ladspa::port_descriptor const> override;
 
     auto
     make_processor(ladspa_instance_id const&, audio::sample_rate const&) const
             -> std::unique_ptr<audio::engine::processor>;
 
 private:
-    std::map<ladspa_instance_id, std::unique_ptr<audio::ladspa::plugin>>
+    std::map<ladspa_instance_id, std::unique_ptr<ladspa::plugin>>
             m_instances;
 };
 

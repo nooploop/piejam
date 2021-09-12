@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/boxed_vector.h>
 #include <piejam/runtime/fx/internal.h>
 
@@ -15,7 +15,7 @@ namespace piejam::runtime::fx
 
 struct registry
 {
-    using item = std::variant<internal, audio::ladspa::plugin_descriptor>;
+    using item = std::variant<internal, ladspa::plugin_descriptor>;
 
     boxed_vector<item> entries;
 
@@ -41,12 +41,12 @@ make_default_registry() -> registry
 inline auto
 find_ladspa_plugin_descriptor(
         fx::registry const& registry,
-        audio::ladspa::plugin_id_t id)
-        -> audio::ladspa::plugin_descriptor const*
+        ladspa::plugin_id_t id)
+        -> ladspa::plugin_descriptor const*
 {
     for (auto const& item : *registry.entries)
     {
-        if (auto pd = std::get_if<audio::ladspa::plugin_descriptor>(&item);
+        if (auto pd = std::get_if<ladspa::plugin_descriptor>(&item);
             pd && pd->id == id)
             return pd;
     }

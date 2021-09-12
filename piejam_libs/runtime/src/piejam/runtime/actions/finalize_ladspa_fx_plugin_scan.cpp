@@ -14,20 +14,20 @@ namespace piejam::runtime::actions
 {
 
 static void
-filter_fx_plugins(std::vector<audio::ladspa::plugin_descriptor>& plugins)
+filter_fx_plugins(std::vector<ladspa::plugin_descriptor>& plugins)
 {
     boost::remove_erase_if(
             plugins,
-            [](audio::ladspa::plugin_descriptor const& pd) {
+            [](ladspa::plugin_descriptor const& pd) {
                 return (pd.num_inputs != pd.num_outputs) ||
                        (pd.num_inputs != 1 && pd.num_inputs != 2);
             });
 }
 
 static void
-sort_fx_plugins(std::vector<audio::ladspa::plugin_descriptor>& plugins)
+sort_fx_plugins(std::vector<ladspa::plugin_descriptor>& plugins)
 {
-    std::ranges::sort(plugins, {}, &audio::ladspa::plugin_descriptor::name);
+    std::ranges::sort(plugins, {}, &ladspa::plugin_descriptor::name);
 }
 
 auto

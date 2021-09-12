@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/ladspa/scan.h>
+#include <piejam/ladspa/scan.h>
 
-#include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/system/dll.h>
 
 #include <ladspa.h>
@@ -16,7 +16,7 @@
 
 #include <system_error>
 
-namespace piejam::audio::ladspa
+namespace piejam::ladspa
 {
 
 auto
@@ -99,4 +99,4 @@ scan_directory(std::filesystem::path const& dir)
     return result;
 }
 
-} // namespace piejam::audio::ladspa
+} // namespace piejam::ladspa

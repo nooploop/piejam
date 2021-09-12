@@ -7,7 +7,7 @@
 #include <string>
 #include <variant>
 
-namespace piejam::audio::ladspa
+namespace piejam::ladspa
 {
 
 struct float_port
@@ -40,4 +40,4 @@ struct port_descriptor
     port_type_descriptor type_desc;
 };
 
-} // namespace piejam::audio::ladspa
+} // namespace piejam::ladspa

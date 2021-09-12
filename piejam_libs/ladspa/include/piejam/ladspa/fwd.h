@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace piejam::audio::ladspa
+namespace piejam::ladspa
 {
 
 using plugin_id_t = unsigned long;
@@ -14,4 +14,4 @@ struct port_descriptor;
 
 class plugin;
 
-} // namespace piejam::audio::ladspa
+} // namespace piejam::ladspa

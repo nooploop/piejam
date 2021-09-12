@@ -54,7 +54,7 @@ static auto
 makeBrowserEntry(
         runtime::store_dispatch dispatch,
         runtime::subscriber& state_change_subscriber,
-        audio::ladspa::plugin_descriptor const& pd)
+        ladspa::plugin_descriptor const& pd)
         -> std::unique_ptr<FxBrowserEntry>
 {
     return std::make_unique<FxBrowserEntryLADSPA>(

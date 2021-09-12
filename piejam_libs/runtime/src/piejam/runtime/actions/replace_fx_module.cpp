@@ -63,7 +63,7 @@ make_replace_fx_module_action(
         state const& st,
         mixer::channel_id const fx_chain_id,
         std::size_t const position,
-        audio::ladspa::plugin_id_t const plugin_id,
+        ladspa::plugin_id_t const plugin_id,
         std::string_view const& name,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
@@ -96,7 +96,7 @@ auto
 replace_fx_module(
         mixer::channel_id const fx_chain_id,
         std::size_t const position,
-        audio::ladspa::plugin_id_t const plugin_id,
+        ladspa::plugin_id_t const plugin_id,
         std::string_view const& name) -> thunk_action
 {
     return [=, name = std::string(name)](auto&& get_state, auto&& dispatch) {

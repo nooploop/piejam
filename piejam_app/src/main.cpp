@@ -4,10 +4,10 @@
 
 #include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/ladspa/plugin.h>
 #include <piejam/gui/model/Factory.h>
 #include <piejam/gui/model/Info.h>
 #include <piejam/gui/qt_log.h>
+#include <piejam/ladspa/plugin.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/device_update.h>
 #include <piejam/midi/input_event_handler.h>

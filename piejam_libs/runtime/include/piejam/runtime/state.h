@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/period_count.h>
@@ -127,8 +127,8 @@ void insert_ladspa_fx_module(
         mixer::channel_id,
         std::size_t position,
         fx::ladspa_instance_id,
-        audio::ladspa::plugin_descriptor const&,
-        std::span<audio::ladspa::port_descriptor const> const& control_inputs,
+        ladspa::plugin_descriptor const&,
+        std::span<ladspa::port_descriptor const> const& control_inputs,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns);
 void insert_missing_ladspa_fx_module(

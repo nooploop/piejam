@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/plugin_descriptor.h>
-#include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/entity_id.h>
+#include <piejam/ladspa/plugin_descriptor.h>
+#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/actions/ladspa_fx_action.h>
 #include <piejam/runtime/fwd.h>
@@ -41,7 +41,7 @@ struct load_ladspa_fx_plugin final
 {
     mixer::channel_id fx_chain_id;
     std::size_t position{};
-    audio::ladspa::plugin_id_t plugin_id;
+    ladspa::plugin_id_t plugin_id;
     std::string name;
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
@@ -56,8 +56,8 @@ struct insert_ladspa_fx_module final
     mixer::channel_id fx_chain_id;
     std::size_t position{};
     fx::ladspa_instance_id instance_id;
-    audio::ladspa::plugin_descriptor plugin_desc;
-    std::span<audio::ladspa::port_descriptor const> control_inputs;
+    ladspa::plugin_descriptor plugin_desc;
+    std::span<ladspa::port_descriptor const> control_inputs;
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
 

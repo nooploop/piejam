@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/plugin_descriptor.h>
+#include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/entity_id.h>
 #include <piejam/gui/model/FxBrowserEntry.h>
 #include <piejam/runtime/mixer_fwd.h>
@@ -18,7 +18,7 @@ public:
     FxBrowserEntryLADSPA(
             runtime::store_dispatch,
             runtime::subscriber&,
-            audio::ladspa::plugin_descriptor const&);
+            ladspa::plugin_descriptor const&);
 
     void insertModule(unsigned chainIndex, unsigned pos) override;
     void replaceModule(unsigned chainIndex, unsigned pos) override;
@@ -26,7 +26,7 @@ public:
 private:
     void onSubscribe() override;
 
-    audio::ladspa::plugin_descriptor m_pd;
+    ladspa::plugin_descriptor m_pd;
 };
 
 } // namespace piejam::gui::model

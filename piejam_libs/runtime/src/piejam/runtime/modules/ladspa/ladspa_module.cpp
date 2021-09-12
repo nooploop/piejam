@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/runtime/fx/ladspa.h>
+#include <piejam/runtime/modules/ladspa/ladspa_module.h>
 
-#include <piejam/audio/ladspa/port_descriptor.h>
+#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_.h>
@@ -15,20 +15,20 @@
 
 #include <boost/container/flat_map.hpp>
 
-namespace piejam::runtime::fx
+namespace piejam::runtime::modules::ladspa
 {
 
 static auto
 make_module_parameters(
-        std::span<audio::ladspa::port_descriptor const> control_inputs,
-        parameters_t& fx_params,
+        std::span<piejam::ladspa::port_descriptor const> control_inputs,
+        fx::parameters_t& fx_params,
         parameter_maps& params) -> fx::module_parameters
 {
     fx::module_parameters module_params;
 
     for (auto const& port_desc : control_inputs)
     {
-        if (auto const* const p = std::get_if<audio::ladspa::float_port>(
+        if (auto const* const p = std::get_if<piejam::ladspa::float_port>(
                     &port_desc.type_desc))
         {
             bool const logarithmic =
@@ -52,16 +52,16 @@ make_module_parameters(
                                                       from_normalized_linear});
 
             fx_params.emplace(
-                    parameter_id(id),
-                    parameter{
+                    fx::parameter_id(id),
+                    fx::parameter{
                             .name = port_desc.name,
-                            .value_to_string =
+                            .value_to_string = fx::
                                     make_default_float_parameter_value_to_string()});
 
             module_params.emplace(port_desc.index, id);
         }
         else if (
-                auto const* const p = std::get_if<audio::ladspa::int_port>(
+                auto const* const p = std::get_if<piejam::ladspa::int_port>(
                         &port_desc.type_desc))
         {
             BOOST_ASSERT(!p->logarithmic);
@@ -74,15 +74,15 @@ make_module_parameters(
 
             fx_params.emplace(
                     id,
-                    parameter{
+                    fx::parameter{
                             .name = port_desc.name,
-                            .value_to_string =
+                            .value_to_string = fx::
                                     make_default_int_parameter_value_to_string()});
 
             module_params.emplace(port_desc.index, id);
         }
         else if (
-                auto const* const p = std::get_if<audio::ladspa::bool_port>(
+                auto const* const p = std::get_if<piejam::ladspa::bool_port>(
                         &port_desc.type_desc))
         {
             auto id = add_parameter(
@@ -91,9 +91,9 @@ make_module_parameters(
 
             fx_params.emplace(
                     id,
-                    parameter{
+                    fx::parameter{
                             .name = port_desc.name,
-                            .value_to_string =
+                            .value_to_string = fx::
                                     make_default_bool_parameter_value_to_string()});
 
             module_params.emplace(port_desc.index, id);
@@ -104,14 +104,14 @@ make_module_parameters(
 }
 
 auto
-make_ladspa_module(
-        ladspa_instance_id instance_id,
+make_module(
+        fx::ladspa_instance_id instance_id,
         std::string const& name,
-        std::span<audio::ladspa::port_descriptor const> control_inputs,
-        parameters_t& fx_params,
-        parameter_maps& params) -> module
+        std::span<piejam::ladspa::port_descriptor const> const& control_inputs,
+        fx::parameters_t& fx_params,
+        parameter_maps& params) -> fx::module
 {
-    return module{
+    return fx::module{
             .fx_instance_id = instance_id,
             .name = name,
             .parameters =
@@ -119,4 +119,4 @@ make_ladspa_module(
             .streams = {}};
 }
 
-} // namespace piejam::runtime::fx
+} // namespace piejam::runtime::modules::ladspa

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer_fwd.h>
@@ -35,7 +35,7 @@ struct session
 
     struct ladspa_plugin
     {
-        audio::ladspa::plugin_id_t id{};
+        ladspa::plugin_id_t id{};
         std::string name;
         fx_preset preset;
         fx_midi_assignments midi;

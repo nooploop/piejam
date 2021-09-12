@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/ladspa/fwd.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/runtime/actions/persistence_action.h>
 #include <piejam/runtime/fwd.h>

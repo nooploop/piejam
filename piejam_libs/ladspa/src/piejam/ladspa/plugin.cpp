@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/ladspa/plugin.h>
+#include <piejam/ladspa/plugin.h>
 
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -10,10 +10,10 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/audio/ladspa/plugin_descriptor.h>
-#include <piejam/audio/ladspa/port_descriptor.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/ladspa/plugin_descriptor.h>
+#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/npos.h>
 #include <piejam/range/indices.h>
 #include <piejam/range/iota.h>
@@ -32,7 +32,7 @@
 #include <variant>
 #include <vector>
 
-namespace piejam::audio::ladspa
+namespace piejam::ladspa
 {
 
 namespace
@@ -273,29 +273,29 @@ struct to_event_port
 {
     std::string_view name;
 
-    auto operator()(audio::ladspa::float_port const&) const
-            -> engine::event_port
+    auto operator()(ladspa::float_port const&) const
+            -> audio::engine::event_port
     {
-        return engine::event_port(std::in_place_type<float>, name);
+        return audio::engine::event_port(std::in_place_type<float>, name);
     }
 
-    auto operator()(audio::ladspa::int_port const&) const -> engine::event_port
+    auto operator()(ladspa::int_port const&) const -> audio::engine::event_port
     {
-        return engine::event_port(std::in_place_type<int>, name);
+        return audio::engine::event_port(std::in_place_type<int>, name);
     }
 
-    auto operator()(audio::ladspa::bool_port const&) const -> engine::event_port
+    auto operator()(ladspa::bool_port const&) const -> audio::engine::event_port
     {
-        return engine::event_port(std::in_place_type<bool>, name);
+        return audio::engine::event_port(std::in_place_type<bool>, name);
     }
 };
 
 auto
-to_event_ports(std::span<audio::ladspa::port_descriptor const> descs)
+to_event_ports(std::span<ladspa::port_descriptor const> descs)
 {
     return algorithm::transform_to_vector(
             descs,
-            [](auto const& desc) -> engine::event_port {
+            [](auto const& desc) -> audio::engine::event_port {
                 return std::visit(to_event_port{desc.name}, desc.type_desc);
             });
 }
@@ -313,7 +313,7 @@ struct control_input
     auto data() const -> float const& { return m_data; }
 
     void initialize(
-            engine::event_input_buffers const& ev_in_bufs,
+            audio::engine::event_input_buffers const& ev_in_bufs,
             std::size_t buf_index)
     {
         m_initialize(*this, ev_in_bufs, buf_index);
@@ -323,7 +323,7 @@ struct control_input
 
 private:
     template <class T>
-    using ev_it_t = typename engine::event_buffer<T>::const_iterator;
+    using ev_it_t = typename audio::engine::event_buffer<T>::const_iterator;
 
     template <class T>
     using ev_it_pair_t = std::pair<ev_it_t<T>, ev_it_t<T>>;
@@ -331,7 +331,7 @@ private:
     template <class T>
     static void initialize(
             control_input& ci,
-            engine::event_input_buffers const& ev_bufs,
+            audio::engine::event_input_buffers const& ev_bufs,
             std::size_t buf_index)
     {
         auto const& ev_buf = ev_bufs.get<T>(buf_index);
@@ -369,7 +369,7 @@ private:
 
     using initialize_t = void (*)(
             control_input&,
-            engine::event_input_buffers const&,
+            audio::engine::event_input_buffers const&,
             std::size_t);
     using advance_t = void (*)(control_input&);
 
@@ -377,16 +377,16 @@ private:
     advance_t m_advance{};
 };
 
-class processor final : public engine::processor
+class processor final : public audio::engine::processor
 {
 public:
     processor(
             plugin_instance instance,
             std::string_view name,
-            std::span<audio::ladspa::port_descriptor const> audio_inputs,
-            std::span<audio::ladspa::port_descriptor const> audio_outputs,
-            std::span<audio::ladspa::port_descriptor const> control_inputs,
-            std::span<audio::ladspa::port_descriptor const> control_outputs)
+            std::span<ladspa::port_descriptor const> audio_inputs,
+            std::span<ladspa::port_descriptor const> audio_outputs,
+            std::span<ladspa::port_descriptor const> control_inputs,
+            std::span<ladspa::port_descriptor const> control_outputs)
         : m_instance(std::move(instance))
         , m_name(name)
         , m_input_port_indices(audio_inputs.size())
@@ -398,12 +398,12 @@ public:
         std::ranges::transform(
                 audio_inputs,
                 m_input_port_indices.begin(),
-                &audio::ladspa::port_descriptor::index);
+                &ladspa::port_descriptor::index);
 
         std::ranges::transform(
                 audio_outputs,
                 m_output_port_indices.begin(),
-                &audio::ladspa::port_descriptor::index);
+                &ladspa::port_descriptor::index);
 
         m_control_inputs.reserve(control_inputs.size());
         for (auto const& pd : control_inputs)
@@ -456,9 +456,9 @@ public:
         return m_event_outputs;
     }
 
-    void process(engine::process_context const& ctx) override
+    void process(audio::engine::process_context const& ctx) override
     {
-        engine::verify_process_context(*this, ctx);
+        audio::engine::verify_process_context(*this, ctx);
 
         BOOST_ASSERT(ctx.event_inputs.size() == m_event_inputs.size());
         for (std::size_t i : range::indices(ctx.event_inputs))
@@ -529,9 +529,9 @@ private:
     std::string m_name;
     std::vector<unsigned long> m_input_port_indices{};
     std::vector<unsigned long> m_output_port_indices{};
-    std::vector<engine::event_port> m_event_inputs;
-    std::vector<engine::event_port> m_event_outputs;
-    std::vector<std::array<float, max_period_size.get()>>
+    std::vector<audio::engine::event_port> m_event_inputs;
+    std::vector<audio::engine::event_port> m_event_outputs;
+    std::vector<std::array<float, audio::max_period_size.get()>>
             m_constant_audio_inputs;
     std::vector<control_input> m_control_inputs;
     std::vector<float> m_control_outputs;
@@ -612,8 +612,8 @@ public:
         return m_ports.input.control;
     }
 
-    auto make_processor(sample_rate const& sample_rate) const
-            -> std::unique_ptr<engine::processor> override
+    auto make_processor(audio::sample_rate const& sample_rate) const
+            -> std::unique_ptr<audio::engine::processor> override
     {
         if (LADSPA_Handle handle = m_ladspa_desc->instantiate(
                     m_ladspa_desc,
@@ -668,4 +668,4 @@ load(plugin_descriptor const& pd) -> std::unique_ptr<plugin>
     return std::make_unique<plugin_impl>(pd);
 }
 
-} // namespace piejam::audio::ladspa
+} // namespace piejam::ladspa

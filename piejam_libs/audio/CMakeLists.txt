@@ -2,12 +2,6 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-include(CheckIncludeFile)
-check_include_file("ladspa.h" LADSPA_HEADER)
-if(NOT LADSPA_HEADER)
-    message(FATAL_ERROR "LADSPA header not found")
-endif()
-
 add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/amplifier.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/level_meter.h
@@ -57,10 +51,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/value_io_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/verify_process_context.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/plugin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/plugin_descriptor.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/ladspa/scan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_peak_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pair.h
@@ -114,8 +104,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/process.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/stream_processor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/ladspa/plugin.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/ladspa/scan.cpp
 )
 
 target_compile_options(piejam_audio PRIVATE -Wall -Wextra -Werror -pedantic-errors)
