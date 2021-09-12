@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
@@ -28,7 +29,7 @@ public:
             thread::configuration const& audio_thread_config,
             std::span<thread::configuration const> const& wt_configs,
             audio::device_manager&,
-            fx::ladspa_processor_factory,
+            ladspa::processor_factory&,
             std::unique_ptr<midi_input_controller>);
     audio_engine_middleware(audio_engine_middleware&&) noexcept = default;
     ~audio_engine_middleware();
@@ -55,7 +56,7 @@ private:
     std::vector<thread::worker> m_workers;
 
     audio::device_manager& m_device_manager;
-    fx::ladspa_processor_factory m_ladspa_fx_processor_factory;
+    ladspa::processor_factory& m_ladspa_processor_factory;
     std::unique_ptr<midi_input_controller> m_midi_controller;
 
     std::unique_ptr<audio_engine> m_engine;

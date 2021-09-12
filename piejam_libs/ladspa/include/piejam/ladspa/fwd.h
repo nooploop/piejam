@@ -20,5 +20,6 @@ struct instance_id_tag;
 using instance_id = entity_id<instance_id_tag>;
 
 class instance_manager;
+class processor_factory;
 
 } // namespace piejam::ladspa

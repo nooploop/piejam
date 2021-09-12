@@ -4,6 +4,8 @@
 
 #include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/ladspa/instance_manager_processor_factory.h>
+#include <piejam/ladspa/plugin.h>
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
@@ -39,6 +41,8 @@ main(int argc, char* argv[]) -> int
     {
         auto audio_device_manager = piejam::audio::make_device_manager();
 
+        piejam::ladspa::instance_manager_processor_factory ladspa_manager;
+
         piejam::runtime::state audio_state;
         audio_state.pcm_devices = audio_device_manager->io_descriptors();
         audio_state.sample_rate = piejam::audio::sample_rate(
@@ -61,7 +65,7 @@ main(int argc, char* argv[]) -> int
                         .priority = 96},
                 {},
                 *audio_device_manager,
-                [](auto&&...) { return nullptr; },
+                ladspa_manager,
                 nullptr);
 
         {

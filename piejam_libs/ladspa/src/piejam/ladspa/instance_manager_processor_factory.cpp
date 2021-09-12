@@ -57,7 +57,7 @@ instance_manager_processor_factory::control_inputs(instance_id const& id) const
 auto
 instance_manager_processor_factory::make_processor(
         instance_id const& id,
-        audio::sample_rate const& sample_rate) const
+        audio::sample_rate const& sample_rate)
         -> std::unique_ptr<audio::engine::processor>
 {
     if (auto it = m_instances.find(id); it != m_instances.end())

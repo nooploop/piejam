@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "audio_device_manager_mock.h"
+#include "ladspa_processor_factory_mock.h"
 #include "middleware_functors_mock.h"
 
 #include <piejam/audio/device.h>
@@ -28,13 +29,14 @@ struct audio_engine_middleware_test : ::testing::Test
 {
     testing::StrictMock<middleware_functors_mock> mf_mock;
     testing::StrictMock<audio_device_manager_mock> audio_device_manager;
+    testing::StrictMock<ladspa_processor_factory_mock> ladspa_processor_factory;
 
     audio_engine_middleware sut{
             make_middleware_functors(mf_mock),
             {},
             {},
             audio_device_manager,
-            [](auto&&...) { return nullptr; },
+            ladspa_processor_factory,
             nullptr};
 };
 

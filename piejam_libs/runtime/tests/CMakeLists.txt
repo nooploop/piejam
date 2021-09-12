@@ -13,6 +13,7 @@ add_executable(piejam_runtime_test
     ${CMAKE_CURRENT_SOURCE_DIR}/fx_parameter_id_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ladspa_fx_middleware_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ladspa_instance_manager_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/ladspa_processor_factory_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware_functors_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/midi_assignment_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/midi_control_middleware_test.cpp

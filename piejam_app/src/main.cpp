@@ -157,9 +157,7 @@ main(int argc, char* argv[]) -> int
                 audio_thread_config,
                 worker_thread_configs,
                 *audio_device_manager,
-                [&ladspa_manager](auto&& id, auto&& sr) {
-                    return ladspa_manager.make_processor(id, sr);
-                },
+                ladspa_manager,
                 runtime::make_midi_input_controller(*midi_device_manager));
     });
 

@@ -17,6 +17,7 @@
 #include <piejam/ladspa/plugin.h>
 #include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/ladspa/port_descriptor.h>
+#include <piejam/ladspa/processor_factory.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
@@ -134,13 +135,13 @@ audio_engine_middleware::audio_engine_middleware(
         thread::configuration const& audio_thread_config,
         std::span<thread::configuration const> const& wt_configs,
         audio::device_manager& device_manager,
-        fx::ladspa_processor_factory ladspa_fx_processor_factory,
+        ladspa::processor_factory& ladspa_processor_factory,
         std::unique_ptr<midi_input_controller> midi_controller)
     : middleware_functors(std::move(mw_fs))
     , m_audio_thread_config(audio_thread_config)
     , m_workers(wt_configs.begin(), wt_configs.end())
     , m_device_manager(device_manager)
-    , m_ladspa_fx_processor_factory(std::move(ladspa_fx_processor_factory))
+    , m_ladspa_processor_factory(ladspa_processor_factory)
     , m_midi_controller(
               midi_controller ? std::move(midi_controller)
                               : make_dummy_midi_input_controller())
@@ -619,7 +620,7 @@ audio_engine_middleware::rebuild()
     if (!m_engine->rebuild(
                 st,
                 [this, sr = st.sample_rate](ladspa::instance_id id) {
-                    return m_ladspa_fx_processor_factory(id, sr);
+                    return m_ladspa_processor_factory.make_processor(id, sr);
                 },
                 m_midi_controller->make_input_event_handler()))
     {
