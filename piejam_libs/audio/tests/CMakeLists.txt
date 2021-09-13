@@ -8,6 +8,7 @@ endif()
 
 add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_spsc_ring_buffer_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/clip_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dag_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/device_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_buffer_memory_test.cpp
@@ -21,12 +22,15 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_algorithms_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_to_dag_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/identity_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/input_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/level_meter_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/level_meter_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lockstep_events_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mix_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/multiply_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/output_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/pan_balance_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pan_component_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pan_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pcm_convert_test.cpp

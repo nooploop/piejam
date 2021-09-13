@@ -160,66 +160,84 @@ connect_stereo_components(graph& g, component const& src, processor& dst)
     g.add_wire(src.outputs()[1], graph_endpoint{.proc = dst, .port = 1});
 }
 
+namespace
+{
+
+struct remove_event_identity_delegate
+{
+    static constexpr auto const is_identity = &is_event_identity_processor;
+    static constexpr auto const wires = &graph::event_wires;
+    static constexpr auto const add_wire = &graph::add_event_wire;
+    static constexpr auto const remove_wire = &graph::remove_event_wire;
+
+    template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
+    static void remove_wires_if(graph& g, P&& p)
+    {
+        g.remove_event_wires_if(std::forward<P>(p));
+    }
+};
+
+struct remove_identity_delegate
+{
+    static constexpr auto const is_identity = &is_identity_processor;
+    static constexpr auto const wires = &graph::wires;
+    static constexpr auto const add_wire = &graph::add_wire;
+    static constexpr auto const remove_wire = &graph::remove_event_wire;
+
+    template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
+    static void remove_wires_if(graph& g, P&& p)
+    {
+        g.remove_wires_if(std::forward<P>(p));
+    }
+};
+
+template <class Delegate>
 void
-remove_event_identity_processors(graph& g)
+remove_identities(graph& g)
 {
     auto starts_in_identity = [](auto const& w) {
-        return is_event_identity_processor(w.first.proc);
+        return Delegate::is_identity(w.first.proc);
     };
 
-    auto it = std::ranges::find_if(g.event_wires(), starts_in_identity);
-    while (it != g.event_wires().end())
+    auto it = std::ranges::find_if(
+            std::invoke(Delegate::wires, g),
+            starts_in_identity);
+    while (it != std::invoke(Delegate::wires, g).end())
     {
         auto it_ends = std::ranges::find_if(
-                g.event_wires(),
+                std::invoke(Delegate::wires, g),
                 [p = &it->first.proc.get()](auto const& w) {
                     return &w.second.proc.get() == p;
                 });
 
         auto out_wire = *it;
-        g.remove_event_wire(it);
+        std::invoke(Delegate::remove_wire, g, it);
 
-        if (it_ends != g.event_wires().end())
-            g.add_event_wire(it_ends->first, out_wire.second);
+        if (it_ends != std::invoke(Delegate::wires, g).end())
+            std::invoke(Delegate::add_wire, g, it_ends->first, out_wire.second);
 
-        it = std::ranges::find_if(g.event_wires(), starts_in_identity);
+        it = std::ranges::find_if(
+                std::invoke(Delegate::wires, g),
+                starts_in_identity);
     }
 
-    g.remove_event_wires_if([](auto const& src, auto const& dst) {
-        return is_event_identity_processor(src.proc) ||
-               is_event_identity_processor(dst.proc);
+    Delegate::remove_wires_if(g, [](auto const& /*src*/, auto const& dst) {
+        return Delegate::is_identity(dst.proc);
     });
+}
+
+} // namespace
+
+void
+remove_event_identity_processors(graph& g)
+{
+    remove_identities<remove_event_identity_delegate>(g);
 }
 
 void
 remove_identity_processors(graph& g)
 {
-    auto starts_in_identity = [](auto const& w) {
-        return is_identity_processor(w.first.proc);
-    };
-
-    auto it = std::ranges::find_if(g.wires(), starts_in_identity);
-    while (it != g.wires().end())
-    {
-        auto it_ends = std::ranges::find_if(
-                g.wires(),
-                [p = &it->first.proc.get()](auto const& w) {
-                    return &w.second.proc.get() == p;
-                });
-
-        auto out_wire = *it;
-        g.remove_wire(it);
-
-        if (it_ends != g.wires().end())
-            g.add_wire(it_ends->first, out_wire.second);
-
-        it = std::ranges::find_if(g.wires(), starts_in_identity);
-    }
-
-    g.remove_wires_if([](auto const& src, auto const& dst) {
-        return is_identity_processor(src.proc) ||
-               is_identity_processor(dst.proc);
-    });
+    remove_identities<remove_identity_delegate>(g);
 }
 
 } // namespace piejam::audio::engine

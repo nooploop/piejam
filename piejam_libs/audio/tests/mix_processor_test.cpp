@@ -231,18 +231,73 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
         EXPECT_FLOAT_EQ(0.81f, v);
 }
 
-struct is_mix_processor_test : ::testing::TestWithParam<std::size_t>
+TEST(mix_processor, mix_one_silence_and_eight_buffers)
+{
+    auto sut = make_mix_processor(9);
+
+    constexpr auto const buffer_size = 8u;
+
+    audio_slice const silence;
+    alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf;
+    in_buf.fill(1.f);
+    audio_slice in_buf_slice(in_buf);
+
+    std::vector<std::reference_wrapper<audio_slice const>> in{
+            in_buf_slice,
+            in_buf_slice,
+            in_buf_slice,
+            in_buf_slice,
+            silence,
+            in_buf_slice,
+            in_buf_slice,
+            in_buf_slice,
+            in_buf_slice};
+    alignas(mipp::RequiredAlignment) std::array<float, buffer_size> out_buf{};
+    std::vector<std::span<float>> out{out_buf};
+    std::vector<audio_slice> result{out[0]};
+
+    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
+
+    sut->process({in, out, result, {}, {}, buffer_size});
+
+    ASSERT_TRUE(result[0].is_buffer());
+    ASSERT_EQ(buffer_size, result[0].buffer().size());
+    for (auto const v : result[0].buffer())
+        EXPECT_FLOAT_EQ(8.f, v);
+}
+
+struct mix_processor_properties_test : ::testing::TestWithParam<std::size_t>
 {
 };
 
-TEST_P(is_mix_processor_test, verify)
+TEST_P(mix_processor_properties_test, is_mix_processor)
 {
     EXPECT_TRUE(is_mix_processor(*make_mix_processor(GetParam())));
 }
 
+TEST_P(mix_processor_properties_test, num_inputs)
+{
+    EXPECT_EQ(GetParam(), make_mix_processor(GetParam())->num_inputs());
+}
+
+TEST_P(mix_processor_properties_test, num_outputs)
+{
+    EXPECT_EQ(1u, make_mix_processor(GetParam())->num_outputs());
+}
+
+TEST_P(mix_processor_properties_test, event_inputs)
+{
+    EXPECT_TRUE(make_mix_processor(GetParam())->event_inputs().empty());
+}
+
+TEST_P(mix_processor_properties_test, event_outputs)
+{
+    EXPECT_TRUE(make_mix_processor(GetParam())->event_outputs().empty());
+}
+
 INSTANTIATE_TEST_SUITE_P(
         verify,
-        is_mix_processor_test,
+        mix_processor_properties_test,
         testing::Range<std::size_t>(2u, 10u));
 
 } // namespace piejam::audio::engine::test
