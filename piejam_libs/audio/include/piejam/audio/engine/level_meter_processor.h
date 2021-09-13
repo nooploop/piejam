@@ -21,15 +21,15 @@ public:
             sample_rate const&,
             std::string_view const& name = {});
 
-    auto type_name() const -> std::string_view override
+    auto type_name() const noexcept -> std::string_view override
     {
         return "level_meter";
     }
 
-    auto num_inputs() const -> std::size_t override { return 1; }
-    auto num_outputs() const -> std::size_t override { return 0; }
-    auto event_inputs() const -> event_ports override { return {}; }
-    auto event_outputs() const -> event_ports override
+    auto num_inputs() const noexcept -> std::size_t override { return 1; }
+    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    auto event_inputs() const noexcept -> event_ports override { return {}; }
+    auto event_outputs() const noexcept -> event_ports override
     {
         static std::array s_ports{
                 event_port(std::in_place_type<float>, "peak_level")};

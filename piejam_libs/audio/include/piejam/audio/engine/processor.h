@@ -20,14 +20,14 @@ public:
 
     virtual ~processor() = default;
 
-    virtual auto type_name() const -> std::string_view = 0;
-    virtual auto name() const -> std::string_view = 0;
+    virtual auto type_name() const noexcept -> std::string_view = 0;
+    virtual auto name() const noexcept -> std::string_view = 0;
 
-    virtual auto num_inputs() const -> std::size_t = 0;
-    virtual auto num_outputs() const -> std::size_t = 0;
+    virtual auto num_inputs() const noexcept -> std::size_t = 0;
+    virtual auto num_outputs() const noexcept -> std::size_t = 0;
 
-    virtual auto event_inputs() const -> event_ports = 0;
-    virtual auto event_outputs() const -> event_ports = 0;
+    virtual auto event_inputs() const noexcept -> event_ports = 0;
+    virtual auto event_outputs() const noexcept -> event_ports = 0;
 
     virtual void process(process_context const&) = 0;
 };

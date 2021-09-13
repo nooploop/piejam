@@ -50,17 +50,20 @@ public:
     {
     }
 
-    auto type_name() const -> std::string_view override { return "convert"; }
+    auto type_name() const noexcept -> std::string_view override
+    {
+        return "convert";
+    }
 
-    auto num_inputs() const -> std::size_t override { return 0; }
-    auto num_outputs() const -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override { return 0; }
+    auto num_outputs() const noexcept -> std::size_t override { return 0; }
 
-    auto event_inputs() const -> event_ports override
+    auto event_inputs() const noexcept -> event_ports override
     {
         return m_input_event_ports;
     }
 
-    auto event_outputs() const -> event_ports override
+    auto event_outputs() const noexcept -> event_ports override
     {
         return m_output_event_ports;
     }

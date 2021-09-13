@@ -44,13 +44,16 @@ public:
         BOOST_ASSERT(m_midi_in);
     }
 
-    auto type_name() const -> std::string_view override { return "midi_input"; }
+    auto type_name() const noexcept -> std::string_view override
+    {
+        return "midi_input";
+    }
 
-    auto num_inputs() const -> std::size_t override { return 0; }
-    auto num_outputs() const -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override { return 0; }
+    auto num_outputs() const noexcept -> std::size_t override { return 0; }
 
-    auto event_inputs() const -> event_ports override { return {}; }
-    auto event_outputs() const -> event_ports override
+    auto event_inputs() const noexcept -> event_ports override { return {}; }
+    auto event_outputs() const noexcept -> event_ports override
     {
         static std::array const s_event_outs{audio::engine::event_port(
                 std::in_place_type<midi::external_event>,

@@ -74,16 +74,19 @@ public:
     {
     }
 
-    auto type_name() const -> std::string_view override { return "mix"; }
+    auto type_name() const noexcept -> std::string_view override
+    {
+        return "mix";
+    }
 
-    auto num_inputs() const -> std::size_t override
+    auto num_inputs() const noexcept -> std::size_t override
     {
         return NumInputs != npos ? NumInputs : m_num_inputs;
     }
-    auto num_outputs() const -> std::size_t override { return 1; }
+    auto num_outputs() const noexcept -> std::size_t override { return 1; }
 
-    auto event_inputs() const -> event_ports override { return {}; }
-    auto event_outputs() const -> event_ports override { return {}; }
+    auto event_inputs() const noexcept -> event_ports override { return {}; }
+    auto event_outputs() const noexcept -> event_ports override { return {}; }
 
     void process(process_context const& ctx) override
     {

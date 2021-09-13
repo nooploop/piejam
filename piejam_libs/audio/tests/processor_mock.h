@@ -17,14 +17,14 @@ namespace piejam::audio::engine::test
 
 struct processor_mock : public processor
 {
-    MOCK_METHOD(std::string_view, type_name, (), (const, override));
-    MOCK_METHOD(std::string_view, name, (), (const, override));
+    MOCK_METHOD(std::string_view, type_name, (), (const, noexcept, override));
+    MOCK_METHOD(std::string_view, name, (), (const, noexcept, override));
 
-    MOCK_METHOD(std::size_t, num_inputs, (), (const, override));
-    MOCK_METHOD(std::size_t, num_outputs, (), (const, override));
+    MOCK_METHOD(std::size_t, num_inputs, (), (const, noexcept, override));
+    MOCK_METHOD(std::size_t, num_outputs, (), (const, noexcept, override));
 
-    MOCK_METHOD(event_ports, event_inputs, (), (const, override));
-    MOCK_METHOD(event_ports, event_outputs, (), (const, override));
+    MOCK_METHOD(event_ports, event_inputs, (), (const, noexcept, override));
+    MOCK_METHOD(event_ports, event_outputs, (), (const, noexcept, override));
 
     MOCK_METHOD(void, process, (process_context const&), (override));
 };

@@ -175,12 +175,15 @@ public:
     {
     }
 
-    auto type_name() const -> std::string_view override { return "filter"; }
+    auto type_name() const noexcept -> std::string_view override
+    {
+        return "filter";
+    }
 
-    auto num_inputs() const -> std::size_t override { return 1; }
-    auto num_outputs() const -> std::size_t override { return 1; }
+    auto num_inputs() const noexcept -> std::size_t override { return 1; }
+    auto num_outputs() const noexcept -> std::size_t override { return 1; }
 
-    auto event_inputs() const -> event_ports override
+    auto event_inputs() const noexcept -> event_ports override
     {
         static std::array s_ports{audio::engine::event_port{
                 std::in_place_type<coefficients>,
@@ -188,7 +191,7 @@ public:
         return s_ports;
     }
 
-    auto event_outputs() const -> event_ports override { return {}; }
+    auto event_outputs() const noexcept -> event_ports override { return {}; }
 
     void process(audio::engine::process_context const& ctx) override
     {

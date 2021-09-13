@@ -434,23 +434,29 @@ public:
         m_instance.cleanup();
     }
 
-    auto type_name() const -> std::string_view override { return "ladspa_fx"; }
+    auto type_name() const noexcept -> std::string_view override
+    {
+        return "ladspa_fx";
+    }
 
-    auto name() const -> std::string_view override { return m_name; }
+    auto name() const noexcept -> std::string_view override { return m_name; }
 
-    auto num_inputs() const -> std::size_t override
+    auto num_inputs() const noexcept -> std::size_t override
     {
         return m_input_port_indices.size();
     }
 
-    auto num_outputs() const -> std::size_t override
+    auto num_outputs() const noexcept -> std::size_t override
     {
         return m_output_port_indices.size();
     }
 
-    auto event_inputs() const -> event_ports override { return m_event_inputs; }
+    auto event_inputs() const noexcept -> event_ports override
+    {
+        return m_event_inputs;
+    }
 
-    auto event_outputs() const -> event_ports override
+    auto event_outputs() const noexcept -> event_ports override
     {
         return m_event_outputs;
     }

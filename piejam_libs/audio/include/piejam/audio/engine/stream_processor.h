@@ -22,13 +22,19 @@ public:
             std::size_t capacity_per_channel,
             std::string_view const& name = {});
 
-    auto type_name() const -> std::string_view override { return "stream"; }
+    auto type_name() const noexcept -> std::string_view override
+    {
+        return "stream";
+    }
 
-    auto num_inputs() const -> std::size_t override { return m_num_channels; }
-    auto num_outputs() const -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return m_num_channels;
+    }
+    auto num_outputs() const noexcept -> std::size_t override { return 0; }
 
-    auto event_inputs() const -> event_ports override { return {}; }
-    auto event_outputs() const -> event_ports override { return {}; }
+    auto event_inputs() const noexcept -> event_ports override { return {}; }
+    auto event_outputs() const noexcept -> event_ports override { return {}; }
 
     void process(process_context const& ctx) override;
 
