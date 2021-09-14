@@ -24,13 +24,13 @@ namespace
 {
 
 auto
-connected_source(graph::wires_t const& ws, graph_endpoint const& dst)
+connected_source(graph::wires_map const& ws, graph_endpoint const& dst)
         -> std::optional<graph_endpoint>
 {
     auto it = std::ranges::find_if(
             ws,
             piejam::equal_to(dst),
-            &graph::wires_t::value_type::second);
+            &graph::wires_map::value_type::second);
     if (it != ws.end())
         return it->first;
     else
@@ -43,26 +43,29 @@ auto
 connected_source(graph const& g, graph_endpoint const& dst)
         -> std::optional<graph_endpoint>
 {
-    return connected_source(g.wires(), dst);
+    return connected_source(g.audio, dst);
 }
 
 auto
 connected_event_source(graph const& g, graph_endpoint const& dst)
         -> std::optional<graph_endpoint>
 {
-    return connected_source(g.event_wires(), dst);
+    return connected_source(g.event, dst);
 }
 
 bool
-has_wire(graph const& g, graph_endpoint const& src, graph_endpoint const& dst)
+has_audio_wire(
+        graph const& g,
+        graph_endpoint const& src,
+        graph_endpoint const& dst)
 {
-    auto connected = g.wires().equal_range(src);
+    auto connected = g.audio.equal_range(src);
     return connected.first != connected.second &&
            std::ranges::find(
                    connected.first,
                    connected.second,
                    dst,
-                   &graph::wires_t::value_type::second) != connected.second;
+                   &graph::wires_map::value_type::second) != connected.second;
 }
 
 bool
@@ -71,13 +74,13 @@ has_event_wire(
         graph_endpoint const& src,
         graph_endpoint const& dst)
 {
-    auto connected = g.event_wires().equal_range(src);
+    auto connected = g.event.equal_range(src);
     return connected.first != connected.second &&
            std::ranges::find(
                    connected.first,
                    connected.second,
                    dst,
-                   &graph::wires_t::value_type::second) != connected.second;
+                   &graph::wires_map::value_type::second) != connected.second;
 }
 
 void
@@ -101,14 +104,14 @@ connect(graph& g,
                 auto const connected_in_src =
                         connected_source(g, prev_mixer_in);
                 BOOST_ASSERT(connected_in_src);
-                g.remove_wire(*connected_in_src, prev_mixer_in);
-                g.add_wire(*connected_in_src, {*mixer, in_index});
+                g.audio.erase(*connected_in_src, prev_mixer_in);
+                g.audio.insert(*connected_in_src, {*mixer, in_index});
             }
 
-            g.add_wire(src, {*mixer, num_prev_inputs});
+            g.audio.insert(src, {*mixer, num_prev_inputs});
 
-            g.remove_wire({prev_mixer, 0}, dst);
-            g.add_wire({*mixer, 0}, dst);
+            g.audio.erase({prev_mixer, 0}, dst);
+            g.audio.insert({*mixer, 0}, dst);
 
             auto it_mixer = std::ranges::find_if(
                     mixers,
@@ -120,26 +123,26 @@ connect(graph& g,
         }
         else
         {
-            g.remove_wire(*connected_src, dst);
+            g.audio.erase(*connected_src, dst);
 
             auto mixer = make_mix_processor(2);
-            g.add_wire(*connected_src, {*mixer, 0});
-            g.add_wire(src, {*mixer, 1});
-            g.add_wire({*mixer, 0}, dst);
+            g.audio.insert(*connected_src, {*mixer, 0});
+            g.audio.insert(src, {*mixer, 1});
+            g.audio.insert({*mixer, 0}, dst);
             mixers.emplace_back(std::move(mixer));
         }
     }
     else
     {
-        g.add_wire(src, dst);
+        g.audio.insert(src, dst);
     }
 }
 
 void
 connect_stereo_components(graph& g, component const& src, component const& dst)
 {
-    g.add_wire(src.outputs()[0], dst.inputs()[0]);
-    g.add_wire(src.outputs()[1], dst.inputs()[1]);
+    g.audio.insert(src.outputs()[0], dst.inputs()[0]);
+    g.audio.insert(src.outputs()[1], dst.inputs()[1]);
 }
 
 void
@@ -156,73 +159,56 @@ connect_stereo_components(
 void
 connect_stereo_components(graph& g, component const& src, processor& dst)
 {
-    g.add_wire(src.outputs()[0], graph_endpoint{.proc = dst, .port = 0});
-    g.add_wire(src.outputs()[1], graph_endpoint{.proc = dst, .port = 1});
+    g.audio.insert(src.outputs()[0], graph_endpoint{.proc = dst, .port = 0});
+    g.audio.insert(src.outputs()[1], graph_endpoint{.proc = dst, .port = 1});
 }
 
 namespace
 {
 
-struct remove_event_identity_delegate
+template <graph::wire_type W>
+bool
+dispatch_is_identity_processor(processor const& p) noexcept
 {
-    static constexpr auto const is_identity = &is_event_identity_processor;
-    static constexpr auto const wires = &graph::event_wires;
-    static constexpr auto const add_wire = &graph::add_event_wire;
-    static constexpr auto const remove_wire = &graph::remove_event_wire;
-
-    template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
-    static void remove_wires_if(graph& g, P&& p)
+    if constexpr (W == graph::wire_type::audio)
     {
-        g.remove_event_wires_if(std::forward<P>(p));
+        return is_identity_processor(p);
     }
-};
-
-struct remove_identity_delegate
-{
-    static constexpr auto const is_identity = &is_identity_processor;
-    static constexpr auto const wires = &graph::wires;
-    static constexpr auto const add_wire = &graph::add_wire;
-    static constexpr auto const remove_wire = &graph::remove_event_wire;
-
-    template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
-    static void remove_wires_if(graph& g, P&& p)
+    else
     {
-        g.remove_wires_if(std::forward<P>(p));
+        static_assert(W == graph::wire_type::event, "Unknown wire type.");
+        return is_event_identity_processor(p);
     }
-};
+}
 
-template <class Delegate>
+template <graph::wire_type W>
 void
-remove_identities(graph& g)
+remove_identities(graph::wires_access<W>& g)
 {
-    auto starts_in_identity = [](auto const& w) {
-        return Delegate::is_identity(w.first.proc);
+    auto starts_in_identity = [&](auto const& w) {
+        return dispatch_is_identity_processor<W>(w.first.proc);
     };
 
-    auto it = std::ranges::find_if(
-            std::invoke(Delegate::wires, g),
-            starts_in_identity);
-    while (it != std::invoke(Delegate::wires, g).end())
+    auto it = std::ranges::find_if(g, starts_in_identity);
+    while (it != g.end())
     {
         auto it_ends = std::ranges::find_if(
-                std::invoke(Delegate::wires, g),
+                g,
                 [p = &it->first.proc.get()](auto const& w) {
                     return &w.second.proc.get() == p;
                 });
 
         auto out_wire = *it;
-        std::invoke(Delegate::remove_wire, g, it);
+        g.erase(it);
 
-        if (it_ends != std::invoke(Delegate::wires, g).end())
-            std::invoke(Delegate::add_wire, g, it_ends->first, out_wire.second);
+        if (it_ends != g.end())
+            g.insert(it_ends->first, out_wire.second);
 
-        it = std::ranges::find_if(
-                std::invoke(Delegate::wires, g),
-                starts_in_identity);
+        it = std::ranges::find_if(g, starts_in_identity);
     }
 
-    Delegate::remove_wires_if(g, [](auto const& /*src*/, auto const& dst) {
-        return Delegate::is_identity(dst.proc);
+    g.erase_if([&](auto const& /*src*/, auto const& dst) {
+        return dispatch_is_identity_processor<W>(dst.proc);
     });
 }
 
@@ -231,13 +217,13 @@ remove_identities(graph& g)
 void
 remove_event_identity_processors(graph& g)
 {
-    remove_identities<remove_event_identity_delegate>(g);
+    remove_identities(g.event);
 }
 
 void
 remove_identity_processors(graph& g)
 {
-    remove_identities<remove_identity_delegate>(g);
+    remove_identities(g.audio);
 }
 
 } // namespace piejam::audio::engine

@@ -381,14 +381,14 @@ connect_mixer_input(
                                 device_buses[device_bus_id];
 
                         if (device_bus.channels.left != npos)
-                            g.add_wire(
+                            g.audio.insert(
                                     {.proc = input_procs[device_bus.channels
                                                                  .left],
                                      .port = 0},
                                     mb_in.inputs()[0]);
 
                         if (device_bus.channels.right != npos)
-                            g.add_wire(
+                            g.audio.insert(
                                     {.proc = input_procs[device_bus.channels
                                                                  .right],
                                      .port = 0},
@@ -569,18 +569,18 @@ connect_midi(
     {
         BOOST_ASSERT(midi_learn_output_proc);
 
-        g.add_event_wire({*midi_in_proc, 0}, {*midi_learn_proc, 0});
-        g.add_event_wire({*midi_learn_proc, 0}, {*midi_learn_output_proc, 0});
+        g.event.insert({*midi_in_proc, 0}, {*midi_learn_proc, 0});
+        g.event.insert({*midi_learn_proc, 0}, {*midi_learn_output_proc, 0});
 
         if (auto* const midi_assign_proc =
                     procs.find(engine_processors::midi_assign))
-            g.add_event_wire({*midi_learn_proc, 1}, {*midi_assign_proc, 0});
+            g.event.insert({*midi_learn_proc, 1}, {*midi_assign_proc, 0});
     }
     else if (
             auto* const midi_assign_proc =
                     procs.find(engine_processors::midi_assign))
     {
-        g.add_event_wire({*midi_in_proc, 0}, {*midi_assign_proc, 0});
+        g.event.insert({*midi_in_proc, 0}, {*midi_assign_proc, 0});
     }
 
     if (auto* const midi_assign_proc =
@@ -595,13 +595,13 @@ connect_midi(
                         auto proc = procs.find(proc_id);
                         BOOST_ASSERT(proc);
 
-                        g.add_event_wire(
+                        g.event.insert(
                                 {*midi_assign_proc, out_index++},
                                 {*proc, 0});
 
                         if (auto param_proc =
                                     param_procs.find_processor(param_id))
-                            g.add_event_wire({*proc, 0}, {*param_proc, 0});
+                            g.event.insert({*proc, 0}, {*param_proc, 0});
                     },
                     id);
         }
@@ -628,7 +628,7 @@ connect_solo_groups(
             auto mix_out = comps.find(mixer_output_key{.channel_id = member});
             BOOST_ASSERT(mix_out);
 
-            g.add_event_wire(
+            g.event.insert(
                     solo_switch->event_outputs()[index],
                     mix_out->event_inputs()[0]);
         }

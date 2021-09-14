@@ -117,8 +117,8 @@ TEST(graph_endpoint_equal_compare, different_proc_different_ports)
 TEST(graph, is_empty_on_default_construction)
 {
     graph sut;
-    EXPECT_TRUE(sut.wires().empty());
-    EXPECT_TRUE(sut.event_wires().empty());
+    EXPECT_TRUE(sut.audio.empty());
+    EXPECT_TRUE(sut.event.empty());
 }
 
 TEST(graph, add_wire)
@@ -130,11 +130,11 @@ TEST(graph, add_wire)
     graph_endpoint src{proc_src, 0};
     graph_endpoint dst{proc_dst, 0};
     graph sut;
-    sut.add_wire(src, dst);
-    EXPECT_FALSE(sut.wires().empty());
-    ASSERT_EQ(1u, sut.wires().size());
-    EXPECT_EQ(src, sut.wires().begin()->first);
-    EXPECT_EQ(dst, sut.wires().begin()->second);
+    sut.audio.insert(src, dst);
+    EXPECT_FALSE(sut.audio.empty());
+    ASSERT_EQ(1u, sut.audio.size());
+    EXPECT_EQ(src, sut.audio.begin()->first);
+    EXPECT_EQ(dst, sut.audio.begin()->second);
 }
 
 TEST(graph, add_event_wire)
@@ -150,11 +150,11 @@ TEST(graph, add_event_wire)
     graph_endpoint src{proc_src, 0};
     graph_endpoint dst{proc_dst, 0};
     graph sut;
-    sut.add_event_wire(src, dst);
-    EXPECT_FALSE(sut.event_wires().empty());
-    ASSERT_EQ(1u, sut.event_wires().size());
-    EXPECT_EQ(src, sut.event_wires().begin()->first);
-    EXPECT_EQ(dst, sut.event_wires().begin()->second);
+    sut.event.insert(src, dst);
+    EXPECT_FALSE(sut.event.empty());
+    ASSERT_EQ(1u, sut.event.size());
+    EXPECT_EQ(src, sut.event.begin()->first);
+    EXPECT_EQ(dst, sut.event.begin()->second);
 }
 
 } // namespace piejam::audio::engine::test

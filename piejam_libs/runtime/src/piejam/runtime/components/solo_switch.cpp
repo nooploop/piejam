@@ -136,7 +136,7 @@ public:
     {
         for (std::size_t const index : range::indices(m_solo_inputs))
         {
-            g.add_event_wire(
+            g.event.insert(
                     audio::engine::graph_endpoint{
                             .proc = *m_solo_inputs[index],
                             .port = 0},

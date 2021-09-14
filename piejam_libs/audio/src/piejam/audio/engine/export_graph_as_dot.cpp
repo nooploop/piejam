@@ -26,16 +26,16 @@ static auto
 graph_processors(graph const& g)
 {
     std::vector<std::reference_wrapper<processor>> procs;
-    procs.reserve((g.wires().size() + g.event_wires().size()) * 2);
+    procs.reserve((g.audio.size() + g.event.size()) * 2);
 
     auto add_procs = [](auto& vec, auto&& w) {
         vec.push_back(w.first.proc);
         vec.push_back(w.second.proc);
     };
 
-    for (auto const& w : g.wires())
+    for (auto const& w : g.audio)
         add_procs(procs, w);
-    for (auto const& w : g.event_wires())
+    for (auto const& w : g.event)
         add_procs(procs, w);
 
     std::ranges::sort(procs, address_less<processor>{});
@@ -147,10 +147,10 @@ export_graph_as_dot(graph const& g) -> std::string
            << std::endl;
     };
 
-    for (auto const& w : g.wires())
+    for (auto const& w : g.audio)
         print_wire(ss, w, 'a', audio_color);
 
-    for (auto const& w : g.event_wires())
+    for (auto const& w : g.event)
         print_wire(ss, w, 'e', event_color);
 
     ss << "}" << std::endl; // digraph

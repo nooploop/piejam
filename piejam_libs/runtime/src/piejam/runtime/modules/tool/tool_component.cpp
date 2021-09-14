@@ -58,7 +58,7 @@ public:
     {
         m_amplifier->connect(g);
 
-        g.add_event_wire(
+        g.event.insert(
                 {*m_gain_input_proc, 0},
                 m_amplifier->event_inputs()[0]);
     }

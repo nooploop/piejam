@@ -53,7 +53,7 @@ graph_to_dag(graph const& g) -> dag
     };
 
     // create a job for each processor
-    for (auto const& [src, dst] : g.wires())
+    for (auto const& [src, dst] : g.audio)
     {
         if (!processor_job_mapping.count(src.proc))
             add_job(src);
@@ -62,7 +62,7 @@ graph_to_dag(graph const& g) -> dag
             add_job(dst);
     }
 
-    for (auto const& [src, dst] : g.event_wires())
+    for (auto const& [src, dst] : g.event)
     {
         if (!processor_job_mapping.count(src.proc))
             add_job(src);
@@ -73,7 +73,7 @@ graph_to_dag(graph const& g) -> dag
 
     // connect jobs according to audio wires
     std::set<std::pair<dag::task_id_t, dag::task_id_t>> added_deps;
-    for (auto const& [src, dst] : g.wires())
+    for (auto const& [src, dst] : g.audio)
     {
         auto const& [src_id, src_job] = processor_job_mapping[src.proc];
         auto const& [dst_id, dst_job] = processor_job_mapping[dst.proc];
@@ -88,7 +88,7 @@ graph_to_dag(graph const& g) -> dag
     }
 
     // connect jobs according to event wires
-    for (auto const& [src, dst] : g.event_wires())
+    for (auto const& [src, dst] : g.event)
     {
         auto const& [src_id, src_job] = processor_job_mapping[src.proc];
         auto const& [dst_id, dst_job] = processor_job_mapping[dst.proc];

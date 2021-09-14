@@ -40,7 +40,7 @@ public:
 
     void connect(engine::graph& g) const override
     {
-        g.add_wire({*m_gain_proc, 0}, {*m_amp_proc, 1});
+        g.audio.insert({*m_gain_proc, 0}, {*m_amp_proc, 1});
     }
 
 private:
@@ -76,8 +76,8 @@ public:
 
     void connect(engine::graph& g) const override
     {
-        g.add_wire({*m_gain_proc, 0}, {*m_left_amp_proc, 1});
-        g.add_wire({*m_gain_proc, 0}, {*m_right_amp_proc, 1});
+        g.audio.insert({*m_gain_proc, 0}, {*m_left_amp_proc, 1});
+        g.audio.insert({*m_gain_proc, 0}, {*m_right_amp_proc, 1});
     }
 
 private:
@@ -119,8 +119,8 @@ public:
 
     void connect(engine::graph& g) const override
     {
-        g.add_wire({*m_left_gain_proc, 0}, {*m_left_amp_proc, 1});
-        g.add_wire({*m_right_gain_proc, 0}, {*m_right_amp_proc, 1});
+        g.audio.insert({*m_left_gain_proc, 0}, {*m_left_amp_proc, 1});
+        g.audio.insert({*m_right_gain_proc, 0}, {*m_right_amp_proc, 1});
     }
 
 private:

@@ -44,10 +44,10 @@ public:
     {
         m_amp_comp->connect(g);
 
-        g.add_event_wire(
+        g.event.insert(
                 {*m_stereo_balance_proc, 0},
                 m_amp_comp->event_inputs()[0]);
-        g.add_event_wire(
+        g.event.insert(
                 {*m_stereo_balance_proc, 1},
                 m_amp_comp->event_inputs()[1]);
     }

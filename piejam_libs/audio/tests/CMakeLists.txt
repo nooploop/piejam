@@ -9,6 +9,7 @@ endif()
 add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_spsc_ring_buffer_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/clip_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/component_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dag_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/device_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_buffer_memory_test.cpp

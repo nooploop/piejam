@@ -73,7 +73,7 @@ public:
     {
         for (std::size_t i : range::indices(m_param_input_procs))
         {
-            g.add_event_wire({*m_param_input_procs[i], 0}, {*m_fx_proc, i});
+            g.event.insert({*m_param_input_procs[i], 0}, {*m_fx_proc, i});
         }
     }
 
@@ -157,13 +157,13 @@ public:
     {
         for (std::size_t i : range::indices(m_param_input_procs))
         {
-            g.add_event_wire(
+            g.event.insert(
                     {*m_param_input_procs[i], 0},
                     {*m_input_event_identity_procs[i], 0});
-            g.add_event_wire(
+            g.event.insert(
                     {*m_input_event_identity_procs[i], 0},
                     {*m_fx_left_proc, i});
-            g.add_event_wire(
+            g.event.insert(
                     {*m_input_event_identity_procs[i], 0},
                     {*m_fx_right_proc, i});
         }

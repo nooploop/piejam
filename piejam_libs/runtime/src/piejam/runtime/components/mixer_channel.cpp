@@ -55,7 +55,7 @@ public:
     {
         m_pan_balance->connect(g);
 
-        g.add_event_wire(
+        g.event.insert(
                 {*m_pan_balance_input_proc, 0},
                 m_pan_balance->event_inputs()[0]);
     }
@@ -101,10 +101,10 @@ public:
         m_mute_solo->connect(g);
         m_level_meter->connect(g);
 
-        g.add_event_wire(
+        g.event.insert(
                 {*m_volume_input_proc, 0},
                 m_volume_amp->event_inputs()[0]);
-        g.add_event_wire(
+        g.event.insert(
                 {*m_mute_input_proc, 0},
                 m_mute_solo->event_inputs()[0]);
 
@@ -117,7 +117,7 @@ public:
                 *m_volume_amp,
                 *m_level_meter);
 
-        g.add_event_wire(
+        g.event.insert(
                 m_level_meter->event_outputs()[0],
                 {*m_peak_level_proc, 0});
     }

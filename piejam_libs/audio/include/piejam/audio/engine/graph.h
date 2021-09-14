@@ -18,37 +18,56 @@ namespace piejam::audio::engine
 class graph
 {
 public:
-    using wires_t = std::multimap<graph_endpoint, graph_endpoint>;
-
-    auto wires() const noexcept -> wires_t const& { return m_wires; }
-    void add_wire(graph_endpoint const& src, graph_endpoint const& dst);
-    void remove_wire(graph_endpoint const& src, graph_endpoint const& dst);
-
-    auto event_wires() const noexcept -> wires_t const&
+    class wires_map
     {
-        return m_event_wires;
-    }
+    public:
+        using map_t = std::multimap<graph_endpoint, graph_endpoint>;
+        using const_iterator = typename map_t::const_iterator;
+        using value_type = typename map_t::value_type;
 
-    void add_event_wire(graph_endpoint const& src, graph_endpoint const& dst);
+        auto empty() const noexcept { return m_wires.empty(); }
+        auto size() const noexcept { return m_wires.size(); }
 
-    void remove_wire(wires_t::const_iterator const&);
-    void remove_event_wire(wires_t::const_iterator const&);
+        auto begin() const noexcept { return m_wires.begin(); }
+        auto end() const noexcept { return m_wires.end(); }
 
-    template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
-    void remove_wires_if(P&& p)
+        auto equal_range(graph_endpoint const& src) const noexcept
+        {
+            return m_wires.equal_range(src);
+        }
+
+        void erase(graph_endpoint const& src, graph_endpoint const& dst);
+        void erase(const_iterator const&);
+
+        template <
+                std::predicate<graph_endpoint const&, graph_endpoint const&> P>
+        void erase_if(P&& p)
+        {
+            std::erase_if(m_wires, boost::hof::unpack(std::forward<P>(p)));
+        }
+
+    protected:
+        map_t m_wires;
+    };
+
+    enum class wire_type
     {
-        std::erase_if(m_wires, boost::hof::unpack(std::forward<P>(p)));
-    }
+        audio,
+        event
+    };
 
-    template <std::predicate<graph_endpoint const&, graph_endpoint const&> P>
-    void remove_event_wires_if(P&& p)
+    template <wire_type W>
+    class wires_access final : public wires_map
     {
-        std::erase_if(m_event_wires, boost::hof::unpack(std::forward<P>(p)));
-    }
+    public:
+        void insert(graph_endpoint const& src, graph_endpoint const& dst);
+    };
 
-private:
-    wires_t m_wires;
-    wires_t m_event_wires;
+    using audio_wires_access = wires_access<wire_type::audio>;
+    using event_wires_access = wires_access<wire_type::event>;
+
+    audio_wires_access audio;
+    event_wires_access event;
 };
 
 auto export_graph_as_dot(graph const&) -> std::string;

@@ -309,29 +309,29 @@ public:
 
     void connect(audio::engine::graph& g) const override
     {
-        g.add_event_wire({*m_type_input_proc, 0}, {*m_event_converter_proc, 0});
-        g.add_event_wire(
+        g.event.insert({*m_type_input_proc, 0}, {*m_event_converter_proc, 0});
+        g.event.insert(
                 {*m_cutoff_input_proc, 0},
                 {*m_event_converter_proc, 1});
-        g.add_event_wire(
+        g.event.insert(
                 {*m_resonance_input_proc, 0},
                 {*m_event_converter_proc, 2});
 
-        g.add_event_wire(
+        g.event.insert(
                 {*m_event_converter_proc, 0},
                 {*m_filter_left_proc, 0});
-        g.add_event_wire(
+        g.event.insert(
                 {*m_event_converter_proc, 0},
                 {*m_filter_right_proc, 0});
 
-        g.add_wire({*m_input_left_proc, 0}, {*m_filter_left_proc, 0});
-        g.add_wire({*m_input_right_proc, 0}, {*m_filter_right_proc, 0});
+        g.audio.insert({*m_input_left_proc, 0}, {*m_filter_left_proc, 0});
+        g.audio.insert({*m_input_right_proc, 0}, {*m_filter_right_proc, 0});
 
-        g.add_wire({*m_input_left_proc, 0}, {*m_in_out_stream_proc, 0});
-        g.add_wire({*m_input_right_proc, 0}, {*m_in_out_stream_proc, 1});
+        g.audio.insert({*m_input_left_proc, 0}, {*m_in_out_stream_proc, 0});
+        g.audio.insert({*m_input_right_proc, 0}, {*m_in_out_stream_proc, 1});
 
-        g.add_wire({*m_filter_left_proc, 0}, {*m_in_out_stream_proc, 2});
-        g.add_wire({*m_filter_right_proc, 0}, {*m_in_out_stream_proc, 3});
+        g.audio.insert({*m_filter_left_proc, 0}, {*m_in_out_stream_proc, 2});
+        g.audio.insert({*m_filter_right_proc, 0}, {*m_in_out_stream_proc, 3});
     }
 
 private:

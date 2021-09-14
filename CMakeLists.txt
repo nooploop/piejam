@@ -27,18 +27,20 @@ if(PIEJAM_COVERAGE AND PIEJAM_LCOV_PATH AND PIEJAM_GENHTML_PATH)
     set(PIEJAM_COVERAGE_ENABLED ON)
     add_compile_options(--coverage)
     add_link_options(--coverage)
+
+    set(PIEJAM_COVERAGE_IGNORE_LIST
+      "*/tests/*"
+      "*/benchmarks/*"
+      "*moc_*.cpp"
+      "*qrc_*.cpp"
+      "*/export_graph_as_dot.cpp"
+      "*/mocs_compilation.cpp"
+      )
+    list(TRANSFORM PIEJAM_COVERAGE_IGNORE_LIST REPLACE "(.+)" "--exclude '\\1'" OUTPUT_VARIABLE PIEJAM_COVERAGE_IGNORE_LIST_EX)
+    list(JOIN PIEJAM_COVERAGE_IGNORE_LIST_EX " " PIEJAM_COVERAGE_IGNORE)
 else()
     set(PIEJAM_COVERAGE_ENABLED OFF)
 endif()
-set(PIEJAM_COVERAGE_IGNORE_LIST
-  "*/tests/*"
-  "*/benchmarks/*"
-  "*moc_*.cpp"
-  "*qrc_*.cpp"
-  "*/export_graph_as_dot.cpp"
-  )
-list(TRANSFORM PIEJAM_COVERAGE_IGNORE_LIST REPLACE "(.+)" "--exclude '\\1'" OUTPUT_VARIABLE PIEJAM_COVERAGE_IGNORE_LIST_EX)
-list(JOIN PIEJAM_COVERAGE_IGNORE_LIST_EX " " PIEJAM_COVERAGE_IGNORE)
 configure_file("CTestCustom.cmake.in" "CTestCustom.cmake")
 
 find_package(Boost COMPONENTS program_options)

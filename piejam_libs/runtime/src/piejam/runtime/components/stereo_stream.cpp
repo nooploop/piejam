@@ -43,10 +43,10 @@ public:
 
     void connect(audio::engine::graph& g) const override
     {
-        g.add_wire(
+        g.audio.insert(
                 {.proc = *m_left_identity, .port = 0},
                 {.proc = *m_stream_proc, .port = 0});
-        g.add_wire(
+        g.audio.insert(
                 {.proc = *m_right_identity, .port = 0},
                 {.proc = *m_stream_proc, .port = 1});
     }

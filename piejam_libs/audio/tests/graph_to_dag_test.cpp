@@ -31,7 +31,7 @@ TEST(graph_to_dag, audio_is_transferred_to_connected_proc)
 
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(1));
     ON_CALL(out_proc, num_inputs()).WillByDefault(Return(1));
-    g.add_wire({in_proc, 0}, {out_proc, 0});
+    g.audio.insert({in_proc, 0}, {out_proc, 0});
 
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
@@ -67,8 +67,8 @@ TEST(graph_to_dag, audio_can_spread_to_multiple_ins)
 
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(1));
     ON_CALL(out_proc, num_inputs()).WillByDefault(Return(2));
-    g.add_wire({in_proc, 0}, {out_proc, 0});
-    g.add_wire({in_proc, 0}, {out_proc, 1});
+    g.audio.insert({in_proc, 0}, {out_proc, 0});
+    g.audio.insert({in_proc, 0}, {out_proc, 1});
 
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
@@ -106,8 +106,8 @@ TEST(graph_to_dag, out_processor_is_called_once_even_with_two_wires_from_in)
 
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(2));
     ON_CALL(out_proc, num_inputs()).WillByDefault(Return(2));
-    g.add_wire({in_proc, 0}, {out_proc, 0});
-    g.add_wire({in_proc, 1}, {out_proc, 1});
+    g.audio.insert({in_proc, 0}, {out_proc, 0});
+    g.audio.insert({in_proc, 1}, {out_proc, 1});
 
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
@@ -129,7 +129,7 @@ TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
 
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(1));
     ON_CALL(out_proc, num_inputs()).WillByDefault(Return(2));
-    g.add_wire({in_proc, 0}, {out_proc, 0});
+    g.audio.insert({in_proc, 0}, {out_proc, 0});
 
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
@@ -167,7 +167,7 @@ TEST(graph_to_dag, event_is_transferred)
     ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_in_ports));
     ON_CALL(out_proc, event_inputs()).WillByDefault(Return(event_out_ports));
 
-    g.add_event_wire({in_proc, 0}, {out_proc, 0});
+    g.event.insert({in_proc, 0}, {out_proc, 0});
 
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
@@ -203,7 +203,7 @@ TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
     ON_CALL(in_proc, num_outputs()).WillByDefault(Return(1));
     ON_CALL(in_proc, event_outputs()).WillByDefault(Return(event_out_ports));
     ON_CALL(out_proc, num_inputs()).WillByDefault(Return(1));
-    g.add_wire({in_proc, 0}, {out_proc, 0});
+    g.audio.insert({in_proc, 0}, {out_proc, 0});
 
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();

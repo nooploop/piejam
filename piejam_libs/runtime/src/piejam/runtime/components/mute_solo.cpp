@@ -39,7 +39,7 @@ public:
     {
         m_mute_solo_amp->connect(g);
 
-        g.add_event_wire(
+        g.event.insert(
                 {*m_mute_solo_proc, 0},
                 m_mute_solo_amp->event_inputs()[0]);
     }

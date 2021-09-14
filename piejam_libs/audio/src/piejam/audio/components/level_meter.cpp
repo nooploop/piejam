@@ -44,8 +44,8 @@ public:
 
     void connect(engine::graph& g) const override
     {
-        g.add_event_wire({*m_left_lm_proc, 0}, {*m_level_convert_proc, 0});
-        g.add_event_wire({*m_right_lm_proc, 0}, {*m_level_convert_proc, 1});
+        g.event.insert({*m_left_lm_proc, 0}, {*m_level_convert_proc, 0});
+        g.event.insert({*m_right_lm_proc, 0}, {*m_level_convert_proc, 1});
     }
 
 private:

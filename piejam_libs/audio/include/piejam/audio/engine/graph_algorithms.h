@@ -19,7 +19,7 @@ auto connected_event_source(graph const&, graph_endpoint const& dst)
         -> std::optional<graph_endpoint>;
 
 bool
-has_wire(graph const&, graph_endpoint const& src, graph_endpoint const& dst);
+has_audio_wire(graph const&, graph_endpoint const& src, graph_endpoint const& dst);
 
 bool has_event_wire(
         graph const&,
