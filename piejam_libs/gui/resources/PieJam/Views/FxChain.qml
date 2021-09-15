@@ -59,6 +59,7 @@ ViewPane {
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
                 spacing: 4
+                cacheBuffer: 10000
 
                 delegate: FxChainModule {
                     anchors.top: if (parent) parent.top
