@@ -72,38 +72,43 @@ public:
     template <class P, std::convertible_to<typename P::value_type> V>
     void set(parameter::id_t<P> id, V&& value) const
     {
-        auto const& proc_map = std::get<processor_map<P>>(m_procs);
-        auto it = proc_map.find(id);
-        if (it != proc_map.end())
-        {
-            if (auto proc = it->second.lock())
-            {
-                proc->set(std::forward<V>(value));
-            }
-        }
+        if (auto proc = find_processor(id))
+            proc->set(std::forward<V>(value));
     }
 
     template <class P, class F>
     auto consume(parameter::id_t<P> id, F&& f) const
     {
-        auto& proc_map = std::get<processor_map<P>>(m_procs);
-        auto it = proc_map.find(id);
-        if (it != proc_map.end())
-        {
-            if (auto proc = it->second.lock())
-                proc->consume(std::forward<F>(f));
-        }
+        if (auto proc = find_processor(id))
+            proc->consume(std::forward<F>(f));
     }
 
-    void clear_expired() { (..., clear_expired<Parameter>()); }
+    bool has_expired() const noexcept
+    {
+        return (has_expired<Parameter>() || ...);
+    }
+
+    void clear_expired() { (clear_expired<Parameter>(), ...); }
 
 private:
     template <class P>
+    static bool expired(typename processor_map<P>::value_type const& p) noexcept
+    {
+        return p.second.expired();
+    }
+
+    template <class P>
+    bool has_expired() const noexcept
+    {
+        return std::ranges::any_of(
+                std::get<processor_map<P>>(m_procs),
+                &expired<P>);
+    }
+
+    template <class P>
     void clear_expired()
     {
-        std::erase_if(std::get<processor_map<P>>(m_procs), [](auto const& p) {
-            return p.second.expired();
-        });
+        std::erase_if(std::get<processor_map<P>>(m_procs), &expired<P>);
     }
 
     std::tuple<processor_map<Parameter>...> m_procs;
@@ -113,7 +118,7 @@ template <class ProcessorFactory, class... P>
 auto
 make_parameter_processor(
         ProcessorFactory& proc_factory,
-        std::variant<P...> const& param,
+        std::variant<parameter::id_t<P>...> const& param,
         std::string_view const& name = {})
         -> std::shared_ptr<audio::engine::processor>
 {

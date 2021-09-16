@@ -24,6 +24,7 @@ add_executable(piejam_runtime_test
     ${CMAKE_CURRENT_SOURCE_DIR}/mute_solo_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mixer_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/parameter_map_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/parameter_processor_factory_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/stream_processor_factory_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/state_test.cpp
 )
