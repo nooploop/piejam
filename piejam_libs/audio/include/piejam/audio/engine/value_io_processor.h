@@ -12,10 +12,6 @@
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/thread/spsc_slot.h>
 
-#include <fmt/format.h>
-
-#include <boost/core/demangle.hpp>
-
 #include <array>
 
 namespace piejam::audio::engine
@@ -28,28 +24,12 @@ public:
     value_io_processor(std::string_view const& name = {})
         : named_processor(name)
         , m_type_name("value_io")
-        , m_event_input_ports({engine::event_port(std::in_place_type<T>, "in")})
-        , m_event_output_ports(
-                  {engine::event_port(std::in_place_type<T>, "out")})
     {
-        m_in_value.push(T{});
     }
 
-    value_io_processor(T const initial, std::string_view const& name = {})
-        : named_processor(name)
-        , m_type_name("value_io")
-        , m_event_input_ports({engine::event_port(std::in_place_type<T>, "in")})
-        , m_event_output_ports{engine::event_port(std::in_place_type<T>, "out")}
-    {
-        m_in_value.push(initial);
-    }
+    void set(T const x) noexcept { m_in_value.push(x); }
 
-    void set(T const x) noexcept(noexcept(m_in_value.push(x)))
-    {
-        m_in_value.push(x);
-    }
-
-    bool get(T& x) { return m_out_value.pull(x); }
+    bool get(T& x) noexcept { return m_out_value.pull(x); }
 
     template <class F>
     void consume(F&& f)
@@ -67,17 +47,19 @@ public:
 
     auto event_inputs() const noexcept -> event_ports override
     {
-        return m_event_input_ports;
+        static std::array s_ports{event_port(std::in_place_type<T>, "in")};
+        return s_ports;
     }
 
     auto event_outputs() const noexcept -> event_ports override
     {
-        return m_event_output_ports;
+        static std::array s_ports{event_port(std::in_place_type<T>, "out")};
+        return s_ports;
     }
 
     void process(engine::process_context const& ctx) override
     {
-        engine::verify_process_context(*this, ctx);
+        verify_process_context(*this, ctx);
 
         auto& out = ctx.event_outputs.get<T>(0);
 
@@ -92,8 +74,6 @@ public:
 
 private:
     std::string m_type_name;
-    std::array<engine::event_port, 1> const m_event_input_ports;
-    std::array<engine::event_port, 1> const m_event_output_ports;
 
     thread::spsc_slot<T> m_in_value;
     thread::spsc_slot<T> m_out_value;
