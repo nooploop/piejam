@@ -26,8 +26,8 @@ public:
     {
     }
 
-    template <class U>
-    constexpr slice(U&& u) requires std::convertible_to<U, span_t>
+    template <std::convertible_to<span_t> U>
+    constexpr slice(U&& u) noexcept(noexcept(span_t(std::forward<U>(u))))
         : m_value(span_t(std::forward<U>(u)))
     {
     }
