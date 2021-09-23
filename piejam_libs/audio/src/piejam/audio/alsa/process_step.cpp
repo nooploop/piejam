@@ -129,17 +129,17 @@ struct interleaved_reader final : pcm_reader
     convert(std::size_t const channel, std::span<float> const& buffer) noexcept
     {
         BOOST_ASSERT(channel < m_num_channels);
-        range::table_view<pcm_sample_t<F>> non_interleaved(
+        range::table_view<pcm_sample_t<F>> interleaved(
                 m_read_buffer.data(),
                 m_num_channels,
                 m_period_size.get(),
                 1,
                 m_num_channels);
 
-        BOOST_ASSERT(non_interleaved[channel].size() == buffer.size());
+        BOOST_ASSERT(interleaved[channel].size() == buffer.size());
 
         std::ranges::transform(
-                non_interleaved[channel],
+                interleaved[channel],
                 buffer.begin(),
                 &pcm_convert::from<F>);
     }
@@ -271,34 +271,32 @@ struct interleaved_writer final : pcm_writer
     convert(std::size_t const channel, std::span<float const> const& buffer)
     {
         BOOST_ASSERT(channel < m_num_channels);
-        range::table_view<pcm_sample_t<F>> non_interleaved(
+        range::table_view<pcm_sample_t<F>> interleaved(
                 m_write_buffer.data(),
                 m_num_channels,
                 m_period_size.get(),
                 1,
                 m_num_channels);
 
-        BOOST_ASSERT(buffer.size() == non_interleaved[channel].size());
+        BOOST_ASSERT(buffer.size() == interleaved[channel].size());
 
         std::ranges::transform(
                 buffer,
-                non_interleaved[channel].begin(),
+                interleaved[channel].begin(),
                 &pcm_convert::to<F>);
     }
 
     void convert(std::size_t const channel, float const constant)
     {
         BOOST_ASSERT(channel < m_num_channels);
-        range::table_view<pcm_sample_t<F>> non_interleaved(
+        range::table_view<pcm_sample_t<F>> interleaved(
                 m_write_buffer.data(),
                 m_num_channels,
                 m_period_size.get(),
                 1,
                 m_num_channels);
 
-        std::ranges::fill(
-                non_interleaved[channel],
-                pcm_convert::to<F>(constant));
+        std::ranges::fill(interleaved[channel], pcm_convert::to<F>(constant));
     }
 
     auto converter() const noexcept -> std::span<converter_f const> override
