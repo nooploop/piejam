@@ -13,11 +13,11 @@ namespace piejam::this_thread
 {
 
 void
-set_priority(int prio)
+set_realtime_priority(int prio)
 {
     sched_param const parm{.sched_priority = prio};
     int const status = pthread_setschedparam(pthread_self(), SCHED_FIFO, &parm);
-    if (status)
+    if (status != 0)
         throw std::system_error(status, std::generic_category());
 }
 

@@ -62,7 +62,7 @@ main(int argc, char* argv[]) -> int
                         }),
                 piejam::thread::configuration{
                         .affinity = boost::lexical_cast<int>(argv[5]),
-                        .priority = 96},
+                        .realtime_priority = 96},
                 {},
                 *audio_device_manager,
                 ladspa_manager,

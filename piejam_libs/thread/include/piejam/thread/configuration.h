@@ -13,7 +13,7 @@ namespace piejam::thread
 struct configuration
 {
     std::optional<int> affinity;
-    std::optional<int> priority;
+    std::optional<int> realtime_priority;
     std::optional<std::string> name;
 
     void apply() const;

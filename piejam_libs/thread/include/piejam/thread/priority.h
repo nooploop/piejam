@@ -7,6 +7,6 @@
 namespace piejam::this_thread
 {
 
-void set_priority(int prio);
+void set_realtime_priority(int prio);
 
 } // namespace piejam::this_thread

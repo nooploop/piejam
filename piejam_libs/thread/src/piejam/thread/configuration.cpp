@@ -16,8 +16,8 @@ configuration::apply() const
 {
     if (affinity)
         this_thread::set_affinity(*affinity);
-    if (priority)
-        this_thread::set_priority(*priority);
+    if (realtime_priority)
+        this_thread::set_realtime_priority(*realtime_priority);
     if (name)
         this_thread::set_name(*name);
 }

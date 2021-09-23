@@ -134,32 +134,40 @@ main(int argc, char* argv[]) -> int
                 rec_dir);
     });
 
-    store.apply_middleware([audio_device_manager = audio_device_manager.get(),
-                            midi_device_manager = midi_device_manager.get(),
-                            &ladspa_manager](
-                                   auto&& get_state,
-                                   auto&& dispatch,
-                                   auto&& next) {
-        thread::configuration const audio_thread_config{
-                2,
-                realtime_priority,
-                "audio_main"};
-        std::array const worker_thread_configs{
-                thread::configuration{3, realtime_priority, "audio_worker_0"},
-                thread::configuration{0, realtime_priority, "audio_worker_1"},
-                thread::configuration{1, realtime_priority, "audio_worker_2"},
-        };
-        return redux::make_middleware<runtime::audio_engine_middleware>(
-                runtime::middleware_functors(
-                        std::forward<decltype(get_state)>(get_state),
-                        std::forward<decltype(dispatch)>(dispatch),
-                        std::forward<decltype(next)>(next)),
-                audio_thread_config,
-                worker_thread_configs,
-                *audio_device_manager,
-                ladspa_manager,
-                runtime::make_midi_input_controller(*midi_device_manager));
-    });
+    store.apply_middleware(
+            [audio_device_manager = audio_device_manager.get(),
+             midi_device_manager = midi_device_manager.get(),
+             &ladspa_manager](auto&& get_state, auto&& dispatch, auto&& next) {
+                thread::configuration const audio_thread_config{
+                        .affinity = 2,
+                        .realtime_priority = realtime_priority,
+                        .name = "audio_main"};
+                std::array const worker_thread_configs{
+                        thread::configuration{
+                                .affinity = 3,
+                                .realtime_priority = realtime_priority,
+                                .name = "audio_worker_0"},
+                        thread::configuration{
+                                .affinity = 0,
+                                .realtime_priority = realtime_priority,
+                                .name = "audio_worker_1"},
+                        thread::configuration{
+                                .affinity = 1,
+                                .realtime_priority = realtime_priority,
+                                .name = "audio_worker_2"},
+                };
+                return redux::make_middleware<runtime::audio_engine_middleware>(
+                        runtime::middleware_functors(
+                                std::forward<decltype(get_state)>(get_state),
+                                std::forward<decltype(dispatch)>(dispatch),
+                                std::forward<decltype(next)>(next)),
+                        audio_thread_config,
+                        worker_thread_configs,
+                        *audio_device_manager,
+                        ladspa_manager,
+                        runtime::make_midi_input_controller(
+                                *midi_device_manager));
+            });
 
     store.apply_middleware([midi_device_manager = midi_device_manager.get()](
                                    auto&& get_state,
