@@ -9,8 +9,8 @@
 #include <boost/hof/unpack.hpp>
 
 #include <concepts>
+#include <iosfwd>
 #include <map>
-#include <string>
 
 namespace piejam::audio::engine
 {
@@ -70,6 +70,6 @@ public:
     event_wires_access event;
 };
 
-auto export_graph_as_dot(graph const&) -> std::string;
+auto export_graph_as_dot(graph const&, std::ostream&) -> std::ostream&;
 
 } // namespace piejam::audio::engine

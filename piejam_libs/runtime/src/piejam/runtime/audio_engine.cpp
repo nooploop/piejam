@@ -868,8 +868,8 @@ audio_engine::rebuild(
     m_impl->param_procs.clear_expired();
     m_impl->stream_procs.clear_expired();
 
-    std::ofstream("graph.dot")
-            << audio::engine::export_graph_as_dot(m_impl->graph) << std::endl;
+    std::ofstream os("graph.dot");
+    audio::engine::export_graph_as_dot(m_impl->graph, os) << std::endl;
 
     return true;
 }

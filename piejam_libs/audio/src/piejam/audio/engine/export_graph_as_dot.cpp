@@ -14,8 +14,8 @@
 #include <boost/range/algorithm_ext/erase.hpp>
 
 #include <algorithm>
+#include <ostream>
 #include <ranges>
-#include <sstream>
 #include <unordered_set>
 #include <vector>
 
@@ -46,14 +46,13 @@ graph_processors(graph const& g)
 }
 
 auto
-export_graph_as_dot(graph const& g) -> std::string
+export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
 {
-    std::stringstream ss;
-    ss << "digraph {" << std::endl;
+    os << "digraph {" << std::endl;
 
     auto all_procs = graph_processors(g);
 
-    ss << "node [shape=plaintext]" << std::endl;
+    os << "node [shape=plaintext]" << std::endl;
 
     constexpr auto const audio_color = "#00ff00";
     constexpr auto const event_color = "#ff00ff";
@@ -63,15 +62,15 @@ export_graph_as_dot(graph const& g) -> std::string
         auto const num_event_inputs = p.event_inputs().size();
         auto const num_event_outputs = p.event_outputs().size();
 
-        ss << p.type_name() << '_' << std::addressof(p) << " [label=<<table>"
+        os << p.type_name() << '_' << std::addressof(p) << " [label=<<table>"
            << std::endl;
 
         if (p.num_inputs() || num_event_inputs)
         {
-            ss << "<tr>" << std::endl;
+            os << "<tr>" << std::endl;
             for (std::size_t i = 0; i < p.num_inputs(); ++i)
             {
-                ss << fmt::format(
+                os << fmt::format(
                               "<td port=\"ai{}\" bgcolor=\"{}\">a{}</td>",
                               i,
                               audio_color,
@@ -80,7 +79,7 @@ export_graph_as_dot(graph const& g) -> std::string
             }
             for (std::size_t i = 0; i < num_event_inputs; ++i)
             {
-                ss << fmt::format(
+                os << fmt::format(
                               "<td port=\"ei{}\" bgcolor=\"{}\">{}</td>",
                               i,
                               event_color,
@@ -88,25 +87,25 @@ export_graph_as_dot(graph const& g) -> std::string
                                       p.event_inputs()[i].name()))
                    << std::endl;
             }
-            ss << "</tr>" << std::endl;
+            os << "</tr>" << std::endl;
         }
 
-        ss << "<tr>" << std::endl;
-        ss << fmt::format(
+        os << "<tr>" << std::endl;
+        os << fmt::format(
                 "<td colspan=\"{}\">{}:{}</td>",
                 std::max(
                         p.num_inputs() + num_event_inputs,
                         p.num_outputs() + p.event_outputs().size()),
                 p.type_name(),
                 algorithm::escape_html(p.name()));
-        ss << "</tr>" << std::endl;
+        os << "</tr>" << std::endl;
 
         if (p.num_outputs() || num_event_outputs)
         {
-            ss << "<tr>" << std::endl;
+            os << "<tr>" << std::endl;
             for (std::size_t i = 0; i < p.num_outputs(); ++i)
             {
-                ss << fmt::format(
+                os << fmt::format(
                               "<td port=\"ao{}\" bgcolor=\"{}\">a{}</td>",
                               i,
                               audio_color,
@@ -115,7 +114,7 @@ export_graph_as_dot(graph const& g) -> std::string
             }
             for (std::size_t i = 0; i < num_event_outputs; ++i)
             {
-                ss << fmt::format(
+                os << fmt::format(
                               "<td port=\"eo{}\" bgcolor=\"{}\">{}</td>",
                               i,
                               event_color,
@@ -123,10 +122,10 @@ export_graph_as_dot(graph const& g) -> std::string
                                       p.event_outputs()[i].name()))
                    << std::endl;
             }
-            ss << "</tr>" << std::endl;
+            os << "</tr>" << std::endl;
         }
 
-        ss << "</table>>]" << std::endl;
+        os << "</table>>]" << std::endl;
     }
 
     constexpr auto print_wire = [](auto& ss,
@@ -148,13 +147,14 @@ export_graph_as_dot(graph const& g) -> std::string
     };
 
     for (auto const& w : g.audio)
-        print_wire(ss, w, 'a', audio_color);
+        print_wire(os, w, 'a', audio_color);
 
     for (auto const& w : g.event)
-        print_wire(ss, w, 'e', event_color);
+        print_wire(os, w, 'e', event_color);
 
-    ss << "}" << std::endl; // digraph
-    return ss.str();
+    os << "}" << std::endl; // digraph
+
+    return os;
 }
 
 } // namespace piejam::audio::engine
