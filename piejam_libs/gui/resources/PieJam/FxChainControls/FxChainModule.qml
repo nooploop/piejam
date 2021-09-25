@@ -10,6 +10,8 @@ import QtQml 2.15
 
 import PieJam.Models 1.0
 
+import "../Controls"
+
 Item {
     id: root
 
@@ -198,26 +200,12 @@ Item {
             }
         }
 
-        BusyIndicator {
-            id: busyLoading
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            running: moduleContent.status != Loader.Ready
-            visible: moduleContent.status != Loader.Ready
-        }
-
-        Loader {
+        BusyLoader {
             id: moduleContent
 
             anchors.top: nameLabel.bottom
             anchors.topMargin: 4
             anchors.bottom: parent.bottom
-
-            asynchronous: true
-
-            visible: status == Loader.Ready
 
             sourceComponent: {
                 if (root.content) {
