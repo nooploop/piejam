@@ -9,6 +9,8 @@ import QtQuick.Controls.Material 2.15
 Item {
     id: root
 
+    property alias active: loader.active
+    property alias item: loader.item
     property alias sourceComponent: loader.sourceComponent
 
     implicitWidth: loader.item ? loader.item.implicitWidth : 200

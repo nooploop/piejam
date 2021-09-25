@@ -37,16 +37,23 @@ ViewPane {
         visible: false
         model: chainModel
 
-        delegate: Item {
+        delegate: BusyLoader {
             id: fxChain
 
             property var modelItem: model.item
 
             function positionViewAtIndex(index, positionMode) {
-                fxModules.positionViewAtIndex(index, positionMode)
+                fxChain.item.positionViewAtIndex(index, positionMode)
             }
 
-            ListView {
+            active: false
+
+            onVisibleChanged: {
+                if (fxChain.visible && !fxChain.active)
+                    fxChain.active = true
+            }
+
+            sourceComponent: ListView {
                 id: fxModules
 
                 anchors.fill: parent
