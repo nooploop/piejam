@@ -70,5 +70,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Util/ColorExt.js</file>
         <file>PieJam/ModelSubscription.qml</file>
         <file>PieJam/Controls/BusyLoader.qml</file>
+        <file>PieJam/FxChainControls/ParameterTouchstrip.qml</file>
+        <file>PieJam/Controls/Touchstrip.qml</file>
     </qresource>
 </RCC>

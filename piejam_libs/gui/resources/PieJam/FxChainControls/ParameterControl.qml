@@ -92,14 +92,25 @@ Item {
             anchors.fill: parent
             anchors.margins: 8
 
-            currentIndex: root.paramModel ? (root.paramModel.isSwitch ? 1 : 0) : 0
+            currentIndex: root.paramModel ? (root.paramModel.isSwitch ? 2 : (root.paramModel.stepped ? 1 : 0)) : 0
+
+            ParameterTouchstrip {
+                id: valueTouchstrip
+
+                value: root.paramModel ? root.paramModel.value : 0
+
+                onChangeValue: {
+                    if (root.paramModel)
+                        root.paramModel.changeValue(newValue)
+                }
+            }
 
             Slider {
                 id: valueSlider
 
-                from: root.paramModel ? (root.paramModel.stepped ? root.paramModel.minValue : 0.0) : 0.0
-                to: root.paramModel ? (root.paramModel.stepped ? root.paramModel.maxValue : 1.0) : 1.0
-                stepSize: root.paramModel ? (root.paramModel.stepped ? 1.0 : 0.0) : 0.0
+                from: root.paramModel ? root.paramModel.minValue : 0.0
+                to: root.paramModel ? root.paramModel.maxValue : 1.0
+                stepSize: root.paramModel ? 1.0 : 0.0
 
                 value: root.paramModel ? root.paramModel.value : 0
 
