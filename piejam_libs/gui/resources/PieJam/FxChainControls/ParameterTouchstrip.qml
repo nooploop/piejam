@@ -69,13 +69,14 @@ Item {
         Button {
             id: relButton
 
-            text: "fine"
             checkable: true
+            display: AbstractButton.IconOnly
+            icon.source: "qrc:///images/icons/arrow-expand-vertical.svg"
 
             Layout.leftMargin: 2
             Layout.rightMargin: 2
             Layout.fillWidth: true
-            Layout.maximumHeight: 36
+            Layout.maximumHeight: 40
         }
     }
 }
