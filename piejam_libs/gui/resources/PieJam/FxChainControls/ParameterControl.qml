@@ -15,9 +15,6 @@ Item {
 
     property var paramModel: null
 
-    signal sliderMoved(real newValue)
-    signal switchToggled(bool newValue)
-
     implicitWidth: 82
 
     Rectangle {
@@ -105,21 +102,18 @@ Item {
                 }
             }
 
-            Slider {
+            EnumSlider {
                 id: valueSlider
 
                 from: root.paramModel ? root.paramModel.minValue : 0.0
                 to: root.paramModel ? root.paramModel.maxValue : 1.0
-                stepSize: root.paramModel ? 1.0 : 0.0
 
                 value: root.paramModel ? root.paramModel.value : 0
 
-                orientation: Qt.Vertical
-
-                onMoved: {
+                onChangeValue: {
                     if (root.paramModel)
-                        root.paramModel.changeValue(valueSlider.value)
-                    sliderMoved(valueSlider.value)
+                        root.paramModel.changeValue(newValue)
+
                     Info.quickTip = "<b>" + nameLabel.text + "</b>: " + valueLabel.text
                 }
             }
@@ -132,7 +126,7 @@ Item {
                 onToggled: {
                     if (root.paramModel)
                         root.paramModel.changeSwitchValue(toggleSwitch.checked)
-                    root.switchToggled(toggleSwitch.checked)
+
                     Info.quickTip = "<b>" + nameLabel.text + "</b>: " + (root.switchValue ? "on" : "off")
                 }
             }
