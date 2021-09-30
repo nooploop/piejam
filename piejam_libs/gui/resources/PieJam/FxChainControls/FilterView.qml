@@ -74,6 +74,7 @@ Item {
         id: spectrum
 
         anchors.top: parent.top
+        anchors.topMargin: 4
         anchors.bottom: parent.bottom
         anchors.left: filterTypeButtons.right
         anchors.leftMargin: 8
@@ -138,7 +139,10 @@ Item {
             posX: root.content ? root.content.cutoff.value : 0
             posY: root.content ? 1 - root.content.resonance.value : 0
 
-            onPosChanged: {
+            handleRadius: 6
+            handleColor: Material.color(Material.Yellow, Material.Shade400)
+
+            onChangePos: {
                 if (root.content)
                     root.content.cutoff.changeValue(x)
 

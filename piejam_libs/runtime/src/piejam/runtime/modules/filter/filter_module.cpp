@@ -48,16 +48,10 @@ to_type_string(int const n) -> std::string
     }
 }
 
-struct cutoff_ival
-{
-    static constexpr float min{20.f};
-    static constexpr float max{20000.f};
-};
-
 struct cutoff_defaults
 {
     static constexpr float default_value{440.f};
-    static constexpr float min{20.f};
+    static constexpr float min{10.f};
     static constexpr float max{20000.f};
 };
 

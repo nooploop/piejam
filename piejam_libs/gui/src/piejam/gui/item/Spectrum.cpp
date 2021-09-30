@@ -28,7 +28,7 @@ namespace
 struct FrequencyScale final
 {
     float size{1};
-    static constexpr float minFrequency{20};
+    static constexpr float minFrequency{10};
     static constexpr float maxFrequency{20000};
 
     static constexpr bool inRange(float const f) noexcept
@@ -68,12 +68,12 @@ struct LevelScale final
     }
 };
 
-std::array s_frequencyTicks{20.f,   30.f,   40.f,    50.f,   60.f,   70.f,
-                            80.f,   90.f,   100.f,   200.f,  300.f,  400.f,
-                            500.f,  600.f,  700.f,   800.f,  900.f,  1000.f,
-                            2000.f, 3000.f, 4000.f,  5000.f, 6000.f, 7000.f,
-                            8000.f, 9000.f, 10000.f, 20000.f};
-std::array s_frequencyLabels{20.f, 100.f, 1000.f, 10000.f};
+std::array s_frequencyTicks{10.f,   20.f,   30.f,   40.f,    50.f,   60.f,
+                            70.f,   80.f,   90.f,   100.f,   200.f,  300.f,
+                            400.f,  500.f,  600.f,  700.f,   800.f,  900.f,
+                            1000.f, 2000.f, 3000.f, 4000.f,  5000.f, 6000.f,
+                            7000.f, 8000.f, 9000.f, 10000.f, 20000.f};
+std::array s_frequencyLabels{10.f, 100.f, 1000.f, 10000.f};
 
 std::array s_levelTicks{-100.f, -80.f, -60.f, -40.f, -20.f, 0.f};
 std::array s_levelLabels{-80.f, -60.f, -40.f, -20.f, 0.f};
