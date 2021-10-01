@@ -204,7 +204,7 @@ Item {
             id: moduleContent
 
             anchors.top: nameLabel.bottom
-            anchors.topMargin: 4
+            anchors.topMargin: 6
             anchors.bottom: parent.bottom
 
             sourceComponent: {
