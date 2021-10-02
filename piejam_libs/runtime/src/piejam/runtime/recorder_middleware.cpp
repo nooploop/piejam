@@ -66,19 +66,22 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
 
     next(a);
 
+    BOOST_ASSERT(st.recording);
+
     auto const& recorder_streams = *get_state().recorder_streams;
     if (recorder_streams.empty())
         return;
 
     auto take_dir = m_impl->recordings_dir /
-                    fmt::format("session_{:04}", st.rec_session) /
+                    fmt::format("session_{:06}", st.rec_session) /
                     fmt::format("take_{:04}", st.rec_take);
 
-    if (!std::filesystem::create_directories(take_dir))
+    std::error_code ec;
+    if (!std::filesystem::create_directories(take_dir, ec))
     {
         spdlog::error(
                 "Could not create recordings directory: {}",
-                std::strerror(errno));
+                ec.message());
         return;
     }
 
@@ -94,11 +97,13 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
         auto filename = take_dir / fmt::format("{}.wav", *mixer_channel->name);
 
         std::size_t file_num{};
-        while (std::filesystem::exists(filename))
+        while (std::filesystem::exists(filename, ec))
+        {
             filename = take_dir / fmt::format(
                                           "{} ({}).wav",
                                           *mixer_channel->name,
                                           ++file_num);
+        }
 
         auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
         if (SndfileHandle::formatCheck(format, 2, st.sample_rate.as_int()))
@@ -111,11 +116,15 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
                     st.sample_rate.as_int());
 
             if (sndfile)
+            {
                 open_streams.emplace(stream_id, std::move(sndfile));
+            }
             else
+            {
                 spdlog::error(
                         "Could not create file for recording: {}",
                         sndfile.strError());
+            }
         }
         else
         {
@@ -148,10 +157,12 @@ recorder_middleware::process_recorder_action(actions::update_streams const& a)
             auto const written =
                     it->second.writef(buffer->samples().data(), num_frames);
             if (static_cast<std::size_t>(written) < num_frames)
+            {
                 spdlog::warn(
                         "Could not write {} frames: {}",
                         num_frames - written,
                         it->second.strError());
+            }
         }
     }
 

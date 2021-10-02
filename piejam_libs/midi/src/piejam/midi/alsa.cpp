@@ -191,7 +191,7 @@ midi_devices::~midi_devices()
 
     if (auto err = m_seq.ioctl(SNDRV_SEQ_IOCTL_UNSUBSCRIBE_PORT, port_sub))
         spdlog::error(
-                "midi_manager: failed to unsubscribe from system "
+                "midi_devices: failed to unsubscribe from system "
                 "announcements: {}",
                 err.message());
 }
@@ -223,7 +223,7 @@ midi_devices::disconnect_input(
 
     if (auto err = m_seq.ioctl(SNDRV_SEQ_IOCTL_UNSUBSCRIBE_PORT, port_sub))
         spdlog::warn(
-                "midi_manager: disconnect from input failed: {}",
+                "midi_devices: disconnect from input failed: {}",
                 err.message());
 }
 
