@@ -30,7 +30,7 @@ auto make_replace_fx_module_action(
         mixer::channel_id fx_chain_id,
         std::size_t position,
         ladspa::plugin_id_t,
-        std::string_view const& name,
+        std::string_view name,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> batch_action;
@@ -39,6 +39,6 @@ auto replace_fx_module(
         mixer::channel_id fx_chain_id,
         std::size_t position,
         ladspa::plugin_id_t,
-        std::string_view const& name) -> thunk_action;
+        std::string_view name) -> thunk_action;
 
 } // namespace piejam::runtime::actions

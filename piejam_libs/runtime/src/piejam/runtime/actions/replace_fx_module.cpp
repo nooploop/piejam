@@ -64,7 +64,7 @@ make_replace_fx_module_action(
         mixer::channel_id const fx_chain_id,
         std::size_t const position,
         ladspa::plugin_id_t const plugin_id,
-        std::string_view const& name,
+        std::string_view const name,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> batch_action
@@ -97,7 +97,7 @@ replace_fx_module(
         mixer::channel_id const fx_chain_id,
         std::size_t const position,
         ladspa::plugin_id_t const plugin_id,
-        std::string_view const& name) -> thunk_action
+        std::string_view const name) -> thunk_action
 {
     return [=, name = std::string(name)](auto&& get_state, auto&& dispatch) {
         dispatch(make_replace_fx_module_action(

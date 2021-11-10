@@ -20,14 +20,14 @@ auto make_mixer_channel_input(
         mixer::channel const&,
         audio::bus_type,
         parameter_processor_factory&,
-        std::string_view const& name = {})
+        std::string_view name = {})
         -> std::unique_ptr<audio::engine::component>;
 
 auto make_mixer_channel_output(
         mixer::channel const&,
         audio::sample_rate const&,
         parameter_processor_factory&,
-        std::string_view const& name = {})
+        std::string_view name = {})
         -> std::unique_ptr<audio::engine::component>;
 
 } // namespace piejam::runtime::components

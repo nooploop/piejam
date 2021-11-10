@@ -12,7 +12,7 @@ namespace piejam::algorithm
 {
 
 inline auto
-escape_html(std::string_view const& src) -> std::string
+escape_html(std::string_view const src) -> std::string
 {
     std::string dst;
     dst.reserve(static_cast<std::size_t>(1.05f * src.size()));

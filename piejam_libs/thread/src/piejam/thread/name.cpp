@@ -14,7 +14,7 @@ namespace piejam::this_thread
 {
 
 void
-set_name(std::string_view const& name)
+set_name(std::string_view const name)
 {
     BOOST_ASSERT(name.length() < 16);
     int const status = pthread_setname_np(pthread_self(), name.data());

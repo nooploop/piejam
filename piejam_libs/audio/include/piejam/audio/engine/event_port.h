@@ -19,7 +19,7 @@ class event_port
 {
 public:
     template <class T>
-    event_port(std::in_place_type_t<T>, std::string_view const& name = {})
+    event_port(std::in_place_type_t<T>, std::string_view const name = {})
         : m_type(typeid(T))
         , m_name(name)
         , m_make_event_buffer(&make_event_buffer<T>)

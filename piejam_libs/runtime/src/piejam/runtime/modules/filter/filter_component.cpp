@@ -170,7 +170,7 @@ class processor final
               single_event_input_processor<processor, coefficients>
 {
 public:
-    processor(std::string_view const& name)
+    processor(std::string_view const name)
         : named_processor(name)
     {
     }
@@ -274,7 +274,7 @@ public:
             audio::sample_rate const& sample_rate,
             parameter_processor_factory& proc_factory,
             processors::stream_processor_factory& stream_proc_factory,
-            std::string_view const& /*name*/)
+            std::string_view const /*name*/)
         : m_type_input_proc(processors::make_parameter_processor(
                   proc_factory,
                   fx_mod.parameters->at(to_underlying(parameter_key::type)),
@@ -310,19 +310,13 @@ public:
     void connect(audio::engine::graph& g) const override
     {
         g.event.insert({*m_type_input_proc, 0}, {*m_event_converter_proc, 0});
-        g.event.insert(
-                {*m_cutoff_input_proc, 0},
-                {*m_event_converter_proc, 1});
+        g.event.insert({*m_cutoff_input_proc, 0}, {*m_event_converter_proc, 1});
         g.event.insert(
                 {*m_resonance_input_proc, 0},
                 {*m_event_converter_proc, 2});
 
-        g.event.insert(
-                {*m_event_converter_proc, 0},
-                {*m_filter_left_proc, 0});
-        g.event.insert(
-                {*m_event_converter_proc, 0},
-                {*m_filter_right_proc, 0});
+        g.event.insert({*m_event_converter_proc, 0}, {*m_filter_left_proc, 0});
+        g.event.insert({*m_event_converter_proc, 0}, {*m_filter_right_proc, 0});
 
         g.audio.insert({*m_input_left_proc, 0}, {*m_filter_left_proc, 0});
         g.audio.insert({*m_input_right_proc, 0}, {*m_filter_right_proc, 0});
@@ -380,7 +374,7 @@ make_component(
         audio::sample_rate const& sample_rate,
         parameter_processor_factory& proc_factory,
         processors::stream_processor_factory& stream_proc_factory,
-        std::string_view const& name)
+        std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<component>(

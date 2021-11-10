@@ -53,13 +53,13 @@ public:
     operator bool() const noexcept { return m_handle; }
 
     template <class Signature>
-    auto symbol(std::string_view const& name) const
+    auto symbol(std::string_view const name) const
     {
         return detail::dll_symbol<Signature>{}(symbol(name));
     }
 
 private:
-    auto symbol(std::string_view const& name) const -> void*;
+    auto symbol(std::string_view const name) const -> void*;
 
     void* m_handle{};
 };

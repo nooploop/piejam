@@ -16,7 +16,7 @@ namespace piejam::audio::engine
 class input_processor final : public named_processor
 {
 public:
-    input_processor(std::string_view const& name = {});
+    input_processor(std::string_view name = {});
 
     void set_input(pcm_input_buffer_converter const& engine_input)
     {

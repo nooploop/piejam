@@ -21,7 +21,7 @@ template <class T>
 class value_io_processor final : public engine::named_processor
 {
 public:
-    value_io_processor(std::string_view const& name = {})
+    value_io_processor(std::string_view const name = {})
         : named_processor(name)
         , m_type_name("value_io")
     {

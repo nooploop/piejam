@@ -16,7 +16,7 @@ namespace piejam::audio::engine
 class output_processor final : public named_processor
 {
 public:
-    output_processor(std::string_view const& name = {});
+    output_processor(std::string_view name = {});
 
     void set_output(pcm_output_buffer_converter const& engine_output)
     {

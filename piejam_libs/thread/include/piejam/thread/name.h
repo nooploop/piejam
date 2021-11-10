@@ -9,6 +9,6 @@
 namespace piejam::this_thread
 {
 
-void set_name(std::string_view const&);
+void set_name(std::string_view);
 
 } // namespace piejam::this_thread

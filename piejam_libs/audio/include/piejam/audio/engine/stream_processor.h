@@ -20,7 +20,7 @@ public:
     stream_processor(
             std::size_t num_channels,
             std::size_t capacity_per_channel,
-            std::string_view const& name = {});
+            std::string_view name = {});
 
     auto type_name() const noexcept -> std::string_view override
     {
@@ -63,6 +63,6 @@ private:
 auto make_stream_processor(
         std::size_t num_channels,
         std::size_t capacity_per_channel,
-        std::string_view const& name = {}) -> std::unique_ptr<stream_processor>;
+        std::string_view name = {}) -> std::unique_ptr<stream_processor>;
 
 } // namespace piejam::audio::engine

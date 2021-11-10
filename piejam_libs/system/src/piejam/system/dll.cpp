@@ -45,7 +45,7 @@ dll::operator=(dll&& other) -> dll&
 }
 
 auto
-dll::symbol(std::string_view const& name) const -> void*
+dll::symbol(std::string_view const name) const -> void*
 {
     BOOST_ASSERT(m_handle);
     void* const res = dlsym(m_handle, name.data());

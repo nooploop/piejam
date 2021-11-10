@@ -30,7 +30,7 @@ class fx_gain final : public audio::engine::component
 public:
     fx_gain(fx::module const& fx_mod,
             parameter_processor_factory& proc_factory,
-            std::string_view const& name)
+            std::string_view const name)
         : m_gain_input_proc(processors::make_parameter_processor(
                   proc_factory,
                   fx_mod.parameters->at(to_underlying(parameter_key::gain)),
@@ -58,9 +58,7 @@ public:
     {
         m_amplifier->connect(g);
 
-        g.event.insert(
-                {*m_gain_input_proc, 0},
-                m_amplifier->event_inputs()[0]);
+        g.event.insert({*m_gain_input_proc, 0}, m_amplifier->event_inputs()[0]);
     }
 
 private:
@@ -74,7 +72,7 @@ auto
 make_component(
         fx::module const& fx_mod,
         parameter_processor_factory& proc_factory,
-        std::string_view const& name)
+        std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<fx_gain>(fx_mod, proc_factory, name);

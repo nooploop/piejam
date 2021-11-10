@@ -14,7 +14,7 @@ namespace piejam::audio::engine
 class named_processor : public processor
 {
 public:
-    named_processor(std::string_view const& name = {})
+    named_processor(std::string_view const name = {})
         : m_name(name)
     {
     }

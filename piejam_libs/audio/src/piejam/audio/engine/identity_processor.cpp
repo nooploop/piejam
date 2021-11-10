@@ -17,7 +17,7 @@ namespace
 class identity_processor final : public named_processor
 {
 public:
-    identity_processor(std::string_view const& name)
+    identity_processor(std::string_view const name)
         : named_processor(name)
     {
     }
@@ -44,7 +44,7 @@ public:
 } // namespace
 
 auto
-make_identity_processor(std::string_view const& name)
+make_identity_processor(std::string_view const name)
         -> std::unique_ptr<processor>
 {
     return std::make_unique<identity_processor>(name);

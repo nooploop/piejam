@@ -16,7 +16,7 @@
 namespace piejam::audio::engine
 {
 
-output_processor::output_processor(std::string_view const& name)
+output_processor::output_processor(std::string_view const name)
     : named_processor(name)
 {
 }

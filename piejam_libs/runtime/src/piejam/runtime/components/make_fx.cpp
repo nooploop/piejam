@@ -33,7 +33,7 @@ make_internal_fx(
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
         audio::sample_rate const& sample_rate,
-        std::string_view const& name)
+        std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
     switch (fx_type)
@@ -75,7 +75,7 @@ make_fx(fx::module const& fx_mod,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
         audio::sample_rate const& sample_rate,
-        std::string_view const& name)
+        std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::visit(

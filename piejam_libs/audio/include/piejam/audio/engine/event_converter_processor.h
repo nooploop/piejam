@@ -38,8 +38,8 @@ public:
     event_converter_processor(
             F&& out_gen,
             std::span<std::string_view const> const& input_names = {},
-            std::string_view const& output_name = {},
-            std::string_view const& name = {})
+            std::string_view const output_name = {},
+            std::string_view const name = {})
         : named_processor(name)
         , m_out_gen(std::forward<F>(out_gen))
         , m_input_event_ports(make_input_event_ports(
@@ -137,22 +137,22 @@ template <class F>
 event_converter_processor(
         F&&,
         std::span<std::string_view const> const&,
-        std::string_view const&) -> event_converter_processor<F>;
+        std::string_view) -> event_converter_processor<F>;
 
 template <class F>
 event_converter_processor(
         F&&,
         std::span<std::string_view const> const&,
-        std::string_view const&,
-        std::string_view const&) -> event_converter_processor<F>;
+        std::string_view,
+        std::string_view) -> event_converter_processor<F>;
 
 template <class F>
 auto
 make_event_converter_processor(
         F&& f,
         std::span<std::string_view const> const& input_names = {},
-        std::string_view const& output_name = {},
-        std::string_view const& name = {}) -> std::unique_ptr<processor>
+        std::string_view const output_name = {},
+        std::string_view const name = {}) -> std::unique_ptr<processor>
 {
     return std::make_unique<event_converter_processor<F>>(
             std::forward<F>(f),

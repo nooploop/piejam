@@ -60,7 +60,7 @@ template <std::size_t NumInputs>
 class mix_processor final : public named_processor
 {
 public:
-    mix_processor(std::string_view const& name) requires(NumInputs != npos)
+    mix_processor(std::string_view const name) requires(NumInputs != npos)
         : named_processor(name)
         , m_num_inputs(NumInputs)
     {
@@ -68,7 +68,7 @@ public:
 
     mix_processor(
             std::size_t const num_inputs,
-            std::string_view const& name) requires(NumInputs == npos)
+            std::string_view const name) requires(NumInputs == npos)
         : named_processor(name)
         , m_num_inputs(num_inputs)
     {
@@ -104,7 +104,7 @@ private:
 #define PIEJAM_MAX_NUM_FIXED_INPUTS_MIX_PROCESSOR 8
 
 auto
-make_mix_processor(std::size_t const num_inputs, std::string_view const& name)
+make_mix_processor(std::size_t const num_inputs, std::string_view const name)
         -> std::unique_ptr<processor>
 {
     switch (num_inputs)

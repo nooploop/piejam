@@ -27,7 +27,7 @@ class event_to_audio_processor final
 public:
     event_to_audio_processor(
             std::size_t const smooth_length,
-            std::string_view const& name)
+            std::string_view const name)
         : named_processor(name)
         , m_smooth_length(smooth_length)
     {
@@ -108,7 +108,7 @@ private:
 auto
 make_event_to_audio_processor(
         std::size_t const smooth_length,
-        std::string_view const& name) -> std::unique_ptr<processor>
+        std::string_view const name) -> std::unique_ptr<processor>
 {
     return std::make_unique<event_to_audio_processor>(smooth_length, name);
 }

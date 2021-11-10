@@ -359,7 +359,7 @@ insert_missing_ladspa_fx_module(
         mixer::channel_id const bus_id,
         std::size_t const position,
         fx::unavailable_ladspa const& unavail,
-        std::string_view const& name)
+        std::string_view const name)
 {
     BOOST_ASSERT(bus_id != mixer::channel_id{});
 

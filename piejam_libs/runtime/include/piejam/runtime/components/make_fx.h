@@ -23,7 +23,7 @@ make_fx(fx::module const&,
         parameter_processor_factory&,
         processors::stream_processor_factory&,
         audio::sample_rate const&,
-        std::string_view const& name = {})
+        std::string_view name = {})
         -> std::unique_ptr<audio::engine::component>;
 
 } // namespace piejam::runtime::components

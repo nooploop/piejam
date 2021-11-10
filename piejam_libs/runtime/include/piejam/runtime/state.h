@@ -136,7 +136,7 @@ void insert_missing_ladspa_fx_module(
         mixer::channel_id,
         std::size_t position,
         fx::unavailable_ladspa const&,
-        std::string_view const& name);
+        std::string_view name);
 void remove_fx_module(state&, fx::module_id fx_mod_id);
 
 void update_midi_assignments(state&, midi_assignments_map const&);

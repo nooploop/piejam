@@ -25,7 +25,7 @@ template <bus_type C>
 class pan_balance_processor final : public named_processor
 {
 public:
-    pan_balance_processor(std::string_view const& name)
+    pan_balance_processor(std::string_view const name)
         : named_processor(name)
     {
     }
@@ -86,14 +86,14 @@ public:
 } // namespace
 
 auto
-make_pan_processor(std::string_view const& name)
+make_pan_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     return std::make_unique<pan_balance_processor<audio::bus_type::mono>>(name);
 }
 
 auto
-make_stereo_balance_processor(std::string_view const& name)
+make_stereo_balance_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     return std::make_unique<pan_balance_processor<audio::bus_type::stereo>>(

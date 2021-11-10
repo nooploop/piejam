@@ -20,7 +20,7 @@ auto make_component(
         audio::sample_rate const&,
         parameter_processor_factory&,
         processors::stream_processor_factory&,
-        std::string_view const& name = {})
+        std::string_view name = {})
         -> std::unique_ptr<audio::engine::component>;
 
 } // namespace piejam::runtime::modules::filter

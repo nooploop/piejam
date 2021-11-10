@@ -10,7 +10,7 @@ namespace piejam::runtime::processors
 {
 
 auto
-make_mute_solo_processor(std::string_view const& name)
+make_mute_solo_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     static constexpr std::array const s_input_names{

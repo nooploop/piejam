@@ -104,9 +104,7 @@ public:
         g.event.insert(
                 {*m_volume_input_proc, 0},
                 m_volume_amp->event_inputs()[0]);
-        g.event.insert(
-                {*m_mute_input_proc, 0},
-                m_mute_solo->event_inputs()[0]);
+        g.event.insert({*m_mute_input_proc, 0}, m_mute_solo->event_inputs()[0]);
 
         audio::engine::connect_stereo_components(
                 g,
@@ -143,7 +141,7 @@ make_mixer_channel_input(
         mixer::channel const& mixer_channel,
         audio::bus_type const bus_type,
         parameter_processor_factory& param_procs,
-        std::string_view const& /*name*/)
+        std::string_view const /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<mixer_channel_input>(
@@ -157,7 +155,7 @@ make_mixer_channel_output(
         mixer::channel const& mixer_channel,
         audio::sample_rate const& sample_rate,
         parameter_processor_factory& param_procs,
-        std::string_view const& /*name*/)
+        std::string_view const /*name*/)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<mixer_channel_output>(

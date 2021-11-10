@@ -27,7 +27,7 @@ public:
             audio_stream_id,
             std::size_t num_channels,
             std::size_t capacity_per_channel,
-            std::string_view const& name = {}) -> std::shared_ptr<processor_t>;
+            std::string_view name = {}) -> std::shared_ptr<processor_t>;
 
     auto find_processor(audio_stream_id) const -> std::shared_ptr<processor_t>;
 

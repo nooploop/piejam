@@ -12,7 +12,7 @@
 namespace piejam::audio::engine
 {
 
-auto make_identity_processor(std::string_view const& name = {})
+auto make_identity_processor(std::string_view name = {})
         -> std::unique_ptr<processor>;
 
 bool is_identity_processor(processor const&);

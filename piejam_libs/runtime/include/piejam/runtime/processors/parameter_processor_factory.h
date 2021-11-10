@@ -34,8 +34,7 @@ public:
             std::weak_ptr<parameter_processor<P>>>;
 
     template <class P>
-    auto
-    make_processor(parameter::id_t<P> id, std::string_view const& name = {})
+    auto make_processor(parameter::id_t<P> id, std::string_view const name = {})
             -> std::shared_ptr<parameter_processor<P>>
     {
         auto proc = std::make_shared<parameter_processor<P>>(name);
@@ -119,7 +118,7 @@ auto
 make_parameter_processor(
         ProcessorFactory& proc_factory,
         std::variant<parameter::id_t<P>...> const& param,
-        std::string_view const& name = {})
+        std::string_view const name = {})
         -> std::shared_ptr<audio::engine::processor>
 {
     return std::visit(

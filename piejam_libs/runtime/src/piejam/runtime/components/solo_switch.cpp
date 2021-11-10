@@ -31,7 +31,7 @@ class solo_switch_processor final : public audio::engine::named_processor
 public:
     solo_switch_processor(
             solo_group_t const& solo_group,
-            std::string_view const& name = {})
+            std::string_view const name = {})
         : named_processor(name)
         , m_solo_group(solo_group.size())
     {
@@ -119,7 +119,7 @@ public:
     solo_switch(
             solo_group_t const& solo_group,
             parameter_processor_factory& param_procs,
-            std::string_view const& name)
+            std::string_view const name)
         : m_solo_inputs(make_solo_inputs(solo_group, param_procs))
         , m_solo_switch_proc(
                   std::make_unique<solo_switch_processor>(solo_group, name))
@@ -179,7 +179,7 @@ auto
 make_solo_switch(
         solo_group_t const& solo_group,
         parameter_processor_factory& param_procs,
-        std::string_view const& name)
+        std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<solo_switch>(solo_group, param_procs, name);

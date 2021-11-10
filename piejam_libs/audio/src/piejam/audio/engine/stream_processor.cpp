@@ -19,7 +19,7 @@ namespace piejam::audio::engine
 stream_processor::stream_processor(
         std::size_t const num_channels,
         std::size_t const capacity_per_channel,
-        std::string_view const& name)
+        std::string_view const name)
     : named_processor(name)
     , m_num_channels(num_channels)
     , m_stream_fn(get_stream_fn(num_channels))
@@ -136,9 +136,9 @@ stream_processor::get_stream_fn(std::size_t const num_channels) -> stream_fn_t
 
 auto
 make_stream_processor(
-        std::size_t num_channels,
-        std::size_t capacity_per_channel,
-        std::string_view const& name) -> std::unique_ptr<stream_processor>
+        std::size_t const num_channels,
+        std::size_t const capacity_per_channel,
+        std::string_view const name) -> std::unique_ptr<stream_processor>
 {
     return std::make_unique<stream_processor>(
             num_channels,

@@ -26,7 +26,7 @@ public:
             audio_stream_id const stream_id,
             processors::stream_processor_factory& stream_proc_factory,
             std::size_t const buffer_capacity_per_channel,
-            std::string_view const& name)
+            std::string_view const name)
         : m_stream_proc(stream_proc_factory.make_processor(
                   stream_id,
                   2,
@@ -73,7 +73,7 @@ make_stereo_stream(
         audio_stream_id const stream_id,
         processors::stream_processor_factory& stream_proc_factory,
         std::size_t const buffer_capacity_per_channel,
-        std::string_view const& name)
+        std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<stereo_stream>(

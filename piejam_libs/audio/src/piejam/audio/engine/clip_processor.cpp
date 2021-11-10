@@ -17,7 +17,7 @@ namespace
 class clip_processor final : public named_processor
 {
 public:
-    clip_processor(float min, float max, std::string_view const& name)
+    clip_processor(float min, float max, std::string_view const name)
         : named_processor(name)
         , m_min(min)
         , m_max(max)
@@ -54,7 +54,7 @@ auto
 make_clip_processor(
         float const min,
         float const max,
-        std::string_view const& name) -> std::unique_ptr<processor>
+        std::string_view const name) -> std::unique_ptr<processor>
 {
     return std::make_unique<clip_processor>(min, max, name);
 }

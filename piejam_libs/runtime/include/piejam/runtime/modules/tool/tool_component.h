@@ -17,7 +17,7 @@ namespace piejam::runtime::modules::tool
 auto make_component(
         fx::module const&,
         parameter_processor_factory&,
-        std::string_view const& name = {})
+        std::string_view name = {})
         -> std::unique_ptr<audio::engine::component>;
 
 } // namespace piejam::runtime::modules::tool

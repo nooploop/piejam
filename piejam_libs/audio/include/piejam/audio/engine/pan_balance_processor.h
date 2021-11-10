@@ -12,10 +12,10 @@
 namespace piejam::audio::engine
 {
 
-auto make_pan_processor(std::string_view const& name = {})
+auto make_pan_processor(std::string_view name = {})
         -> std::unique_ptr<processor>;
 
-auto make_stereo_balance_processor(std::string_view const& name = {})
+auto make_stereo_balance_processor(std::string_view name = {})
         -> std::unique_ptr<processor>;
 
 } // namespace piejam::audio::engine
