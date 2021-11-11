@@ -37,10 +37,10 @@ struct audio_engine_render_test : public ::testing::Test
     std::vector<audio::pair<float>> output;
 
     std::vector<audio::pcm_input_buffer_converter> in_converter{
-            [this](std::span<float> const& buffer) {
+            [this](std::span<float> const buffer) {
                 std::ranges::copy(audio_in_left, buffer.begin());
             },
-            [this](std::span<float> const& buffer) {
+            [this](std::span<float> const buffer) {
                 std::ranges::copy(audio_in_right, buffer.begin());
             }};
     std::vector<audio::pcm_output_buffer_converter> out_converter{

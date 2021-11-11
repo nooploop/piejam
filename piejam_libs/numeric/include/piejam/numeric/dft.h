@@ -20,7 +20,7 @@ public:
     auto input_size() const noexcept -> std::size_t;
     auto output_size() const noexcept -> std::size_t;
 
-    auto process(std::span<float const> const&)
+    auto process(std::span<float const>)
             -> std::span<std::complex<float> const>;
 
 private:

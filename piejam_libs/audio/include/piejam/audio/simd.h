@@ -74,7 +74,7 @@ reg_data(T const& t) noexcept -> T const&
 
 template <class T>
 constexpr auto
-reg_data(std::span<T const> const& t) noexcept -> T const*
+reg_data(std::span<T const> const t) noexcept -> T const*
 {
     return t.data();
 }

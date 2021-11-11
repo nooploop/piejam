@@ -34,7 +34,7 @@ verify_process_context(processor const& proc, process_context const& ctx)
                                    simd::is_aligned(b.buffer().data()));
     }));
     BOOST_ASSERT(
-            std::ranges::all_of(ctx.outputs, [&](std::span<float> const& b) {
+            std::ranges::all_of(ctx.outputs, [&](std::span<float> const b) {
                 return b.data() && (b.size() == ctx.buffer_size &&
                                     simd::is_aligned(b.data()));
             }));

@@ -41,7 +41,7 @@ level_meter_processor::process(engine::process_context const& ctx)
                     [this, bs = ctx.buffer_size](float const c) {
                         std::fill_n(std::back_inserter(m_lm), bs, c);
                     },
-                    [this](std::span<float const> const& buffer) {
+                    [this](std::span<float const> const buffer) {
                         std::ranges::copy(buffer, std::back_inserter(m_lm));
                     }),
             ctx.inputs[0].get().as_variant());

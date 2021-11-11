@@ -128,7 +128,7 @@ void insert_ladspa_fx_module(
         std::size_t position,
         ladspa::instance_id,
         ladspa::plugin_descriptor const&,
-        std::span<ladspa::port_descriptor const> const& control_inputs,
+        std::span<const ladspa::port_descriptor> control_inputs,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns);
 void insert_missing_ladspa_fx_module(

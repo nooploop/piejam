@@ -39,7 +39,7 @@ public:
     void add_child(task_id_t parent, task_id_t child);
 
     auto make_runnable(
-            std::span<thread::worker> const& = {},
+            std::span<thread::worker> = {},
             std::size_t event_memory_size = (1u << 16))
             -> std::unique_ptr<dag_executor>;
 

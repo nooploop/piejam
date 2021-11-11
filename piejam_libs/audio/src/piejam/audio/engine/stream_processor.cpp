@@ -52,7 +52,7 @@ stream_processor::stream_1(process_context const& ctx)
                         m_buffer.write(
                                 {m_interleave_buffer.data(), buffer_size});
                     },
-                    [this](std::span<float const> const& buffer) {
+                    [this](std::span<float const> const buffer) {
                         m_buffer.write(buffer);
                     }),
             ctx.inputs[0].get().as_variant());
@@ -101,7 +101,7 @@ stream_processor::stream_n(process_context const& ctx)
                                     buffer_size,
                                     constant);
                         },
-                        [this, ch](std::span<float const> const& buffer) {
+                        [this, ch](std::span<float const> const buffer) {
                             std::ranges::copy(
                                     buffer,
                                     range::stride_iterator(

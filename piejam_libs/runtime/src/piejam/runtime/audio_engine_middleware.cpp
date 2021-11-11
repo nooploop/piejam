@@ -133,7 +133,7 @@ struct update_info final : ui::cloneable_action<update_info, action>
 audio_engine_middleware::audio_engine_middleware(
         middleware_functors mw_fs,
         thread::configuration const& audio_thread_config,
-        std::span<thread::configuration const> const& wt_configs,
+        std::span<thread::configuration const> const wt_configs,
         audio::device_manager& device_manager,
         ladspa::processor_factory& ladspa_processor_factory,
         std::unique_ptr<midi_input_controller> midi_controller)

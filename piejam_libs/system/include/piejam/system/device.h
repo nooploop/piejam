@@ -39,7 +39,7 @@ public:
         return ioctl(request, &x, sizeof(T));
     }
 
-    [[nodiscard]] auto read(std::span<std::byte> const& buffer) noexcept
+    [[nodiscard]] auto read(std::span<std::byte> buffer) noexcept
             -> outcome::std_result<std::size_t>;
 
     [[nodiscard]] auto set_nonblock(bool set = true) -> std::error_code;

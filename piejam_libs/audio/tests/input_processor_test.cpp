@@ -25,7 +25,7 @@ TEST(input_processor, input_is_propagated_to_outputs)
     std::vector<std::span<float>> outputs{out_buf};
     std::vector<audio_slice> results(1);
     auto converter =
-            pcm_input_buffer_converter([&out_buf](std::span<float> const& buf) {
+            pcm_input_buffer_converter([&out_buf](std::span<float> const buf) {
                 std::ranges::copy(out_buf, buf.begin());
             });
     sut.set_input(converter);

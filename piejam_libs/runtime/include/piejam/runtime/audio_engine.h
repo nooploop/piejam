@@ -26,7 +26,7 @@ class audio_engine
 {
 public:
     audio_engine(
-            std::span<thread::worker> const& workers,
+            std::span<thread::worker> workers,
             audio::sample_rate const&,
             unsigned num_device_input_channels,
             unsigned num_device_output_channels);
@@ -50,8 +50,8 @@ public:
             std::unique_ptr<midi::input_event_handler>);
 
     void init_process(
-            std::span<audio::pcm_input_buffer_converter const> const&,
-            std::span<audio::pcm_output_buffer_converter const> const&);
+            std::span<audio::pcm_input_buffer_converter const>,
+            std::span<audio::pcm_output_buffer_converter const>);
 
     void process(std::size_t buffer_size) noexcept;
 

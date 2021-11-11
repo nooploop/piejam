@@ -367,7 +367,7 @@ connect_mixer_input(
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         component_map const& comps,
-        std::span<audio::engine::input_processor> const& input_procs,
+        std::span<audio::engine::input_processor> const input_procs,
         std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& mixer_channel,
         audio::engine::component& mb_in)
@@ -417,8 +417,8 @@ connect_mixer_output(
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         component_map const& comps,
-        std::span<audio::engine::output_processor> const& output_procs,
-        std::span<processor_ptr> const& output_clip_procs,
+        std::span<audio::engine::output_processor> const output_procs,
+        std::span<processor_ptr> const output_clip_procs,
         std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& mixer_channel,
         audio::engine::component& mb_out)
@@ -495,9 +495,9 @@ make_graph(
         component_map const& comps,
         mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
-        std::span<audio::engine::input_processor> const& input_procs,
-        std::span<audio::engine::output_processor> const& output_procs,
-        std::span<processor_ptr> const& output_clip_procs,
+        std::span<audio::engine::input_processor> const input_procs,
+        std::span<audio::engine::output_processor> const output_procs,
+        std::span<processor_ptr> const output_clip_procs,
         recorders_t const& recorders,
         std::vector<processor_ptr>& mixer_procs)
 {
@@ -649,7 +649,7 @@ make_io_processors(std::size_t num_channels)
 struct audio_engine::impl
 {
     impl(audio::sample_rate const& sr,
-         std::span<thread::worker> const& workers,
+         std::span<thread::worker> const workers,
          std::size_t num_device_input_channels,
          std::size_t num_device_output_channels)
         : sample_rate(sr)
@@ -687,7 +687,7 @@ struct audio_engine::impl
 };
 
 audio_engine::audio_engine(
-        std::span<thread::worker> const& workers,
+        std::span<thread::worker> const workers,
         audio::sample_rate const& sample_rate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels)
@@ -876,8 +876,8 @@ audio_engine::rebuild(
 
 void
 audio_engine::init_process(
-        std::span<audio::pcm_input_buffer_converter const> const& in_conv,
-        std::span<audio::pcm_output_buffer_converter const> const& out_conv)
+        std::span<const audio::pcm_input_buffer_converter> const in_conv,
+        std::span<const audio::pcm_output_buffer_converter> const out_conv)
 {
     BOOST_ASSERT(m_impl->input_procs.size() == in_conv.size());
     for (std::size_t const i : range::indices(in_conv))

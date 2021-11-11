@@ -83,7 +83,7 @@ device::ioctl(unsigned long request, device const& other) noexcept
 }
 
 auto
-device::read(std::span<std::byte> const& buffer) noexcept
+device::read(std::span<std::byte> const buffer) noexcept
         -> outcome::std_result<std::size_t>
 {
     auto const res = ::read(m_fd, buffer.data(), buffer.size());

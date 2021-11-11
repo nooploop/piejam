@@ -20,9 +20,9 @@ constexpr auto min_period_size = 16;
 constexpr auto max_period_size = 1024;
 
 static auto
-mix(std::span<float const> const& in1,
-    std::span<float const> const& in2,
-    std::span<float> const& dst)
+mix(std::span<float const> const in1,
+    std::span<float const> const in2,
+    std::span<float> const dst)
 {
     std::transform(
             in1.begin(),
@@ -86,9 +86,9 @@ BENCHMARK(BM_mix_audio_slice)
 
 static auto
 multiply_std(
-        std::span<float const> const& in1,
-        std::span<float const> const& in2,
-        std::span<float> const& dst)
+        std::span<float const> const in1,
+        std::span<float const> const in2,
+        std::span<float> const dst)
 {
     std::transform(
             in1.begin(),
@@ -124,9 +124,9 @@ BENCHMARK(BM_multiply_std)
 
 static auto
 multiply(
-        std::span<float const> const& in1,
-        std::span<float const> const& in2,
-        std::span<float> const& dst)
+        std::span<float const> const in1,
+        std::span<float const> const in2,
+        std::span<float> const dst)
 {
     piejam::audio::simd::transform(
             in1,

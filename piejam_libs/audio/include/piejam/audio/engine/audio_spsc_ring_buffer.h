@@ -26,7 +26,7 @@ public:
     {
     }
 
-    auto write(std::span<float const> const& data) -> std::size_t
+    auto write(std::span<float const> const data) -> std::size_t
     {
         BOOST_ASSERT(!data.empty());
 
@@ -70,7 +70,7 @@ public:
         return write_size;
     }
 
-    template <std::invocable<std::span<float const> const&> F>
+    template <std::invocable<std::span<float const>> F>
     auto consume(F&& f)
     {
         std::size_t const write_index =

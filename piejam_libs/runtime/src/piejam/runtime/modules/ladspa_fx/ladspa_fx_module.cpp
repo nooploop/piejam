@@ -107,7 +107,7 @@ auto
 make_module(
         ladspa::instance_id instance_id,
         std::string const& name,
-        std::span<piejam::ladspa::port_descriptor const> const& control_inputs,
+        std::span<const ladspa::port_descriptor> const control_inputs,
         fx::parameters_t& fx_params,
         parameter_maps& params) -> fx::module
 {

@@ -154,7 +154,7 @@ public:
             dag::tasks_t const& tasks,
             dag::graph_t const& graph,
             std::size_t const event_memory_size,
-            std::span<thread::worker> const& worker_threads)
+            std::span<thread::worker> const worker_threads)
         : dag_executor_base(tasks, graph)
         , m_initial_tasks(
                   distribute_initial_tasks(1 + worker_threads.size(), m_nodes))
@@ -233,7 +233,7 @@ private:
                 std::size_t const event_memory_size,
                 std::atomic_size_t& nodes_to_process,
                 std::atomic_size_t& buffer_size,
-                std::span<job_deque_t> const& run_queues)
+                std::span<job_deque_t> const run_queues)
             : m_worker_index(worker_index)
             , m_event_memory(event_memory_size)
             , m_nodes_to_process(nodes_to_process)
@@ -337,7 +337,7 @@ private:
             std::size_t const event_memory_size,
             std::atomic_size_t& nodes_to_process,
             std::atomic_size_t& buffer_size,
-            std::span<job_deque_t> const& run_queues) -> workers_t
+            std::span<job_deque_t> const run_queues) -> workers_t
     {
         workers_t workers;
         workers.reserve(num_workers);
@@ -355,7 +355,7 @@ private:
         return workers;
     }
 
-    static auto make_worker_tasks(std::span<dag_worker> const& workers)
+    static auto make_worker_tasks(std::span<dag_worker> const workers)
             -> std::vector<thread::worker::task_t>
     {
         std::vector<thread::worker::task_t> tasks;
@@ -438,7 +438,7 @@ dag::add_child(task_id_t const parent, task_id_t const child)
 
 auto
 dag::make_runnable(
-        std::span<thread::worker> const& worker_threads,
+        std::span<thread::worker> const worker_threads,
         std::size_t const event_memory_size) -> std::unique_ptr<dag_executor>
 {
     if (worker_threads.empty())

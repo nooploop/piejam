@@ -27,7 +27,7 @@ public:
     audio_engine_middleware(
             middleware_functors,
             thread::configuration const& audio_thread_config,
-            std::span<thread::configuration const> const& wt_configs,
+            std::span<const thread::configuration> wt_configs,
             audio::device_manager&,
             ladspa::processor_factory&,
             std::unique_ptr<midi_input_controller>);

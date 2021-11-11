@@ -33,7 +33,7 @@ using StereoChannel = StereoChannelClass::Value;
 
 template <StereoChannel SC>
 constexpr auto
-frameValue(std::span<float const, 2> const& frame) -> float
+frameValue(std::span<float const, 2> const frame) -> float
 {
     switch (SC)
     {

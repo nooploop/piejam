@@ -53,7 +53,7 @@ TEST(audio_spsc_ring_buffer, consume_from_empty_does_nothing)
     ASSERT_EQ(4u, buf.write(data));
 
     std::size_t num_calls{};
-    buf.consume([&](std::span<float const> const& d) {
+    buf.consume([&](std::span<float const> const d) {
         EXPECT_TRUE(std::ranges::equal(d, data));
         ++num_calls;
     });
@@ -73,7 +73,7 @@ TEST(audio_spsc_ring_buffer, consume_on_border_will_call_the_functor_twice)
     ASSERT_EQ(4u, buf.write(data));
 
     std::size_t num_calls{};
-    buf.consume([&](std::span<float const> const& d) {
+    buf.consume([&](std::span<float const> const d) {
         switch (num_calls)
         {
             case 0:
@@ -104,7 +104,7 @@ TEST(audio_spsc_ring_buffer,
     ASSERT_EQ(6u, buf.write(data));
 
     std::size_t num_calls{};
-    buf.consume([&](std::span<float const> const& d) {
+    buf.consume([&](std::span<float const> const d) {
         switch (num_calls)
         {
             case 0:

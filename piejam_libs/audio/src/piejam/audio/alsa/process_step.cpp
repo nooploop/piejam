@@ -117,7 +117,7 @@ struct interleaved_reader final : pcm_reader
                   range::iota(num_channels),
                   [this](std::size_t const channel) {
                       return pcm_input_buffer_converter(
-                              [this, channel](std::span<float> const& buffer) {
+                              [this, channel](std::span<float> const buffer) {
                                   convert(channel, buffer);
                               });
                   }))
@@ -126,7 +126,7 @@ struct interleaved_reader final : pcm_reader
     }
 
     void
-    convert(std::size_t const channel, std::span<float> const& buffer) noexcept
+    convert(std::size_t const channel, std::span<float> const buffer) noexcept
     {
         BOOST_ASSERT(channel < m_num_channels);
         range::table_view<pcm_sample_t<F>> interleaved(
@@ -267,8 +267,7 @@ struct interleaved_writer final : pcm_writer
                 buffer);
     }
 
-    void
-    convert(std::size_t const channel, std::span<float const> const& buffer)
+    void convert(std::size_t const channel, std::span<float const> const buffer)
     {
         BOOST_ASSERT(channel < m_num_channels);
         range::table_view<pcm_sample_t<F>> interleaved(

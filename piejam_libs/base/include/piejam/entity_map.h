@@ -67,7 +67,7 @@ public:
     }
 
     template <std::invocable<id_t, Entity&> U>
-    auto update(std::span<id_t const> const& ids, U&& u)
+    auto update(std::span<id_t const> const ids, U&& u)
     {
         m_map.update([ids, &u](map_t& m) {
             for (auto const id : ids)

@@ -49,7 +49,7 @@ TEST_F(stream_processor_1_test, process_buffer_and_consume)
     sut->process(ctx);
 
     std::vector<float> out;
-    sut->consume([&out](std::span<float const> const& data) {
+    sut->consume([&out](std::span<float const> const data) {
         std::ranges::copy(data, std::back_inserter(out));
     });
 
@@ -65,7 +65,7 @@ TEST_F(stream_processor_1_test, process_constant_and_consume)
     sut->process(ctx);
 
     std::vector<float> out;
-    sut->consume([&out](std::span<float const> const& data) {
+    sut->consume([&out](std::span<float const> const data) {
         std::ranges::copy(data, std::back_inserter(out));
     });
 
@@ -87,7 +87,7 @@ TEST_F(stream_processor_1_test, process_twice_buffer_and_consume)
     sut->process(ctx);
 
     std::vector<float> out;
-    sut->consume([&out](std::span<float const> const& data) {
+    sut->consume([&out](std::span<float const> const data) {
         std::ranges::copy(data, std::back_inserter(out));
     });
 
@@ -129,7 +129,7 @@ TEST_F(stream_processor_2_test, process_buffer_and_consume)
     sut->process(ctx);
 
     std::vector<float> out;
-    sut->consume([&out](std::span<float const> const& data) {
+    sut->consume([&out](std::span<float const> const data) {
         std::ranges::copy(data, std::back_inserter(out));
     });
 
@@ -164,7 +164,7 @@ TEST_F(stream_processor_2_test, process_constants_and_consume)
     sut->process(ctx);
 
     std::vector<float> out;
-    sut->consume([&out](std::span<float const> const& data) {
+    sut->consume([&out](std::span<float const> const data) {
         std::ranges::copy(data, std::back_inserter(out));
     });
 
@@ -233,7 +233,7 @@ TEST_F(stream_processor_4_test, process_buffer_and_consume)
     sut->process(ctx);
 
     std::vector<float> out;
-    sut->consume([&out](std::span<float const> const& data) {
+    sut->consume([&out](std::span<float const> const data) {
         std::ranges::copy(data, std::back_inserter(out));
     });
 
@@ -316,7 +316,7 @@ TEST_F(stream_processor_n_test, process_buffer_and_consume)
     sut->process(ctx);
 
     std::vector<float> out;
-    sut->consume([&out](std::span<float const> const& data) {
+    sut->consume([&out](std::span<float const> const data) {
         std::ranges::copy(data, std::back_inserter(out));
     });
 

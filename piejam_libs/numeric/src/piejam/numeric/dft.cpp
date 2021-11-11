@@ -81,7 +81,7 @@ dft::output_size() const noexcept -> std::size_t
 }
 
 auto
-dft::process(std::span<float const> const& in)
+dft::process(std::span<const float> const in)
         -> std::span<const std::complex<float>>
 {
     BOOST_ASSERT(in.size() == m_impl->input_size);

@@ -25,7 +25,7 @@ namespace bhof = boost::hof;
 template <class T>
 struct slice_add
 {
-    constexpr slice_add(std::span<T> const& out) noexcept
+    constexpr slice_add(std::span<T> const out) noexcept
         : m_out(out)
     {
     }
@@ -77,7 +77,7 @@ private:
 template <class T>
 struct slice_multiply
 {
-    constexpr slice_multiply(std::span<T> const& out) noexcept
+    constexpr slice_multiply(std::span<T> const out) noexcept
         : m_out(out)
     {
     }
@@ -147,7 +147,7 @@ struct slice_clamp
     constexpr slice_clamp(
             T const min,
             T const max,
-            std::span<T> const& out) noexcept
+            std::span<T> const out) noexcept
         : m_min(min)
         , m_max(max)
         , m_out(out)
@@ -184,7 +184,7 @@ private:
 template <class T>
 struct slice_copy
 {
-    constexpr slice_copy(std::span<T> const& out) noexcept
+    constexpr slice_copy(std::span<T> const out) noexcept
         : m_out(out)
     {
     }
@@ -194,7 +194,7 @@ struct slice_copy
         std::ranges::fill(m_out, c);
     }
 
-    constexpr void operator()(std::span<T const> const& buf) const noexcept
+    constexpr void operator()(std::span<T const> const buf) const noexcept
     {
         if (buf.data() != m_out.data())
         {
@@ -221,7 +221,7 @@ struct subslice
         return c;
     }
 
-    constexpr auto operator()(std::span<T const> const& buf) const noexcept
+    constexpr auto operator()(std::span<T const> const buf) const noexcept
             -> slice<T>
     {
         BOOST_ASSERT(m_offset < buf.size());
@@ -238,7 +238,7 @@ template <class T, class F>
 struct slice_transform
 {
     template <std::convertible_to<F> G>
-    constexpr slice_transform(std::span<T> const& out, G&& g)
+    constexpr slice_transform(std::span<T> const out, G&& g)
         : m_out(out)
         , m_f(std::forward<G>(g))
     {
@@ -249,7 +249,7 @@ struct slice_transform
         return m_f(c);
     }
 
-    constexpr auto operator()(std::span<T const> const& buf) const noexcept
+    constexpr auto operator()(std::span<T const> const buf) const noexcept
             -> slice<T>
     {
         BOOST_ASSERT(buf.size() == m_out.size());
@@ -265,7 +265,7 @@ private:
 template <class T>
 struct slice_interleave
 {
-    constexpr slice_interleave(std::span<T> const& out) noexcept
+    constexpr slice_interleave(std::span<T> const out) noexcept
         : m_out(out)
     {
     }
@@ -295,7 +295,7 @@ private:
 
 template <class T>
 constexpr auto
-add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
+add(slice<T> const& l, slice<T> const& r, std::span<T> const out) noexcept
         -> slice<T>
 {
     return std::visit(
@@ -306,7 +306,7 @@ add(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
 
 template <class T>
 constexpr auto
-multiply(slice<T> const& l, slice<T> const& r, std::span<T> const& out) noexcept
+multiply(slice<T> const& l, slice<T> const& r, std::span<T> const out) noexcept
         -> slice<T>
 {
     return std::visit(
@@ -320,22 +320,21 @@ constexpr auto
 clamp(slice<T> const& s,
       T const min,
       T const max,
-      std::span<T> const& out) noexcept -> slice<T>
+      std::span<T> const out) noexcept -> slice<T>
 {
     return std::visit(detail::slice_clamp<T>(min, max, out), s.as_variant());
 }
 
 template <class T>
 constexpr void
-copy(slice<T> const& s, std::span<T> const& out) noexcept
+copy(slice<T> const& s, std::span<T> const out) noexcept
 {
     std::visit(detail::slice_copy(out), s.as_variant());
 }
 
 template <class T, class F>
 constexpr auto
-transform(slice<T> const& s, std::span<T> const& out, F&& f) noexcept
-        -> slice<T>
+transform(slice<T> const& s, std::span<T> const out, F&& f) noexcept -> slice<T>
 {
     return std::visit(
             detail::slice_transform<T, F>(out, std::forward<F>(f)),
@@ -357,7 +356,7 @@ constexpr auto
 interleave(
         slice<T> const& s1,
         slice<T> const& s2,
-        std::span<T> const& out) noexcept
+        std::span<T> const out) noexcept
 {
     std::visit(detail::slice_interleave(out), s1.as_variant(), s2.as_variant());
 }
@@ -369,7 +368,7 @@ interleave(
         slice<T> const& s2,
         slice<T> const& s3,
         slice<T> const& s4,
-        std::span<T> const& out) noexcept
+        std::span<T> const out) noexcept
 {
     std::visit(
             detail::slice_interleave(out),
