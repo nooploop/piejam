@@ -15,8 +15,11 @@ template <class Range, class T>
 constexpr auto
 find_or_get_first(Range const& rng, T&& value)
 {
-    auto first = std::begin(rng);
-    auto last = std::end(rng);
+    using std::begin;
+    using std::end;
+
+    auto first = begin(rng);
+    auto last = end(rng);
     auto it = std::find(first, last, std::forward<T>(value));
     return it == last ? first : it;
 }

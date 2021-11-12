@@ -15,12 +15,18 @@ template <std::ranges::forward_range Target, std::ranges::sized_range Source>
 constexpr auto
 shift_push_back(Target&& target, Source&& source)
 {
-    auto const count = std::min(std::size(target), std::size(source));
-    std::shift_left(std::begin(target), std::end(target), count);
+    using std::begin;
+    using std::end;
+    using std::size;
+
+    auto const size_source = size(source);
+    auto const size_target = size(target);
+    auto const count = std::min(size_source, size_target);
+    std::shift_left(begin(target), end(target), count);
     std::copy(
-            std::next(std::begin(source), std::size(source) - count),
-            std::end(source),
-            std::next(std::begin(target), std::size(target) - count));
+            std::next(begin(source), size_source - count),
+            end(source),
+            std::next(begin(target), size_target - count));
 }
 
 } // namespace piejam::algorithm

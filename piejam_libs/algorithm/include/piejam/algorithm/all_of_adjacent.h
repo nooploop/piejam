@@ -12,10 +12,7 @@
 namespace piejam::algorithm
 {
 
-template <
-        std::input_iterator It,
-        std::predicate<std::iter_value_t<It>, std::iter_value_t<It>>
-                BinaryPredicate>
+template <std::input_iterator It, class BinaryPredicate>
 constexpr bool
 all_of_adjacent(It&& first, It&& last, BinaryPredicate&& p)
 {
@@ -26,17 +23,16 @@ all_of_adjacent(It&& first, It&& last, BinaryPredicate&& p)
                    std::not_fn(std::forward<BinaryPredicate>(p)));
 }
 
-template <
-        std::ranges::input_range Range,
-        std::predicate<
-                std::ranges::range_value_t<Range>,
-                std::ranges::range_value_t<Range>> BinaryPredicate>
+template <std::ranges::input_range Range, class BinaryPredicate>
 constexpr bool
 all_of_adjacent(Range&& rng, BinaryPredicate&& p)
 {
+    using std::begin;
+    using std::end;
+
     return all_of_adjacent(
-            std::begin(std::forward<Range>(rng)),
-            std::end(std::forward<Range>(rng)),
+            begin(std::forward<Range>(rng)),
+            end(std::forward<Range>(rng)),
             std::forward<BinaryPredicate>(p));
 }
 

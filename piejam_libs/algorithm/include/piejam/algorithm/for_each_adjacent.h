@@ -14,9 +14,12 @@ template <class Range, class BinaryOp>
 constexpr void
 for_each_adjacent(Range&& rng, BinaryOp&& op)
 {
-    auto first = std::begin(rng);
-    auto const last = std::end(rng);
-    auto second = first != last ? std::next(std::begin(rng)) : last;
+    using std::begin;
+    using std::end;
+
+    auto first = begin(rng);
+    auto const last = end(rng);
+    auto second = first != last ? std::next(begin(rng)) : last;
 
     while (second != last)
         std::invoke(std::forward<BinaryOp>(op), *first++, *second++);

@@ -15,10 +15,13 @@ template <class Container, class T>
 auto
 insert_at(Container&& c, std::size_t const index, T&& value)
 {
-    BOOST_ASSERT(index <= c.size());
+    using std::begin;
+    using std::size;
+
+    BOOST_ASSERT(index <= size(c));
 
     return std::forward<Container>(c).insert(
-            std::next(std::begin(std::forward<Container>(c)), index),
+            std::next(begin(std::forward<Container>(c)), index),
             std::forward<T>(value));
 }
 
@@ -26,10 +29,13 @@ template <class Container>
 auto
 erase_at(Container&& c, std::size_t const index)
 {
-    BOOST_ASSERT(index < c.size());
+    using std::begin;
+    using std::size;
+
+    BOOST_ASSERT(index < size(c));
 
     return std::forward<Container>(c).erase(
-            std::next(std::begin(std::forward<Container>(c)), index));
+            std::next(begin(std::forward<Container>(c)), index));
 }
 
 } // namespace piejam

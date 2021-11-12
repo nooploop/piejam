@@ -29,8 +29,10 @@ public:
                     &m_batching,
                     [](bool* batching) { *batching = false; });
 
-            for (auto it = std::begin(*batch), it_end = std::end(*batch);
-                 it != it_end;
+            using std::begin;
+            using std::end;
+
+            for (auto it = begin(*batch), it_end = end(*batch); it != it_end;
                  ++it)
             {
                 m_batching = std::next(it) != it_end;

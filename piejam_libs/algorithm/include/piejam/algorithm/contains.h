@@ -18,7 +18,9 @@ template <
 constexpr auto
 contains(Range const& rng, T&& value) -> bool
 {
-    return std::ranges::find(rng, std::forward<T>(value)) != std::end(rng);
+    using std::end;
+
+    return std::ranges::find(rng, std::forward<T>(value)) != end(rng);
 }
 
 template <
@@ -27,8 +29,9 @@ template <
 constexpr auto
 contains_if(Range const& rng, Predicate&& p) -> bool
 {
-    return std::ranges::find_if(rng, std::forward<Predicate>(p)) !=
-           std::end(rng);
+    using std::end;
+
+    return std::ranges::find_if(rng, std::forward<Predicate>(p)) != end(rng);
 }
 
 } // namespace piejam::algorithm

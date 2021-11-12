@@ -15,14 +15,17 @@ template <class Range>
 auto
 string_join(Range const& rng, char sep) -> std::string
 {
-    if (!std::empty(rng))
+    using std::begin;
+    using std::empty;
+    using std::end;
+
+    if (!empty(rng))
     {
-        auto first = std::begin(rng);
+        auto first = begin(rng);
         std::string acc(*first);
-        std::for_each(
-                std::next(first),
-                std::end(rng),
-                [&acc, sep](auto const& s) { (acc += sep) += s; });
+        std::for_each(std::next(first), end(rng), [&acc, sep](auto const& s) {
+            (acc += sep) += s;
+        });
         return acc;
     }
     else
