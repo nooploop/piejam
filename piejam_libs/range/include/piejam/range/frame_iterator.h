@@ -25,11 +25,10 @@ struct frame_iterator
               std::span<T, frame_extent<NumChannels>>>
 {
     using value_type = std::span<T, frame_extent<NumChannels>>;
-    using pointer = T*;
 
     constexpr frame_iterator() noexcept requires(NumChannels == 0) = default;
     constexpr frame_iterator() noexcept requires(NumChannels != 0)
-        : m_frame(pointer{}, NumChannels)
+        : m_frame(nullptr, NumChannels)
     {
     }
 

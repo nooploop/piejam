@@ -182,7 +182,7 @@ transform(
 
 template <class T>
 void
-fill(table_view<T> const& tv, T value)
+fill(table_view<T> const& tv, T const value)
 {
     for (auto row : tv)
         std::ranges::fill(row, value);

@@ -14,7 +14,7 @@ constexpr auto
 indices(R&& rng) noexcept
 {
     return std::views::iota(
-            typename std::decay_t<R>::size_type{},
+            std::ranges::range_size_t<R>{},
             std::ranges::size(std::forward<R>(rng)));
 }
 
