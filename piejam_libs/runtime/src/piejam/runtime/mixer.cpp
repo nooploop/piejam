@@ -17,6 +17,7 @@ namespace piejam::runtime::mixer
 namespace
 {
 
+using channel_io_t = io_pair<io_address_t>;
 using channels_io_t = boost::container::flat_map<channel_id, channel_io_t>;
 
 auto
@@ -62,7 +63,7 @@ make_channels_io_graph(channels_io_t const& channels_io) -> io_graph
         if (channel_id const* const out_channel_id =
                     std::get_if<channel_id>(&ch_io.out))
         {
-            if (std::holds_alternative<std::nullptr_t>(
+            if (std::holds_alternative<default_t>(
                         channels_io.at(*out_channel_id).in))
             {
                 result[id].children.push_back(*out_channel_id);

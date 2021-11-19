@@ -83,7 +83,9 @@ make_initial_state() -> state
     // reset the output to default back again
     st.mixer_state.channels.update(
             st.mixer_state.main,
-            [](mixer::channel& mixer_channel) { mixer_channel.out = nullptr; });
+            [](mixer::channel& mixer_channel) {
+                mixer_channel.out = piejam::default_t{};
+            });
     set_parameter_value(
             st.params,
             st.mixer_state.channels[st.mixer_state.main].record,

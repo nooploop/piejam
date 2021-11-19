@@ -261,7 +261,7 @@ get_mixer_channel_selected_input(
 
     return std::visit(
             boost::hof::match(
-                    [](std::nullptr_t) {
+                    [](default_t) {
                         return selected_route{
                                 .state = selected_route::state_t::valid,
                                 .name = s_mix};
@@ -316,7 +316,7 @@ get_mixer_channel_selected_output(
 
     return std::visit(
             boost::hof::match(
-                    [](std::nullptr_t) {
+                    [](default_t) {
                         return selected_route{
                                 .state = selected_route::state_t::valid,
                                 .name = s_none};
@@ -326,8 +326,7 @@ get_mixer_channel_selected_output(
                                     channels.find(target_channel_id))
                         {
                             return selected_route{
-                                    .state = std::holds_alternative<
-                                                     std::nullptr_t>(
+                                    .state = std::holds_alternative<default_t>(
                                                      target_channel->in)
                                                      ? selected_route::state_t::
                                                                valid

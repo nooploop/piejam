@@ -103,8 +103,7 @@ add_bus::reduce(state const& st) const -> state
         new_st.mixer_state.channels.update(
                 new_st.mixer_state.main,
                 [added_bus_id](mixer::channel& mixer_channel) {
-                    if (std::holds_alternative<std::nullptr_t>(
-                                mixer_channel.out))
+                    if (std::holds_alternative<default_t>(mixer_channel.out))
                     {
                         mixer_channel.out = added_bus_id;
                     }

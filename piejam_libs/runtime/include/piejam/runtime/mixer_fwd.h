@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/boxed_string.h>
+#include <piejam/default.h>
 #include <piejam/fwd.h>
 #include <piejam/runtime/device_io_fwd.h>
 
@@ -21,12 +22,10 @@ using channels_t = entity_map<channel>;
 using missing_device_address = boxed_string;
 
 using io_address_t = std::variant<
-        std::nullptr_t,
+        default_t,
         device_io::bus_id,
         missing_device_address,
         channel_id>;
-
-using channel_io_t = io_pair<io_address_t>;
 
 using channel_ids_t = std::vector<channel_id>;
 

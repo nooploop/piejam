@@ -375,24 +375,28 @@ connect_mixer_input(
     boost::ignore_unused(channels);
     std::visit(
             boost::hof::match(
-                    [](std::nullptr_t) {},
+                    [](default_t) {},
                     [&](device_io::bus_id const device_bus_id) {
                         device_io::bus const& device_bus =
                                 device_buses[device_bus_id];
 
                         if (device_bus.channels.left != npos)
+                        {
                             g.audio.insert(
                                     {.proc = input_procs[device_bus.channels
                                                                  .left],
                                      .port = 0},
                                     mb_in.inputs()[0]);
+                        }
 
                         if (device_bus.channels.right != npos)
+                        {
                             g.audio.insert(
                                     {.proc = input_procs[device_bus.channels
                                                                  .right],
                                      .port = 0},
                                     mb_in.inputs()[1]);
+                        }
                     },
                     [&](mixer::channel_id const src_channel_id) {
                         BOOST_ASSERT(channels.contains(src_channel_id));
@@ -425,7 +429,7 @@ connect_mixer_output(
 {
     std::visit(
             boost::hof::match(
-                    [](std::nullptr_t) {},
+                    [](default_t) {},
                     [&](device_io::bus_id const device_bus_id) {
                         device_io::bus const& device_bus =
                                 device_buses[device_bus_id];
@@ -471,8 +475,7 @@ connect_mixer_output(
                         mixer::channel const& dst_channel =
                                 channels[dst_channel_id];
 
-                        if (std::holds_alternative<std::nullptr_t>(
-                                    dst_channel.in))
+                        if (std::holds_alternative<default_t>(dst_channel.in))
                         {
                             auto* const dst_mb_in = comps.find(mixer_input_key{
                                     dst_channel_id,

@@ -260,7 +260,7 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
 {
     return std::visit(
             boost::hof::match(
-                    [](std::nullptr_t) {
+                    [](default_t) {
                         return session::mixer_io{
                                 .type = session::mixer_io_type::default_,
                                 .name = {}};
