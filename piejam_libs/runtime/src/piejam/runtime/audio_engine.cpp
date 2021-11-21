@@ -121,7 +121,9 @@ make_mixer_components(
 {
     for (auto const& [mixer_channel_id, mixer_channel] : channels)
     {
-        mixer_input_key const in_key{mixer_channel_id, mixer_channel.in};
+        mixer_input_key const in_key{
+                .channel_id = mixer_channel_id,
+                .route = mixer_channel.in};
         if (auto comp = prev_comps.remove(in_key))
         {
             comps.insert(in_key, std::move(comp));
@@ -141,7 +143,7 @@ make_mixer_components(
                             param_procs));
         }
 
-        mixer_output_key const out_key{mixer_channel_id};
+        mixer_output_key const out_key{.channel_id = mixer_channel_id};
         if (auto comp = prev_comps.remove(out_key))
         {
             comps.insert(out_key, std::move(comp));
@@ -166,9 +168,8 @@ make_solo_group_components(
 {
     for (auto&& [id, group] : solo_groups)
     {
-        solo_group_key key{id};
         comps.insert(
-                key,
+                solo_group_key{.owner = id},
                 components::make_solo_switch(group, param_procs, "solo"));
     }
 }
@@ -489,7 +490,7 @@ connect_mixer_output(
                                     mixer_procs);
                         }
                     },
-                    [](boxed_string const&) {}),
+                    [](mixer::missing_device_address const&) {}),
             mixer_channel.out);
 }
 
@@ -577,7 +578,9 @@ connect_midi(
 
         if (auto* const midi_assign_proc =
                     procs.find(engine_processors::midi_assign))
+        {
             g.event.insert({*midi_learn_proc, 1}, {*midi_assign_proc, 0});
+        }
     }
     else if (
             auto* const midi_assign_proc =
@@ -595,16 +598,20 @@ connect_midi(
             std::visit(
                     [&](auto const& param_id) {
                         std::tuple const proc_id{param_id, assignment};
-                        auto proc = procs.find(proc_id);
-                        BOOST_ASSERT(proc);
+                        auto midi_conv_proc = procs.find(proc_id);
+                        BOOST_ASSERT(midi_conv_proc);
 
                         g.event.insert(
                                 {*midi_assign_proc, out_index++},
-                                {*proc, 0});
+                                {*midi_conv_proc, 0});
 
                         if (auto param_proc =
                                     param_procs.find_processor(param_id))
-                            g.event.insert({*proc, 0}, {*param_proc, 0});
+                        {
+                            g.event.insert(
+                                    {*midi_conv_proc, 0},
+                                    {*param_proc, 0});
+                        }
                     },
                     id);
         }
@@ -619,7 +626,7 @@ connect_solo_groups(
 {
     for (auto const& [owner, group] : solo_groups)
     {
-        auto solo_switch = comps.find(solo_group_key{owner});
+        auto solo_switch = comps.find(solo_group_key{.owner = owner});
         BOOST_ASSERT(solo_switch);
 
         solo_switch->connect(g);
@@ -640,7 +647,7 @@ connect_solo_groups(
 
 template <class Processor>
 auto
-make_io_processors(std::size_t num_channels)
+make_io_processors(std::size_t const num_channels)
 {
     return algorithm::transform_to_vector(
             range::iota(num_channels),
@@ -728,7 +735,7 @@ audio_engine::get_parameter_update(parameter::id_t<P> const id) const
         -> std::optional<typename P::value_type>
 {
     using value_type = typename P::value_type;
-    std::optional<typename P::value_type> result;
+    std::optional<value_type> result;
     m_impl->param_procs.consume(id, [&result](value_type const& lvl) {
         result = lvl;
     });
@@ -879,8 +886,8 @@ audio_engine::rebuild(
 
 void
 audio_engine::init_process(
-        std::span<const audio::pcm_input_buffer_converter> const in_conv,
-        std::span<const audio::pcm_output_buffer_converter> const out_conv)
+        std::span<audio::pcm_input_buffer_converter const> const in_conv,
+        std::span<audio::pcm_output_buffer_converter const> const out_conv)
 {
     BOOST_ASSERT(m_impl->input_procs.size() == in_conv.size());
     for (std::size_t const i : range::indices(in_conv))
