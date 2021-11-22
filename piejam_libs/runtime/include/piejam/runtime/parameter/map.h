@@ -50,7 +50,7 @@ public:
         return id;
     }
 
-    auto remove(id_t id) -> void
+    auto remove(id_t const id) -> void
     {
         m_parameters.remove(id);
         auto it = m_values.find(id);
@@ -58,30 +58,30 @@ public:
         m_values.erase(it);
     }
 
-    auto contains(id_t id) const noexcept -> bool
+    auto contains(id_t const id) const noexcept -> bool
     {
         return m_parameters.contains(id);
     }
 
-    auto get_parameter(id_t id) const noexcept -> Parameter const*
+    auto get_parameter(id_t const id) const noexcept -> Parameter const*
     {
         return m_parameters.find(id);
     }
 
-    auto find(id_t id) const noexcept -> value_type const*
+    auto find(id_t const id) const noexcept -> value_type const*
     {
         auto it = m_values.find(id);
         return it != m_values.end() ? std::addressof(it->second) : nullptr;
     }
 
-    auto get(id_t id) const noexcept -> value_type const&
+    auto get(id_t const id) const noexcept -> value_type const&
     {
         auto it = m_values.find(id);
         BOOST_ASSERT(it != m_values.end());
         return it->second;
     }
 
-    auto get_cached(id_t id) const noexcept -> const_cached_type
+    auto get_cached(id_t const id) const noexcept -> const_cached_type
     {
         auto it = m_values.find(id);
         return it != m_values.end() ? (*m_cache)[m_values.index_of(it)]
@@ -89,7 +89,7 @@ public:
     }
 
     template <std::convertible_to<value_type> V>
-    auto set(id_t id, V&& value) -> void
+    auto set(id_t const id, V&& value) -> void
     {
         auto it = m_values.find(id);
         BOOST_ASSERT(it != m_values.end());
