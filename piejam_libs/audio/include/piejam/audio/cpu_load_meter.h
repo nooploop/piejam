@@ -14,7 +14,7 @@ namespace piejam::audio
 class cpu_load_meter
 {
 public:
-    cpu_load_meter(std::size_t num_frames, sample_rate const&);
+    cpu_load_meter(std::size_t num_frames, sample_rate);
 
     auto stop() -> float;
 

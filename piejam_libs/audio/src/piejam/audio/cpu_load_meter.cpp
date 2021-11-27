@@ -11,7 +11,7 @@ namespace piejam::audio
 
 cpu_load_meter::cpu_load_meter(
         std::size_t const num_frames,
-        audio::sample_rate const& sample_rate)
+        audio::sample_rate const sample_rate)
     : m_max_processing_time(sample_rate.to_nanoseconds(num_frames))
     , m_processing_start(clock_t::now())
 {

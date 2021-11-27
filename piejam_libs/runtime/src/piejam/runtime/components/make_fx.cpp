@@ -32,7 +32,7 @@ make_internal_fx(
         fx::module const& fx_mod,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
-        audio::sample_rate const& sample_rate,
+        audio::sample_rate const sample_rate,
         std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
@@ -74,7 +74,7 @@ make_fx(fx::module const& fx_mod,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
-        audio::sample_rate const& sample_rate,
+        audio::sample_rate const sample_rate,
         std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {

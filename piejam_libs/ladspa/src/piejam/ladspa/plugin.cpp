@@ -617,7 +617,7 @@ public:
         return m_ports.input.control;
     }
 
-    auto make_processor(audio::sample_rate const& sample_rate) const
+    auto make_processor(audio::sample_rate const sample_rate) const
             -> std::unique_ptr<audio::engine::processor> override
     {
         if (LADSPA_Handle handle = m_ladspa_desc->instantiate(

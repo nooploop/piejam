@@ -11,6 +11,7 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_algorithms.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/mixer.h>
@@ -70,7 +71,7 @@ class mixer_channel_output final : public audio::engine::component
 {
 public:
     mixer_channel_output(
-            audio::sample_rate const& sample_rate,
+            audio::sample_rate const sample_rate,
             mixer::channel const& mixer_channel,
             parameter_processor_factory& param_procs)
         : m_volume_input_proc(
@@ -153,7 +154,7 @@ make_mixer_channel_input(
 auto
 make_mixer_channel_output(
         mixer::channel const& mixer_channel,
-        audio::sample_rate const& sample_rate,
+        audio::sample_rate const sample_rate,
         parameter_processor_factory& param_procs,
         std::string_view const /*name*/)
         -> std::unique_ptr<audio::engine::component>

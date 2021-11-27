@@ -94,7 +94,7 @@ make_coefficients(
 }
 
 auto
-make_coefficent_converter_processor(audio::sample_rate const& sample_rate)
+make_coefficent_converter_processor(audio::sample_rate const sample_rate)
 {
     static constexpr std::string_view s_type_name = "type";
     static constexpr std::string_view s_cutoff_name = "cutoff";
@@ -271,7 +271,7 @@ class component final : public audio::engine::component
 public:
     component(
             fx::module const& fx_mod,
-            audio::sample_rate const& sample_rate,
+            audio::sample_rate const sample_rate,
             parameter_processor_factory& proc_factory,
             processors::stream_processor_factory& stream_proc_factory,
             std::string_view const /*name*/)
@@ -371,7 +371,7 @@ private:
 auto
 make_component(
         fx::module const& fx_mod,
-        audio::sample_rate const& sample_rate,
+        audio::sample_rate const sample_rate,
         parameter_processor_factory& proc_factory,
         processors::stream_processor_factory& stream_proc_factory,
         std::string_view const name)

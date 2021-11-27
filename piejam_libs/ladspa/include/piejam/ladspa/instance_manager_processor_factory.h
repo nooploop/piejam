@@ -30,7 +30,7 @@ public:
     auto control_inputs(instance_id const&) const
             -> std::span<port_descriptor const> override;
 
-    auto make_processor(instance_id const&, audio::sample_rate const&)
+    auto make_processor(instance_id const&, audio::sample_rate)
             -> std::unique_ptr<audio::engine::processor> override;
 
 private:

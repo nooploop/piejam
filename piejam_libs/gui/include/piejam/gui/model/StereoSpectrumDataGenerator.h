@@ -21,7 +21,7 @@ public:
     StereoSpectrumDataGenerator();
     ~StereoSpectrumDataGenerator();
 
-    void setSampleRate(audio::sample_rate const&);
+    void setSampleRate(audio::sample_rate);
     void setActive(bool active);
     void setChannel(StereoChannel);
 

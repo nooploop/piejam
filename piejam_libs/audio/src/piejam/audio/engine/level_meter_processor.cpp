@@ -24,7 +24,7 @@ level_meter_decay_time(unsigned const sample_rate) -> std::size_t
 }
 
 level_meter_processor::level_meter_processor(
-        sample_rate const& sample_rate,
+        sample_rate const sample_rate,
         std::string_view const name)
     : engine::named_processor(name)
     , m_lm(level_meter_decay_time(sample_rate.get()))

@@ -17,7 +17,7 @@ namespace piejam::audio::engine
 class level_meter_processor final : public named_processor
 {
 public:
-    level_meter_processor(sample_rate const&, std::string_view name = {});
+    level_meter_processor(sample_rate, std::string_view name = {});
 
     auto type_name() const noexcept -> std::string_view override
     {

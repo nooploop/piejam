@@ -17,7 +17,7 @@ namespace piejam::runtime::modules::scope
 
 auto make_component(
         fx::module const&,
-        audio::sample_rate const&,
+        audio::sample_rate,
         processors::stream_processor_factory&)
         -> std::unique_ptr<audio::engine::component>;
 

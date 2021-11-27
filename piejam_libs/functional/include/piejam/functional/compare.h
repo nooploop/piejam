@@ -26,9 +26,7 @@ struct compare
     template <class X, class Y>
     constexpr auto operator()(X&& x, Y&& y) const noexcept
     {
-        return Compare{}(
-                std::forward<decltype(x)>(x),
-                std::forward<decltype(y)>(y));
+        return Compare{}(std::forward<X>(x), std::forward<Y>(y));
     }
 };
 

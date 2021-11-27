@@ -40,7 +40,7 @@ template <StereoChannel SC>
 class Generator
 {
 public:
-    Generator(audio::sample_rate const& sampleRate)
+    Generator(audio::sample_rate const sampleRate)
     {
         float const binSize = sampleRate.as_float() / s_dft_size;
         for (std::size_t const i : range::iota(s_dft.output_size()))
@@ -156,7 +156,7 @@ StereoSpectrumDataGenerator::StereoSpectrumDataGenerator()
 StereoSpectrumDataGenerator::~StereoSpectrumDataGenerator() = default;
 
 void
-StereoSpectrumDataGenerator::setSampleRate(audio::sample_rate const& sampleRate)
+StereoSpectrumDataGenerator::setSampleRate(audio::sample_rate const sampleRate)
 {
     if (m_impl->sampleRate != sampleRate)
     {

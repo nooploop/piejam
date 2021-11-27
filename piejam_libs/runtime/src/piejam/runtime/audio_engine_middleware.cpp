@@ -165,7 +165,7 @@ make_update_devices_action(
         box<audio::pcm_io_descriptors> current_devices,
         std::size_t const input_index,
         std::size_t const output_index,
-        audio::sample_rate const& sample_rate,
+        audio::sample_rate const sample_rate,
         audio::period_size const& period_size,
         audio::period_count const& period_count) -> update_devices
 {

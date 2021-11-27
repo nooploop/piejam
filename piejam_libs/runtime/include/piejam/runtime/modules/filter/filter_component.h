@@ -17,7 +17,7 @@ namespace piejam::runtime::modules::filter
 
 auto make_component(
         fx::module const&,
-        audio::sample_rate const&,
+        audio::sample_rate,
         parameter_processor_factory&,
         processors::stream_processor_factory&,
         std::string_view name = {})
