@@ -166,8 +166,8 @@ make_update_devices_action(
         std::size_t const input_index,
         std::size_t const output_index,
         audio::sample_rate const sample_rate,
-        audio::period_size const& period_size,
-        audio::period_count const& period_count) -> update_devices
+        audio::period_size const period_size,
+        audio::period_count const period_count) -> update_devices
 {
     update_devices next_action;
     next_action.pcm_devices = new_devices;

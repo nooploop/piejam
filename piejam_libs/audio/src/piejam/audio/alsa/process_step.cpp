@@ -108,7 +108,7 @@ struct interleaved_reader final : pcm_reader
     interleaved_reader(
             system::device& fd,
             std::size_t const num_channels,
-            audio::period_size const& period_size)
+            audio::period_size const period_size)
         : m_fd(fd)
         , m_num_channels(num_channels)
         , m_period_size(period_size)
@@ -178,7 +178,7 @@ auto
 make_reader(
         system::device& fd,
         pcm_device_config const& config,
-        audio::period_size const& period_size) -> std::unique_ptr<pcm_reader>
+        audio::period_size const period_size) -> std::unique_ptr<pcm_reader>
 {
     if (!fd)
         return std::make_unique<dummy_reader>();
@@ -240,7 +240,7 @@ struct interleaved_writer final : pcm_writer
     interleaved_writer(
             system::device& fd,
             std::size_t const num_channels,
-            audio::period_size const& period_size)
+            audio::period_size const period_size)
         : m_fd(fd)
         , m_num_channels(num_channels)
         , m_period_size(period_size)
@@ -329,7 +329,7 @@ auto
 make_writer(
         system::device& fd,
         pcm_device_config const& config,
-        audio::period_size const& period_size) -> std::unique_ptr<pcm_writer>
+        audio::period_size const period_size) -> std::unique_ptr<pcm_writer>
 {
     if (!fd)
         return std::make_unique<dummy_writer>();
