@@ -81,29 +81,29 @@ public:
         if (bottom == 0)
             return nullptr;
 
-        bottom_index const newBottom = bottom - 1;
+        bottom_index const new_bottom = bottom - 1;
 
-        m_bottom.store(newBottom);
+        m_bottom.store(new_bottom);
 
-        Job* const job = m_jobs[newBottom];
+        Job* const job = m_jobs[new_bottom];
 
         top_index top = m_top.load();
-        if (newBottom > top.index)
+        if (new_bottom > top.index)
             return job;
 
-        top_index newTop;
-        newTop.index = 0;
-        newTop.tag = top.tag + 1;
+        top_index new_top;
+        new_top.index = 0;
+        new_top.tag = top.tag + 1;
 
         m_bottom.store(0);
 
-        if (newBottom == top.index)
+        if (new_bottom == top.index)
         {
-            if (m_top.compare_exchange_strong(top, newTop))
+            if (m_top.compare_exchange_strong(top, new_top))
                 return job;
         }
 
-        m_top.store(newTop, std::memory_order_release);
+        m_top.store(new_top, std::memory_order_release);
         return nullptr;
     }
 
@@ -116,11 +116,11 @@ public:
 
         Job* const job = m_jobs[top.index];
 
-        top_index newTop;
-        newTop.index = top.index + 1;
-        newTop.tag = top.tag + 1;
+        top_index new_top;
+        new_top.index = top.index + 1;
+        new_top.tag = top.tag + 1;
 
-        if (m_top.compare_exchange_strong(top, newTop))
+        if (m_top.compare_exchange_strong(top, new_top))
             return job;
 
         return nullptr;
