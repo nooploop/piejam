@@ -7,7 +7,6 @@ add_library(piejam_thread STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/cache_line_size.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/configuration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/job_deque.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/name.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/priority.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/semaphore.h

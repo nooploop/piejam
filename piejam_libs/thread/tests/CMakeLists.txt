@@ -7,7 +7,6 @@ if(NOT PIEJAM_TESTS)
 endif()
 
 add_executable(piejam_thread_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/job_deque_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/spsc_slot_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/worker_test.cpp
 )

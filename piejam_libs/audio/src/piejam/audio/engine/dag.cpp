@@ -8,19 +8,16 @@
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/thread_context.h>
-#include <piejam/functional/compare.h>
 #include <piejam/range/indices.h>
-#include <piejam/thread/job_deque.h>
 #include <piejam/thread/worker.h>
 
 #include <boost/assert.hpp>
+#include <boost/lockfree/stack.hpp>
 
 #include <algorithm>
 #include <atomic>
-#include <iostream>
 #include <ranges>
 #include <span>
-#include <stdexcept>
 #include <vector>
 
 namespace piejam::audio::engine
@@ -50,7 +47,7 @@ protected:
 
     static void init_node_for_process(node& n)
     {
-        n.parents_to_process.store(n.num_parents, std::memory_order_release);
+        n.parents_to_process.store(n.num_parents, std::memory_order_relaxed);
     }
 
     using nodes_t = std::unordered_map<dag::task_id_t, node>;
@@ -147,8 +144,11 @@ private:
 class dag_executor_mt final : public dag_executor_base
 {
 public:
-    static constexpr std::size_t job_deque_capacity = 256;
-    using job_deque_t = thread::job_deque<node, job_deque_capacity>;
+    static constexpr std::size_t job_queue_capacity = 1024;
+    using jobs_t = boost::lockfree::stack<
+            node*,
+            boost::lockfree::fixed_sized<true>,
+            boost::lockfree::capacity<job_queue_capacity>>;
 
     dag_executor_mt(
             dag::tasks_t const& tasks,
@@ -156,29 +156,21 @@ public:
             std::size_t const event_memory_size,
             std::span<thread::worker> const worker_threads)
         : dag_executor_base(tasks, graph)
-        , m_initial_tasks(
-                  distribute_initial_tasks(1 + worker_threads.size(), m_nodes))
-        , m_run_queues(1 + worker_threads.size())
+        , m_initial_tasks(distribute_initial_tasks(m_nodes))
         , m_main_worker(
-                  0,
                   event_memory_size,
                   m_nodes_to_process,
                   m_buffer_size,
-                  m_run_queues)
+                  m_run_queue)
         , m_worker_threads(worker_threads)
         , m_workers(make_workers(
                   worker_threads.size(),
                   event_memory_size,
                   m_nodes_to_process,
                   m_buffer_size,
-                  m_run_queues))
+                  m_run_queue))
         , m_worker_tasks(make_worker_tasks(m_workers))
     {
-        if (std::ranges::any_of(
-                    m_initial_tasks,
-                    greater(job_deque_capacity),
-                    std::ranges::size))
-            throw std::runtime_error("Too many processors.");
     }
 
     void operator()(std::size_t const buffer_size) override
@@ -188,11 +180,8 @@ public:
         for (auto&& [id, n] : m_nodes)
             init_node_for_process(n);
 
-        BOOST_ASSERT(m_initial_tasks.size() == m_run_queues.size());
-        for (std::size_t const i : range::indices(m_initial_tasks))
-        {
-            m_run_queues[i].initialize(m_initial_tasks[i]);
-        }
+        for (node* const n : m_initial_tasks)
+            m_run_queue.unsynchronized_push(n);
 
         m_nodes_to_process.store(m_nodes.size(), std::memory_order_release);
 
@@ -206,20 +195,16 @@ public:
     }
 
 private:
-    static auto
-    distribute_initial_tasks(std::size_t const num_run_queues, nodes_t& nodes)
-            -> std::vector<std::vector<node*>>
+    static auto distribute_initial_tasks(nodes_t& nodes) -> std::vector<node*>
     {
-        std::vector<std::vector<node*>> initial_tasks(num_run_queues);
-
-        std::size_t next_queue{};
+        std::vector<node*> initial_tasks;
+        initial_tasks.reserve(nodes.size());
 
         for (auto&& [id, node] : nodes)
         {
             if (node.num_parents == 0)
             {
-                initial_tasks[next_queue].push_back(std::addressof(node));
-                next_queue = (next_queue + 1) % num_run_queues;
+                initial_tasks.push_back(std::addressof(node));
             }
         }
 
@@ -229,18 +214,14 @@ private:
     struct dag_worker
     {
         dag_worker(
-                std::size_t const worker_index,
                 std::size_t const event_memory_size,
                 std::atomic_size_t& nodes_to_process,
                 std::atomic_size_t& buffer_size,
-                std::span<job_deque_t> const run_queues)
-            : m_worker_index(worker_index)
-            , m_event_memory(event_memory_size)
+                jobs_t& run_queue)
+            : m_event_memory(event_memory_size)
             , m_nodes_to_process(nodes_to_process)
             , m_buffer_size(buffer_size)
-            , m_run_queues(run_queues)
-            , m_steal_indices(
-                      make_steal_indices(worker_index, m_run_queues.size()))
+            , m_run_queue(run_queue)
         {
         }
 
@@ -249,26 +230,13 @@ private:
             m_thread_context.buffer_size =
                     m_buffer_size.load(std::memory_order_relaxed);
 
-            auto& worker_queue = m_run_queues[m_worker_index];
-
             while (m_nodes_to_process.load(std::memory_order_acquire))
             {
-                if (node* n = worker_queue.pop())
+                node* n{};
+                if (m_run_queue.pop(n))
                 {
                     while (n)
                         n = process_node(*n);
-                }
-                else
-                {
-                    for (std::size_t const steal_index : m_steal_indices)
-                    {
-                        if (node* n = m_run_queues[steal_index].steal())
-                        {
-                            while (n)
-                                n = process_node(*n);
-                            break;
-                        }
-                    }
                 }
             }
 
@@ -278,8 +246,6 @@ private:
     private:
         auto process_node(node& n) -> node*
         {
-            job_deque_t& run_queue = m_run_queues[m_worker_index];
-
             BOOST_ASSERT(
                     n.parents_to_process.load(std::memory_order_relaxed) == 0);
 
@@ -288,11 +254,13 @@ private:
             node* next{};
             for (node& child : n.children)
             {
-                if (1 == child.parents_to_process.fetch_sub(1))
+                if (1 == child.parents_to_process.fetch_sub(
+                                 1,
+                                 std::memory_order_acq_rel))
                 {
                     if (next)
                     {
-                        run_queue.push(std::addressof(child));
+                        m_run_queue.push(std::addressof(child));
                     }
                     else
                     {
@@ -301,33 +269,21 @@ private:
                 }
             }
 
-            BOOST_VERIFY(0 < m_nodes_to_process.fetch_sub(1));
+            BOOST_VERIFY(
+                    0 <
+                    m_nodes_to_process.fetch_sub(1, std::memory_order_acq_rel));
 
             return next;
         }
 
-        static auto make_steal_indices(
-                std::size_t const worker_index,
-                std::size_t const num_queues) -> std::vector<std::size_t>
-        {
-            return algorithm::transform_to_vector(
-                    std::views::iota(std::size_t{1}, num_queues),
-                    [=](std::size_t i) -> std::size_t {
-                        return (worker_index + i) % num_queues;
-                    });
-        }
-
-        std::size_t m_worker_index;
         audio::engine::event_buffer_memory m_event_memory;
         audio::engine::thread_context m_thread_context{
                 &m_event_memory.memory_resource()};
         std::atomic_size_t& m_nodes_to_process;
         std::atomic_size_t& m_buffer_size;
-        std::span<job_deque_t> m_run_queues;
-        std::vector<std::size_t> m_steal_indices;
+        jobs_t& m_run_queue;
 
         static_assert(std::atomic_size_t::is_always_lock_free);
-        static_assert(std::atomic_long::is_always_lock_free);
     };
 
     using workers_t = std::vector<dag_worker>;
@@ -337,7 +293,7 @@ private:
             std::size_t const event_memory_size,
             std::atomic_size_t& nodes_to_process,
             std::atomic_size_t& buffer_size,
-            std::span<job_deque_t> const run_queues) -> workers_t
+            jobs_t& run_queue) -> workers_t
     {
         workers_t workers;
         workers.reserve(num_workers);
@@ -345,11 +301,10 @@ private:
         for (std::size_t i = 1; i < num_workers + 1; ++i)
         {
             workers.emplace_back(
-                    i,
                     event_memory_size,
                     nodes_to_process,
                     buffer_size,
-                    run_queues);
+                    run_queue);
         }
 
         return workers;
@@ -368,8 +323,8 @@ private:
     }
 
     std::atomic_size_t m_nodes_to_process{};
-    std::vector<std::vector<node*>> const m_initial_tasks;
-    std::vector<job_deque_t> m_run_queues;
+    std::vector<node*> const m_initial_tasks;
+    jobs_t m_run_queue;
     dag_worker m_main_worker;
     std::span<thread::worker> m_worker_threads;
     workers_t m_workers;
