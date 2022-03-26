@@ -137,7 +137,7 @@ bool
 is_default_source_valid(channels_t const& channels, channel_id const ch_id)
 {
     auto test = extract_channels_io(channels);
-    test[ch_id].in = nullptr; // default case
+    test[ch_id].in = default_t{}; // default case
     return !has_cycle(make_channels_io_graph(test));
 }
 
