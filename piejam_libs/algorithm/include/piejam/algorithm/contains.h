@@ -13,7 +13,7 @@ namespace piejam::algorithm
 {
 
 template <
-        std::ranges::range Range,
+        std::ranges::input_range Range,
         std::convertible_to<std::ranges::range_value_t<Range>> T>
 constexpr auto
 contains(Range const& rng, T&& value) -> bool
@@ -24,8 +24,8 @@ contains(Range const& rng, T&& value) -> bool
 }
 
 template <
-        std::ranges::range Range,
-        std::predicate<std::ranges::range_reference_t<Range>> Predicate>
+        std::ranges::input_range Range,
+        std::indirect_unary_predicate<std::ranges::iterator_t<Range>> Predicate>
 constexpr auto
 contains_if(Range const& rng, Predicate&& p) -> bool
 {
