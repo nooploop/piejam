@@ -9,6 +9,7 @@
 #include <dlfcn.h>
 
 #include <system_error>
+#include <utility>
 
 namespace piejam::system
 {

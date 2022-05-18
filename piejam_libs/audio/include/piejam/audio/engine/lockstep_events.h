@@ -7,6 +7,7 @@
 #include <piejam/audio/engine/event_buffer.h>
 
 #include <algorithm>
+#include <functional>
 #include <limits>
 #include <tuple>
 

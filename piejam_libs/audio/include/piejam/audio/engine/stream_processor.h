@@ -9,6 +9,7 @@
 
 #include <mipp.h>
 
+#include <memory>
 #include <string_view>
 
 namespace piejam::audio::engine
