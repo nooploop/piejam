@@ -284,9 +284,8 @@ get_hw_params(
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_RATE),
             &audio::sample_rate::get);
 
-    if (sample_rate)
+    if (sample_rate && algorithm::contains(result.sample_rates, *sample_rate))
     {
-        BOOST_ASSERT(algorithm::contains(result.sample_rates, *sample_rate));
         set_interval_value(
                 hw_params,
                 SNDRV_PCM_HW_PARAM_RATE,
@@ -300,9 +299,8 @@ get_hw_params(
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIOD_SIZE),
             &audio::period_size::get);
 
-    if (period_size)
+    if (period_size && algorithm::contains(result.period_sizes, *period_size))
     {
-        BOOST_ASSERT(algorithm::contains(result.period_sizes, *period_size));
         set_interval_value(
                 hw_params,
                 SNDRV_PCM_HW_PARAM_PERIOD_SIZE,
