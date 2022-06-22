@@ -18,7 +18,7 @@ Item {
         when: root.target
         target: root.target
         property: "subscribed"
-        value: root.subscribed
+        value: root.subscribed && !Qt.inputMethod.visible
         restoreMode: Binding.RestoreBinding
     }
 }
