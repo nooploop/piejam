@@ -14,6 +14,7 @@
 #include <sys/ioctl.h>
 
 #include <algorithm>
+#include <string_view>
 
 namespace piejam::audio::alsa
 {
@@ -132,7 +133,10 @@ get_pcm_io_descriptors() -> pcm_io_descriptors
                     pcm_info.card,
                     pcm_info.device,
                     stream_type);
-            auto name = fmt::format("{} - {}", sc.info.name, pcm_info.name);
+            auto name = fmt::format(
+                    "{} - {}",
+                    reinterpret_cast<char const*>(sc.info.name),
+                    reinterpret_cast<char const*>(pcm_info.name));
             return pcm_descriptor{
                     .name = std::move(name),
                     .path = std::move(path)};
