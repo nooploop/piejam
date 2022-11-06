@@ -9,14 +9,12 @@ add_library(piejam_thread STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/name.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/priority.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/semaphore.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/spsc_slot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/thread/worker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/affinity.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/configuration.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/name.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/priority.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/thread/semaphore.cpp
 )
 
 target_include_directories(piejam_thread PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -5,11 +5,11 @@
 #pragma once
 
 #include <piejam/thread/configuration.h>
-#include <piejam/thread/semaphore.h>
 
 #include <atomic>
 #include <concepts>
 #include <functional>
+#include <semaphore>
 #include <thread>
 
 namespace piejam::thread
@@ -67,8 +67,8 @@ public:
     void wait() { m_sem_finished.acquire(); }
 
 private:
-    semaphore m_sem_work;
-    semaphore m_sem_finished;
+    std::binary_semaphore m_sem_work{0};
+    std::binary_semaphore m_sem_finished{0};
 
     task_t m_task{[]() {}};
     std::jthread m_thread;
