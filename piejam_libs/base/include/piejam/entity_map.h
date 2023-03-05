@@ -92,7 +92,7 @@ public:
         return m_map.update([id](map_t& m) { return m.erase(id); });
     }
 
-    bool operator==(entity_map const&) const noexcept = default;
+    auto operator==(entity_map const&) const noexcept -> bool = default;
 
 private:
     box<map_t> m_map;

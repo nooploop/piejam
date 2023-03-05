@@ -18,9 +18,9 @@ namespace detail
 struct box_equal
 {
     template <class T>
-    constexpr bool operator()(
+    constexpr auto operator()(
             std::shared_ptr<T const> const& l,
-            std::shared_ptr<T const> const& r) const noexcept
+            std::shared_ptr<T const> const& r) const noexcept -> bool
     {
         return l.get() == r.get() || *l == *r;
     }
@@ -29,9 +29,9 @@ struct box_equal
 struct box_eq
 {
     template <class T>
-    constexpr bool operator()(
+    constexpr auto operator()(
             std::shared_ptr<T const> const& l,
-            std::shared_ptr<T const> const& r) const noexcept
+            std::shared_ptr<T const> const& r) const noexcept -> bool
     {
         return l.get() == r.get();
     }
@@ -53,6 +53,10 @@ struct is_box<box<T, Eq>> : std::true_type
 template <class B>
 constexpr bool is_box_v = is_box<B>::value;
 
+template <class From, class To>
+concept convertible_to_box_value =
+        std::is_convertible_v<From, To> && !is_box_v<std::decay_t<From>>;
+
 template <class T, class Eq>
 class box
 {
@@ -62,8 +66,8 @@ public:
     {
     }
 
-    template <std::convertible_to<T const> U>
-    box(U&& v) requires(!is_box_v<std::decay_t<U>>)
+    template <convertible_to_box_value<T const> U>
+    box(U&& v)
         : box(std::in_place, std::forward<U>(v))
     {
     }
@@ -76,13 +80,13 @@ public:
 
     auto get() const noexcept -> T const& { return *m_value; }
 
-    operator T const &() const noexcept { return *m_value; }
+    operator T const&() const noexcept { return *m_value; }
 
     auto operator*() const noexcept -> T const& { return *m_value; }
     auto operator->() const noexcept -> T const* { return m_value.get(); }
 
-    template <std::convertible_to<T const> U>
-    auto operator=(U&& value) -> box& requires(!is_box_v<std::decay_t<U>>)
+    template <convertible_to_box_value<T const> U>
+    auto operator=(U&& value) -> box&
     {
         m_value = std::make_shared<T const>(std::forward<U>(value));
         return *this;
@@ -96,12 +100,12 @@ public:
         return u(*value);
     }
 
-    bool operator==(box const& other) const noexcept
+    auto operator==(box const& other) const noexcept -> bool
     {
         return Eq{}(m_value, other.m_value);
     }
 
-    bool operator!=(box const& other) const noexcept
+    auto operator!=(box const& other) const noexcept -> bool
     {
         return !(*this == other);
     }

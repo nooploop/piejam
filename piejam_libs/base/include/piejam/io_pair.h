@@ -46,7 +46,7 @@ struct io_pair
     constexpr auto operator=(io_pair const&) -> io_pair& = default;
     constexpr auto operator=(io_pair&&) -> io_pair& = default;
 
-    constexpr bool operator==(io_pair const&) const noexcept = default;
+    constexpr auto operator==(io_pair const&) const noexcept -> bool = default;
 
     constexpr auto get(io_direction const io_dir) const noexcept -> T const&
     {
