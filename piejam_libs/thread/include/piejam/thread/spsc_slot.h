@@ -46,7 +46,7 @@ public:
         }
     }
 
-    bool pull(T& r) noexcept requires(std::is_nothrow_copy_assignable_v<T>)
+    auto pull(T& r) noexcept -> bool requires(std::is_nothrow_copy_assignable_v<T>)
     {
         bool pulled{};
         consume([&r, &pulled](T const& value) noexcept {
@@ -69,7 +69,7 @@ private:
         return x | 0b100;
     }
 
-    static constexpr bool marked(std::size_t const x) noexcept
+    static constexpr auto marked(std::size_t const x) noexcept -> bool
     {
         return (x & 0b100);
     }
