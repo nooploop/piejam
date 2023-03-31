@@ -21,11 +21,7 @@ template <class T>
 class value_io_processor final : public engine::named_processor
 {
 public:
-    value_io_processor(std::string_view const name = {})
-        : named_processor(name)
-        , m_type_name("value_io")
-    {
-    }
+    using named_processor::named_processor;
 
     void set(T const x) noexcept { m_in_value.push(x); }
 
@@ -39,7 +35,8 @@ public:
 
     auto type_name() const noexcept -> std::string_view override
     {
-        return m_type_name;
+        using namespace std::string_view_literals;
+        return "value_io"sv;
     }
 
     auto num_inputs() const noexcept -> std::size_t override { return 0; }
@@ -73,8 +70,6 @@ public:
     }
 
 private:
-    std::string m_type_name;
-
     thread::spsc_slot<T> m_in_value;
     thread::spsc_slot<T> m_out_value;
 };
