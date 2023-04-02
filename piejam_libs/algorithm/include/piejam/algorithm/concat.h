@@ -6,11 +6,12 @@
 
 #include <algorithm>
 #include <iterator>
+#include <ranges>
 
 namespace piejam::algorithm
 {
 
-template <class Result, class... Range>
+template <class Result, std::ranges::forward_range... Range>
 auto
 concat(Range&&... rng) -> Result
 {

@@ -11,7 +11,7 @@
 namespace piejam::algorithm
 {
 
-template <std::ranges::range Range, class F>
+template <std::ranges::forward_range Range, class F>
 auto
 transform_to_vector(Range const& rng, F&& f)
 {

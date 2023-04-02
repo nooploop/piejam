@@ -20,18 +20,18 @@ struct edit_script_deletion
     std::size_t pos{};
 };
 
-inline constexpr bool
+inline constexpr auto
 operator==(
         edit_script_deletion const& l,
-        edit_script_deletion const& r) noexcept
+        edit_script_deletion const& r) noexcept -> bool
 {
     return l.pos == r.pos;
 }
 
-inline constexpr bool
+inline constexpr auto
 operator!=(
         edit_script_deletion const& l,
-        edit_script_deletion const& r) noexcept
+        edit_script_deletion const& r) noexcept -> bool
 {
     return l.pos != r.pos;
 }
@@ -47,19 +47,19 @@ template <class T>
 edit_script_insertion(std::size_t, T const&) -> edit_script_insertion<T>;
 
 template <class T>
-constexpr bool
+constexpr auto
 operator==(
         edit_script_insertion<T> const& l,
-        edit_script_insertion<T> const& r) noexcept
+        edit_script_insertion<T> const& r) noexcept -> bool
 {
     return l.pos == r.pos && l.value == r.value;
 }
 
 template <class T>
-constexpr bool
+constexpr auto
 operator!=(
         edit_script_insertion<T> const& l,
-        edit_script_insertion<T> const& r) noexcept
+        edit_script_insertion<T> const& r) noexcept -> bool
 {
     return !(l == r);
 }

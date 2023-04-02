@@ -4,15 +4,20 @@
 
 #pragma once
 
+#include <piejam/algorithm/concepts.h>
+
 #include <piejam/npos.h>
 
 #include <cassert>
 #include <iterator>
+#include <ranges>
 
 namespace piejam::algorithm
 {
 
-template <class Range, class Predicate>
+template <
+        std::ranges::input_range Range,
+        range_unary_predicate<Range> Predicate>
 constexpr auto
 index_of_if(Range const& rng, Predicate&& p)
 {
@@ -27,7 +32,9 @@ index_of_if(Range const& rng, Predicate&& p)
     return npos;
 }
 
-template <class Range, class T>
+template <
+        std::ranges::input_range Range,
+        equality_comparable_with_range_value<Range> T>
 constexpr auto
 index_of(Range const& rng, T&& value) -> std::size_t
 {

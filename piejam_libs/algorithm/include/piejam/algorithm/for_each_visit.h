@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <ranges>
 #include <variant>
 
 namespace piejam::algorithm
 {
 
-template <class Range, class Visitor>
+template <std::ranges::input_range Range, class Visitor>
 constexpr void
 for_each_visit(Range&& rng, Visitor&& v)
 {

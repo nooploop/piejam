@@ -29,7 +29,7 @@ string_join(Range const& rng, char sep) -> std::string
         return acc;
     }
     else
-        return std::string();
+        return {};
 }
 
 } // namespace piejam::algorithm

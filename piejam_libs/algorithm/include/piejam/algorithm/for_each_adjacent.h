@@ -4,13 +4,15 @@
 
 #pragma once
 
+#include <piejam/algorithm/concepts.h>
+
 #include <functional>
 #include <iterator>
 
 namespace piejam::algorithm
 {
 
-template <class Range, class BinaryOp>
+template <std::ranges::forward_range Range, range_binary_op<Range> BinaryOp>
 constexpr void
 for_each_adjacent(Range&& rng, BinaryOp&& op)
 {
@@ -19,7 +21,7 @@ for_each_adjacent(Range&& rng, BinaryOp&& op)
 
     auto first = begin(rng);
     auto const last = end(rng);
-    auto second = first != last ? std::next(begin(rng)) : last;
+    auto second = first != last ? std::next(first) : last;
 
     while (second != last)
         std::invoke(std::forward<BinaryOp>(op), *first++, *second++);

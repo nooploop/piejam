@@ -4,14 +4,17 @@
 
 #pragma once
 
+#include <piejam/algorithm/concepts.h>
+
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <ranges>
 
 namespace piejam::algorithm
 {
 
-template <class Range, class T>
+template <std::ranges::input_range Range, convertible_to_range_value<Range> T>
 constexpr auto
 find_or_get_first(Range const& rng, T&& value)
 {
