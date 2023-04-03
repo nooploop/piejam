@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <piejam/redux/flag_resetter.h>
 #include <piejam/redux/functors.h>
-
-#include <memory>
 
 namespace piejam::redux
 {
@@ -25,9 +24,7 @@ public:
     {
         if (auto* const batch = as_batch_action(a))
         {
-            std::unique_ptr<bool, void (*)(bool*)> flag_reset(
-                    &m_batching,
-                    [](bool* batching) { *batching = false; });
+            flag_resetter reset_batching{&m_batching};
 
             using std::begin;
             using std::end;

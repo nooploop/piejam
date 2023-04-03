@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/redux/concepts.h>
 #include <piejam/redux/functors.h>
 
 #include <cassert>
@@ -22,7 +23,7 @@ public:
     using next_f = redux::next_f<Action>;
     using get_state_f = redux::get_state_f<State>;
 
-    template <class Reducer>
+    template <concepts::reducer<State, Action> Reducer>
     store(Reducer&& reducer, State initial_state = {})
         : m_reducer(std::forward<Reducer>(reducer))
         , m_state(std::move(initial_state))
@@ -49,7 +50,7 @@ public:
                 std::move(m_dispatch));                       // next
     }
 
-    template <class Subscriber>
+    template <concepts::subscriber<State> Subscriber>
     void subscribe(Subscriber&& s)
     {
         m_subscriber = std::forward<Subscriber>(s);

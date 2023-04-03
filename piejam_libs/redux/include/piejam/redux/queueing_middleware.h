@@ -4,23 +4,22 @@
 
 #pragma once
 
-#include <piejam/redux/cloneable.h>
+#include <piejam/redux/concepts.h>
+#include <piejam/redux/flag_resetter.h>
 #include <piejam/redux/functors.h>
 
-#include <memory>
 #include <queue>
 
 namespace piejam::redux
 {
 
-template <class Action>
-    requires cloneable<Action>
+template <concepts::cloneable Action>
 class queueing_middleware
 {
 public:
-    template <class Next>
+    template <concepts::next<Action> Next>
     queueing_middleware(Next&& next)
-        : m_next(std::forward<Next>(next))
+        : m_next{std::forward<Next>(next)}
     {
     }
 
@@ -33,6 +32,7 @@ public:
         else
         {
             m_dispatching = true;
+            flag_resetter reset_dispatching{&m_dispatching};
 
             m_next(a);
 
@@ -42,8 +42,6 @@ public:
                 m_queued_actions.pop();
                 m_next(*action);
             }
-
-            m_dispatching = false;
         }
     }
 

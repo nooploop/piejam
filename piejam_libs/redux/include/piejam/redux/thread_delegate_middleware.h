@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/redux/cloneable.h>
+#include <piejam/redux/concepts.h>
 #include <piejam/redux/functors.h>
 #include <piejam/redux/make_middleware.h>
 
@@ -14,8 +14,7 @@
 namespace piejam::redux
 {
 
-template <class DelegateMethod, class Action>
-    requires cloneable<Action>
+template <class DelegateMethod, concepts::cloneable Action>
 class thread_delegate_middleware
 {
 public:
@@ -77,7 +76,7 @@ struct make_thread_delegate_middleware
                 thread_delegate_middleware<DelegateMethod, Action>>(
                 m_delegate_to_id,
                 m_delegate_method,
-                std::move(dispatch),
+                std::forward<Dispatch>(dispatch),
                 std::move(next));
     }
 
