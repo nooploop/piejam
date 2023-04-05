@@ -32,7 +32,6 @@ struct audio_engine_middleware_test : ::testing::Test
     testing::StrictMock<ladspa_processor_factory_mock> ladspa_processor_factory;
 
     audio_engine_middleware sut{
-            make_middleware_functors(mf_mock),
             {},
             {},
             audio_device_manager,
@@ -53,7 +52,7 @@ TEST_F(audio_engine_middleware_test,
         auto reduce(state const& st) const -> state override { return st; }
     } action;
     EXPECT_CALL(mf_mock, next(::testing::Ref(action)));
-    sut(action);
+    sut(make_middleware_functors(mf_mock), action);
 }
 
 TEST_F(audio_engine_middleware_test,
@@ -65,7 +64,7 @@ TEST_F(audio_engine_middleware_test,
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
 
     actions::select_sample_rate action;
-    sut(action);
+    sut(make_middleware_functors(mf_mock), action);
 }
 
 TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
@@ -97,7 +96,7 @@ TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
     action.index = 1;
 
     ASSERT_EQ(audio::sample_rate(), st.sample_rate);
-    sut(action);
+    sut(make_middleware_functors(mf_mock), action);
 
     EXPECT_EQ(audio::sample_rate(48000u), st.sample_rate);
 }
@@ -131,7 +130,7 @@ TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
     action.index = 1;
 
     ASSERT_EQ(audio::period_size(), st.period_size);
-    sut(action);
+    sut(make_middleware_functors(mf_mock), action);
 
     EXPECT_EQ(audio::period_size(128u), st.period_size);
 }
@@ -171,7 +170,7 @@ TEST_F(audio_engine_middleware_test,
     in_action.input = true;
     in_action.index = 1; // select another device
 
-    sut(in_action);
+    sut(make_middleware_functors(mf_mock), in_action);
 
     EXPECT_EQ(1u, st.input.index);
 }

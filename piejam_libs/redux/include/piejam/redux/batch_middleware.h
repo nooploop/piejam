@@ -6,21 +6,23 @@
 
 #include <piejam/redux/flag_resetter.h>
 #include <piejam/redux/functors.h>
+#include <piejam/redux/middleware_functors.h>
 
 namespace piejam::redux
 {
 
-template <class Action>
 class batch_middleware
 {
 public:
-    batch_middleware(bool& batching, next_f<Action> next)
+    batch_middleware(bool& batching)
         : m_batching(batching)
-        , m_next(std::move(next))
     {
     }
 
-    void operator()(Action const& a) const
+    template <class State, class Action>
+    void operator()(
+            middleware_functors<State, Action> const& mw_fs,
+            Action const& a) const
     {
         if (auto* const batch = as_batch_action(a))
         {
@@ -33,18 +35,17 @@ public:
                  ++it)
             {
                 m_batching = std::next(it) != it_end;
-                m_next(*it);
+                mw_fs.next(*it);
             }
         }
         else
         {
-            m_next(a);
+            mw_fs.next(a);
         }
     }
 
 private:
     bool& m_batching;
-    next_f<Action> m_next;
 };
 
 } // namespace piejam::redux

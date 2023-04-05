@@ -5,9 +5,11 @@
 #include <piejam/runtime/ladspa_fx_middleware.h>
 
 #include <piejam/ladspa/instance_manager.h>
+#include <piejam/redux/middleware_functors.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/ladspa_fx_action.h>
+#include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/action.h>
 
@@ -17,36 +19,37 @@ namespace piejam::runtime
 {
 
 ladspa_fx_middleware::ladspa_fx_middleware(
-        middleware_functors mw_fs,
         ladspa::instance_manager& ladspa_control)
-    : middleware_functors(std::move(mw_fs))
-    , m_ladspa_control(ladspa_control)
+    : m_ladspa_control(ladspa_control)
 {
 }
 
 void
-ladspa_fx_middleware::operator()(action const& action)
+ladspa_fx_middleware::operator()(
+        middleware_functors const& mw_fs,
+        action const& action)
 {
     if (auto const* const a =
                 dynamic_cast<actions::ladspa_fx_action const*>(&action))
     {
         auto v = ui::make_action_visitor<actions::ladspa_fx_action_visitor>(
-                [this](auto const& a) { process_ladspa_fx_action(a); });
+                [&](auto const& a) { process_ladspa_fx_action(mw_fs, a); });
 
         a->visit(v);
     }
     else
     {
-        next(action);
+        mw_fs.next(action);
     }
 }
 
 template <>
 void
 ladspa_fx_middleware::process_ladspa_fx_action(
+        middleware_functors const& mw_fs,
         actions::load_ladspa_fx_plugin const& a)
 {
-    auto const& st = get_state();
+    auto const& st = mw_fs.get_state();
 
     if (auto plugin_desc =
                 find_ladspa_plugin_descriptor(st.fx_registry, a.plugin_id))
@@ -62,7 +65,7 @@ ladspa_fx_middleware::process_ladspa_fx_action(
             next_action.initial_values = a.initial_values;
             next_action.midi_assignments = a.midi_assignments;
 
-            next(next_action);
+            mw_fs.next(next_action);
 
             return;
         }
@@ -80,21 +83,22 @@ ladspa_fx_middleware::process_ladspa_fx_action(
             .parameter_values = a.initial_values,
             .midi_assignments = a.midi_assignments};
     next_action.name = a.name;
-    next(next_action);
+    mw_fs.next(next_action);
 }
 
 template <>
 void
 ladspa_fx_middleware::process_ladspa_fx_action(
+        middleware_functors const& mw_fs,
         actions::delete_fx_module const& a)
 {
-    auto const& st = get_state();
+    auto const& st = mw_fs.get_state();
 
     fx::module const& fx_mod = st.fx_modules[a.fx_mod_id];
 
     auto const fx_instance_id = fx_mod.fx_instance_id;
 
-    next(a);
+    mw_fs.next(a);
 
     if (ladspa::instance_id const* const instance_id =
                 std::get_if<ladspa::instance_id>(&fx_instance_id))

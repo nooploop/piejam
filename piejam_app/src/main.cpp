@@ -60,7 +60,10 @@
 #include <fstream>
 #include <iostream>
 
-static auto
+namespace
+{
+
+auto
 config_file_path(piejam::runtime::locations const& locs)
 {
     BOOST_ASSERT(!locs.config_dir.empty());
@@ -72,6 +75,19 @@ config_file_path(piejam::runtime::locations const& locs)
 }
 
 constexpr int realtime_priority = 96;
+
+struct QtThreadDelegator
+{
+    template <std::invocable F>
+    void operator()(F&& f)
+    {
+        QMetaObject::invokeMethod(app, std::forward<F>(f));
+    }
+
+    QGuiApplication* app{};
+};
+
+} // namespace
 
 auto
 main(int argc, char* argv[]) -> int
@@ -111,113 +127,67 @@ main(int argc, char* argv[]) -> int
     auto midi_device_manager = midi::make_device_manager();
     ladspa::instance_manager_processor_factory ladspa_manager;
 
+    using middleware_factory =
+            redux::middleware_factory<runtime::state, runtime::action>;
+
     runtime::store store(
             [](auto const& st, auto const& a) { return a.reduce(st); },
             runtime::make_initial_state());
 
-    store.apply_middleware([](auto&& get_state, auto&& dispatch, auto&& next) {
-        return redux::make_middleware<runtime::persistence_middleware>(
-                std::forward<decltype(get_state)>(get_state),
-                std::forward<decltype(dispatch)>(dispatch),
-                std::forward<decltype(next)>(next));
-    });
-
-    store.apply_middleware([rec_dir = locs.rec_dir](
-                                   auto&& get_state,
-                                   auto&& dispatch,
-                                   auto&& next) {
-        return redux::make_middleware<runtime::recorder_middleware>(
-                runtime::middleware_functors(
-                        std::forward<decltype(get_state)>(get_state),
-                        std::forward<decltype(dispatch)>(dispatch),
-                        std::forward<decltype(next)>(next)),
-                rec_dir);
-    });
+    store.apply_middleware(
+            middleware_factory::make<runtime::persistence_middleware>());
 
     store.apply_middleware(
-            [audio_device_manager = audio_device_manager.get(),
-             midi_device_manager = midi_device_manager.get(),
-             &ladspa_manager](auto&& get_state, auto&& dispatch, auto&& next) {
-                thread::configuration const audio_thread_config{
-                        .affinity = 2,
-                        .realtime_priority = realtime_priority,
-                        .name = "audio_main"};
-                std::array const worker_thread_configs{
-                        thread::configuration{
-                                .affinity = 3,
-                                .realtime_priority = realtime_priority,
-                                .name = "audio_worker_0"},
-                        thread::configuration{
-                                .affinity = 0,
-                                .realtime_priority = realtime_priority,
-                                .name = "audio_worker_1"},
-                        thread::configuration{
-                                .affinity = 1,
-                                .realtime_priority = realtime_priority,
-                                .name = "audio_worker_2"},
-                };
-                return redux::make_middleware<runtime::audio_engine_middleware>(
-                        runtime::middleware_functors(
-                                std::forward<decltype(get_state)>(get_state),
-                                std::forward<decltype(dispatch)>(dispatch),
-                                std::forward<decltype(next)>(next)),
-                        audio_thread_config,
-                        worker_thread_configs,
-                        *audio_device_manager,
-                        ladspa_manager,
-                        runtime::make_midi_input_controller(
-                                *midi_device_manager));
-            });
-
-    store.apply_middleware([midi_device_manager = midi_device_manager.get()](
-                                   auto&& get_state,
-                                   auto&& dispatch,
-                                   auto&& next) {
-        return redux::make_middleware<runtime::midi_control_middleware>(
-                runtime::middleware_functors(
-                        std::forward<decltype(get_state)>(get_state),
-                        std::forward<decltype(dispatch)>(dispatch),
-                        std::forward<decltype(next)>(next)),
-                [midi_device_manager]() {
-                    return midi_device_manager->update_devices();
-                });
-    });
+            middleware_factory::make<runtime::recorder_middleware>(
+                    locs.rec_dir));
 
     store.apply_middleware(
-            [&ladspa_manager](auto&& get_state, auto&& dispatch, auto&& next) {
-                return redux::make_middleware<runtime::ladspa_fx_middleware>(
-                        runtime::middleware_functors(
-                                std::forward<decltype(get_state)>(get_state),
-                                std::forward<decltype(dispatch)>(dispatch),
-                                std::forward<decltype(next)>(next)),
-                        ladspa_manager);
-            });
+            middleware_factory::make<runtime::audio_engine_middleware>(
+                    thread::configuration{
+                            .affinity = 2,
+                            .realtime_priority = realtime_priority,
+                            .name = "audio_main"},
+                    std::array{
+                            thread::configuration{
+                                    .affinity = 3,
+                                    .realtime_priority = realtime_priority,
+                                    .name = "audio_worker_0"},
+                            thread::configuration{
+                                    .affinity = 0,
+                                    .realtime_priority = realtime_priority,
+                                    .name = "audio_worker_1"},
+                            thread::configuration{
+                                    .affinity = 1,
+                                    .realtime_priority = realtime_priority,
+                                    .name = "audio_worker_2"}},
+                    *audio_device_manager,
+                    ladspa_manager,
+                    runtime::make_midi_input_controller(*midi_device_manager)));
 
     store.apply_middleware(
-            redux::make_thunk_middleware<runtime::state, runtime::action>{});
+            middleware_factory::make<runtime::midi_control_middleware>(
+                    [&midi_device_manager]() {
+                        return midi_device_manager->update_devices();
+                    }));
+
+    store.apply_middleware(
+            middleware_factory::make<runtime::ladspa_fx_middleware>(
+                    ladspa_manager));
+
+    store.apply_middleware(middleware_factory::make<redux::thunk_middleware>());
 
     bool batching{};
-    store.apply_middleware([&batching](
-                                   auto&& /*get_state*/,
-                                   auto&& /*dispatch*/,
-                                   auto&& next) {
-        return redux::make_middleware<redux::batch_middleware<runtime::action>>(
-                batching,
-                std::forward<decltype(next)>(next));
-    });
+    store.apply_middleware(
+            middleware_factory::make<redux::batch_middleware>(batching));
+
+    store.apply_middleware(middleware_factory::make<
+                           redux::queueing_middleware<runtime::action>>());
 
     store.apply_middleware(
-            [](auto&& /*get_state*/, auto&& /*dispatch*/, auto&& next) {
-                return redux::make_middleware<
-                        redux::queueing_middleware<runtime::action>>(
-                        std::forward<decltype(next)>(next));
-            });
-
-    store.apply_middleware(redux::make_thread_delegate_middleware(
-            std::this_thread::get_id(),
-            [app = &app](auto&& f) {
-                QMetaObject::invokeMethod(app, std::forward<decltype(f)>(f));
-            }));
+            middleware_factory::make<
+                    redux::thread_delegate_middleware<QtThreadDelegator>>(
+                    std::this_thread::get_id(),
+                    QtThreadDelegator{&app}));
 
     runtime::subscriber state_change_subscriber(
             [&store]() -> runtime::state const& { return store.state(); });

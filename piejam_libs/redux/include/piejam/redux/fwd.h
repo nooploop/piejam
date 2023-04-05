@@ -10,4 +10,7 @@ namespace piejam::redux
 template <class State, class Action>
 class store;
 
+template <class State, class Action>
+class middleware_functors;
+
 } // namespace piejam::redux

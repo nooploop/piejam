@@ -2,7 +2,9 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <piejam/redux/make_middleware.h>
 #include <piejam/redux/queueing_middleware.h>
+#include <piejam/redux/store.h>
 
 #include <gtest/gtest.h>
 
@@ -11,47 +13,83 @@
 namespace piejam::redux::test
 {
 
+namespace
+{
+
+using state_t = std::vector<int>;
+
 struct queaction
 {
     int x;
 
-    auto clone() const -> std::unique_ptr<queaction>
+    [[nodiscard]] auto clone() const -> std::unique_ptr<queaction>
     {
         return std::make_unique<queaction>(queaction{x});
     }
 };
 
+struct single_dispatch_middleware
+{
+    auto operator()(
+            middleware_functors<state_t, queaction> const& mw_fs,
+            queaction const& a)
+    {
+        if (dispatch)
+        {
+            mw_fs.dispatch(queaction{999});
+            dispatch = false;
+        }
+
+        mw_fs.next(a);
+    }
+
+    bool dispatch{true};
+};
+
+using store_t = store<state_t, queaction>;
+
+} // namespace
+
 TEST(queueing_middleware, if_currently_not_dispatching_proceed_to_next)
 {
-    int result{};
-    queueing_middleware<queaction> sut(
-            [&result](queaction const& a) { result = a.x; });
+    using make_mw_factory = middleware_factory<state_t, queaction>;
 
-    sut.operator()(queaction{7});
+    store_t store{[](state_t const& st, queaction const& a) {
+        auto new_st = st;
+        new_st.push_back(a.x);
+        return new_st;
+    }};
 
-    EXPECT_EQ(7, result);
+    store.apply_middleware(
+            make_mw_factory::make<queueing_middleware<queaction>>());
+
+    store.dispatch(queaction{23});
+
+    ASSERT_EQ(1u, store.state().size());
+    EXPECT_EQ(23, store.state()[0]);
 }
 
 TEST(queueing_middleware,
-     if_currently_dispatching_action_is_queued_and_executed_after_the_current_one)
+     if_currently_dispatching_then_new_dispatched_action_is_queued)
 {
-    std::vector<int> result;
-    queueing_middleware<queaction> sut(
-            [dispatch = bool{true}, &result, &sut](queaction const& a) mutable {
-                if (dispatch)
-                {
-                    sut.operator()(queaction{58});
-                    dispatch = false;
-                }
+    using make_mw_factory = middleware_factory<state_t, queaction>;
 
-                result.push_back(a.x);
-            });
+    store_t store{[](state_t const& st, queaction const& a) {
+        auto new_st = st;
+        new_st.push_back(a.x);
+        return new_st;
+    }};
 
-    sut.operator()(queaction{23});
+    store.apply_middleware(make_mw_factory::make<single_dispatch_middleware>());
 
-    ASSERT_EQ(2u, result.size());
-    EXPECT_EQ(23, result[0]);
-    EXPECT_EQ(58, result[1]);
+    store.apply_middleware(
+            make_mw_factory::make<queueing_middleware<queaction>>());
+
+    store.dispatch(queaction{23});
+
+    ASSERT_EQ(2u, store.state().size());
+    EXPECT_EQ(23, store.state()[0]);
+    EXPECT_EQ(999, store.state()[1]);
 }
 
 } // namespace piejam::redux::test

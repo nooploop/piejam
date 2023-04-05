@@ -8,6 +8,7 @@
 #include <piejam/runtime/actions/load_session.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/actions/save_session.h>
+#include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/persistence/access.h>
 #include <piejam/runtime/persistence/session.h>
 
@@ -16,64 +17,65 @@
 namespace piejam::runtime
 {
 
-persistence_middleware::persistence_middleware(
-        get_state_f get_state,
-        dispatch_f dispatch,
-        next_f next)
-    : m_get_state(std::move(get_state))
-    , m_dispatch(std::move(dispatch))
-    , m_next(std::move(next))
-{
-    BOOST_ASSERT(m_get_state);
-    BOOST_ASSERT(m_next);
-}
-
 void
-persistence_middleware::operator()(action const& a)
+persistence_middleware::operator()(
+        middleware_functors const& mw_fs,
+        action const& a)
 {
     if (auto action = dynamic_cast<actions::persistence_action const*>(&a))
     {
         auto v = ui::make_action_visitor<actions::persistence_action_visitor>(
-                [this](auto&& a) { process_persistence_action(a); });
+                [&](auto&& a) { process_persistence_action(mw_fs, a); });
 
         action->visit(v);
     }
     else
     {
-        m_next(a);
+        mw_fs.next(a);
     }
 }
 
 template <>
 void
 persistence_middleware::process_persistence_action(
+        middleware_functors const& mw_fs,
         actions::load_app_config const& a)
 {
-    persistence::load_app_config(a.file, m_dispatch);
+    persistence::load_app_config(a.file, [&](auto const& action) {
+        mw_fs.dispatch(action);
+    });
 }
 
 template <>
 void
 persistence_middleware::process_persistence_action(
+        middleware_functors const& mw_fs,
         actions::save_app_config const& a)
 {
-    persistence::save_app_config(a.file, a.enabled_midi_devices, m_get_state());
+    persistence::save_app_config(
+            a.file,
+            a.enabled_midi_devices,
+            mw_fs.get_state());
 }
 
 template <>
 void
 persistence_middleware::process_persistence_action(
+        middleware_functors const& mw_fs,
         actions::load_session const& a)
 {
-    persistence::load_session(a.file, m_dispatch);
+    persistence::load_session(a.file, [&](auto const& action) {
+        mw_fs.dispatch(action);
+    });
 }
 
 template <>
 void
 persistence_middleware::process_persistence_action(
+        middleware_functors const& mw_fs,
         actions::save_session const& a)
 {
-    persistence::save_session(a.file, m_get_state());
+    persistence::save_session(a.file, mw_fs.get_state());
 }
 
 } // namespace piejam::runtime

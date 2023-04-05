@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
+#include <piejam/redux/fwd.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/processors/fwd.h>
 #include <piejam/runtime/ui/fwd.h>
@@ -39,5 +40,7 @@ struct midi_device_config;
 
 struct midi_assignment;
 class midi_input_controller;
+
+using middleware_functors = redux::middleware_functors<state, action>;
 
 } // namespace piejam::runtime

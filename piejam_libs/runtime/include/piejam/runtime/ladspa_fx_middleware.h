@@ -5,21 +5,21 @@
 #pragma once
 
 #include <piejam/ladspa/fwd.h>
-#include <piejam/runtime/middleware_functors.h>
+#include <piejam/runtime/fwd.h>
 
 namespace piejam::runtime
 {
 
-class ladspa_fx_middleware final : private middleware_functors
+class ladspa_fx_middleware final
 {
 public:
-    ladspa_fx_middleware(middleware_functors, ladspa::instance_manager&);
+    ladspa_fx_middleware(ladspa::instance_manager&);
 
-    void operator()(action const&);
+    void operator()(middleware_functors const&, action const&);
 
 private:
     template <class Action>
-    void process_ladspa_fx_action(Action const&);
+    void process_ladspa_fx_action(middleware_functors const&, Action const&);
 
     ladspa::instance_manager& m_ladspa_control;
 };

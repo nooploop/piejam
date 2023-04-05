@@ -13,6 +13,7 @@
 #include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/save_app_config.h>
+#include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/state.h>
 
 #include <boost/assert.hpp>
@@ -78,40 +79,42 @@ no_device_updates() -> midi_control_middleware::device_updates_f
 } // namespace
 
 midi_control_middleware::midi_control_middleware(
-        middleware_functors mw_fs,
         device_updates_f device_updates)
-    : middleware_functors(std::move(mw_fs))
-    , m_device_updates(
+    : m_device_updates(
               device_updates ? std::move(device_updates) : no_device_updates())
 {
 }
 
 void
-midi_control_middleware::operator()(action const& action)
+midi_control_middleware::operator()(
+        middleware_functors const& mw_fs,
+        action const& action)
 {
     if (auto const* const a =
                 dynamic_cast<actions::midi_control_action const*>(&action))
     {
         auto v = ui::make_action_visitor<actions::midi_control_action_visitor>(
-                [this](auto const& a) { process_midi_control_action(a); });
+                [&](auto const& a) { process_midi_control_action(mw_fs, a); });
 
         a->visit(v);
     }
     else
     {
-        next(action);
+        mw_fs.next(action);
     }
 }
 
 void
-midi_control_middleware::process_device_update(midi::device_added const& up)
+midi_control_middleware::process_device_update(
+        middleware_functors const& mw_fs,
+        midi::device_added const& up)
 {
     if (auto it = std::ranges::find(m_enabled_devices, up.name);
         it != m_enabled_devices.end())
     {
         actions::activate_midi_device action;
         action.device_id = up.device_id;
-        dispatch(action);
+        mw_fs.dispatch(action);
 
         m_enabled_devices.erase(it);
         BOOST_ASSERT(!algorithm::contains(m_enabled_devices, up.name));
@@ -119,9 +122,11 @@ midi_control_middleware::process_device_update(midi::device_added const& up)
 }
 
 void
-midi_control_middleware::process_device_update(midi::device_removed const& up)
+midi_control_middleware::process_device_update(
+        middleware_functors const& mw_fs,
+        midi::device_removed const& up)
 {
-    auto const& st = get_state();
+    auto const& st = mw_fs.get_state();
     if (auto it = st.midi_devices->find(up.device_id);
         it != st.midi_devices->end() && it->second.enabled)
     {
@@ -133,6 +138,7 @@ midi_control_middleware::process_device_update(midi::device_removed const& up)
 template <>
 void
 midi_control_middleware::process_midi_control_action(
+        middleware_functors const& mw_fs,
         actions::refresh_midi_devices const&)
 {
     update_midi_devices next_action;
@@ -140,38 +146,40 @@ midi_control_middleware::process_midi_control_action(
 
     if (!next_action.updates.empty())
     {
-        algorithm::for_each_visit(next_action.updates, [this](auto const& up) {
-            process_device_update(up);
+        algorithm::for_each_visit(next_action.updates, [&](auto const& up) {
+            process_device_update(mw_fs, up);
         });
 
-        next(next_action);
+        mw_fs.next(next_action);
     }
 }
 
 template <>
 void
 midi_control_middleware::process_midi_control_action(
+        middleware_functors const& mw_fs,
         actions::save_app_config const& action)
 {
     auto next_action = action;
 
     next_action.enabled_midi_devices = m_enabled_devices;
 
-    for (auto const& [id, config] : *get_state().midi_devices)
+    for (auto const& [id, config] : *mw_fs.get_state().midi_devices)
     {
         if (config.enabled)
             next_action.enabled_midi_devices.emplace_back(config.name);
     }
 
-    next(next_action);
+    mw_fs.next(next_action);
 }
 
 template <>
 void
 midi_control_middleware::process_midi_control_action(
+        middleware_functors const& mw_fs,
         actions::apply_app_config const& action)
 {
-    auto const& st = get_state();
+    auto const& st = mw_fs.get_state();
     for (std::string const& dev_name : action.conf.enabled_midi_input_devices)
     {
         auto it = std::ranges::find_if(
@@ -186,7 +194,7 @@ midi_control_middleware::process_midi_control_action(
             {
                 actions::activate_midi_device activate_action;
                 activate_action.device_id = it->first;
-                dispatch(activate_action);
+                mw_fs.dispatch(activate_action);
             }
         }
         else
@@ -198,17 +206,18 @@ midi_control_middleware::process_midi_control_action(
     std::ranges::sort(m_enabled_devices);
     boost::unique_erase(m_enabled_devices);
 
-    next(action);
+    mw_fs.next(action);
 }
 
 template <>
 void
 midi_control_middleware::process_midi_control_action(
+        middleware_functors const& mw_fs,
         actions::request_info_update const& action)
 {
-    next(action);
+    mw_fs.next(action);
 
-    auto const& st = get_state();
+    auto const& st = mw_fs.get_state();
     actions::request_parameters_update param_update;
 
     algorithm::for_each_visit(
@@ -216,7 +225,7 @@ midi_control_middleware::process_midi_control_action(
             [&param_update](auto const& id) { param_update.push_back(id); });
 
     if (!param_update.empty())
-        next(param_update);
+        mw_fs.next(param_update);
 }
 
 } // namespace piejam::runtime

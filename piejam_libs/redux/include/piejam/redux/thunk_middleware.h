@@ -6,53 +6,29 @@
 
 #include <piejam/redux/functors.h>
 #include <piejam/redux/make_middleware.h>
+#include <piejam/redux/middleware_functors.h>
 
 namespace piejam::redux
 {
 
-template <class State, class Action>
 class thunk_middleware
 {
 public:
-    thunk_middleware(
-            get_state_f<State> get_state,
-            dispatch_f<Action> dispatch,
-            next_f<Action> next)
-        : m_get_state(std::move(get_state))
-        , m_dispatch(std::move(dispatch))
-        , m_next(std::move(next))
+    template <class State, class Action>
+    void operator()(
+            middleware_functors<State, Action> const& mw_fs,
+            Action const& a) const
     {
-    }
-
-    void operator()(Action const& a) const
-    {
+        using mw_fs_t = middleware_functors<State, Action>;
         if (auto* const ta = as_thunk_action(a))
         {
-            (*ta)(m_get_state, m_dispatch);
+            (*ta)(std::bind_front(&mw_fs_t::get_state, mw_fs),
+                  std::bind_front(&mw_fs_t::dispatch, mw_fs));
         }
         else
         {
-            m_next(a);
+            mw_fs.next(a);
         }
-    }
-
-private:
-    get_state_f<State> m_get_state;
-    dispatch_f<Action> m_dispatch;
-    next_f<Action> m_next;
-};
-
-template <class State, class Action>
-struct make_thunk_middleware
-{
-    template <class GetState, class Dispatch, class Next>
-    auto
-    operator()(GetState&& get_state, Dispatch&& dispatch, Next&& next) const
-    {
-        return make_middleware<thunk_middleware<State, Action>>(
-                std::forward<GetState>(get_state),
-                std::forward<Dispatch>(dispatch),
-                std::forward<Next>(next));
     }
 };
 

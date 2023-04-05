@@ -8,6 +8,7 @@
 #include <piejam/runtime/actions/recording.h>
 #include <piejam/runtime/actions/request_streams_update.h>
 #include <piejam/runtime/actions/update_streams.h>
+#include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/action.h>
 
@@ -32,43 +33,44 @@ struct recorder_middleware::impl
     open_streams_t open_streams;
 };
 
-recorder_middleware::recorder_middleware(
-        middleware_functors mw_fs,
-        std::filesystem::path recordings_dir)
-    : middleware_functors(std::move(mw_fs))
-    , m_impl(std::make_unique<impl>(std::move(recordings_dir)))
+recorder_middleware::recorder_middleware(std::filesystem::path recordings_dir)
+    : m_impl(std::make_unique<impl>(std::move(recordings_dir)))
 {
 }
 
 recorder_middleware::~recorder_middleware() = default;
 
 void
-recorder_middleware::operator()(action const& act)
+recorder_middleware::operator()(
+        middleware_functors const& mw_fs,
+        action const& act)
 {
     if (auto const* a = dynamic_cast<actions::recorder_action const*>(&act))
     {
         auto v = ui::make_action_visitor<actions::recorder_action_visitor>(
-                [this](auto const& a) { process_recorder_action(a); });
+                [&](auto const& a) { process_recorder_action(mw_fs, a); });
         a->visit(v);
     }
     else
     {
-        next(act);
+        mw_fs.next(act);
     }
 }
 
 void
-recorder_middleware::process_recorder_action(actions::start_recording const& a)
+recorder_middleware::process_recorder_action(
+        middleware_functors const& mw_fs,
+        actions::start_recording const& a)
 {
-    auto const& st = get_state();
+    auto const& st = mw_fs.get_state();
 
     BOOST_ASSERT(!st.recording);
 
-    next(a);
+    mw_fs.next(a);
 
     BOOST_ASSERT(st.recording);
 
-    auto const& recorder_streams = *get_state().recorder_streams;
+    auto const& recorder_streams = *mw_fs.get_state().recorder_streams;
     if (recorder_streams.empty())
         return;
 
@@ -91,7 +93,7 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
     for (auto const& [mixer_channel_id, stream_id] : recorder_streams)
     {
         mixer::channel const* const mixer_channel =
-                get_state().mixer_state.channels.find(mixer_channel_id);
+                mw_fs.get_state().mixer_state.channels.find(mixer_channel_id);
         BOOST_ASSERT(mixer_channel);
 
         auto filename = take_dir / fmt::format("{}.wav", *mixer_channel->name);
@@ -138,15 +140,19 @@ recorder_middleware::process_recorder_action(actions::start_recording const& a)
 }
 
 void
-recorder_middleware::process_recorder_action(actions::stop_recording const& a)
+recorder_middleware::process_recorder_action(
+        middleware_functors const& mw_fs,
+        actions::stop_recording const& a)
 {
     m_impl->open_streams.clear();
 
-    next(a);
+    mw_fs.next(a);
 }
 
 void
-recorder_middleware::process_recorder_action(actions::update_streams const& a)
+recorder_middleware::process_recorder_action(
+        middleware_functors const& mw_fs,
+        actions::update_streams const& a)
 {
     for (auto const& [stream_id, buffer] : a.streams)
     {
@@ -166,7 +172,7 @@ recorder_middleware::process_recorder_action(actions::update_streams const& a)
         }
     }
 
-    next(a);
+    mw_fs.next(a);
 }
 
 } // namespace piejam::runtime

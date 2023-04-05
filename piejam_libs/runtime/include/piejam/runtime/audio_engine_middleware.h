@@ -9,7 +9,6 @@
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
-#include <piejam/runtime/middleware_functors.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/fwd.h>
 
@@ -21,11 +20,10 @@
 namespace piejam::runtime
 {
 
-class audio_engine_middleware final : private middleware_functors
+class audio_engine_middleware final
 {
 public:
     audio_engine_middleware(
-            middleware_functors,
             thread::configuration const& audio_thread_config,
             std::span<const thread::configuration> wt_configs,
             audio::device_manager&,
@@ -34,23 +32,25 @@ public:
     audio_engine_middleware(audio_engine_middleware&&) noexcept = default;
     ~audio_engine_middleware();
 
-    void operator()(action const&);
+    void operator()(middleware_functors const&, action const&);
 
 private:
     template <class Action>
-    void process_device_action(Action const&);
+    void process_device_action(middleware_functors const&, Action const&);
 
     template <class Action>
-    void process_engine_action(Action const&);
+    void process_engine_action(middleware_functors const&, Action const&);
 
     template <class Parameter>
-    void process_engine_action(actions::set_parameter_value<Parameter> const&);
+    void process_engine_action(
+            middleware_functors const&,
+            actions::set_parameter_value<Parameter> const&);
 
     void close_device();
-    void open_device();
-    void start_engine();
+    void open_device(middleware_functors const&);
+    void start_engine(middleware_functors const&);
 
-    void rebuild();
+    void rebuild(middleware_functors const&);
 
     thread::configuration m_audio_thread_config;
     std::vector<thread::worker> m_workers;

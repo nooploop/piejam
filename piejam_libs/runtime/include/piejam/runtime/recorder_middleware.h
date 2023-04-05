@@ -6,7 +6,6 @@
 
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/middleware_functors.h>
 
 #include <filesystem>
 #include <memory>
@@ -14,20 +13,24 @@
 namespace piejam::runtime
 {
 
-class recorder_middleware final : private middleware_functors
+class recorder_middleware final
 {
 public:
-    recorder_middleware(
-            middleware_functors,
-            std::filesystem::path recordings_dir);
+    recorder_middleware(std::filesystem::path recordings_dir);
     ~recorder_middleware();
 
-    void operator()(action const&);
+    void operator()(middleware_functors const&, action const&);
 
 private:
-    void process_recorder_action(actions::start_recording const&);
-    void process_recorder_action(actions::stop_recording const&);
-    void process_recorder_action(actions::update_streams const&);
+    void process_recorder_action(
+            middleware_functors const&,
+            actions::start_recording const&);
+    void process_recorder_action(
+            middleware_functors const&,
+            actions::stop_recording const&);
+    void process_recorder_action(
+            middleware_functors const&,
+            actions::update_streams const&);
 
     struct impl;
     std::unique_ptr<impl> m_impl;

@@ -40,10 +40,8 @@ as_thunk_action(tst_action const& a)
 struct thunk_middleware_test : testing::Test
 {
     int state{};
-    thunk_middleware<int, tst_action> sut{
-            [this]() -> int const& { return state; },
-            [](auto const&) {},
-            [](auto const&) {}};
+    using mw_fs_t = middleware_functors<int, tst_action>;
+    thunk_middleware sut;
 };
 
 TEST_F(thunk_middleware_test, invoke_thunk)
@@ -53,7 +51,10 @@ TEST_F(thunk_middleware_test, invoke_thunk)
     ta.payload = [&from_thunk](auto&&, auto&&) { from_thunk = 5; };
 
     ASSERT_EQ(0, from_thunk);
-    sut(ta);
+    sut(mw_fs_t{[this]() -> int const& { return state; },
+                [](auto const&) {},
+                [](auto const&) {}},
+        static_cast<tst_action const&>(ta));
     EXPECT_EQ(5, from_thunk);
 }
 

@@ -44,6 +44,7 @@
 #include <piejam/runtime/actions/update_streams.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/midi_input_controller.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
@@ -131,14 +132,12 @@ struct update_info final : ui::cloneable_action<update_info, action>
 } // namespace
 
 audio_engine_middleware::audio_engine_middleware(
-        middleware_functors mw_fs,
         thread::configuration const& audio_thread_config,
         std::span<thread::configuration const> const wt_configs,
         audio::device_manager& device_manager,
         ladspa::processor_factory& ladspa_processor_factory,
         std::unique_ptr<midi_input_controller> midi_controller)
-    : middleware_functors(std::move(mw_fs))
-    , m_audio_thread_config(audio_thread_config)
+    : m_audio_thread_config(audio_thread_config)
     , m_workers(wt_configs.begin(), wt_configs.end())
     , m_device_manager(device_manager)
     , m_ladspa_processor_factory(ladspa_processor_factory)
@@ -153,9 +152,11 @@ audio_engine_middleware::~audio_engine_middleware() = default;
 
 template <class Action>
 void
-audio_engine_middleware::process_device_action(Action const& a)
+audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
+        Action const& a)
 {
-    next(a);
+    mw_fs.next(a);
 }
 
 static auto
@@ -260,11 +261,12 @@ make_update_devices_action(
 template <>
 void
 audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
         actions::apply_app_config const& a)
 {
-    state const& current_state = get_state();
+    state const& current_state = mw_fs.get_state();
 
-    next(make_update_devices_action(
+    mw_fs.next(make_update_devices_action(
             m_device_manager,
             current_state.pcm_devices,
             current_state.pcm_devices,
@@ -282,16 +284,18 @@ audio_engine_middleware::process_device_action(
             a.conf.period_size,
             a.conf.period_count));
 
-    next(a);
+    mw_fs.next(a);
 }
 
 template <>
 void
-audio_engine_middleware::process_device_action(actions::refresh_devices const&)
+audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
+        actions::refresh_devices const&)
 {
-    state const& current_state = get_state();
+    state const& current_state = mw_fs.get_state();
 
-    next(make_update_devices_action(
+    mw_fs.next(make_update_devices_action(
             m_device_manager,
             m_device_manager.io_descriptors(),
             current_state.pcm_devices,
@@ -305,11 +309,12 @@ audio_engine_middleware::process_device_action(actions::refresh_devices const&)
 template <>
 void
 audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
         actions::initiate_device_selection const& action)
 {
-    state const& current_state = get_state();
+    state const& current_state = mw_fs.get_state();
 
-    next(make_update_devices_action(
+    mw_fs.next(make_update_devices_action(
             m_device_manager,
             current_state.pcm_devices,
             current_state.pcm_devices,
@@ -323,14 +328,15 @@ audio_engine_middleware::process_device_action(
 template <>
 void
 audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
         actions::select_sample_rate const& action)
 {
-    state const& current_state = get_state();
+    state const& current_state = mw_fs.get_state();
 
     auto const srs = sample_rates_from_state(current_state);
     if (action.index < srs.size())
     {
-        next(make_update_devices_action(
+        mw_fs.next(make_update_devices_action(
                 m_device_manager,
                 current_state.pcm_devices,
                 current_state.pcm_devices,
@@ -345,14 +351,15 @@ audio_engine_middleware::process_device_action(
 template <>
 void
 audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
         actions::select_period_size const& action)
 {
-    state const& current_state = get_state();
+    state const& current_state = mw_fs.get_state();
 
     auto const pss = period_sizes_from_state(current_state);
     if (action.index < pss.size())
     {
-        next(make_update_devices_action(
+        mw_fs.next(make_update_devices_action(
                 m_device_manager,
                 current_state.pcm_devices,
                 current_state.pcm_devices,
@@ -367,14 +374,15 @@ audio_engine_middleware::process_device_action(
 template <>
 void
 audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
         actions::select_period_count const& action)
 {
-    state const& current_state = get_state();
+    state const& current_state = mw_fs.get_state();
 
     auto const pcs = period_counts_from_state(current_state);
     if (action.index < pcs.size())
     {
-        next(make_update_devices_action(
+        mw_fs.next(make_update_devices_action(
                 m_device_manager,
                 current_state.pcm_devices,
                 current_state.pcm_devices,
@@ -389,47 +397,53 @@ audio_engine_middleware::process_device_action(
 template <>
 void
 audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
         actions::activate_midi_device const& action)
 {
     if (m_midi_controller->activate_input_device(action.device_id))
-        next(action);
+        mw_fs.next(action);
 }
 
 template <>
 void
 audio_engine_middleware::process_device_action(
+        middleware_functors const& mw_fs,
         actions::deactivate_midi_device const& action)
 {
     m_midi_controller->deactivate_input_device(action.device_id);
-    next(action);
+    mw_fs.next(action);
 }
 
 template <class Action>
 void
-audio_engine_middleware::process_engine_action(Action const& a)
+audio_engine_middleware::process_engine_action(
+        middleware_functors const& mw_fs,
+        Action const& a)
 {
-    next(a);
-    rebuild();
+    mw_fs.next(a);
+    rebuild(mw_fs);
 }
 
 template <class Parameter>
 void
 audio_engine_middleware::process_engine_action(
+        middleware_functors const& mw_fs,
         actions::set_parameter_value<Parameter> const& a)
 {
-    next(a);
+    mw_fs.next(a);
 
     if (m_engine)
     {
         m_engine->set_parameter_value(
                 a.id,
-                get_parameter_value(get_state().params, a.id));
+                get_parameter_value(mw_fs.get_state().params, a.id));
     }
 }
 
 template <>
 void
 audio_engine_middleware::process_engine_action(
+        middleware_functors const& mw_fs,
         actions::request_parameters_update const& a)
 {
     if (m_engine)
@@ -447,13 +461,14 @@ audio_engine_middleware::process_engine_action(
                 });
 
         if (!next_action.empty())
-            next(next_action);
+            mw_fs.next(next_action);
     }
 }
 
 template <>
 void
 audio_engine_middleware::process_engine_action(
+        middleware_functors const& mw_fs,
         actions::request_streams_update const& a)
 {
     if (m_engine)
@@ -462,7 +477,7 @@ audio_engine_middleware::process_engine_action(
 
         for (auto const& id : a.streams)
         {
-            auto const& st = get_state();
+            auto const& st = mw_fs.get_state();
             if (audio_stream_buffer const* stream = st.streams.find(id))
             {
                 if (auto buffer = m_engine->get_stream(id); !buffer.empty())
@@ -478,28 +493,32 @@ audio_engine_middleware::process_engine_action(
         }
 
         if (!next_action.streams.empty())
-            next(next_action);
+            mw_fs.next(next_action);
     }
 }
 
 template <>
 void
-audio_engine_middleware::process_engine_action(actions::stop_recording const& a)
+audio_engine_middleware::process_engine_action(
+        middleware_functors const& mw_fs,
+        actions::stop_recording const& a)
 {
     actions::request_streams_update streams_update;
-    for (auto const& [channel_id, stream_id] : *get_state().recorder_streams)
+    for (auto const& [channel_id, stream_id] :
+         *mw_fs.get_state().recorder_streams)
         streams_update.streams.emplace(stream_id);
 
     if (!streams_update.streams.empty())
-        process_engine_action(streams_update);
+        process_engine_action(mw_fs, streams_update);
 
-    next(a);
-    rebuild();
+    mw_fs.next(a);
+    rebuild(mw_fs);
 }
 
 template <>
 void
 audio_engine_middleware::process_engine_action(
+        middleware_functors const& mw_fs,
         actions::request_info_update const&)
 {
     {
@@ -507,7 +526,7 @@ audio_engine_middleware::process_engine_action(
         next_action.xruns = m_device->xruns();
         next_action.cpu_load = m_device->cpu_load();
 
-        next(next_action);
+        mw_fs.next(next_action);
     }
 
     if (m_engine)
@@ -520,18 +539,18 @@ audio_engine_middleware::process_engine_action(
             {
                 actions::update_midi_assignments next_action;
                 next_action.assignments.emplace(
-                        *get_state().midi_learning,
+                        *mw_fs.get_state().midi_learning,
                         midi_assignment{
                                 .channel = cc_event->channel,
                                 .control_type = midi_assignment::type::cc,
                                 .control_id = cc_event->data.cc});
 
-                next(next_action);
+                mw_fs.next(next_action);
             }
 
-            next(actions::stop_midi_learning{});
+            mw_fs.next(actions::stop_midi_learning{});
 
-            rebuild();
+            rebuild(mw_fs);
         }
     }
 }
@@ -547,9 +566,9 @@ audio_engine_middleware::close_device()
 }
 
 void
-audio_engine_middleware::open_device()
+audio_engine_middleware::open_device(middleware_functors const& mw_fs)
 {
-    auto const& st = get_state();
+    auto const& st = mw_fs.get_state();
 
     if (st.input.index == npos || st.output.index == npos ||
         st.sample_rate.invalid() || st.period_size.invalid() ||
@@ -583,13 +602,13 @@ audio_engine_middleware::open_device()
 }
 
 void
-audio_engine_middleware::start_engine()
+audio_engine_middleware::start_engine(middleware_functors const& mw_fs)
 {
     BOOST_ASSERT(m_device);
 
     if (m_device->is_open())
     {
-        auto const& state = get_state();
+        auto const& state = mw_fs.get_state();
 
         m_engine = std::make_unique<audio_engine>(
                 m_workers,
@@ -606,17 +625,17 @@ audio_engine_middleware::start_engine()
                     engine->process(buffer_size);
                 });
 
-        rebuild();
+        rebuild(mw_fs);
     }
 }
 
 void
-audio_engine_middleware::rebuild()
+audio_engine_middleware::rebuild(middleware_functors const& mw_fs)
 {
     if (!m_engine || !m_device->is_running())
         return;
 
-    auto const& st = get_state();
+    auto const& st = mw_fs.get_state();
     if (!m_engine->rebuild(
                 st,
                 [this, sr = st.sample_rate](ladspa::instance_id id) {
@@ -629,33 +648,35 @@ audio_engine_middleware::rebuild()
 }
 
 void
-audio_engine_middleware::operator()(action const& action)
+audio_engine_middleware::operator()(
+        middleware_functors const& mw_fs,
+        action const& action)
 {
     if (auto a = dynamic_cast<actions::device_action const*>(&action))
     {
-        if (get_state().recording)
-            process_engine_action(actions::stop_recording{});
+        if (mw_fs.get_state().recording)
+            process_engine_action(mw_fs, actions::stop_recording{});
 
         close_device();
 
         auto v = ui::make_action_visitor<actions::device_action_visitor>(
-                [this](auto&& a) { process_device_action(a); });
+                [&](auto&& a) { process_device_action(mw_fs, a); });
 
         a->visit(v);
 
-        open_device();
-        start_engine();
+        open_device(mw_fs);
+        start_engine(mw_fs);
     }
     else if (auto a = dynamic_cast<actions::engine_action const*>(&action))
     {
         auto v = ui::make_action_visitor<actions::engine_action_visitor>(
-                [this](auto&& a) { process_engine_action(a); });
+                [&](auto&& a) { process_engine_action(mw_fs, a); });
 
         a->visit(v);
     }
     else
     {
-        next(action);
+        mw_fs.next(action);
     }
 }
 

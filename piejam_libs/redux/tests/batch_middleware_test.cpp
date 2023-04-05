@@ -39,12 +39,15 @@ struct batch_middleware_test : testing::Test
     std::size_t batched_count{};
     std::size_t unbatched_count{};
 
-    batch_middleware<tst_action> sut{m_batching, [this](auto const&) {
-                                         if (m_batching)
-                                             ++batched_count;
-                                         else
-                                             ++unbatched_count;
-                                     }};
+    batch_middleware sut{m_batching};
+
+    void next(tst_action const&)
+    {
+        if (m_batching)
+            ++batched_count;
+        else
+            ++unbatched_count;
+    }
 };
 
 TEST_F(batch_middleware_test, invoke_batched_actions_in_sequence)
@@ -54,7 +57,13 @@ TEST_F(batch_middleware_test, invoke_batched_actions_in_sequence)
     action.batched_actions.emplace_back();
     action.batched_actions.emplace_back();
 
-    sut.operator()(action);
+    int state{};
+    middleware_functors<int, tst_action> mw_fs{
+            [&state]() -> int const& { return state; },
+            [](auto const&) { FAIL(); },
+            [this](auto const& a) { this->next(a); }};
+
+    sut(mw_fs, static_cast<tst_action const&>(action));
 
     EXPECT_EQ(2u, batched_count);
     EXPECT_EQ(1u, unbatched_count);

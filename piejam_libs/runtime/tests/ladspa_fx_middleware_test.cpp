@@ -35,11 +35,11 @@ TEST_F(ladspa_fx_middleware_test, unknown_action_is_passed_to_next)
         auto reduce(state const& st) const -> state { return st; }
     };
 
-    ladspa_fx_middleware sut(make_middleware_functors(mf_mock), lfx_ctrl_mock);
+    ladspa_fx_middleware sut(lfx_ctrl_mock);
 
     some_action action;
     EXPECT_CALL(mf_mock, next(testing::Ref(action)));
-    sut(action);
+    sut(make_middleware_functors(mf_mock), action);
 }
 
 TEST_F(ladspa_fx_middleware_test,
@@ -49,7 +49,7 @@ TEST_F(ladspa_fx_middleware_test,
     using testing::ReturnRef;
     using testing::WhenDynamicCastTo;
 
-    ladspa_fx_middleware sut(make_middleware_functors(mf_mock), lfx_ctrl_mock);
+    ladspa_fx_middleware sut(lfx_ctrl_mock);
 
     state st;
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
@@ -66,7 +66,7 @@ TEST_F(ladspa_fx_middleware_test,
 
     actions::load_ladspa_fx_plugin action;
     action.plugin_id = plug_id;
-    sut(action);
+    sut(make_middleware_functors(mf_mock), action);
 }
 
 TEST_F(ladspa_fx_middleware_test,
@@ -76,7 +76,7 @@ TEST_F(ladspa_fx_middleware_test,
     using testing::ReturnRef;
     using testing::WhenDynamicCastTo;
 
-    ladspa_fx_middleware sut(make_middleware_functors(mf_mock), lfx_ctrl_mock);
+    ladspa_fx_middleware sut(lfx_ctrl_mock);
 
     ladspa::plugin_id_t const plug_id{23};
 
@@ -97,7 +97,7 @@ TEST_F(ladspa_fx_middleware_test,
 
     actions::load_ladspa_fx_plugin action;
     action.plugin_id = plug_id;
-    sut(action);
+    sut(make_middleware_functors(mf_mock), action);
 }
 
 TEST_F(ladspa_fx_middleware_test,
@@ -108,7 +108,7 @@ TEST_F(ladspa_fx_middleware_test,
     using testing::ReturnRef;
     using testing::WhenDynamicCastTo;
 
-    ladspa_fx_middleware sut(make_middleware_functors(mf_mock), lfx_ctrl_mock);
+    ladspa_fx_middleware sut(lfx_ctrl_mock);
 
     ladspa::plugin_id_t const plug_id{23};
 
@@ -128,7 +128,7 @@ TEST_F(ladspa_fx_middleware_test,
 
     actions::load_ladspa_fx_plugin action;
     action.plugin_id = plug_id;
-    sut(action);
+    sut(make_middleware_functors(mf_mock), action);
 }
 
 } // namespace piejam::runtime::test
