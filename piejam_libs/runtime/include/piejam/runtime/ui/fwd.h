@@ -30,4 +30,7 @@ struct thunk_action;
 template <class State>
 struct batch_action;
 
+template <class State>
+struct update_state_action;
+
 } // namespace piejam::runtime::ui

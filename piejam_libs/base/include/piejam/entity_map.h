@@ -92,6 +92,15 @@ public:
         return m_map.update([id](map_t& m) { return m.erase(id); });
     }
 
+    template <std::ranges::range RangeOfIds>
+    void remove(RangeOfIds const& ids)
+    {
+        m_map.update([&](map_t& m) {
+            for (id_t const id : ids)
+                m.erase(id);
+        });
+    }
+
     auto operator==(entity_map const&) const noexcept -> bool = default;
 
 private:

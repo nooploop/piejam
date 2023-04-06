@@ -8,8 +8,6 @@
 #include <piejam/fwd.h>
 #include <piejam/range/interleaved_vector.h>
 
-#include <vector>
-
 namespace piejam::runtime
 {
 

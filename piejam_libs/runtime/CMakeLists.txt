@@ -69,6 +69,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter_assignment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/registry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/unavailable_ladspa.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/generic_action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/middleware_functors.h
@@ -135,9 +136,11 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/batch_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/cloneable_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/generic_action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/profiling_reducer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/update_state_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/activate_midi_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp

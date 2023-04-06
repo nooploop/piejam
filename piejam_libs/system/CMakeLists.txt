@@ -10,11 +10,13 @@ add_library(piejam_system STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/dll.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/device.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/system/file_utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/avg_cpu_load_tracker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/cpu_load.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/cpu_temp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/dll.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/device.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/system/file_utils.cpp
 )
 
 target_include_directories(piejam_system PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

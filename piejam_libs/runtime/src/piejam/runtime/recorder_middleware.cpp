@@ -8,9 +8,14 @@
 #include <piejam/runtime/actions/recording.h>
 #include <piejam/runtime/actions/request_streams_update.h>
 #include <piejam/runtime/actions/update_streams.h>
+#include <piejam/runtime/generic_action_visitor.h>
 #include <piejam/runtime/middleware_functors.h>
+#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/action.h>
+#include <piejam/runtime/ui/update_state_action.h>
+
+#include <piejam/system/file_utils.h>
 
 #include <sndfile.hh>
 
@@ -24,13 +29,162 @@
 namespace piejam::runtime
 {
 
-struct recorder_middleware::impl
+namespace
+{
+
+struct recorder_middleware_data
 {
     using open_streams_t =
             boost::container::flat_map<audio_stream_id, SndfileHandle>;
 
     std::filesystem::path recordings_dir;
-    open_streams_t open_streams;
+    open_streams_t open_streams{};
+};
+
+struct recorder_action_visitor
+    : private generic_action_visitor<recorder_middleware_data>
+{
+    using base_t = runtime::generic_action_visitor<recorder_middleware_data>;
+
+    using base_t::base_t;
+
+    void operator()(actions::start_recording const&)
+    {
+        auto const& st = get_state();
+
+        BOOST_ASSERT(!st.recording);
+        BOOST_ASSERT(st.recorder_streams->empty());
+
+        auto take_dir = data.recordings_dir /
+                        fmt::format("session_{:06}", st.rec_session) /
+                        fmt::format("take_{:04}", st.rec_take);
+
+        std::error_code ec;
+        if (!std::filesystem::create_directories(take_dir, ec))
+        {
+            spdlog::error(
+                    "Could not create recordings directory: {}",
+                    ec.message());
+            return;
+        }
+
+        recorder_streams_t recorder_streams;
+        auto streams = st.streams;
+        recorder_middleware_data::open_streams_t open_streams;
+
+        for (auto const& [mixer_channel_id, mixer_channel] :
+             st.mixer_state.channels)
+        {
+            if (!get_parameter_value(st.params, mixer_channel.record))
+                continue;
+
+            auto filename = system::make_unique_filename(
+                    take_dir,
+                    *mixer_channel.name,
+                    "wav");
+
+            auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
+            constexpr int const num_channels{2};
+            if (SndfileHandle::formatCheck(
+                        format,
+                        num_channels,
+                        st.sample_rate.as_int()))
+            {
+                SndfileHandle sndfile(
+                        filename.string(),
+                        SFM_WRITE,
+                        format,
+                        num_channels,
+                        st.sample_rate.as_int());
+
+                if (sndfile)
+                {
+                    auto stream_id = streams.add(num_channels);
+                    recorder_streams.emplace(mixer_channel_id, stream_id);
+                    open_streams.emplace(stream_id, std::move(sndfile));
+                }
+                else
+                {
+                    spdlog::error(
+                            "Could not create file for recording: {}",
+                            sndfile.strError());
+                }
+            }
+            else
+            {
+                spdlog::error(
+                        "Could not create file for recording: Invalid file "
+                        "format.");
+            }
+        }
+
+        if (open_streams.empty())
+            return;
+
+        data.open_streams = std::move(open_streams);
+
+        next(update_state_action{
+                [streams = std::move(streams),
+                 recorder_streams = std::move(recorder_streams)](state& st) {
+                    st.recording = true;
+                    st.recorder_streams = std::move(recorder_streams);
+                    st.streams = std::move(streams);
+                }});
+    }
+
+    void operator()(actions::stop_recording const&)
+    {
+        auto const& st = get_state();
+
+        BOOST_ASSERT(st.recording);
+
+        data.open_streams.clear();
+
+        next(update_state_action{[](state& new_st) {
+            new_st.recording = false;
+            ++new_st.rec_take;
+
+            new_st.streams.remove(
+                    *new_st.recorder_streams | std::views::values);
+
+            new_st.recorder_streams = {};
+        }});
+    }
+
+    void operator()(actions::update_streams const& a)
+    {
+        for (auto const& [stream_id, buffer] : a.streams)
+        {
+            if (auto it = data.open_streams.find(stream_id);
+                it != data.open_streams.end())
+            {
+                auto const num_frames = buffer->num_frames();
+                auto const written =
+                        it->second.writef(buffer->samples().data(), num_frames);
+                if (static_cast<std::size_t>(written) < num_frames)
+                {
+                    spdlog::warn(
+                            "Could not write {} frames: {}",
+                            num_frames - written,
+                            it->second.strError());
+                }
+            }
+        }
+
+        next(a);
+    }
+};
+
+} // namespace
+
+struct recorder_middleware::impl
+{
+    impl(std::filesystem::path recordings_dir)
+        : data{recordings_dir}
+    {
+    }
+
+    recorder_middleware_data data;
 };
 
 recorder_middleware::recorder_middleware(std::filesystem::path recordings_dir)
@@ -48,131 +202,13 @@ recorder_middleware::operator()(
     if (auto const* a = dynamic_cast<actions::recorder_action const*>(&act))
     {
         auto v = ui::make_action_visitor<actions::recorder_action_visitor>(
-                [&](auto const& a) { process_recorder_action(mw_fs, a); });
+                recorder_action_visitor{mw_fs, m_impl->data});
         a->visit(v);
     }
     else
     {
         mw_fs.next(act);
     }
-}
-
-void
-recorder_middleware::process_recorder_action(
-        middleware_functors const& mw_fs,
-        actions::start_recording const& a)
-{
-    auto const& st = mw_fs.get_state();
-
-    BOOST_ASSERT(!st.recording);
-
-    mw_fs.next(a);
-
-    BOOST_ASSERT(st.recording);
-
-    auto const& recorder_streams = *mw_fs.get_state().recorder_streams;
-    if (recorder_streams.empty())
-        return;
-
-    auto take_dir = m_impl->recordings_dir /
-                    fmt::format("session_{:06}", st.rec_session) /
-                    fmt::format("take_{:04}", st.rec_take);
-
-    std::error_code ec;
-    if (!std::filesystem::create_directories(take_dir, ec))
-    {
-        spdlog::error(
-                "Could not create recordings directory: {}",
-                ec.message());
-        return;
-    }
-
-    impl::open_streams_t open_streams;
-    open_streams.reserve(recorder_streams.size());
-
-    for (auto const& [mixer_channel_id, stream_id] : recorder_streams)
-    {
-        mixer::channel const* const mixer_channel =
-                mw_fs.get_state().mixer_state.channels.find(mixer_channel_id);
-        BOOST_ASSERT(mixer_channel);
-
-        auto filename = take_dir / fmt::format("{}.wav", *mixer_channel->name);
-
-        std::size_t file_num{};
-        while (std::filesystem::exists(filename, ec))
-        {
-            filename = take_dir / fmt::format(
-                                          "{} ({}).wav",
-                                          *mixer_channel->name,
-                                          ++file_num);
-        }
-
-        auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
-        if (SndfileHandle::formatCheck(format, 2, st.sample_rate.as_int()))
-        {
-            SndfileHandle sndfile(
-                    filename.string(),
-                    SFM_WRITE,
-                    format,
-                    2,
-                    st.sample_rate.as_int());
-
-            if (sndfile)
-            {
-                open_streams.emplace(stream_id, std::move(sndfile));
-            }
-            else
-            {
-                spdlog::error(
-                        "Could not create file for recording: {}",
-                        sndfile.strError());
-            }
-        }
-        else
-        {
-            spdlog::error(
-                    "Could not create file for recording: Invalid file "
-                    "format.");
-        }
-    }
-
-    m_impl->open_streams = std::move(open_streams);
-}
-
-void
-recorder_middleware::process_recorder_action(
-        middleware_functors const& mw_fs,
-        actions::stop_recording const& a)
-{
-    m_impl->open_streams.clear();
-
-    mw_fs.next(a);
-}
-
-void
-recorder_middleware::process_recorder_action(
-        middleware_functors const& mw_fs,
-        actions::update_streams const& a)
-{
-    for (auto const& [stream_id, buffer] : a.streams)
-    {
-        if (auto it = m_impl->open_streams.find(stream_id);
-            it != m_impl->open_streams.end())
-        {
-            auto const num_frames = buffer->num_frames();
-            auto const written =
-                    it->second.writef(buffer->samples().data(), num_frames);
-            if (static_cast<std::size_t>(written) < num_frames)
-            {
-                spdlog::warn(
-                        "Could not write {} frames: {}",
-                        num_frames - written,
-                        it->second.strError());
-            }
-        }
-    }
-
-    mw_fs.next(a);
 }
 
 } // namespace piejam::runtime

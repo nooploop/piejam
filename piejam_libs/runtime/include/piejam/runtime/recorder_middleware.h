@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/fwd.h>
 
 #include <filesystem>
@@ -22,16 +21,6 @@ public:
     void operator()(middleware_functors const&, action const&);
 
 private:
-    void process_recorder_action(
-            middleware_functors const&,
-            actions::start_recording const&);
-    void process_recorder_action(
-            middleware_functors const&,
-            actions::stop_recording const&);
-    void process_recorder_action(
-            middleware_functors const&,
-            actions::update_streams const&);
-
     struct impl;
     std::unique_ptr<impl> m_impl;
 };
