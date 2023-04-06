@@ -12,12 +12,6 @@ namespace piejam::runtime::actions
 {
 
 auto
-request_parameters_update::reduce(state const& st) const -> state
-{
-    return st;
-}
-
-auto
 request_parameters_update::empty() const noexcept -> bool
 {
     bool result{true};

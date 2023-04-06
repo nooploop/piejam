@@ -16,12 +16,12 @@ namespace piejam::runtime::actions
 {
 
 struct update_streams final
-    : ui::cloneable_action<update_streams, action>
+    : ui::cloneable_action<update_streams, reducible_action>
     , visitable_recorder_action<update_streams>
 {
     boost::container::flat_map<audio_stream_id, audio_stream_buffer> streams;
 
-    auto reduce(state const&) const -> state;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

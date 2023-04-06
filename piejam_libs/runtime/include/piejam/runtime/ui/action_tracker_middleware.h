@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/ui/fwd.h>
 
+#include <piejam/runtime/ui/action.h>
+
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/statistics/count.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
@@ -20,11 +22,10 @@
 namespace piejam::runtime::ui
 {
 
-template <class State>
 class action_tracker_middleware
 {
 public:
-    action_tracker_middleware(next_f<State> next, std::string name)
+    action_tracker_middleware(next_f next, std::string name)
         : m_next(std::move(next))
         , m_name(std::move(name))
     {
@@ -45,7 +46,7 @@ public:
         }
     }
 
-    void operator()(action<State> const& a)
+    void operator()(action const& a)
     {
         auto const started = std::chrono::steady_clock::now();
         m_next(a);
@@ -55,7 +56,7 @@ public:
     }
 
 private:
-    next_f<State> m_next;
+    next_f m_next;
     std::string m_name;
 
     using acc_t = boost::accumulators::accumulator_set<

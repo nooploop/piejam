@@ -15,7 +15,7 @@ namespace piejam::runtime::actions
 {
 
 struct add_mixer_channel final
-    : ui::cloneable_action<add_mixer_channel, action>
+    : ui::cloneable_action<add_mixer_channel, reducible_action>
     , visitable_engine_action<add_mixer_channel>
 {
     add_mixer_channel() = default;
@@ -27,56 +27,56 @@ struct add_mixer_channel final
     std::string name;
     bool auto_assign_input{};
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 struct delete_mixer_channel final
-    : ui::cloneable_action<delete_mixer_channel, action>
+    : ui::cloneable_action<delete_mixer_channel, reducible_action>
     , visitable_engine_action<delete_mixer_channel>
 {
     mixer::channel_id mixer_channel_id{};
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 auto initiate_mixer_channel_deletion(mixer::channel_id) -> thunk_action;
 
 struct set_mixer_channel_name final
-    : ui::cloneable_action<set_mixer_channel_name, action>
+    : ui::cloneable_action<set_mixer_channel_name, reducible_action>
 {
     mixer::channel_id channel_id;
     std::string name;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 template <io_direction D>
 struct set_mixer_channel_route final
-    : ui::cloneable_action<set_mixer_channel_route<D>, action>
+    : ui::cloneable_action<set_mixer_channel_route<D>, reducible_action>
     , visitable_engine_action<set_mixer_channel_route<D>>
 {
     mixer::channel_id channel_id;
     mixer::io_address_t route;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 struct move_mixer_channel_left final
-    : ui::cloneable_action<move_mixer_channel_left, action>
+    : ui::cloneable_action<move_mixer_channel_left, reducible_action>
     , visitable_engine_action<move_mixer_channel_left>
 {
     mixer::channel_id channel_id;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 struct move_mixer_channel_right final
-    : ui::cloneable_action<move_mixer_channel_right, action>
+    : ui::cloneable_action<move_mixer_channel_right, reducible_action>
     , visitable_engine_action<move_mixer_channel_right>
 {
     mixer::channel_id channel_id;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

@@ -9,14 +9,17 @@
 namespace piejam::runtime::ui
 {
 
-template <class State>
 struct action
 {
-    using state_t = State;
-
     virtual ~action() = default;
 
-    virtual auto clone() const -> std::unique_ptr<action> = 0;
+    [[nodiscard]] virtual auto clone() const -> std::unique_ptr<action> = 0;
+};
+
+template <class State>
+struct reducible_action : action
+{
+    using state_t = State;
 
     virtual auto reduce(State const&) const -> State = 0;
 };

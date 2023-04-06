@@ -16,7 +16,7 @@ namespace piejam::runtime::actions
 
 template <class Parameter>
 struct set_parameter_value final
-    : ui::cloneable_action<set_parameter_value<Parameter>, action>
+    : ui::cloneable_action<set_parameter_value<Parameter>, reducible_action>
     , visitable_engine_action<set_parameter_value<Parameter>>
 {
     template <class V>
@@ -29,7 +29,7 @@ struct set_parameter_value final
     parameter::id_t<Parameter> id{};
     typename Parameter::value_type value{};
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

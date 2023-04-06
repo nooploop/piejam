@@ -29,8 +29,6 @@ struct save_app_config final
 
     std::filesystem::path file;
     std::vector<std::string> enabled_midi_devices;
-
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

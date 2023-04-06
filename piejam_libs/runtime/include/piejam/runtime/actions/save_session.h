@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <piejam/ladspa/fwd.h>
 #include <piejam/entity_id_hash.h>
+#include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/actions/persistence_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -28,8 +28,6 @@ struct save_session final
     }
 
     std::filesystem::path file;
-
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

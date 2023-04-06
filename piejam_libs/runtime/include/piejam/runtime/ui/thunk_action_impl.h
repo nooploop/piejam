@@ -18,11 +18,4 @@ thunk_action<State>::operator()(
     m_thunk(get_state, dispatch);
 }
 
-template <class State>
-auto
-thunk_action<State>::reduce(State const&) const -> State
-{
-    throw std::runtime_error("thunk_action is not reducible.");
-}
-
 } // namespace piejam::runtime::ui

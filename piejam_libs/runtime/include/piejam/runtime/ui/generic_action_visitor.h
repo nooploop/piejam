@@ -11,8 +11,7 @@ template <class State, class Data>
 class generic_action_visitor
 {
 public:
-    using action_t = ui::action<State>;
-    using mw_fs_t = redux::middleware_functors<State, action_t>;
+    using mw_fs_t = redux::middleware_functors<State, action>;
 
     generic_action_visitor(mw_fs_t const& mw_fs, Data& data)
         : m_mw_fs{mw_fs}
@@ -21,8 +20,8 @@ public:
     }
 
     auto get_state() const -> State const& { return m_mw_fs.get_state(); }
-    void dispatch(action_t const& a) { m_mw_fs.dispatch(a); }
-    void next(action_t const& a) { m_mw_fs.next(a); }
+    void dispatch(action const& a) { m_mw_fs.dispatch(a); }
+    void next(action const& a) { m_mw_fs.next(a); }
 
 private:
     mw_fs_t const& m_mw_fs;

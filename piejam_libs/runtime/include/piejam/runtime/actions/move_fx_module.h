@@ -16,23 +16,23 @@ namespace piejam::runtime::actions
 {
 
 struct move_fx_module_left final
-    : ui::cloneable_action<move_fx_module_left, action>
+    : ui::cloneable_action<move_fx_module_left, reducible_action>
     , visitable_engine_action<move_fx_module_left>
 {
     mixer::channel_id fx_chain_id;
     fx::module_id fx_mod_id;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 struct move_fx_module_right final
-    : ui::cloneable_action<move_fx_module_right, action>
+    : ui::cloneable_action<move_fx_module_right, reducible_action>
     , visitable_engine_action<move_fx_module_right>
 {
     mixer::channel_id fx_chain_id;
     fx::module_id fx_mod_id;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

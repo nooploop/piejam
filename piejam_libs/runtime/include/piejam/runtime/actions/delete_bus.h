@@ -15,12 +15,12 @@ namespace piejam::runtime::actions
 {
 
 struct delete_bus final
-    : ui::cloneable_action<delete_bus, action>
+    : ui::cloneable_action<delete_bus, reducible_action>
     , visitable_engine_action<delete_bus>
 {
     device_io::bus_id bus_id{};
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

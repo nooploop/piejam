@@ -15,28 +15,28 @@ namespace piejam::runtime::actions
 {
 
 struct start_midi_learning final
-    : ui::cloneable_action<start_midi_learning, action>
+    : ui::cloneable_action<start_midi_learning, reducible_action>
     , visitable_engine_action<start_midi_learning>
 {
     midi_assignment_id assignment_id;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 struct stop_midi_learning final
-    : ui::cloneable_action<stop_midi_learning, action>
+    : ui::cloneable_action<stop_midi_learning, reducible_action>
     , visitable_engine_action<stop_midi_learning>
 {
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 struct update_midi_assignments final
-    : ui::cloneable_action<update_midi_assignments, action>
+    : ui::cloneable_action<update_midi_assignments, reducible_action>
     , visitable_engine_action<update_midi_assignments>
 {
     midi_assignments_map assignments;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

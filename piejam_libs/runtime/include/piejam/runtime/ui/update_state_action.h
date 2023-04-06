@@ -15,7 +15,7 @@ namespace piejam::runtime::ui
 
 template <class State>
 struct update_state_action final
-    : cloneable_action<update_state_action<State>, action<State>>
+    : cloneable_action<update_state_action<State>, reducible_action<State>>
 {
     using update_state_f = std::function<void(State&)>;
 

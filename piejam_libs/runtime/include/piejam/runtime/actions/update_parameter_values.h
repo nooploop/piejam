@@ -22,7 +22,7 @@ namespace piejam::runtime::actions
 {
 
 struct update_parameter_values final
-    : ui::cloneable_action<update_parameter_values, action>
+    : ui::cloneable_action<update_parameter_values, reducible_action>
 {
     using parameter_values_t = boost::mp11::mp_rename<
             boost::mp11::mp_transform<parameter::id_value_map_t, parameters_t>,
@@ -37,9 +37,9 @@ struct update_parameter_values final
         std::get<parameter::id_value_map_t<P>>(values).emplace(id, value);
     }
 
-    auto empty() const noexcept -> bool;
+    [[nodiscard]] auto empty() const noexcept -> bool;
 
-    auto reduce(state const& st) const -> state;
+    [[nodiscard]] auto reduce(state const& st) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

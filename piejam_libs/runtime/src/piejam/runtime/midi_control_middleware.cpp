@@ -26,7 +26,7 @@ namespace
 {
 
 struct update_midi_devices final
-    : ui::cloneable_action<update_midi_devices, action>
+    : ui::cloneable_action<update_midi_devices, reducible_action>
 {
     std::vector<midi::device_update> updates;
 

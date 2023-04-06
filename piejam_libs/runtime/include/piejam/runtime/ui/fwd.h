@@ -9,8 +9,10 @@
 namespace piejam::runtime::ui
 {
 
-template <class State>
 struct action;
+
+template <class State>
+struct reducible_action;
 
 template <class DerivedAction, class ActionInterface>
 struct cloneable_action;
@@ -18,16 +20,13 @@ struct cloneable_action;
 template <class State>
 using get_state_f = redux::get_state_f<State>;
 
-template <class State>
-using dispatch_f = redux::dispatch_f<action<State>>;
+using dispatch_f = redux::dispatch_f<action>;
 
-template <class State>
-using next_f = redux::next_f<action<State>>;
+using next_f = redux::next_f<action>;
 
 template <class State>
 struct thunk_action;
 
-template <class State>
 struct batch_action;
 
 template <class State>

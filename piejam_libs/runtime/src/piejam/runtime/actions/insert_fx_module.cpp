@@ -29,12 +29,6 @@ insert_internal_fx_module::reduce(state const& st) const -> state
 }
 
 auto
-load_ladspa_fx_plugin::reduce(state const& st) const -> state
-{
-    return st;
-}
-
-auto
 insert_ladspa_fx_module::reduce(state const& st) const -> state
 {
     auto new_st = st;

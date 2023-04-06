@@ -24,8 +24,6 @@ struct load_session final
     }
 
     std::filesystem::path file;
-
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

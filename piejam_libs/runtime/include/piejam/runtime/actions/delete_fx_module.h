@@ -16,13 +16,13 @@ namespace piejam::runtime::actions
 {
 
 struct delete_fx_module final
-    : ui::cloneable_action<delete_fx_module, action>
+    : ui::cloneable_action<delete_fx_module, reducible_action>
     , visitable_engine_action<delete_fx_module>
     , visitable_ladspa_fx_action<delete_fx_module>
 {
     fx::module_id fx_mod_id;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

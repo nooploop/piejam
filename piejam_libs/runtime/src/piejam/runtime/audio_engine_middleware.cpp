@@ -71,7 +71,8 @@ update_channel(std::size_t& ch, std::size_t const num_chs)
         ch = npos;
 }
 
-struct update_devices final : ui::cloneable_action<update_devices, action>
+struct update_devices final
+    : ui::cloneable_action<update_devices, reducible_action>
 {
     box<piejam::audio::pcm_io_descriptors> pcm_devices;
 
@@ -115,7 +116,7 @@ struct update_devices final : ui::cloneable_action<update_devices, action>
     }
 };
 
-struct update_info final : ui::cloneable_action<update_info, action>
+struct update_info final : ui::cloneable_action<update_info, reducible_action>
 {
     std::size_t xruns{};
     float cpu_load{};

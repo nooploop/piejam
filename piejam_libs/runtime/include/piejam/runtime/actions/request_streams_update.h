@@ -20,8 +20,6 @@ struct request_streams_update final
     , visitable_engine_action<request_streams_update>
 {
     boost::container::flat_set<audio_stream_id> streams;
-
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

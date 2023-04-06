@@ -15,12 +15,12 @@ namespace piejam::runtime::actions
 {
 
 struct toggle_fx_module_bypass final
-    : ui::cloneable_action<toggle_fx_module_bypass, action>
+    : ui::cloneable_action<toggle_fx_module_bypass, reducible_action>
     , visitable_engine_action<toggle_fx_module_bypass>
 {
     fx::module_id fx_mod_id;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

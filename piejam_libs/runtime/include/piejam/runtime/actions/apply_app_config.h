@@ -15,13 +15,13 @@ namespace piejam::runtime::actions
 {
 
 struct apply_app_config final
-    : ui::cloneable_action<apply_app_config, action>
+    : ui::cloneable_action<apply_app_config, reducible_action>
     , visitable_device_action<apply_app_config>
     , visitable_midi_control_action<apply_app_config>
 {
     persistence::app_config conf;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

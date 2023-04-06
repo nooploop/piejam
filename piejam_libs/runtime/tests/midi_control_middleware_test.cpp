@@ -26,7 +26,7 @@ struct midi_control_middleware_test : testing::Test
 
 TEST_F(midi_control_middleware_test, unknown_action_is_passed_to_next)
 {
-    struct some_action final : public action
+    struct some_action final : public reducible_action
     {
         auto clone() const -> std::unique_ptr<action>
         {
@@ -68,7 +68,7 @@ TEST_F(midi_control_middleware_test, refresh_midi_devices_and_add_update)
     state st;
 
     EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
-        st = a.reduce(st);
+        st = dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     actions::refresh_midi_devices action;
     sut(make_middleware_functors(mf_mock), action);
@@ -99,7 +99,7 @@ TEST_F(midi_control_middleware_test,
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
-        st = a.reduce(st);
+        st = dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     actions::refresh_midi_devices action;
     sut(make_middleware_functors(mf_mock), action);
@@ -127,7 +127,7 @@ TEST_F(midi_control_middleware_test,
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
-        st = a.reduce(st);
+        st = dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     actions::refresh_midi_devices action;
     sut(make_middleware_functors(mf_mock), action);
@@ -168,7 +168,7 @@ TEST_F(midi_control_middleware_test, remove_and_readd_enabled_device)
                     Field(&actions::activate_midi_device::device_id,
                           next_dev_id))));
     EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
-        st = a.reduce(st);
+        st = dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     actions::refresh_midi_devices action;
     sut(make_middleware_functors(mf_mock), action);
@@ -203,7 +203,7 @@ TEST_F(midi_control_middleware_test, remove_eanabled_and_add_new_device)
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
-        st = a.reduce(st);
+        st = dynamic_cast<reducible_action const&>(a).reduce(st);
     });
 
     actions::refresh_midi_devices action;
@@ -273,7 +273,7 @@ TEST_F(midi_control_middleware_test,
     // setup, we need to remove the enabled device first
     {
         EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
-            st = a.reduce(st);
+            st = dynamic_cast<reducible_action const&>(a).reduce(st);
         });
 
         actions::refresh_midi_devices action;

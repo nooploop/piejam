@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/runtime/ui/action.h>
+
 #include <memory>
 
 namespace piejam::runtime::ui
@@ -12,7 +14,7 @@ namespace piejam::runtime::ui
 template <class DerivedAction, class ActionInterface>
 struct cloneable_action : public ActionInterface
 {
-    auto clone() const -> std::unique_ptr<ActionInterface> override
+    [[nodiscard]] auto clone() const -> std::unique_ptr<action> override
     {
         return std::make_unique<DerivedAction>(
                 static_cast<DerivedAction const&>(*this));

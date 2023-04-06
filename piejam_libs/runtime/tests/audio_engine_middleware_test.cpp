@@ -42,14 +42,17 @@ struct audio_engine_middleware_test : ::testing::Test
 TEST_F(audio_engine_middleware_test,
        non_device_actions_are_passed_directly_to_next)
 {
-    struct non_device_action : action
+    struct non_device_action : reducible_action
     {
-        auto clone() const -> std::unique_ptr<action> override
+        [[nodiscard]] auto clone() const -> std::unique_ptr<action> override
         {
             return std::make_unique<non_device_action>();
         }
 
-        auto reduce(state const& st) const -> state override { return st; }
+        [[nodiscard]] auto reduce(state const& st) const -> state override
+        {
+            return st;
+        }
     } action;
     EXPECT_CALL(mf_mock, next(::testing::Ref(action)));
     sut(make_middleware_functors(mf_mock), action);
@@ -87,7 +90,7 @@ TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
     st.output.hw_params = default_hw_params;
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
-        st = a.reduce(st);
+        st = dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(default_hw_params));
@@ -121,7 +124,7 @@ TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
     st.output.hw_params = default_hw_params;
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
-        st = a.reduce(st);
+        st = dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(default_hw_params));
@@ -158,7 +161,7 @@ TEST_F(audio_engine_middleware_test,
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
-        st = a.reduce(st);
+        st = dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(hw_params));

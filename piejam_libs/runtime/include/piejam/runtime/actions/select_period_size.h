@@ -17,8 +17,6 @@ struct select_period_size final
     , visitable_device_action<select_period_size>
 {
     std::size_t index{};
-
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

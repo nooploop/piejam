@@ -56,6 +56,8 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
+#include <boost/core/demangle.hpp>
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -88,6 +90,17 @@ struct QtThreadDelegator
 };
 
 } // namespace
+
+namespace piejam::runtime::ui
+{
+
+auto
+as_thunk_action(action const& a) -> thunk_action<runtime::state> const*
+{
+    return dynamic_cast<thunk_action<runtime::state> const*>(&a);
+}
+
+} // namespace piejam::runtime::ui
 
 auto
 main(int argc, char* argv[]) -> int
@@ -131,7 +144,21 @@ main(int argc, char* argv[]) -> int
             redux::middleware_factory<runtime::state, runtime::action>;
 
     runtime::store store(
-            [](auto const& st, auto const& a) { return a.reduce(st); },
+            [](runtime::state const& st, runtime::action const& a) {
+                if (auto const* const ra =
+                            dynamic_cast<runtime::reducible_action const*>(&a);
+                    ra)
+                {
+                    return ra->reduce(st);
+                }
+                else
+                {
+                    spdlog::warn(
+                            "non-reducible action detected: {}",
+                            boost::core::demangle(typeid(a).name()));
+                    return st;
+                }
+            },
             runtime::make_initial_state());
 
     store.apply_middleware(

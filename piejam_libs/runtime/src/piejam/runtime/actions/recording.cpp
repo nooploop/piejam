@@ -13,20 +13,6 @@ namespace piejam::runtime::actions
 {
 
 auto
-start_recording::reduce(state const& st) const -> state
-{
-    BOOST_ASSERT_MSG(false, "not reducible");
-    return st;
-}
-
-auto
-stop_recording::reduce(state const& st) const -> state
-{
-    BOOST_ASSERT_MSG(false, "not reducible");
-    return st;
-}
-
-auto
 request_recorder_streams_update() -> thunk_action
 {
     return [](auto const& get_state, auto const& dispatch) {

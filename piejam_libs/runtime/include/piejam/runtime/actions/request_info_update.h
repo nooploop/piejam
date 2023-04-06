@@ -18,7 +18,6 @@ struct request_info_update final
     , visitable_engine_action<request_info_update>
     , visitable_midi_control_action<request_info_update>
 {
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

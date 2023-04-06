@@ -133,7 +133,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action_tracker_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/batch_action.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/batch_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/cloneable_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/generic_action_visitor.h
@@ -151,28 +150,16 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/fx_chain_actions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/initiate_device_selection.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/insert_fx_module.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_app_config.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/load_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/mixer_actions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/move_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/recording.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_devices.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/refresh_midi_devices.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/reload_missing_plugins.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/replace_fx_module.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_info_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_mixer_levels_update.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_parameters_update.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/request_streams_update.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/save_app_config.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/save_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/scan_ladspa_fx_plugins.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_bus_channel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_period_count.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_period_size.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_sample_rate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_device_bus_name.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_float_parameter_normalized.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_parameter_value.cpp
@@ -180,7 +167,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_streams.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/audio_engine_middleware.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/batch_action.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/make_fx.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mixer_channel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp

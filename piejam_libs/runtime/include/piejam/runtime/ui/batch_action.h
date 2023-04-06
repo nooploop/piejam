@@ -16,20 +16,24 @@
 namespace piejam::runtime::ui
 {
 
-template <class State>
-struct batch_action final
-    : ui::cloneable_action<batch_action<State>, action<State>>
+struct batch_action final : ui::cloneable_action<batch_action, action>
 {
-    bool empty() const noexcept { return m_actions.empty(); }
+    [[nodiscard]] auto empty() const noexcept -> bool
+    {
+        return m_actions.empty();
+    }
 
-    auto begin() const
+    [[nodiscard]] auto begin() const
     {
         return boost::make_indirect_iterator(m_actions.begin());
     }
 
-    auto end() const { return boost::make_indirect_iterator(m_actions.end()); }
+    [[nodiscard]] auto end() const
+    {
+        return boost::make_indirect_iterator(m_actions.end());
+    }
 
-    void push_back(std::unique_ptr<action<State>> action)
+    void push_back(std::unique_ptr<action> action)
     {
         m_actions.push_back(std::move(action));
     }
@@ -41,7 +45,7 @@ struct batch_action final
                 std::make_unique<Action>(std::forward<Args>(args)...));
     }
 
-    void append(batch_action<State> other)
+    void append(batch_action other)
     {
         m_actions.insert(
                 m_actions.end(),
@@ -49,17 +53,14 @@ struct batch_action final
                 std::make_move_iterator(other.m_actions.end()));
     }
 
-    auto reduce(State const&) const -> State override;
-
 private:
-    std::vector<std::shared_ptr<action<State> const>> m_actions;
+    std::vector<std::shared_ptr<action const>> m_actions;
 };
 
-template <class State>
-auto
-as_batch_action(action<State> const& a) -> batch_action<State> const*
+inline auto
+as_batch_action(action const& a) -> batch_action const*
 {
-    return dynamic_cast<batch_action<State> const*>(&a);
+    return dynamic_cast<batch_action const*>(&a);
 }
 
 } // namespace piejam::runtime::ui

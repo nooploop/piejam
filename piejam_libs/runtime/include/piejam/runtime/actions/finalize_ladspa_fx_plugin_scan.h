@@ -15,11 +15,11 @@ namespace piejam::runtime::actions
 {
 
 struct finalize_ladspa_fx_plugin_scan final
-    : ui::cloneable_action<finalize_ladspa_fx_plugin_scan, action>
+    : ui::cloneable_action<finalize_ladspa_fx_plugin_scan, reducible_action>
 {
     std::vector<ladspa::plugin_descriptor> plugins;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

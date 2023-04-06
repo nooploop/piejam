@@ -19,7 +19,6 @@ struct start_recording final
     , visitable_recorder_action<start_recording>
     , visitable_engine_action<start_recording>
 {
-    auto reduce(state const&) const -> state override;
 };
 
 struct stop_recording final
@@ -27,7 +26,6 @@ struct stop_recording final
     , visitable_recorder_action<stop_recording>
     , visitable_engine_action<stop_recording>
 {
-    auto reduce(state const&) const -> state override;
 };
 
 auto request_recorder_streams_update() -> thunk_action;

@@ -14,13 +14,13 @@ namespace piejam::runtime::actions
 {
 
 struct add_bus final
-    : ui::cloneable_action<add_bus, action>
+    : ui::cloneable_action<add_bus, reducible_action>
     , visitable_engine_action<add_bus>
 {
     io_direction direction{};
     audio::bus_type type{};
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

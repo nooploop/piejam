@@ -40,8 +40,6 @@ struct request_parameters_update final
     }
 
     auto empty() const noexcept -> bool;
-
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

@@ -23,7 +23,7 @@ namespace piejam::runtime::actions
 {
 
 struct insert_internal_fx_module final
-    : ui::cloneable_action<insert_internal_fx_module, action>
+    : ui::cloneable_action<insert_internal_fx_module, reducible_action>
     , visitable_engine_action<insert_internal_fx_module>
 {
     mixer::channel_id fx_chain_id;
@@ -32,7 +32,7 @@ struct insert_internal_fx_module final
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 struct load_ladspa_fx_plugin final
@@ -45,12 +45,10 @@ struct load_ladspa_fx_plugin final
     std::string name;
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
-
-    auto reduce(state const&) const -> state override;
 };
 
 struct insert_ladspa_fx_module final
-    : ui::cloneable_action<insert_ladspa_fx_module, action>
+    : ui::cloneable_action<insert_ladspa_fx_module, reducible_action>
     , visitable_engine_action<insert_ladspa_fx_module>
 {
     mixer::channel_id fx_chain_id;
@@ -61,18 +59,18 @@ struct insert_ladspa_fx_module final
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
 
-    auto reduce(state const& st) const -> state override;
+    [[nodiscard]] auto reduce(state const& st) const -> state override;
 };
 
 struct insert_missing_ladspa_fx_module final
-    : ui::cloneable_action<insert_missing_ladspa_fx_module, action>
+    : ui::cloneable_action<insert_missing_ladspa_fx_module, reducible_action>
 {
     mixer::channel_id fx_chain_id;
     std::size_t position{};
     fx::unavailable_ladspa unavailable_ladspa;
     std::string name;
 
-    auto reduce(state const& st) const -> state override;
+    [[nodiscard]] auto reduce(state const& st) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

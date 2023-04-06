@@ -17,8 +17,6 @@ struct select_sample_rate final
     , visitable_device_action<select_sample_rate>
 {
     std::size_t index{};
-
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

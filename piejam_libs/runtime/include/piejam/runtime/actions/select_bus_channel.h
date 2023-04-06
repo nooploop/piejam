@@ -16,14 +16,14 @@ namespace piejam::runtime::actions
 {
 
 struct select_bus_channel final
-    : ui::cloneable_action<select_bus_channel, action>
+    : ui::cloneable_action<select_bus_channel, reducible_action>
     , visitable_engine_action<select_bus_channel>
 {
     device_io::bus_id bus_id{};
     audio::bus_channel channel_selector{};
     std::size_t channel_index{};
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

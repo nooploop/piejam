@@ -16,7 +16,6 @@ struct refresh_midi_devices final
     : ui::cloneable_action<refresh_midi_devices, action>
     , visitable_midi_control_action<refresh_midi_devices>
 {
-    auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions

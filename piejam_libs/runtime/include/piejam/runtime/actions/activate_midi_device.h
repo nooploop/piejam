@@ -15,12 +15,12 @@ namespace piejam::runtime::actions
 {
 
 struct activate_midi_device final
-    : ui::cloneable_action<activate_midi_device, action>
+    : ui::cloneable_action<activate_midi_device, reducible_action>
     , visitable_device_action<activate_midi_device>
 {
     midi::device_id_t device_id;
 
-    auto reduce(state const&) const -> state override;
+    [[nodiscard]] auto reduce(state const&) const -> state override;
 };
 
 } // namespace piejam::runtime::actions
