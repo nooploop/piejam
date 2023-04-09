@@ -221,7 +221,8 @@ template <size_t Version>
 static void upgrade(nlohmann::json&);
 
 template <size_t... I>
-static auto make_upgrade_functions_array(std::index_sequence<I...>)
+static auto
+make_upgrade_functions_array(std::index_sequence<I...>)
         -> upgrade_functions_array
 {
     return upgrade_functions_array{{upgrade<I>...}};
@@ -278,6 +279,8 @@ save_session(std::ostream& out, session const& ses)
 {
     out << nlohmann::json(ses).dump(4) << std::endl;
 }
+
+session::~session() = default;
 
 } // namespace persistence
 

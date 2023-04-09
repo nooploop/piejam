@@ -351,10 +351,10 @@ make_mixer_channels(persistence::session session) -> thunk_action
 
 } // namespace
 
-void
-apply_session(persistence::session session, dispatch_f const& dispatch)
+auto
+apply_session(persistence::session session) -> thunk_action
 {
-    dispatch(make_mixer_channels(std::move(session)));
+    return make_mixer_channels(std::move(session));
 }
 
 } // namespace piejam::runtime::actions

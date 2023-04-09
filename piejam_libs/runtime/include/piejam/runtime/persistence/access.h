@@ -14,13 +14,11 @@
 namespace piejam::runtime::persistence
 {
 
-void load_app_config(std::filesystem::path const&, dispatch_f const&);
 void save_app_config(
         std::filesystem::path const&,
         std::vector<std::string> const& enabled_midi_input_devices,
         state const&);
 
-void load_session(std::filesystem::path const&, dispatch_f const&);
 void save_session(std::filesystem::path const&, state const&);
 
 } // namespace piejam::runtime::persistence

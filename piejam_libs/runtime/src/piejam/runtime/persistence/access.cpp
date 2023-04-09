@@ -28,28 +28,6 @@ namespace piejam::runtime::persistence
 {
 
 void
-load_app_config(std::filesystem::path const& file, dispatch_f const& dispatch)
-{
-    if (!std::filesystem::exists(file))
-        return;
-
-    try
-    {
-        std::ifstream in(file);
-        if (!in.is_open())
-            throw std::runtime_error("could not open config file");
-
-        actions::apply_app_config action;
-        action.conf = persistence::load_app_config(in);
-        dispatch(action);
-    }
-    catch (std::exception const& err)
-    {
-        spdlog::error("could not load config file: {}", err.what());
-    }
-}
-
-void
 save_app_config(
         std::filesystem::path const& file,
         std::vector<std::string> const& enabled_midi_input_devices,
@@ -310,26 +288,6 @@ export_mixer_channels(state const& st, mixer::channel_ids_t const& channel_ids)
                         st.mixer_state.channels[channel_id];
                 return export_mixer_channel(st, mixer_channel);
             });
-}
-
-void
-load_session(std::filesystem::path const& file, dispatch_f const& dispatch)
-{
-    if (!std::filesystem::exists(file))
-        return;
-
-    try
-    {
-        std::ifstream in(file);
-        if (!in.is_open())
-            throw std::runtime_error("could not open session file");
-
-        actions::apply_session(persistence::load_session(in), dispatch);
-    }
-    catch (std::exception const& err)
-    {
-        spdlog::error("load_session: {}", err.what());
-    }
 }
 
 void

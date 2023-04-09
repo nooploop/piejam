@@ -26,6 +26,8 @@ inline constexpr unsigned current_session_version = 0;
 
 struct session
 {
+    ~session();
+
     struct internal_fx
     {
         fx::internal type;
