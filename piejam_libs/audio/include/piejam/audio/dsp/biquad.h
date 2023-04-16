@@ -24,32 +24,25 @@ public:
     } coeffs;
 
     constexpr biquad() noexcept = default;
-    constexpr biquad(coefficients const& c)
-        : coeffs(c)
-    {
-    }
-    constexpr biquad(coefficients&& c)
-        : coeffs(std::move(c))
+
+    constexpr biquad(coefficients c) noexcept
+        : coeffs{std::move(c)}
     {
     }
 
-    constexpr auto process(T const x0) noexcept -> float
+    // transposed canonical
+    constexpr auto process(T const x) noexcept -> T
     {
-        T const y0 = (coeffs.a0 * x0) + (coeffs.a1 * m_x1) +
-                     (coeffs.a2 * m_x2) - (coeffs.b1 * m_y1) -
-                     (coeffs.b2 * m_y2);
-        m_x2 = m_x1;
-        m_x1 = x0;
-        m_y2 = m_y1;
-        m_y1 = y0;
-        return y0;
+        T const y = coeffs.a0 * x + m_z1;
+        //
+        m_z1 = coeffs.a1 * x - coeffs.b1 * y + m_z2;
+        m_z2 = coeffs.a2 * x - coeffs.b2 * y;
+        return y;
     }
 
 private:
-    T m_x1{};
-    T m_x2{};
-    T m_y1{};
-    T m_y2{};
+    T m_z1{};
+    T m_z2{};
 };
 
 } // namespace piejam::audio::dsp

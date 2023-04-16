@@ -180,8 +180,14 @@ public:
         return "filter";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 1; }
-    auto num_outputs() const noexcept -> std::size_t override { return 1; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
 
     auto event_inputs() const noexcept -> event_ports override
     {
@@ -191,7 +197,10 @@ public:
         return s_ports;
     }
 
-    auto event_outputs() const noexcept -> event_ports override { return {}; }
+    auto event_outputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
 
     void process(audio::engine::process_context const& ctx) override
     {
@@ -215,33 +224,27 @@ public:
             std::size_t const from_offset,
             std::size_t const to_offset)
     {
-        std::visit(
+        using audio::engine::audio_slice;
+
+        std::size_t const count = to_offset - from_offset;
+
+        auto out_it = std::next(ctx.outputs[0].begin(), from_offset);
+
+        audio_slice::visit(
                 boost::hof::match(
-                        [this, &ctx, from_offset, to_offset](float const c) {
+                        [=, this, &out_it](float const c) {
                             std::ranges::generate_n(
-                                    std::next(
-                                            ctx.outputs[0].begin(),
-                                            from_offset),
-                                    to_offset - from_offset,
-                                    [this, c]() {
-                                        return m_biquad_second.process(
-                                                m_biquad_first.process(c));
-                                    });
+                                    out_it,
+                                    count,
+                                    std::bind_front(m_process_sample, this, c));
                         },
-                        [this, &ctx, from_offset, to_offset](
-                                audio::engine::audio_slice::span_t const& buf) {
+                        [=, this, &out_it](audio_slice::span_t const& buf) {
                             std::ranges::transform(
-                                    std::next(buf.begin(), from_offset),
-                                    std::next(buf.begin(), to_offset),
-                                    std::next(
-                                            ctx.outputs[0].begin(),
-                                            from_offset),
-                                    [this](float const x0) {
-                                        return m_biquad_second.process(
-                                                m_biquad_first.process(x0));
-                                    });
+                                    buf,
+                                    out_it,
+                                    std::bind_front(m_process_sample, this));
                         }),
-                ctx.inputs[0].get().as_variant());
+                subslice(ctx.inputs[0].get(), from_offset, count));
     }
 
     void process_event_value(
@@ -253,16 +256,38 @@ public:
 
         m_biquad_first.coeffs = value.coeffs;
 
-        if (m_type == type::lp4 || m_type == type::bp4 || m_type == type::hp4)
-            m_biquad_second.coeffs = value.coeffs;
-        else
-            m_biquad_second.coeffs = {};
+        switch (m_type)
+        {
+            case type::lp4:
+            case type::bp4:
+            case type::hp4:
+                m_biquad_second.coeffs = value.coeffs;
+                m_process_sample = &processor::process_sample;
+                break;
+
+            default:
+                m_biquad_second.coeffs = {};
+                m_process_sample = &processor::process_sample_first_only;
+                break;
+        }
+    }
+
+    auto process_sample(float const x0) -> float
+    {
+        return m_biquad_second.process(m_biquad_first.process(x0));
+    }
+
+    auto process_sample_first_only(float const x0) -> float
+    {
+        return m_biquad_first.process(x0);
     }
 
 private:
     type m_type{type::bypass};
     audio::dsp::biquad<float> m_biquad_first;
     audio::dsp::biquad<float> m_biquad_second;
+    using process_sample_t = float (processor::*)(float);
+    process_sample_t m_process_sample{&processor::process_sample_first_only};
 };
 
 class component final : public audio::engine::component
@@ -301,11 +326,25 @@ public:
     {
     }
 
-    auto inputs() const -> endpoints override { return m_inputs; }
-    auto outputs() const -> endpoints override { return m_outputs; }
+    auto inputs() const -> endpoints override
+    {
+        return m_inputs;
+    }
 
-    auto event_inputs() const -> endpoints override { return m_event_inputs; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    auto outputs() const -> endpoints override
+    {
+        return m_outputs;
+    }
+
+    auto event_inputs() const -> endpoints override
+    {
+        return m_event_inputs;
+    }
+
+    auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(audio::engine::graph& g) const override
     {
