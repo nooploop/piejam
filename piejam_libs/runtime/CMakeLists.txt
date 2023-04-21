@@ -57,7 +57,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/stereo_stream.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io_fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/dynamic_key_object_map.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/dynamic_key_shared_object_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/get_parameter_name.h

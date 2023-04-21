@@ -23,8 +23,8 @@ using missing_device_address = boxed_string;
 
 using io_address_t = std::variant<
         default_t,
-        device_io::bus_id,
         missing_device_address,
+        device_io::bus_id,
         channel_id>;
 
 using channel_ids_t = std::vector<channel_id>;
