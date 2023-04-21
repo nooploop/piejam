@@ -22,16 +22,28 @@ public:
     {
     }
 
-    auto type_name() const noexcept -> std::string_view override
+    [[nodiscard]] auto type_name() const noexcept -> std::string_view override
     {
         return "audio_identity";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 1; }
-    auto num_outputs() const noexcept -> std::size_t override { return 1; }
+    [[nodiscard]] auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
+    [[nodiscard]] auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
 
-    auto event_inputs() const noexcept -> event_ports override { return {}; }
-    auto event_outputs() const noexcept -> event_ports override { return {}; }
+    [[nodiscard]] auto event_inputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
+    [[nodiscard]] auto event_outputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
 
     void process(process_context const&) override
     {
@@ -50,8 +62,8 @@ make_identity_processor(std::string_view const name)
     return std::make_unique<identity_processor>(name);
 }
 
-bool
-is_identity_processor(processor const& p)
+auto
+is_identity_processor(processor const& p) -> bool
 {
     return typeid(p) == typeid(identity_processor);
 }

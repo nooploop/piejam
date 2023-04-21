@@ -131,10 +131,14 @@ interleave(I1&& in1, I2&& in2, std::span<T> out)
         reg_out.store(o);
 
         if constexpr (I1_is_span)
+        {
             i1 += step;
+        }
 
         if constexpr (I2_is_span)
+        {
             i2 += step;
+        }
     }
 }
 
@@ -211,16 +215,24 @@ interleave(I1&& in1, I2&& in2, I3&& in3, I4&& in4, std::span<T> out)
         reg_out4.store(o + step * 2);
 
         if constexpr (I1_is_span)
+        {
             i1 += step;
+        }
 
         if constexpr (I2_is_span)
+        {
             i2 += step;
+        }
 
         if constexpr (I3_is_span)
+        {
             i3 += step;
+        }
 
         if constexpr (I4_is_span)
+        {
             i4 += step;
+        }
     }
 }
 

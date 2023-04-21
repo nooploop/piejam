@@ -35,7 +35,9 @@ TEST(process_thread, stop_on_error)
 
     // wait until thread stops
     for (std::size_t n = 100000; n && sut.is_running(); --n)
+    {
         ;
+    }
 
     EXPECT_FALSE(sut.is_running());
     EXPECT_EQ(std::make_error_condition(std::errc::broken_pipe), sut.error());

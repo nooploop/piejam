@@ -29,11 +29,25 @@ public:
         return "clip";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 1; }
-    auto num_outputs() const noexcept -> std::size_t override { return 1; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
 
-    auto event_inputs() const noexcept -> event_ports override { return {}; }
-    auto event_outputs() const noexcept -> event_ports override { return {}; }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
+
+    auto event_inputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
+
+    auto event_outputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
 
     void process(process_context const& ctx) override
     {

@@ -17,6 +17,7 @@ public:
     virtual ~device_manager() = default;
 
     virtual auto io_descriptors() -> pcm_io_descriptors = 0;
+
     virtual auto
     hw_params(pcm_descriptor const&, sample_rate const*, period_size const*)
             -> pcm_hw_params = 0;

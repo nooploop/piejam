@@ -25,7 +25,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_converter_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_identity_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_port.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_to_audio_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_algorithms.h
@@ -47,6 +46,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/single_event_input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice_algorithms.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/smoother_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/stream_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/thread_context.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/value_io_processor.h
@@ -86,11 +86,11 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/pan.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/stereo_balance.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/device_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/audio_slice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/clip_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/dag.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/event_to_audio_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/export_graph_as_dot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/graph_algorithms.cpp
@@ -104,6 +104,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/pan_balance_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/process.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/smoother_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/stream_processor.cpp
 )
 

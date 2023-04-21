@@ -34,9 +34,13 @@ graph_processors(graph const& g)
     };
 
     for (auto const& w : g.audio)
+    {
         add_procs(procs, w);
+    }
     for (auto const& w : g.event)
+    {
         add_procs(procs, w);
+    }
 
     std::ranges::sort(procs, address_less<processor>{});
 
@@ -71,7 +75,7 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
             for (std::size_t i = 0; i < p.num_inputs(); ++i)
             {
                 os << fmt::format(
-                              "<td port=\"ai{}\" bgcolor=\"{}\">a{}</td>",
+                              R"(<td port="ai{}" bgcolor="{}">a{}</td>)",
                               i,
                               audio_color,
                               i)
@@ -80,7 +84,7 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
             for (std::size_t i = 0; i < num_event_inputs; ++i)
             {
                 os << fmt::format(
-                              "<td port=\"ei{}\" bgcolor=\"{}\">{}</td>",
+                              R"(<td port="ei{}" bgcolor="{}">{}</td>)",
                               i,
                               event_color,
                               algorithm::escape_html(
@@ -106,7 +110,7 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
             for (std::size_t i = 0; i < p.num_outputs(); ++i)
             {
                 os << fmt::format(
-                              "<td port=\"ao{}\" bgcolor=\"{}\">a{}</td>",
+                              R"(<td port="ao{}" bgcolor="{}">a{}</td>)",
                               i,
                               audio_color,
                               i)
@@ -115,7 +119,7 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
             for (std::size_t i = 0; i < num_event_outputs; ++i)
             {
                 os << fmt::format(
-                              "<td port=\"eo{}\" bgcolor=\"{}\">{}</td>",
+                              R"(<td port="eo{}" bgcolor="{}">{}</td>)",
                               i,
                               event_color,
                               algorithm::escape_html(
@@ -147,10 +151,14 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
     };
 
     for (auto const& w : g.audio)
+    {
         print_wire(os, w, 'a', audio_color);
+    }
 
     for (auto const& w : g.event)
+    {
         print_wire(os, w, 'e', event_color);
+    }
 
     os << "}" << std::endl; // digraph
 

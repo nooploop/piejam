@@ -14,18 +14,19 @@ is_silence(audio_slice const& sl) noexcept -> bool
 {
     struct is_silence_visitor
     {
-        constexpr bool operator()(float const x) const noexcept
+        constexpr auto operator()(float const x) const noexcept -> bool
         {
             return x == 0.f;
         }
 
-        constexpr bool operator()(audio_slice::span_t const& b) const noexcept
+        constexpr auto operator()(audio_slice::span_t const& b) const noexcept
+                -> bool
         {
             return b.empty();
         }
     };
 
-    return std::visit(is_silence_visitor{}, sl.as_variant());
+    return audio_slice::visit(is_silence_visitor{}, sl);
 }
 
 } // namespace piejam::audio::engine

@@ -59,15 +59,15 @@ template <std::size_t NumInputs>
 class multiply_processor final : public named_processor
 {
 public:
-    multiply_processor(std::string_view const name) requires(NumInputs != npos)
+    multiply_processor(std::string_view const name)
+        requires(NumInputs != npos)
         : named_processor(name)
         , m_num_inputs(NumInputs)
     {
     }
 
-    multiply_processor(
-            std::size_t num_inputs,
-            std::string_view const name) requires(NumInputs == npos)
+    multiply_processor(std::size_t num_inputs, std::string_view const name)
+        requires(NumInputs == npos)
         : named_processor(name)
         , m_num_inputs(num_inputs)
     {
@@ -82,10 +82,20 @@ public:
     {
         return NumInputs != npos ? NumInputs : m_num_inputs;
     }
-    auto num_outputs() const noexcept -> std::size_t override { return 1; }
 
-    auto event_inputs() const noexcept -> event_ports override { return {}; }
-    auto event_outputs() const noexcept -> event_ports override { return {}; }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
+
+    auto event_inputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
+    auto event_outputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
 
     void process(process_context const& ctx) override
     {

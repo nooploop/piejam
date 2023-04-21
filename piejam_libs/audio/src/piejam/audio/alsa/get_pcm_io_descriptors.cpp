@@ -13,7 +13,10 @@
 #include <sound/asound.h>
 #include <sys/ioctl.h>
 
+#include <boost/assert.hpp>
+
 #include <algorithm>
+#include <filesystem>
 #include <string_view>
 
 namespace piejam::audio::alsa
@@ -28,17 +31,18 @@ struct soundcard
     snd_ctl_card_info info;
 };
 
-const std::filesystem::path s_sound_devices_dir("/dev/snd");
+std::filesystem::path const s_sound_devices_dir("/dev/snd");
 
 auto
 soundcards() -> std::vector<soundcard>
 {
     std::vector<soundcard> cards;
 
-    if (std::filesystem::exists(s_sound_devices_dir))
+    std::error_code ec;
+    if (std::filesystem::exists(s_sound_devices_dir, ec))
     {
         for (auto const& entry :
-             std::filesystem::directory_iterator(s_sound_devices_dir))
+             std::filesystem::directory_iterator(s_sound_devices_dir, ec))
         {
             unsigned card{};
             if (1 == std::sscanf(
@@ -55,7 +59,9 @@ soundcards() -> std::vector<soundcard>
                 }
                 else
                 {
-                    cards.emplace_back(entry.path(), card_info);
+                    cards.emplace_back(soundcard{
+                            .ctl_path = entry.path(),
+                            .info = card_info});
                 }
             }
         }
@@ -65,12 +71,15 @@ soundcards() -> std::vector<soundcard>
 }
 
 auto
-get_devices(soundcard const& scard, int stream_type)
-        -> std::vector<snd_pcm_info>
+get_devices(soundcard const& sc, int stream_type) -> std::vector<snd_pcm_info>
 {
+    BOOST_ASSERT(
+            stream_type == SNDRV_PCM_STREAM_CAPTURE ||
+            stream_type == SNDRV_PCM_STREAM_PLAYBACK);
+
     std::vector<snd_pcm_info> devices;
 
-    system::device fd(scard.ctl_path);
+    system::device fd(sc.ctl_path);
 
     int device{-1};
     do
@@ -82,24 +91,28 @@ get_devices(soundcard const& scard, int stream_type)
         }
 
         if (device == -1)
+        {
             break;
+        }
 
         snd_pcm_info info{};
-        info.card = scard.info.card;
+        info.card = sc.info.card;
         info.device = static_cast<unsigned>(device);
         info.subdevice = 0;
         info.stream = stream_type;
 
         if (auto err = fd.ioctl(SNDRV_CTL_IOCTL_PCM_INFO, info))
         {
-            static const auto error_to_ignore =
+            static auto const error_to_ignore =
                     std::make_error_code(std::errc::no_such_file_or_directory);
             if (err != error_to_ignore)
+            {
                 spdlog::error("get_devices: {}", err.message());
+            }
         }
         else
         {
-            devices.push_back(std::move(info));
+            devices.emplace_back(std::move(info));
         }
     } while (device != -1);
 
@@ -107,16 +120,43 @@ get_devices(soundcard const& scard, int stream_type)
 }
 
 auto
-input_devices(soundcard const& scard) -> std::vector<snd_pcm_info>
+input_devices(soundcard const& sc) -> std::vector<snd_pcm_info>
 {
-    return get_devices(scard, SNDRV_PCM_STREAM_CAPTURE);
+    return get_devices(sc, SNDRV_PCM_STREAM_CAPTURE);
 }
 
 auto
-output_devices(soundcard const& scard) -> std::vector<snd_pcm_info>
+output_devices(soundcard const& sc) -> std::vector<snd_pcm_info>
 {
-    return get_devices(scard, SNDRV_PCM_STREAM_PLAYBACK);
+    return get_devices(sc, SNDRV_PCM_STREAM_PLAYBACK);
 }
+
+struct to_pcm_descriptor
+{
+    to_pcm_descriptor(soundcard const& sc, char stream_type)
+        : sc{sc}
+        , stream_type{stream_type}
+    {
+        BOOST_ASSERT(stream_type == 'c' || stream_type == 'p');
+    }
+
+    auto operator()(snd_pcm_info const& pcm_info) const -> pcm_descriptor
+    {
+        return pcm_descriptor{
+                .name = fmt::format(
+                        "{} - {}",
+                        reinterpret_cast<char const*>(sc.info.name),
+                        reinterpret_cast<char const*>(pcm_info.name)),
+                .path = fmt::format(
+                        "/dev/snd/pcmC{}D{}{}",
+                        pcm_info.card,
+                        pcm_info.device,
+                        stream_type)};
+    }
+
+    soundcard const& sc;
+    char stream_type;
+};
 
 } // namespace
 
@@ -125,34 +165,16 @@ get_pcm_io_descriptors() -> pcm_io_descriptors
 {
     pcm_io_descriptors result;
 
-    auto to_pcm_descriptor = [](soundcard const& sc, char stream_type) {
-        return [&sc,
-                stream_type](snd_pcm_info const& pcm_info) -> pcm_descriptor {
-            auto path = fmt::format(
-                    "/dev/snd/pcmC{}D{}{}",
-                    pcm_info.card,
-                    pcm_info.device,
-                    stream_type);
-            auto name = fmt::format(
-                    "{} - {}",
-                    reinterpret_cast<char const*>(sc.info.name),
-                    reinterpret_cast<char const*>(pcm_info.name));
-            return pcm_descriptor{
-                    .name = std::move(name),
-                    .path = std::move(path)};
-        };
-    };
-
     for (soundcard const& sc : soundcards())
     {
         std::ranges::transform(
                 input_devices(sc),
                 std::back_inserter(result.inputs),
-                to_pcm_descriptor(sc, 'c'));
+                to_pcm_descriptor{sc, 'c'});
         std::ranges::transform(
                 output_devices(sc),
                 std::back_inserter(result.outputs),
-                to_pcm_descriptor(sc, 'p'));
+                to_pcm_descriptor{sc, 'p'});
     }
 
     return result;

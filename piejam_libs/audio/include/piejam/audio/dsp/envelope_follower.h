@@ -26,7 +26,9 @@ public:
     {
         ++m_write_pos;
         if (m_write_pos == m_buffer.size())
+        {
             m_write_pos = 0;
+        }
 
         m_buffer[m_write_pos] = std::abs(in);
 

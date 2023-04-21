@@ -36,15 +36,15 @@ level_meter_processor::process(engine::process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
-    std::visit(
+    audio_slice::visit(
             boost::hof::match(
                     [this, bs = ctx.buffer_size](float const c) {
                         std::fill_n(std::back_inserter(m_lm), bs, c);
                     },
-                    [this](std::span<float const> const buffer) {
+                    [this](audio_slice::span_t const buffer) {
                         std::ranges::copy(buffer, std::back_inserter(m_lm));
                     }),
-            ctx.inputs[0].get().as_variant());
+            ctx.inputs[0].get());
 
     ctx.event_outputs.get<float>(0).insert(0, m_lm.get());
 }

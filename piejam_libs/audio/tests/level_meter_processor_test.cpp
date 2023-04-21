@@ -35,7 +35,9 @@ struct level_meter_processor_test : ::testing::Test
     {
         ev_out_bufs.set_event_memory(std::pmr::get_default_resource());
         for (auto const& port : sut.event_outputs())
+        {
             ev_out_bufs.add(port);
+        }
     }
 };
 

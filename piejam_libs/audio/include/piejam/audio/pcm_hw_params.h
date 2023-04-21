@@ -22,7 +22,7 @@ struct pcm_hw_params
     period_sizes_t period_sizes;
     period_counts_t period_counts;
 
-    bool operator==(pcm_hw_params const&) const noexcept = default;
+    auto operator==(pcm_hw_params const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::audio

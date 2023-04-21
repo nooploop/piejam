@@ -5,11 +5,11 @@
 #include <piejam/audio/components/amplifier.h>
 
 #include <piejam/audio/engine/component.h>
-#include <piejam/audio/engine/event_to_audio_processor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_endpoint.h>
 #include <piejam/audio/engine/multiply_processor.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/smoother_processor.h>
 
 #include <fmt/format.h>
 
@@ -25,18 +25,32 @@ class mono_amplifier final : public engine::component
 {
 public:
     mono_amplifier(std::string_view name)
-        : m_gain_proc(engine::make_event_to_audio_processor(
-                  engine::default_event_to_audio_smooth_length,
+        : m_gain_proc(engine::make_smoother_processor(
+                  engine::default_smooth_length,
                   fmt::format("{} gain", name)))
         , m_amp_proc(engine::make_multiply_processor(2, name))
     {
     }
 
-    auto inputs() const -> endpoints override { return m_inputs; }
-    auto outputs() const -> endpoints override { return m_outputs; }
+    [[nodiscard]] auto inputs() const -> endpoints override
+    {
+        return m_inputs;
+    }
 
-    auto event_inputs() const -> endpoints override { return m_event_inputs; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    [[nodiscard]] auto outputs() const -> endpoints override
+    {
+        return m_outputs;
+    }
+
+    [[nodiscard]] auto event_inputs() const -> endpoints override
+    {
+        return m_event_inputs;
+    }
+
+    [[nodiscard]] auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(engine::graph& g) const override
     {
@@ -56,8 +70,8 @@ class stereo_amplifier final : public engine::component
 {
 public:
     stereo_amplifier(std::string_view name)
-        : m_gain_proc(engine::make_event_to_audio_processor(
-                  engine::default_event_to_audio_smooth_length,
+        : m_gain_proc(engine::make_smoother_processor(
+                  engine::default_smooth_length,
                   fmt::format("{} gain", name)))
         , m_left_amp_proc(engine::make_multiply_processor(
                   2,
@@ -68,11 +82,25 @@ public:
     {
     }
 
-    auto inputs() const -> endpoints override { return m_inputs; }
-    auto outputs() const -> endpoints override { return m_outputs; }
+    [[nodiscard]] auto inputs() const -> endpoints override
+    {
+        return m_inputs;
+    }
 
-    auto event_inputs() const -> endpoints override { return m_event_inputs; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    [[nodiscard]] auto outputs() const -> endpoints override
+    {
+        return m_outputs;
+    }
+
+    [[nodiscard]] auto event_inputs() const -> endpoints override
+    {
+        return m_event_inputs;
+    }
+
+    [[nodiscard]] auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(engine::graph& g) const override
     {
@@ -96,11 +124,11 @@ class stereo_split_amplifier final : public engine::component
 {
 public:
     stereo_split_amplifier(std::string_view name)
-        : m_left_gain_proc(engine::make_event_to_audio_processor(
-                  engine::default_event_to_audio_smooth_length,
+        : m_left_gain_proc(engine::make_smoother_processor(
+                  engine::default_smooth_length,
                   fmt::format("{} gain L", name)))
-        , m_right_gain_proc(engine::make_event_to_audio_processor(
-                  engine::default_event_to_audio_smooth_length,
+        , m_right_gain_proc(engine::make_smoother_processor(
+                  engine::default_smooth_length,
                   fmt::format("{} gain R", name)))
         , m_left_amp_proc(engine::make_multiply_processor(
                   2,
@@ -111,11 +139,25 @@ public:
     {
     }
 
-    auto inputs() const -> endpoints override { return m_inputs; }
-    auto outputs() const -> endpoints override { return m_outputs; }
+    [[nodiscard]] auto inputs() const -> endpoints override
+    {
+        return m_inputs;
+    }
 
-    auto event_inputs() const -> endpoints override { return m_event_inputs; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    [[nodiscard]] auto outputs() const -> endpoints override
+    {
+        return m_outputs;
+    }
+
+    [[nodiscard]] auto event_inputs() const -> endpoints override
+    {
+        return m_event_inputs;
+    }
+
+    [[nodiscard]] auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(engine::graph& g) const override
     {

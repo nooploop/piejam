@@ -23,16 +23,30 @@ public:
         m_engine_output = engine_output;
     }
 
-    auto type_name() const noexcept -> std::string_view override
+    [[nodiscard]] auto type_name() const noexcept -> std::string_view override
     {
         return "output";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 1; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    [[nodiscard]] auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
 
-    auto event_inputs() const noexcept -> event_ports override { return {}; }
-    auto event_outputs() const noexcept -> event_ports override { return {}; }
+    [[nodiscard]] auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    [[nodiscard]] auto event_inputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
+
+    [[nodiscard]] auto event_outputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
 
     void process(process_context const&) override;
 

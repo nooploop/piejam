@@ -34,11 +34,25 @@ public:
     {
     }
 
-    auto inputs() const -> endpoints override { return m_inputs; }
-    auto outputs() const -> endpoints override { return m_outputs; }
+    auto inputs() const -> endpoints override
+    {
+        return m_inputs;
+    }
 
-    auto event_inputs() const -> endpoints override { return m_event_inputs; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    auto outputs() const -> endpoints override
+    {
+        return m_outputs;
+    }
+
+    auto event_inputs() const -> endpoints override
+    {
+        return m_event_inputs;
+    }
+
+    auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(engine::graph& g) const override
     {

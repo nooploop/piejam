@@ -23,9 +23,15 @@ class value_io_processor final : public engine::named_processor
 public:
     using named_processor::named_processor;
 
-    void set(T const x) noexcept { m_in_value.push(x); }
+    void set(T const x) noexcept
+    {
+        m_in_value.push(x);
+    }
 
-    bool get(T& x) noexcept { return m_out_value.pull(x); }
+    bool get(T& x) noexcept
+    {
+        return m_out_value.pull(x);
+    }
 
     template <class F>
     void consume(F&& f)
@@ -39,8 +45,14 @@ public:
         return "value_io"sv;
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 0; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
 
     auto event_inputs() const noexcept -> event_ports override
     {

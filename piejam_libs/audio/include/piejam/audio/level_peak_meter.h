@@ -27,9 +27,15 @@ public:
         m_peak_level = abs_x > decayed ? abs_x : decayed;
     }
 
-    auto get() const noexcept -> float { return m_peak_level; }
+    [[nodiscard]] auto get() const noexcept -> float
+    {
+        return m_peak_level;
+    }
 
-    void clear() noexcept { m_peak_level = 0.f; }
+    void clear() noexcept
+    {
+        m_peak_level = 0.f;
+    }
 
 private:
     float m_peak_level{};

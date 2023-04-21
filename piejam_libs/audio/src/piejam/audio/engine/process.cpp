@@ -17,7 +17,9 @@ namespace
 class dummy_dag_executor final : public dag_executor
 {
 public:
-    void operator()(std::size_t) override {}
+    void operator()(std::size_t) override
+    {
+    }
 };
 
 } // namespace
@@ -33,11 +35,13 @@ process::~process()
     delete m_next_executor.load();
 }
 
-bool
-process::swap_executor(std::unique_ptr<dag_executor> next_dag_executor)
+auto
+process::swap_executor(std::unique_ptr<dag_executor> next_dag_executor) -> bool
 {
     if (!next_dag_executor)
+    {
         next_dag_executor = std::make_unique<dummy_dag_executor>();
+    }
 
     m_prev_executor = {};
     auto prev_executor_future = m_prev_executor.get_future();

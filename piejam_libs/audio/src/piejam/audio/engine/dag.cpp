@@ -60,7 +60,9 @@ private:
     {
         nodes_t nodes;
         for (auto const& [id, task] : tasks)
+        {
             nodes[id].task = task;
+        }
 
         for (auto const& [parent_id, children] : graph)
         {
@@ -74,7 +76,9 @@ private:
                     });
 
             for (dag::task_id_t const child_id : children)
+            {
                 ++nodes[child_id].num_parents;
+            }
         }
 
         return nodes;
@@ -178,10 +182,14 @@ public:
         m_buffer_size.store(buffer_size, std::memory_order_relaxed);
 
         for (auto&& [id, n] : m_nodes)
+        {
             init_node_for_process(n);
+        }
 
         for (node* const n : m_initial_tasks)
+        {
             m_run_queue.unsynchronized_push(n);
+        }
 
         m_nodes_to_process.store(m_nodes.size(), std::memory_order_release);
 
@@ -236,7 +244,9 @@ private:
                 if (m_run_queue.pop(n))
                 {
                     while (n)
+                    {
                         n = process_node(*n);
+                    }
                 }
             }
 
@@ -317,7 +327,9 @@ private:
         tasks.reserve(workers.size());
 
         for (auto& w : workers)
+        {
             tasks.emplace_back(std::ref(w));
+        }
 
         return tasks;
     }
@@ -339,7 +351,9 @@ is_descendent(
         dag::task_id_t const descendent) -> bool
 {
     if (parent == descendent)
+    {
         return true;
+    }
 
     return std::ranges::any_of(
             t.at(parent),
@@ -397,10 +411,12 @@ dag::make_runnable(
         std::size_t const event_memory_size) -> std::unique_ptr<dag_executor>
 {
     if (worker_threads.empty())
+    {
         return std::make_unique<dag_executor_st>(
                 m_tasks,
                 m_graph,
                 event_memory_size);
+    }
 
     return std::make_unique<dag_executor_mt>(
             m_tasks,

@@ -166,8 +166,7 @@ TEST_F(audio_engine_middleware_test,
     EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(hw_params));
     EXPECT_CALL(audio_device_manager, make_device(_, _, _))
-            .WillRepeatedly(
-                    Return(ByMove(std::make_unique<audio::dummy_device>())));
+            .WillRepeatedly(Return(ByMove(audio::make_dummy_device())));
 
     actions::initiate_device_selection in_action;
     in_action.input = true;

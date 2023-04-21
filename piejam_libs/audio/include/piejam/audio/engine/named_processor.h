@@ -19,7 +19,10 @@ public:
     {
     }
 
-    [[nodiscard]] auto name() const noexcept -> std::string_view override { return m_name; }
+    [[nodiscard]] auto name() const noexcept -> std::string_view override
+    {
+        return m_name;
+    }
 
 private:
     std::string const m_name;

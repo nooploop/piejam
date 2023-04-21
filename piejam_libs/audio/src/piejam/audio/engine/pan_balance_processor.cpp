@@ -35,8 +35,15 @@ public:
         return C == bus_type::mono ? "pan" : "balance";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 0; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
 
     auto event_inputs() const noexcept -> event_ports override
     {
@@ -69,7 +76,9 @@ public:
                 ctx.event_inputs.get<float>(0);
 
         if (ev_buf_pan.empty())
+        {
             return;
+        }
 
         event_buffer<float>& ev_buf_left = ctx.event_outputs.get<float>(0);
         event_buffer<float>& ev_buf_right = ctx.event_outputs.get<float>(1);

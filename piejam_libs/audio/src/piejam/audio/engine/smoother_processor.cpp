@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/engine/event_to_audio_processor.h>
+#include <piejam/audio/engine/smoother_processor.h>
 
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -20,12 +20,12 @@ namespace piejam::audio::engine
 namespace
 {
 
-class event_to_audio_processor final
+class smoother_processor final
     : public named_processor
-    , public single_event_input_processor<event_to_audio_processor, float>
+    , public single_event_input_processor<smoother_processor, float>
 {
 public:
-    event_to_audio_processor(
+    smoother_processor(
             std::size_t const smooth_length,
             std::string_view const name)
         : named_processor(name)
@@ -35,18 +35,29 @@ public:
 
     auto type_name() const noexcept -> std::string_view override
     {
-        return "e_to_a";
+        return "smooth";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 0; }
-    auto num_outputs() const noexcept -> std::size_t override { return 1; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
 
     auto event_inputs() const noexcept -> event_ports override
     {
         static std::array s_ports{event_port(std::in_place_type<float>, "ev")};
         return s_ports;
     }
-    auto event_outputs() const noexcept -> event_ports override { return {}; }
+
+    auto event_outputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
 
     void process(engine::process_context const& ctx) override
     {
@@ -62,7 +73,7 @@ public:
         if (m_smoother.is_running())
         {
             std::copy_n(
-                    m_smoother.input_iterator(),
+                    m_smoother.generator(),
                     ctx.buffer_size,
                     ctx.outputs[0].begin());
         }
@@ -74,28 +85,24 @@ public:
 
     void process_slice(
             process_context const& ctx,
-            std::size_t const from_offset,
-            std::size_t const to_offset)
+            std::size_t const offset,
+            std::size_t const count)
     {
-        auto const n = to_offset - from_offset;
-        auto it_out = std::next(ctx.outputs[0].begin(), from_offset);
+        auto it_out = std::next(ctx.outputs[0].begin(), offset);
 
         if (m_smoother.is_running())
         {
-            std::copy_n(m_smoother.input_iterator(), n, std::move(it_out));
+            std::copy_n(m_smoother.generator(), count, std::move(it_out));
         }
         else
         {
-            std::fill_n(std::move(it_out), n, m_smoother.current());
+            std::fill_n(std::move(it_out), count, m_smoother.current());
         }
     }
 
-    void process_event_value(
-            process_context const&,
-            std::size_t /*offset*/,
-            float const value)
+    void process_event(process_context const&, event<float> const& ev)
     {
-        m_smoother.set(value, m_smooth_length);
+        m_smoother.set(ev.value(), m_smooth_length);
     }
 
 private:
@@ -106,11 +113,11 @@ private:
 } // namespace
 
 auto
-make_event_to_audio_processor(
+make_smoother_processor(
         std::size_t const smooth_length,
         std::string_view const name) -> std::unique_ptr<processor>
 {
-    return std::make_unique<event_to_audio_processor>(smooth_length, name);
+    return std::make_unique<smoother_processor>(smooth_length, name);
 }
 
 } // namespace piejam::audio::engine

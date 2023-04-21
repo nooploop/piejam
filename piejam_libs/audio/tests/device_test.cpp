@@ -13,50 +13,50 @@ namespace piejam::audio::test
 
 TEST(dummy_device, is_open_always_false)
 {
-    dummy_device sut;
-    EXPECT_FALSE(sut.is_open());
+    auto sut = make_dummy_device();
+    EXPECT_FALSE(sut->is_open());
 
-    sut.close();
-    EXPECT_FALSE(sut.is_open());
+    sut->close();
+    EXPECT_FALSE(sut->is_open());
 }
 
 TEST(dummy_device, cant_run)
 {
-    dummy_device sut;
+    auto sut = make_dummy_device();
 
-    EXPECT_FALSE(sut.is_running());
-    sut.start({}, {}, {});
+    EXPECT_FALSE(sut->is_running());
+    sut->start({}, {}, {});
 
-    EXPECT_FALSE(sut.is_running());
+    EXPECT_FALSE(sut->is_running());
 
-    sut.stop();
-    EXPECT_FALSE(sut.is_running());
+    sut->stop();
+    EXPECT_FALSE(sut->is_running());
 
-    sut.close();
-    EXPECT_FALSE(sut.is_running());
+    sut->close();
+    EXPECT_FALSE(sut->is_running());
 }
 
 TEST(dummy_device, stats_always_zero)
 {
-    dummy_device sut;
+    auto sut = make_dummy_device();
 
-    EXPECT_EQ(0u, sut.xruns());
-    EXPECT_FLOAT_EQ(0.f, sut.cpu_load());
+    EXPECT_EQ(0u, sut->xruns());
+    EXPECT_FLOAT_EQ(0.f, sut->cpu_load());
 
-    sut.start({}, {}, {});
+    sut->start({}, {}, {});
 
-    EXPECT_EQ(0u, sut.xruns());
-    EXPECT_FLOAT_EQ(0.f, sut.cpu_load());
+    EXPECT_EQ(0u, sut->xruns());
+    EXPECT_FLOAT_EQ(0.f, sut->cpu_load());
 
-    sut.stop();
+    sut->stop();
 
-    EXPECT_EQ(0u, sut.xruns());
-    EXPECT_FLOAT_EQ(0.f, sut.cpu_load());
+    EXPECT_EQ(0u, sut->xruns());
+    EXPECT_FLOAT_EQ(0.f, sut->cpu_load());
 
-    sut.close();
+    sut->close();
 
-    EXPECT_EQ(0u, sut.xruns());
-    EXPECT_FLOAT_EQ(0.f, sut.cpu_load());
+    EXPECT_EQ(0u, sut->xruns());
+    EXPECT_FLOAT_EQ(0.f, sut->cpu_load());
 }
 
 } // namespace piejam::audio::test

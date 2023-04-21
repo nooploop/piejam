@@ -32,10 +32,21 @@ public:
     {
         return m_num_channels;
     }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
 
-    auto event_inputs() const noexcept -> event_ports override { return {}; }
-    auto event_outputs() const noexcept -> event_ports override { return {}; }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    auto event_inputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
+
+    auto event_outputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
 
     void process(process_context const& ctx) override;
 

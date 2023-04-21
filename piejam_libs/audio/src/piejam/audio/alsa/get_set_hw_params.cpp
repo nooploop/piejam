@@ -26,11 +26,14 @@
 namespace piejam::audio::alsa
 {
 
-static auto
+namespace
+{
+
+auto
 test_interval_value(
         system::device& fd,
         snd_pcm_hw_params params,
-        unsigned ival_index,
+        unsigned const ival_index,
         unsigned const value) -> bool
 {
     params.rmask = (1u << ival_index);
@@ -45,9 +48,11 @@ test_interval_value(
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, params))
     {
         if (err != std::make_error_code(std::errc::invalid_argument))
+        {
             spdlog::error(
                     "get_hw_params/test_interval_value: {}",
                     err.message());
+        }
 
         return false;
     }
@@ -55,81 +60,80 @@ test_interval_value(
     return true;
 }
 
-static auto
+auto
 test_interval_value(
         system::device& fd,
         snd_pcm_hw_params const& params,
-        unsigned ival_index)
+        unsigned const ival_index)
 {
     return [&fd, &params, ival_index](unsigned const value) -> bool {
         return test_interval_value(fd, params, ival_index, value);
     };
 }
 
-static constexpr unsigned
-mask_offset(unsigned const val) noexcept
+constexpr auto
+mask_offset(unsigned const val) noexcept -> unsigned
 {
     return val >> 5u;
 }
 
-static constexpr unsigned
-mask_bit(unsigned const i) noexcept
+constexpr auto
+mask_bit(unsigned const i) noexcept -> unsigned
 {
     return 1u << (i & 31u);
 }
 
-static constexpr bool
+constexpr auto
 test_mask_bit(
         snd_pcm_hw_params const& params,
         unsigned const mask,
-        unsigned const bit)
+        unsigned const bit) -> bool
 {
     return params.masks[mask - SNDRV_PCM_HW_PARAM_FIRST_MASK]
                    .bits[mask_offset(bit)] &
            mask_bit(bit);
 }
 
-static auto
-test_mask_bit(snd_pcm_hw_params const& params, unsigned mask)
+auto
+test_mask_bit(snd_pcm_hw_params const& params, unsigned const mask)
 {
     return [&params, mask](unsigned const bit) {
         return test_mask_bit(params, mask, bit);
     };
 }
 
-static constexpr void
-set_mask_bit(snd_pcm_hw_params& params, unsigned mask, unsigned bit)
+constexpr void
+set_mask_bit(snd_pcm_hw_params& params, unsigned const mask, unsigned const bit)
 {
     params.masks[mask - SNDRV_PCM_HW_PARAM_FIRST_MASK].bits[mask_offset(bit)] =
             mask_bit(bit);
     params.rmask |= (1u << mask);
 }
 
-static constexpr auto
-get_interval(snd_pcm_hw_params const& params, unsigned const interval_index)
+constexpr auto
+get_interval(snd_pcm_hw_params const& params, unsigned const ival_index)
         -> snd_interval const&
 {
-    return params.intervals[interval_index - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
+    return params.intervals[ival_index - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
 }
 
-static constexpr void
+constexpr void
 set_interval_value(
         snd_pcm_hw_params& params,
-        unsigned const interval_index,
+        unsigned const ival_index,
         unsigned const value)
 {
     snd_interval& ival =
-            params.intervals
-                    [interval_index - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
+            params.intervals[ival_index - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
     ival.min = value;
     ival.max = value;
     ival.openmin = 0;
     ival.openmax = 0;
     ival.integer = 1;
-    params.rmask |= (1u << interval_index);
+    params.rmask |= (1u << ival_index);
 }
 
-static auto
+auto
 make_snd_pcm_hw_params_for_refine_any() -> snd_pcm_hw_params
 {
     snd_pcm_hw_params hw_params{};
@@ -146,7 +150,7 @@ make_snd_pcm_hw_params_for_refine_any() -> snd_pcm_hw_params
     return hw_params;
 }
 
-static constexpr auto
+constexpr auto
 alsa_to_pcm_format(unsigned alsa_format) -> pcm_format
 {
     switch (alsa_format)
@@ -184,7 +188,7 @@ alsa_to_pcm_format(unsigned alsa_format) -> pcm_format
     }
 }
 
-static constexpr auto
+constexpr auto
 pcm_to_alsa_format(pcm_format pf) -> unsigned
 {
     switch (pf)
@@ -222,6 +226,8 @@ pcm_to_alsa_format(pcm_format pf) -> unsigned
     }
 }
 
+} // namespace
+
 auto
 get_hw_params(
         pcm_descriptor const& pcm,
@@ -234,7 +240,9 @@ get_hw_params(
 
     system::device fd(pcm.path);
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, hw_params))
+    {
         throw std::system_error(err);
+    }
 
     result.interleaved =
             test_mask_bit(
@@ -326,7 +334,9 @@ set_hw_params(
     auto hw_params = make_snd_pcm_hw_params_for_refine_any();
 
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, hw_params))
+    {
         throw std::system_error(err);
+    }
 
     hw_params.cmask = 0;
 
@@ -356,7 +366,9 @@ set_hw_params(
             process_config.period_count.get());
 
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_PARAMS, hw_params))
+    {
         throw std::system_error(err);
+    }
 }
 
 } // namespace piejam::audio::alsa

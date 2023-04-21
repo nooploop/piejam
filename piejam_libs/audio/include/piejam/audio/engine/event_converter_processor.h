@@ -55,8 +55,14 @@ public:
         return "convert";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 0; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
 
     auto event_inputs() const noexcept -> event_ports override
     {

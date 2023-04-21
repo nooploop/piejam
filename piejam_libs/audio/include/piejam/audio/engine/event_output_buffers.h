@@ -22,11 +22,25 @@ class event_output_buffers final
 public:
     using size_type = std::size_t;
 
-    auto empty() const noexcept -> bool { return m_event_buffers.empty(); }
-    auto size() const noexcept -> std::size_t { return m_event_buffers.size(); }
+    [[nodiscard]] auto empty() const noexcept -> bool
+    {
+        return m_event_buffers.empty();
+    }
 
-    auto begin() const { return m_event_buffers.begin(); }
-    auto end() const { return m_event_buffers.end(); }
+    [[nodiscard]] auto size() const noexcept -> size_type
+    {
+        return m_event_buffers.size();
+    }
+
+    [[nodiscard]] auto begin() const
+    {
+        return m_event_buffers.begin();
+    }
+
+    [[nodiscard]] auto end() const
+    {
+        return m_event_buffers.end();
+    }
 
     void set_event_memory(std::pmr::memory_resource* const event_memory)
     {
@@ -56,7 +70,9 @@ public:
     void clear_buffers()
     {
         for (auto& ev_buf : m_event_buffers)
+        {
             ev_buf->clear();
+        }
     }
 
 private:

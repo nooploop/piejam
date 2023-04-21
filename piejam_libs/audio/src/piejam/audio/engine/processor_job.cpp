@@ -37,10 +37,14 @@ processor_job::processor_job(processor& proc)
             simd::is_aligned,
             [](auto const& b) { return b.data(); })));
     for (event_port const& port : m_proc.event_inputs())
+    {
         m_event_inputs.add(port);
+    }
     BOOST_ASSERT(m_proc.event_inputs().size() == m_event_inputs.size());
     for (event_port const& port : m_proc.event_outputs())
+    {
         m_event_outputs.add(port);
+    }
     BOOST_ASSERT(m_proc.event_outputs().size() == m_event_outputs.size());
 }
 
@@ -86,7 +90,9 @@ processor_job::operator()(thread_context const& ctx)
     if (m_process_context.buffer_size != buffer_size)
     {
         for (std::span<float>& out : m_outputs)
+        {
             out = {out.data(), buffer_size};
+        }
 
         m_process_context.buffer_size = buffer_size;
     }

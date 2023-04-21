@@ -37,7 +37,7 @@ namespace piejam::runtime::modules::filter
 namespace
 {
 
-struct coefficients
+struct event_value
 {
     using coeffs_t = audio::dsp::biquad<float>::coefficients;
 
@@ -88,7 +88,7 @@ make_coefficients(
 {
     using make_t = typename boost::mp11::
             mp_map_find<tag_make_coefficients_map, Tag>::second_type;
-    return coefficients{
+    return event_value{
             .tp = tag,
             .coeffs = make_t::value(cutoff, res, inv_sr)};
 }
@@ -156,7 +156,7 @@ make_coefficent_converter_processor(audio::sample_rate const sample_rate)
                         return make_coefficients(br_tag{}, cutoff, res, inv_sr);
 
                     default:
-                        return coefficients{};
+                        return event_value{};
                 }
             },
             std::span(s_converter_input_names),
@@ -167,7 +167,7 @@ make_coefficent_converter_processor(audio::sample_rate const sample_rate)
 class processor final
     : public audio::engine::named_processor
     , public audio::engine::
-              single_event_input_processor<processor, coefficients>
+              single_event_input_processor<processor, event_value>
 {
 public:
     processor(std::string_view const name)
@@ -192,7 +192,7 @@ public:
     auto event_inputs() const noexcept -> event_ports override
     {
         static std::array s_ports{audio::engine::event_port{
-                std::in_place_type<coefficients>,
+                std::in_place_type<event_value>,
                 "coeffs"}};
         return s_ports;
     }
@@ -214,21 +214,23 @@ public:
     void process_buffer(audio::engine::process_context const& ctx)
     {
         if (m_type == type::bypass)
+        {
             ctx.results[0] = ctx.inputs[0];
+        }
         else
+        {
             process_slice(ctx, 0, ctx.buffer_size);
+        }
     }
 
     void process_slice(
             audio::engine::process_context const& ctx,
-            std::size_t const from_offset,
-            std::size_t const to_offset)
+            std::size_t const offset,
+            std::size_t const count)
     {
         using audio::engine::audio_slice;
 
-        std::size_t const count = to_offset - from_offset;
-
-        auto out_it = std::next(ctx.outputs[0].begin(), from_offset);
+        auto out_it = std::next(ctx.outputs[0].begin(), offset);
 
         audio_slice::visit(
                 boost::hof::match(
@@ -244,24 +246,23 @@ public:
                                     out_it,
                                     std::bind_front(m_process_sample, this));
                         }),
-                subslice(ctx.inputs[0].get(), from_offset, count));
+                subslice(ctx.inputs[0].get(), offset, count));
     }
 
-    void process_event_value(
+    void process_event(
             audio::engine::process_context const& /*ctx*/,
-            std::size_t const /*offset*/,
-            coefficients const& value)
+            audio::engine::event<event_value> const& ev)
     {
-        m_type = value.tp;
+        m_type = ev.value().tp;
 
-        m_biquad_first.coeffs = value.coeffs;
+        m_biquad_first.coeffs = ev.value().coeffs;
 
         switch (m_type)
         {
             case type::lp4:
             case type::bp4:
             case type::hp4:
-                m_biquad_second.coeffs = value.coeffs;
+                m_biquad_second.coeffs = ev.value().coeffs;
                 m_process_sample = &processor::process_sample;
                 break;
 

@@ -21,7 +21,8 @@ class abstract_event_buffer
 public:
     virtual ~abstract_event_buffer() = default;
 
-    virtual auto type() const -> std::type_index const& = 0;
+    [[nodiscard]] virtual auto type() const -> std::type_index const& = 0;
+
     virtual void clear() = 0;
 };
 
@@ -49,21 +50,28 @@ public:
     {
     }
 
-    auto type() const -> std::type_index const& override
+    [[nodiscard]] auto type() const -> std::type_index const& override
     {
         static std::type_index const s_type(typeid(T));
         return s_type;
     }
 
-    bool empty() const noexcept { return m_event_container.empty(); }
-    auto size() const noexcept { return m_event_container.size(); }
+    [[nodiscard]] auto empty() const noexcept -> bool
+    {
+        return m_event_container.empty();
+    }
 
-    auto begin() const noexcept -> const_iterator
+    [[nodiscard]] auto size() const noexcept
+    {
+        return m_event_container.size();
+    }
+
+    [[nodiscard]] auto begin() const noexcept -> const_iterator
     {
         return m_event_container.begin();
     }
 
-    auto end() const noexcept -> const_iterator
+    [[nodiscard]] auto end() const noexcept -> const_iterator
     {
         return m_event_container.end();
     }
@@ -81,7 +89,10 @@ public:
     auto operator=(event_buffer const&) = delete;
     auto operator=(event_buffer&&) = delete;
 
-    void clear() override { m_event_container.clear(); }
+    void clear() override
+    {
+        m_event_container.clear();
+    }
 
 private:
     std::pmr::memory_resource*& m_event_memory;

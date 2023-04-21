@@ -21,7 +21,9 @@ namespace
 
 struct test_dummy_dag_executor : public dag_executor
 {
-    void operator()(std::size_t) {}
+    void operator()(std::size_t)
+    {
+    }
 };
 
 } // namespace
@@ -38,8 +40,10 @@ TEST(process_test, swap_executor)
     });
 
     for (std::size_t i = 0; i < 10000; ++i)
+    {
         EXPECT_TRUE(
                 sut.swap_executor(std::make_unique<test_dummy_dag_executor>()));
+    }
 
     running = false;
     process_thread.join();

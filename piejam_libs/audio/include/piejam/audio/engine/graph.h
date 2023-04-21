@@ -25,13 +25,27 @@ public:
         using const_iterator = typename map_t::const_iterator;
         using value_type = typename map_t::value_type;
 
-        auto empty() const noexcept { return m_wires.empty(); }
-        auto size() const noexcept { return m_wires.size(); }
+        [[nodiscard]] auto empty() const noexcept
+        {
+            return m_wires.empty();
+        }
 
-        auto begin() const noexcept { return m_wires.begin(); }
-        auto end() const noexcept { return m_wires.end(); }
+        [[nodiscard]] auto size() const noexcept
+        {
+            return m_wires.size();
+        }
 
-        auto equal_range(graph_endpoint const& src) const noexcept
+        [[nodiscard]] auto begin() const noexcept
+        {
+            return m_wires.begin();
+        }
+
+        [[nodiscard]] auto end() const noexcept
+        {
+            return m_wires.end();
+        }
+
+        [[nodiscard]] auto equal_range(graph_endpoint const& src) const noexcept
         {
             return m_wires.equal_range(src);
         }

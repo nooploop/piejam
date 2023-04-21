@@ -10,9 +10,12 @@
 #include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/processor.h>
+
+#include <piejam/algorithm/contains.h>
 #include <piejam/functional/compare.h>
 
 #include <boost/assert.hpp>
+#include <boost/range/iterator_range_core.hpp>
 
 #include <algorithm>
 #include <ranges>
@@ -27,14 +30,27 @@ auto
 connected_source(graph::wires_map const& ws, graph_endpoint const& dst)
         -> std::optional<graph_endpoint>
 {
-    auto it = std::ranges::find_if(
-            ws,
-            piejam::equal_to(dst),
-            &graph::wires_map::value_type::second);
+    auto it = std::ranges::find(ws, dst, &graph::wires_map::value_type::second);
     if (it != ws.end())
+    {
         return it->first;
+    }
     else
-        return {};
+    {
+        return std::nullopt;
+    }
+}
+
+auto
+has_wire(
+        graph::wires_map const& ws,
+        graph_endpoint const& src,
+        graph_endpoint const& dst) -> bool
+{
+    return algorithm::contains(
+            boost::make_iterator_range(ws.equal_range(src)),
+            dst,
+            &graph::wires_map::value_type::second);
 }
 
 } // namespace
@@ -53,34 +69,22 @@ connected_event_source(graph const& g, graph_endpoint const& dst)
     return connected_source(g.event, dst);
 }
 
-bool
+auto
 has_audio_wire(
         graph const& g,
         graph_endpoint const& src,
-        graph_endpoint const& dst)
+        graph_endpoint const& dst) -> bool
 {
-    auto connected = g.audio.equal_range(src);
-    return connected.first != connected.second &&
-           std::ranges::find(
-                   connected.first,
-                   connected.second,
-                   dst,
-                   &graph::wires_map::value_type::second) != connected.second;
+    return has_wire(g.audio, src, dst);
 }
 
-bool
+auto
 has_event_wire(
         graph const& g,
         graph_endpoint const& src,
-        graph_endpoint const& dst)
+        graph_endpoint const& dst) -> bool
 {
-    auto connected = g.event.equal_range(src);
-    return connected.first != connected.second &&
-           std::ranges::find(
-                   connected.first,
-                   connected.second,
-                   dst,
-                   &graph::wires_map::value_type::second) != connected.second;
+    return has_wire(g.event, src, dst);
 }
 
 void
@@ -167,8 +171,8 @@ namespace
 {
 
 template <graph::wire_type W>
-bool
-dispatch_is_identity_processor(processor const& p) noexcept
+auto
+is_identity_processor(processor const& p) noexcept -> bool
 {
     if constexpr (W == graph::wire_type::audio)
     {
@@ -186,7 +190,7 @@ void
 remove_identities(graph::wires_access<W>& g)
 {
     auto starts_in_identity = [&](auto const& w) {
-        return dispatch_is_identity_processor<W>(w.first.proc);
+        return is_identity_processor<W>(w.first.proc);
     };
 
     auto it = std::ranges::find_if(g, starts_in_identity);
@@ -202,13 +206,15 @@ remove_identities(graph::wires_access<W>& g)
         g.erase(it);
 
         if (it_ends != g.end())
+        {
             g.insert(it_ends->first, out_wire.second);
+        }
 
         it = std::ranges::find_if(g, starts_in_identity);
     }
 
     g.erase_if([&](auto const& /*src*/, auto const& dst) {
-        return dispatch_is_identity_processor<W>(dst.proc);
+        return is_identity_processor<W>(dst.proc);
     });
 }
 

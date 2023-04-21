@@ -26,20 +26,27 @@ public:
     {
     }
 
-    auto type_name() const noexcept -> std::string_view override
+    [[nodiscard]] auto type_name() const noexcept -> std::string_view override
     {
         return "event_identity";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 0; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    [[nodiscard]] auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
 
-    auto event_inputs() const noexcept -> event_ports override
+    [[nodiscard]] auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    [[nodiscard]] auto event_inputs() const noexcept -> event_ports override
     {
         return m_event_inputs;
     }
 
-    auto event_outputs() const noexcept -> event_ports override
+    [[nodiscard]] auto event_outputs() const noexcept -> event_ports override
     {
         return m_event_outputs;
     }
@@ -63,8 +70,8 @@ make_event_identity_processor() -> std::unique_ptr<processor>
     return std::make_unique<event_identity_processor>(std::in_place_type<T>);
 }
 
-inline bool
-is_event_identity_processor(processor const& p) noexcept
+inline auto
+is_event_identity_processor(processor const& p) noexcept -> bool
 {
     return typeid(p) == typeid(event_identity_processor);
 }

@@ -17,10 +17,12 @@ template <class T>
 class slice
 {
 public:
+    using value_type = T;
     using span_t = std::span<T const>;
     using variant_t = std::variant<T, span_t>;
 
     constexpr slice() noexcept = default;
+
     constexpr slice(T v) noexcept
         : m_value(v)
     {
@@ -32,31 +34,38 @@ public:
     {
     }
 
-    constexpr bool is_constant() const noexcept
+    [[nodiscard]] constexpr auto is_constant() const noexcept -> bool
     {
         return std::holds_alternative<T>(m_value);
     }
 
-    constexpr auto constant() const noexcept -> T
+    [[nodiscard]] constexpr auto constant() const noexcept -> T
     {
         BOOST_ASSERT(is_constant());
         return *std::get_if<0>(&m_value);
     }
 
-    constexpr bool is_buffer() const noexcept
+    [[nodiscard]] constexpr auto is_buffer() const noexcept -> bool
     {
         return std::holds_alternative<span_t>(m_value);
     }
 
-    constexpr auto buffer() const noexcept -> span_t const&
+    [[nodiscard]] constexpr auto buffer() const noexcept -> span_t const&
     {
         BOOST_ASSERT(is_buffer());
         return *std::get_if<1>(&m_value);
     }
 
-    constexpr auto as_variant() const noexcept -> variant_t const&
+    [[nodiscard]] constexpr auto as_variant() const noexcept -> variant_t const&
     {
         return m_value;
+    }
+
+    template <class Visitor, class... S>
+    static auto visit(Visitor&& v, S&&... s)
+        requires(std::is_same_v<slice<T>, std::decay_t<S>> && ...)
+    {
+        return std::visit(std::forward<Visitor>(v), s.m_value...);
     }
 
 private:

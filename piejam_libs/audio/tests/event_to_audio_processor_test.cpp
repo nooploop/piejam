@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/engine/event_to_audio_processor.h>
+#include <piejam/audio/engine/smoother_processor.h>
 
 #include <piejam/algorithm/all_of_adjacent.h>
 #include <piejam/audio/engine/event_buffer.h>
@@ -36,7 +36,7 @@ struct event_to_audio_processor_test : testing::Test
     audio::engine::event_input_buffers ev_in_bufs;
     audio::engine::event_output_buffers ev_out_bufs;
     static constexpr std::size_t const buffer_size{
-            default_event_to_audio_smooth_length * 2};
+            default_smooth_length * 2};
     std::array<float, buffer_size> out0;
     std::array<std::span<float>, 1> outputs{out0};
     std::array<audio_slice, 1> results;
@@ -50,7 +50,7 @@ struct event_to_audio_processor_test : testing::Test
 
 TEST_F(event_to_audio_processor_test, num_io)
 {
-    auto sut = make_event_to_audio_processor();
+    auto sut = make_smoother_processor();
     EXPECT_EQ(0u, sut->num_inputs());
     EXPECT_EQ(1u, sut->num_outputs());
     EXPECT_EQ(1u, sut->event_inputs().size());
@@ -59,7 +59,7 @@ TEST_F(event_to_audio_processor_test, num_io)
 
 TEST_F(event_to_audio_processor_test, default_will_produce_silence)
 {
-    auto sut = make_event_to_audio_processor();
+    auto sut = make_smoother_processor();
     sut->process(ctx);
 
     ASSERT_TRUE(ctx.results[0].is_constant());
@@ -68,7 +68,7 @@ TEST_F(event_to_audio_processor_test, default_will_produce_silence)
 
 TEST_F(event_to_audio_processor_test, event_at_begin_of_buffer)
 {
-    auto sut = make_event_to_audio_processor();
+    auto sut = make_smoother_processor();
 
     ev_in_buf.insert(0u, 1.f);
 
@@ -89,7 +89,7 @@ TEST_F(event_to_audio_processor_test, event_at_begin_of_buffer)
 
 TEST_F(event_to_audio_processor_test, rampup_inside_buffer)
 {
-    auto sut = make_event_to_audio_processor();
+    auto sut = make_smoother_processor();
 
     constexpr std::size_t offset{10};
     ev_in_buf.insert(offset, 1.f);
@@ -108,20 +108,20 @@ TEST_F(event_to_audio_processor_test, rampup_inside_buffer)
             std::next(out0.begin(), offset),
             std::next(
                     out0.begin(),
-                    offset + default_event_to_audio_smooth_length),
+                    offset + default_smooth_length),
             std::less{}));
 
     EXPECT_TRUE(std::ranges::all_of(
             std::next(
                     out0.begin(),
-                    offset + default_event_to_audio_smooth_length),
+                    offset + default_smooth_length),
             out0.end(),
             equal_to(1.f)));
 }
 
 TEST_F(event_to_audio_processor_test, noramp_if_same_target)
 {
-    auto sut = make_event_to_audio_processor();
+    auto sut = make_smoother_processor();
 
     constexpr std::size_t offset{10};
     ev_in_buf.insert(offset, 0.f);
@@ -134,7 +134,7 @@ TEST_F(event_to_audio_processor_test, noramp_if_same_target)
 
 TEST_F(event_to_audio_processor_test, ramp_over_process_boundary)
 {
-    auto sut = make_event_to_audio_processor();
+    auto sut = make_smoother_processor();
 
     constexpr std::size_t offset{10};
     ev_in_buf.insert(buffer_size - offset, 1.f);
@@ -161,13 +161,13 @@ TEST_F(event_to_audio_processor_test, ramp_over_process_boundary)
             out0.begin(),
             std::next(
                     out0.begin(),
-                    default_event_to_audio_smooth_length - offset + 1), // +1?
+                    default_smooth_length - offset + 1), // +1?
             std::less{}));
 
     EXPECT_TRUE(std::ranges::all_of(
             std::next(
                     out0.begin(),
-                    default_event_to_audio_smooth_length - offset + 1), // +1?
+                    default_smooth_length - offset + 1), // +1?
             out0.end(),
             equal_to(1.f)));
 }

@@ -49,26 +49,36 @@ graph_to_dag(graph const& g) -> dag
                 [j = std::move(job)](thread_context const& ctx) { (*j)(ctx); });
         processor_job_mapping.emplace(e.proc, std::pair(id, job_ptr));
         if (!e.proc.get().event_outputs().empty())
+        {
             clear_event_buffer_jobs.push_back(job_ptr);
+        }
     };
 
     // create a job for each processor
     for (auto const& [src, dst] : g.audio)
     {
         if (!processor_job_mapping.count(src.proc))
+        {
             add_job(src);
+        }
 
         if (!processor_job_mapping.count(dst.proc))
+        {
             add_job(dst);
+        }
     }
 
     for (auto const& [src, dst] : g.event)
     {
         if (!processor_job_mapping.count(src.proc))
+        {
             add_job(src);
+        }
 
         if (!processor_job_mapping.count(dst.proc))
+        {
             add_job(dst);
+        }
     }
 
     // connect jobs according to audio wires
@@ -114,7 +124,9 @@ graph_to_dag(graph const& g) -> dag
             for (auto const& [id, children] : result.graph())
             {
                 if (children.empty())
+                {
                     jobs_without_children.push_back(id);
+                }
             }
             return jobs_without_children;
         }();
@@ -123,11 +135,15 @@ graph_to_dag(graph const& g) -> dag
                 result.add_task([jobs = std::move(clear_event_buffer_jobs)](
                                         thread_context const&) {
                     for (auto job : jobs)
+                    {
                         job->clear_event_output_buffers();
+                    }
                 });
 
         for (dag::task_id_t const final_job_id : final_jobs)
+        {
             result.add_child(final_job_id, clear_job_id);
+        }
     }
 
     return result;

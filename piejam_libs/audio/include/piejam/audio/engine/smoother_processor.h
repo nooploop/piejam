@@ -12,10 +12,10 @@
 namespace piejam::audio::engine
 {
 
-inline constexpr std::size_t default_event_to_audio_smooth_length = 256;
+inline constexpr std::size_t default_smooth_length = 256;
 
-auto make_event_to_audio_processor(
-        std::size_t smooth_length = default_event_to_audio_smooth_length,
+auto make_smoother_processor(
+        std::size_t smooth_length = default_smooth_length,
         std::string_view const name = {}) -> std::unique_ptr<processor>;
 
 } // namespace piejam::audio::engine

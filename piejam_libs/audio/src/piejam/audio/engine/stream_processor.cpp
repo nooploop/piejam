@@ -40,7 +40,7 @@ stream_processor::process(process_context const& ctx)
 void
 stream_processor::stream_1(process_context const& ctx)
 {
-    std::visit(
+    audio_slice::visit(
             boost::hof::match(
                     [this,
                      buffer_size = ctx.buffer_size](float const constant) {
@@ -52,10 +52,10 @@ stream_processor::stream_1(process_context const& ctx)
                         m_buffer.write(
                                 {m_interleave_buffer.data(), buffer_size});
                     },
-                    [this](std::span<float const> const buffer) {
+                    [this](audio_slice::span_t const buffer) {
                         m_buffer.write(buffer);
                     }),
-            ctx.inputs[0].get().as_variant());
+            ctx.inputs[0].get());
 }
 
 void
@@ -90,7 +90,7 @@ stream_processor::stream_n(process_context const& ctx)
     {
         auto const& in = ctx.inputs[ch];
 
-        std::visit(
+        audio_slice::visit(
                 boost::hof::match(
                         [this, ch, buffer_size = ctx.buffer_size](
                                 float const constant) {
@@ -101,14 +101,14 @@ stream_processor::stream_n(process_context const& ctx)
                                     buffer_size,
                                     constant);
                         },
-                        [this, ch](std::span<float const> const buffer) {
+                        [this, ch](audio_slice::span_t const buffer) {
                             std::ranges::copy(
                                     buffer,
                                     range::stride_iterator(
                                             m_interleave_buffer.data() + ch,
                                             m_num_channels));
                         }),
-                in.get().as_variant());
+                in.get());
     }
 
     m_buffer.write(

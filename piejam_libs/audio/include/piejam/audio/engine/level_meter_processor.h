@@ -19,15 +19,27 @@ class level_meter_processor final : public named_processor
 public:
     level_meter_processor(sample_rate, std::string_view name = {});
 
-    auto type_name() const noexcept -> std::string_view override
+    [[nodiscard]] auto type_name() const noexcept -> std::string_view override
     {
         return "level_meter";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 1; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
-    auto event_inputs() const noexcept -> event_ports override { return {}; }
-    auto event_outputs() const noexcept -> event_ports override
+    [[nodiscard]] auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
+
+    [[nodiscard]] auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    [[nodiscard]] auto event_inputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
+
+    [[nodiscard]] auto event_outputs() const noexcept -> event_ports override
     {
         static std::array s_ports{
                 event_port(std::in_place_type<float>, "peak_level")};

@@ -53,7 +53,7 @@ struct pair
     constexpr auto operator=(pair const&) -> pair& = default;
     constexpr auto operator=(pair&&) -> pair& = default;
 
-    constexpr bool operator==(pair const&) const noexcept = default;
+    constexpr auto operator==(pair const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::audio

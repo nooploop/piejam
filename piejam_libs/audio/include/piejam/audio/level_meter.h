@@ -34,9 +34,12 @@ public:
         m_squared_history.push_back(sq);
     }
 
-    auto get() const noexcept -> float { return m_peak_level; }
+    [[nodiscard]] auto get() const noexcept -> float
+    {
+        return m_peak_level;
+    }
 
-    auto get_rms() const noexcept -> float
+    [[nodiscard]] auto get_rms() const noexcept -> float
     {
         return std::sqrt(m_squared_sum / m_squared_history.size());
     }

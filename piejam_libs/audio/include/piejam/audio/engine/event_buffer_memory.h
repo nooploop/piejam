@@ -24,7 +24,10 @@ public:
         return *m_memory_resource;
     }
 
-    void release() { m_memory_resource->release(); }
+    void release()
+    {
+        m_memory_resource->release();
+    }
 
 private:
     std::vector<std::byte> m_memory;

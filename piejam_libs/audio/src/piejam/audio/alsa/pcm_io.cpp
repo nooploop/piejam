@@ -51,11 +51,15 @@ open_pcm(
         while (sw_params.boundary * 2 <=
                static_cast<long unsigned>(
                        std::numeric_limits<long>::max() - buffer_size))
+        {
             sw_params.boundary *= 2;
+        }
         sw_params.silence_size = sw_params.boundary;
 
         if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_SW_PARAMS, sw_params))
+        {
             throw std::system_error(err);
+        }
 
         return fd;
     }
@@ -82,21 +86,27 @@ pcm_io::pcm_io(
         if (auto err = m_input_fd.ioctl(
                     SNDRV_PCM_IOCTL_LINK,
                     std::as_const(m_output_fd)))
+        {
             throw std::system_error(err);
+        }
     }
 }
 
 pcm_io::~pcm_io()
 {
     if (m_process_thread)
+    {
         stop();
+    }
 
     if (is_open())
+    {
         close();
+    }
 }
 
-bool
-pcm_io::is_open() const noexcept
+auto
+pcm_io::is_open() const noexcept -> bool
 {
     return m_input_fd || m_output_fd;
 }
@@ -112,12 +122,14 @@ pcm_io::close()
     if (input_fd && output_fd)
     {
         if (auto err = output_fd.ioctl(SNDRV_PCM_IOCTL_UNLINK))
+        {
             spdlog::error("pcm_io::close: {}", err.message());
+        }
     }
 }
 
-bool
-pcm_io::is_running() const noexcept
+auto
+pcm_io::is_running() const noexcept -> bool
 {
     return m_process_thread && m_process_thread->is_running();
 }
@@ -165,7 +177,9 @@ pcm_io::stop()
 
     system::device& fd = m_input_fd ? m_input_fd : m_output_fd;
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_DROP))
+    {
         spdlog::error("pcm_io::stop: {}", err.message());
+    }
 }
 
 } // namespace piejam::audio::alsa

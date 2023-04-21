@@ -68,7 +68,9 @@ constexpr void
 update_channel(std::size_t& ch, std::size_t const num_chs)
 {
     if (ch >= num_chs)
+    {
         ch = npos;
+    }
 }
 
 struct update_devices final
@@ -145,7 +147,7 @@ audio_engine_middleware::audio_engine_middleware(
     , m_midi_controller(
               midi_controller ? std::move(midi_controller)
                               : make_dummy_midi_input_controller())
-    , m_device(std::make_unique<audio::dummy_device>())
+    , m_device(audio::make_dummy_device())
 {
 }
 
@@ -402,7 +404,9 @@ audio_engine_middleware::process_device_action(
         actions::activate_midi_device const& action)
 {
     if (m_midi_controller->activate_input_device(action.device_id))
+    {
         mw_fs.next(action);
+    }
 }
 
 template <>
@@ -457,12 +461,16 @@ audio_engine_middleware::process_engine_action(
                     for (auto&& id : ids)
                     {
                         if (auto value = m_engine->get_parameter_update(id))
+                        {
                             next_action.push_back(id, *value);
+                        }
                     }
                 });
 
         if (!next_action.empty())
+        {
             mw_fs.next(next_action);
+        }
     }
 }
 
@@ -494,7 +502,9 @@ audio_engine_middleware::process_engine_action(
         }
 
         if (!next_action.streams.empty())
+        {
             mw_fs.next(next_action);
+        }
     }
 }
 
@@ -507,10 +517,14 @@ audio_engine_middleware::process_engine_action(
     actions::request_streams_update streams_update;
     for (auto const& [channel_id, stream_id] :
          *mw_fs.get_state().recorder_streams)
+    {
         streams_update.streams.emplace(stream_id);
+    }
 
     if (!streams_update.streams.empty())
+    {
         process_engine_action(mw_fs, streams_update);
+    }
 
     mw_fs.next(a);
     rebuild(mw_fs);
@@ -559,7 +573,7 @@ audio_engine_middleware::process_engine_action(
 void
 audio_engine_middleware::close_device()
 {
-    m_device = std::make_unique<piejam::audio::dummy_device>();
+    m_device = audio::make_dummy_device();
 
     // The engine is executed by a device, we can safely destroy it after device
     // was closed.
@@ -574,7 +588,9 @@ audio_engine_middleware::open_device(middleware_functors const& mw_fs)
     if (st.input.index == npos || st.output.index == npos ||
         st.sample_rate.invalid() || st.period_size.invalid() ||
         st.period_count.invalid())
+    {
         return;
+    }
 
     try
     {
@@ -634,7 +650,9 @@ void
 audio_engine_middleware::rebuild(middleware_functors const& mw_fs)
 {
     if (!m_engine || !m_device->is_running())
+    {
         return;
+    }
 
     auto const& st = mw_fs.get_state();
     if (!m_engine->rebuild(
@@ -656,7 +674,9 @@ audio_engine_middleware::operator()(
     if (auto a = dynamic_cast<actions::device_action const*>(&action))
     {
         if (mw_fs.get_state().recording)
+        {
             process_engine_action(mw_fs, actions::stop_recording{});
+        }
 
         close_device();
 

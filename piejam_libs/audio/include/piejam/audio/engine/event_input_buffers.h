@@ -21,10 +21,20 @@ public:
 
     event_input_buffers() = default;
 
-    auto size() const noexcept -> std::size_t { return m_event_buffers.size(); }
+    [[nodiscard]] auto size() const noexcept -> size_type
+    {
+        return m_event_buffers.size();
+    }
 
-    auto begin() const { return m_event_buffers.begin(); }
-    auto end() const { return m_event_buffers.end(); }
+    [[nodiscard]] auto begin() const
+    {
+        return m_event_buffers.begin();
+    }
+
+    [[nodiscard]] auto end() const
+    {
+        return m_event_buffers.end();
+    }
 
     void add(event_port const& port)
     {
@@ -51,7 +61,7 @@ public:
     }
 
     template <class T>
-    auto get(std::size_t const buffer_index) const noexcept
+    [[nodiscard]] auto get(std::size_t const buffer_index) const noexcept
             -> event_buffer<T> const&
     {
         BOOST_ASSERT(buffer_index < m_event_buffers.size());

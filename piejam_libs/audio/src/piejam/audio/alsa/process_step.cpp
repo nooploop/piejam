@@ -52,7 +52,9 @@ transferi(
         arg.result = 0;
 
         if (auto err = fd.ioctl(request, arg))
+        {
             return err;
+        }
 
         frames_transferred += static_cast<std::size_t>(arg.result);
         BOOST_ASSERT(frames_transferred <= frames);
@@ -98,8 +100,14 @@ struct dummy_reader final : pcm_reader
         return {};
     }
 
-    auto transfer() noexcept -> std::error_code override { return {}; }
-    void clear() noexcept override {}
+    auto transfer() noexcept -> std::error_code override
+    {
+        return {};
+    }
+
+    void clear() noexcept override
+    {
+    }
 };
 
 template <pcm_format F>
@@ -156,7 +164,9 @@ struct interleaved_reader final : pcm_reader
                           m_read_buffer.data(),
                           m_period_size.get(),
                           m_num_channels))
+        {
             return err;
+        }
 
         return {};
     }
@@ -181,7 +191,9 @@ make_reader(
         audio::period_size const period_size) -> std::unique_ptr<pcm_reader>
 {
     if (!fd)
+    {
         return std::make_unique<dummy_reader>();
+    }
 
     if (config.interleaved)
     {
@@ -230,8 +242,13 @@ struct dummy_writer final : pcm_writer
         return {};
     }
 
-    auto transfer() noexcept -> std::error_code override { return {}; }
-    void clear() noexcept override {}
+    auto transfer() noexcept -> std::error_code override
+    {
+        return {};
+    }
+    void clear() noexcept override
+    {
+    }
 };
 
 template <pcm_format F>
@@ -332,7 +349,9 @@ make_writer(
         audio::period_size const period_size) -> std::unique_ptr<pcm_writer>
 {
     if (!fd)
+    {
         return std::make_unique<dummy_writer>();
+    }
 
     if (config.interleaved)
     {
@@ -399,7 +418,8 @@ process_step::process_step(
               m_io_config.out_config,
               m_io_config.process_config.period_size))
     , m_cpu_load_mean_acc(
-              io_config.process_config.sample_rate.get() /
+              io_config.process_config.sample_rate.to_samples(
+                      std::chrono::seconds{1}) /
               io_config.process_config.period_size.get()) // 1sec window
 {
     m_xruns.store(0, std::memory_order_relaxed);
@@ -419,7 +439,9 @@ process_step::operator()() -> std::error_condition
         system::device& fd = m_input_fd ? m_input_fd : m_output_fd;
 
         if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_PREPARE))
+        {
             return err.default_error_condition();
+        }
 
         if (m_output_fd)
         {
@@ -430,13 +452,17 @@ process_step::operator()() -> std::error_condition
                  ++i)
             {
                 if (auto err = m_writer->transfer())
+                {
                     return err.default_error_condition();
+                }
             }
         }
         else if (m_input_fd)
         {
             if (auto err = m_input_fd.ioctl(SNDRV_PCM_IOCTL_START))
+            {
                 return err.default_error_condition();
+            }
         }
 
         m_reader->clear();
@@ -469,7 +495,9 @@ process_step::operator()() -> std::error_condition
             ++m_xruns;
         }
         else
+        {
             return err.default_error_condition();
+        }
     }
 
     return {};

@@ -32,7 +32,10 @@ public:
     auto operator=(dag const&) -> dag& = delete;
     auto operator=(dag&&) -> dag& = default;
 
-    auto graph() const noexcept -> graph_t const& { return m_graph; }
+    auto graph() const noexcept -> graph_t const&
+    {
+        return m_graph;
+    }
 
     auto add_task(task_t) -> task_id_t;
     auto add_child_task(task_id_t parent, task_t) -> task_id_t;

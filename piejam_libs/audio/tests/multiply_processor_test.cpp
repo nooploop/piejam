@@ -134,7 +134,9 @@ TEST(mix_processor, multiply_three_non_silence_channels)
 
     ASSERT_EQ(buffer_size, result[0].buffer().size());
     for (auto const v : result[0].buffer())
+    {
         EXPECT_FLOAT_EQ(0.23f * 0.58f * 0.58f, v);
+    }
 }
 
 TEST(mix_processor, multiply_eight_non_silence_and_one_constant_channel)
@@ -170,7 +172,9 @@ TEST(mix_processor, multiply_eight_non_silence_and_one_constant_channel)
     float const expected = 0.23f * 0.23f * 0.23f * 0.23f * 0.58f * 0.23f *
                            0.23f * 0.23f * 0.23f;
     for (auto const v : result[0].buffer())
+    {
         EXPECT_FLOAT_EQ(expected, v);
+    }
 }
 
 struct multiply_processor_properties_test

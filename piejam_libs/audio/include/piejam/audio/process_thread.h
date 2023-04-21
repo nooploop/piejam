@@ -24,14 +24,17 @@ public:
             is_nothrow_default_constructible_v<std::atomic_bool, std::thread>) =
             default;
 
-    ~process_thread() { stop(); }
+    ~process_thread()
+    {
+        stop();
+    }
 
-    bool is_running() const noexcept
+    [[nodiscard]] auto is_running() const noexcept -> bool
     {
         return m_running.load(std::memory_order_relaxed);
     }
 
-    auto error() const -> std::error_condition const&
+    [[nodiscard]] auto error() const -> std::error_condition const&
     {
         BOOST_ASSERT(!m_running);
         return m_error;
@@ -67,7 +70,9 @@ public:
     {
         m_running = false;
         if (m_thread.joinable())
+        {
             m_thread.join();
+        }
     }
 
 private:

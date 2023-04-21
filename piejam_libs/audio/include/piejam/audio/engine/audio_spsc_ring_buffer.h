@@ -39,7 +39,9 @@ public:
                 write_available(write_index, read_index, m_capacity);
 
         if (available == 0)
+        {
             return 0;
+        }
 
         std::size_t const write_size = std::min(data.size(), available);
         BOOST_ASSERT(write_size > 0);
@@ -63,7 +65,9 @@ public:
             std::copy(data.begin(), std::move(data_end), std::move(write_out));
 
             if (new_write_index == m_capacity)
+            {
                 new_write_index = 0;
+            }
         }
 
         m_write_index.store(new_write_index, std::memory_order_release);
@@ -79,7 +83,9 @@ public:
                 m_read_index.load(std::memory_order_relaxed);
 
         if (write_index == read_index)
+        {
             return;
+        }
 
         auto read_begin = std::next(m_buffer.begin(), read_index);
         auto read_end = std::next(m_buffer.begin(), write_index);

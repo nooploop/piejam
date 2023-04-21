@@ -174,7 +174,9 @@ TEST(mix_processor, mix_two_non_silence_channels)
     ASSERT_TRUE(result[0].is_buffer());
     ASSERT_EQ(buffer_size, result[0].buffer().size());
     for (auto const v : result[0].buffer())
+    {
         EXPECT_FLOAT_EQ(0.81f, v);
+    }
 }
 
 TEST(mix_processor, mix_two_silence_one_non_silence_channel)
@@ -228,7 +230,9 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
 
     ASSERT_EQ(buffer_size, result[0].buffer().size());
     for (auto const v : result[0].buffer())
+    {
         EXPECT_FLOAT_EQ(0.81f, v);
+    }
 }
 
 TEST(mix_processor, mix_one_silence_and_eight_buffers)
@@ -263,7 +267,9 @@ TEST(mix_processor, mix_one_silence_and_eight_buffers)
     ASSERT_TRUE(result[0].is_buffer());
     ASSERT_EQ(buffer_size, result[0].buffer().size());
     for (auto const v : result[0].buffer())
+    {
         EXPECT_FLOAT_EQ(8.f, v);
+    }
 }
 
 struct mix_processor_properties_test : ::testing::TestWithParam<std::size_t>

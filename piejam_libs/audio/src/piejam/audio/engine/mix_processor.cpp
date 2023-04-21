@@ -48,7 +48,9 @@ mix<npos>(process_context const& ctx)
     for (audio_slice const& in : ctx.inputs)
     {
         if (is_silence(in))
+        {
             continue;
+        }
 
         res = add(in, res, out);
     }
@@ -60,15 +62,15 @@ template <std::size_t NumInputs>
 class mix_processor final : public named_processor
 {
 public:
-    mix_processor(std::string_view const name) requires(NumInputs != npos)
+    mix_processor(std::string_view const name)
+        requires(NumInputs != npos)
         : named_processor(name)
         , m_num_inputs(NumInputs)
     {
     }
 
-    mix_processor(
-            std::size_t const num_inputs,
-            std::string_view const name) requires(NumInputs == npos)
+    mix_processor(std::size_t const num_inputs, std::string_view const name)
+        requires(NumInputs == npos)
         : named_processor(name)
         , m_num_inputs(num_inputs)
     {
@@ -83,10 +85,19 @@ public:
     {
         return NumInputs != npos ? NumInputs : m_num_inputs;
     }
-    auto num_outputs() const noexcept -> std::size_t override { return 1; }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 1;
+    }
 
-    auto event_inputs() const noexcept -> event_ports override { return {}; }
-    auto event_outputs() const noexcept -> event_ports override { return {}; }
+    auto event_inputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
+    auto event_outputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
 
     void process(process_context const& ctx) override
     {

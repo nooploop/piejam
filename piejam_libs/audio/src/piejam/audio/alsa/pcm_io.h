@@ -24,10 +24,10 @@ public:
            pcm_io_config const& io_config);
     ~pcm_io() override;
 
-    bool is_open() const noexcept override;
+    [[nodiscard]] auto is_open() const noexcept -> bool override;
     void close() override;
 
-    bool is_running() const noexcept override;
+    [[nodiscard]] auto is_running() const noexcept -> bool override;
 
     void
     start(thread::configuration const&,
@@ -36,12 +36,12 @@ public:
 
     void stop() override;
 
-    auto cpu_load() const noexcept -> float override
+    [[nodiscard]] auto cpu_load() const noexcept -> float override
     {
         return m_cpu_load.load(std::memory_order_relaxed);
     }
 
-    auto xruns() const noexcept -> std::size_t override
+    [[nodiscard]] auto xruns() const noexcept -> std::size_t override
     {
         return m_xruns.load(std::memory_order_relaxed);
     }

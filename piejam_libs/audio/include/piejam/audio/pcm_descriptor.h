@@ -16,7 +16,8 @@ struct pcm_descriptor
     std::string name;
     std::filesystem::path path;
 
-    bool operator==(pcm_descriptor const& other) const noexcept = default;
+    auto operator==(pcm_descriptor const& other) const noexcept
+            -> bool = default;
 };
 
 struct pcm_io_descriptors
@@ -24,7 +25,7 @@ struct pcm_io_descriptors
     std::vector<pcm_descriptor> inputs;
     std::vector<pcm_descriptor> outputs;
 
-    bool operator==(pcm_io_descriptors const&) const noexcept = default;
+    auto operator==(pcm_io_descriptors const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::audio

@@ -50,7 +50,9 @@ struct slice_add
             return m_out;
         }
         else
+        {
             return l_buf;
+        }
     }
 
     constexpr auto
@@ -226,7 +228,7 @@ struct subslice
     {
         BOOST_ASSERT(m_offset < buf.size());
         BOOST_ASSERT(m_offset + m_size <= buf.size());
-        return std::span<T const>(buf.data() + m_offset, m_size);
+        return buf.subspan(m_offset, m_size);
     }
 
 private:
@@ -298,10 +300,7 @@ constexpr auto
 add(slice<T> const& l, slice<T> const& r, std::span<T> const out) noexcept
         -> slice<T>
 {
-    return std::visit(
-            detail::slice_add<T>(out),
-            l.as_variant(),
-            r.as_variant());
+    return slice<T>::visit(detail::slice_add<T>(out), l, r);
 }
 
 template <class T>
@@ -309,10 +308,7 @@ constexpr auto
 multiply(slice<T> const& l, slice<T> const& r, std::span<T> const out) noexcept
         -> slice<T>
 {
-    return std::visit(
-            detail::slice_multiply<T>(out),
-            l.as_variant(),
-            r.as_variant());
+    return slice<T>::visit(detail::slice_multiply<T>(out), l, r);
 }
 
 template <class T>
@@ -322,23 +318,23 @@ clamp(slice<T> const& s,
       T const max,
       std::span<T> const out) noexcept -> slice<T>
 {
-    return std::visit(detail::slice_clamp<T>(min, max, out), s.as_variant());
+    return slice<T>::visit(detail::slice_clamp<T>(min, max, out), s);
 }
 
 template <class T>
 constexpr void
 copy(slice<T> const& s, std::span<T> const out) noexcept
 {
-    std::visit(detail::slice_copy(out), s.as_variant());
+    slice<T>::visit(detail::slice_copy(out), s);
 }
 
 template <class T, class F>
 constexpr auto
 transform(slice<T> const& s, std::span<T> const out, F&& f) noexcept -> slice<T>
 {
-    return std::visit(
+    return slice<T>::visit(
             detail::slice_transform<T, F>(out, std::forward<F>(f)),
-            s.as_variant());
+            s);
 }
 
 template <class T>
@@ -348,7 +344,7 @@ subslice(
         std::size_t const offset,
         std::size_t const size) noexcept -> slice<T>
 {
-    return std::visit(detail::subslice<T>(offset, size), s.as_variant());
+    return slice<T>::visit(detail::subslice<T>(offset, size), s);
 }
 
 template <class T>
@@ -358,7 +354,7 @@ interleave(
         slice<T> const& s2,
         std::span<T> const out) noexcept
 {
-    std::visit(detail::slice_interleave(out), s1.as_variant(), s2.as_variant());
+    slice<T>::visit(detail::slice_interleave(out), s1, s2);
 }
 
 template <class T>
@@ -370,12 +366,7 @@ interleave(
         slice<T> const& s4,
         std::span<T> const out) noexcept
 {
-    std::visit(
-            detail::slice_interleave(out),
-            s1.as_variant(),
-            s2.as_variant(),
-            s3.as_variant(),
-            s4.as_variant());
+    slice<T>::visit(detail::slice_interleave(out), s1, s2, s3, s4);
 }
 
 } // namespace piejam::audio::engine

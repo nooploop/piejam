@@ -24,23 +24,30 @@ single_event_input_processor<Processor, T>::process_sliced(
 {
     event_buffer<T> const& ev_in_buf = ctx.event_inputs.get<T>(0);
 
-    Processor& this_proc = static_cast<Processor&>(*this);
+    auto& this_proc = static_cast<Processor&>(*this);
 
     if (ev_in_buf.empty())
+    {
         this_proc.process_buffer(ctx);
+    }
     else
     {
         std::size_t offset{};
         for (event<T> const& ev : ev_in_buf)
         {
             BOOST_ASSERT(ev.offset() < ctx.buffer_size);
+            BOOST_ASSERT(offset <= ev.offset());
+
             if (offset != ev.offset())
-                this_proc.process_slice(ctx, offset, ev.offset());
+            {
+                this_proc.process_slice(ctx, offset, ev.offset() - offset);
+            }
+
+            this_proc.process_event(ctx, ev);
             offset = ev.offset();
-            this_proc.process_event_value(ctx, offset, ev.value());
         }
 
-        this_proc.process_slice(ctx, offset, ctx.buffer_size);
+        this_proc.process_slice(ctx, offset, ctx.buffer_size - offset);
     }
 }
 

@@ -18,13 +18,15 @@ auto connected_source(graph const&, graph_endpoint const& dst)
 auto connected_event_source(graph const&, graph_endpoint const& dst)
         -> std::optional<graph_endpoint>;
 
-bool
-has_audio_wire(graph const&, graph_endpoint const& src, graph_endpoint const& dst);
-
-bool has_event_wire(
+auto has_audio_wire(
         graph const&,
         graph_endpoint const& src,
-        graph_endpoint const& dst);
+        graph_endpoint const& dst) -> bool;
+
+auto has_event_wire(
+        graph const&,
+        graph_endpoint const& src,
+        graph_endpoint const& dst) -> bool;
 
 //! Smart connect function, which will insert a mixer if connecting to an
 //! already connected destination. The mixer will be stored in the mixers

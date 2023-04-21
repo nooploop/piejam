@@ -18,11 +18,11 @@ public:
 
     virtual ~component() = default;
 
-    virtual auto inputs() const -> endpoints = 0;
-    virtual auto outputs() const -> endpoints = 0;
+    [[nodiscard]] virtual auto inputs() const -> endpoints = 0;
+    [[nodiscard]] virtual auto outputs() const -> endpoints = 0;
 
-    virtual auto event_inputs() const -> endpoints = 0;
-    virtual auto event_outputs() const -> endpoints = 0;
+    [[nodiscard]] virtual auto event_inputs() const -> endpoints = 0;
+    [[nodiscard]] virtual auto event_outputs() const -> endpoints = 0;
 
     virtual void connect(graph&) const = 0;
 };

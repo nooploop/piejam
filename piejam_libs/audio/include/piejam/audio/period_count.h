@@ -15,15 +15,26 @@ class period_count
 {
 public:
     constexpr period_count() noexcept = default;
+
     explicit constexpr period_count(unsigned const value) noexcept
         : m_value(value)
     {
     }
 
-    constexpr auto valid() const noexcept -> bool { return m_value != 0; }
-    constexpr auto invalid() const noexcept -> bool { return m_value == 0; }
+    [[nodiscard]] constexpr auto valid() const noexcept -> bool
+    {
+        return m_value != 0;
+    }
 
-    constexpr auto get() const noexcept -> unsigned { return m_value; }
+    [[nodiscard]] constexpr auto invalid() const noexcept -> bool
+    {
+        return m_value == 0;
+    }
+
+    [[nodiscard]] constexpr auto get() const noexcept -> unsigned
+    {
+        return m_value;
+    }
 
     constexpr auto operator==(period_count const&) const noexcept
             -> bool = default;

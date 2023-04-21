@@ -48,7 +48,9 @@ BM_multiply_processor_2_inputs(benchmark::State& state)
     process_context ctx{in, out, res, {}, {}, buffer_size};
 
     for (auto _ : state)
+    {
         sut->process(ctx);
+    }
 }
 
 static void
@@ -82,7 +84,9 @@ BM_multiply_processor_3_inputs(benchmark::State& state)
     process_context ctx{in, out, res, {}, {}, buffer_size};
 
     for (auto _ : state)
+    {
         sut->process(ctx);
+    }
 }
 
 static void
@@ -119,7 +123,9 @@ BM_multiply_processor_4_inputs(benchmark::State& state)
     process_context ctx{in, out, res, {}, {}, buffer_size};
 
     for (auto _ : state)
+    {
         sut->process(ctx);
+    }
 }
 
 BENCHMARK(BM_multiply_processor_2_inputs)->RangeMultiplier(2)->Range(1, 1024);
