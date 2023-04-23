@@ -19,7 +19,7 @@ struct queaction
 {
     int x;
 
-    auto clone() const -> std::unique_ptr<queaction>
+    [[nodiscard]] auto clone() const -> std::unique_ptr<queaction>
     {
         return std::make_unique<queaction>(queaction{x});
     }

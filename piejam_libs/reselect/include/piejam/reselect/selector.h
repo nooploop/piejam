@@ -25,7 +25,10 @@ public:
     {
     }
 
-    auto get(State const& st) const -> Value { return m_f(st); }
+    [[nodiscard]] auto get(State const& st) const -> Value
+    {
+        return m_f(st);
+    }
 
 private:
     function_type m_f;

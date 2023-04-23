@@ -17,13 +17,13 @@ template <std::floating_point T>
 class rolling_mean
 {
 public:
-    rolling_mean(std::size_t window_size)
+    constexpr rolling_mean(std::size_t window_size)
         : m_acc(boost::accumulators::tag::rolling_window::window_size =
                         window_size)
     {
     }
 
-    auto operator()(T x) -> T
+    [[nodiscard]] constexpr auto operator()(T x) -> T
     {
         m_acc(x);
         return boost::accumulators::rolling_mean(m_acc);

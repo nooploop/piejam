@@ -19,7 +19,7 @@ namespace detail
 
 // until C++23, similiar implementation as published on
 // https://en.cppreference.com
-struct __contains_fn
+struct contains_fn
 {
     template <
             std::input_iterator I,
@@ -30,7 +30,7 @@ struct __contains_fn
                          std::ranges::equal_to,
                          std::projected<I, Proj>,
                          T const*>
-    constexpr auto
+    [[nodiscard]] constexpr auto
     operator()(I first, S last, T const& value, Proj proj = {}) const -> bool
     {
         return std::ranges::find(std::move(first), last, value, proj) != last;
@@ -41,8 +41,8 @@ struct __contains_fn
                          std::ranges::equal_to,
                          std::projected<std::ranges::iterator_t<R>, Proj>,
                          T const*>
-    constexpr auto operator()(R&& r, T const& value, Proj proj = {}) const
-            -> bool
+    [[nodiscard]] constexpr auto
+    operator()(R&& r, T const& value, Proj proj = {}) const -> bool
     {
         return (*this)(std::ranges::begin(r), std::ranges::end(r), value, proj);
     }
@@ -50,16 +50,46 @@ struct __contains_fn
 
 } // namespace detail
 
-inline constexpr detail::__contains_fn contains{};
+inline constexpr detail::contains_fn contains{};
 
-template <
-        std::ranges::input_range Range,
-        range_unary_predicate<Range> Predicate>
-constexpr auto
-contains_if(Range const& rng, Predicate&& p) -> bool
+namespace detail
 {
-    return std::ranges::find_if(rng, std::forward<Predicate>(p)) !=
-           std::ranges::end(rng);
-}
+
+struct contains_if_fn
+{
+    template <
+            std::input_iterator I,
+            std::sentinel_for<I> S,
+            class Proj = std::identity,
+            std::indirect_unary_predicate<std::projected<I, Proj>> Predicate>
+    [[nodiscard]] constexpr auto
+    operator()(I first, S last, Predicate pred, Proj proj = {}) const -> bool
+    {
+        return std::ranges::find_if(
+                       std::move(first),
+                       last,
+                       std::move(pred),
+                       std::move(proj)) != last;
+    }
+
+    template <
+            std::ranges::input_range R,
+            class Proj = std::identity,
+            std::indirect_unary_predicate<
+                    std::projected<std::ranges::iterator_t<R>, Proj>> Predicate>
+    [[nodiscard]] constexpr auto
+    operator()(R&& r, Predicate pred, Proj proj = {}) const -> bool
+    {
+        return (*this)(
+                std::ranges::begin(r),
+                std::ranges::end(r),
+                std::move(pred),
+                std::move(proj));
+    }
+};
+
+} // namespace detail
+
+inline constexpr detail::contains_if_fn contains_if;
 
 } // namespace piejam::algorithm

@@ -18,51 +18,23 @@ namespace piejam::algorithm
 struct edit_script_deletion
 {
     std::size_t pos{};
+
+    [[nodiscard]] constexpr auto
+    operator==(edit_script_deletion const&) const noexcept -> bool = default;
 };
-
-inline constexpr auto
-operator==(
-        edit_script_deletion const& l,
-        edit_script_deletion const& r) noexcept -> bool
-{
-    return l.pos == r.pos;
-}
-
-inline constexpr auto
-operator!=(
-        edit_script_deletion const& l,
-        edit_script_deletion const& r) noexcept -> bool
-{
-    return l.pos != r.pos;
-}
 
 template <class T>
 struct edit_script_insertion
 {
     std::size_t pos{};
     T value{};
+
+    [[nodiscard]] constexpr auto
+    operator==(edit_script_insertion const&) const noexcept -> bool = default;
 };
 
 template <class T>
 edit_script_insertion(std::size_t, T const&) -> edit_script_insertion<T>;
-
-template <class T>
-constexpr auto
-operator==(
-        edit_script_insertion<T> const& l,
-        edit_script_insertion<T> const& r) noexcept -> bool
-{
-    return l.pos == r.pos && l.value == r.value;
-}
-
-template <class T>
-constexpr auto
-operator!=(
-        edit_script_insertion<T> const& l,
-        edit_script_insertion<T> const& r) noexcept -> bool
-{
-    return !(l == r);
-}
 
 template <class T>
 using edit_script_op =
@@ -76,7 +48,7 @@ using common_range_value_type_t =
         std::common_type_t<std::ranges::range_value_t<Range>...>;
 
 template <class Src, class Dst>
-auto
+[[nodiscard]] auto
 edit_script(Src const& src, Dst const& dst)
         -> edit_script_ops<common_range_value_type_t<Src, Dst>>
 {
@@ -110,10 +82,14 @@ edit_script(Src const& src, Dst const& dst)
         auto const row_size = src.size() + 1;
 
         for (std::size_t y = 0; y < row_size; ++y)
+        {
             graph[y] = y;
+        }
 
         for (std::size_t y = 0, p = 0; y < dst.size() + 1; ++y, p += row_size)
+        {
             graph[p] = y;
+        }
 
         auto left = [](auto* g) { return g - 1; };
         auto up = [row_size](auto* g) { return g - row_size; };
@@ -189,7 +165,7 @@ namespace detail
 {
 
 template <class T>
-auto
+[[nodiscard]] auto
 prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> ops)
         -> edit_script_ops<T>
 {
@@ -202,7 +178,10 @@ prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> ops)
             del.pos -= deletion_offset++;
         }
 
-        auto operator()(edit_script_insertion<T>&) { --deletion_offset; }
+        auto operator()(edit_script_insertion<T>&)
+        {
+            --deletion_offset;
+        }
     } visitor;
 
     for_each_visit(ops, visitor);
@@ -213,7 +192,7 @@ prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> ops)
 } // namespace detail
 
 template <class T, class Visitor>
-auto
+[[nodiscard]] auto
 apply_edit_script(edit_script_ops<T> ops, Visitor&& v)
 {
     for_each_visit(

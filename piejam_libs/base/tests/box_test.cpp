@@ -56,7 +56,10 @@ TEST(box, arrow_operator)
 {
     struct struct_with_method
     {
-        int meth() const noexcept { return 5; }
+        [[nodiscard]] auto meth() const noexcept -> int
+        {
+            return 5;
+        }
     };
 
     box<struct_with_method> x;

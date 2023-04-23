@@ -38,7 +38,7 @@ struct channel
 
     box<fx::chain_t> fx_chain{};
 
-    bool operator==(channel const&) const noexcept = default;
+    auto operator==(channel const&) const noexcept -> bool = default;
 };
 
 struct state
@@ -49,7 +49,7 @@ struct state
     channel_id main;
 };
 
-bool is_default_source_valid(channels_t const&, channel_id);
+auto is_default_source_valid(channels_t const&, channel_id) -> bool;
 
 auto valid_source_channels(channels_t const&, channel_id)
         -> std::vector<channel_id>;

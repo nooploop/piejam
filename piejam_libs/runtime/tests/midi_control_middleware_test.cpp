@@ -28,12 +28,15 @@ TEST_F(midi_control_middleware_test, unknown_action_is_passed_to_next)
 {
     struct some_action final : public reducible_action
     {
-        auto clone() const -> std::unique_ptr<action>
+        [[nodiscard]] auto clone() const -> std::unique_ptr<action> override
         {
             return std::make_unique<some_action>();
         }
 
-        auto reduce(state const& st) const -> state { return st; }
+        [[nodiscard]] auto reduce(state const& st) const -> state override
+        {
+            return st;
+        }
     };
 
     midi_control_middleware sut({});

@@ -11,7 +11,7 @@ namespace piejam::numeric::intops
 {
 
 template <class Source>
-constexpr auto
+[[nodiscard]] constexpr auto
 sign_map(Source const x) noexcept -> Source
 {
     static_assert(
@@ -23,7 +23,7 @@ sign_map(Source const x) noexcept -> Source
 //! map integer ranges of different signedness:
 //! [0 ; UMAX] <-> [SMIN ; SMAX]
 template <class Target, class Source>
-constexpr auto
+[[nodiscard]] constexpr auto
 sign_map(Source const x) noexcept
         -> std::enable_if_t<is_signed_v<Target> != is_signed_v<Source>, Target>
 {

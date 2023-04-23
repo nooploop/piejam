@@ -22,13 +22,14 @@ class spsc_slot
 
 public:
     void push(T const& v) noexcept
-            requires(std::is_nothrow_copy_assignable_v<T>)
+        requires(std::is_nothrow_copy_assignable_v<T>)
     {
         m_store[m_write].value = v;
         commit();
     }
 
-    void push(T&& v) noexcept requires(std::is_nothrow_move_assignable_v<T>)
+    void push(T&& v) noexcept
+        requires(std::is_nothrow_move_assignable_v<T>)
     {
         m_store[m_write].value = std::move(v);
         commit();
@@ -46,7 +47,8 @@ public:
         }
     }
 
-    auto pull(T& r) noexcept -> bool requires(std::is_nothrow_copy_assignable_v<T>)
+    auto pull(T& r) noexcept -> bool
+        requires(std::is_nothrow_copy_assignable_v<T>)
     {
         bool pulled{};
         consume([&r, &pulled](T const& value) noexcept {

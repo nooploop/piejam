@@ -42,7 +42,7 @@ class dll
 {
 public:
     constexpr dll() noexcept = default;
-    dll(std::filesystem::path const&);
+    explicit dll(std::filesystem::path const&);
     dll(dll&&) noexcept;
     dll(dll const&) = delete;
     ~dll();
@@ -50,7 +50,10 @@ public:
     auto operator=(dll&&) -> dll&;
     auto operator=(dll const&) -> dll& = delete;
 
-    operator bool() const noexcept { return m_handle; }
+    [[nodiscard]] operator bool() const noexcept
+    {
+        return m_handle;
+    }
 
     template <class Signature>
     auto symbol(std::string_view const name) const
@@ -59,7 +62,7 @@ public:
     }
 
 private:
-    auto symbol(std::string_view const name) const -> void*;
+    [[nodiscard]] auto symbol(std::string_view const name) const -> void*;
 
     void* m_handle{};
 };

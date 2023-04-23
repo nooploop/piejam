@@ -17,8 +17,8 @@ public:
     dft(std::size_t size);
     ~dft();
 
-    auto input_size() const noexcept -> std::size_t;
-    auto output_size() const noexcept -> std::size_t;
+    [[nodiscard]] auto input_size() const noexcept -> std::size_t;
+    [[nodiscard]] auto output_size() const noexcept -> std::size_t;
 
     auto process(std::span<float const>)
             -> std::span<std::complex<float> const>;

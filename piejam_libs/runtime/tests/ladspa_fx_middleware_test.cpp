@@ -27,12 +27,15 @@ TEST_F(ladspa_fx_middleware_test, unknown_action_is_passed_to_next)
 {
     struct some_action final : public action
     {
-        auto clone() const -> std::unique_ptr<action>
+        [[nodiscard]] auto clone() const -> std::unique_ptr<action> override
         {
             return std::make_unique<some_action>();
         }
 
-        auto reduce(state const& st) const -> state { return st; }
+        [[nodiscard]] auto reduce(state const& st) const -> state
+        {
+            return st;
+        }
     };
 
     ladspa_fx_middleware sut(lfx_ctrl_mock);

@@ -29,7 +29,8 @@ struct interleaved_view
     constexpr interleaved_view(
             T* const data,
             std::size_t const num_channels,
-            std::size_t const num_frames) noexcept requires(NumChannels == 0)
+            std::size_t const num_frames) noexcept
+        requires(NumChannels == 0)
         : m_begin(std::span<T, frame_extent<NumChannels>>(data, num_channels))
         , m_end(m_begin + num_frames)
     {
@@ -37,43 +38,50 @@ struct interleaved_view
 
     constexpr interleaved_view(
             T* const data,
-            std::size_t const num_frames) noexcept requires(NumChannels != 0)
+            std::size_t const num_frames) noexcept
+        requires(NumChannels != 0)
         : m_begin(std::span<T, frame_extent<NumChannels>>(data, NumChannels))
         , m_end(m_begin + num_frames)
     {
     }
 
     template <class U>
-    constexpr interleaved_view(
-            interleaved_view<U, NumChannels> const&
-                    other) requires(std::is_convertible_v<U*, T*>)
+    constexpr interleaved_view(interleaved_view<U, NumChannels> const& other)
+        requires(std::is_convertible_v<U*, T*>)
         : m_begin(other.begin())
         , m_end(other.end())
     {
     }
 
-    constexpr auto begin() const -> iterator { return m_begin; }
-    constexpr auto end() const -> iterator { return m_end; }
+    [[nodiscard]] constexpr auto begin() const -> iterator
+    {
+        return m_begin;
+    }
 
-    constexpr auto num_channels() const noexcept -> std::size_t
-            requires(NumChannels == 0)
+    [[nodiscard]] constexpr auto end() const -> iterator
+    {
+        return m_end;
+    }
+
+    [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
+        requires(NumChannels == 0)
     {
         return m_begin.num_channels();
     }
 
-    constexpr auto num_channels() const noexcept -> std::size_t
-            requires(NumChannels != 0)
+    [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
+        requires(NumChannels != 0)
     {
         return NumChannels;
     }
 
-    constexpr auto num_frames() const noexcept -> std::size_t
+    [[nodiscard]] constexpr auto num_frames() const noexcept -> std::size_t
     {
         return std::distance(m_begin, m_end);
     }
 
     template <std::size_t ToNumChannels>
-    constexpr auto channels_cast() const noexcept
+    [[nodiscard]] constexpr auto channels_cast() const noexcept
             -> interleaved_view<T, ToNumChannels>
         requires(NumChannels == 0)
     {
@@ -81,7 +89,8 @@ struct interleaved_view
         return interleaved_view<T, ToNumChannels>(m_begin, m_end);
     }
 
-private : iterator m_begin;
+private:
+    iterator m_begin;
     iterator m_end;
 };
 

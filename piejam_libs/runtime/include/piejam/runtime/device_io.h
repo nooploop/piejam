@@ -23,7 +23,7 @@ struct bus
     //! mono channels hold same device channel in the pair
     channel_index_pair channels{npos};
 
-    bool operator==(bus const&) const noexcept = default;
+    auto operator==(bus const&) const noexcept -> bool = default;
 };
 
 struct state

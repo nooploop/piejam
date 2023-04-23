@@ -26,14 +26,14 @@ struct plugin_descriptor
     std::size_t num_outputs{};
 };
 
-inline bool
-operator==(plugin_descriptor const& l, plugin_descriptor const& r)
+inline auto
+operator==(plugin_descriptor const& l, plugin_descriptor const& r) -> bool
 {
     return l.id == r.id;
 }
 
-inline bool
-operator!=(plugin_descriptor const& l, plugin_descriptor const& r)
+inline auto
+operator!=(plugin_descriptor const& l, plugin_descriptor const& r) -> bool
 {
     return l.id != r.id;
 }

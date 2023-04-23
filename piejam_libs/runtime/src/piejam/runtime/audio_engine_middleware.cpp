@@ -273,16 +273,14 @@ audio_engine_middleware::process_device_action(
             m_device_manager,
             current_state.pcm_devices,
             current_state.pcm_devices,
-            algorithm::index_of_if(
+            algorithm::index_of(
                     current_state.pcm_devices->inputs,
-                    [&](auto const& d) {
-                        return d.name == a.conf.input_device_name;
-                    }),
-            algorithm::index_of_if(
+                    a.conf.input_device_name,
+                    &audio::pcm_descriptor::name),
+            algorithm::index_of(
                     current_state.pcm_devices->outputs,
-                    [&](auto const& d) {
-                        return d.name == a.conf.output_device_name;
-                    }),
+                    a.conf.output_device_name,
+                    &audio::pcm_descriptor::name),
             a.conf.sample_rate,
             a.conf.period_size,
             a.conf.period_count));

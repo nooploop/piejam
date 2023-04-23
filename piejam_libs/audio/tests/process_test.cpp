@@ -21,7 +21,7 @@ namespace
 
 struct test_dummy_dag_executor : public dag_executor
 {
-    void operator()(std::size_t)
+    void operator()(std::size_t) override
     {
     }
 };

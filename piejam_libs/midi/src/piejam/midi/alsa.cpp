@@ -18,33 +18,39 @@ namespace piejam::midi::alsa
 namespace
 {
 
-auto
+[[nodiscard]] auto
 open_seq() -> system::device
 {
     system::device seq("/dev/snd/seq");
 
     int version{};
     if (auto err = seq.ioctl(SNDRV_SEQ_IOCTL_PVERSION, version))
+    {
         throw std::system_error(err);
+    }
 
     if (SNDRV_PROTOCOL_INCOMPATIBLE(SNDRV_SEQ_VERSION, version))
+    {
         throw std::runtime_error("midi seq incompatible version");
+    }
 
     return seq;
 }
 
-auto
+[[nodiscard]] auto
 get_client_id(system::device& seq) -> int
 {
     int client_id{};
 
     if (auto err = seq.ioctl(SNDRV_SEQ_IOCTL_CLIENT_ID, client_id))
+    {
         throw std::system_error(err);
+    }
 
     return client_id;
 }
 
-auto
+[[nodiscard]] auto
 make_input_port(system::device& seq, midi_client_id_t client_id) -> midi_port_t
 {
     snd_seq_port_info port_info{};
@@ -54,7 +60,9 @@ make_input_port(system::device& seq, midi_client_id_t client_id) -> midi_port_t
             SNDRV_SEQ_PORT_CAP_WRITE | SNDRV_SEQ_PORT_CAP_SUBS_WRITE;
 
     if (auto err = seq.ioctl(SNDRV_SEQ_IOCTL_CREATE_PORT, port_info))
+    {
         throw std::system_error(err);
+    }
 
     return port_info.addr.port;
 }
@@ -69,26 +77,32 @@ scan_devices(system::device& seq, Handler&& handler)
     while (!seq.ioctl(SNDRV_SEQ_IOCTL_QUERY_NEXT_CLIENT, client_info))
     {
         if (client_info.client == SNDRV_SEQ_CLIENT_SYSTEM)
+        {
             continue;
+        }
 
         if (client_info.num_ports <= 0)
+        {
             continue;
+        }
 
         snd_seq_port_info port_info{};
         port_info.addr.client = client_info.client;
         port_info.addr.port = 0;
 
         if (seq.ioctl(SNDRV_SEQ_IOCTL_GET_PORT_INFO, port_info))
+        {
             continue;
+        }
 
         do
         {
-            std::forward<Handler>(handler)(client_info, port_info);
+            std::invoke(std::forward<Handler>(handler), client_info, port_info);
         } while (!seq.ioctl(SNDRV_SEQ_IOCTL_QUERY_NEXT_PORT, port_info));
     }
 }
 
-auto
+[[nodiscard]] auto
 scan_input_devices(system::device& seq) -> std::vector<midi_device>
 {
     std::vector<midi_device> result;
@@ -98,16 +112,14 @@ scan_input_devices(system::device& seq) -> std::vector<midi_device>
             [&result](
                     snd_seq_client_info const& client_info,
                     snd_seq_port_info const& port_info) {
-                if (client_info.type != KERNEL_CLIENT)
-                    return;
-
-                if ((port_info.capability & SNDRV_SEQ_PORT_CAP_READ) &&
+                if ((client_info.type == KERNEL_CLIENT) &&
+                    (port_info.capability & SNDRV_SEQ_PORT_CAP_READ) &&
                     (port_info.capability & SNDRV_SEQ_PORT_CAP_SUBS_READ))
                 {
-                    result.emplace_back(
-                            port_info.addr.client,
-                            port_info.addr.port,
-                            client_info.name);
+                    result.emplace_back(midi_device{
+                            .client_id = port_info.addr.client,
+                            .port = port_info.addr.port,
+                            .name = client_info.name});
                 }
             });
 
@@ -123,7 +135,9 @@ midi_io::midi_io()
     , m_input_buffer(sizeof(snd_seq_event) * 128)
 {
     if (auto err = m_seq.set_nonblock())
+    {
         throw std::system_error(err);
+    }
 }
 
 void
@@ -131,7 +145,9 @@ midi_io::process_input(event_handler& handler)
 {
     auto read_result = m_seq.read(m_input_buffer);
     if (!read_result)
+    {
         return;
+    }
 
     std::span<snd_seq_event const> events(
             reinterpret_cast<snd_seq_event const*>(m_input_buffer.data()),
@@ -170,7 +186,9 @@ midi_devices::midi_devices(midi_client_id_t in_client_id, midi_port_t in_port)
     port_sub.dest.port = m_port;
 
     if (auto err = m_seq.ioctl(SNDRV_SEQ_IOCTL_SUBSCRIBE_PORT, port_sub))
+    {
         throw std::system_error(err);
+    }
 
     std::ranges::transform(
             scan_input_devices(m_seq),
@@ -178,7 +196,9 @@ midi_devices::midi_devices(midi_client_id_t in_client_id, midi_port_t in_port)
             [](auto const& d) { return midi_device_added{.device = d}; });
 
     if (auto err = m_seq.set_nonblock())
+    {
         throw std::system_error(err);
+    }
 }
 
 midi_devices::~midi_devices()
@@ -190,16 +210,18 @@ midi_devices::~midi_devices()
     port_sub.dest.port = m_port;
 
     if (auto err = m_seq.ioctl(SNDRV_SEQ_IOCTL_UNSUBSCRIBE_PORT, port_sub))
+    {
         spdlog::error(
                 "midi_devices: failed to unsubscribe from system "
                 "announcements: {}",
                 err.message());
+    }
 }
 
-bool
+[[nodiscard]] auto
 midi_devices::connect_input(
         midi_client_id_t source_client_id,
-        midi_port_t source_port)
+        midi_port_t source_port) -> bool
 {
     snd_seq_port_subscribe port_sub{};
     port_sub.sender.client = source_client_id;
@@ -222,15 +244,17 @@ midi_devices::disconnect_input(
     port_sub.dest.port = m_in_port;
 
     if (auto err = m_seq.ioctl(SNDRV_SEQ_IOCTL_UNSUBSCRIBE_PORT, port_sub))
+    {
         spdlog::warn(
                 "midi_devices: disconnect from input failed: {}",
                 err.message());
+    }
 }
 
-auto
-midi_devices::update() -> std::vector<midi_device_update>
+[[nodiscard]] auto
+midi_devices::update() -> std::vector<midi_device_event>
 {
-    std::vector<midi_device_update> result = std::move(m_initial_updates);
+    std::vector<midi_device_event> result = std::move(m_initial_updates);
 
     snd_seq_event ev{};
     while (auto read_result =

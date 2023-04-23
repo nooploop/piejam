@@ -117,7 +117,10 @@ public:
         return m_stride;
     }
 
-    [[nodiscard]] constexpr bool empty() const noexcept { return m_size == 0; }
+    [[nodiscard]] constexpr auto empty() const noexcept -> bool
+    {
+        return m_size == 0;
+    }
 
 private:
     pointer m_data{};

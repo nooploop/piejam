@@ -36,9 +36,15 @@ public:
         };
     }
 
-    auto state() const noexcept -> State const& { return m_state; }
+    [[nodiscard]] auto state() const noexcept -> State const&
+    {
+        return m_state;
+    }
 
-    void dispatch(Action const& action) { m_dispatch(action); }
+    void dispatch(Action const& action)
+    {
+        m_dispatch(action);
+    }
 
     template <class MiddlewareFactory>
     void apply_middleware(MiddlewareFactory&& mf)

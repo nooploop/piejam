@@ -11,7 +11,10 @@ namespace piejam::test
 
 struct default_ctor_except
 {
-    default_ctor_except() noexcept(false) {}
+    default_ctor_except() noexcept(false)
+    {
+        throw;
+    }
 };
 
 TEST(type_traits, is_nothrow_default_constructible)

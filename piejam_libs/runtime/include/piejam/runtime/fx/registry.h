@@ -19,7 +19,7 @@ struct registry
 
     boxed_vector<item> entries;
 
-    bool operator==(registry const&) const noexcept = default;
+    auto operator==(registry const&) const noexcept -> bool = default;
 };
 
 inline auto

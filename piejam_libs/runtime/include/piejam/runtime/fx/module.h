@@ -20,7 +20,7 @@ struct module
     box<module_parameters> parameters;
     box<module_streams> streams;
 
-    bool operator==(module const&) const noexcept = default;
+    auto operator==(module const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::runtime::fx

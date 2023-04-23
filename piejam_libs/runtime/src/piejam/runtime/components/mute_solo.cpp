@@ -29,11 +29,23 @@ public:
     {
     }
 
-    auto inputs() const -> endpoints override { return m_inputs; }
-    auto outputs() const -> endpoints override { return m_outputs; }
+    [[nodiscard]] auto inputs() const -> endpoints override
+    {
+        return m_inputs;
+    }
+    [[nodiscard]] auto outputs() const -> endpoints override
+    {
+        return m_outputs;
+    }
 
-    auto event_inputs() const -> endpoints override { return m_event_inputs; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    [[nodiscard]] auto event_inputs() const -> endpoints override
+    {
+        return m_event_inputs;
+    }
+    [[nodiscard]] auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(audio::engine::graph& g) const override
     {

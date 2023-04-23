@@ -18,7 +18,7 @@ struct unavailable_ladspa
     std::vector<parameter_value_assignment> parameter_values;
     std::vector<parameter_midi_assignment> midi_assignments;
 
-    bool operator==(unavailable_ladspa const&) const noexcept = default;
+    auto operator==(unavailable_ladspa const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::runtime::fx

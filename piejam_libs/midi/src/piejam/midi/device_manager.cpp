@@ -84,7 +84,7 @@ struct alsa_input_processor final : input_event_handler
                 });
     }
 
-    void process(event_handler& ev_handler)
+    void process(event_handler& ev_handler) override
     {
         alsa_event_handler alsa_ev_handler(ev_handler, m_devices);
         m_midi_io.process_input(alsa_ev_handler);
@@ -98,7 +98,7 @@ private:
 class alsa_device_manager final : public device_manager
 {
 public:
-    bool activate_input_device(device_id_t const& device_id) override;
+    auto activate_input_device(device_id_t const& device_id) -> bool override;
     void deactivate_input_device(device_id_t const& device_id) override;
 
     auto update_devices() -> std::vector<device_update> override;
@@ -107,19 +107,19 @@ public:
             -> std::unique_ptr<input_event_handler> override;
 
 private:
-    bool is_update_relevant(alsa::midi_device_added const&) const
+    auto is_update_relevant(alsa::midi_device_added const&) const -> bool
     {
         return true;
     }
 
-    bool is_update_relevant(alsa::midi_device_removed const& op) const
+    auto is_update_relevant(alsa::midi_device_removed const& op) const -> bool
     {
         return algorithm::contains_if(
                 m_alsa_input_devices,
                 tuple::element<1>.equal_to(std::cref(op.device)));
     }
 
-    bool is_update_relevant(alsa::midi_device_update const& op) const
+    auto is_update_relevant(alsa::midi_device_event const& op) const -> bool
     {
         return std::visit(
                 [this](auto const& op) { return is_update_relevant(op); },
@@ -150,7 +150,7 @@ private:
         return device_removed{.device_id = device_id};
     }
 
-    auto process_midi_device_update(alsa::midi_device_update const& op)
+    auto process_midi_device_update(alsa::midi_device_event const& op)
     {
         return std::visit(
                 [this](auto const& op) {
@@ -167,8 +167,8 @@ private:
     std::unordered_map<device_id_t, alsa::midi_device> m_alsa_input_devices;
 };
 
-bool
-alsa_device_manager::activate_input_device(device_id_t const& device_id)
+auto
+alsa_device_manager::activate_input_device(device_id_t const& device_id) -> bool
 {
     if (auto it = m_alsa_input_devices.find(device_id);
         it != m_alsa_input_devices.end())
@@ -201,7 +201,9 @@ alsa_device_manager::update_devices() -> std::vector<device_update>
     for (auto const& op : m_alsa_midi_devices.update())
     {
         if (is_update_relevant(op))
+        {
             result.emplace_back(process_midi_device_update(op));
+        }
     }
 
     return result;

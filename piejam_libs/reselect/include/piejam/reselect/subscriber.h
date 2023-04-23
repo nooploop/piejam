@@ -29,13 +29,14 @@ public:
     }
 
     template <class Value>
-    auto observe_once(selector<Value, State> const& sel) -> Value
+    [[nodiscard]] auto observe_once(selector<Value, State> const& sel) -> Value
     {
         return sel.get(m_get_state());
     }
 
     template <class Value, class Handler>
-    auto observe(selector<Value, State> sel, Handler&& handler) -> subscription
+    [[nodiscard]] auto observe(selector<Value, State> sel, Handler&& handler)
+            -> subscription
     {
         auto last = std::make_shared<Value>(sel.get(m_get_state()));
         std::invoke(std::forward<Handler>(handler), *last);
@@ -47,7 +48,9 @@ public:
                                     last](State const& st) mutable {
                     auto alive = token.lock();
                     if (!alive)
+                    {
                         return;
+                    }
 
                     auto current = sel.get(st);
                     if (*last != current)
@@ -59,7 +62,10 @@ public:
                 token);
     }
 
-    void notify(State const& st) { m_observer(st); }
+    void notify(State const& st)
+    {
+        m_observer(st);
+    }
 
 private:
     get_state_f m_get_state;

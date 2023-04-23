@@ -35,15 +35,14 @@ auto
 make_default_float_parameter_value_to_string() noexcept
         -> parameter_value_to_string
 {
-    return parameter_value_to_string(
-            [](float x) { return fmt::format("{:.2f}", x); });
+    return {[](float x) { return fmt::format("{:.2f}", x); }};
 }
 
 auto
 make_default_int_parameter_value_to_string() noexcept
         -> parameter_value_to_string
 {
-    return parameter_value_to_string([](int x) { return std::to_string(x); });
+    return {[](int x) { return std::to_string(x); }};
 }
 
 auto
@@ -51,7 +50,7 @@ make_default_bool_parameter_value_to_string() noexcept
         -> parameter_value_to_string
 {
     using namespace std::string_literals;
-    return parameter_value_to_string([](bool x) { return x ? "on"s : "off"s; });
+    return {[](bool x) { return x ? "on"s : "off"s; }};
 }
 
 namespace

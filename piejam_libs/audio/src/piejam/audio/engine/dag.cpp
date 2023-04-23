@@ -160,20 +160,19 @@ public:
             std::size_t const event_memory_size,
             std::span<thread::worker> const worker_threads)
         : dag_executor_base(tasks, graph)
+        , m_worker_threads(worker_threads)
         , m_initial_tasks(distribute_initial_tasks(m_nodes))
         , m_main_worker(
                   event_memory_size,
                   m_nodes_to_process,
                   m_buffer_size,
                   m_run_queue)
-        , m_worker_threads(worker_threads)
         , m_workers(make_workers(
                   worker_threads.size(),
                   event_memory_size,
                   m_nodes_to_process,
                   m_buffer_size,
                   m_run_queue))
-        , m_worker_tasks(make_worker_tasks(m_workers))
     {
     }
 
@@ -193,10 +192,12 @@ public:
 
         m_nodes_to_process.store(m_nodes.size(), std::memory_order_release);
 
-        BOOST_ASSERT(m_worker_tasks.size() == m_worker_threads.size());
+        BOOST_ASSERT(m_workers.size() == m_worker_threads.size());
         for (std::size_t const w : range::indices(m_worker_threads))
         {
-            m_worker_threads[w].wakeup(m_worker_tasks[w]);
+            // Wrap into a reference_wrapper here to guarantee small-object
+            // optimization inside the worker thread.
+            m_worker_threads[w].wakeup(std::ref(m_workers[w]));
         }
 
         m_main_worker();
@@ -320,28 +321,13 @@ private:
         return workers;
     }
 
-    static auto make_worker_tasks(std::span<dag_worker> const workers)
-            -> std::vector<thread::worker::task_t>
-    {
-        std::vector<thread::worker::task_t> tasks;
-        tasks.reserve(workers.size());
-
-        for (auto& w : workers)
-        {
-            tasks.emplace_back(std::ref(w));
-        }
-
-        return tasks;
-    }
-
+    std::span<thread::worker> m_worker_threads;
     std::atomic_size_t m_nodes_to_process{};
     std::vector<node*> const m_initial_tasks;
     jobs_t m_run_queue;
     dag_worker m_main_worker;
-    std::span<thread::worker> m_worker_threads;
-    workers_t m_workers;
-    std::vector<thread::worker::task_t> m_worker_tasks;
     std::atomic_size_t m_buffer_size{};
+    workers_t m_workers;
 };
 
 auto

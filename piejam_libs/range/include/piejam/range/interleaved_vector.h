@@ -17,7 +17,8 @@ class interleaved_vector
 {
 public:
     constexpr interleaved_vector() noexcept
-            requires(NumChannels != 0) = default;
+        requires(NumChannels != 0)
+    = default;
 
     constexpr interleaved_vector(std::size_t const num_channels) noexcept
         : m_num_channels(num_channels)
@@ -25,7 +26,8 @@ public:
         BOOST_ASSERT(interleaved_vector::num_channels() > 0);
     }
 
-    constexpr interleaved_vector(std::vector<T> vec) requires(NumChannels != 0)
+    constexpr interleaved_vector(std::vector<T> vec)
+        requires(NumChannels != 0)
         : m_vec(std::move(vec))
     {
         BOOST_ASSERT(m_vec.size() % interleaved_vector::num_channels() == 0);
@@ -33,28 +35,34 @@ public:
 
     constexpr interleaved_vector(
             std::vector<T> vec,
-            std::size_t const num_channels) requires(NumChannels == 0)
+            std::size_t const num_channels)
+        requires(NumChannels == 0)
         : m_num_channels(num_channels)
         , m_vec(std::move(vec))
     {
         BOOST_ASSERT(m_vec.size() % interleaved_vector::num_channels() == 0);
     }
 
-    constexpr auto num_channels() const noexcept -> std::size_t
+    [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
     {
         return NumChannels == 0 ? m_num_channels : NumChannels;
     }
 
-    constexpr bool empty() const noexcept { return m_vec.empty(); }
+    [[nodiscard]] constexpr auto empty() const noexcept -> bool
+    {
+        return m_vec.empty();
+    }
 
-    constexpr auto begin() noexcept -> frame_iterator<T, NumChannels>
+    [[nodiscard]] constexpr auto begin() noexcept
+            -> frame_iterator<T, NumChannels>
     {
         return std::span<T, frame_extent<NumChannels>>(
                 m_vec.data(),
                 num_channels());
     }
 
-    constexpr auto end() noexcept -> frame_iterator<T, NumChannels>
+    [[nodiscard]] constexpr auto end() noexcept
+            -> frame_iterator<T, NumChannels>
     {
         BOOST_ASSERT(m_vec.size() % num_channels() == 0);
         return std::span<T, frame_extent<NumChannels>>(
@@ -62,7 +70,7 @@ public:
                 num_channels());
     }
 
-    constexpr auto begin() const noexcept
+    [[nodiscard]] constexpr auto begin() const noexcept
             -> frame_iterator<T const, NumChannels>
     {
         return std::span<T const, frame_extent<NumChannels>>(
@@ -70,7 +78,8 @@ public:
                 num_channels());
     }
 
-    constexpr auto end() const noexcept -> frame_iterator<T const, NumChannels>
+    [[nodiscard]] constexpr auto end() const noexcept
+            -> frame_iterator<T const, NumChannels>
     {
         BOOST_ASSERT(m_vec.size() % num_channels() == 0);
         return std::span<T const, frame_extent<NumChannels>>(
@@ -78,28 +87,32 @@ public:
                 num_channels());
     }
 
-    constexpr auto frames() const noexcept
+    [[nodiscard]] constexpr auto frames() const noexcept
             -> interleaved_view<T const, NumChannels>
     {
         return {begin(), end()};
     }
 
-    constexpr auto frames() noexcept -> interleaved_view<T, NumChannels>
+    [[nodiscard]] constexpr auto frames() noexcept
+            -> interleaved_view<T, NumChannels>
     {
         return {begin(), end()};
     }
 
-    constexpr auto num_frames() const noexcept -> std::size_t
+    [[nodiscard]] constexpr auto num_frames() const noexcept -> std::size_t
     {
         return m_vec.size() / m_num_channels;
     }
 
-    constexpr auto samples() const noexcept -> std::span<T const>
+    [[nodiscard]] constexpr auto samples() const noexcept -> std::span<T const>
     {
         return m_vec;
     }
 
-    constexpr auto samples() noexcept -> std::span<T> { return m_vec; }
+    [[nodiscard]] constexpr auto samples() noexcept -> std::span<T>
+    {
+        return m_vec;
+    }
 
 private:
     std::size_t m_num_channels{NumChannels};

@@ -15,11 +15,14 @@ namespace piejam::system
 class avg_cpu_load_tracker final
 {
 public:
-    avg_cpu_load_tracker(std::size_t num_cores);
+    explicit avg_cpu_load_tracker(std::size_t num_cores);
 
-    auto total() const noexcept -> float { return m_total_avg; }
+    [[nodiscard]] auto total() const noexcept -> float
+    {
+        return m_total_avg;
+    }
 
-    auto per_core() const noexcept -> std::span<float const>
+    [[nodiscard]] auto per_core() const noexcept -> std::span<float const>
     {
         return m_per_core_avg;
     }

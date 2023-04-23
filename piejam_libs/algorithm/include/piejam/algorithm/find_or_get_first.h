@@ -15,7 +15,7 @@ namespace piejam::algorithm
 {
 
 template <std::ranges::input_range Range, convertible_to_range_value<Range> T>
-constexpr auto
+[[nodiscard]] constexpr auto
 find_or_get_first(Range const& rng, T&& value)
 {
     using std::begin;

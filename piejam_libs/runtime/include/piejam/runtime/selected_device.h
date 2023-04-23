@@ -16,7 +16,7 @@ struct selected_device
     std::size_t index{npos};
     box<audio::pcm_hw_params> hw_params;
 
-    bool operator==(selected_device const&) const noexcept = default;
+    auto operator==(selected_device const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::runtime

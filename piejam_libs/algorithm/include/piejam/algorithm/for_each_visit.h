@@ -15,7 +15,9 @@ constexpr void
 for_each_visit(Range&& rng, Visitor&& v)
 {
     for (auto&& var : std::forward<Range>(rng))
+    {
         std::visit(std::forward<Visitor>(v), std::forward<decltype(var)>(var));
+    }
 }
 
 } // namespace piejam::algorithm

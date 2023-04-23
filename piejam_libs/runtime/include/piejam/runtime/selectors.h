@@ -80,7 +80,7 @@ struct mixer_device_route
     device_io::bus_id bus_id;
     std::string name;
 
-    bool operator==(mixer_device_route const&) const noexcept = default;
+    auto operator==(mixer_device_route const&) const noexcept -> bool = default;
 };
 
 extern const selector<boxed_vector<mixer_device_route>>
@@ -93,7 +93,8 @@ struct mixer_channel_route
     mixer::channel_id channel_id;
     std::string name;
 
-    bool operator==(mixer_channel_route const&) const noexcept = default;
+    auto operator==(mixer_channel_route const&) const noexcept
+            -> bool = default;
 };
 
 auto make_default_mixer_channel_input_is_valid_selector(mixer::channel_id)
@@ -117,7 +118,7 @@ struct selected_route
     state_t state{};
     std::string name;
 
-    bool operator==(selected_route const&) const noexcept = default;
+    auto operator==(selected_route const&) const noexcept -> bool = default;
 };
 
 auto make_mixer_channel_input_selector(mixer::channel_id)

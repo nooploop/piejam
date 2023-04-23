@@ -24,7 +24,9 @@ for_each_adjacent(Range&& rng, BinaryOp&& op)
     auto second = first != last ? std::next(first) : last;
 
     while (second != last)
+    {
         std::invoke(std::forward<BinaryOp>(op), *first++, *second++);
+    }
 }
 
 } // namespace piejam::algorithm

@@ -22,12 +22,12 @@ class instance_manager_processor_factory final
     , public processor_factory
 {
 public:
-    ~instance_manager_processor_factory();
+    ~instance_manager_processor_factory() override;
 
     auto load(plugin_descriptor const&) -> instance_id override;
     void unload(instance_id const&) override;
 
-    auto control_inputs(instance_id const&) const
+    [[nodiscard]] auto control_inputs(instance_id const&) const
             -> std::span<port_descriptor const> override;
 
     auto make_processor(instance_id const&, audio::sample_rate)

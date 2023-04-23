@@ -10,7 +10,7 @@ namespace piejam::range
 {
 
 template <std::integral T>
-constexpr auto
+[[nodiscard]] constexpr auto
 iota(T const max) noexcept
 {
     return std::views::iota(T{}, max);

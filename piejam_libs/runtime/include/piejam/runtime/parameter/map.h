@@ -29,8 +29,15 @@ public:
     using const_cached_type = std::shared_ptr<value_type const>;
     using cache_t = std::vector<cached_type>;
 
-    bool empty() const noexcept { return m_parameters.empty(); }
-    auto size() const noexcept -> std::size_t { return m_parameters.size(); }
+    [[nodiscard]] auto empty() const noexcept -> bool
+    {
+        return m_parameters.empty();
+    }
+
+    [[nodiscard]] auto size() const noexcept -> std::size_t
+    {
+        return m_parameters.size();
+    }
 
     template <std::same_as<Parameter> P>
     auto add(P&& p) -> id_t

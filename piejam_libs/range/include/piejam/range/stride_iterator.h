@@ -106,42 +106,48 @@ public:
         return *this;
     }
 
-    friend constexpr bool
+    friend constexpr auto
     operator==(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
+            -> bool
     {
         assert(lhs.m_stride == rhs.m_stride);
         assert(!lhs.m_stride || (lhs.m_it - rhs.m_it) % lhs.m_stride == 0);
         return lhs.m_it == rhs.m_it;
     }
 
-    friend constexpr bool
+    friend constexpr auto
     operator!=(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
+            -> bool
     {
         return !(lhs == rhs);
     }
 
-    friend constexpr bool
+    friend constexpr auto
     operator<(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
+            -> bool
     {
         assert(lhs.m_stride == rhs.m_stride);
         assert(!lhs.m_stride || (lhs.m_it - rhs.m_it) % lhs.m_stride == 0);
         return lhs.m_it < rhs.m_it;
     }
 
-    friend constexpr bool
+    friend constexpr auto
     operator<=(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
+            -> bool
     {
         return lhs == rhs || lhs < rhs;
     }
 
-    friend constexpr bool
+    friend constexpr auto
     operator>(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
+            -> bool
     {
         return rhs < lhs;
     }
 
-    friend constexpr bool
+    friend constexpr auto
     operator>=(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
+            -> bool
     {
         return rhs <= lhs;
     }

@@ -16,25 +16,26 @@ namespace detail
 template <class T>
 struct unwrap_const_addressof
 {
-    constexpr auto operator()(T const& t) const noexcept -> T const*
+    using R = T const*;
+
+    [[nodiscard]] constexpr auto operator()(T const& t) const noexcept -> R
     {
         return std::addressof(t);
     }
 
-    constexpr auto operator()(T const* const t) const noexcept -> T const*
+    [[nodiscard]] constexpr auto operator()(T const* t) const noexcept -> R
     {
         return t;
     }
 
-    constexpr auto operator()(std::reference_wrapper<T> const& t) const noexcept
-            -> T const*
+    [[nodiscard]] constexpr auto
+    operator()(std::reference_wrapper<T> const& t) const noexcept -> R
     {
         return std::addressof(t.get());
     }
 
-    constexpr auto
-    operator()(std::reference_wrapper<T const> const& t) const noexcept
-            -> T const*
+    [[nodiscard]] constexpr auto
+    operator()(std::reference_wrapper<T const> const& t) const noexcept -> R
     {
         return std::addressof(t.get());
     }

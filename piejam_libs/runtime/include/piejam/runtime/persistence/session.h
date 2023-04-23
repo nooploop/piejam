@@ -47,7 +47,10 @@ struct session
     {
         using base_t = std::variant<internal_fx, ladspa_plugin>;
         using base_t::variant;
-        auto as_variant() const noexcept -> base_t const& { return *this; }
+        [[nodiscard]] auto as_variant() const noexcept -> base_t const&
+        {
+            return *this;
+        }
     };
 
     struct mixer_parameters

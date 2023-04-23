@@ -26,8 +26,12 @@ struct frame_iterator
 {
     using value_type = std::span<T, frame_extent<NumChannels>>;
 
-    constexpr frame_iterator() noexcept requires(NumChannels == 0) = default;
-    constexpr frame_iterator() noexcept requires(NumChannels != 0)
+    constexpr frame_iterator() noexcept
+        requires(NumChannels == 0)
+    = default;
+
+    constexpr frame_iterator() noexcept
+        requires(NumChannels != 0)
         : m_frame(nullptr, NumChannels)
     {
     }
@@ -35,7 +39,7 @@ struct frame_iterator
     template <class U>
     constexpr frame_iterator(
             frame_iterator<U, NumChannels> const& other) noexcept
-            requires(std::is_convertible_v<U*, T*>)
+        requires(std::is_convertible_v<U*, T*>)
         : m_frame(other.m_frame)
     {
     }
@@ -43,14 +47,14 @@ struct frame_iterator
     template <class U, std::size_t NumChannels2>
     constexpr frame_iterator(
             frame_iterator<U, NumChannels2> const& other) noexcept
-            requires(std::is_convertible_v<U*, T*>&& NumChannels == 0)
+        requires(std::is_convertible_v<U*, T*> && NumChannels == 0)
         : m_frame(other.m_frame)
     {
     }
 
     template <class U>
     constexpr frame_iterator(frame_iterator<U, 0> const& other) noexcept
-            requires(std::is_convertible_v<U*, T*>&& NumChannels != 0)
+        requires(std::is_convertible_v<U*, T*> && NumChannels != 0)
         : m_frame(other.m_frame)
     {
         BOOST_ASSERT(other.m_frame.size() == NumChannels);
@@ -61,12 +65,12 @@ struct frame_iterator
     {
     }
 
-    constexpr auto num_channels() const noexcept -> std::size_t
+    [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
     {
         return NumChannels == 0 ? m_frame.size() : NumChannels;
     }
 
-    constexpr auto operator*() const noexcept -> value_type const&
+    [[nodiscard]] constexpr auto operator*() const noexcept -> value_type const&
     {
         return m_frame;
     }

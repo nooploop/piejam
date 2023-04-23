@@ -11,7 +11,7 @@
 namespace piejam::algorithm
 {
 
-inline auto
+[[nodiscard]] inline auto
 escape_html(std::string_view const src) -> std::string
 {
     std::string dst;
@@ -28,15 +28,19 @@ escape_html(std::string_view const src) -> std::string
             case '\'':
                 dst += "&apos;";
                 break;
+
             case '"':
                 dst += "&quot;";
                 break;
+
             case '<':
                 dst += "&lt;";
                 break;
+
             case '>':
                 dst += "&gt;";
                 break;
+
             default:
                 dst += ch;
                 break;

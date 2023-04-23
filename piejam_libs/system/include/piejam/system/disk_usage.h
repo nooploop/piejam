@@ -9,12 +9,17 @@
 namespace piejam::system
 {
 
-auto
+[[nodiscard]] auto
 disk_usage(std::filesystem::path const& p)
 {
-    auto info = std::filesystem::space(p);
-    auto const capacity = static_cast<float>(info.capacity);
-    return (capacity - static_cast<float>(info.free)) / capacity;
+    std::error_code ec;
+    if (auto info = std::filesystem::space(p, ec); !ec)
+    {
+        auto const capacity = static_cast<float>(info.capacity);
+        return (capacity - static_cast<float>(info.free)) / capacity;
+    }
+
+    return 0.f;
 }
 
 } // namespace piejam::system

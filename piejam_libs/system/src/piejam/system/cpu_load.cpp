@@ -17,8 +17,10 @@ namespace piejam::system
 namespace
 {
 
-auto
-parse_cpu_line(std::string line) -> std::pair<std::string, cpu_load_data>
+using cpu_name_t = std::string;
+
+[[nodiscard]] auto
+parse_cpu_line(std::string line) -> std::pair<cpu_name_t, cpu_load_data>
 {
     std::pair<std::string, cpu_load_data> result;
 
@@ -38,7 +40,7 @@ parse_cpu_line(std::string line) -> std::pair<std::string, cpu_load_data>
 void
 cpu_load(cpu_load_data& total, std::span<cpu_load_data> per_core) noexcept
 {
-    static std::string s_cpu{"cpu"};
+    using namespace std::string_literals;
 
     try
     {
@@ -47,10 +49,10 @@ cpu_load(cpu_load_data& total, std::span<cpu_load_data> per_core) noexcept
         std::array<char, 1024> line;
         while (stat_file.getline(line.data(), line.size()))
         {
-            if (boost::starts_with(line, s_cpu))
+            if (boost::starts_with(line, "cpu"s))
             {
                 auto parsed_data = parse_cpu_line(line.data());
-                if (parsed_data.first == s_cpu)
+                if (parsed_data.first == "cpu"s)
                 {
                     total = parsed_data.second;
                 }

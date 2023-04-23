@@ -93,35 +93,42 @@ public:
     {
     }
 
-    constexpr auto data() const noexcept -> T* { return m_data; }
-    constexpr auto major_size() const noexcept -> size_type
+    [[nodiscard]] constexpr auto data() const noexcept -> T*
+    {
+        return m_data;
+    }
+
+    [[nodiscard]] constexpr auto major_size() const noexcept -> size_type
     {
         return m_major_size;
     }
-    constexpr auto minor_size() const noexcept -> size_type
+
+    [[nodiscard]] constexpr auto minor_size() const noexcept -> size_type
     {
         return m_minor_size;
     }
-    constexpr auto major_step() const noexcept -> difference_type
+
+    [[nodiscard]] constexpr auto major_step() const noexcept -> difference_type
     {
         return m_major_step;
     }
-    constexpr auto minor_step() const noexcept -> difference_type
+
+    [[nodiscard]] constexpr auto minor_step() const noexcept -> difference_type
     {
         return m_minor_step;
     }
 
-    constexpr auto begin() const noexcept -> iterator
+    [[nodiscard]] constexpr auto begin() const noexcept -> iterator
     {
         return {m_data, m_major_step, m_minor_size, m_minor_step};
     }
 
-    constexpr auto cbegin() const noexcept -> const_iterator
+    [[nodiscard]] constexpr auto cbegin() const noexcept -> const_iterator
     {
         return {m_data, m_major_step, m_minor_size, m_minor_step};
     }
 
-    constexpr auto end() const noexcept -> iterator
+    [[nodiscard]] constexpr auto end() const noexcept -> iterator
     {
         return {m_data + m_major_size * m_major_step,
                 m_major_step,
@@ -129,7 +136,7 @@ public:
                 m_minor_step};
     }
 
-    constexpr auto cend() const noexcept -> const_iterator
+    [[nodiscard]] constexpr auto cend() const noexcept -> const_iterator
     {
         return {m_data + m_major_size * m_major_step,
                 m_major_step,
@@ -137,8 +144,8 @@ public:
                 m_minor_step};
     }
 
-    constexpr auto operator[](size_type major_index) const noexcept
-            -> strided_span<T>
+    [[nodiscard]] constexpr auto
+    operator[](size_type major_index) const noexcept -> strided_span<T>
     {
         return {m_data + major_index * m_major_step,
                 m_minor_size,
@@ -177,7 +184,9 @@ transform(
     for (auto src_it = src.begin(), src_end = src.end(), dst_it = dst.begin();
          src_it != src_end;
          ++src_it, ++dst_it)
+    {
         std::ranges::transform(*src_it, dst_it->begin(), op);
+    }
 }
 
 template <class T>
@@ -185,7 +194,9 @@ void
 fill(table_view<T> const& tv, T const value)
 {
     for (auto row : tv)
+    {
         std::ranges::fill(row, value);
+    }
 }
 
 template <class T>
