@@ -15,9 +15,7 @@
 namespace piejam::thread
 {
 
-//! A thread which gets a task assigned. The worker needs to be
-//! woken up to execute the task. When the work on the task is done,
-//! the thread yields the cpu and waits for the next wakeup call.
+//! Single task worker thread.
 class worker
 {
 public:
@@ -27,14 +25,14 @@ public:
         : m_thread([this, conf = std::move(conf)](std::stop_token stoken) {
             conf.apply();
 
-            m_sem_finished.release();
-
-            while (!stoken.stop_requested())
+            while (true)
             {
                 m_sem_work.acquire();
 
                 if (stoken.stop_requested())
+                {
                     break;
+                }
 
                 m_task();
 
@@ -42,7 +40,6 @@ public:
             }
         })
     {
-        wait();
     }
 
     worker(worker const&) = delete;
@@ -50,6 +47,7 @@ public:
 
     ~worker()
     {
+        m_sem_finished.acquire();
         m_thread.request_stop();
         m_sem_work.release();
     }
@@ -60,15 +58,14 @@ public:
     template <std::invocable<> F>
     void wakeup(F&& task) noexcept
     {
+        m_sem_finished.acquire();
         m_task = std::forward<F>(task);
         m_sem_work.release();
     }
 
-    void wait() { m_sem_finished.acquire(); }
-
 private:
     std::binary_semaphore m_sem_work{0};
-    std::binary_semaphore m_sem_finished{0};
+    std::binary_semaphore m_sem_finished{1};
 
     task_t m_task{[]() {}};
     std::jthread m_thread;
