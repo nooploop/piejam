@@ -6,7 +6,7 @@
 
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/sample_rate.h>
-#include <piejam/runtime/components/stereo_stream.h>
+#include <piejam/runtime/components/stream.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
 #include <piejam/to_underlying.h>

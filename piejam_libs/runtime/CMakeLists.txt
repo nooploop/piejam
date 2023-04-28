@@ -54,7 +54,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mixer_channel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/solo_switch.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/stereo_stream.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/stream.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io_fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/dynamic_key_shared_object_map.h
@@ -171,7 +171,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mixer_channel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/solo_switch.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/stereo_stream.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/stream.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/parameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_assignment_id.cpp
