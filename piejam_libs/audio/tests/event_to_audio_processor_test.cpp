@@ -4,7 +4,6 @@
 
 #include <piejam/audio/engine/smoother_processor.h>
 
-#include <piejam/algorithm/all_of_adjacent.h>
 #include <piejam/audio/engine/event_buffer.h>
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -12,7 +11,9 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
-#include <piejam/functional/compare.h>
+
+#include <piejam/algorithm/all_of_adjacent.h>
+#include <piejam/functional/operators.h>
 
 #include <gtest/gtest.h>
 
@@ -35,8 +36,7 @@ struct event_to_audio_processor_test : testing::Test
     audio::engine::event_buffer<float> ev_in_buf{ev_buf_pmr_mem};
     audio::engine::event_input_buffers ev_in_bufs;
     audio::engine::event_output_buffers ev_out_bufs;
-    static constexpr std::size_t const buffer_size{
-            default_smooth_length * 2};
+    static constexpr std::size_t const buffer_size{default_smooth_length * 2};
     std::array<float, buffer_size> out0;
     std::array<std::span<float>, 1> outputs{out0};
     std::array<audio_slice, 1> results;
@@ -106,15 +106,11 @@ TEST_F(event_to_audio_processor_test, rampup_inside_buffer)
 
     EXPECT_TRUE(algorithm::all_of_adjacent(
             std::next(out0.begin(), offset),
-            std::next(
-                    out0.begin(),
-                    offset + default_smooth_length),
+            std::next(out0.begin(), offset + default_smooth_length),
             std::less{}));
 
     EXPECT_TRUE(std::ranges::all_of(
-            std::next(
-                    out0.begin(),
-                    offset + default_smooth_length),
+            std::next(out0.begin(), offset + default_smooth_length),
             out0.end(),
             equal_to(1.f)));
 }

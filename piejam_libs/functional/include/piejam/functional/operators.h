@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <boost/hof/returns.hpp>
+
 #include <functional>
 
 namespace piejam
@@ -38,5 +40,11 @@ inline constexpr auto less = detail::compare<std::less<>>{};
 inline constexpr auto less_equal = detail::compare<std::less_equal<>>{};
 inline constexpr auto greater = detail::compare<std::greater<>>{};
 inline constexpr auto greater_equal = detail::compare<std::greater_equal<>>{};
+
+inline constexpr auto indirection_op =
+        [](auto&& v) BOOST_HOF_RETURNS(*std::forward<decltype(v)>(v));
+
+inline constexpr auto addressof_op =
+        [](auto&& v) BOOST_HOF_RETURNS(&std::forward<decltype(v)>(v));
 
 } // namespace piejam

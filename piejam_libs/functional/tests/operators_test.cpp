@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/functional/compare.h>
+#include <piejam/functional/operators.h>
 
 #include <gtest/gtest.h>
 
@@ -69,6 +69,31 @@ TEST(partial_compare, greater_equal)
     EXPECT_FALSE(greater_equal(4, 5));
     EXPECT_TRUE(greater_equal(5, 5));
     EXPECT_TRUE(greater_equal(6, 5));
+}
+
+TEST(indirection_op, static_asserts)
+{
+    int* a{};
+    int* const b{};
+    int const* c{};
+    int const* const d{};
+    static_assert(std::is_same_v<int&, decltype(indirection_op(a))>);
+    static_assert(std::is_same_v<int&, decltype(indirection_op(b))>);
+    static_assert(std::is_same_v<int const&, decltype(indirection_op(c))>);
+    static_assert(std::is_same_v<int const&, decltype(indirection_op(d))>);
+
+    using p_t = int*;
+    static_assert(std::is_same_v<int&, decltype(indirection_op(p_t{}))>);
+}
+
+TEST(indirection_op, derefs_a_pointer)
+{
+    int x{5};
+    int* const b = &x;
+    int const* const d = &x;
+
+    EXPECT_EQ(5, indirection_op(b));
+    EXPECT_EQ(5, indirection_op(d));
 }
 
 } // namespace piejam::test

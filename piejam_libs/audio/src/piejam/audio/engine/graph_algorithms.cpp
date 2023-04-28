@@ -12,7 +12,7 @@
 #include <piejam/audio/engine/processor.h>
 
 #include <piejam/algorithm/contains.h>
-#include <piejam/functional/compare.h>
+#include <piejam/functional/operators.h>
 
 #include <boost/assert.hpp>
 #include <boost/range/iterator_range_core.hpp>
