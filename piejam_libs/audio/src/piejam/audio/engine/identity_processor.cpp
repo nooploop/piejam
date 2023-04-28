@@ -5,6 +5,7 @@
 #include <piejam/audio/engine/identity_processor.h>
 
 #include <piejam/audio/engine/named_processor.h>
+#include <piejam/audio/engine/verify_process_context.h>
 
 #include <boost/assert.hpp>
 
@@ -31,6 +32,7 @@ public:
     {
         return 1;
     }
+
     [[nodiscard]] auto num_outputs() const noexcept -> std::size_t override
     {
         return 1;
@@ -40,16 +42,21 @@ public:
     {
         return {};
     }
+
     [[nodiscard]] auto event_outputs() const noexcept -> event_ports override
     {
         return {};
     }
 
-    void process(process_context const&) override
+    void process(process_context const& ctx) override
     {
         BOOST_ASSERT_MSG(
                 false,
                 "Should be removed from graph before executing.");
+
+        verify_process_context(*this, ctx);
+
+        ctx.results[0] = ctx.inputs[0];
     }
 };
 
