@@ -11,6 +11,7 @@
 #include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/BusConfig.h>
+#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChain.h>
@@ -101,6 +102,14 @@ runRegistration()
             1,
             0,
             "StereoChannel",
+            "Not creatable as it is an enum type");
+
+    qRegisterMetaType<piejam::gui::model::BusType>();
+    qmlRegisterUncreatableType<piejam::gui::model::BusTypeClass>(
+            "PieJam.Models",
+            1,
+            0,
+            "BusType",
             "Not creatable as it is an enum type");
 
     qmlRegisterSingletonInstance<piejam::gui::model::MixerDbScales>(

@@ -18,7 +18,7 @@ class StereoChannelClass
     StereoChannelClass() noexcept = default;
 
 public:
-    enum Value
+    enum class Value
     {
         Left,
         Right,

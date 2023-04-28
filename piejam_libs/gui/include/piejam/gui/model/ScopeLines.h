@@ -17,17 +17,36 @@ namespace piejam::gui::model
 class ScopeLines
 {
 public:
-    bool empty() const noexcept { return m_data.empty(); }
-    auto size() const noexcept -> std::size_t { return m_data.size() / 2; }
+    [[nodiscard]] auto empty() const noexcept -> bool
+    {
+        return m_data.empty();
+    }
 
-    constexpr auto ys() const noexcept -> std::vector<float> const&
+    [[nodiscard]] auto size() const noexcept -> std::size_t
+    {
+        return m_data.size() / 2;
+    }
+
+    [[nodiscard]] constexpr auto ys() const noexcept
+            -> std::vector<float> const&
     {
         return m_data;
     }
 
-    void clear() { m_data.clear(); }
-    void resize(std::size_t const sz) { m_data.resize(sz * 2, 0.f); }
-    void reserve(std::size_t const capacity) { m_data.reserve(capacity * 2); }
+    void clear()
+    {
+        m_data.clear();
+    }
+
+    void resize(std::size_t const sz)
+    {
+        m_data.resize(sz * 2, 0.f);
+    }
+
+    void reserve(std::size_t const capacity)
+    {
+        m_data.reserve(capacity * 2);
+    }
 
     void push_back(float const y0, float const y1)
     {
@@ -43,7 +62,8 @@ public:
         algorithm::shift_push_back(m_data, other.m_data);
     }
 
-    bool operator==(ScopeLines const&) const noexcept = default;
+    [[nodiscard]] auto operator==(ScopeLines const&) const noexcept
+            -> bool = default;
 
 private:
     std::vector<float> m_data;
