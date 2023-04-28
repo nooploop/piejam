@@ -10,6 +10,7 @@ add_executable(piejam_functional_test
     ${CMAKE_CURRENT_SOURCE_DIR}/compare_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/deref_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/get_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/get_if_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/memo_test.cpp
 )
 target_link_libraries(piejam_functional_test gtest_driver piejam_functional)

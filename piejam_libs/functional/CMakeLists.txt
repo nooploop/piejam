@@ -10,6 +10,7 @@ target_sources(piejam_functional INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/compare.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/deref.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/get.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/get_if.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/functional/memo.h
 )
 
