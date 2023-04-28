@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/algorithm/string_join.h>
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/lockstep_events.h>
 #include <piejam/audio/engine/named_processor.h>
@@ -24,29 +23,49 @@ namespace piejam::audio::engine
 template <class OutputGenerator>
 class event_converter_processor final : public named_processor
 {
-public:
-    using output_t = std::decay_t<
-            boost::callable_traits::return_type_t<OutputGenerator>>;
+    template <class T>
+    struct get_outputs_t
+    {
+        using type = std::tuple<T>;
+    };
+
+    template <class... T>
+    struct get_outputs_t<std::tuple<T...>>
+    {
+        using type = tuple::decay_elements_t<std::tuple<T...>>;
+    };
+
+    using outputs_t = typename get_outputs_t<std::decay_t<
+            boost::callable_traits::return_type_t<OutputGenerator>>>::type;
     using inputs_t = tuple::decay_elements_t<
             boost::callable_traits::args_t<OutputGenerator>>;
 
-    static constexpr std::size_t num_event_inputs = std::tuple_size_v<inputs_t>;
+    static inline constexpr std::size_t num_event_inputs{
+            std::tuple_size_v<inputs_t>};
+    static inline constexpr std::size_t num_event_outputs{
+            std::tuple_size_v<outputs_t>};
 
     static_assert(num_event_inputs > 0);
 
+    static inline constexpr auto input_index_sequence{
+            std::make_index_sequence<num_event_inputs>{}};
+    static inline constexpr auto output_index_sequence{
+            std::make_index_sequence<num_event_outputs>{}};
+
+public:
     template <class F>
     event_converter_processor(
             F&& out_gen,
             std::span<std::string_view const> const input_names = {},
-            std::string_view const output_name = {},
+            std::span<std::string_view const> const output_names = {},
             std::string_view const name = {})
         : named_processor(name)
         , m_out_gen(std::forward<F>(out_gen))
-        , m_input_event_ports(make_input_event_ports(
-                  input_names,
-                  make_input_index_sequence()))
-        , m_output_event_ports(
-                  {event_port(std::in_place_type<output_t>, output_name)})
+        , m_input_event_ports(
+                  make_event_ports<inputs_t>(input_names, input_index_sequence))
+        , m_output_event_ports(make_event_ports<outputs_t>(
+                  output_names,
+                  output_index_sequence))
     {
     }
 
@@ -59,6 +78,7 @@ public:
     {
         return 0;
     }
+
     auto num_outputs() const noexcept -> std::size_t override
     {
         return 0;
@@ -78,44 +98,53 @@ public:
     {
         verify_process_context(*this, ctx);
 
-        process_events(ctx, make_input_index_sequence());
+        process_events(ctx);
     }
 
 private:
-    template <std::size_t... I>
-    void process_events(
-            process_context const& ctx,
-            std::index_sequence<I...> indices)
+    template <class... T>
+    void send_result(
+            std::tuple<event_buffer<T>&...> const& out_bufs,
+            std::size_t offset,
+            std::tuple<T...> result)
     {
-        auto in_bufs = get_input_buffers(ctx, indices);
-        auto& out_buf = ctx.event_outputs.get<output_t>(0);
+        std::apply(
+                [&, offset](event_buffer<T>&... out_buf) {
+                    std::apply(
+                            [&, offset](T const&... v) {
+                                (out_buf.insert(offset, v), ...);
+                            },
+                            result);
+                },
+                out_bufs);
+    }
+
+    void process_events(process_context const& ctx)
+    {
+        auto in_bufs = get_input_buffers(ctx, input_index_sequence);
+        auto out_bufs = get_output_buffers(ctx, output_index_sequence);
 
         m_last = lockstep_events(
-                [this, &out_buf](std::size_t offset, auto&&... args) {
-                    out_buf.insert(
+                [&]<class... Args>(std::size_t offset, Args&&... args) {
+                    send_result(
+                            out_bufs,
                             offset,
-                            std::invoke(
+                            std::tuple{std::invoke(
                                     m_out_gen,
-                                    std::forward<decltype(args)>(args)...));
+                                    std::forward<Args>(args)...)});
                 },
                 m_last,
-                std::get<I>(in_bufs)...);
+                in_bufs);
     }
 
-    static auto make_input_index_sequence()
-    {
-        return std::make_index_sequence<num_event_inputs>{};
-    }
-
-    template <std::size_t... I>
-    static auto make_input_event_ports(
+    template <class TypesTuple, std::size_t... I>
+    static auto make_event_ports(
             std::span<std::string_view const> const names,
             std::index_sequence<I...>)
     {
-        std::size_t const num_names = names.size();
-        return std::array{event_port(
-                std::in_place_type<std::tuple_element_t<I, inputs_t>>,
-                I < num_names ? names[I] : std::string())...};
+        return std::array{event_port{
+                std::in_place_type<std::tuple_element_t<I, TypesTuple>>,
+                I < names.size() ? names[I] : std::string_view{}}...};
     }
 
     template <std::size_t... I>
@@ -126,9 +155,18 @@ private:
                 ctx.event_inputs.get<std::tuple_element_t<I, inputs_t>>(I)...);
     }
 
+    template <std::size_t... I>
+    static auto
+    get_output_buffers(process_context const& ctx, std::index_sequence<I...>)
+    {
+        return std::forward_as_tuple(
+                ctx.event_outputs.get<std::tuple_element_t<I, outputs_t>>(
+                        I)...);
+    }
+
     OutputGenerator m_out_gen;
     std::array<event_port, num_event_inputs> m_input_event_ports;
-    std::array<event_port, 1> m_output_event_ports;
+    std::array<event_port, num_event_outputs> m_output_event_ports;
     inputs_t m_last;
 };
 
@@ -143,13 +181,13 @@ template <class F>
 event_converter_processor(
         F&&,
         std::span<std::string_view const>,
-        std::string_view) -> event_converter_processor<F>;
+        std::span<std::string_view const>) -> event_converter_processor<F>;
 
 template <class F>
 event_converter_processor(
         F&&,
         std::span<std::string_view const>,
-        std::string_view,
+        std::span<std::string_view const>,
         std::string_view) -> event_converter_processor<F>;
 
 template <class F>
@@ -157,7 +195,7 @@ auto
 make_event_converter_processor(
         F&& f,
         std::span<std::string_view const> const input_names = {},
-        std::string_view const output_name = {},
+        std::span<std::string_view const> const output_name = {},
         std::string_view const name = {}) -> std::unique_ptr<processor>
 {
     return std::make_unique<event_converter_processor<F>>(

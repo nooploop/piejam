@@ -66,16 +66,19 @@ private:
     static auto make_stereo_level_converter()
             -> std::unique_ptr<engine::processor>
     {
-        static std::array const s_port_names{
-                std::string_view("level l"),
-                std::string_view("level r")};
+        using namespace std::string_view_literals;
+        static constexpr std::array const s_input_names{
+                "level l"sv,
+                "level r"sv};
+        static constexpr std::array const s_output_names{"stereo_level"sv};
+
         return std::unique_ptr<engine::processor>{
                 new engine::event_converter_processor(
                         [](float l, float r) -> pair<float> {
                             return {l, r};
                         },
-                        std::span(s_port_names),
-                        "stereo_level")};
+                        s_input_names,
+                        s_output_names)};
     }
 
     std::unique_ptr<engine::processor> m_left_lm_proc;

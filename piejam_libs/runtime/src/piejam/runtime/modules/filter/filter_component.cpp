@@ -88,21 +88,18 @@ make_coefficients(
 {
     using make_t = typename boost::mp11::
             mp_map_find<tag_make_coefficients_map, Tag>::second_type;
-    return event_value{
-            .tp = tag,
-            .coeffs = make_t::value(cutoff, res, inv_sr)};
+    return event_value{.tp = tag, .coeffs = make_t::value(cutoff, res, inv_sr)};
 }
 
 auto
 make_coefficent_converter_processor(audio::sample_rate const sample_rate)
 {
-    static constexpr std::string_view s_type_name = "type";
-    static constexpr std::string_view s_cutoff_name = "cutoff";
-    static constexpr std::string_view s_res_name = "res";
-    static constexpr std::array s_converter_input_names{
-            s_type_name,
-            s_cutoff_name,
-            s_res_name};
+    using namespace std::string_view_literals;
+    static constexpr std::array const s_input_names{
+            "type"sv,
+            "cutoff"sv,
+            "res"sv};
+    static constexpr std::array const s_output_names{"coeffs"sv};
     return audio::engine::make_event_converter_processor(
             [inv_sr = 1.f / sample_rate.as_float()](
                     int const type,
@@ -159,15 +156,14 @@ make_coefficent_converter_processor(audio::sample_rate const sample_rate)
                         return event_value{};
                 }
             },
-            std::span(s_converter_input_names),
-            "coeffs",
+            s_input_names,
+            s_output_names,
             "make_coeff");
 }
 
 class processor final
     : public audio::engine::named_processor
-    , public audio::engine::
-              single_event_input_processor<processor, event_value>
+    , public audio::engine::single_event_input_processor<processor, event_value>
 {
 public:
     processor(std::string_view const name)
