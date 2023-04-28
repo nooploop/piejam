@@ -29,13 +29,13 @@ namespace piejam::runtime
 namespace
 {
 
-struct volume_low_db_interval
+struct volume_low_dB_interval
 {
     static constexpr float min = -60.f;
     static constexpr float max = -12.f;
 };
 
-struct volume_high_db_interval
+struct volume_high_dB_interval
 {
     static constexpr float min = -12.f;
     static constexpr float max = 12.f;
@@ -45,14 +45,20 @@ constexpr auto
 to_normalized_volume(float_parameter const& p, float const value)
 {
     if (value == 0.f)
+    {
         return 0.f;
+    }
     else if (0.f < value && value < 0.0625f)
-        return parameter::to_normalized_db<volume_low_db_interval>(p, value) /
+    {
+        return parameter::to_normalized_dB<volume_low_dB_interval>(p, value) /
                4.f;
+    }
     else
-        return (parameter::to_normalized_db<volume_high_db_interval>(p, value) *
+    {
+        return (parameter::to_normalized_dB<volume_high_dB_interval>(p, value) *
                 0.75f) +
                0.25f;
+    }
 }
 
 constexpr auto
@@ -60,15 +66,21 @@ from_normalized_volume(float_parameter const& p, float const norm_value)
         -> float
 {
     if (norm_value == 0.f)
+    {
         return 0.f;
+    }
     else if (0.f < norm_value && norm_value < 0.25f)
-        return parameter::from_normalized_db<volume_low_db_interval>(
+    {
+        return parameter::from_normalized_dB<volume_low_dB_interval>(
                 p,
                 4.f * norm_value);
+    }
     else
-        return parameter::from_normalized_db<volume_high_db_interval>(
+    {
+        return parameter::from_normalized_dB<volume_high_dB_interval>(
                 p,
                 (norm_value - 0.25f) / 0.75f);
+    }
 }
 
 } // namespace
@@ -480,12 +492,16 @@ add_device_bus(
                 if (io_dir == io_direction::input)
                 {
                     if (mixer_channel.in == route_name)
+                    {
                         mixer_channel.in = mixer::io_address_t(id);
+                    }
                 }
                 else
                 {
                     if (mixer_channel.out == route_name)
+                    {
                         mixer_channel.out = mixer::io_address_t(id);
+                    }
                 }
             });
 
@@ -559,10 +575,14 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
                                            mixer::channel_id,
                                            mixer::channel& mixer_channel) {
         if (mixer_channel.in == mixer::io_address_t(mixer_channel_id))
+        {
             mixer_channel.in = {};
+        }
 
         if (mixer_channel.out == mixer::io_address_t(mixer_channel_id))
+        {
             mixer_channel.out = {};
+        }
     });
 }
 
@@ -575,10 +595,14 @@ remove_device_bus(state& st, device_io::bus_id const device_bus_id)
             [device_bus_id,
              &name](mixer::channel_id, mixer::channel& mixer_channel) {
                 if (mixer_channel.in == mixer::io_address_t(device_bus_id))
+                {
                     mixer_channel.in = mixer::missing_device_address(name);
+                }
 
                 if (mixer_channel.out == mixer::io_address_t(device_bus_id))
+                {
                     mixer_channel.out = mixer::missing_device_address(name);
+                }
             });
 
     st.device_io_state.buses.remove(device_bus_id);

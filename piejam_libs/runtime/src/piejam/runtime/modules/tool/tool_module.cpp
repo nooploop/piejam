@@ -55,9 +55,9 @@ make_module(fx::parameters_t& fx_params, parameter_maps& params) -> fx::module
                     .min = gain_defaults::min,
                     .max = gain_defaults::max,
                     .to_normalized =
-                            runtime::parameter::to_normalized_db<dB_ival>,
+                            runtime::parameter::to_normalized_dB<dB_ival>,
                     .from_normalized =
-                            &runtime::parameter::from_normalized_db<dB_ival>});
+                            &runtime::parameter::from_normalized_dB<dB_ival>});
     fx_params.emplace(
             gain_param_id,
             fx::parameter{
