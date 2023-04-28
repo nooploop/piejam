@@ -11,7 +11,14 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/smoother_processor.h>
 
+#include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/range/iota.h>
+#include <piejam/range/zip.h>
+
 #include <fmt/format.h>
+
+#include <boost/assert.hpp>
+#include <boost/range/adaptor/indirected.hpp>
 
 #include <array>
 
@@ -21,14 +28,54 @@ namespace piejam::audio::components
 namespace
 {
 
-class mono_amplifier final : public engine::component
+auto
+format_name(
+        std::string_view name,
+        std::string_view param,
+        std::size_t ch,
+        std::size_t num_channels)
+{
+    switch (num_channels)
+    {
+        case 1:
+            return fmt::format("{} {} M", name, param);
+
+        case 2:
+            switch (ch)
+            {
+                case 0:
+                    return fmt::format("{} {} L", name, param);
+                case 1:
+                    return fmt::format("{} {} R", name, param);
+                default:
+                    BOOST_ASSERT(false);
+                    return fmt::format("{} {}", name, param);
+            }
+
+        default:
+            return fmt::format("{} {} {}", name, param, ch);
+    }
+}
+
+//! amplifies with same gain all channels
+class amplifier final : public engine::component
 {
 public:
-    mono_amplifier(std::string_view name)
-        : m_gain_proc(engine::make_smoother_processor(
+    amplifier(std::size_t num_channels, std::string_view name)
+        : m_gain_proc{engine::make_smoother_processor(
                   engine::default_smooth_length,
-                  fmt::format("{} gain", name)))
-        , m_amp_proc(engine::make_multiply_processor(2, name))
+                  fmt::format("{} gain", name))}
+        , m_amp_procs{algorithm::transform_to_vector(
+                  range::iota(num_channels),
+                  [=](auto ch) {
+                      return engine::make_multiply_processor(
+                              2,
+                              format_name(name, "amp", ch, num_channels));
+                  })}
+        , m_inputs{algorithm::transform_to_vector(
+                  m_amp_procs | boost::adaptors::indirected,
+                  engine::make_graph_endpoint<0>)}
+        , m_outputs{m_inputs}
     {
     }
 
@@ -54,31 +101,47 @@ public:
 
     void connect(engine::graph& g) const override
     {
-        g.audio.insert({*m_gain_proc, 0}, {*m_amp_proc, 1});
+        for (auto const& amp_proc : m_amp_procs)
+        {
+            g.audio.insert({*m_gain_proc, 0}, {*amp_proc, 1});
+        }
     }
 
 private:
     std::unique_ptr<engine::processor> m_gain_proc;
-    std::unique_ptr<engine::processor> m_amp_proc;
+    std::vector<std::unique_ptr<engine::processor>> m_amp_procs;
 
-    std::array<engine::graph_endpoint, 1> m_inputs{{{*m_amp_proc, 0}}};
-    std::array<engine::graph_endpoint, 1> m_outputs{{{*m_amp_proc, 0}}};
+    std::vector<engine::graph_endpoint> m_inputs;
+    std::vector<engine::graph_endpoint> m_outputs;
     std::array<engine::graph_endpoint, 1> m_event_inputs{{{*m_gain_proc, 0}}};
 };
 
-class stereo_amplifier final : public engine::component
+//! amplifies every channel with it's own gain
+class split_amplifier final : public engine::component
 {
 public:
-    stereo_amplifier(std::string_view name)
-        : m_gain_proc(engine::make_smoother_processor(
-                  engine::default_smooth_length,
-                  fmt::format("{} gain", name)))
-        , m_left_amp_proc(engine::make_multiply_processor(
-                  2,
-                  fmt::format("{} amp L", name)))
-        , m_right_amp_proc(engine::make_multiply_processor(
-                  2,
-                  fmt::format("{} amp R", name)))
+    split_amplifier(std::size_t num_channels, std::string_view name)
+        : m_gain_procs{algorithm::transform_to_vector(
+                  range::iota(num_channels),
+                  [=](auto ch) {
+                      return engine::make_smoother_processor(
+                              engine::default_smooth_length,
+                              format_name(name, "gain", ch, num_channels));
+                  })}
+        , m_amp_procs{algorithm::transform_to_vector(
+                  range::iota(num_channels),
+                  [=](auto ch) {
+                      return engine::make_multiply_processor(
+                              2,
+                              format_name(name, "amp", ch, num_channels));
+                  })}
+        , m_inputs{algorithm::transform_to_vector(
+                  m_amp_procs | boost::adaptors::indirected,
+                  engine::make_graph_endpoint<0>)}
+        , m_outputs{m_inputs}
+        , m_event_inputs{algorithm::transform_to_vector(
+                  m_gain_procs | boost::adaptors::indirected,
+                  engine::make_graph_endpoint<0>)}
     {
     }
 
@@ -104,101 +167,56 @@ public:
 
     void connect(engine::graph& g) const override
     {
-        g.audio.insert({*m_gain_proc, 0}, {*m_left_amp_proc, 1});
-        g.audio.insert({*m_gain_proc, 0}, {*m_right_amp_proc, 1});
+        for (auto const& [gain_proc, amp_proc] :
+             range::zip(m_gain_procs, m_amp_procs))
+        {
+            g.audio.insert({*gain_proc, 0}, {*amp_proc, 1});
+        }
     }
 
 private:
-    std::unique_ptr<engine::processor> m_gain_proc;
-    std::unique_ptr<engine::processor> m_left_amp_proc;
-    std::unique_ptr<engine::processor> m_right_amp_proc;
+    std::vector<std::unique_ptr<engine::processor>> m_gain_procs;
+    std::vector<std::unique_ptr<engine::processor>> m_amp_procs;
 
-    std::array<engine::graph_endpoint, 2> m_inputs{
-            {{*m_left_amp_proc, 0}, {*m_right_amp_proc, 0}}};
-    std::array<engine::graph_endpoint, 2> m_outputs{
-            {{*m_left_amp_proc, 0}, {*m_right_amp_proc, 0}}};
-    std::array<engine::graph_endpoint, 1> m_event_inputs{{{*m_gain_proc, 0}}};
-};
-
-class stereo_split_amplifier final : public engine::component
-{
-public:
-    stereo_split_amplifier(std::string_view name)
-        : m_left_gain_proc(engine::make_smoother_processor(
-                  engine::default_smooth_length,
-                  fmt::format("{} gain L", name)))
-        , m_right_gain_proc(engine::make_smoother_processor(
-                  engine::default_smooth_length,
-                  fmt::format("{} gain R", name)))
-        , m_left_amp_proc(engine::make_multiply_processor(
-                  2,
-                  fmt::format("{} amp L", name)))
-        , m_right_amp_proc(engine::make_multiply_processor(
-                  2,
-                  fmt::format("{} amp R", name)))
-    {
-    }
-
-    [[nodiscard]] auto inputs() const -> endpoints override
-    {
-        return m_inputs;
-    }
-
-    [[nodiscard]] auto outputs() const -> endpoints override
-    {
-        return m_outputs;
-    }
-
-    [[nodiscard]] auto event_inputs() const -> endpoints override
-    {
-        return m_event_inputs;
-    }
-
-    [[nodiscard]] auto event_outputs() const -> endpoints override
-    {
-        return {};
-    }
-
-    void connect(engine::graph& g) const override
-    {
-        g.audio.insert({*m_left_gain_proc, 0}, {*m_left_amp_proc, 1});
-        g.audio.insert({*m_right_gain_proc, 0}, {*m_right_amp_proc, 1});
-    }
-
-private:
-    std::unique_ptr<engine::processor> m_left_gain_proc;
-    std::unique_ptr<engine::processor> m_right_gain_proc;
-    std::unique_ptr<engine::processor> m_left_amp_proc;
-    std::unique_ptr<engine::processor> m_right_amp_proc;
-
-    std::array<engine::graph_endpoint, 2> m_inputs{
-            {{*m_left_amp_proc, 0}, {*m_right_amp_proc, 0}}};
-    std::array<engine::graph_endpoint, 2> m_outputs{
-            {{*m_left_amp_proc, 0}, {*m_right_amp_proc, 0}}};
-    std::array<engine::graph_endpoint, 2> m_event_inputs{
-            {{*m_left_gain_proc, 0}, {*m_right_gain_proc, 0}}};
+    std::vector<engine::graph_endpoint> m_inputs;
+    std::vector<engine::graph_endpoint> m_outputs;
+    std::vector<engine::graph_endpoint> m_event_inputs;
 };
 
 } // namespace
 
 auto
+make_amplifier(std::size_t num_channels, std::string_view name)
+        -> std::unique_ptr<engine::component>
+{
+    return std::make_unique<amplifier>(num_channels, name);
+}
+
+auto
 make_mono_amplifier(std::string_view name) -> std::unique_ptr<engine::component>
 {
-    return std::make_unique<mono_amplifier>(name);
+    return make_amplifier(1, name);
 }
 
 auto
 make_stereo_amplifier(std::string_view name)
         -> std::unique_ptr<engine::component>
 {
-    return std::make_unique<stereo_amplifier>(name);
+    return make_amplifier(2, name);
+}
+
+auto
+make_split_amplifier(std::size_t num_channels, std::string_view name)
+        -> std::unique_ptr<engine::component>
+{
+    return std::make_unique<split_amplifier>(num_channels, name);
 }
 
 auto
 make_stereo_split_amplifier(std::string_view name)
         -> std::unique_ptr<engine::component>
 {
-    return std::make_unique<stereo_split_amplifier>(name);
+    return make_split_amplifier(2, name);
 }
 
 } // namespace piejam::audio::components
