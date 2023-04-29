@@ -19,7 +19,6 @@ auto make_module(
         ladspa::instance_id,
         std::string const& name,
         std::span<piejam::ladspa::port_descriptor const> control_inputs,
-        fx::parameters_t&,
-        parameter_maps&) -> fx::module;
+        fx_parameter_factory const&) -> fx::module;
 
 } // namespace piejam::runtime::modules::ladspa_fx

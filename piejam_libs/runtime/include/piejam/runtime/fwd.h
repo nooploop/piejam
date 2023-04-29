@@ -38,6 +38,8 @@ class parameter_maps;
 using parameter_processor_factory = boost::mp11::
         mp_rename<parameters_t, processors::parameter_processor_factory>;
 
+class fx_parameter_factory;
+
 struct midi_device_config;
 
 struct midi_assignment;

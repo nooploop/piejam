@@ -6,7 +6,8 @@
 
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/parameters.h>
+
+#include <piejam/audio/types.h>
 
 namespace piejam::runtime::modules::tool
 {
@@ -16,6 +17,6 @@ enum class parameter_key : fx::parameter_key
     gain
 };
 
-auto make_module(fx::parameters_t&, parameter_maps&) -> fx::module;
+auto make_module(fx_parameter_factory const&) -> fx::module;
 
 } // namespace piejam::runtime::modules::tool

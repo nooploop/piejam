@@ -8,6 +8,7 @@
 #include <piejam/indexed_access.h>
 #include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/fx/parameter.h>
+#include <piejam/runtime/fx_parameter_factory.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
@@ -170,35 +171,9 @@ period_counts_from_state(state const& state) -> audio::period_counts_t
 }
 
 static auto
-make_fx_tool(
-        fx::modules_t& fx_modules,
-        fx::parameters_t& fx_params,
-        parameter_maps& params)
+make_internal_fx_module(fx::modules_t& fx_modules, fx::module&& fx_mod)
 {
-    return fx_modules.add(modules::tool::make_module(fx_params, params));
-}
-
-static auto
-make_fx_filter(
-        fx::modules_t& fx_modules,
-        fx::parameters_t& fx_params,
-        parameter_maps& params,
-        audio_streams_cache& streams)
-{
-    return fx_modules.add(
-            modules::filter::make_module(fx_params, params, streams));
-}
-
-static auto
-make_fx_scope(fx::modules_t& fx_modules, audio_streams_cache& streams)
-{
-    return fx_modules.add(modules::scope::make_module(streams));
-}
-
-static auto
-make_fx_spectrum(fx::modules_t& fx_modules, audio_streams_cache& streams)
-{
-    return fx_modules.add(modules::spectrum::make_module(streams));
+    return fx_modules.add(std::move(fx_mod));
 }
 
 static void
@@ -270,41 +245,52 @@ apply_fx_midi_assignments(
 auto
 insert_internal_fx_module(
         state& st,
-        mixer::channel_id const bus_id,
+        mixer::channel_id const mixer_channel_id,
         std::size_t const position,
         fx::internal const fx_type,
         std::vector<fx::parameter_value_assignment> const& initial_assignments,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> fx::module_id
 {
-    BOOST_ASSERT(bus_id != mixer::channel_id{});
+    BOOST_ASSERT(mixer_channel_id.valid());
 
-    fx::chain_t fx_chain = st.mixer_state.channels[bus_id].fx_chain;
+    mixer::channel const& mixer_channel =
+            st.mixer_state.channels[mixer_channel_id];
+
+    fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
     fx::parameters_t fx_params = st.fx_parameters;
+
+    fx_parameter_factory fx_params_factory{st.params, fx_params};
 
     fx::module_id fx_mod_id;
     switch (fx_type)
     {
         case fx::internal::tool:
-            fx_mod_id = make_fx_tool(st.fx_modules, fx_params, st.params);
+            fx_mod_id = make_internal_fx_module(
+                    st.fx_modules,
+                    modules::tool::make_module(fx_params_factory));
             break;
 
         case fx::internal::filter:
-            fx_mod_id = make_fx_filter(
+            fx_mod_id = make_internal_fx_module(
                     st.fx_modules,
-                    fx_params,
-                    st.params,
-                    st.streams);
+                    modules::filter::make_module(
+                            fx_params_factory,
+                            st.streams));
             break;
 
         case fx::internal::scope:
-            fx_mod_id = make_fx_scope(st.fx_modules, st.streams);
+            fx_mod_id = make_internal_fx_module(
+                    st.fx_modules,
+                    modules::scope::make_module(st.streams));
             break;
 
         case fx::internal::spectrum:
-            fx_mod_id = make_fx_spectrum(st.fx_modules, st.streams);
+            fx_mod_id = make_internal_fx_module(
+                    st.fx_modules,
+                    modules::spectrum::make_module(st.streams));
             break;
     }
 
@@ -317,9 +303,11 @@ insert_internal_fx_module(
     apply_parameter_values(initial_assignments, fx_mod, st.params);
     apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
 
-    st.mixer_state.channels.update(bus_id, [&](mixer::channel& mixer_channel) {
-        mixer_channel.fx_chain = std::move(fx_chain);
-    });
+    st.mixer_state.channels.update(
+            mixer_channel_id,
+            [&](mixer::channel& mixer_channel) {
+                mixer_channel.fx_chain = std::move(fx_chain);
+            });
 
     return fx_mod_id;
 }
@@ -348,8 +336,7 @@ insert_ladspa_fx_module(
                     instance_id,
                     plugin_desc.name,
                     control_inputs,
-                    fx_params,
-                    st.params)));
+                    fx_parameter_factory{st.params, fx_params})));
 
     st.fx_parameters = std::move(fx_params);
 

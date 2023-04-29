@@ -9,6 +9,8 @@
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/parameters.h>
 
+#include <piejam/audio/types.h>
+
 namespace piejam::runtime::modules::filter
 {
 
@@ -36,7 +38,8 @@ enum class stream_key : fx::stream_key
     in_out
 };
 
-auto make_module(fx::parameters_t&, parameter_maps&, audio_streams_cache&)
+auto
+make_module(fx_parameter_factory const&, audio_streams_cache&)
         -> fx::module;
 
 } // namespace piejam::runtime::modules::filter
