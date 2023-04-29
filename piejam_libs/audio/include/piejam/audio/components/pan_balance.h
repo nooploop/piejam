@@ -12,6 +12,8 @@
 namespace piejam::audio::components
 {
 
+auto make_pan(std::string_view name = {}) -> std::unique_ptr<engine::component>;
+
 auto make_stereo_balance(std::string_view name = {})
         -> std::unique_ptr<engine::component>;
 

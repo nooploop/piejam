@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/components/pan.h>
+#include <piejam/audio/components/pan_balance.h>
 
 #include <piejam/audio/engine/component.h>
 

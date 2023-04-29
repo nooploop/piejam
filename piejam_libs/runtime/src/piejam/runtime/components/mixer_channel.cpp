@@ -6,8 +6,7 @@
 
 #include <piejam/audio/components/amplifier.h>
 #include <piejam/audio/components/level_meter.h>
-#include <piejam/audio/components/pan.h>
-#include <piejam/audio/components/stereo_balance.h>
+#include <piejam/audio/components/pan_balance.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_algorithms.h>
@@ -44,13 +43,21 @@ public:
     {
         return m_pan_balance->inputs();
     }
+
     auto outputs() const -> endpoints override
     {
         return m_pan_balance->outputs();
     }
 
-    auto event_inputs() const -> endpoints override { return {}; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    auto event_inputs() const -> endpoints override
+    {
+        return {};
+    }
+
+    auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(audio::engine::graph& g) const override
     {
@@ -87,14 +94,25 @@ public:
     {
     }
 
-    auto inputs() const -> endpoints override { return m_volume_amp->inputs(); }
+    auto inputs() const -> endpoints override
+    {
+        return m_volume_amp->inputs();
+    }
+
     auto outputs() const -> endpoints override
     {
         return m_mute_solo->outputs();
     }
 
-    auto event_inputs() const -> endpoints override { return m_event_inputs; }
-    auto event_outputs() const -> endpoints override { return {}; }
+    auto event_inputs() const -> endpoints override
+    {
+        return m_event_inputs;
+    }
+
+    auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(audio::engine::graph& g) const override
     {
