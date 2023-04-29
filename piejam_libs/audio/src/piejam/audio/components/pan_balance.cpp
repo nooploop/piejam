@@ -8,6 +8,7 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_endpoint.h>
+#include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/pan_balance_processor.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/pair.h>
@@ -57,15 +58,21 @@ public:
     {
         m_amp_comp->connect(g);
 
-        g.event.insert({*m_param_proc, 0}, m_amp_comp->event_inputs()[0]);
-        g.event.insert({*m_param_proc, 1}, m_amp_comp->event_inputs()[1]);
+        using namespace engine::endpoint_indices;
+        engine::connect_event(
+                g,
+                *m_param_proc,
+                from<0, 1>{},
+                *m_amp_comp,
+                to<0, 1>{});
     }
 
 private:
     std::unique_ptr<engine::processor> m_param_proc;
     std::unique_ptr<engine::component> m_amp_comp;
 
-    std::array<engine::graph_endpoint, 1> m_event_inputs{{{*m_param_proc, 0}}};
+    std::array<engine::graph_endpoint, 1> m_event_inputs{
+            engine::graph_endpoint{.proc = *m_param_proc, .port = 0}};
 };
 
 } // namespace

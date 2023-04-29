@@ -28,6 +28,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_algorithms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_endpoint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_generic_algorithms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_to_dag.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/identity_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/input_processor.h

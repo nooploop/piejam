@@ -7,14 +7,17 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/event_identity_processor.h>
 #include <piejam/audio/engine/graph.h>
+#include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/processor.h>
 
 #include <piejam/algorithm/contains.h>
+#include <piejam/functional/address_compare.h>
 #include <piejam/functional/operators.h>
 
 #include <boost/assert.hpp>
+#include <boost/range/adaptor/indirected.hpp>
 #include <boost/range/iterator_range_core.hpp>
 
 #include <algorithm>
@@ -35,10 +38,8 @@ connected_source(graph::wires_map const& ws, graph_endpoint const& dst)
     {
         return it->first;
     }
-    else
-    {
-        return std::nullopt;
-    }
+
+    return std::nullopt;
 }
 
 auto
@@ -104,7 +105,7 @@ connect(graph& g,
             for (std::size_t in_index = 0; in_index < num_prev_inputs;
                  ++in_index)
             {
-                graph_endpoint prev_mixer_in{prev_mixer, in_index};
+                graph_endpoint const prev_mixer_in{prev_mixer, in_index};
                 auto const connected_in_src =
                         connected_source(g, prev_mixer_in);
                 BOOST_ASSERT(connected_in_src);
@@ -119,7 +120,7 @@ connect(graph& g,
 
             auto it_mixer = std::ranges::find_if(
                     mixers,
-                    [pma = std::addressof(prev_mixer)](auto const& m) {
+                    [pma = &prev_mixer](auto const& m) {
                         return m.get() == pma;
                     });
             BOOST_ASSERT(it_mixer != mixers.end());
@@ -145,8 +146,8 @@ connect(graph& g,
 void
 connect_stereo_components(graph& g, component const& src, component const& dst)
 {
-    g.audio.insert(src.outputs()[0], dst.inputs()[0]);
-    g.audio.insert(src.outputs()[1], dst.inputs()[1]);
+    using namespace endpoint_indices;
+    connect(g, src, stereo, dst, stereo);
 }
 
 void
@@ -156,15 +157,15 @@ connect_stereo_components(
         component const& dst,
         std::vector<std::unique_ptr<processor>>& mixers)
 {
-    connect(g, src.outputs()[0], dst.inputs()[0], mixers);
-    connect(g, src.outputs()[1], dst.inputs()[1], mixers);
+    using namespace endpoint_indices;
+    connect(g, src, stereo, dst, stereo, mixers);
 }
 
 void
 connect_stereo_components(graph& g, component const& src, processor& dst)
 {
-    g.audio.insert(src.outputs()[0], graph_endpoint{.proc = dst, .port = 0});
-    g.audio.insert(src.outputs()[1], graph_endpoint{.proc = dst, .port = 1});
+    using namespace endpoint_indices;
+    connect(g, src, stereo, dst, stereo);
 }
 
 namespace
