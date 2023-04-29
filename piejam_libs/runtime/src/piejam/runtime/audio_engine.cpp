@@ -12,6 +12,7 @@
 #include <piejam/audio/engine/dag_executor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_algorithms.h>
+#include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/graph_to_dag.h>
 #include <piejam/audio/engine/input_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
@@ -321,7 +322,7 @@ connect_fx_chain(
     algorithm::for_each_adjacent(
             fx_chain_comps,
             [&](auto const l_comp, auto const r_comp) {
-                connect_stereo_components(g, *l_comp, *r_comp, mixer_procs);
+                connect(g, *l_comp, *r_comp, mixer_procs);
             });
 }
 
@@ -344,30 +345,22 @@ connect_mixer_channel_with_fx_chain(
 
     if (fx_chain_comps.empty())
     {
-        connect_stereo_components(g, mb_in, mb_out, mixer_procs);
+        connect(g, mb_in, mb_out, mixer_procs);
 
         if (recorder)
         {
-            connect_stereo_components(g, mb_in, *recorder);
+            connect(g, mb_in, *recorder);
         }
     }
     else
     {
-        connect_stereo_components(
-                g,
-                mb_in,
-                *fx_chain_comps.front(),
-                mixer_procs);
+        connect(g, mb_in, *fx_chain_comps.front(), mixer_procs);
         connect_fx_chain(g, fx_chain_comps, mixer_procs);
-        connect_stereo_components(
-                g,
-                *fx_chain_comps.back(),
-                mb_out,
-                mixer_procs);
+        connect(g, *fx_chain_comps.back(), mb_out, mixer_procs);
 
         if (recorder)
         {
-            connect_stereo_components(g, *fx_chain_comps.back(), *recorder);
+            connect(g, *fx_chain_comps.back(), *recorder);
         }
     }
 }
@@ -418,7 +411,7 @@ connect_mixer_input(
                                         .get();
                         BOOST_ASSERT(source_mb_out);
 
-                        audio::engine::connect_stereo_components(
+                        audio::engine::connect(
                                 g,
                                 *source_mb_out,
                                 mb_in,
@@ -496,7 +489,7 @@ connect_mixer_output(
                                             .get();
                             BOOST_ASSERT(dst_mb_in);
 
-                            audio::engine::connect_stereo_components(
+                            audio::engine::connect(
                                     g,
                                     mb_out,
                                     *dst_mb_in,

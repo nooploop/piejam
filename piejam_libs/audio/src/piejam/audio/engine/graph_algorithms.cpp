@@ -141,31 +141,6 @@ connect(graph& g,
     }
 }
 
-void
-connect_stereo_components(graph& g, component const& src, component const& dst)
-{
-    using namespace endpoint_indices;
-    connect(g, src, stereo, dst, stereo);
-}
-
-void
-connect_stereo_components(
-        graph& g,
-        component const& src,
-        component const& dst,
-        std::vector<std::unique_ptr<processor>>& mixers)
-{
-    using namespace endpoint_indices;
-    connect(g, src, stereo, dst, stereo, mixers);
-}
-
-void
-connect_stereo_components(graph& g, component const& src, processor& dst)
-{
-    using namespace endpoint_indices;
-    connect(g, src, stereo, dst, stereo);
-}
-
 namespace
 {
 

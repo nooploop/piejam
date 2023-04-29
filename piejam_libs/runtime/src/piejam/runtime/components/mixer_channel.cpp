@@ -10,6 +10,7 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_algorithms.h>
+#include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/components/mute_solo.h>
@@ -125,14 +126,8 @@ public:
                 m_volume_amp->event_inputs()[0]);
         g.event.insert({*m_mute_input_proc, 0}, m_mute_solo->event_inputs()[0]);
 
-        audio::engine::connect_stereo_components(
-                g,
-                *m_volume_amp,
-                *m_mute_solo);
-        audio::engine::connect_stereo_components(
-                g,
-                *m_volume_amp,
-                *m_level_meter);
+        audio::engine::connect(g, *m_volume_amp, *m_mute_solo);
+        audio::engine::connect(g, *m_volume_amp, *m_level_meter);
 
         g.event.insert(
                 m_level_meter->event_outputs()[0],

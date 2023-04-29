@@ -58,7 +58,7 @@ public:
     {
         m_amp_comp->connect(g);
 
-        using namespace engine::endpoint_indices;
+        using namespace engine::endpoint_ports;
         engine::connect_event(
                 g,
                 *m_param_proc,

@@ -37,17 +37,6 @@ connect(graph&,
         graph_endpoint const& dst,
         std::vector<std::unique_ptr<processor>>& mixers);
 
-void
-connect_stereo_components(graph&, component const& src, component const& dst);
-
-void connect_stereo_components(
-        graph&,
-        component const& src,
-        component const& dst,
-        std::vector<std::unique_ptr<processor>>& mixers);
-
-void connect_stereo_components(graph&, component const& src, processor& dst);
-
 void remove_event_identity_processors(graph&);
 void remove_identity_processors(graph&);
 

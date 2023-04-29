@@ -9,6 +9,7 @@
 
 #include <piejam/audio/engine/event_identity_processor.h>
 #include <piejam/audio/engine/graph.h>
+#include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
 #include <piejam/audio/engine/slice.h>
@@ -287,7 +288,7 @@ TEST(connect_stereo_components, with_destination_processor)
             .WillByDefault(Return(component::endpoints(src_outputs)));
     ON_CALL(dst, num_inputs()).WillByDefault(Return(2));
 
-    connect_stereo_components(g, src, dst);
+    connect(g, src, dst);
     EXPECT_EQ(2u, g.audio.size());
     EXPECT_TRUE(has_audio_wire(g, {src_proc, 0}, {dst, 0}));
     EXPECT_TRUE(has_audio_wire(g, {src_proc, 1}, {dst, 1}));
@@ -319,7 +320,7 @@ TEST(connect_stereo_components, with_destination_component)
     ON_CALL(dst, inputs())
             .WillByDefault(Return(component::endpoints(dst_inputs)));
 
-    connect_stereo_components(g, src, dst);
+    connect(g, src, dst);
     EXPECT_EQ(2u, g.audio.size());
     EXPECT_TRUE(has_audio_wire(g, {src_proc, 0}, {dst_proc, 0}));
     EXPECT_TRUE(has_audio_wire(g, {src_proc, 1}, {dst_proc, 1}));
@@ -362,8 +363,8 @@ TEST(connect_stereo_components, connect_two_components_to_one)
     ON_CALL(dst, inputs())
             .WillByDefault(Return(component::endpoints(dst_inputs)));
 
-    connect_stereo_components(g, src1, dst, mixers);
-    connect_stereo_components(g, src2, dst, mixers);
+    connect(g, src1, dst, mixers);
+    connect(g, src2, dst, mixers);
     EXPECT_EQ(2u, mixers.size());
     EXPECT_EQ(6u, g.audio.size());
     EXPECT_TRUE(g.event.empty());
