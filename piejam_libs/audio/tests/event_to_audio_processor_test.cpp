@@ -102,7 +102,7 @@ TEST_F(event_to_audio_processor_test, rampup_inside_buffer)
     EXPECT_TRUE(std::ranges::all_of(
             out0.begin(),
             std::next(out0.begin(), offset),
-            equal_to(0.f)));
+            equal_to<>(0.f)));
 
     EXPECT_TRUE(algorithm::all_of_adjacent(
             std::next(out0.begin(), offset),
@@ -112,7 +112,7 @@ TEST_F(event_to_audio_processor_test, rampup_inside_buffer)
     EXPECT_TRUE(std::ranges::all_of(
             std::next(out0.begin(), offset + default_smooth_length),
             out0.end(),
-            equal_to(1.f)));
+            equal_to<>(1.f)));
 }
 
 TEST_F(event_to_audio_processor_test, noramp_if_same_target)
@@ -125,7 +125,7 @@ TEST_F(event_to_audio_processor_test, noramp_if_same_target)
     sut->process(ctx);
 
     ASSERT_TRUE(ctx.results[0].is_buffer());
-    EXPECT_TRUE(std::ranges::all_of(out0, equal_to(0.f)));
+    EXPECT_TRUE(std::ranges::all_of(out0, equal_to<>(0.f)));
 }
 
 TEST_F(event_to_audio_processor_test, ramp_over_process_boundary)
@@ -143,7 +143,7 @@ TEST_F(event_to_audio_processor_test, ramp_over_process_boundary)
     EXPECT_TRUE(std::ranges::all_of(
             out0.begin(),
             std::next(out0.begin(), buffer_size - offset),
-            equal_to(0.f)));
+            equal_to<>(0.f)));
 
     EXPECT_TRUE(algorithm::all_of_adjacent(
             std::next(out0.begin(), buffer_size - offset),
@@ -165,7 +165,7 @@ TEST_F(event_to_audio_processor_test, ramp_over_process_boundary)
                     out0.begin(),
                     default_smooth_length - offset + 1), // +1?
             out0.end(),
-            equal_to(1.f)));
+            equal_to<>(1.f)));
 }
 
 } // namespace piejam::audio::engine::test

@@ -23,7 +23,7 @@ graph::wires_map::erase(graph_endpoint const& src, graph_endpoint const& dst)
     auto it = std::ranges::find_if(
             from_source.first,
             from_source.second,
-            equal_to(dst),
+            equal_to<>(dst),
             &value_type::second);
     BOOST_ASSERT(it != m_wires.end());
     m_wires.erase(it);
@@ -45,9 +45,7 @@ graph::wires_access<graph::wire_type::audio>::insert(
     BOOST_ASSERT(dst.port < dst.proc.get().num_inputs());
 
     BOOST_ASSERT_MSG(
-            std::ranges::none_of(
-                    m_wires,
-                    [&dst](auto const& wire) { return wire.second == dst; }),
+            std::ranges::none_of(m_wires, equal_to<>(dst), &value_type::second),
             "destination endpoint already added, missing a mixer?");
 
     m_wires.emplace(src, dst);
@@ -66,9 +64,7 @@ graph::wires_access<graph::wire_type::event>::insert(
             dst.proc.get().event_inputs()[dst.port].type());
 
     BOOST_ASSERT_MSG(
-            std::ranges::none_of(
-                    m_wires,
-                    [&dst](auto const& wire) { return wire.second == dst; }),
+            std::ranges::none_of(m_wires, equal_to<>(dst), &value_type::second),
             "destination endpoint already added, missing an event mixer?");
 
     m_wires.emplace(src, dst);

@@ -42,9 +42,9 @@ graph_processors(graph const& g)
         add_procs(procs, w);
     }
 
-    std::ranges::sort(procs, address_less<processor>{});
+    std::ranges::sort(procs, address_less<processor>);
 
-    boost::unique_erase(procs, address_equal_to<processor>{});
+    boost::unique_erase(procs, address_equal_to<processor>);
 
     return procs;
 }

@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include <functional>
+#include <piejam/functional/operators.h>
+
 #include <memory>
 
 namespace piejam
@@ -43,34 +44,27 @@ struct unwrap_const_addressof
 
 } // namespace detail
 
-template <class T, class Compare>
-struct address_compare
-{
-    template <class U, class V>
-    constexpr auto operator()(U const& l, V const& r) const noexcept -> bool
-    {
-        return Compare{}(
-                detail::unwrap_const_addressof<T>{}(l),
-                detail::unwrap_const_addressof<T>{}(r));
-    }
-};
+template <class T>
+inline constexpr auto address_equal_to =
+        equal_to<detail::unwrap_const_addressof<T>>;
 
 template <class T>
-using address_equal_to = address_compare<T, std::equal_to<>>;
+inline constexpr auto address_not_equal_to =
+        not_equal_to<detail::unwrap_const_addressof<T>>;
 
 template <class T>
-using address_greater = address_compare<T, std::greater<>>;
+inline constexpr auto address_greater =
+        greater<detail::unwrap_const_addressof<T>>;
 
 template <class T>
-using address_greater_equal = address_compare<T, std::greater_equal<>>;
+inline constexpr auto address_greater_equal =
+        greater_equal<detail::unwrap_const_addressof<T>>;
 
 template <class T>
-using address_less = address_compare<T, std::less<>>;
+inline constexpr auto address_less = less<detail::unwrap_const_addressof<T>>;
 
 template <class T>
-using address_less_equal = address_compare<T, std::less_equal<>>;
-
-template <class T>
-using address_not_equal_to = address_compare<T, std::not_equal_to<>>;
+inline constexpr auto address_less_equal =
+        less_equal<detail::unwrap_const_addressof<T>>;
 
 } // namespace piejam

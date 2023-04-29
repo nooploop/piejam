@@ -17,7 +17,6 @@
 #include <piejam/functional/operators.h>
 
 #include <boost/assert.hpp>
-#include <boost/range/adaptor/indirected.hpp>
 #include <boost/range/iterator_range_core.hpp>
 
 #include <algorithm>
@@ -120,9 +119,8 @@ connect(graph& g,
 
             auto it_mixer = std::ranges::find_if(
                     mixers,
-                    [pma = &prev_mixer](auto const& m) {
-                        return m.get() == pma;
-                    });
+                    address_equal_to<processor>(prev_mixer),
+                    indirection_op);
             BOOST_ASSERT(it_mixer != mixers.end());
             std::swap(*it_mixer, mixer);
         }
@@ -199,9 +197,8 @@ remove_identities(graph::wires_access<W>& g)
     {
         auto it_ends = std::ranges::find_if(
                 g,
-                [p = &it->first.proc.get()](auto const& w) {
-                    return &w.second.proc.get() == p;
-                });
+                address_equal_to<processor>(it->first.proc),
+                &dst_processor);
 
         auto out_wire = *it;
         g.erase(it);

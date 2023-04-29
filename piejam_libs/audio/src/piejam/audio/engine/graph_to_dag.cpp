@@ -37,7 +37,7 @@ graph_to_dag(graph const& g) -> dag
     std::map<
             std::reference_wrapper<processor>,
             std::pair<dag::task_id_t, processor_job*>,
-            address_less<processor>>
+            decltype(address_less<processor>)>
             processor_job_mapping;
 
     std::vector<processor_job*> clear_event_buffer_jobs;

@@ -14,32 +14,45 @@ namespace piejam
 namespace detail
 {
 
-template <class Compare>
+template <class Compare, class Proj>
 struct compare
 {
     template <class X>
-    constexpr auto operator()(X&& x) const noexcept
+    constexpr auto operator()(X&& x, Proj proj = {}) const noexcept
     {
-        return [x](auto&& y) noexcept {
-            return Compare{}(std::forward<decltype(y)>(y), x);
+        return [proj_x = proj(x), proj = std::move(proj)](auto&& y) noexcept {
+            return Compare{}(proj(std::forward<decltype(y)>(y)), proj_x);
         };
     }
 
     template <class X, class Y>
-    constexpr auto operator()(X&& x, Y&& y) const noexcept
+    constexpr auto operator()(X&& x, Y&& y, Proj proj = {}) const noexcept
     {
-        return Compare{}(std::forward<X>(x), std::forward<Y>(y));
+        return Compare{}(proj(std::forward<X>(x)), proj(std::forward<Y>(y)));
     }
 };
 
 } // namespace detail
 
-inline constexpr auto equal_to = detail::compare<std::equal_to<>>{};
-inline constexpr auto not_equal_to = detail::compare<std::not_equal_to<>>{};
-inline constexpr auto less = detail::compare<std::less<>>{};
-inline constexpr auto less_equal = detail::compare<std::less_equal<>>{};
-inline constexpr auto greater = detail::compare<std::greater<>>{};
-inline constexpr auto greater_equal = detail::compare<std::greater_equal<>>{};
+template <class Proj = std::identity>
+inline constexpr auto equal_to = detail::compare<std::equal_to<>, Proj>{};
+
+template <class Proj = std::identity>
+inline constexpr auto not_equal_to =
+        detail::compare<std::not_equal_to<>, Proj>{};
+
+template <class Proj = std::identity>
+inline constexpr auto less = detail::compare<std::less<>, Proj>{};
+
+template <class Proj = std::identity>
+inline constexpr auto less_equal = detail::compare<std::less_equal<>, Proj>{};
+
+template <class Proj = std::identity>
+inline constexpr auto greater = detail::compare<std::greater<>, Proj>{};
+
+template <class Proj = std::identity>
+inline constexpr auto greater_equal =
+        detail::compare<std::greater_equal<>, Proj>{};
 
 inline constexpr auto indirection_op =
         [](auto&& v) BOOST_HOF_RETURNS(*std::forward<decltype(v)>(v));

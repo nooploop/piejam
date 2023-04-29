@@ -84,6 +84,32 @@ public:
     event_wires_access event;
 };
 
+using wire_t = graph::wires_map::value_type;
+
+[[nodiscard]] inline constexpr auto
+src_processor(wire_t const& w) -> processor&
+{
+    return w.first.proc;
+}
+
+[[nodiscard]] inline constexpr auto
+src_port(wire_t const& w) -> std::size_t
+{
+    return w.first.port;
+}
+
+[[nodiscard]] inline constexpr auto
+dst_processor(wire_t const& w) -> processor&
+{
+    return w.second.proc;
+}
+
+[[nodiscard]] inline constexpr auto
+dst_port(wire_t const& w) -> std::size_t
+{
+    return w.second.port;
+}
+
 auto export_graph_as_dot(graph const&, std::ostream&) -> std::ostream&;
 
 } // namespace piejam::audio::engine

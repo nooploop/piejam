@@ -48,11 +48,6 @@ mix<npos>(process_context const& ctx)
 
     for (audio_slice const& in : ctx.inputs)
     {
-        if (is_silence(in))
-        {
-            continue;
-        }
-
         res = add(in, res, out);
     }
 
@@ -79,13 +74,15 @@ public:
 
     auto type_name() const noexcept -> std::string_view override
     {
-        return "mix";
+        using namespace std::string_view_literals;
+        return "mix"sv;
     }
 
     auto num_inputs() const noexcept -> std::size_t override
     {
         return NumInputs != npos ? NumInputs : m_num_inputs;
     }
+
     auto num_outputs() const noexcept -> std::size_t override
     {
         return 1;
@@ -95,6 +92,7 @@ public:
     {
         return {};
     }
+
     auto event_outputs() const noexcept -> event_ports override
     {
         return {};
@@ -147,7 +145,7 @@ is_mix_processor(processor const& proc) noexcept
 
     return std::ranges::any_of(
             mix_processor_typeids,
-            equal_to(std::type_index(typeid(proc))));
+            equal_to<>(std::type_index(typeid(proc))));
 }
 
 #undef PIEJAM_MAX_NUM_FIXED_INPUTS_MIX_PROCESSOR
