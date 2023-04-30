@@ -32,21 +32,27 @@ public:
 using StereoChannel = StereoChannelClass::Value;
 
 template <StereoChannel SC>
-constexpr auto
-frameValue(std::span<float const, 2> const frame) -> float
+struct StereoFrameValue
 {
-    switch (SC)
+    constexpr auto
+    operator()(std::span<float const, 2> const frame) const noexcept -> float
     {
-        case StereoChannel::Left:
-            return frame[0];
-        case StereoChannel::Right:
-            return frame[1];
-        case StereoChannel::Middle:
-            return frame[0] + frame[1];
-        case StereoChannel::Side:
-            return frame[0] - frame[1];
+        switch (SC)
+        {
+            case StereoChannel::Left:
+                return frame[0];
+            case StereoChannel::Right:
+                return frame[1];
+            case StereoChannel::Middle:
+                return frame[0] + frame[1];
+            case StereoChannel::Side:
+                return frame[0] - frame[1];
+        }
     }
-}
+};
+
+template <StereoChannel SC>
+static constexpr StereoFrameValue<SC> stereoFrameValue;
 
 } // namespace piejam::gui::model
 

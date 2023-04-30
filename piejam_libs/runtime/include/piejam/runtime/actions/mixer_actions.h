@@ -4,12 +4,14 @@
 
 #pragma once
 
-#include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
+
+#include <piejam/audio/types.h>
+#include <piejam/entity_id.h>
 
 namespace piejam::runtime::actions
 {
@@ -19,12 +21,14 @@ struct add_mixer_channel final
     , visitable_engine_action<add_mixer_channel>
 {
     add_mixer_channel() = default;
-    add_mixer_channel(std::string name)
+    add_mixer_channel(std::string name, audio::bus_type bus_type)
         : name(std::move(name))
+        , bus_type(bus_type)
     {
     }
 
     std::string name;
+    audio::bus_type bus_type;
     bool auto_assign_input{};
 
     [[nodiscard]] auto reduce(state const&) const -> state override;

@@ -76,7 +76,9 @@ struct recorder_action_visitor
              st.mixer_state.channels)
         {
             if (!get_parameter_value(st.params, mixer_channel.record))
+            {
                 continue;
+            }
 
             auto filename = system::make_unique_filename(
                     take_dir,
@@ -84,7 +86,8 @@ struct recorder_action_visitor
                     "wav");
 
             auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
-            constexpr int const num_channels{2};
+            int const num_channels = static_cast<int>(
+                    audio::num_channels(mixer_channel.bus_type));
             if (SndfileHandle::formatCheck(
                         format,
                         num_channels,
@@ -119,7 +122,9 @@ struct recorder_action_visitor
         }
 
         if (open_streams.empty())
+        {
             return;
+        }
 
         data.open_streams = std::move(open_streams);
 
@@ -134,9 +139,7 @@ struct recorder_action_visitor
 
     void operator()(actions::stop_recording const&)
     {
-        auto const& st = get_state();
-
-        BOOST_ASSERT(st.recording);
+        BOOST_ASSERT(get_state().recording);
 
         data.open_streams.clear();
 

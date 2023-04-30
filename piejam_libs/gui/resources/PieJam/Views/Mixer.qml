@@ -8,6 +8,8 @@ import QtQuick.Controls.Material 2.15
 
 import QtQml 2.15
 
+import PieJam.Models 1.0 as PJModels
+
 import ".."
 import "../MixerControls"
 
@@ -16,7 +18,7 @@ ViewPane {
 
     property var model
 
-    signal fxButtonClicked(int index)
+    signal fxButtonClicked(int index, int busType)
 
     Rectangle {
         id: leftBorderShadow
@@ -55,7 +57,7 @@ ViewPane {
 
         model: root.model.inputChannels
 
-        onFxButtonClicked: root.fxButtonClicked(index + 1)
+        onFxButtonClicked: root.fxButtonClicked(index + 1, busType)
 
         header: Item {
             width: 8
@@ -80,19 +82,12 @@ ViewPane {
                 anchors.right: parent.right
                 anchors.rightMargin: 8
 
-                name: privates.channelAddStripName
+                name: "In " + (inputs.count + 1)
 
-                onAddClicked: root.model.addChannel(channelAddStrip.name)
+                onAddMonoClicked: root.model.addMonoChannel(channelAddStrip.name)
+                onAddStereoClicked: root.model.addStereoChannel(channelAddStrip.name)
             }
         }
-
-        QtObject {
-            id: privates
-
-            property string channelAddStripName: ""
-        }
-
-        onCountChanged: privates.channelAddStripName = "In " + (inputs.count + 1)
     }
 
     Rectangle {
@@ -136,7 +131,7 @@ ViewPane {
         sourceComponent: ChannelStrip {
 
             perform.model: root.model.mainChannel.perform
-            perform.onFxButtonClicked: root.fxButtonClicked(0)
+            perform.onFxButtonClicked: root.fxButtonClicked(0, busType)
 
             edit.model: root.model.mainChannel.edit
             edit.deletable: false

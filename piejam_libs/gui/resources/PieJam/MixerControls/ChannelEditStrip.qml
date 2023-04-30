@@ -6,7 +6,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
-import PieJam.Models 1.0
+import PieJam.Models 1.0 as PJModels
 
 import ".."
 
@@ -76,7 +76,7 @@ Item {
 
             displayText: root.model ? root.model.selectedInput : ""
 
-            Material.foreground: root.model ? (MixerChannelEdit.SelectedInputState.Invalid === root.model.selectedInputState
+            Material.foreground: root.model ? (PJModels.MixerChannelEdit.SelectedInputState.Invalid === root.model.selectedInputState
                                         ? Material.Red
                                         : Material.primaryTextColor) : Material.primaryTextColor
 
@@ -86,9 +86,9 @@ Item {
                 MenuItem {
                     enabled: root.model ? root.model.defaultInputIsValid : true
 
-                    text: qsTr("Mix")
+                    text: root.model && (root.model.busType == PJModels.BusType.Mono) ? qsTr("None") : qsTr("Mix")
 
-                    onClicked: root.model.changeInputToMix()
+                    onClicked: root.model.changeInputToDefault()
                 }
 
                 Menu {
@@ -150,9 +150,9 @@ Item {
 
             displayText: root.model ? root.model.selectedOutput : ""
 
-            Material.foreground: root.model ? (root.model.selectedOutputState === MixerChannelEdit.SelectedOutputState.Invalid
+            Material.foreground: root.model ? (root.model.selectedOutputState === PJModels.MixerChannelEdit.SelectedOutputState.Invalid
                                         ? Material.Red
-                                        : root.model.selectedOutputState === MixerChannelEdit.SelectedOutputState.NotMixed
+                                        : root.model.selectedOutputState === PJModels.MixerChannelEdit.SelectedOutputState.NotMixed
                                                 ? Material.Yellow
                                                 : Material.primaryTextColor) : Material.primaryTextColor;
 

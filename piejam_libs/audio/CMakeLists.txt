@@ -46,6 +46,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/process.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_job.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_util.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_test_environment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/single_event_input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice.h

@@ -35,7 +35,6 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/mixer.h>
-#include <piejam/runtime/mixer_util.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/runtime/processors/midi_assignment_processor.h>
@@ -117,7 +116,6 @@ make_mixer_components(
         component_map& prev_comps,
         audio::sample_rate const sample_rate,
         mixer::channels_t const& channels,
-        device_io::buses_t const& device_buses,
         parameter_processor_factory& param_procs)
 {
     for (auto const& [mixer_channel_id, mixer_channel] : channels)
@@ -131,17 +129,9 @@ make_mixer_components(
         }
         else
         {
-            audio::bus_type const bus_type = mixer_channel_input_type(
-                    channels,
-                    mixer_channel_id,
-                    device_buses);
-
             comps.insert(
                     in_key,
-                    components::make_mixer_channel_input(
-                            mixer_channel,
-                            bus_type,
-                            param_procs));
+                    components::make_mixer_channel_input(mixer_channel));
         }
 
         mixer_output_key const out_key{.channel_id = mixer_channel_id};
@@ -155,8 +145,8 @@ make_mixer_components(
                     out_key,
                     components::make_mixer_channel_output(
                             mixer_channel,
-                            sample_rate,
-                            param_procs));
+                            param_procs,
+                            sample_rate));
         }
     }
 }
@@ -281,6 +271,7 @@ make_midi_assignment_processors(
 
 auto
 make_recorder_processors(
+        mixer::channels_t const& channels,
         recorder_streams_t const& recorder_streams,
         processors::stream_processor_factory& stream_procs,
         std::size_t const frames_capacity)
@@ -295,13 +286,18 @@ make_recorder_processors(
         }
         else
         {
-            recorders.emplace(
-                    channel_id,
-                    stream_procs.make_processor(
-                            stream_id,
-                            2,
-                            frames_capacity,
-                            "recorder"));
+            if (mixer::channel const* const mixer_channel =
+                        channels.find(channel_id);
+                mixer_channel)
+            {
+                recorders.emplace(
+                        channel_id,
+                        stream_procs.make_processor(
+                                stream_id,
+                                audio::num_channels(mixer_channel->bus_type),
+                                frames_capacity,
+                                "recorder"));
+            }
         }
     }
 
@@ -330,9 +326,9 @@ auto
 connect_mixer_channel_with_fx_chain(
         audio::engine::graph& g,
         component_map const& comps,
-        audio::engine::component& mb_in,
+        audio::engine::component& mixer_channel_in,
         fx::chain_t const& fx_chain,
-        audio::engine::component& mb_out,
+        audio::engine::component& mixer_channel_out,
         std::shared_ptr<audio::engine::processor> const& recorder,
         std::vector<processor_ptr>& mixer_procs)
 {
@@ -345,18 +341,18 @@ connect_mixer_channel_with_fx_chain(
 
     if (fx_chain_comps.empty())
     {
-        connect(g, mb_in, mb_out, mixer_procs);
+        connect(g, mixer_channel_in, mixer_channel_out, mixer_procs);
 
         if (recorder)
         {
-            connect(g, mb_in, *recorder);
+            connect(g, mixer_channel_in, *recorder);
         }
     }
     else
     {
-        connect(g, mb_in, *fx_chain_comps.front(), mixer_procs);
+        connect(g, mixer_channel_in, *fx_chain_comps.front(), mixer_procs);
         connect_fx_chain(g, fx_chain_comps, mixer_procs);
-        connect(g, *fx_chain_comps.back(), mb_out, mixer_procs);
+        connect(g, *fx_chain_comps.back(), mixer_channel_out, mixer_procs);
 
         if (recorder)
         {
@@ -374,7 +370,7 @@ connect_mixer_input(
         std::span<audio::engine::input_processor> const input_procs,
         std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& mixer_channel,
-        audio::engine::component& mb_in)
+        audio::engine::component& mixer_channel_in)
 {
     boost::ignore_unused(channels);
     std::visit(
@@ -391,30 +387,33 @@ connect_mixer_input(
                                     {.proc = input_procs[device_bus.channels
                                                                  .left],
                                      .port = 0},
-                                    mb_in.inputs()[0]);
+                                    mixer_channel_in.inputs()[0]);
                         }
 
-                        if (device_bus.channels.right != npos)
+                        if (mixer_channel.bus_type == audio::bus_type::stereo &&
+                            device_bus.channels.right != npos)
                         {
                             g.audio.insert(
                                     {.proc = input_procs[device_bus.channels
                                                                  .right],
                                      .port = 0},
-                                    mb_in.inputs()[1]);
+                                    mixer_channel_in.inputs()[1]);
                         }
                     },
                     [&](mixer::channel_id const src_channel_id) {
                         BOOST_ASSERT(channels.contains(src_channel_id));
 
-                        auto* const source_mb_out =
-                                comps.find(mixer_output_key{src_channel_id})
-                                        .get();
-                        BOOST_ASSERT(source_mb_out);
+                        audio::engine::component* const
+                                source_mixer_channel_out =
+                                        comps.find(mixer_output_key{
+                                                           src_channel_id})
+                                                .get();
+                        BOOST_ASSERT(source_mixer_channel_out);
 
                         audio::engine::connect(
                                 g,
-                                *source_mb_out,
-                                mb_in,
+                                *source_mixer_channel_out,
+                                mixer_channel_in,
                                 mixer_procs);
                     }),
             mixer_channel.in);
@@ -430,7 +429,7 @@ connect_mixer_output(
         std::span<processor_ptr> const output_clip_procs,
         std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& mixer_channel,
-        audio::engine::component& mb_out)
+        audio::engine::component& mixer_channel_out)
 {
     std::visit(
             boost::hof::match(
@@ -462,7 +461,7 @@ connect_mixer_output(
                             ch != npos)
                         {
                             connect(g,
-                                    mb_out.outputs()[0],
+                                    mixer_channel_out.outputs()[0],
                                     {.proc = get_clip_proc(ch), .port = 0},
                                     mixer_procs);
                         }
@@ -471,7 +470,7 @@ connect_mixer_output(
                             ch != npos)
                         {
                             connect(g,
-                                    mb_out.outputs()[1],
+                                    mixer_channel_out.outputs()[1],
                                     {.proc = get_clip_proc(ch), .port = 0},
                                     mixer_procs);
                         }
@@ -491,7 +490,7 @@ connect_mixer_output(
 
                             audio::engine::connect(
                                     g,
-                                    mb_out,
+                                    mixer_channel_out,
                                     *dst_mb_in,
                                     mixer_procs);
                         }
@@ -515,10 +514,11 @@ make_graph(
 
     for (auto const& [mixer_channel_id, mixer_channel] : channels)
     {
-        auto* mb_in =
+        audio::engine::component* mixer_channel_in =
                 comps.find(mixer_input_key{mixer_channel_id, mixer_channel.in})
                         .get();
-        auto* mb_out = comps.find(mixer_output_key{mixer_channel_id}).get();
+        audio::engine::component* mixer_channel_out =
+                comps.find(mixer_output_key{mixer_channel_id}).get();
 
         std::shared_ptr<audio::engine::processor> recorder;
         if (auto it = recorders.find(mixer_channel_id); it != recorders.end())
@@ -526,11 +526,11 @@ make_graph(
             recorder = it->second;
         }
 
-        BOOST_ASSERT(mb_in);
-        BOOST_ASSERT(mb_out);
+        BOOST_ASSERT(mixer_channel_in);
+        BOOST_ASSERT(mixer_channel_out);
 
-        mb_in->connect(g);
-        mb_out->connect(g);
+        mixer_channel_in->connect(g);
+        mixer_channel_out->connect(g);
 
         connect_mixer_input(
                 g,
@@ -540,14 +540,14 @@ make_graph(
                 input_procs,
                 mixer_procs,
                 mixer_channel,
-                *mb_in);
+                *mixer_channel_in);
 
         connect_mixer_channel_with_fx_chain(
                 g,
                 comps,
-                *mb_in,
+                *mixer_channel_in,
                 mixer_channel.fx_chain,
-                *mb_out,
+                *mixer_channel_out,
                 recorder,
                 mixer_procs);
 
@@ -560,7 +560,7 @@ make_graph(
                 output_clip_procs,
                 mixer_procs,
                 mixer_channel,
-                *mb_out);
+                *mixer_channel_out);
     }
 
     return g;
@@ -809,7 +809,6 @@ audio_engine::rebuild(
             m_impl->comps,
             m_impl->sample_rate,
             st.mixer_state.channels,
-            st.device_io_state.buses,
             m_impl->param_procs);
     make_fx_chain_components(
             comps,
@@ -845,6 +844,7 @@ audio_engine::rebuild(
     if (st.recording)
     {
         recorders = make_recorder_processors(
+                st.mixer_state.channels,
                 st.recorder_streams,
                 m_impl->stream_procs,
                 st.sample_rate.to_samples(std::chrono::seconds(3)));

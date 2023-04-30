@@ -36,7 +36,9 @@ to_dB_string(float x) -> std::string
 } // namespace
 
 auto
-make_module(fx_parameter_factory const& fx_params_factory) -> fx::module
+make_module(
+        audio::bus_type const bus_type,
+        fx_parameter_factory const& fx_params_factory) -> fx::module
 {
     using namespace std::string_literals;
 
@@ -44,6 +46,7 @@ make_module(fx_parameter_factory const& fx_params_factory) -> fx::module
     return fx::module{
             .fx_instance_id = fx::internal::tool,
             .name = "Tool"s,
+            .bus_type = bus_type,
             .parameters =
                     fx::module_parameters{
                             {to_underlying(parameter_key::gain),

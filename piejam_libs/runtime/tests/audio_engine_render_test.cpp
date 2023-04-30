@@ -70,14 +70,18 @@ struct audio_engine_render_test : public ::testing::Test
         sut.process(buffer_size);
 
         for (std::size_t o = 0; o < buffer_size; ++o)
+        {
             output.emplace_back(audio_out_left[o], audio_out_right[o]);
+        }
     }
 
     void render(std::size_t iterations)
     {
         sut.init_process(in_converter, out_converter);
         while (iterations--)
+        {
             render_buffer();
+        }
     }
 
     void rebuild(state const& st)
@@ -97,7 +101,9 @@ struct audio_engine_render_test : public ::testing::Test
     {
         std::ofstream os(file);
         for (auto const& p : output)
+        {
             os << p.left << '\t' << p.right << std::endl;
+        }
     }
 };
 
@@ -105,13 +111,13 @@ TEST_F(audio_engine_render_test, add_input_channel)
 {
     auto st = make_initial_state();
 
-    add_mixer_channel(st, "in1");
-    add_mixer_channel(st, "out");
+    add_mixer_channel(st, "in1", audio::bus_type::stereo);
+    add_mixer_channel(st, "out", audio::bus_type::stereo);
 
     rebuild(st);
     render(200);
 
-    add_mixer_channel(st, "in2");
+    add_mixer_channel(st, "in2", audio::bus_type::mono);
 
     rebuild(st);
     render(200);

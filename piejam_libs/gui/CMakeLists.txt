@@ -66,8 +66,8 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/ScopeLinesObject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataPoint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StereoChannel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StereoSpectrumDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StreamChannelsBisector.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Subscribable.h
@@ -102,7 +102,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelPerform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerDbScales.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/ScopeLinesGenerator.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StereoSpectrumDataGenerator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/SpectrumDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StreamChannelsBisector.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
 )

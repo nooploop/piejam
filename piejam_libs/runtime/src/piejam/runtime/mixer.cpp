@@ -82,16 +82,24 @@ has_cycle(io_graph& g, channel_id const id)
     auto& node = g[id];
 
     if (node.finished)
+    {
         return false;
+    }
 
     if (node.visited)
+    {
         return true;
+    }
 
     node.visited = true;
 
     for (auto child : node.children)
+    {
         if (has_cycle(g, child))
+        {
             return true;
+        }
+    }
 
     node.finished = true;
 
@@ -111,21 +119,33 @@ auto
 valid_io_channels(channels_t const& channels, channel_id const ch_id)
         -> std::vector<mixer::channel_id>
 {
-    auto test = extract_channels_io(channels);
+    auto channels_io = extract_channels_io(channels);
 
     std::vector<mixer::channel_id> valid_ids;
     for (auto const& [mixer_channel_id, mixer_channel] : channels)
     {
         if (mixer_channel_id == ch_id)
+        {
+            // mono mixer channels can't have input channels
+            if (D == io_direction::input &&
+                mixer_channel.bus_type == audio::bus_type::mono)
+            {
+                return {};
+            }
+
+            // otherwise, we can't be our own input
             continue;
+        }
 
-        auto prev_id = test[ch_id].get(D);
-        test[ch_id].get(D) = mixer_channel_id;
+        auto prev_id = channels_io[ch_id].get(D);
+        channels_io[ch_id].get(D) = mixer_channel_id;
 
-        if (!has_cycle(make_channels_io_graph(test)))
+        if (!has_cycle(make_channels_io_graph(channels_io)))
+        {
             valid_ids.push_back(mixer_channel_id);
+        }
 
-        test[ch_id].get(D) = prev_id;
+        channels_io[ch_id].get(D) = prev_id;
     }
 
     return valid_ids;
@@ -136,9 +156,9 @@ valid_io_channels(channels_t const& channels, channel_id const ch_id)
 bool
 is_default_source_valid(channels_t const& channels, channel_id const ch_id)
 {
-    auto test = extract_channels_io(channels);
-    test[ch_id].in = default_t{}; // default case
-    return !has_cycle(make_channels_io_graph(test));
+    auto channels_io = extract_channels_io(channels);
+    channels_io[ch_id].in = default_t{};
+    return !has_cycle(make_channels_io_graph(channels_io));
 }
 
 auto

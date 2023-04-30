@@ -18,9 +18,29 @@
 namespace piejam::gui::model
 {
 
+namespace
+{
+
+[[nodiscard]] constexpr auto
+toLevel(float const l)
+{
+    constexpr auto min = math::dB_to_linear(-60.01f);
+    return math::linear_to_dB(l, min);
+}
+
+[[nodiscard]] constexpr auto
+toVolume(float const v)
+{
+    constexpr auto min = math::dB_to_linear(-60.01f);
+    return math::linear_to_dB(v, min);
+}
+
+} // namespace
+
 struct MixerChannelPerform::Impl
 {
     runtime::mixer::channel_id busId;
+    audio::bus_type bus_type;
     runtime::float_parameter_id volume;
     runtime::float_parameter_id panBalance;
     runtime::bool_parameter_id record;
@@ -41,6 +61,9 @@ MixerChannelPerform::MixerChannelPerform(
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
               id,
+              observe_once(
+                      runtime::selectors::make_mixer_channel_bus_type_selector(
+                              id)),
               observe_once(
                       runtime::selectors::
                               make_mixer_channel_volume_parameter_selector(id)),
@@ -88,20 +111,11 @@ MixerChannelPerform::MixerChannelPerform(
                               runtime::selectors::
                                       make_mixer_channel_solo_parameter_selector(
                                               id)))))
+    , m_busType(toBusType(m_impl->bus_type))
 {
 }
 
 MixerChannelPerform::~MixerChannelPerform() = default;
-
-static constexpr auto toLevel =
-        [min = math::dB_to_linear(-60.01f)](float const l) {
-            return math::linear_to_dB(l, min);
-        };
-
-static constexpr auto toVolume =
-        [min = math::dB_to_linear(-60.01f)](float const v) {
-            return math::linear_to_dB(v, min);
-        };
 
 void
 MixerChannelPerform::onSubscribe()
@@ -109,12 +123,6 @@ MixerChannelPerform::onSubscribe()
     observe(runtime::selectors::make_mixer_channel_name_selector(m_impl->busId),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
-            });
-
-    observe(runtime::selectors::make_mixer_channel_input_type_selector(
-                    m_impl->busId),
-            [this](audio::bus_type const bus_type) {
-                setMono(bus_type == audio::bus_type::mono);
             });
 
     observe(runtime::selectors::make_float_parameter_value_selector(

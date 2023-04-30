@@ -6,7 +6,6 @@
 
 #include <piejam/audio/engine/fwd.h>
 
-#include <functional>
 #include <span>
 #include <string_view>
 

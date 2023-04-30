@@ -21,7 +21,8 @@ add_mixer_channel::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    auto added_mixer_channel_id = runtime::add_mixer_channel(new_st, name);
+    auto added_mixer_channel_id =
+            runtime::add_mixer_channel(new_st, name, bus_type);
 
     if (auto_assign_input)
     {
@@ -39,7 +40,8 @@ add_mixer_channel::reduce(state const& st) const -> state
                                        bus_id;
                     }));
 
-            if (it == new_st.mixer_state.channels.end())
+            if (it == new_st.mixer_state.channels.end() &&
+                new_st.device_io_state.buses[bus_id].bus_type == bus_type)
             {
                 new_st.mixer_state.channels.update(
                         added_mixer_channel_id,

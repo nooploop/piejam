@@ -4,14 +4,16 @@
 
 #pragma once
 
-#include <piejam/boxed_string.h>
-#include <piejam/entity_map.h>
-#include <piejam/io_direction.h>
 #include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/stereo_level.h>
+
+#include <piejam/audio/types.h>
+#include <piejam/boxed_string.h>
+#include <piejam/entity_map.h>
+#include <piejam/io_direction.h>
 
 #include <boost/assert.hpp>
 
@@ -25,6 +27,8 @@ namespace piejam::runtime::mixer
 struct channel
 {
     boxed_string name{};
+
+    audio::bus_type bus_type{};
 
     io_address_t in{};
     io_address_t out{};

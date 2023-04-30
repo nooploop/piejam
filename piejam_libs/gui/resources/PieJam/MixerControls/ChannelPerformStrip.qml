@@ -16,7 +16,7 @@ Item {
 
     property var model
 
-    signal fxButtonClicked()
+    signal fxButtonClicked(int busType)
 
     implicitWidth: 132
     implicitHeight: 400
@@ -52,7 +52,7 @@ Item {
 
             onMoved: {
                 root.model.changePanBalance(panControls.value)
-                Info.quickTip = (root.model.mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
+                Info.quickTip = (root.model.busType == PJModels.BusType.Mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
                         + panControls.value.toFixed(2)
             }
 
@@ -123,7 +123,7 @@ Item {
 
             padding: 6
 
-            onClicked: root.fxButtonClicked()
+            onClicked: root.fxButtonClicked(root.model ? root.model.busType : PJModels.BusType.Mono)
         }
     }
 

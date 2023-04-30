@@ -4,10 +4,12 @@
 
 #pragma once
 
-#include <piejam/audio/types.h>
+#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+
+#include <piejam/audio/types.h>
 #include <piejam/runtime/device_io_fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
@@ -22,7 +24,7 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
     Q_OBJECT
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
-    Q_PROPERTY(bool mono READ mono NOTIFY monoChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
     Q_PROPERTY(double volume READ volume NOTIFY volumeChanged FINAL)
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
@@ -49,7 +51,11 @@ public:
             runtime::mixer::channel_id);
     ~MixerChannelPerform();
 
-    auto name() const noexcept -> QString const& { return m_name; }
+    auto name() const noexcept -> QString const&
+    {
+        return m_name;
+    }
+
     void setName(QString const& x)
     {
         if (m_name != x)
@@ -59,17 +65,16 @@ public:
         }
     }
 
-    auto mono() const noexcept -> bool { return m_mono; }
-    void setMono(bool x)
+    auto busType() const noexcept -> BusType
     {
-        if (m_mono != x)
-        {
-            m_mono = x;
-            emit monoChanged();
-        }
+        return m_busType;
     }
 
-    auto volume() const noexcept -> double { return m_volume; }
+    auto volume() const noexcept -> double
+    {
+        return m_volume;
+    }
+
     void setVolume(double const x)
     {
         if (m_volume != x)
@@ -81,8 +86,16 @@ public:
 
     Q_INVOKABLE void changeVolume(double);
 
-    auto levelLeft() const noexcept -> double { return m_levelLeft; }
-    auto levelRight() const noexcept -> double { return m_levelRight; }
+    auto levelLeft() const noexcept -> double
+    {
+        return m_levelLeft;
+    }
+
+    auto levelRight() const noexcept -> double
+    {
+        return m_levelRight;
+    }
+
     void setLevel(double left, double right)
     {
         if (m_levelLeft != left)
@@ -98,7 +111,11 @@ public:
         }
     }
 
-    auto panBalance() const noexcept -> double { return m_panBalance; }
+    auto panBalance() const noexcept -> double
+    {
+        return m_panBalance;
+    }
+
     void setPanBalance(double const x)
     {
         if (m_panBalance != x)
@@ -110,7 +127,11 @@ public:
 
     Q_INVOKABLE void changePanBalance(double);
 
-    auto record() const noexcept -> bool { return m_record; }
+    auto record() const noexcept -> bool
+    {
+        return m_record;
+    }
+
     void setRecord(bool x)
     {
         if (m_record != x)
@@ -122,7 +143,11 @@ public:
 
     Q_INVOKABLE void changeRecord(bool);
 
-    auto mute() const noexcept -> bool { return m_mute; }
+    auto mute() const noexcept -> bool
+    {
+        return m_mute;
+    }
+
     void setMute(bool const x)
     {
         if (m_mute != x)
@@ -134,7 +159,11 @@ public:
 
     Q_INVOKABLE void changeMute(bool);
 
-    auto solo() const noexcept -> bool { return m_solo; }
+    auto solo() const noexcept -> bool
+    {
+        return m_solo;
+    }
+
     void setSolo(bool const x)
     {
         if (m_solo != x)
@@ -146,7 +175,11 @@ public:
 
     Q_INVOKABLE void changeSolo(bool);
 
-    auto mutedBySolo() const noexcept -> bool { return m_mutedBySolo; }
+    auto mutedBySolo() const noexcept -> bool
+    {
+        return m_mutedBySolo;
+    }
+
     void setMutedBySolo(bool const x)
     {
         if (m_mutedBySolo != x)
@@ -181,7 +214,7 @@ private:
     std::unique_ptr<Impl> m_impl;
 
     QString m_name;
-    bool m_mono{};
+    BusType m_busType{BusType::Mono};
     double m_volume{1.};
     double m_levelLeft{};
     double m_levelRight{};

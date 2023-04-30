@@ -30,7 +30,8 @@ public:
 
     auto mainChannel() const -> MixerChannel*;
 
-    Q_INVOKABLE void addChannel(QString const& newChannelName);
+    Q_INVOKABLE void addMonoChannel(QString const& newChannelName);
+    Q_INVOKABLE void addStereoChannel(QString const& newChannelName);
 
     Q_INVOKABLE void requestLevelsUpdate();
 

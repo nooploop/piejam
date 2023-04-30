@@ -98,12 +98,14 @@ auto
 make_module(
         ladspa::instance_id instance_id,
         std::string const& name,
+        audio::bus_type const bus_type,
         std::span<const ladspa::port_descriptor> const control_inputs,
         fx_parameter_factory const& fx_params_factory) -> fx::module
 {
     return fx::module{
             .fx_instance_id = instance_id,
             .name = name,
+            .bus_type = bus_type,
             .parameters =
                     make_module_parameters(control_inputs, fx_params_factory),
             .streams = {}};

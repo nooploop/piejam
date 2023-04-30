@@ -15,6 +15,15 @@
 
 #include <fstream>
 
+namespace piejam::audio
+{
+
+NLOHMANN_JSON_SERIALIZE_ENUM(
+        bus_type,
+        {{bus_type::mono, "mono"}, {bus_type::stereo, "stereo"}})
+
+} // namespace piejam::audio
+
 namespace piejam::runtime
 {
 
@@ -131,26 +140,38 @@ void
 to_json(nlohmann::json& j, session::mixer_midi const& midi)
 {
     if (midi.volume)
+    {
         j["volume"] = *midi.volume;
+    }
 
     if (midi.pan)
+    {
         j["pan"] = *midi.pan;
+    }
 
     if (midi.mute)
+    {
         j["mute"] = *midi.mute;
+    }
 }
 
 void
 from_json(nlohmann::json const& j, session::mixer_midi& midi)
 {
     if (j.contains("volume"))
+    {
         midi.volume = j.at("volume").get<midi_assignment>();
+    }
 
     if (j.contains("pan"))
+    {
         midi.pan = j.at("pan").get<midi_assignment>();
+    }
 
     if (j.contains("mute"))
+    {
         midi.mute = j.at("mute").get<midi_assignment>();
+    }
 }
 
 NLOHMANN_JSON_SERIALIZE_ENUM(
@@ -176,6 +197,7 @@ void
 to_json(nlohmann::json& j, session::mixer_channel const& mb)
 {
     j = {{"name", mb.name},
+         {"bus_type", mb.bus_type},
          {"parameter", mb.parameter},
          {"midi", mb.midi},
          {"fx_chain", mb.fx_chain},
@@ -187,6 +209,7 @@ void
 from_json(nlohmann::json const& j, session::mixer_channel& mb)
 {
     j.at("name").get_to(mb.name);
+    j.at("bus_type").get_to(mb.bus_type);
     j.at("parameter").get_to(mb.parameter);
     j.at("midi").get_to(mb.midi);
     j.at("fx_chain").get_to(mb.fx_chain);
@@ -250,7 +273,9 @@ upgrade_session(nlohmann::json& json_ses)
 
         BOOST_ASSERT(file_version > prev_version);
         if (file_version <= prev_version)
+        {
             throw std::runtime_error("cannot upgrade session file");
+        }
     }
 }
 
@@ -262,10 +287,14 @@ load_session(std::istream& in) -> session
     auto const file_version = get_version(json_ses);
 
     if (file_version > current_session_version)
+    {
         throw std::runtime_error("session version is too new");
+    }
 
     if (file_version < current_session_version)
+    {
         upgrade_session(json_ses);
+    }
 
     BOOST_ASSERT(current_session_version == get_version(json_ses));
 

@@ -14,7 +14,7 @@ namespace piejam::runtime::test
 struct state_with_one_mixer_input : testing::Test
 {
     state_with_one_mixer_input()
-        : bus_id(add_mixer_channel(sut, "foo"))
+        : bus_id(add_mixer_channel(sut, "foo", audio::bus_type::mono))
     {
     }
 
@@ -78,7 +78,7 @@ TEST_F(state_with_one_mixer_input,
 struct state_with_one_fx : testing::Test
 {
     state_with_one_fx()
-        : bus_id(add_mixer_channel(sut, "foo"))
+        : bus_id(add_mixer_channel(sut, "foo", audio::bus_type::stereo))
         , fx_mod_id(insert_internal_fx_module(
                   sut,
                   bus_id,

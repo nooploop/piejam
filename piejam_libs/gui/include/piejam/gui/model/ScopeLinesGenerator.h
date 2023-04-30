@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/AudioStreamListener.h>
+#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/fwd.h>
 
@@ -19,16 +20,17 @@ class ScopeLinesGenerator final : public AudioStreamListener
 
 public:
     ScopeLinesGenerator();
-    ~ScopeLinesGenerator();
+    ~ScopeLinesGenerator() override;
 
+    void setStreamType(piejam::gui::model::BusType streamType);
     void setSamplesPerLine(int x);
     void setActive(bool active);
-    void setChannel(StereoChannel);
+    void setStereoChannel(StereoChannel);
 
     void update(Stream const&) override;
 
 signals:
-    void generated(ScopeLines const&);
+    void generated(piejam::gui::model::ScopeLines const&);
 
 private:
     struct Impl;

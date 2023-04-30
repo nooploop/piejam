@@ -82,7 +82,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi_input_controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_util.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/filter/filter_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h
@@ -179,7 +178,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_control_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_input_controller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer_util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_component.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/filter/filter_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa_fx/ladspa_fx_component.cpp

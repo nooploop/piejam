@@ -30,6 +30,25 @@ make_pan_processor(std::string_view const name)
 }
 
 auto
+make_volume_pan_processor(std::string_view const name)
+        -> std::unique_ptr<audio::engine::processor>
+{
+    using namespace std::string_view_literals;
+    static constexpr const std::array s_input_names{"volume"sv, "pan"sv};
+    static constexpr const std::array s_output_names{"gain L"sv, "gain R"sv};
+    return make_event_converter_processor(
+            [](float volume, float pan) -> std::tuple<float, float> {
+                auto pan_gain = sinusoidal_constant_power_pan(pan);
+                return std::tuple{
+                        volume * pan_gain.left,
+                        volume * pan_gain.right};
+            },
+            s_input_names,
+            s_output_names,
+            fmt::format("volume_pan {}", name));
+}
+
+auto
 make_stereo_balance_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
@@ -44,6 +63,25 @@ make_stereo_balance_processor(std::string_view const name)
             s_input_names,
             s_output_names,
             fmt::format("balance {}", name));
+}
+
+auto
+make_volume_stereo_balance_processor(std::string_view const name)
+        -> std::unique_ptr<audio::engine::processor>
+{
+    using namespace std::string_view_literals;
+    static constexpr const std::array s_input_names{"volume"sv, "balance"sv};
+    static constexpr const std::array s_output_names{"gain L"sv, "gain R"sv};
+    return make_event_converter_processor(
+            [](float volume, float param) -> std::tuple<float, float> {
+                auto balance_gain = stereo_balance(param);
+                return std::tuple{
+                        volume * balance_gain.left,
+                        volume * balance_gain.right};
+            },
+            s_input_names,
+            s_output_names,
+            fmt::format("volume_balance {}", name));
 }
 
 } // namespace piejam::audio::engine

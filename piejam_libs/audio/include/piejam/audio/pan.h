@@ -71,14 +71,13 @@ stereo_balance(float balance_pos) -> stereo_gain
     {
         return stereo_gain{1.f, math::pow3(1 + balance_pos)};
     }
-    else if (balance_pos > 0.f)
+
+    if (balance_pos > 0.f)
     {
         return stereo_gain{math::pow3(1 - balance_pos), 1.f};
     }
-    else
-    {
-        return stereo_gain{1.f};
-    }
+
+    return stereo_gain{1.f};
 }
 
 } // namespace piejam::audio

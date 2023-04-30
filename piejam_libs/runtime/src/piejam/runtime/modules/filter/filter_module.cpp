@@ -69,6 +69,7 @@ to_resonance_string(float const r)
 
 auto
 make_module(
+        audio::bus_type const bus_type,
         fx_parameter_factory const& fx_params_factory,
         audio_streams_cache& streams) -> fx::module
 {
@@ -77,6 +78,7 @@ make_module(
     return fx::module{
             .fx_instance_id = fx::internal::filter,
             .name = "Filter"s,
+            .bus_type = bus_type,
             .parameters =
                     fx::module_parameters{
                             {to_underlying(parameter_key::type),
@@ -124,7 +126,7 @@ make_module(
                                                      &to_resonance_string})}},
             .streams = fx::module_streams{
                     {to_underlying(stream_key::in_out),
-                     streams.add(audio_stream_buffer(std::in_place, 2 * 2))}}};
+                     streams.add(audio_stream_buffer(std::in_place, 4))}}};
 }
 
 } // namespace piejam::runtime::modules::filter

@@ -37,7 +37,9 @@ save_app_config(
     {
         std::ofstream out(file);
         if (!out.is_open())
+        {
             throw std::runtime_error("could not open config file");
+        }
 
         persistence::app_config conf;
 
@@ -210,15 +212,21 @@ export_mixer_midi(state const& st, mixer::channel const& mixer_channel)
 
     if (auto it = st.midi_assignments->find(mixer_channel.volume);
         it != st.midi_assignments->end())
+    {
         result.volume = it->second;
+    }
 
     if (auto it = st.midi_assignments->find(mixer_channel.pan_balance);
         it != st.midi_assignments->end())
+    {
         result.pan = it->second;
+    }
 
     if (auto it = st.midi_assignments->find(mixer_channel.mute);
         it != st.midi_assignments->end())
+    {
         result.mute = it->second;
+    }
 
     return result;
 }
@@ -270,6 +278,7 @@ export_mixer_channel(state const& st, mixer::channel const& mixer_channel)
 {
     session::mixer_channel result;
     result.name = mixer_channel.name;
+    result.bus_type = mixer_channel.bus_type;
     result.fx_chain = export_fx_chain(st, *mixer_channel.fx_chain);
     result.midi = export_mixer_midi(st, mixer_channel);
     result.parameter = export_mixer_parameters(st, mixer_channel);
@@ -297,7 +306,9 @@ save_session(std::filesystem::path const& file, state const& st)
     {
         std::ofstream out(file);
         if (!out.is_open())
+        {
             throw std::runtime_error("could not open session file");
+        }
 
         session ses;
 

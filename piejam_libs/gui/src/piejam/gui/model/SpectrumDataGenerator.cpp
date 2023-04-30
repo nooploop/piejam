@@ -2,11 +2,12 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/StereoSpectrumDataGenerator.h>
+#include <piejam/gui/model/SpectrumDataGenerator.h>
 
 #include <piejam/algorithm/shift_push_back.h>
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/functional/operators.h>
 #include <piejam/math.h>
 #include <piejam/numeric/dft.h>
 #include <piejam/numeric/window.h>
@@ -29,14 +30,13 @@ numeric::dft s_dft{s_dft_size};
 
 struct InactiveGenerator
 {
-    auto operator()(AudioStreamListener::Stream const&)
-            -> std::optional<SpectrumDataPoints>
+    auto operator()(AudioStreamListener::Stream const&) -> SpectrumDataPoints
     {
         return SpectrumDataPoints();
     }
 };
 
-template <StereoChannel SC>
+template <std::size_t NumChannels, class FrameConverter>
 class Generator
 {
 public:
@@ -44,7 +44,9 @@ public:
     {
         float const binSize = sampleRate.as_float() / s_dft_size;
         for (std::size_t const i : range::iota(s_dft.output_size()))
+        {
             m_dataPoints[i].frequency_Hz = i * binSize;
+        }
     }
 
     static constexpr auto envelope(float const prev, float const in) noexcept
@@ -55,15 +57,15 @@ public:
     }
 
     auto operator()(AudioStreamListener::Stream const& stream)
-            -> std::optional<SpectrumDataPoints>
+            -> SpectrumDataPoints
     {
         m_streamBuffer.clear();
         m_streamBuffer.reserve(stream.num_frames());
 
         std::ranges::transform(
-                stream.channels_cast<2>(),
+                stream.channels_cast<NumChannels>(),
                 std::back_inserter(m_streamBuffer),
-                &frameValue<SC>);
+                FrameConverter{});
 
         algorithm::shift_push_back(m_dftPrepareBuffer, m_streamBuffer);
 
@@ -103,13 +105,14 @@ private:
 
 } // namespace
 
-struct StereoSpectrumDataGenerator::Impl
+struct SpectrumDataGenerator::Impl
 {
+    BusType busType;
     audio::sample_rate sampleRate{48000};
     bool active{};
     StereoChannel channel{StereoChannel::Left};
 
-    using Generate = std::function<std::optional<SpectrumDataPoints>(
+    using Generate = std::function<SpectrumDataPoints(
             AudioStreamListener::Stream const&)>;
     Generate generator{InactiveGenerator{}};
 
@@ -117,28 +120,50 @@ struct StereoSpectrumDataGenerator::Impl
     {
         if (active)
         {
-            switch (channel)
+            switch (busType)
             {
-                case StereoChannel::Left:
-                    generator = Generator<StereoChannel::Left>{sampleRate};
+                case BusType::Mono:
+                    generator =
+                            Generator<2, StereoFrameValue<StereoChannel::Left>>{
+                                    sampleRate};
                     break;
 
-                case StereoChannel::Right:
-                    generator = Generator<StereoChannel::Right>{sampleRate};
-                    break;
+                case BusType::Stereo:
+                    switch (channel)
+                    {
+                        case StereoChannel::Left:
+                            generator = Generator<
+                                    2,
+                                    StereoFrameValue<StereoChannel::Left>>{
+                                    sampleRate};
+                            break;
 
-                case StereoChannel::Middle:
-                    generator = Generator<StereoChannel::Middle>{sampleRate};
-                    break;
+                        case StereoChannel::Right:
+                            generator = Generator<
+                                    2,
+                                    StereoFrameValue<StereoChannel::Right>>{
+                                    sampleRate};
+                            break;
 
-                case StereoChannel::Side:
-                    generator = Generator<StereoChannel::Side>{sampleRate};
-                    break;
+                        case StereoChannel::Middle:
+                            generator = Generator<
+                                    2,
+                                    StereoFrameValue<StereoChannel::Middle>>{
+                                    sampleRate};
+                            break;
 
-                default:
-                    BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
-                    generator = InactiveGenerator{};
-                    break;
+                        case StereoChannel::Side:
+                            generator = Generator<
+                                    2,
+                                    StereoFrameValue<StereoChannel::Side>>{
+                                    sampleRate};
+                            break;
+
+                        default:
+                            BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
+                            generator = InactiveGenerator{};
+                            break;
+                    }
             }
         }
         else
@@ -146,50 +171,53 @@ struct StereoSpectrumDataGenerator::Impl
             generator = InactiveGenerator{};
         }
     }
+
+    template <class T>
+    void updateGeneratorProperty(T& member, T value)
+    {
+        if (member != value)
+        {
+            member = std::move(value);
+            updateGenerator();
+        }
+    }
 };
 
-StereoSpectrumDataGenerator::StereoSpectrumDataGenerator()
+SpectrumDataGenerator::SpectrumDataGenerator()
     : m_impl(std::make_unique<Impl>())
 {
 }
 
-StereoSpectrumDataGenerator::~StereoSpectrumDataGenerator() = default;
+SpectrumDataGenerator::~SpectrumDataGenerator() = default;
 
 void
-StereoSpectrumDataGenerator::setSampleRate(audio::sample_rate const sampleRate)
+SpectrumDataGenerator::setBusType(BusType const busType)
 {
-    if (m_impl->sampleRate != sampleRate)
-    {
-        m_impl->sampleRate = sampleRate;
-        m_impl->updateGenerator();
-    }
+    m_impl->updateGeneratorProperty(m_impl->busType, busType);
 }
 
 void
-StereoSpectrumDataGenerator::setActive(bool const active)
+SpectrumDataGenerator::setSampleRate(audio::sample_rate const sampleRate)
 {
-    if (m_impl->active != active)
-    {
-        m_impl->active = active;
-        m_impl->updateGenerator();
-    }
+    m_impl->updateGeneratorProperty(m_impl->sampleRate, sampleRate);
 }
 
 void
-StereoSpectrumDataGenerator::setChannel(StereoChannel const channel)
+SpectrumDataGenerator::setActive(bool const active)
 {
-    if (m_impl->channel != channel)
-    {
-        m_impl->channel = channel;
-        m_impl->updateGenerator();
-    }
+    m_impl->updateGeneratorProperty(m_impl->active, active);
 }
 
 void
-StereoSpectrumDataGenerator::update(Stream const& stream)
+SpectrumDataGenerator::setChannel(StereoChannel const channel)
 {
-    if (auto spectrumData = m_impl->generator(stream))
-        generated(*spectrumData);
+    m_impl->updateGeneratorProperty(m_impl->channel, channel);
+}
+
+void
+SpectrumDataGenerator::update(Stream const& stream)
+{
+    generated(m_impl->generator(stream));
 }
 
 } // namespace piejam::gui::model

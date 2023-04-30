@@ -6,6 +6,8 @@
 
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/ScopeLinesGenerator.h>
+
+#include <piejam/audio/types.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
@@ -32,14 +34,15 @@ FxScope::FxScope(
         runtime::fx::module_id const fx_mod_id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(fx_mod_id))
+    , m_busType{toBusType(observe_once(
+              runtime::selectors::make_fx_module_bus_type_selector(fx_mod_id)))}
 {
-    auto const streams =
-            observe_once(runtime::selectors::make_fx_module_streams_selector(
-                    m_impl->fx_mod_id));
+    auto const streams = observe_once(
+            runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
 
     constexpr auto streamKey =
-            to_underlying(runtime::modules::scope::stream_key::left_right);
-    auto const streamId = streams.get().at(streamKey);
+            to_underlying(runtime::modules::scope::stream_key::input);
+    auto const streamId = streams->at(streamKey);
     FxStreamKeyId fxStreamKeyId{.key = streamKey, .id = streamId};
 
     m_impl->streamA = std::make_unique<FxStream>(
@@ -50,8 +53,9 @@ FxScope::FxScope(
     connectSubscribableChild(*m_impl->streamA);
 
     m_impl->streamA->setListener(&m_impl->accumulatorA);
+    m_impl->accumulatorA.setStreamType(m_busType);
     m_impl->accumulatorA.setActive(activeA());
-    m_impl->accumulatorA.setChannel(channelA());
+    m_impl->accumulatorA.setStereoChannel(channelA());
 
     QObject::connect(
             &m_impl->accumulatorA,
@@ -62,25 +66,29 @@ FxScope::FxScope(
                 dataA()->update();
             });
 
-    m_impl->streamB = std::make_unique<FxStream>(
-            dispatch(),
-            this->state_change_subscriber(),
-            fxStreamKeyId);
+    if (m_busType == BusType::Stereo)
+    {
+        m_impl->streamB = std::make_unique<FxStream>(
+                dispatch(),
+                this->state_change_subscriber(),
+                fxStreamKeyId);
 
-    connectSubscribableChild(*m_impl->streamB);
+        connectSubscribableChild(*m_impl->streamB);
 
-    m_impl->streamB->setListener(&m_impl->accumulatorB);
-    m_impl->accumulatorB.setActive(activeB());
-    m_impl->accumulatorB.setChannel(channelB());
+        m_impl->streamB->setListener(&m_impl->accumulatorB);
+        m_impl->accumulatorB.setStreamType(m_busType);
+        m_impl->accumulatorB.setActive(activeB());
+        m_impl->accumulatorB.setStereoChannel(channelB());
 
-    QObject::connect(
-            &m_impl->accumulatorB,
-            &ScopeLinesGenerator::generated,
-            this,
-            [this](ScopeLines const& addedLines) {
-                dataB()->get().shift_push_back(addedLines);
-                dataB()->update();
-            });
+        QObject::connect(
+                &m_impl->accumulatorB,
+                &ScopeLinesGenerator::generated,
+                this,
+                [this](ScopeLines const& addedLines) {
+                    dataB()->get().shift_push_back(addedLines);
+                    dataB()->update();
+                });
+    }
 }
 
 FxScope::~FxScope() = default;
@@ -90,6 +98,7 @@ FxScope::onSubscribe()
 {
     requestUpdates(std::chrono::milliseconds{16}, [this]() {
         m_impl->streamA->requestUpdate();
+        // no need to update streamB, since it points to same stream as streamA
     });
 }
 
@@ -124,7 +133,7 @@ FxScope::changeChannelA(piejam::gui::model::StereoChannel const x)
     if (m_channelA != x)
     {
         m_channelA = x;
-        m_impl->accumulatorA.setChannel(x);
+        m_impl->accumulatorA.setStereoChannel(x);
         emit channelAChanged();
     }
 }
@@ -148,7 +157,7 @@ FxScope::changeChannelB(piejam::gui::model::StereoChannel const x)
     if (m_channelB != x)
     {
         m_channelB = x;
-        m_impl->accumulatorB.setChannel(x);
+        m_impl->accumulatorB.setStereoChannel(x);
         emit channelBChanged();
     }
 }

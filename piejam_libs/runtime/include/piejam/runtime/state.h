@@ -108,7 +108,8 @@ auto add_device_bus(
         audio::bus_type,
         channel_index_pair const&) -> device_io::bus_id;
 
-auto add_mixer_channel(state&, std::string name) -> mixer::channel_id;
+auto add_mixer_channel(state&, std::string name, audio::bus_type)
+        -> mixer::channel_id;
 
 void remove_mixer_channel(state&, mixer::channel_id);
 

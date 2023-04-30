@@ -12,12 +12,74 @@
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/selectors.h>
 
+#include <ranges>
+
 namespace piejam::gui::model
 {
 
+namespace
+{
+
+[[nodiscard]] auto
+makeBrowserEntry(
+        runtime::store_dispatch dispatch,
+        runtime::subscriber& state_change_subscriber,
+        runtime::fx::internal fx_type) -> std::unique_ptr<FxBrowserEntry>
+{
+    return std::make_unique<FxBrowserEntryInternal>(
+            std::move(dispatch),
+            state_change_subscriber,
+            fx_type);
+}
+
+[[nodiscard]] auto
+makeBrowserEntry(
+        runtime::store_dispatch dispatch,
+        runtime::subscriber& state_change_subscriber,
+        ladspa::plugin_descriptor const& pd) -> std::unique_ptr<FxBrowserEntry>
+{
+    return std::make_unique<FxBrowserEntryLADSPA>(
+            std::move(dispatch),
+            state_change_subscriber,
+            pd);
+}
+
+} // namespace
+
 struct FxBrowser::Impl
 {
+    void updateEntries(
+            runtime::store_dispatch dispatch,
+            runtime::subscriber& state_change_subscriber)
+    {
+        std::vector<runtime::fx::registry::item> new_entries;
+        std::ranges::copy(
+                fx_registry.entries.get() |
+                        std::views::filter(
+                                runtime::fx::is_available_for_bus_type{
+                                        bus_type_filter}),
+                std::back_inserter(new_entries));
+
+        algorithm::apply_edit_script(
+                algorithm::edit_script(filtered_fx_registry, new_entries),
+                piejam::gui::generic_list_model_edit_script_executor{
+                        entries,
+                        [&](auto const& item) {
+                            return std::visit(
+                                    [&](auto&& x) {
+                                        return makeBrowserEntry(
+                                                dispatch,
+                                                state_change_subscriber,
+                                                x);
+                                    },
+                                    item);
+                        }});
+        filtered_fx_registry = std::move(new_entries);
+    }
+
+    audio::bus_type bus_type_filter{audio::bus_type::mono};
     runtime::fx::registry fx_registry;
+    std::vector<runtime::fx::registry::item> filtered_fx_registry;
 
     FxBrowserList entries;
 };
@@ -38,29 +100,11 @@ FxBrowser::entries() noexcept -> FxBrowserList*
     return &m_impl->entries;
 }
 
-static auto
-makeBrowserEntry(
-        runtime::store_dispatch dispatch,
-        runtime::subscriber& state_change_subscriber,
-        runtime::fx::internal fx_type) -> std::unique_ptr<FxBrowserEntry>
+void
+FxBrowser::setBusTypeFilter(BusType busType)
 {
-    return std::make_unique<FxBrowserEntryInternal>(
-            std::move(dispatch),
-            state_change_subscriber,
-            fx_type);
-}
-
-static auto
-makeBrowserEntry(
-        runtime::store_dispatch dispatch,
-        runtime::subscriber& state_change_subscriber,
-        ladspa::plugin_descriptor const& pd)
-        -> std::unique_ptr<FxBrowserEntry>
-{
-    return std::make_unique<FxBrowserEntryLADSPA>(
-            std::move(dispatch),
-            state_change_subscriber,
-            pd);
+    m_impl->bus_type_filter = toBusType(busType);
+    m_impl->updateEntries(dispatch(), state_change_subscriber());
 }
 
 void
@@ -68,23 +112,8 @@ FxBrowser::onSubscribe()
 {
     observe(runtime::selectors::select_fx_registry,
             [this](runtime::fx::registry const& fx_registry) {
-                algorithm::apply_edit_script(
-                        algorithm::edit_script(
-                                m_impl->fx_registry.entries.get(),
-                                fx_registry.entries.get()),
-                        piejam::gui::generic_list_model_edit_script_executor{
-                                *entries(),
-                                [this](auto const& item) {
-                                    return std::visit(
-                                            [this](auto&& x) {
-                                                return makeBrowserEntry(
-                                                        dispatch(),
-                                                        state_change_subscriber(),
-                                                        x);
-                                            },
-                                            item);
-                                }});
                 m_impl->fx_registry = fx_registry;
+                m_impl->updateEntries(dispatch(), state_change_subscriber());
             });
 }
 

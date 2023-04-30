@@ -16,8 +16,24 @@ TEST(mixer_valid_io, test1)
     using testing::Matches;
 
     channels_t channels;
-    auto bus1 = channels.add(channel{});
-    auto bus2 = channels.add(channel{});
+    auto bus1 = channels.add(
+            channel{.name = "foo",
+                    .bus_type = audio::bus_type::stereo,
+                    .volume = {},
+                    .pan_balance = {},
+                    .record = {},
+                    .mute = {},
+                    .solo = {},
+                    .level = {}});
+    auto bus2 = channels.add(
+            channel{.name = "bar",
+                    .bus_type = audio::bus_type::stereo,
+                    .volume = {},
+                    .pan_balance = {},
+                    .record = {},
+                    .mute = {},
+                    .solo = {},
+                    .level = {}});
 
     auto vs1 = valid_source_channels(channels, bus1);
     EXPECT_TRUE(Matches(ElementsAre(bus2))(vs1));
@@ -40,7 +56,9 @@ TEST(mixer_valid_io, test2)
     channels_t channels;
     auto bus1 = channels.add(channel{});
     auto bus2 = channels.add(
-            channel{.in = bus1,
+            channel{.name = "foo",
+                    .bus_type = audio::bus_type::stereo,
+                    .in = bus1,
                     .volume = {},
                     .pan_balance = {},
                     .record = {},

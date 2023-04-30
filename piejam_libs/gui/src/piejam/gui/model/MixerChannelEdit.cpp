@@ -16,6 +16,7 @@ namespace piejam::gui::model
 struct MixerChannelEdit::Impl
 {
     runtime::mixer::channel_id channelId;
+    audio::bus_type bus_type;
 
     boxed_vector<runtime::selectors::mixer_device_route> inputDevices;
     boxed_vector<runtime::selectors::mixer_channel_route> inputChannels;
@@ -28,7 +29,12 @@ MixerChannelEdit::MixerChannelEdit(
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(id))
+    , m_impl(std::make_unique<Impl>(
+              id,
+              observe_once(
+                      runtime::selectors::make_mixer_channel_bus_type_selector(
+                              id))))
+    , m_busType(toBusType(m_impl->bus_type))
 {
 }
 
@@ -72,7 +78,9 @@ MixerChannelEdit::onSubscribe()
                 }
             });
 
-    observe(runtime::selectors::select_mixer_input_devices,
+    observe(m_impl->bus_type == audio::bus_type::mono
+                    ? runtime::selectors::select_mixer_mono_input_devices
+                    : runtime::selectors::select_mixer_stereo_input_devices,
             [this](boxed_vector<runtime::selectors::mixer_device_route> const&
                            inputDevices) {
                 m_impl->inputDevices = inputDevices;
@@ -186,7 +194,7 @@ MixerChannelEdit::deleteChannel()
 }
 
 void
-MixerChannelEdit::changeInputToMix()
+MixerChannelEdit::changeInputToDefault()
 {
     runtime::actions::set_mixer_channel_input action;
     action.channel_id = m_impl->channelId;

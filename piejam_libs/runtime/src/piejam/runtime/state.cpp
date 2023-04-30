@@ -90,7 +90,8 @@ auto
 make_initial_state() -> state
 {
     state st;
-    st.mixer_state.main = add_mixer_channel(st, "Main");
+    st.mixer_state.main =
+            add_mixer_channel(st, "Main", audio::bus_type::stereo);
     // main doesn't belong into inputs
     remove_erase(st.mixer_state.inputs, st.mixer_state.main);
     // reset the output to default back again
@@ -256,7 +257,7 @@ insert_internal_fx_module(
 
     mixer::channel const& mixer_channel =
             st.mixer_state.channels[mixer_channel_id];
-
+    auto const bus_type = mixer_channel.bus_type;
     fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
@@ -270,13 +271,14 @@ insert_internal_fx_module(
         case fx::internal::tool:
             fx_mod_id = make_internal_fx_module(
                     st.fx_modules,
-                    modules::tool::make_module(fx_params_factory));
+                    modules::tool::make_module(bus_type, fx_params_factory));
             break;
 
         case fx::internal::filter:
             fx_mod_id = make_internal_fx_module(
                     st.fx_modules,
                     modules::filter::make_module(
+                            bus_type,
                             fx_params_factory,
                             st.streams));
             break;
@@ -284,13 +286,13 @@ insert_internal_fx_module(
         case fx::internal::scope:
             fx_mod_id = make_internal_fx_module(
                     st.fx_modules,
-                    modules::scope::make_module(st.streams));
+                    modules::scope::make_module(bus_type, st.streams));
             break;
 
         case fx::internal::spectrum:
             fx_mod_id = make_internal_fx_module(
                     st.fx_modules,
-                    modules::spectrum::make_module(st.streams));
+                    modules::spectrum::make_module(bus_type, st.streams));
             break;
     }
 
@@ -315,7 +317,7 @@ insert_internal_fx_module(
 void
 insert_ladspa_fx_module(
         state& st,
-        mixer::channel_id const bus_id,
+        mixer::channel_id const mixer_channel_id,
         std::size_t const position,
         ladspa::instance_id const instance_id,
         ladspa::plugin_descriptor const& plugin_desc,
@@ -323,9 +325,12 @@ insert_ladspa_fx_module(
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
 {
-    BOOST_ASSERT(bus_id != mixer::channel_id{});
+    BOOST_ASSERT(mixer_channel_id != mixer::channel_id{});
 
-    fx::chain_t fx_chain = st.mixer_state.channels[bus_id].fx_chain;
+    mixer::channel const& mixer_channel =
+            st.mixer_state.channels[mixer_channel_id];
+    auto const bus_type = mixer_channel.bus_type;
+    fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
     fx::parameters_t fx_params = st.fx_parameters;
@@ -335,6 +340,7 @@ insert_ladspa_fx_module(
             st.fx_modules.add(modules::ladspa_fx::make_module(
                     instance_id,
                     plugin_desc.name,
+                    bus_type,
                     control_inputs,
                     fx_parameter_factory{st.params, fx_params})));
 
@@ -344,9 +350,11 @@ insert_ladspa_fx_module(
     apply_parameter_values(initial_values, fx_mod, st.params);
     apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
 
-    st.mixer_state.channels.update(bus_id, [&](mixer::channel& mixer_channel) {
-        mixer_channel.fx_chain = std::move(fx_chain);
-    });
+    st.mixer_state.channels.update(
+            mixer_channel_id,
+            [&](mixer::channel& mixer_channel) {
+                mixer_channel.fx_chain = std::move(fx_chain);
+            });
 
     st.fx_ladspa_instances.update(
             [&](fx::ladspa_instances& fx_ladspa_instances) {
@@ -496,10 +504,12 @@ add_device_bus(
 }
 
 auto
-add_mixer_channel(state& st, std::string name) -> mixer::channel_id
+add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
+        -> mixer::channel_id
 {
     auto bus_id = st.mixer_state.channels.add(mixer::channel{
             .name = std::move(name),
+            .bus_type = bus_type,
             .in = {},
             .out = st.mixer_state.main,
             .volume = add_parameter(

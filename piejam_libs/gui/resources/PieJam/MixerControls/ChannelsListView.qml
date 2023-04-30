@@ -6,10 +6,12 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
+import PieJam.Models 1.0 as PJModels
+
 ListView {
     id: root
 
-    signal fxButtonClicked(int index)
+    signal fxButtonClicked(int index, int busType)
 
     spacing: 2
     clip: true
@@ -19,11 +21,11 @@ ListView {
     reuseItems: true
 
     delegate: ChannelStrip {
-        anchors.top: if (parent) parent.top
-        anchors.bottom: if (parent) parent.bottom
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
         perform.model: model.item.perform
-        perform.onFxButtonClicked: root.fxButtonClicked(model.index)
+        perform.onFxButtonClicked: root.fxButtonClicked(model.index, busType)
 
         edit.model: model.item.edit
     }

@@ -5,6 +5,8 @@
 #include <piejam/gui/model/ScopeLinesGenerator.h>
 
 #include <piejam/gui/model/ScopeLines.h>
+
+#include <piejam/functional/operators.h>
 #include <piejam/math.h>
 #include <piejam/range/indices.h>
 #include <piejam/range/interleaved_view.h>
@@ -21,38 +23,37 @@ namespace
 
 struct InactiveGenerator
 {
-    auto operator()(AudioStreamListener::Stream const&)
-            -> std::optional<ScopeLines>
+    auto operator()(AudioStreamListener::Stream const&) -> ScopeLines
     {
-        return ScopeLines();
+        return ScopeLines{};
     }
 };
 
-constexpr auto
+[[nodiscard]] constexpr auto
 clip(float const v) -> float
 {
     return math::clamp(v, -1.f, 1.f);
 }
 
-template <StereoChannel SC>
+template <std::size_t NumChannels, class FrameConverter>
 class Generator
 {
 public:
     Generator(int const samplesPerPoint)
-        : m_samplesPerPoint(samplesPerPoint)
+        : m_samplesPerPoint{samplesPerPoint}
     {
     }
 
-    auto operator()(AudioStreamListener::Stream const& stream)
-            -> std::optional<ScopeLines>
+    auto operator()(AudioStreamListener::Stream const& stream) -> ScopeLines
     {
-        auto const stereoView = stream.channels_cast<2>();
+        auto const frames = stream.channels_cast<NumChannels>();
 
         ScopeLines result;
+        FrameConverter convert;
 
-        for (auto const frame : stereoView)
+        for (std::span<float const, NumChannels> const frame : frames)
         {
-            float const sample = frameValue<SC>(frame);
+            float const sample = convert(frame);
 
             if (m_accNumSamples) [[likely]]
             {
@@ -90,35 +91,56 @@ private:
 
 struct ScopeLinesGenerator::Impl
 {
-    int samplesPerPoint{1};
+    BusType streamType{BusType::Mono};
+    int samplesPerLine{1};
     bool active{};
     StereoChannel channel{StereoChannel::Left};
 
-    using Generate = std::function<std::optional<ScopeLines>(
-            AudioStreamListener::Stream const&)>;
+    using Generate =
+            std::function<ScopeLines(AudioStreamListener::Stream const&)>;
     Generate generator{InactiveGenerator{}};
 
     auto makeGenerator() const -> Generate
     {
         if (active)
         {
-            switch (channel)
+            switch (streamType)
             {
-                case StereoChannel::Left:
-                    return Generator<StereoChannel::Left>{samplesPerPoint};
+                case BusType::Mono:
+                    return Generator<2, StereoFrameValue<StereoChannel::Left>>{
+                            samplesPerLine};
 
-                case StereoChannel::Right:
-                    return Generator<StereoChannel::Right>{samplesPerPoint};
+                case BusType::Stereo:
+                    switch (channel)
+                    {
+                        case StereoChannel::Left:
+                            return Generator<
+                                    2,
+                                    StereoFrameValue<StereoChannel::Left>>{
+                                    samplesPerLine};
 
-                case StereoChannel::Middle:
-                    return Generator<StereoChannel::Middle>{samplesPerPoint};
+                        case StereoChannel::Right:
+                            return Generator<
+                                    2,
+                                    StereoFrameValue<StereoChannel::Right>>{
+                                    samplesPerLine};
 
-                case StereoChannel::Side:
-                    return Generator<StereoChannel::Side>{samplesPerPoint};
+                        case StereoChannel::Middle:
+                            return Generator<
+                                    2,
+                                    StereoFrameValue<StereoChannel::Middle>>{
+                                    samplesPerLine};
 
-                default:
-                    BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
-                    return InactiveGenerator{};
+                        case StereoChannel::Side:
+                            return Generator<
+                                    2,
+                                    StereoFrameValue<StereoChannel::Side>>{
+                                    samplesPerLine};
+
+                        default:
+                            BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
+                            return InactiveGenerator{};
+                    }
             }
         }
         else
@@ -127,7 +149,20 @@ struct ScopeLinesGenerator::Impl
         }
     }
 
-    void updateGenerator() { generator = makeGenerator(); }
+    void updateGenerator()
+    {
+        generator = makeGenerator();
+    }
+
+    template <class T>
+    void updateGeneratorProperty(T& member, T value)
+    {
+        if (member != value)
+        {
+            member = std::move(value);
+            updateGenerator();
+        }
+    }
 };
 
 ScopeLinesGenerator::ScopeLinesGenerator()
@@ -138,43 +173,38 @@ ScopeLinesGenerator::ScopeLinesGenerator()
 ScopeLinesGenerator::~ScopeLinesGenerator() = default;
 
 void
+ScopeLinesGenerator::setStreamType(piejam::gui::model::BusType const streamType)
+{
+    m_impl->updateGeneratorProperty(m_impl->streamType, streamType);
+}
+
+void
 ScopeLinesGenerator::setSamplesPerLine(int const samplesPerLine)
 {
     if (samplesPerLine <= 0)
-        throw std::invalid_argument("samplesPerPoint must be positive");
-
-    if (m_impl->samplesPerPoint != samplesPerLine)
     {
-        m_impl->samplesPerPoint = samplesPerLine;
-        m_impl->updateGenerator();
+        throw std::invalid_argument("samplesPerPoint must be positive");
     }
+
+    m_impl->updateGeneratorProperty(m_impl->samplesPerLine, samplesPerLine);
 }
 
 void
 ScopeLinesGenerator::setActive(bool const active)
 {
-    if (m_impl->active != active)
-    {
-        m_impl->active = active;
-        m_impl->updateGenerator();
-    }
+    m_impl->updateGeneratorProperty(m_impl->active, active);
 }
 
 void
-ScopeLinesGenerator::setChannel(StereoChannel const channel)
+ScopeLinesGenerator::setStereoChannel(StereoChannel const channel)
 {
-    if (m_impl->channel != channel)
-    {
-        m_impl->channel = channel;
-        m_impl->updateGenerator();
-    }
+    m_impl->updateGeneratorProperty(m_impl->channel, channel);
 }
 
 void
 ScopeLinesGenerator::update(Stream const& stream)
 {
-    if (auto lines = m_impl->generator(stream))
-        generated(*lines);
+    generated(m_impl->generator(stream));
 }
 
 } // namespace piejam::gui::model

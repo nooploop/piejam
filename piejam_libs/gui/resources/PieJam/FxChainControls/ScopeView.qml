@@ -62,7 +62,9 @@ Item {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: channelASelector.top
+        anchors.bottom: root.content && root.content.busType == PJModels.BusType.Stereo
+                        ? channelASelector.top
+                        : parent.bottom
 
         from: 0
         to: 11
@@ -72,6 +74,8 @@ Item {
 
     StereoChannelSelector {
         id: channelASelector
+
+        visible: root.content && root.content.busType == PJModels.BusType.Stereo
 
         name: "A"
         active: root.content ? root.content.activeA : false
@@ -88,6 +92,8 @@ Item {
 
     StereoChannelSelector {
         id: channelBSelector
+
+        visible: root.content && root.content.busType == PJModels.BusType.Stereo
 
         name: "B"
         active: root.content ? root.content.activeB : false

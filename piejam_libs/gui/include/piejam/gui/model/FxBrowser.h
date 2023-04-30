@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
@@ -20,9 +21,11 @@ class FxBrowser final : public Subscribable<SubscribableModel>
 
 public:
     FxBrowser(runtime::store_dispatch, runtime::subscriber&);
-    ~FxBrowser();
+    ~FxBrowser() override;
 
     auto entries() noexcept -> FxBrowserList*;
+
+    Q_INVOKABLE void setBusTypeFilter(piejam::gui::model::BusType busType);
 
 private:
     void onSubscribe() override;

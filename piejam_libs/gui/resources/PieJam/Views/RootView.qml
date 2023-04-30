@@ -96,6 +96,7 @@ Item {
 
             onFxButtonClicked: {
                 fxChainPane.chainIndex = index
+                root.modelFactory.fxBrowser.setBusTypeFilter(busType)
                 content.currentIndex = 3
             }
         }

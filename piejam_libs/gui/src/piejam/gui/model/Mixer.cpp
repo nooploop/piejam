@@ -109,10 +109,21 @@ Mixer::onSubscribe()
 }
 
 void
-Mixer::addChannel(QString const& newChannelName)
+Mixer::addMonoChannel(QString const& newChannelName)
 {
     runtime::actions::add_mixer_channel action;
     action.name = newChannelName.toStdString();
+    action.bus_type = audio::bus_type::mono;
+    action.auto_assign_input = true;
+    dispatch(action);
+}
+
+void
+Mixer::addStereoChannel(QString const& newChannelName)
+{
+    runtime::actions::add_mixer_channel action;
+    action.name = newChannelName.toStdString();
+    action.bus_type = audio::bus_type::stereo;
     action.auto_assign_input = true;
     dispatch(action);
 }

@@ -8,14 +8,16 @@
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 
+#include <piejam/audio/types.h>
+
 namespace piejam::runtime::modules::scope
 {
 
 enum class stream_key : fx::stream_key
 {
-    left_right
+    input
 };
 
-auto make_module(audio_streams_cache&) -> fx::module;
+auto make_module(audio::bus_type, audio_streams_cache&) -> fx::module;
 
 } // namespace piejam::runtime::modules::scope

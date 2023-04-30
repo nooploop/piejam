@@ -25,22 +25,30 @@ namespace piejam::runtime::modules::tool
 namespace
 {
 
-class fx_gain final : public audio::engine::component
+class component final : public audio::engine::component
 {
 public:
-    fx_gain(fx::module const& fx_mod,
+    component(
+            fx::module const& fx_mod,
             parameter_processor_factory& proc_factory,
             std::string_view const name)
         : m_gain_input_proc(processors::make_parameter_processor(
                   proc_factory,
                   fx_mod.parameters->at(to_underlying(parameter_key::gain)),
-                  fmt::format("gain {}", name)))
-        , m_amplifier(audio::components::make_stereo_amplifier(
-                  fmt::format("amp {}", name)))
+                  fmt::format("tool_gain {}", name)))
+        , m_amplifier(
+                  fx_mod.bus_type == audio::bus_type::mono
+                          ? audio::components::make_mono_amplifier(
+                                    fmt::format("tool {}", name))
+                          : audio::components::make_stereo_amplifier(
+                                    fmt::format("tool {}", name)))
     {
     }
 
-    auto inputs() const -> endpoints override { return m_amplifier->inputs(); }
+    auto inputs() const -> endpoints override
+    {
+        return m_amplifier->inputs();
+    }
 
     auto outputs() const -> endpoints override
     {
@@ -52,7 +60,10 @@ public:
         return m_amplifier->event_inputs();
     }
 
-    auto event_outputs() const -> endpoints override { return {}; }
+    auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
 
     void connect(audio::engine::graph& g) const override
     {
@@ -75,7 +86,7 @@ make_component(
         std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<fx_gain>(fx_mod, proc_factory, name);
+    return std::make_unique<component>(fx_mod, proc_factory, name);
 }
 
 } // namespace piejam::runtime::modules::tool

@@ -26,7 +26,9 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.bottom: channelASelector.top
+        anchors.bottom: root.content && root.content.busType == PJModels.BusType.Stereo
+                        ? channelASelector.top
+                        : parent.bottom
 
         spectrumAData: root.content ? root.content.dataA : null
         spectrumAColor: Material.color(Material.Pink)
@@ -66,6 +68,8 @@ Item {
     StereoChannelSelector {
         id: channelASelector
 
+        visible: root.content && root.content.busType == PJModels.BusType.Stereo
+
         name: "A"
         active: root.content ? root.content.activeA : false
         channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
@@ -81,6 +85,8 @@ Item {
 
     StereoChannelSelector {
         id: channelBSelector
+
+        visible: root.content && root.content.busType == PJModels.BusType.Stereo
 
         name: "B"
         active: root.content ? root.content.activeB : false

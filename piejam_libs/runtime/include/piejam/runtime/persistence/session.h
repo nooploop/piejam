@@ -4,12 +4,14 @@
 
 #pragma once
 
-#include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/persistence/fx_midi_assignments.h>
 #include <piejam/runtime/persistence/fx_preset.h>
+
+#include <piejam/audio/types.h>
+#include <piejam/ladspa/fwd.h>
 
 #include <nlohmann/json_fwd.hpp>
 
@@ -85,6 +87,7 @@ struct session
     struct mixer_channel
     {
         std::string name;
+        audio::bus_type bus_type;
         mixer_parameters parameter;
         mixer_midi midi;
         fx_chain_t fx_chain;

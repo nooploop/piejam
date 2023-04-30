@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/audio/types.h>
 #include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -18,6 +19,7 @@ namespace piejam::runtime::modules::ladspa_fx
 auto make_module(
         ladspa::instance_id,
         std::string const& name,
+        audio::bus_type,
         std::span<piejam::ladspa::port_descriptor const> control_inputs,
         fx_parameter_factory const&) -> fx::module;
 

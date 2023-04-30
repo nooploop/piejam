@@ -11,7 +11,8 @@ Item {
 
     property alias name: nameText.text
 
-    signal addClicked()
+    signal addMonoClicked()
+    signal addStereoClicked()
 
     implicitWidth: 132
     implicitHeight: 400
@@ -32,17 +33,31 @@ Item {
         }
 
         Button {
-            id: addButton
+            id: addMonoButton
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: addStereoButton.top
+
+            text: qsTr("Add Mono")
+
+            Material.background: Material.color(Material.Green, Material.Shade400)
+
+            onClicked: root.addMonoClicked()
+        }
+
+        Button {
+            id: addStereoButton
 
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
-            text: qsTr("Add")
+            text: qsTr("Add Stereo")
 
             Material.background: Material.color(Material.Green, Material.Shade400)
 
-            onClicked: root.addClicked()
+            onClicked: root.addStereoClicked()
         }
     }
 }

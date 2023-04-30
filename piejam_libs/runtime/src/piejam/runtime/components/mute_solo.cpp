@@ -23,25 +23,27 @@ namespace
 class mute_solo final : public audio::engine::component
 {
 public:
-    mute_solo(std::string_view const name)
+    explicit mute_solo(std::string_view const name)
         : m_mute_solo_proc(processors::make_mute_solo_processor(name))
-        , m_mute_solo_amp(audio::components::make_stereo_amplifier("mute_amp"))
+        , m_mute_solo_amp(audio::components::make_stereo_amplifier("mute"))
     {
     }
 
     [[nodiscard]] auto inputs() const -> endpoints override
     {
-        return m_inputs;
+        return m_mute_solo_amp->inputs();
     }
+
     [[nodiscard]] auto outputs() const -> endpoints override
     {
-        return m_outputs;
+        return m_mute_solo_amp->outputs();
     }
 
     [[nodiscard]] auto event_inputs() const -> endpoints override
     {
         return m_event_inputs;
     }
+
     [[nodiscard]] auto event_outputs() const -> endpoints override
     {
         return {};
@@ -60,10 +62,6 @@ private:
     std::unique_ptr<audio::engine::processor> m_mute_solo_proc;
     std::unique_ptr<audio::engine::component> m_mute_solo_amp;
 
-    std::array<audio::engine::graph_endpoint, 2> m_inputs{
-            {m_mute_solo_amp->inputs()[0], m_mute_solo_amp->inputs()[1]}};
-    std::array<audio::engine::graph_endpoint, 2> m_outputs{
-            {m_mute_solo_amp->outputs()[0], m_mute_solo_amp->outputs()[1]}};
     std::array<audio::engine::graph_endpoint, 2> m_event_inputs{
             {{*m_mute_solo_proc, 0}, {*m_mute_solo_proc, 1}}};
 };

@@ -4,11 +4,13 @@
 
 #include <piejam/runtime/modules/filter/filter_component.h>
 
+#include <piejam/audio/components/remap_channels.h>
 #include <piejam/audio/dsp/biquad_filter.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/event_converter_processor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_endpoint.h>
+#include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/single_event_input_processor.h>
@@ -18,6 +20,7 @@
 #include <piejam/audio/sample_rate.h>
 #include <piejam/integral_constant.h>
 #include <piejam/math.h>
+#include <piejam/runtime/components/stream.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/parameter_processor_factory.h>
@@ -25,6 +28,7 @@
 #include <piejam/to_underlying.h>
 
 #include <boost/container/flat_map.hpp>
+#include <boost/container/static_vector.hpp>
 #include <boost/hof/match.hpp>
 #include <boost/mp11/map.hpp>
 
@@ -287,8 +291,60 @@ private:
     process_sample_t m_process_sample{&processor::process_sample_first_only};
 };
 
+template <std::size_t NumChannels>
+[[nodiscard]] constexpr auto
+filter_channel_name(std::size_t ch)
+{
+    using namespace std::string_view_literals;
+    switch (NumChannels)
+    {
+        case 2:
+            switch (ch)
+            {
+                case 0:
+                    return "filter L"sv;
+                case 1:
+                    return "filter R"sv;
+                default:
+                    return "filter"sv;
+            }
+
+        default:
+            return "filter"sv;
+    }
+}
+
+auto
+make_in_out_stream(
+        audio::bus_type bus_type,
+        audio_stream_id stream_id,
+        processors::stream_processor_factory& stream_proc_factory,
+        std::size_t const buffer_capacity_per_channel)
+{
+    auto in_out_stream = components::make_stream(
+            stream_id,
+            stream_proc_factory,
+            4,
+            buffer_capacity_per_channel,
+            "filter_in_out");
+
+    switch (bus_type)
+    {
+        case audio::bus_type::mono:
+            return audio::components::make_remap_channels(
+                    std::move(in_out_stream),
+                    audio::engine::endpoint_ports::from<0, 2>{},
+                    audio::engine::endpoint_ports::to<0, 2>{});
+
+        case audio::bus_type::stereo:
+            return in_out_stream;
+    }
+}
+
+template <std::size_t... Channel>
 class component final : public audio::engine::component
 {
+    static inline constexpr std::size_t num_channels = sizeof...(Channel);
 
 public:
     component(
@@ -310,16 +366,13 @@ public:
                   fx_mod.parameters->at(
                           to_underlying(parameter_key::resonance)),
                   "res"))
-        , m_event_converter_proc(
-                  make_coefficent_converter_processor(sample_rate))
-        , m_filter_left_proc(std::make_unique<processor>("left"))
-        , m_filter_right_proc(std::make_unique<processor>("right"))
-        , m_in_out_stream_proc(stream_proc_factory.make_processor(
+        , m_coeffs_proc(make_coefficent_converter_processor(sample_rate))
+        , m_in_out_stream(make_in_out_stream(
+                  fx_mod.bus_type,
                   fx_mod.streams->at(
                           to_underlying(modules::filter::stream_key::in_out)),
-                  4,
-                  sample_rate.to_samples(std::chrono::milliseconds(17 * 3)),
-                  "filter_in_out"))
+                  stream_proc_factory,
+                  sample_rate.to_samples(std::chrono::milliseconds(120))))
     {
     }
 
@@ -345,51 +398,87 @@ public:
 
     void connect(audio::engine::graph& g) const override
     {
-        g.event.insert({*m_type_input_proc, 0}, {*m_event_converter_proc, 0});
-        g.event.insert({*m_cutoff_input_proc, 0}, {*m_event_converter_proc, 1});
-        g.event.insert(
-                {*m_resonance_input_proc, 0},
-                {*m_event_converter_proc, 2});
+        using namespace audio::engine::endpoint_ports;
 
-        g.event.insert({*m_event_converter_proc, 0}, {*m_filter_left_proc, 0});
-        g.event.insert({*m_event_converter_proc, 0}, {*m_filter_right_proc, 0});
+        m_in_out_stream->connect(g);
 
-        g.audio.insert({*m_input_left_proc, 0}, {*m_filter_left_proc, 0});
-        g.audio.insert({*m_input_right_proc, 0}, {*m_filter_right_proc, 0});
+        audio::engine::connect_event(
+                g,
+                *m_type_input_proc,
+                from<0>{},
+                *m_coeffs_proc,
+                to<0>{});
 
-        g.audio.insert({*m_input_left_proc, 0}, {*m_in_out_stream_proc, 0});
-        g.audio.insert({*m_input_right_proc, 0}, {*m_in_out_stream_proc, 1});
+        audio::engine::connect_event(
+                g,
+                *m_cutoff_input_proc,
+                from<0>{},
+                *m_coeffs_proc,
+                to<1>{});
 
-        g.audio.insert({*m_filter_left_proc, 0}, {*m_in_out_stream_proc, 2});
-        g.audio.insert({*m_filter_right_proc, 0}, {*m_in_out_stream_proc, 3});
+        audio::engine::connect_event(
+                g,
+                *m_resonance_input_proc,
+                from<0>{},
+                *m_coeffs_proc,
+                to<2>{});
+
+        (audio::engine::connect_event(
+                 g,
+                 *m_coeffs_proc,
+                 from<0>{},
+                 *m_filter_procs[Channel],
+                 to<0>{}),
+         ...);
+
+        (audio::engine::connect(
+                 g,
+                 *m_input_procs[Channel],
+                 from<0>{},
+                 *m_filter_procs[Channel],
+                 to<0>{}),
+         ...);
+
+        (audio::engine::connect(
+                 g,
+                 *m_input_procs[Channel],
+                 from<0>{},
+                 *m_in_out_stream,
+                 to<Channel>{}),
+         ...);
+
+        (audio::engine::connect(
+                 g,
+                 *m_filter_procs[Channel],
+                 from<0>{},
+                 *m_in_out_stream,
+                 to<Channel + num_channels>{}),
+         ...);
     }
 
 private:
     std::shared_ptr<audio::engine::processor> m_type_input_proc;
     std::shared_ptr<audio::engine::processor> m_cutoff_input_proc;
     std::shared_ptr<audio::engine::processor> m_resonance_input_proc;
-    std::unique_ptr<audio::engine::processor> m_event_converter_proc;
-    std::unique_ptr<audio::engine::processor> m_input_left_proc{
-            audio::engine::make_identity_processor()};
-    std::unique_ptr<audio::engine::processor> m_input_right_proc{
-            audio::engine::make_identity_processor()};
-    std::unique_ptr<processor> m_filter_left_proc;
-    std::unique_ptr<processor> m_filter_right_proc;
-    std::shared_ptr<audio::engine::processor> m_in_out_stream_proc;
-    std::array<audio::engine::graph_endpoint, 2> m_inputs{
+    std::unique_ptr<audio::engine::processor> m_coeffs_proc;
+    std::array<std::unique_ptr<audio::engine::processor>, num_channels>
+            m_input_procs{
+                    ((void)Channel,
+                     audio::engine::make_identity_processor())...};
+    std::array<std::unique_ptr<audio::engine::processor>, num_channels>
+            m_filter_procs{
+                    ((void)Channel,
+                     std::make_unique<processor>(
+                             filter_channel_name<num_channels>(Channel)))...};
+    std::shared_ptr<audio::engine::component> m_in_out_stream;
+    std::array<audio::engine::graph_endpoint, num_channels> m_inputs{
             audio::engine::graph_endpoint{
-                    .proc = *m_input_left_proc,
-                    .port = 0},
+                    .proc = *m_input_procs[Channel],
+                    .port = 0}...};
+    std::array<audio::engine::graph_endpoint, num_channels> m_outputs{
             audio::engine::graph_endpoint{
-                    .proc = *m_input_right_proc,
-                    .port = 0}};
-    std::array<audio::engine::graph_endpoint, 2> m_outputs{
-            audio::engine::graph_endpoint{
-                    .proc = *m_filter_left_proc,
-                    .port = 0},
-            audio::engine::graph_endpoint{
-                    .proc = *m_filter_right_proc,
-                    .port = 0}};
+                    .proc = *m_filter_procs[Channel],
+                    .port = 0}...};
     std::array<audio::engine::graph_endpoint, 3> m_event_inputs{
             audio::engine::graph_endpoint{
                     .proc = *m_type_input_proc,
@@ -402,6 +491,25 @@ private:
                     .port = 0}};
 };
 
+template <std::size_t... Channel>
+auto
+make_component(
+        fx::module const& fx_mod,
+        audio::sample_rate const sample_rate,
+        parameter_processor_factory& proc_factory,
+        processors::stream_processor_factory& stream_proc_factory,
+        std::string_view const name,
+        std::index_sequence<Channel...>)
+        -> std::unique_ptr<audio::engine::component>
+{
+    return std::make_unique<component<Channel...>>(
+            fx_mod,
+            sample_rate,
+            proc_factory,
+            stream_proc_factory,
+            name);
+}
+
 } // namespace
 
 auto
@@ -413,12 +521,26 @@ make_component(
         std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
-    return std::make_unique<component>(
-            fx_mod,
-            sample_rate,
-            proc_factory,
-            stream_proc_factory,
-            name);
+    switch (fx_mod.bus_type)
+    {
+        case audio::bus_type::mono:
+            return make_component(
+                    fx_mod,
+                    sample_rate,
+                    proc_factory,
+                    stream_proc_factory,
+                    name,
+                    std::make_index_sequence<1>{});
+
+        case audio::bus_type::stereo:
+            return make_component(
+                    fx_mod,
+                    sample_rate,
+                    proc_factory,
+                    stream_proc_factory,
+                    name,
+                    std::make_index_sequence<2>{});
+    }
 }
 
 } // namespace piejam::runtime::modules::filter

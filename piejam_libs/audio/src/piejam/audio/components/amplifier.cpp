@@ -38,7 +38,7 @@ format_name(
     switch (num_channels)
     {
         case 1:
-            return fmt::format("{} {} M", name, param);
+            return fmt::format("{} {}", name, param);
 
         case 2:
             switch (ch)

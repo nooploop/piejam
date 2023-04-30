@@ -62,6 +62,8 @@ extern const selector<boxed_vector<mixer::channel_id>>
         select_mixer_input_channels;
 extern const selector<mixer::channel_id> select_mixer_main_channel;
 
+auto make_mixer_channel_bus_type_selector(mixer::channel_id)
+        -> selector<audio::bus_type>;
 auto make_mixer_channel_volume_parameter_selector(mixer::channel_id)
         -> selector<float_parameter_id>;
 auto make_mixer_channel_pan_balance_parameter_selector(mixer::channel_id)
@@ -84,7 +86,9 @@ struct mixer_device_route
 };
 
 extern const selector<boxed_vector<mixer_device_route>>
-        select_mixer_input_devices;
+        select_mixer_mono_input_devices;
+extern const selector<boxed_vector<mixer_device_route>>
+        select_mixer_stereo_input_devices;
 extern const selector<boxed_vector<mixer_device_route>>
         select_mixer_output_devices;
 
@@ -131,9 +135,6 @@ auto make_device_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
 auto make_mixer_channel_name_selector(mixer::channel_id)
         -> selector<boxed_string>;
 
-auto make_mixer_channel_input_type_selector(mixer::channel_id)
-        -> selector<audio::bus_type>;
-
 auto make_mixer_channel_can_move_left_selector(mixer::channel_id)
         -> selector<bool>;
 auto make_mixer_channel_can_move_right_selector(mixer::channel_id)
@@ -159,6 +160,8 @@ auto make_fx_chain_selector(mixer::channel_id) -> selector<box<fx::chain_t>>;
 auto make_fx_module_instance_id_selector(fx::module_id)
         -> selector<fx::instance_id>;
 auto make_fx_module_name_selector(fx::module_id) -> selector<boxed_string>;
+auto make_fx_module_bus_type_selector(fx::module_id)
+        -> selector<audio::bus_type>;
 auto make_fx_module_bypass_selector(fx::module_id) -> selector<bool>;
 auto make_fx_module_parameters_selector(fx::module_id)
         -> selector<box<fx::module_parameters>>;

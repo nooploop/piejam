@@ -89,13 +89,19 @@ apply_mixer_midi(
     mixer::channel const& mixer_channel = channels[channel_id];
 
     if (mixer_midi.volume)
+    {
         action.assignments.emplace(mixer_channel.volume, *mixer_midi.volume);
+    }
 
     if (mixer_midi.pan)
+    {
         action.assignments.emplace(mixer_channel.pan_balance, *mixer_midi.pan);
+    }
 
     if (mixer_midi.mute)
+    {
         action.assignments.emplace(mixer_channel.mute, *mixer_midi.mute);
+    }
 }
 
 void
@@ -108,7 +114,9 @@ apply_mixer_midi(
     BOOST_ASSERT(mb_data.size() == channel_ids.size());
 
     for (std::size_t const i : range::indices(channel_ids))
+    {
         apply_mixer_midi(action, channels, channel_ids[i], mb_data[i].midi);
+    }
 }
 
 void
@@ -180,17 +188,25 @@ apply_mixer_io(
                             device_buses,
                             mixer_io.name);
                     it != device_buses.end())
+                {
                     return mixer::io_address_t(it->first);
+                }
                 else
+                {
                     return mixer::io_address_t(mixer_io.name);
+                }
 
             case persistence::session::mixer_io_type::channel:
                 if (auto it =
                             find_mixer_channel_by_name(channels, mixer_io.name);
                     it != channels.end())
+                {
                     return mixer::io_address_t(it->first);
+                }
                 else
+                {
                     return mixer::io_address_t();
+                }
 
             default:
                 return mixer::io_address_t();
@@ -278,7 +294,9 @@ configure_mixer_channels(
                 session.main_mixer_channel.midi);
 
         if (!midi_action->assignments.empty())
+        {
             action.push_back(std::move(midi_action));
+        }
     }
 
     // paramaeters
@@ -335,7 +353,11 @@ make_mixer_channels(persistence::session session) -> thunk_action
         batch_action action;
 
         for (auto const& mb_data : session.mixer_channels)
-            action.emplace_back<actions::add_mixer_channel>(mb_data.name);
+        {
+            action.emplace_back<actions::add_mixer_channel>(
+                    mb_data.name,
+                    mb_data.bus_type);
+        }
 
         auto set_main_name_action =
                 std::make_unique<actions::set_mixer_channel_name>();

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/ScopeLinesObject.h>
 #include <piejam/gui/model/StereoChannel.h>
@@ -26,8 +27,11 @@ class FxScope final : public Subscribable<FxModuleContent>
                        NOTIFY samplesPerLineChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataA READ dataA CONSTANT)
-    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataB READ dataB CONSTANT)
+    Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataA READ dataA CONSTANT
+                       FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataB READ dataB CONSTANT
+                       FINAL)
     Q_PROPERTY(bool activeA READ activeA NOTIFY activeAChanged FINAL)
     Q_PROPERTY(bool activeB READ activeB NOTIFY activeBChanged FINAL)
     Q_PROPERTY(piejam::gui::model::StereoChannel channelA READ channelA NOTIFY
@@ -39,14 +43,25 @@ public:
     FxScope(runtime::store_dispatch,
             runtime::subscriber&,
             runtime::fx::module_id);
-    ~FxScope();
+    ~FxScope() override;
 
-    auto type() const noexcept -> Type override final { return Type::Scope; }
+    auto type() const noexcept -> Type override
+    {
+        return Type::Scope;
+    }
 
-    auto samplesPerLine() const noexcept -> int { return m_samplesPerLine; }
-    void setSamplesPerLine(int const x);
+    auto samplesPerLine() const noexcept -> int
+    {
+        return m_samplesPerLine;
+    }
 
-    auto viewSize() const noexcept -> int { return m_viewSize; }
+    void setSamplesPerLine(int x);
+
+    auto viewSize() const noexcept -> int
+    {
+        return m_viewSize;
+    }
+
     void setViewSize(int const x)
     {
         if (m_viewSize != x)
@@ -58,39 +73,66 @@ public:
         }
     }
 
-    bool activeA() const noexcept { return m_activeA; }
+    auto busType() const noexcept -> BusType
+    {
+        return m_busType;
+    }
+
+    auto activeA() const noexcept -> bool
+    {
+        return m_activeA;
+    }
 
     Q_INVOKABLE void changeActiveA(bool active);
 
-    auto channelA() const noexcept -> StereoChannel { return m_channelA; }
+    auto channelA() const noexcept -> StereoChannel
+    {
+        return m_channelA;
+    }
 
     Q_INVOKABLE void changeChannelA(piejam::gui::model::StereoChannel);
 
-    auto dataA() noexcept -> ScopeLinesObject* { return &m_linesA; }
+    auto dataA() noexcept -> ScopeLinesObject*
+    {
+        return &m_linesA;
+    }
 
-    bool activeB() const noexcept { return m_activeB; }
+    auto activeB() const noexcept -> bool
+    {
+        return m_activeB;
+    }
 
     Q_INVOKABLE void changeActiveB(bool active);
 
-    auto channelB() const noexcept -> StereoChannel { return m_channelB; }
+    auto channelB() const noexcept -> StereoChannel
+    {
+        return m_channelB;
+    }
 
     Q_INVOKABLE void changeChannelB(piejam::gui::model::StereoChannel);
 
-    auto dataB() noexcept -> ScopeLinesObject* { return &m_linesB; }
+    auto dataB() noexcept -> ScopeLinesObject*
+    {
+        return &m_linesB;
+    }
 
     Q_INVOKABLE void clear()
     {
         m_linesA.get().clear();
 
         if (m_activeA)
+        {
             m_linesA.get().resize(m_viewSize);
+        }
 
         m_linesA.update();
 
         m_linesB.get().clear();
 
         if (m_activeB)
+        {
             m_linesB.get().resize(m_viewSize);
+        }
 
         m_linesB.update();
     }
@@ -111,6 +153,7 @@ private:
 
     int m_samplesPerLine{1};
     int m_viewSize{};
+    BusType m_busType;
     bool m_activeA{true};
     StereoChannel m_channelA{StereoChannel::Left};
     ScopeLinesObject m_linesA;

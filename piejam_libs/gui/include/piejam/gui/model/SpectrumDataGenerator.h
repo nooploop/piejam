@@ -4,23 +4,26 @@
 
 #pragma once
 
-#include <piejam/audio/fwd.h>
 #include <piejam/gui/model/AudioStreamListener.h>
+#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/SpectrumDataPoint.h>
 #include <piejam/gui/model/StereoChannel.h>
+
+#include <piejam/audio/fwd.h>
 
 #include <memory>
 
 namespace piejam::gui::model
 {
 
-class StereoSpectrumDataGenerator final : public AudioStreamListener
+class SpectrumDataGenerator final : public AudioStreamListener
 {
     Q_OBJECT
 public:
-    StereoSpectrumDataGenerator();
-    ~StereoSpectrumDataGenerator();
+    SpectrumDataGenerator();
+    ~SpectrumDataGenerator() override;
 
+    void setBusType(BusType);
     void setSampleRate(audio::sample_rate);
     void setActive(bool active);
     void setChannel(StereoChannel);
@@ -28,7 +31,7 @@ public:
     void update(Stream const&) override;
 
 signals:
-    void generated(SpectrumDataPoints const&);
+    void generated(piejam::gui::model::SpectrumDataPoints const&);
 
 private:
     struct Impl;

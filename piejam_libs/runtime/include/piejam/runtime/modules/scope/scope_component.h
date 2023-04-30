@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include <piejam/audio/engine/fwd.h>
-#include <piejam/audio/fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+
+#include <piejam/audio/engine/fwd.h>
+#include <piejam/audio/fwd.h>
 
 #include <memory>
 #include <string_view>
