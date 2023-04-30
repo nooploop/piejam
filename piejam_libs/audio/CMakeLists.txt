@@ -7,6 +7,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/identity.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/level_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/pan_balance.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/remap_channels.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device_manager.h
@@ -19,6 +20,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag_executor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/endpoint_ports.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_buffer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/event_buffer_memory.h
@@ -30,6 +32,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_algorithms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_endpoint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_generic_algorithms.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_node.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/graph_to_dag.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/identity_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/input_processor.h

@@ -21,12 +21,12 @@ public:
     [[nodiscard]] virtual auto inputs() const -> endpoints = 0;
     [[nodiscard]] virtual auto outputs() const -> endpoints = 0;
 
-    [[nodiscard]] auto num_inputs() const noexcept -> std::size_t
+    [[nodiscard]] constexpr auto num_inputs() const noexcept -> std::size_t
     {
         return inputs().size();
     }
 
-    [[nodiscard]] auto num_outputs() const noexcept -> std::size_t
+    [[nodiscard]] constexpr auto num_outputs() const noexcept -> std::size_t
     {
         return outputs().size();
     }

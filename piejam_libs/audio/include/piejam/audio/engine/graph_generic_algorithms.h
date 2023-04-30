@@ -1,12 +1,12 @@
 // PieJam - An audio mixer for Raspberry Pi.
-// SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
+// SPDX-FileCopyrightText: 2023  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 
-#include <piejam/audio/engine/component.h>
+#include <piejam/audio/engine/endpoint_ports.h>
 #include <piejam/audio/engine/graph.h>
-#include <piejam/audio/engine/processor.h>
+#include <piejam/audio/engine/graph_node.h>
 
 #include <boost/assert.hpp>
 
@@ -17,87 +17,13 @@
 namespace piejam::audio::engine
 {
 
-namespace endpoint_ports
-{
-
-template <std::size_t... Is>
-using from = std::index_sequence<Is...>;
-
-template <std::size_t... Is>
-using to = std::index_sequence<Is...>;
-
-static inline constexpr std::index_sequence<0, 1> stereo;
-
-} // namespace endpoint_ports
-
 void
 connect(graph&,
         graph_endpoint const& src,
         graph_endpoint const& dst,
         std::vector<std::unique_ptr<processor>>& mixers);
 
-namespace detail
-{
-
-template <class C>
-concept graph_entity = std::is_base_of_v<component, std::remove_cvref_t<C>> ||
-                       std::is_base_of_v<processor, std::remove_cvref_t<C>>;
-
-inline constexpr auto
-src_endpoint(component const& src, std::size_t port) noexcept
-{
-    return src.outputs()[port];
-}
-
-inline constexpr auto
-src_endpoint(processor& src, std::size_t port) noexcept
-{
-    return graph_endpoint{.proc = src, .port = port};
-}
-
-inline constexpr auto
-dst_endpoint(component const& src, std::size_t port) noexcept
-{
-    return src.inputs()[port];
-}
-
-inline constexpr auto
-dst_endpoint(processor& src, std::size_t port) noexcept
-{
-    return graph_endpoint{.proc = src, .port = port};
-}
-
-inline constexpr auto
-src_event_endpoint(component const& src, std::size_t port) noexcept
-{
-    return src.event_outputs()[port];
-}
-
-inline constexpr auto
-src_event_endpoint(processor& src, std::size_t port) noexcept
-{
-    return graph_endpoint{.proc = src, .port = port};
-}
-
-inline constexpr auto
-dst_event_endpoint(component const& src, std::size_t port) noexcept
-{
-    return src.event_inputs()[port];
-}
-
-inline constexpr auto
-dst_event_endpoint(processor& src, std::size_t port) noexcept
-{
-    return graph_endpoint{.proc = src, .port = port};
-}
-
-} // namespace detail
-
-template <
-        detail::graph_entity Src,
-        std::size_t... M,
-        detail::graph_entity Dst,
-        std::size_t... N>
+template <graph_node Src, std::size_t... M, graph_node Dst, std::size_t... N>
 void
 connect(graph& g,
         Src&& src,
@@ -108,12 +34,12 @@ connect(graph& g,
     static_assert(sizeof...(M) == sizeof...(N));
 
     (g.audio.insert(
-             detail::src_endpoint(std::forward<Src>(src), M),
-             detail::dst_endpoint(std::forward<Dst>(dst), N)),
+             src_endpoint(std::forward<Src>(src), M),
+             dst_endpoint(std::forward<Dst>(dst), N)),
      ...);
 }
 
-template <detail::graph_entity Src, detail::graph_entity Dst>
+template <graph_node Src, graph_node Dst>
 void
 connect(graph& g, Src&& src, Dst&& dst)
 {
@@ -122,16 +48,12 @@ connect(graph& g, Src&& src, Dst&& dst)
     for (std::size_t p = 0, e = src.num_outputs(); p < e; ++p)
     {
         g.audio.insert(
-                detail::src_endpoint(std::forward<Src>(src), p),
-                detail::dst_endpoint(std::forward<Dst>(dst), p));
+                src_endpoint(std::forward<Src>(src), p),
+                dst_endpoint(std::forward<Dst>(dst), p));
     }
 }
 
-template <
-        detail::graph_entity Src,
-        std::size_t... M,
-        detail::graph_entity Dst,
-        std::size_t... N>
+template <graph_node Src, std::size_t... M, graph_node Dst, std::size_t... N>
 void
 connect(graph& g,
         Src&& src,
@@ -143,13 +65,13 @@ connect(graph& g,
     static_assert(sizeof...(M) == sizeof...(N));
 
     (connect(g,
-             detail::src_endpoint(std::forward<Src>(src), M),
-             detail::dst_endpoint(std::forward<Dst>(dst), N),
+             src_endpoint(std::forward<Src>(src), M),
+             dst_endpoint(std::forward<Dst>(dst), N),
              mixers),
      ...);
 }
 
-template <detail::graph_entity Src, detail::graph_entity Dst>
+template <graph_node Src, graph_node Dst>
 void
 connect(graph& g,
         Src&& src,
@@ -161,17 +83,13 @@ connect(graph& g,
     for (std::size_t p = 0, e = src.outputs().size(); p < e; ++p)
     {
         connect(g,
-                detail::src_endpoint(std::forward<Src>(src), p),
-                detail::dst_endpoint(std::forward<Dst>(dst), p),
+                src_endpoint(std::forward<Src>(src), p),
+                dst_endpoint(std::forward<Dst>(dst), p),
                 mixers);
     }
 }
 
-template <
-        detail::graph_entity Src,
-        std::size_t... M,
-        detail::graph_entity Dst,
-        std::size_t... N>
+template <graph_node Src, std::size_t... M, graph_node Dst, std::size_t... N>
 void
 connect_event(
         graph& g,
@@ -183,8 +101,8 @@ connect_event(
     static_assert(sizeof...(M) == sizeof...(N));
 
     (g.event.insert(
-             detail::src_event_endpoint(std::forward<Src>(src), M),
-             detail::dst_event_endpoint(std::forward<Dst>(dst), N)),
+             src_event_endpoint(std::forward<Src>(src), M),
+             dst_event_endpoint(std::forward<Dst>(dst), N)),
      ...);
 }
 
