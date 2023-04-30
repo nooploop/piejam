@@ -47,7 +47,7 @@ FxScope::FxScope(
             this->state_change_subscriber(),
             fxStreamKeyId);
 
-    connect(*m_impl->streamA);
+    connectSubscribableChild(*m_impl->streamA);
 
     m_impl->streamA->setListener(&m_impl->accumulatorA);
     m_impl->accumulatorA.setActive(activeA());
@@ -67,7 +67,7 @@ FxScope::FxScope(
             this->state_change_subscriber(),
             fxStreamKeyId);
 
-    connect(*m_impl->streamB);
+    connectSubscribableChild(*m_impl->streamB);
 
     m_impl->streamB->setListener(&m_impl->accumulatorB);
     m_impl->accumulatorB.setActive(activeB());

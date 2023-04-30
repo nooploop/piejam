@@ -19,15 +19,23 @@ class SubscribableModel : public QObject
 public:
     using QObject::QObject;
 
-    auto subscribed() const -> bool { return m_subscribed; }
+    auto subscribed() const -> bool
+    {
+        return m_subscribed;
+    }
+
     void setSubscribed(bool subs)
     {
         if (m_subscribed != subs)
         {
             if (subs)
+            {
                 subscribe();
+            }
             else
+            {
                 unsubscribe();
+            }
 
             m_subscribed = subs;
 
@@ -39,7 +47,7 @@ signals:
     void subscribedChanged();
 
 protected:
-    auto connect(SubscribableModel& child)
+    auto connectSubscribableChild(SubscribableModel& child)
     {
         return QObject::connect(
                 this,

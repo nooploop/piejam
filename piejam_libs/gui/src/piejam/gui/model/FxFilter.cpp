@@ -59,7 +59,7 @@ FxFilter::FxFilter(
             dispatch(),
             this->state_change_subscriber(),
             FxParameterKeyId{.key = filterTypeKey, .id = filterTypeId});
-    connect(*m_impl->filterTypeParam);
+    connectSubscribableChild(*m_impl->filterTypeParam);
 
     constexpr auto cutoffKey =
             to_underlying(runtime::modules::filter::parameter_key::cutoff);
@@ -68,7 +68,7 @@ FxFilter::FxFilter(
             dispatch(),
             this->state_change_subscriber(),
             FxParameterKeyId{.key = cutoffKey, .id = cutoffId});
-    connect(*m_impl->cutoffParam);
+    connectSubscribableChild(*m_impl->cutoffParam);
 
     constexpr auto resonanceKey =
             to_underlying(runtime::modules::filter::parameter_key::resonance);
@@ -77,7 +77,7 @@ FxFilter::FxFilter(
             dispatch(),
             this->state_change_subscriber(),
             FxParameterKeyId{.key = resonanceKey, .id = resonanceId});
-    connect(*m_impl->resonanceParam);
+    connectSubscribableChild(*m_impl->resonanceParam);
 
     auto const streams =
             observe_once(runtime::selectors::make_fx_module_streams_selector(
@@ -92,7 +92,7 @@ FxFilter::FxFilter(
             this->state_change_subscriber(),
             FxStreamKeyId{.key = streamKey, .id = streamId});
 
-    connect(*m_impl->inOutStream);
+    connectSubscribableChild(*m_impl->inOutStream);
 
     m_impl->dataGeneratorIn.setActive(spectogramActive());
     m_impl->dataGeneratorIn.setChannel(StereoChannel::Middle);

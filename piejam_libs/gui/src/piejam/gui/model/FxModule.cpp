@@ -93,7 +93,7 @@ FxModule::FxModule(
                       state_change_subscriber,
                       fx_mod_id)))
 {
-    connect(*m_impl->content);
+    connectSubscribableChild(*m_impl->content);
 }
 
 FxModule::~FxModule() = default;

@@ -47,7 +47,7 @@ FxSpectrum::FxSpectrum(
             this->state_change_subscriber(),
             fxStreamKeyId);
 
-    connect(*m_impl->streamA);
+    connectSubscribableChild(*m_impl->streamA);
 
     m_impl->streamA->setListener(&m_impl->dataGeneratorA);
     m_impl->dataGeneratorA.setActive(activeA());
@@ -66,7 +66,7 @@ FxSpectrum::FxSpectrum(
             this->state_change_subscriber(),
             fxStreamKeyId);
 
-    connect(*m_impl->streamB);
+    connectSubscribableChild(*m_impl->streamB);
 
     m_impl->streamB->setListener(&m_impl->dataGeneratorB);
     m_impl->dataGeneratorB.setActive(activeB());
