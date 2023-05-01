@@ -1,3 +1,7 @@
+// PieJam - An audio mixer for Raspberry Pi.
+// SPDX-FileCopyrightText: 2023  Dimitrij Kotrev
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include <piejam/redux/flag_resetter.h>
 
 #include <gtest/gtest.h>

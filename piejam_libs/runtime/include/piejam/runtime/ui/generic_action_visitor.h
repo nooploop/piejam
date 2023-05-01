@@ -1,3 +1,7 @@
+// PieJam - An audio mixer for Raspberry Pi.
+// SPDX-FileCopyrightText: 2023  Dimitrij Kotrev
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 
 #include <piejam/runtime/ui/action.h>
@@ -19,9 +23,20 @@ public:
     {
     }
 
-    auto get_state() const -> State const& { return m_mw_fs.get_state(); }
-    void dispatch(action const& a) { m_mw_fs.dispatch(a); }
-    void next(action const& a) { m_mw_fs.next(a); }
+    auto get_state() const -> State const&
+    {
+        return m_mw_fs.get_state();
+    }
+
+    void dispatch(action const& a)
+    {
+        m_mw_fs.dispatch(a);
+    }
+
+    void next(action const& a)
+    {
+        m_mw_fs.next(a);
+    }
 
 private:
     mw_fs_t const& m_mw_fs;
@@ -41,9 +56,20 @@ public:
     {
     }
 
-    auto get_state() const -> State const& { return m_mw_fs.get_state(); }
-    void dispatch(action const& a) { m_mw_fs.dispatch(a); }
-    void next(action const& a) { m_mw_fs.next(a); }
+    auto get_state() const -> State const&
+    {
+        return m_mw_fs.get_state();
+    }
+
+    void dispatch(action const& a)
+    {
+        m_mw_fs.dispatch(a);
+    }
+
+    void next(action const& a)
+    {
+        m_mw_fs.next(a);
+    }
 
 private:
     mw_fs_t const& m_mw_fs;
