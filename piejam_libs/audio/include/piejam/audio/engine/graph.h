@@ -51,7 +51,7 @@ public:
         }
 
         void erase(graph_endpoint const& src, graph_endpoint const& dst);
-        void erase(const_iterator const&);
+        auto erase(const_iterator const&) -> const_iterator;
 
         template <
                 std::predicate<graph_endpoint const&, graph_endpoint const&> P>

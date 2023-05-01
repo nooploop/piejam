@@ -28,16 +28,11 @@ auto has_event_wire(
         graph_endpoint const& src,
         graph_endpoint const& dst) -> bool;
 
-//! Smart connect function, which will insert a mixer if connecting to an
-//! already connected destination. The mixer will be stored in the mixers
-//! vector.
-void
-connect(graph&,
-        graph_endpoint const& src,
-        graph_endpoint const& dst,
-        std::vector<std::unique_ptr<processor>>& mixers);
-
 void remove_event_identity_processors(graph&);
 void remove_identity_processors(graph&);
+
+using mix_processors = std::vector<std::unique_ptr<processor>>;
+
+auto finalize_graph(graph const&) -> std::tuple<graph, mix_processors>;
 
 } // namespace piejam::audio::engine

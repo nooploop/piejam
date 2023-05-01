@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <ranges>
+#include <set>
 
 namespace piejam::audio::engine
 {
@@ -87,60 +88,6 @@ has_event_wire(
     return has_wire(g.event, src, dst);
 }
 
-void
-connect(graph& g,
-        graph_endpoint const& src,
-        graph_endpoint const& dst,
-        std::vector<std::unique_ptr<processor>>& mixers)
-{
-    if (auto const connected_src = connected_source(g, dst))
-    {
-        if (is_mix_processor(connected_src->proc))
-        {
-            processor& prev_mixer = connected_src->proc;
-            std::size_t const num_prev_inputs = prev_mixer.num_inputs();
-            auto mixer = make_mix_processor(num_prev_inputs + 1);
-
-            for (std::size_t in_index = 0; in_index < num_prev_inputs;
-                 ++in_index)
-            {
-                graph_endpoint const prev_mixer_in{prev_mixer, in_index};
-                auto const connected_in_src =
-                        connected_source(g, prev_mixer_in);
-                BOOST_ASSERT(connected_in_src);
-                g.audio.erase(*connected_in_src, prev_mixer_in);
-                g.audio.insert(*connected_in_src, {*mixer, in_index});
-            }
-
-            g.audio.insert(src, {*mixer, num_prev_inputs});
-
-            g.audio.erase({prev_mixer, 0}, dst);
-            g.audio.insert({*mixer, 0}, dst);
-
-            auto it_mixer = std::ranges::find_if(
-                    mixers,
-                    address_equal_to<processor>(prev_mixer),
-                    indirection_op);
-            BOOST_ASSERT(it_mixer != mixers.end());
-            std::swap(*it_mixer, mixer);
-        }
-        else
-        {
-            g.audio.erase(*connected_src, dst);
-
-            auto mixer = make_mix_processor(2);
-            g.audio.insert(*connected_src, {*mixer, 0});
-            g.audio.insert(src, {*mixer, 1});
-            g.audio.insert({*mixer, 0}, dst);
-            mixers.emplace_back(std::move(mixer));
-        }
-    }
-    else
-    {
-        g.audio.insert(src, dst);
-    }
-}
-
 namespace
 {
 
@@ -163,32 +110,109 @@ template <graph::wire_type W>
 void
 remove_identities(graph::wires_access<W>& g)
 {
-    auto starts_in_identity = [&](auto const& w) {
-        return is_identity_processor<W>(w.first.proc);
-    };
+    typename graph::wires_access<W>::wires_map::map_t id_wires;
 
-    auto it = std::ranges::find_if(g, starts_in_identity);
-    while (it != g.end())
+    for (auto it = g.begin(); it != g.end();)
     {
-        auto it_ends = std::ranges::find_if(
-                g,
-                address_equal_to<processor>(it->first.proc),
-                &dst_processor);
-
-        auto out_wire = *it;
-        g.erase(it);
-
-        if (it_ends != g.end())
+        if (is_identity_processor<W>(it->first.proc) ||
+            is_identity_processor<W>(it->second.proc))
         {
-            g.insert(it_ends->first, out_wire.second);
+            id_wires.emplace(*it);
+            it = g.erase(it);
         }
-
-        it = std::ranges::find_if(g, starts_in_identity);
+        else
+        {
+            ++it;
+        }
     }
 
-    g.erase_if([&](auto const& /*src*/, auto const& dst) {
-        return is_identity_processor<W>(dst.proc);
-    });
+    std::set<typename graph::wires_access<W>::wires_map::value_type> new_wires;
+
+    for (auto it = id_wires.begin(); it != id_wires.end();)
+    {
+        if (is_identity_processor<W>(it->second.proc))
+        {
+            auto following = id_wires.equal_range(it->second);
+
+            for (auto const& [src, dst] : boost::make_iterator_range(following))
+            {
+                if (is_identity_processor<W>(it->first.proc) ||
+                    is_identity_processor<W>(dst.proc))
+                {
+                    id_wires.emplace(it->first, dst);
+                }
+                else
+                {
+                    new_wires.emplace(it->first, dst);
+                }
+            }
+
+            it = id_wires.erase(it);
+
+            if (following.first != following.second)
+            {
+                it = id_wires.begin();
+            }
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    for (auto const& [src, dst] : new_wires)
+    {
+        g.insert(src, dst);
+    }
+}
+
+auto
+insert_mixer(graph& g) -> mix_processors
+{
+    mix_processors result;
+
+    std::multimap<graph_endpoint, graph::wires_map::const_iterator> rev_g;
+
+    // build the reverse graph
+    for (auto it = g.audio.begin(), it_end = g.audio.end(); it != it_end; ++it)
+    {
+        rev_g.emplace(it->second, it);
+    }
+
+    for (auto it = rev_g.begin(), it_end = rev_g.end(); it != it_end;)
+    {
+        auto it_up = it;
+        while (it->first == it_up->first)
+        {
+            ++it_up;
+        }
+
+        auto num_ins = static_cast<std::size_t>(std::distance(it, it_up));
+        if (num_ins > 1)
+        {
+            auto dst = it->first;
+            auto mixer = make_mix_processor(num_ins);
+            std::size_t port{};
+            while (it != it_up)
+            {
+                g.audio.insert(
+                        it->second->first,
+                        graph_endpoint{.proc = *mixer, .port = port++});
+                g.audio.erase(it->second);
+                ++it;
+            }
+
+            g.audio.insert(graph_endpoint{.proc = *mixer, .port = 0}, dst);
+
+            result.emplace_back(std::move(mixer));
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return result;
 }
 
 } // namespace
@@ -203,6 +227,19 @@ void
 remove_identity_processors(graph& g)
 {
     remove_identities(g.audio);
+}
+
+auto
+finalize_graph(graph const& g) -> std::tuple<graph, mix_processors>
+{
+    graph result{g};
+
+    remove_event_identity_processors(result);
+    remove_identity_processors(result);
+
+    mix_processors mixers = insert_mixer(result);
+
+    return std::tuple{std::move(result), std::move(mixers)};
 }
 
 } // namespace piejam::audio::engine

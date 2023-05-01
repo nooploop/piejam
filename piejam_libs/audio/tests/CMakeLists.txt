@@ -20,6 +20,7 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/event_output_buffers_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_to_audio_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/fake_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_algorithms_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graph_to_dag_test.cpp

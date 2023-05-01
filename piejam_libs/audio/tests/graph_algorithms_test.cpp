@@ -5,6 +5,7 @@
 #include <piejam/audio/engine/graph_algorithms.h>
 
 #include "component_mock.h"
+#include "fake_processor.h"
 #include "processor_mock.h"
 
 #include <piejam/audio/engine/event_identity_processor.h>
@@ -16,66 +17,33 @@
 
 #include <gtest/gtest.h>
 
+#include <fstream>
+
 namespace piejam::audio::engine::test
 {
 
-TEST(connect, connect_to_already_connected_will_insert_a_mixer)
+TEST(finalize_graph, connect_to_already_connected_will_insert_a_mixer)
 {
     using namespace testing;
 
-    processor_mock src1;
-    processor_mock src2;
-    processor_mock dst;
-    std::vector<std::unique_ptr<processor>> mixers;
+    fake_processor src1{"src1", 0, 1};
+    fake_processor src2{"src2", 0, 1};
+    fake_processor dst{"dst", 1, 0};
     graph sut;
-
-    ON_CALL(src1, num_outputs()).WillByDefault(Return(1));
-    ON_CALL(src2, num_outputs()).WillByDefault(Return(1));
-    ON_CALL(dst, num_inputs()).WillByDefault(Return(1));
-
     sut.audio.insert({src1, 0}, {dst, 0});
     EXPECT_TRUE(has_audio_wire(sut, {src1, 0}, {dst, 0}));
+    sut.audio.insert({src2, 0}, {dst, 0});
 
-    connect(sut, {src2, 0}, {dst, 0}, mixers);
-    EXPECT_FALSE(has_audio_wire(sut, {src1, 0}, {dst, 0}));
+    auto [result, mixers] = finalize_graph(sut);
+
+    EXPECT_FALSE(has_audio_wire(result, {src1, 0}, {dst, 0}));
+    EXPECT_FALSE(has_audio_wire(result, {src2, 0}, {dst, 0}));
     ASSERT_EQ(1u, mixers.size());
     EXPECT_TRUE(is_mix_processor(*mixers.front()));
     EXPECT_EQ(2u, mixers.front()->num_inputs());
-    EXPECT_TRUE(has_audio_wire(sut, {src1, 0}, {*mixers.front(), 0}));
-    EXPECT_TRUE(has_audio_wire(sut, {src2, 0}, {*mixers.front(), 1}));
-    EXPECT_TRUE(has_audio_wire(sut, {*mixers.front(), 0}, {dst, 0}));
-}
-
-TEST(connect,
-     connect_to_already_connected_and_connected_is_a_mixer_will_replace_the_mixer_with_new_one_with_additional_input)
-{
-    using namespace testing;
-
-    processor_mock src1;
-    processor_mock src2;
-    processor_mock src3;
-    processor_mock dst;
-    std::vector<std::unique_ptr<processor>> mixers;
-    graph sut;
-
-    ON_CALL(src1, num_outputs()).WillByDefault(Return(1));
-    ON_CALL(src2, num_outputs()).WillByDefault(Return(1));
-    ON_CALL(src3, num_outputs()).WillByDefault(Return(1));
-    ON_CALL(dst, num_inputs()).WillByDefault(Return(1));
-
-    sut.audio.insert({src1, 0}, {dst, 0});
-    EXPECT_TRUE(has_audio_wire(sut, {src1, 0}, {dst, 0}));
-    connect(sut, {src2, 0}, {dst, 0}, mixers);
-    connect(sut, {src3, 0}, {dst, 0}, mixers);
-
-    EXPECT_FALSE(has_audio_wire(sut, {src1, 0}, {dst, 0}));
-    ASSERT_EQ(1u, mixers.size());
-    EXPECT_TRUE(is_mix_processor(*mixers.front()));
-    EXPECT_EQ(3u, mixers.front()->num_inputs());
-    EXPECT_TRUE(has_audio_wire(sut, {src1, 0}, {*mixers.front(), 0}));
-    EXPECT_TRUE(has_audio_wire(sut, {src2, 0}, {*mixers.front(), 1}));
-    EXPECT_TRUE(has_audio_wire(sut, {src3, 0}, {*mixers.front(), 2}));
-    EXPECT_TRUE(has_audio_wire(sut, {*mixers.front(), 0}, {dst, 0}));
+    EXPECT_TRUE(has_audio_wire(result, {src1, 0}, {*mixers.front(), 0}));
+    EXPECT_TRUE(has_audio_wire(result, {src2, 0}, {*mixers.front(), 1}));
+    EXPECT_TRUE(has_audio_wire(result, {*mixers.front(), 0}, {dst, 0}));
 }
 
 TEST(remove_event_identity_processors, identity_without_output)
@@ -327,29 +295,25 @@ TEST(connect_stereo_components, with_destination_component)
     EXPECT_TRUE(g.event.empty());
 }
 
-TEST(connect_stereo_components, connect_two_components_to_one)
+TEST(finalize_graph, connect_two_components_to_one)
 {
-    processor_mock src_proc1;
-    processor_mock src_proc2;
+    fake_processor src_proc1{"src1", 0, 2};
+    fake_processor src_proc2{"src2", 0, 2};
     component_mock src1;
     component_mock src2;
     processor_mock dst_proc;
     component_mock dst;
 
-    std::vector<std::unique_ptr<processor>> mixers;
-
     graph g;
 
     using testing::Return;
 
-    ON_CALL(src_proc1, num_outputs()).WillByDefault(Return(2));
     std::array src1_outputs{
             graph_endpoint{.proc = src_proc1, .port = 0},
             graph_endpoint{.proc = src_proc1, .port = 1}};
     ON_CALL(src1, outputs())
             .WillByDefault(Return(component::endpoints(src1_outputs)));
 
-    ON_CALL(src_proc2, num_outputs()).WillByDefault(Return(2));
     std::array src2_outputs{
             graph_endpoint{.proc = src_proc2, .port = 0},
             graph_endpoint{.proc = src_proc2, .port = 1}};
@@ -363,32 +327,31 @@ TEST(connect_stereo_components, connect_two_components_to_one)
     ON_CALL(dst, inputs())
             .WillByDefault(Return(component::endpoints(dst_inputs)));
 
-    connect(g, src1, dst, mixers);
-    connect(g, src2, dst, mixers);
+    connect(g, src1, dst);
+    connect(g, src2, dst);
+
+    auto [result, mixers] = finalize_graph(g);
+
     EXPECT_EQ(2u, mixers.size());
-    EXPECT_EQ(6u, g.audio.size());
-    EXPECT_TRUE(g.event.empty());
+    EXPECT_EQ(6u, result.audio.size());
+    EXPECT_TRUE(result.event.empty());
 
-    if (has_audio_wire(g, {src_proc1, 0}, {*mixers[0], 0}))
+    if (has_audio_wire(result, {src_proc1, 0}, {*mixers[0], 0}))
     {
-        EXPECT_TRUE(has_audio_wire(g, {src_proc1, 1}, {*mixers[1], 0}));
-
-        EXPECT_TRUE(has_audio_wire(g, {src_proc2, 0}, {*mixers[0], 1}));
-        EXPECT_TRUE(has_audio_wire(g, {src_proc2, 1}, {*mixers[1], 1}));
-
-        EXPECT_TRUE(has_audio_wire(g, {*mixers[0], 0}, {dst_proc, 0}));
-        EXPECT_TRUE(has_audio_wire(g, {*mixers[1], 0}, {dst_proc, 1}));
+        EXPECT_TRUE(has_audio_wire(result, {src_proc1, 1}, {*mixers[1], 0}));
+        EXPECT_TRUE(has_audio_wire(result, {src_proc2, 0}, {*mixers[0], 1}));
+        EXPECT_TRUE(has_audio_wire(result, {src_proc2, 1}, {*mixers[1], 1}));
+        EXPECT_TRUE(has_audio_wire(result, {*mixers[0], 0}, {dst_proc, 0}));
+        EXPECT_TRUE(has_audio_wire(result, {*mixers[1], 0}, {dst_proc, 1}));
     }
     else
     {
-        EXPECT_TRUE(has_audio_wire(g, {src_proc1, 0}, {*mixers[1], 0}));
-        EXPECT_TRUE(has_audio_wire(g, {src_proc1, 1}, {*mixers[0], 0}));
-
-        EXPECT_TRUE(has_audio_wire(g, {src_proc2, 0}, {*mixers[1], 1}));
-        EXPECT_TRUE(has_audio_wire(g, {src_proc2, 1}, {*mixers[0], 1}));
-
-        EXPECT_TRUE(has_audio_wire(g, {*mixers[1], 0}, {dst_proc, 0}));
-        EXPECT_TRUE(has_audio_wire(g, {*mixers[0], 0}, {dst_proc, 1}));
+        EXPECT_TRUE(has_audio_wire(result, {src_proc1, 0}, {*mixers[1], 0}));
+        EXPECT_TRUE(has_audio_wire(result, {src_proc1, 1}, {*mixers[0], 0}));
+        EXPECT_TRUE(has_audio_wire(result, {src_proc2, 0}, {*mixers[1], 1}));
+        EXPECT_TRUE(has_audio_wire(result, {src_proc2, 1}, {*mixers[0], 1}));
+        EXPECT_TRUE(has_audio_wire(result, {*mixers[1], 0}, {dst_proc, 0}));
+        EXPECT_TRUE(has_audio_wire(result, {*mixers[0], 0}, {dst_proc, 1}));
     }
 }
 

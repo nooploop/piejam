@@ -29,10 +29,10 @@ graph::wires_map::erase(graph_endpoint const& src, graph_endpoint const& dst)
     m_wires.erase(it);
 }
 
-void
-graph::wires_map::erase(const_iterator const& it)
+auto
+graph::wires_map::erase(const_iterator const& it) -> const_iterator
 {
-    m_wires.erase(it);
+    return m_wires.erase(it);
 }
 
 template <>
@@ -43,10 +43,6 @@ graph::wires_access<graph::wire_type::audio>::insert(
 {
     BOOST_ASSERT(src.port < src.proc.get().num_outputs());
     BOOST_ASSERT(dst.port < dst.proc.get().num_inputs());
-
-    BOOST_ASSERT_MSG(
-            std::ranges::none_of(m_wires, equal_to<>(dst), &value_type::second),
-            "destination endpoint already added, missing a mixer?");
 
     m_wires.emplace(src, dst);
 }

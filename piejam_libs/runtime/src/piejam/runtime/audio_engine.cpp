@@ -307,8 +307,7 @@ make_recorder_processors(
 auto
 connect_fx_chain(
         audio::engine::graph& g,
-        std::vector<audio::engine::component*> const& fx_chain_comps,
-        std::vector<processor_ptr>& mixer_procs)
+        std::vector<audio::engine::component*> const& fx_chain_comps)
 {
     for (auto comp : fx_chain_comps)
     {
@@ -318,7 +317,7 @@ connect_fx_chain(
     algorithm::for_each_adjacent(
             fx_chain_comps,
             [&](auto const l_comp, auto const r_comp) {
-                connect(g, *l_comp, *r_comp, mixer_procs);
+                connect(g, *l_comp, *r_comp);
             });
 }
 
@@ -329,8 +328,7 @@ connect_mixer_channel_with_fx_chain(
         audio::engine::component& mixer_channel_in,
         fx::chain_t const& fx_chain,
         audio::engine::component& mixer_channel_out,
-        std::shared_ptr<audio::engine::processor> const& recorder,
-        std::vector<processor_ptr>& mixer_procs)
+        std::shared_ptr<audio::engine::processor> const& recorder)
 {
     auto fx_chain_comps = algorithm::transform_to_vector(
             fx_chain,
@@ -341,7 +339,7 @@ connect_mixer_channel_with_fx_chain(
 
     if (fx_chain_comps.empty())
     {
-        connect(g, mixer_channel_in, mixer_channel_out, mixer_procs);
+        connect(g, mixer_channel_in, mixer_channel_out);
 
         if (recorder)
         {
@@ -350,9 +348,9 @@ connect_mixer_channel_with_fx_chain(
     }
     else
     {
-        connect(g, mixer_channel_in, *fx_chain_comps.front(), mixer_procs);
-        connect_fx_chain(g, fx_chain_comps, mixer_procs);
-        connect(g, *fx_chain_comps.back(), mixer_channel_out, mixer_procs);
+        connect(g, mixer_channel_in, *fx_chain_comps.front());
+        connect_fx_chain(g, fx_chain_comps);
+        connect(g, *fx_chain_comps.back(), mixer_channel_out);
 
         if (recorder)
         {
@@ -368,7 +366,6 @@ connect_mixer_input(
         device_io::buses_t const& device_buses,
         component_map const& comps,
         std::span<audio::engine::input_processor> const input_procs,
-        std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& mixer_channel,
         audio::engine::component& mixer_channel_in)
 {
@@ -413,8 +410,7 @@ connect_mixer_input(
                         audio::engine::connect(
                                 g,
                                 *source_mixer_channel_out,
-                                mixer_channel_in,
-                                mixer_procs);
+                                mixer_channel_in);
                     }),
             mixer_channel.in);
 }
@@ -427,7 +423,6 @@ connect_mixer_output(
         component_map const& comps,
         std::span<audio::engine::output_processor> const output_procs,
         std::span<processor_ptr> const output_clip_procs,
-        std::vector<processor_ptr>& mixer_procs,
         mixer::channel const& mixer_channel,
         audio::engine::component& mixer_channel_out)
 {
@@ -448,10 +443,9 @@ connect_mixer_output(
                                         1.f,
                                         std::to_string(ch));
 
-                                connect(g,
+                                g.audio.insert(
                                         {.proc = *clip_proc, .port = 0},
-                                        {.proc = output_procs[ch], .port = 0},
-                                        mixer_procs);
+                                        {.proc = output_procs[ch], .port = 0});
                             }
 
                             return *clip_proc;
@@ -460,19 +454,17 @@ connect_mixer_output(
                         if (auto const ch = device_bus.channels.left;
                             ch != npos)
                         {
-                            connect(g,
+                            g.audio.insert(
                                     mixer_channel_out.outputs()[0],
-                                    {.proc = get_clip_proc(ch), .port = 0},
-                                    mixer_procs);
+                                    {.proc = get_clip_proc(ch), .port = 0});
                         }
 
                         if (auto const ch = device_bus.channels.right;
                             ch != npos)
                         {
-                            connect(g,
+                            g.audio.insert(
                                     mixer_channel_out.outputs()[1],
-                                    {.proc = get_clip_proc(ch), .port = 0},
-                                    mixer_procs);
+                                    {.proc = get_clip_proc(ch), .port = 0});
                         }
                     },
                     [&](mixer::channel_id const dst_channel_id) {
@@ -491,8 +483,7 @@ connect_mixer_output(
                             audio::engine::connect(
                                     g,
                                     mixer_channel_out,
-                                    *dst_mb_in,
-                                    mixer_procs);
+                                    *dst_mb_in);
                         }
                     },
                     [](mixer::missing_device_address const&) {}),
@@ -507,8 +498,7 @@ make_graph(
         std::span<audio::engine::input_processor> const input_procs,
         std::span<audio::engine::output_processor> const output_procs,
         std::span<processor_ptr> const output_clip_procs,
-        recorders_t const& recorders,
-        std::vector<processor_ptr>& mixer_procs)
+        recorders_t const& recorders)
 {
     audio::engine::graph g;
 
@@ -538,7 +528,6 @@ make_graph(
                 device_buses,
                 comps,
                 input_procs,
-                mixer_procs,
                 mixer_channel,
                 *mixer_channel_in);
 
@@ -548,8 +537,7 @@ make_graph(
                 *mixer_channel_in,
                 mixer_channel.fx_chain,
                 *mixer_channel_out,
-                recorder,
-                mixer_procs);
+                recorder);
 
         connect_mixer_output(
                 g,
@@ -558,7 +546,6 @@ make_graph(
                 comps,
                 output_procs,
                 output_clip_procs,
-                mixer_procs,
                 mixer_channel,
                 *mixer_channel_out);
     }
@@ -852,7 +839,6 @@ audio_engine::rebuild(
 
     std::vector<processor_ptr> output_clip_procs(
             m_impl->output_clip_procs.size());
-    std::vector<processor_ptr> mixers;
 
     auto new_graph = make_graph(
             comps,
@@ -861,8 +847,7 @@ audio_engine::rebuild(
             m_impl->input_procs,
             m_impl->output_procs,
             output_clip_procs,
-            recorders,
-            mixers);
+            recorders);
 
     connect_midi(
             new_graph,
@@ -873,17 +858,16 @@ audio_engine::rebuild(
 
     connect_solo_groups(new_graph, comps, solo_groups);
 
-    audio::engine::remove_event_identity_processors(new_graph);
-    audio::engine::remove_identity_processors(new_graph);
+    auto [final_graph, mixers] = audio::engine::finalize_graph(new_graph);
 
     if (!m_impl->process.swap_executor(
-                audio::engine::graph_to_dag(new_graph).make_runnable(
-                        m_impl->worker_threads)))
+                audio::engine::graph_to_dag(final_graph)
+                        .make_runnable(m_impl->worker_threads)))
     {
         return false;
     }
 
-    m_impl->graph = std::move(new_graph);
+    m_impl->graph = std::move(final_graph);
     m_impl->output_clip_procs = std::move(output_clip_procs);
     m_impl->mixer_procs = std::move(mixers);
     m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
@@ -894,8 +878,15 @@ audio_engine::rebuild(
     m_impl->param_procs.clear_expired();
     m_impl->stream_procs.clear_expired();
 
-    std::ofstream os("graph.dot");
-    audio::engine::export_graph_as_dot(m_impl->graph, os) << std::endl;
+    {
+        std::ofstream os("graph.dot");
+        audio::engine::export_graph_as_dot(new_graph, os) << std::endl;
+    }
+
+    {
+        std::ofstream os("final_graph.dot");
+        audio::engine::export_graph_as_dot(m_impl->graph, os) << std::endl;
+    }
 
     return true;
 }
