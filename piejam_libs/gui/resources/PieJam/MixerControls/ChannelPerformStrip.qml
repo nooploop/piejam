@@ -5,6 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 import PieJam.Models 1.0 as PJModels
 
@@ -26,104 +27,95 @@ Item {
 
         anchors.fill: parent
 
-        HeaderLabel {
-            id: title
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 0
 
-            height: 24
+            HeaderLabel {
+                id: title
 
-            anchors.top: parent.top
-            anchors.right: fxButton.left
-            anchors.rightMargin: 4
-            anchors.left: parent.left
+                Layout.fillWidth: true
+                Layout.preferredHeight: 24
 
-            text: root.model ? root.model.name : ""
-        }
-
-        BipolarSlider {
-            id: panControls
-
-            height: 40
-
-            anchors.right: parent.right
-            anchors.left: parent.left
-            anchors.top: title.bottom
-
-            value: root.model ? root.model.panBalance : 0
-
-            onMoved: {
-                root.model.changePanBalance(panControls.value)
-                Info.quickTip = (root.model.busType == PJModels.BusType.Mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
-                        + panControls.value.toFixed(2)
+                text: root.model ? root.model.name : ""
             }
 
-            MidiAssignArea {
-                id: midiAssignPan
+            BipolarSlider {
+                id: panControls
 
-                model: root.model ? root.model.panMidi : null
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
 
-                anchors.fill: parent
-                anchors.topMargin: 1
-                anchors.bottomMargin: 1
+                value: root.model ? root.model.panBalance : 0
+
+                onMoved: {
+                    root.model.changePanBalance(panControls.value)
+                    Info.quickTip = (root.model.busType
+                                     == PJModels.BusType.Mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
+                            + panControls.value.toFixed(2)
+                }
+
+                MidiAssignArea {
+                    id: midiAssignPan
+
+                    model: root.model ? root.model.panMidi : null
+
+                    anchors.fill: parent
+                    anchors.topMargin: 1
+                    anchors.bottomMargin: 1
+                }
             }
-        }
 
-        LevelMeterVolumeFader {
-            anchors.right: parent.right
-            anchors.left: parent.left
-            anchors.bottom: channelControls.top
-            anchors.top: panControls.bottom
+            LevelMeterVolumeFader {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-            volume: root.model ?  root.model.volume : 0
-            levelLeft: root.model ? root.model.levelLeft : 0
-            levelRight: root.model ? root.model.levelRight : 0
+                volume: root.model ? root.model.volume : 0
+                levelLeft: root.model ? root.model.levelLeft : 0
+                levelRight: root.model ? root.model.levelRight : 0
 
-            muted: root.model ? (root.model.mute || root.model.mutedBySolo) : false
+                muted: root.model ? (root.model.mute
+                                     || root.model.mutedBySolo) : false
 
-            volumeMidi: root.model ? root.model.volumeMidi : null
+                volumeMidi: root.model ? root.model.volumeMidi : null
 
-            levelMeterScale: PJModels.MixerDbScales.levelMeterScale
-            volumeFaderScale: PJModels.MixerDbScales.volumeFaderScale
+                levelMeterScale: PJModels.MixerDbScales.levelMeterScale
+                volumeFaderScale: PJModels.MixerDbScales.volumeFaderScale
 
-            onFaderMoved: root.model.changeVolume(newVolume)
-        }
+                onFaderMoved: root.model.changeVolume(newVolume)
+            }
 
-        ChannelControls {
-            id: channelControls
+            Button {
+                id: fxButton
 
-            height: 32
+                Layout.fillWidth: true
+                Layout.preferredHeight: 36
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+                text: qsTr("fx")
 
-            record: root.model ? root.model.record : false
-            mute: root.model ? root.model.mute : false
-            solo: root.model ? root.model.solo : false
+                padding: 6
 
-            muteMidi: root.model ? root.model.muteMidi : null
-            soloMidi: root.model ? root.model.soloMidi : null
+                onClicked: root.fxButtonClicked(
+                               root.model ? root.model.busType : PJModels.BusType.Mono)
+            }
 
-            onRecordToggled: root.model.changeRecord(!root.model.record)
-            onMuteToggled: root.model.changeMute(!root.model.mute)
-            onSoloToggled: root.model.changeSolo(!root.model.solo)
-        }
+            ChannelControls {
+                id: channelControls
 
-        Button {
-            id: fxButton
+                Layout.fillWidth: true
+                Layout.preferredHeight: 32
 
-            width: 24
-            height: 36
+                record: root.model ? root.model.record : false
+                mute: root.model ? root.model.mute : false
+                solo: root.model ? root.model.solo : false
 
-            anchors.right: parent.right
-            anchors.rightMargin: 0
-            anchors.top: parent.top
-            anchors.topMargin: -6
+                muteMidi: root.model ? root.model.muteMidi : null
+                soloMidi: root.model ? root.model.soloMidi : null
 
-            text: qsTr("fx")
-
-            padding: 6
-
-            onClicked: root.fxButtonClicked(root.model ? root.model.busType : PJModels.BusType.Mono)
+                onRecordToggled: root.model.changeRecord(!root.model.record)
+                onMuteToggled: root.model.changeMute(!root.model.mute)
+                onSoloToggled: root.model.changeSolo(!root.model.solo)
+            }
         }
     }
 
