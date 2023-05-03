@@ -4,18 +4,18 @@
 
 #pragma once
 
-#include <piejam/range/frame_iterator.h>
+#include <piejam/range/span_iterator.h>
 
 #include <ranges>
 
-namespace piejam::range
+namespace piejam::audio
 {
 
-template <class T, std::size_t NumChannels = 0>
+template <class T, std::size_t NumChannels = std::dynamic_extent>
 struct interleaved_view
     : std::ranges::view_interface<interleaved_view<T, NumChannels>>
 {
-    using iterator = frame_iterator<T, NumChannels>;
+    using iterator = range::span_iterator<T, NumChannels>;
 
     constexpr interleaved_view() noexcept = default;
 
@@ -23,15 +23,15 @@ struct interleaved_view
         : m_begin(std::move(first))
         , m_end(std::move(last))
     {
-        BOOST_ASSERT(m_begin.num_channels() == m_end.num_channels());
+        BOOST_ASSERT(m_begin->template size() == m_end->template size());
     }
 
     constexpr interleaved_view(
             T* const data,
             std::size_t const num_channels,
             std::size_t const num_frames) noexcept
-        requires(NumChannels == 0)
-        : m_begin(std::span<T, frame_extent<NumChannels>>(data, num_channels))
+        requires(NumChannels == std::dynamic_extent)
+        : m_begin(std::span<T, NumChannels>(data, num_channels))
         , m_end(m_begin + num_frames)
     {
     }
@@ -39,8 +39,8 @@ struct interleaved_view
     constexpr interleaved_view(
             T* const data,
             std::size_t const num_frames) noexcept
-        requires(NumChannels != 0)
-        : m_begin(std::span<T, frame_extent<NumChannels>>(data, NumChannels))
+        requires(NumChannels != std::dynamic_extent)
+        : m_begin(std::span<T, NumChannels>(data, NumChannels))
         , m_end(m_begin + num_frames)
     {
     }
@@ -64,13 +64,13 @@ struct interleaved_view
     }
 
     [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
-        requires(NumChannels == 0)
+        requires(NumChannels == std::dynamic_extent)
     {
-        return m_begin.num_channels();
+        return m_begin->template size();
     }
 
     [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
-        requires(NumChannels != 0)
+        requires(NumChannels != std::dynamic_extent)
     {
         return NumChannels;
     }
@@ -83,9 +83,9 @@ struct interleaved_view
     template <std::size_t ToNumChannels>
     [[nodiscard]] constexpr auto channels_cast() const noexcept
             -> interleaved_view<T, ToNumChannels>
-        requires(NumChannels == 0)
+        requires(NumChannels == std::dynamic_extent)
     {
-        BOOST_ASSERT(m_begin.num_channels() == ToNumChannels);
+        BOOST_ASSERT(m_begin->template size() == ToNumChannels);
         return interleaved_view<T, ToNumChannels>(m_begin, m_end);
     }
 
@@ -94,4 +94,4 @@ private:
     iterator m_end;
 };
 
-} // namespace piejam::range
+} // namespace piejam::audio

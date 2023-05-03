@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstddef>
+#include <span>
 
 namespace piejam::audio
 {
@@ -28,5 +29,12 @@ struct pair;
 class period_count;
 class period_size;
 class sample_rate;
+
+template <class T, std::size_t NumChannels>
+struct interleaved_view;
+template <class T>
+using dynamic_interleaved_view = interleaved_view<T, std::dynamic_extent>;
+template <class T, std::size_t NumChannels>
+class interleaved_vector;
 
 } // namespace piejam::audio

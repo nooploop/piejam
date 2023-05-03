@@ -6,10 +6,10 @@
 
 #include <piejam/gui/model/ScopeLines.h>
 
+#include <piejam/audio/interleaved_view.h>
 #include <piejam/functional/operators.h>
 #include <piejam/math.h>
 #include <piejam/range/indices.h>
-#include <piejam/range/interleaved_view.h>
 
 #include <boost/assert.hpp>
 

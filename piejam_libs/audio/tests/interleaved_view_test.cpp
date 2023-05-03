@@ -2,13 +2,13 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/range/interleaved_view.h>
+#include <piejam/audio/interleaved_view.h>
 
 #include <gtest/gtest.h>
 
 #include <array>
 
-namespace piejam::range::test
+namespace piejam::audio::test
 {
 
 TEST(interleaved_view, concept_check)
@@ -47,11 +47,11 @@ TEST(interleaved_view, make_from_data_num_channels_and_num_frames)
     EXPECT_EQ(it_end->data(), buf.data() + buf.size());
 }
 
-TEST(interleaved_view, make_from_frame_iterators)
+TEST(interleaved_view, make_from_span_iterators)
 {
     std::array buf{1.f, 2.f, 3.f, 4.f};
-    frame_iterator<float> first(std::span(buf.data(), 2));
-    frame_iterator<float> last(std::span(buf.data() + buf.size(), 2));
+    range::span_iterator<float> first(std::span(buf.data(), 2));
+    range::span_iterator<float> last(std::span(buf.data() + buf.size(), 2));
 
     interleaved_view<float> v(first, last);
 
@@ -93,4 +93,4 @@ TEST(interleaved_view, channels_cast)
     EXPECT_EQ(it_end->data(), buf.data() + buf.size());
 }
 
-} // namespace piejam::range::test
+} // namespace piejam::audio::test

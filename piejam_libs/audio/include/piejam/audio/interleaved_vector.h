@@ -4,21 +4,20 @@
 
 #pragma once
 
-#include <piejam/range/frame_iterator.h>
-#include <piejam/range/interleaved_view.h>
+#include <piejam/audio/interleaved_view.h>
+
+#include <piejam/range/span_iterator.h>
 
 #include <vector>
 
-namespace piejam::range
+namespace piejam::audio
 {
 
-template <class T, std::size_t NumChannels = 0>
+template <class T, std::size_t NumChannels = std::dynamic_extent>
 class interleaved_vector
 {
 public:
-    constexpr interleaved_vector() noexcept
-        requires(NumChannels != 0)
-    = default;
+    constexpr interleaved_vector() noexcept = default;
 
     constexpr interleaved_vector(std::size_t const num_channels) noexcept
         : m_num_channels(num_channels)
@@ -27,7 +26,7 @@ public:
     }
 
     constexpr interleaved_vector(std::vector<T> vec)
-        requires(NumChannels != 0)
+        requires(NumChannels != std::dynamic_extent)
         : m_vec(std::move(vec))
     {
         BOOST_ASSERT(m_vec.size() % interleaved_vector::num_channels() == 0);
@@ -36,7 +35,7 @@ public:
     constexpr interleaved_vector(
             std::vector<T> vec,
             std::size_t const num_channels)
-        requires(NumChannels == 0)
+        requires(NumChannels == std::dynamic_extent)
         : m_num_channels(num_channels)
         , m_vec(std::move(vec))
     {
@@ -45,7 +44,8 @@ public:
 
     [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
     {
-        return NumChannels == 0 ? m_num_channels : NumChannels;
+        return NumChannels == std::dynamic_extent ? m_num_channels
+                                                  : NumChannels;
     }
 
     [[nodiscard]] constexpr auto empty() const noexcept -> bool
@@ -54,35 +54,33 @@ public:
     }
 
     [[nodiscard]] constexpr auto begin() noexcept
-            -> frame_iterator<T, NumChannels>
+            -> range::span_iterator<T, NumChannels>
     {
-        return std::span<T, frame_extent<NumChannels>>(
-                m_vec.data(),
-                num_channels());
+        return std::span<T, NumChannels>(m_vec.data(), num_channels());
     }
 
     [[nodiscard]] constexpr auto end() noexcept
-            -> frame_iterator<T, NumChannels>
+            -> range::span_iterator<T, NumChannels>
     {
+        BOOST_ASSERT(num_channels() != 0);
         BOOST_ASSERT(m_vec.size() % num_channels() == 0);
-        return std::span<T, frame_extent<NumChannels>>(
+        return std::span<T, NumChannels>(
                 m_vec.data() + m_vec.size(),
                 num_channels());
     }
 
     [[nodiscard]] constexpr auto begin() const noexcept
-            -> frame_iterator<T const, NumChannels>
+            -> range::span_iterator<T const, NumChannels>
     {
-        return std::span<T const, frame_extent<NumChannels>>(
-                m_vec.data(),
-                num_channels());
+        return std::span<T const, NumChannels>(m_vec.data(), num_channels());
     }
 
     [[nodiscard]] constexpr auto end() const noexcept
-            -> frame_iterator<T const, NumChannels>
+            -> range::span_iterator<T const, NumChannels>
     {
+        BOOST_ASSERT(num_channels() != 0);
         BOOST_ASSERT(m_vec.size() % num_channels() == 0);
-        return std::span<T const, frame_extent<NumChannels>>(
+        return std::span<T const, NumChannels>(
                 m_vec.data() + m_vec.size(),
                 num_channels());
     }
@@ -119,4 +117,4 @@ private:
     std::vector<T> m_vec;
 };
 
-} // namespace piejam::range
+} // namespace piejam::audio

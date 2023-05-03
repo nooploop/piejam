@@ -6,12 +6,12 @@
 
 #include <piejam/algorithm/shift_push_back.h>
 #include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/interleaved_view.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/functional/operators.h>
 #include <piejam/math.h>
 #include <piejam/numeric/dft.h>
 #include <piejam/numeric/window.h>
-#include <piejam/range/interleaved_view.h>
 #include <piejam/range/iota.h>
 
 #include <boost/assert.hpp>

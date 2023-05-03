@@ -7,10 +7,8 @@ if(NOT PIEJAM_TESTS)
 endif()
 
 add_executable(piejam_range_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/frame_iterator_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/indices_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/interleaved_vector_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/interleaved_view_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/span_iterator_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/stride_iterator_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/strided_span_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/table_view_test.cpp

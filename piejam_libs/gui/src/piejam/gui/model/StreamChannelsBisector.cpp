@@ -4,8 +4,8 @@
 
 #include <piejam/gui/model/StreamChannelsBisector.h>
 
-#include <piejam/range/interleaved_vector.h>
-#include <piejam/range/interleaved_view.h>
+#include <piejam/audio/interleaved_vector.h>
+#include <piejam/audio/interleaved_view.h>
 
 namespace piejam::gui::model
 {
@@ -17,10 +17,10 @@ StreamChannelsBisector::update(Stream const& input)
 
     auto const num_channels = input.num_channels() / 2;
     auto const vector_size = num_channels * input.num_frames();
-    range::interleaved_vector<float> first(
+    audio::interleaved_vector<float> first(
             std::vector<float>(vector_size),
             num_channels);
-    range::interleaved_vector<float> second(
+    audio::interleaved_vector<float> second(
             std::vector<float>(vector_size),
             num_channels);
 
