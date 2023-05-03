@@ -32,7 +32,7 @@ struct frame_iterator
 
     constexpr frame_iterator() noexcept
         requires(NumChannels != 0)
-        : m_frame(nullptr, NumChannels)
+        : m_frame{nullptr, NumChannels}
     {
     }
 
@@ -40,7 +40,7 @@ struct frame_iterator
     constexpr frame_iterator(
             frame_iterator<U, NumChannels> const& other) noexcept
         requires(std::is_convertible_v<U*, T*>)
-        : m_frame(other.m_frame)
+        : m_frame{other.m_frame}
     {
     }
 
@@ -48,26 +48,33 @@ struct frame_iterator
     constexpr frame_iterator(
             frame_iterator<U, NumChannels2> const& other) noexcept
         requires(std::is_convertible_v<U*, T*> && NumChannels == 0)
-        : m_frame(other.m_frame)
+        : m_frame{other.m_frame}
     {
     }
 
     template <class U>
     constexpr frame_iterator(frame_iterator<U, 0> const& other) noexcept
         requires(std::is_convertible_v<U*, T*> && NumChannels != 0)
-        : m_frame(other.m_frame)
+        : m_frame{other.m_frame}
     {
         BOOST_ASSERT(other.m_frame.size() == NumChannels);
     }
 
-    constexpr frame_iterator(value_type const& frame) noexcept
-        : m_frame(frame)
+    constexpr frame_iterator(value_type const frame) noexcept
+        : m_frame{frame}
     {
     }
 
     [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
     {
         return NumChannels == 0 ? m_frame.size() : NumChannels;
+    }
+
+    [[nodiscard]] constexpr auto
+    operator==(frame_iterator const& other) const noexcept -> bool
+    {
+        return m_frame.data() == other.m_frame.data() &&
+               m_frame.size() == other.m_frame.size();
     }
 
     [[nodiscard]] constexpr auto operator*() const noexcept -> value_type const&

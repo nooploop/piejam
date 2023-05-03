@@ -21,6 +21,19 @@ TEST(table_view, static_asserts)
     static_assert(std::ranges::sized_range<table_view<float>>);
 }
 
+TEST(table_view, major_index_iterator_equality)
+{
+    // 1 2 3
+    // 4 5 6
+    std::array arr{1, 2, 3, 0, 4, 5, 6, 0};
+
+    table_view<int> sut(arr.data(), 2, 3, 4, 1);
+
+    EXPECT_EQ(sut.begin(), sut.begin());
+    EXPECT_NE(sut.begin(), sut.end());
+    EXPECT_EQ(sut.end(), sut.end());
+}
+
 TEST(row_major_table_view, iterate_and_compare)
 {
     // 1 2 3

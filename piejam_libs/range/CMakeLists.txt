@@ -18,6 +18,5 @@ target_sources(piejam_range INTERFACE
 )
 
 target_include_directories(piejam_range INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(piejam_range INTERFACE piejam_base)
 
 add_subdirectory(tests)

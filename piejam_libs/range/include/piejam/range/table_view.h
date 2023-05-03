@@ -45,12 +45,22 @@ public:
         {
         }
 
+        [[nodiscard]] constexpr auto
+        operator==(major_index_iterator const& other) const noexcept -> bool
+        {
+            return m_stride.data() == other.m_stride.data() &&
+                   m_stride.size() == other.m_stride.size() &&
+                   m_stride.stride() == other.m_stride.stride() &&
+                   m_step == other.m_step;
+        }
+
         constexpr auto operator*() const noexcept -> reference
         {
             return m_stride;
         }
 
-        auto operator+=(std::ptrdiff_t n) noexcept -> major_index_iterator&
+        constexpr auto operator+=(std::ptrdiff_t n) noexcept
+                -> major_index_iterator&
         {
             m_stride = {
                     m_stride.data() + n * m_step,
@@ -59,7 +69,8 @@ public:
             return *this;
         }
 
-        auto operator-(major_index_iterator const& other) const noexcept
+        constexpr auto
+        operator-(major_index_iterator const& other) const noexcept
         {
             BOOST_ASSERT(m_stride.size() == other.m_stride.size());
             BOOST_ASSERT(m_stride.stride() == other.m_stride.stride());
@@ -69,7 +80,7 @@ public:
 
     private:
         strided_span<U> m_stride;
-        difference_type m_step;
+        difference_type m_step{};
     };
 
     using value_type = T;

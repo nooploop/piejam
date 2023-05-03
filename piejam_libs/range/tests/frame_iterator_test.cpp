@@ -46,4 +46,14 @@ TEST(frame_iterator, static_non_const_to_runtime_const)
     EXPECT_EQ(-1.f, (*it)[1]);
 }
 
+TEST(frame_iterator, equality)
+{
+    std::array<float, 2> a{1.f, -1.f};
+    frame_iterator<float, 2> it1(a);
+    frame_iterator<float, 2> it2(a);
+
+    EXPECT_EQ(it1, it2);
+    EXPECT_FALSE(it1 != it2);
+}
+
 } // namespace piejam::range::test
