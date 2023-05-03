@@ -61,6 +61,9 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/interleaved_view.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_peak_meter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/multichannel_buffer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/multichannel_layout.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/multichannel_view.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pair.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_buffer_converter.h

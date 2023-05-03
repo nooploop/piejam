@@ -172,6 +172,14 @@ private:
 };
 
 template <class T>
+table_view(
+        T*,
+        typename table_view<T>::size_type,
+        typename table_view<T>::size_type,
+        typename table_view<T>::difference_type,
+        typename table_view<T>::difference_type) -> table_view<T>;
+
+template <class T>
 auto
 transpose(table_view<T> const& t) noexcept -> table_view<T>
 {
