@@ -6,14 +6,15 @@
 
 #include <piejam/range/stride_iterator.h>
 
-#include <cassert>
+#include <boost/assert.hpp>
+
 #include <iterator>
 #include <type_traits>
 
 namespace piejam::range
 {
 
-template <class T>
+template <class T, std::ptrdiff_t Stride = 0>
 class strided_span
 {
 public:
@@ -25,41 +26,54 @@ public:
     using const_pointer = T const*;
     using reference = T&;
     using const_reference = T const&;
-    using iterator = stride_iterator<pointer>;
-    using const_iterator = stride_iterator<const_pointer>;
+    using iterator = stride_iterator<pointer, Stride>;
+    using const_iterator = stride_iterator<const_pointer, Stride>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     constexpr strided_span() noexcept = default;
 
-    constexpr strided_span(pointer ptr, size_type size, difference_type stride)
+    constexpr strided_span(
+            pointer ptr,
+            size_type size,
+            difference_type stride) noexcept
+        requires(Stride == 0)
         : m_data(ptr)
         , m_size(size)
         , m_stride(stride)
     {
-        assert((m_data && m_stride) || (!m_data && !m_size && !m_stride));
+        BOOST_ASSERT(m_stride > 0);
+    }
+
+    constexpr strided_span(pointer ptr, size_type size) noexcept
+        requires(Stride != 0)
+        : m_data(ptr)
+        , m_size(size)
+    {
     }
 
     constexpr strided_span(strided_span const&) noexcept = default;
 
     [[nodiscard]] constexpr auto begin() const noexcept -> iterator
     {
-        return {m_data, m_stride};
+        return make_iterator<iterator>(m_data, stride());
     }
 
     [[nodiscard]] constexpr auto cbegin() const noexcept -> const_iterator
     {
-        return {m_data, m_stride};
+        return make_iterator<const_iterator>(m_data, stride());
     }
 
     [[nodiscard]] constexpr auto end() const noexcept -> iterator
     {
-        return {m_data + m_size * m_stride, m_stride};
+        return make_iterator<iterator>(m_data + m_size * stride(), stride());
     }
 
     [[nodiscard]] constexpr auto cend() const noexcept -> const_iterator
     {
-        return {m_data + m_size * m_stride, m_stride};
+        return make_iterator<const_iterator>(
+                m_data + m_size * stride(),
+                stride());
     }
 
     [[nodiscard]] constexpr auto rbegin() const noexcept -> reverse_iterator
@@ -86,13 +100,13 @@ public:
 
     [[nodiscard]] constexpr auto front() const -> reference
     {
-        assert(m_size);
+        BOOST_ASSERT(m_size);
         return *begin();
     }
 
     [[nodiscard]] constexpr auto back() const -> reference
     {
-        assert(m_size);
+        BOOST_ASSERT(m_size);
         return *std::prev(end());
     }
 
@@ -103,8 +117,8 @@ public:
 
     [[nodiscard]] constexpr auto operator[](size_type idx) const -> reference
     {
-        assert(m_data && idx < m_size);
-        return m_data[idx * m_stride];
+        BOOST_ASSERT(m_data && idx < m_size);
+        return m_data[idx * stride()];
     }
 
     [[nodiscard]] constexpr auto size() const noexcept -> size_type
@@ -114,7 +128,7 @@ public:
 
     [[nodiscard]] constexpr auto stride() const noexcept -> difference_type
     {
-        return m_stride;
+        return Stride == 0 ? m_stride : Stride;
     }
 
     [[nodiscard]] constexpr auto empty() const noexcept -> bool
@@ -122,10 +136,33 @@ public:
         return m_size == 0;
     }
 
+    template <difference_type ToStride>
+    [[nodiscard]] constexpr auto stride_cast() const noexcept
+            -> strided_span<T, ToStride>
+        requires(Stride == 0 && ToStride != 0)
+    {
+        BOOST_ASSERT(m_stride == ToStride);
+        return {m_data, m_size};
+    }
+
 private:
+    template <class Iterator, class Data>
+    static constexpr auto make_iterator(Data&& d, difference_type stride)
+            -> Iterator
+    {
+        if constexpr (Stride == 0)
+        {
+            return Iterator{d, stride};
+        }
+        else
+        {
+            return Iterator{d};
+        }
+    }
+
     pointer m_data{};
     size_type m_size{};
-    difference_type m_stride{1};
+    difference_type m_stride{Stride == 0 ? 1 : Stride};
 };
 
 } // namespace piejam::range

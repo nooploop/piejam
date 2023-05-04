@@ -43,7 +43,7 @@ public:
             Iterator const& it,
             typename base_type::difference_type stride)
             noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
-            requires (Stride == 0)
+        requires (Stride == 0)
         : m_it{it}
         , m_stride{stride}
     {
@@ -53,7 +53,7 @@ public:
     explicit constexpr stride_iterator(
             Iterator const& it)
             noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
-            requires (Stride != 0)
+        requires (Stride != 0)
         : m_it{it}
     {
     }
@@ -62,7 +62,7 @@ public:
             Iterator&& it,
             typename base_type::difference_type stride)
             noexcept(std::is_nothrow_move_constructible_v<Iterator>)
-            requires (Stride == 0)
+        requires (Stride == 0)
         : m_it{std::move(it)}
         , m_stride{stride}
     {
@@ -72,7 +72,7 @@ public:
     explicit constexpr stride_iterator(
             Iterator&& it)
             noexcept(std::is_nothrow_move_constructible_v<Iterator>)
-            requires (Stride != 0)
+        requires (Stride != 0)
         : m_it{std::move(it)}
     {
         BOOST_ASSERT(m_stride > 0);
