@@ -26,7 +26,7 @@ TEST(strided_span, default_ctor)
 
     EXPECT_EQ(nullptr, sut.data());
     EXPECT_EQ(0u, sut.size());
-    EXPECT_EQ(0, sut.stride());
+    EXPECT_EQ(1, sut.stride());
     EXPECT_TRUE(sut.empty());
     EXPECT_TRUE(sut.begin() == sut.end());
     EXPECT_FALSE(sut.begin() != sut.end());

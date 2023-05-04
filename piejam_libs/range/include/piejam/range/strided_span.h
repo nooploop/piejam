@@ -125,7 +125,7 @@ public:
 private:
     pointer m_data{};
     size_type m_size{};
-    difference_type m_stride{};
+    difference_type m_stride{1};
 };
 
 } // namespace piejam::range

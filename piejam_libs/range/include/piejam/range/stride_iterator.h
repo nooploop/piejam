@@ -4,187 +4,146 @@
 
 #pragma once
 
-#include <cassert>
+#include <boost/assert.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
+
 #include <iterator>
 #include <type_traits>
 
 namespace piejam::range
 {
 
-template <class Iterator>
+template <
+        class Iterator,
+        typename std::iterator_traits<Iterator>::difference_type Stride = 0>
 class stride_iterator
+    : public boost::stl_interfaces::iterator_interface<
+              stride_iterator<Iterator, Stride>,
+              typename std::iterator_traits<Iterator>::iterator_category,
+              typename std::iterator_traits<Iterator>::value_type,
+              typename std::iterator_traits<Iterator>::reference,
+              typename std::iterator_traits<Iterator>::pointer,
+              typename std::iterator_traits<Iterator>::difference_type>
 {
-public:
-    using iterator_category =
-            typename std::iterator_traits<Iterator>::iterator_category;
-    using value_type = typename std::iterator_traits<Iterator>::value_type;
-    using difference_type =
-            typename std::iterator_traits<Iterator>::difference_type;
-    using reference = typename std::iterator_traits<Iterator>::reference;
-    using pointer = typename std::iterator_traits<Iterator>::pointer;
+    using base_type = boost::stl_interfaces::iterator_interface<
+            stride_iterator<Iterator, Stride>,
+            typename std::iterator_traits<Iterator>::iterator_category,
+            typename std::iterator_traits<Iterator>::value_type,
+            typename std::iterator_traits<Iterator>::reference,
+            typename std::iterator_traits<Iterator>::pointer,
+            typename std::iterator_traits<Iterator>::difference_type>;
 
-    constexpr stride_iterator() noexcept(
-            std::is_nothrow_default_constructible_v<Iterator>) = default;
+public:
+    // clang-format off
+
+    constexpr stride_iterator()
+            noexcept(std::is_nothrow_default_constructible_v<Iterator>) = default;
 
     constexpr stride_iterator(
             Iterator const& it,
-            difference_type const
-                    stride) noexcept(std::
-                                             is_nothrow_copy_constructible_v<
-                                                     Iterator>)
-        : m_it(it)
-        , m_stride(stride)
+            typename base_type::difference_type stride)
+            noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
+            requires (Stride == 0)
+        : m_it{it}
+        , m_stride{stride}
+    {
+        BOOST_ASSERT(m_stride > 0);
+    }
+
+    explicit constexpr stride_iterator(
+            Iterator const& it)
+            noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
+            requires (Stride != 0)
+        : m_it{it}
     {
     }
 
     constexpr stride_iterator(
             Iterator&& it,
-            difference_type const
-                    stride) noexcept(std::
-                                             is_nothrow_move_constructible_v<
-                                                     Iterator>)
-        : m_it(std::move(it))
-        , m_stride(stride)
+            typename base_type::difference_type stride)
+            noexcept(std::is_nothrow_move_constructible_v<Iterator>)
+            requires (Stride == 0)
+        : m_it{std::move(it)}
+        , m_stride{stride}
     {
+        BOOST_ASSERT(m_stride > 0);
     }
 
-    [[nodiscard]] constexpr auto stride() const noexcept { return m_stride; }
+    explicit constexpr stride_iterator(
+            Iterator&& it)
+            noexcept(std::is_nothrow_move_constructible_v<Iterator>)
+            requires (Stride != 0)
+        : m_it{std::move(it)}
+    {
+        BOOST_ASSERT(m_stride > 0);
+    }
 
-    [[nodiscard]] constexpr auto operator*() const noexcept -> reference
+    // clang-format on
+
+    [[nodiscard]] constexpr auto stride() const noexcept ->
+            typename base_type::difference_type
+    {
+        return Stride == 0 ? m_stride : Stride;
+    }
+
+    auto operator++() -> stride_iterator&
+        requires requires(Iterator it) { ++it; }
+    {
+        std::advance(m_it, stride());
+        return *this;
+    }
+
+    using base_type::operator++;
+
+    auto operator--() -> stride_iterator&
+        requires requires(Iterator it) { --it; }
+    {
+        std::advance(m_it, -stride());
+        return *this;
+    }
+
+    using base_type::operator--;
+
+    [[nodiscard]] constexpr auto operator*() noexcept -> decltype(auto)
     {
         return *m_it;
     }
 
-    [[nodiscard]] constexpr auto operator->() const noexcept -> pointer
+    [[nodiscard]] constexpr auto operator*() const noexcept -> decltype(auto)
     {
-        return m_it.operator->();
+        return *m_it;
     }
 
-    [[nodiscard]] constexpr auto
-    operator[](difference_type const n) const noexcept -> reference
-    {
-        return m_it[n * m_stride];
-    }
-
-    constexpr auto operator++() noexcept -> stride_iterator&
-    {
-        std::advance(m_it, m_stride);
-        return *this;
-    }
-
-    constexpr auto operator++(int) noexcept -> stride_iterator
-    {
-        auto copy = *this;
-        std::advance(m_it, m_stride);
-        return copy;
-    }
-
-    constexpr auto operator+=(difference_type const n) noexcept
+    constexpr auto operator+=(typename base_type::difference_type n)
             -> stride_iterator&
+        requires requires(Iterator it) { it + n; }
     {
-        std::advance(m_it, n * m_stride);
+        std::advance(m_it, n * stride());
         return *this;
     }
 
-    constexpr auto operator--() noexcept -> stride_iterator&
-    {
-        std::advance(m_it, -m_stride);
-        return *this;
-    }
-
-    constexpr auto operator--(int) noexcept -> stride_iterator
-    {
-        auto copy = *this;
-        std::advance(m_it, -m_stride);
-        return copy;
-    }
-
-    constexpr auto operator-=(difference_type const n) noexcept
-            -> stride_iterator&
-    {
-        std::advance(m_it, -n * m_stride);
-        return *this;
-    }
-
-    friend constexpr auto
+    [[nodiscard]] friend constexpr auto
     operator==(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
             -> bool
     {
-        assert(lhs.m_stride == rhs.m_stride);
-        assert(!lhs.m_stride || (lhs.m_it - rhs.m_it) % lhs.m_stride == 0);
-        return lhs.m_it == rhs.m_it;
+        return lhs.m_it == rhs.m_it && lhs.stride() == rhs.stride();
     }
 
-    friend constexpr auto
-    operator!=(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
-            -> bool
+    [[nodiscard]] constexpr auto
+    operator-(stride_iterator const& rhs) const noexcept ->
+            typename base_type::difference_type
+        requires requires(
+                Iterator l,
+                Iterator r,
+                typename base_type::difference_type s) { (l - r) / s; }
     {
-        return !(lhs == rhs);
-    }
-
-    friend constexpr auto
-    operator<(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
-            -> bool
-    {
-        assert(lhs.m_stride == rhs.m_stride);
-        assert(!lhs.m_stride || (lhs.m_it - rhs.m_it) % lhs.m_stride == 0);
-        return lhs.m_it < rhs.m_it;
-    }
-
-    friend constexpr auto
-    operator<=(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
-            -> bool
-    {
-        return lhs == rhs || lhs < rhs;
-    }
-
-    friend constexpr auto
-    operator>(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
-            -> bool
-    {
-        return rhs < lhs;
-    }
-
-    friend constexpr auto
-    operator>=(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
-            -> bool
-    {
-        return rhs <= lhs;
-    }
-
-    friend constexpr auto
-    operator+(stride_iterator it, difference_type const n) noexcept
-            -> stride_iterator
-    {
-        return it += n;
-    }
-
-    friend constexpr auto
-    operator+(difference_type const n, stride_iterator const& it) noexcept
-            -> stride_iterator
-    {
-        return it + n;
-    }
-
-    friend constexpr auto
-    operator-(stride_iterator it, difference_type const n) noexcept
-            -> stride_iterator
-    {
-        return it -= n;
-    }
-
-    friend constexpr auto
-    operator-(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
-            -> difference_type
-    {
-        assert(lhs.m_stride == rhs.m_stride);
-        assert((lhs.m_it - rhs.m_it) % lhs.m_stride == 0);
-        return (lhs.m_it - rhs.m_it) / lhs.m_stride;
+        BOOST_ASSERT(stride() == rhs.stride());
+        return (m_it - rhs.m_it) / m_stride;
     }
 
 private:
     Iterator m_it{};
-    difference_type m_stride{};
+    typename base_type::difference_type m_stride{Stride == 0 ? 1 : Stride};
 };
 
 template <class Iterator>
