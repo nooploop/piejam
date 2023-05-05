@@ -14,7 +14,7 @@
 namespace piejam::range
 {
 
-template <class T, std::ptrdiff_t Stride = 0>
+template <class T, std::ptrdiff_t Stride = dynamic_stride>
 class strided_span
 {
 public:
@@ -37,7 +37,7 @@ public:
             pointer ptr,
             size_type size,
             difference_type stride) noexcept
-        requires(Stride == 0)
+        requires(Stride == dynamic_stride)
         : m_data(ptr)
         , m_size(size)
         , m_stride(stride)
@@ -46,7 +46,7 @@ public:
     }
 
     constexpr strided_span(pointer ptr, size_type size) noexcept
-        requires(Stride != 0)
+        requires(Stride != dynamic_stride)
         : m_data(ptr)
         , m_size(size)
     {
@@ -128,7 +128,7 @@ public:
 
     [[nodiscard]] constexpr auto stride() const noexcept -> difference_type
     {
-        return Stride == 0 ? m_stride : Stride;
+        return Stride == dynamic_stride ? m_stride : Stride;
     }
 
     [[nodiscard]] constexpr auto empty() const noexcept -> bool
@@ -139,7 +139,7 @@ public:
     template <difference_type ToStride>
     [[nodiscard]] constexpr auto stride_cast() const noexcept
             -> strided_span<T, ToStride>
-        requires(Stride == 0 && ToStride != 0)
+        requires(Stride == dynamic_stride && ToStride != dynamic_stride)
     {
         BOOST_ASSERT(m_stride == ToStride);
         return {m_data, m_size};
@@ -150,7 +150,7 @@ private:
     static constexpr auto make_iterator(Data&& d, difference_type stride)
             -> Iterator
     {
-        if constexpr (Stride == 0)
+        if constexpr (Stride == dynamic_stride)
         {
             return Iterator{d, stride};
         }
@@ -162,7 +162,7 @@ private:
 
     pointer m_data{};
     size_type m_size{};
-    difference_type m_stride{Stride == 0 ? 1 : Stride};
+    difference_type m_stride{Stride == dynamic_stride ? 1 : Stride};
 };
 
 } // namespace piejam::range

@@ -4,6 +4,7 @@
 
 #include <piejam/range/table_view.h>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <algorithm>
@@ -34,7 +35,7 @@ TEST(table_view, major_index_iterator_equality)
     EXPECT_EQ(sut.end(), sut.end());
 }
 
-TEST(row_major_table_view, iterate_and_compare)
+TEST(row_major_table_view, index_access)
 {
     // 1 2 3
     // 4 5 6
@@ -42,13 +43,10 @@ TEST(row_major_table_view, iterate_and_compare)
 
     table_view<int> sut(arr.data(), 2, 3, 4, 1);
 
-    auto row1 = *sut.begin();
-    std::array expected_row1{1, 2, 3};
-    EXPECT_TRUE(std::equal(row1.begin(), row1.end(), expected_row1.begin()));
+    ASSERT_EQ(2, sut.major_size());
 
-    auto row2 = *std::next(sut.begin());
-    std::array expected_row2{4, 5, 6};
-    EXPECT_TRUE(std::equal(row2.begin(), row2.end(), expected_row2.begin()));
+    EXPECT_THAT(sut[0], testing::ElementsAre(1, 2, 3));
+    EXPECT_THAT(sut[1], testing::ElementsAre(4, 5, 6));
 }
 
 TEST(row_major_table_view, transpose)
@@ -152,6 +150,44 @@ TEST(column_major_table_view, transpose)
     auto row2 = *std::next(sut.begin());
     std::array expected_row2{4, 5, 6};
     EXPECT_TRUE(std::equal(row2.begin(), row2.end(), expected_row2.begin()));
+}
+
+TEST(table_view, compile_time_minor_step)
+{
+    // 1 2 3
+    // 4 5 6
+    std::array arr{1, 2, 3, 0, 4, 5, 6, 0};
+
+    table_view<int, std::dynamic_extent, std::dynamic_extent, 0, 1>
+            sut(arr.data(), 2, 3, 4, 1);
+
+    ASSERT_EQ(2, sut.major_size());
+
+    static_assert(std::is_same_v<
+                  strided_span<int, 1>,
+                  std::remove_cvref_t<decltype(sut[0])>>);
+
+    static_assert(std::is_same_v<
+                  strided_span<int, 1>,
+                  std::remove_cvref_t<decltype(*sut.begin())>>);
+
+    EXPECT_THAT(sut[0], testing::ElementsAre(1, 2, 3));
+    EXPECT_THAT(sut[1], testing::ElementsAre(4, 5, 6));
+}
+
+TEST(table_view, compile_time_major_step)
+{
+    // 1 2 3
+    // 4 5 6
+    std::array arr{1, 2, 3, 0, 4, 5, 6, 0};
+
+    table_view<int, std::dynamic_extent, std::dynamic_extent, 4, 0>
+            sut(arr.data(), 2, 3, 4, 1);
+
+    ASSERT_EQ(2, sut.major_size());
+
+    EXPECT_THAT(sut[0], testing::ElementsAre(1, 2, 3));
+    EXPECT_THAT(sut[1], testing::ElementsAre(4, 5, 6));
 }
 
 TEST(table_view, fill)

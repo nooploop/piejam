@@ -13,9 +13,12 @@
 namespace piejam::range
 {
 
+inline constexpr std::ptrdiff_t dynamic_stride{};
+
 template <
         class Iterator,
-        typename std::iterator_traits<Iterator>::difference_type Stride = 0>
+        typename std::iterator_traits<Iterator>::difference_type Stride =
+                dynamic_stride>
 class stride_iterator
     : public boost::stl_interfaces::iterator_interface<
               stride_iterator<Iterator, Stride>,
@@ -43,17 +46,17 @@ public:
             Iterator const& it,
             typename base_type::difference_type stride)
             noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
-        requires (Stride == 0)
+        requires (Stride == dynamic_stride)
         : m_it{it}
         , m_stride{stride}
     {
-        BOOST_ASSERT(m_stride > 0);
+        BOOST_ASSERT(m_stride > dynamic_stride);
     }
 
     explicit constexpr stride_iterator(
             Iterator const& it)
             noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
-        requires (Stride != 0)
+        requires (Stride != dynamic_stride)
         : m_it{it}
     {
     }
@@ -62,7 +65,7 @@ public:
             Iterator&& it,
             typename base_type::difference_type stride)
             noexcept(std::is_nothrow_move_constructible_v<Iterator>)
-        requires (Stride == 0)
+        requires (Stride == dynamic_stride)
         : m_it{std::move(it)}
         , m_stride{stride}
     {
@@ -72,7 +75,7 @@ public:
     explicit constexpr stride_iterator(
             Iterator&& it)
             noexcept(std::is_nothrow_move_constructible_v<Iterator>)
-        requires (Stride != 0)
+        requires (Stride != dynamic_stride)
         : m_it{std::move(it)}
     {
         BOOST_ASSERT(m_stride > 0);
@@ -83,7 +86,7 @@ public:
     [[nodiscard]] constexpr auto stride() const noexcept ->
             typename base_type::difference_type
     {
-        return Stride == 0 ? m_stride : Stride;
+        return Stride == dynamic_stride ? m_stride : Stride;
     }
 
     auto operator++() -> stride_iterator&
@@ -143,7 +146,8 @@ public:
 
 private:
     Iterator m_it{};
-    typename base_type::difference_type m_stride{Stride == 0 ? 1 : Stride};
+    typename base_type::difference_type m_stride{
+            Stride == dynamic_stride ? 1 : Stride};
 };
 
 template <class Iterator>
