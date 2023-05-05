@@ -61,12 +61,12 @@ public:
 
     [[nodiscard]] auto view() noexcept
     {
-        return multichannel_view{m_layout, m_num_channels, std::span{m_data}};
+        return multichannel_view{std::span{m_data}, m_layout, m_num_channels};
     }
 
     [[nodiscard]] auto view() const noexcept
     {
-        return multichannel_view{m_layout, m_num_channels, std::span{m_data}};
+        return multichannel_view{std::span{m_data}, m_layout, m_num_channels};
     }
 
     [[nodiscard]] auto layout() const noexcept -> multichannel_layout
