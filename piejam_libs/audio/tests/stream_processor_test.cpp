@@ -48,12 +48,10 @@ TEST_F(stream_processor_1_test, process_buffer_and_consume)
 
     sut->process(ctx);
 
-    std::vector<float> out;
-    sut->consume([&out](std::span<float const> const data) {
-        std::ranges::copy(data, std::back_inserter(out));
-    });
+    auto out = sut->consume();
 
-    EXPECT_TRUE(std::ranges::equal(in_buf, out));
+    ASSERT_EQ(out.num_channels(), 1);
+    EXPECT_THAT(out.channels()[0], testing::ElementsAreArray(in_buf));
 }
 
 TEST_F(stream_processor_1_test, process_constant_and_consume)
@@ -64,13 +62,12 @@ TEST_F(stream_processor_1_test, process_constant_and_consume)
 
     sut->process(ctx);
 
-    std::vector<float> out;
-    sut->consume([&out](std::span<float const> const data) {
-        std::ranges::copy(data, std::back_inserter(out));
-    });
+    auto out = sut->consume();
 
-    EXPECT_EQ(8u, out.size());
-    EXPECT_TRUE(std::ranges::all_of(out, [](float x) { return x == 3.f; }));
+    ASSERT_EQ(1, out.num_channels());
+    EXPECT_THAT(
+            out.channels()[0],
+            testing::ElementsAre(3.f, 3.f, 3.f, 3.f, 3.f, 3.f, 3.f, 3.f));
 }
 
 TEST_F(stream_processor_1_test, process_twice_buffer_and_consume)
@@ -86,14 +83,12 @@ TEST_F(stream_processor_1_test, process_twice_buffer_and_consume)
     in_buf = {2.f, 2.f, 2.f, 2.f};
     sut->process(ctx);
 
-    std::vector<float> out;
-    sut->consume([&out](std::span<float const> const data) {
-        std::ranges::copy(data, std::back_inserter(out));
-    });
+    auto out = sut->consume();
 
-    EXPECT_TRUE(std::ranges::equal(
-            std::array{1.f, 1.f, 1.f, 1.f, 2.f, 2.f, 2.f, 2.f},
-            out));
+    ASSERT_EQ(1, out.num_channels());
+    EXPECT_THAT(
+            out.channels()[0],
+            testing::ElementsAre(1.f, 1.f, 1.f, 1.f, 2.f, 2.f, 2.f, 2.f));
 }
 
 struct stream_processor_2_test : testing::Test
@@ -128,30 +123,11 @@ TEST_F(stream_processor_2_test, process_buffer_and_consume)
 
     sut->process(ctx);
 
-    std::vector<float> out;
-    sut->consume([&out](std::span<float const> const data) {
-        std::ranges::copy(data, std::back_inserter(out));
-    });
+    auto out = sut->consume();
 
-    using testing::ElementsAre;
-    using testing::Matches;
-    EXPECT_TRUE(Matches(ElementsAre(
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            3.f,
-            4.f,
-            3.f,
-            4.f,
-            3.f,
-            4.f,
-            3.f,
-            4.f))(out));
+    ASSERT_EQ(2, out.num_channels());
+    EXPECT_THAT(out.channels()[0], testing::ElementsAreArray(in1_buf));
+    EXPECT_THAT(out.channels()[1], testing::ElementsAreArray(in2_buf));
 }
 
 TEST_F(stream_processor_2_test, process_constants_and_consume)
@@ -163,30 +139,15 @@ TEST_F(stream_processor_2_test, process_constants_and_consume)
 
     sut->process(ctx);
 
-    std::vector<float> out;
-    sut->consume([&out](std::span<float const> const data) {
-        std::ranges::copy(data, std::back_inserter(out));
-    });
+    auto out = sut->consume();
 
-    using testing::ElementsAre;
-    using testing::Matches;
-    EXPECT_TRUE(Matches(ElementsAre(
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            1.f,
-            2.f,
-            1.f,
-            2.f))(out));
+    ASSERT_EQ(2, out.num_channels());
+    EXPECT_THAT(
+            out.channels()[0],
+            testing::ElementsAre(1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f));
+    EXPECT_THAT(
+            out.channels()[1],
+            testing::ElementsAre(2.f, 2.f, 2.f, 2.f, 2.f, 2.f, 2.f, 2.f));
 }
 
 struct stream_processor_4_test : testing::Test
@@ -232,46 +193,14 @@ TEST_F(stream_processor_4_test, process_buffer_and_consume)
 
     sut->process(ctx);
 
-    std::vector<float> out;
-    sut->consume([&out](std::span<float const> const data) {
-        std::ranges::copy(data, std::back_inserter(out));
-    });
+    auto out = sut->consume();
 
-    using testing::ElementsAre;
-    using testing::Matches;
-    EXPECT_TRUE(Matches(ElementsAre(
-            1.f,
-            2.f,
-            5.f,
-            6.f,
-            1.f,
-            2.f,
-            5.f,
-            6.f,
-            1.f,
-            2.f,
-            5.f,
-            6.f,
-            1.f,
-            2.f,
-            5.f,
-            6.f,
-            3.f,
-            4.f,
-            7.f,
-            8.f,
-            3.f,
-            4.f,
-            7.f,
-            8.f,
-            3.f,
-            4.f,
-            7.f,
-            8.f,
-            3.f,
-            4.f,
-            7.f,
-            8.f))(out));
+    ASSERT_EQ(4, out.num_channels());
+
+    EXPECT_THAT(out.channels()[0], testing::ElementsAreArray(in1_buf));
+    EXPECT_THAT(out.channels()[1], testing::ElementsAreArray(in2_buf));
+    EXPECT_THAT(out.channels()[2], testing::ElementsAreArray(in3_buf));
+    EXPECT_THAT(out.channels()[3], testing::ElementsAreArray(in4_buf));
 }
 
 struct stream_processor_n_test : testing::Test
@@ -303,7 +232,7 @@ TEST_F(stream_processor_n_test, process_buffer_and_consume)
     audio_slice in3(in3_buf);
     alignas(mipp::RequiredAlignment) std::array in4_buf{9.f, 9.f, -9.f, -9.f};
     audio_slice in4(in4_buf);
-    audio_slice in5(0.f);
+    audio_slice in5(23.f);
 
     std::array ins{
             std::cref(in1),
@@ -315,34 +244,17 @@ TEST_F(stream_processor_n_test, process_buffer_and_consume)
 
     sut->process(ctx);
 
-    std::vector<float> out;
-    sut->consume([&out](std::span<float const> const data) {
-        std::ranges::copy(data, std::back_inserter(out));
-    });
+    auto out = sut->consume();
 
-    using testing::ElementsAre;
-    using testing::Matches;
-    EXPECT_TRUE(Matches(ElementsAre(
-            1.f,
-            5.f,
-            -1.f,
-            9.f,
-            0.f,
-            2.f,
-            6.f,
-            -2.f,
-            9.f,
-            0.f,
-            3.f,
-            7.f,
-            -3.f,
-            -9.f,
-            0.f,
-            4.f,
-            8.f,
-            -4.f,
-            -9.f,
-            0.f))(out));
+    ASSERT_EQ(5, out.num_channels());
+
+    EXPECT_THAT(out.channels()[0], testing::ElementsAreArray(in1_buf));
+    EXPECT_THAT(out.channels()[1], testing::ElementsAreArray(in2_buf));
+    EXPECT_THAT(out.channels()[2], testing::ElementsAreArray(in3_buf));
+    EXPECT_THAT(out.channels()[3], testing::ElementsAreArray(in4_buf));
+    EXPECT_THAT(
+            out.channels()[4],
+            testing::ElementsAre(23.f, 23.f, 23.f, 23.f));
 }
 
 } // namespace piejam::audio::engine::test

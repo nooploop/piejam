@@ -35,7 +35,7 @@ clip(float const v) -> float
     return math::clamp(v, -1.f, 1.f);
 }
 
-template <std::size_t NumChannels, class FrameConverter>
+template <StereoChannel SC>
 class Generator
 {
 public:
@@ -46,17 +46,30 @@ public:
 
     auto operator()(AudioStreamListener::Stream const& stream) -> ScopeLines
     {
-        auto const typed_stream =
-                stream
-                        .cast<audio::multichannel_layout_interleaved,
-                              NumChannels>();
-
         ScopeLines result;
 
-        for (auto const frame : typed_stream.frames())
-        {
-            float const sample = FrameConverter{}(frame);
+        BOOST_ASSERT(
+                stream.layout() == audio::multichannel_layout::non_interleaved);
+        auto const typed_stream = stream.channels_cast<2>();
 
+        auto samples = [&]() {
+            if constexpr (SC == StereoChannel::Left)
+            {
+                return typed_stream.channels()[0];
+            }
+            else if constexpr (SC == StereoChannel::Right)
+            {
+                return typed_stream.channels()[1];
+            }
+            else
+            {
+                return typed_stream.frames() |
+                       std::views::transform(StereoFrameValue<SC>{});
+            }
+        }();
+
+        for (auto const sample : samples)
+        {
             if (m_accNumSamples) [[likely]]
             {
                 m_accY0 = std::min(m_accY0, sample);
@@ -109,34 +122,25 @@ struct ScopeLinesGenerator::Impl
             switch (streamType)
             {
                 case BusType::Mono:
-                    return Generator<2, StereoFrameValue<StereoChannel::Left>>{
-                            samplesPerLine};
+                    return Generator<StereoChannel::Left>{samplesPerLine};
 
                 case BusType::Stereo:
                     switch (channel)
                     {
                         case StereoChannel::Left:
-                            return Generator<
-                                    2,
-                                    StereoFrameValue<StereoChannel::Left>>{
+                            return Generator<StereoChannel::Left>{
                                     samplesPerLine};
 
                         case StereoChannel::Right:
-                            return Generator<
-                                    2,
-                                    StereoFrameValue<StereoChannel::Right>>{
+                            return Generator<StereoChannel::Right>{
                                     samplesPerLine};
 
                         case StereoChannel::Middle:
-                            return Generator<
-                                    2,
-                                    StereoFrameValue<StereoChannel::Middle>>{
+                            return Generator<StereoChannel::Middle>{
                                     samplesPerLine};
 
                         case StereoChannel::Side:
-                            return Generator<
-                                    2,
-                                    StereoFrameValue<StereoChannel::Side>>{
+                            return Generator<StereoChannel::Side>{
                                     samplesPerLine};
 
                         default:

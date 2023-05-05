@@ -35,7 +35,7 @@ struct InactiveGenerator
     }
 };
 
-template <std::size_t NumChannels, class FrameConverter>
+template <StereoChannel SC>
 class Generator
 {
 public:
@@ -61,12 +61,39 @@ public:
         m_streamBuffer.clear();
         m_streamBuffer.reserve(stream.num_frames());
 
-        std::ranges::transform(
-                stream.cast<audio::multichannel_layout_interleaved,
-                            NumChannels>()
-                        .frames(),
-                std::back_inserter(m_streamBuffer),
-                FrameConverter{});
+        BOOST_ASSERT(
+                stream.layout() == audio::multichannel_layout::non_interleaved);
+        auto stereoView = stream.channels_cast<2>();
+        if constexpr (SC == StereoChannel::Left)
+        {
+            m_streamBuffer.insert(
+                    m_streamBuffer.end(),
+                    stereoView.channels()[0].begin(),
+                    stereoView.channels()[0].end());
+        }
+        else if constexpr (SC == StereoChannel::Right)
+        {
+            m_streamBuffer.insert(
+                    m_streamBuffer.end(),
+                    stereoView.channels()[1].begin(),
+                    stereoView.channels()[1].end());
+        }
+        else if constexpr (SC == StereoChannel::Middle)
+        {
+            std::ranges::transform(
+                    stereoView.channels()[0],
+                    stereoView.channels()[1],
+                    std::back_inserter(m_streamBuffer),
+                    std::plus{});
+        }
+        else if constexpr (SC == StereoChannel::Side)
+        {
+            std::ranges::transform(
+                    stereoView.channels()[0],
+                    stereoView.channels()[1],
+                    std::back_inserter(m_streamBuffer),
+                    std::minus{});
+        }
 
         algorithm::shift_push_back(m_dftPrepareBuffer, m_streamBuffer);
 
@@ -124,40 +151,30 @@ struct SpectrumDataGenerator::Impl
             switch (busType)
             {
                 case BusType::Mono:
-                    generator =
-                            Generator<2, StereoFrameValue<StereoChannel::Left>>{
-                                    sampleRate};
+                    generator = Generator<StereoChannel::Left>{sampleRate};
                     break;
 
                 case BusType::Stereo:
                     switch (channel)
                     {
                         case StereoChannel::Left:
-                            generator = Generator<
-                                    2,
-                                    StereoFrameValue<StereoChannel::Left>>{
-                                    sampleRate};
+                            generator =
+                                    Generator<StereoChannel::Left>{sampleRate};
                             break;
 
                         case StereoChannel::Right:
-                            generator = Generator<
-                                    2,
-                                    StereoFrameValue<StereoChannel::Right>>{
-                                    sampleRate};
+                            generator =
+                                    Generator<StereoChannel::Right>{sampleRate};
                             break;
 
                         case StereoChannel::Middle:
-                            generator = Generator<
-                                    2,
-                                    StereoFrameValue<StereoChannel::Middle>>{
+                            generator = Generator<StereoChannel::Middle>{
                                     sampleRate};
                             break;
 
                         case StereoChannel::Side:
-                            generator = Generator<
-                                    2,
-                                    StereoFrameValue<StereoChannel::Side>>{
-                                    sampleRate};
+                            generator =
+                                    Generator<StereoChannel::Side>{sampleRate};
                             break;
 
                         default:

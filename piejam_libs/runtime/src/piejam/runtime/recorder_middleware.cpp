@@ -16,6 +16,7 @@
 #include <piejam/runtime/ui/update_state_action.h>
 
 #include <piejam/audio/multichannel_buffer.h>
+#include <piejam/audio/simd.h>
 #include <piejam/system/file_utils.h>
 
 #include <sndfile.hh>
@@ -26,6 +27,9 @@
 
 #include <boost/assert.hpp>
 #include <boost/container/flat_map.hpp>
+#include <boost/range/algorithm_ext/push_back.hpp>
+
+#include <ranges>
 
 namespace piejam::runtime
 {
@@ -103,8 +107,7 @@ struct recorder_action_visitor
 
                 if (sndfile)
                 {
-                    auto stream_id = streams.add(
-                            audio::multichannel_buffer<float>{num_channels});
+                    auto stream_id = streams.add(std::in_place, num_channels);
                     recorder_streams.emplace(mixer_channel_id, stream_id);
                     open_streams.emplace(stream_id, std::move(sndfile));
                 }
@@ -166,9 +169,31 @@ struct recorder_action_visitor
                 auto const num_frames = buffer->num_frames();
                 BOOST_ASSERT(
                         buffer->layout() ==
-                        audio::multichannel_layout::interleaved);
+                        audio::multichannel_layout::non_interleaved);
+                BOOST_ASSERT(
+                        buffer->num_channels() == 1 ||
+                        buffer->num_channels() == 2);
+
+                auto write_data = buffer->samples();
+
+                audio::multichannel_buffer<float>::vector interleaved;
+                if (buffer->num_channels() == 2)
+                {
+                    auto stereo_view =
+                            buffer->view()
+                                    .cast<audio::multichannel_layout_non_interleaved,
+                                          2>();
+                    interleaved.resize(stereo_view.samples().size());
+                    audio::simd::interleave(
+                            std::span{stereo_view.channels()[0]},
+                            std::span{stereo_view.channels()[1]},
+                            std::span{interleaved});
+
+                    write_data = interleaved;
+                }
+
                 auto const written =
-                        it->second.writef(buffer->samples().data(), num_frames);
+                        it->second.writef(write_data.data(), num_frames);
                 if (static_cast<std::size_t>(written) < num_frames)
                 {
                     spdlog::warn(

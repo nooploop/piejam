@@ -489,15 +489,14 @@ audio_engine_middleware::process_engine_action(
             auto const& st = mw_fs.get_state();
             if (audio_stream_buffer const* stream = st.streams.find(id))
             {
-                if (auto buffer = m_engine->get_stream(id); !buffer.empty())
+                if (auto captured = m_engine->get_stream(id);
+                    !captured->empty())
                 {
-                    next_action.streams.emplace(
-                            id,
-                            audio_stream_buffer(
-                                    std::in_place,
-                                    audio::multichannel_layout::interleaved,
-                                    stream->get().num_channels(),
-                                    std::move(buffer)));
+                    BOOST_ASSERT(stream->get().num_channels() != 0);
+                    BOOST_ASSERT(
+                            captured->num_channels() ==
+                            stream->get().num_channels());
+                    next_action.streams.emplace(id, std::move(captured));
                 }
             }
         }

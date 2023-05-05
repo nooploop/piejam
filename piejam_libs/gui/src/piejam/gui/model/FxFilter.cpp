@@ -11,7 +11,7 @@
 #include <piejam/gui/model/FxStreamKeyId.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
-#include <piejam/gui/model/StreamChannelsBisector.h>
+#include <piejam/gui/model/StreamStereoSplitter.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
@@ -29,7 +29,7 @@ struct FxFilter::Impl
     SpectrumData spectrumDataIn;
     SpectrumData spectrumDataOut;
 
-    StreamChannelsBisector bisector;
+    StreamStereoSplitter bisector;
 
     SpectrumDataGenerator dataGeneratorIn;
     SpectrumDataGenerator dataGeneratorOut;
@@ -102,12 +102,12 @@ FxFilter::FxFilter(
 
     QObject::connect(
             &m_impl->bisector,
-            &StreamChannelsBisector::bisected,
+            &StreamStereoSplitter::splitted,
             &m_impl->dataGeneratorOut,
-            [this](AudioStreamListener::Stream const& in,
-                   AudioStreamListener::Stream const& out) {
-                m_impl->dataGeneratorIn.update(in);
-                m_impl->dataGeneratorOut.update(out);
+            [this](std::vector<AudioStreamListener::Stream> inOut) {
+                BOOST_ASSERT(inOut.size() == 2);
+                m_impl->dataGeneratorIn.update(inOut[0]);
+                m_impl->dataGeneratorOut.update(inOut[1]);
             });
 
     QObject::connect(

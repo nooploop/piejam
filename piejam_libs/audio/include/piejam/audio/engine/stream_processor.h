@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <piejam/audio/engine/audio_spsc_ring_buffer.h>
 #include <piejam/audio/engine/named_processor.h>
+#include <piejam/audio/engine/stream_ring_buffer.h>
 
 #include <mipp.h>
 
@@ -50,26 +50,15 @@ public:
 
     void process(process_context const& ctx) override;
 
-    template <class F>
-    void consume(F&& f)
+    auto consume()
     {
-        m_buffer.consume(std::forward<F>(f));
+        return m_buffer.consume();
     }
 
 private:
-    using stream_fn_t = void (stream_processor::*)(process_context const&);
-
-    void stream_1(process_context const&);
-    void stream_2(process_context const&);
-    void stream_4(process_context const&);
-    void stream_n(process_context const&);
-    static auto get_stream_fn(std::size_t num_channels) -> stream_fn_t;
-
     std::size_t const m_num_channels;
-    stream_fn_t const m_stream_fn;
 
-    audio_spsc_ring_buffer m_buffer;
-    mipp::vector<float> m_interleave_buffer;
+    stream_ring_buffer m_buffer;
 };
 
 auto make_stream_processor(

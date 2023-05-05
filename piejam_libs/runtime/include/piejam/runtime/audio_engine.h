@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/audio/fwd.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/pcm_buffer_converter.h>
 #include <piejam/audio/types.h>
@@ -43,8 +44,7 @@ public:
     [[nodiscard]] auto get_learned_midi() const
             -> std::optional<midi::external_event>;
 
-    [[nodiscard]] auto get_stream(audio_stream_id) const
-            -> audio::multichannel_buffer<float>::vector;
+    [[nodiscard]] auto get_stream(audio_stream_id) const -> audio_stream_buffer;
 
     [[nodiscard]] auto
     rebuild(state const&,

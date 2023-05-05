@@ -11,14 +11,14 @@
 namespace piejam::gui::model
 {
 
-class StreamChannelsBisector final : public AudioStreamListener
+class StreamStereoSplitter final : public AudioStreamListener
 {
     Q_OBJECT
 public:
     void update(Stream const&) override;
 
 signals:
-    void bisected(Stream const&, Stream const&);
+    void splitted(std::vector<Stream>);
 };
 
 } // namespace piejam::gui::model

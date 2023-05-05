@@ -16,7 +16,9 @@ class AudioStreamListener : public QObject
     Q_OBJECT
 
 public:
-    using Stream = audio::multichannel_view<float const>;
+    using Stream = audio::multichannel_view<
+            float const,
+            audio::multichannel_layout_non_interleaved>;
 
     virtual void update(Stream const&) = 0;
 };

@@ -7,7 +7,6 @@ if(NOT PIEJAM_TESTS)
 endif()
 
 add_executable(piejam_audio_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/audio_spsc_ring_buffer_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/clip_processor_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/component_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/dag_test.cpp
@@ -44,6 +43,7 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/slice_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/smoother_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/stream_processor_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/stream_ring_buffer_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/value_io_processor_test.cpp
 )
 target_link_libraries(piejam_audio_test gtest_driver gmock piejam_audio piejam_range)
