@@ -40,11 +40,13 @@ public:
         using reference = strided_span<U, MinorStep> const&;
 
         constexpr major_index_iterator() noexcept = default;
+
         constexpr major_index_iterator(
                 U* const data,
                 difference_type const step,
                 std::size_t const minor_size,
                 difference_type const minor_step) noexcept
+            requires(MinorStep == dynamic_stride)
             : m_stride{data, minor_size, minor_step}
             , m_step{step}
         {
@@ -57,6 +59,24 @@ public:
             BOOST_ASSERT(
                     (MinorStep == dynamic_stride && minor_step != 0) ||
                     MinorStep == minor_step);
+        }
+
+        constexpr major_index_iterator(
+                U* const data,
+                difference_type const step,
+                std::size_t const minor_size,
+                difference_type const minor_step) noexcept
+            requires(MinorStep != dynamic_stride)
+            : m_stride{data, minor_size}
+            , m_step{step}
+        {
+            BOOST_ASSERT(
+                    (MajorStep == dynamic_stride && step != 0) ||
+                    MajorStep == step);
+            BOOST_ASSERT(
+                    MinorSize == std::dynamic_extent ||
+                    MinorSize == minor_size);
+            BOOST_ASSERT(MinorStep == minor_step);
         }
 
         [[nodiscard]] constexpr auto
@@ -76,10 +96,17 @@ public:
         [[nodiscard]] constexpr auto operator+=(std::ptrdiff_t n) noexcept
                 -> major_index_iterator&
         {
-            m_stride = {
-                    m_stride.data() + n * step(),
-                    m_stride.size(),
-                    m_stride.stride()};
+            if constexpr (MinorStep == dynamic_stride)
+            {
+                m_stride = {
+                        m_stride.data() + n * step(),
+                        m_stride.size(),
+                        m_stride.stride()};
+            }
+            else
+            {
+                m_stride = {m_stride.data() + n * step(), m_stride.size()};
+            }
             return *this;
         }
 

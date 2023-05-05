@@ -5,6 +5,8 @@
 #include <piejam/gui/model/FxStream.h>
 
 #include <piejam/gui/model/AudioStreamListener.h>
+
+#include <piejam/audio/multichannel_buffer.h>
 #include <piejam/runtime/actions/request_streams_update.h>
 #include <piejam/runtime/selectors.h>
 
@@ -34,7 +36,9 @@ FxStream::onSubscribe()
                     m_impl->fxStreamKeyId.id),
             [this](runtime::audio_stream_buffer const& buf) {
                 if (auto l = listener(); l && !buf->empty())
-                    l->update(buf->frames());
+                {
+                    l->update(buf->view());
+                }
             });
 }
 

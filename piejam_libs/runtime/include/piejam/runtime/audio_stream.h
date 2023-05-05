@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <piejam/audio/interleaved_vector.h>
+#include <piejam/audio/fwd.h>
 #include <piejam/box.h>
 #include <piejam/fwd.h>
 
 namespace piejam::runtime
 {
 
-using audio_stream_buffer = unique_box<audio::interleaved_vector<float>>;
+using audio_stream_buffer = unique_box<audio::multichannel_buffer<float>>;
 using audio_streams_cache = entity_map<audio_stream_buffer>;
 using audio_stream_id = entity_id<audio_stream_buffer>;
 

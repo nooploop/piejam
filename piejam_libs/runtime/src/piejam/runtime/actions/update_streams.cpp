@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/state.h>
 
+#include <piejam/audio/multichannel_buffer.h>
+
 #include <boost/assert.hpp>
 
 namespace piejam::runtime::actions

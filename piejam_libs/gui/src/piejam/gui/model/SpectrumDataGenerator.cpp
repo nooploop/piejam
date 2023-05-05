@@ -6,7 +6,6 @@
 
 #include <piejam/algorithm/shift_push_back.h>
 #include <piejam/algorithm/transform_to_vector.h>
-#include <piejam/audio/interleaved_view.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/functional/operators.h>
 #include <piejam/math.h>
@@ -63,7 +62,9 @@ public:
         m_streamBuffer.reserve(stream.num_frames());
 
         std::ranges::transform(
-                stream.channels_cast<NumChannels>(),
+                stream.cast<audio::multichannel_layout_interleaved,
+                            NumChannels>()
+                        .frames(),
                 std::back_inserter(m_streamBuffer),
                 FrameConverter{});
 

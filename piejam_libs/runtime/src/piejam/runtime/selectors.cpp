@@ -4,16 +4,18 @@
 
 #include <piejam/runtime/selectors.h>
 
-#include <piejam/algorithm/transform_to_vector.h>
-#include <piejam/boxify_result.h>
-#include <piejam/functional/memo.h>
-#include <piejam/npos.h>
-#include <piejam/reselect/selector.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/solo_group.h>
 #include <piejam/runtime/state.h>
+
+#include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/multichannel_buffer.h>
+#include <piejam/boxify_result.h>
+#include <piejam/functional/memo.h>
+#include <piejam/npos.h>
+#include <piejam/reselect/selector.h>
 
 #include <boost/hof/match.hpp>
 #include <boost/hof/unpack.hpp>

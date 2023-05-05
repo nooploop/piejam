@@ -15,6 +15,7 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/update_state_action.h>
 
+#include <piejam/audio/multichannel_buffer.h>
 #include <piejam/system/file_utils.h>
 
 #include <sndfile.hh>
@@ -86,23 +87,24 @@ struct recorder_action_visitor
                     "wav");
 
             auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
-            int const num_channels = static_cast<int>(
-                    audio::num_channels(mixer_channel.bus_type));
+            std::size_t const num_channels =
+                    audio::num_channels(mixer_channel.bus_type);
             if (SndfileHandle::formatCheck(
                         format,
-                        num_channels,
+                        static_cast<int>(num_channels),
                         st.sample_rate.as_int()))
             {
                 SndfileHandle sndfile(
                         filename.string(),
                         SFM_WRITE,
                         format,
-                        num_channels,
+                        static_cast<int>(num_channels),
                         st.sample_rate.as_int());
 
                 if (sndfile)
                 {
-                    auto stream_id = streams.add(num_channels);
+                    auto stream_id = streams.add(
+                            audio::multichannel_buffer<float>{num_channels});
                     recorder_streams.emplace(mixer_channel_id, stream_id);
                     open_streams.emplace(stream_id, std::move(sndfile));
                 }
@@ -162,6 +164,9 @@ struct recorder_action_visitor
                 it != data.open_streams.end())
             {
                 auto const num_frames = buffer->num_frames();
+                BOOST_ASSERT(
+                        buffer->layout() ==
+                        audio::multichannel_layout::interleaved);
                 auto const written =
                         it->second.writef(buffer->samples().data(), num_frames);
                 if (static_cast<std::size_t>(written) < num_frames)

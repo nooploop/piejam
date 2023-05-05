@@ -4,22 +4,6 @@
 
 #include <piejam/runtime/audio_engine_middleware.h>
 
-#include <piejam/algorithm/find_or_get_first.h>
-#include <piejam/algorithm/for_each_visit.h>
-#include <piejam/algorithm/index_of.h>
-#include <piejam/algorithm/transform_to_vector.h>
-#include <piejam/audio/device.h>
-#include <piejam/audio/device_manager.h>
-#include <piejam/audio/engine/processor.h>
-#include <piejam/audio/pcm_descriptor.h>
-#include <piejam/audio/pcm_hw_params.h>
-#include <piejam/audio/pcm_io_config.h>
-#include <piejam/ladspa/plugin.h>
-#include <piejam/ladspa/plugin_descriptor.h>
-#include <piejam/ladspa/port_descriptor.h>
-#include <piejam/ladspa/processor_factory.h>
-#include <piejam/midi/event.h>
-#include <piejam/midi/input_event_handler.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/apply_app_config.h>
@@ -49,6 +33,24 @@
 #include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/batch_action.h>
+
+#include <piejam/algorithm/find_or_get_first.h>
+#include <piejam/algorithm/for_each_visit.h>
+#include <piejam/algorithm/index_of.h>
+#include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/device.h>
+#include <piejam/audio/device_manager.h>
+#include <piejam/audio/engine/processor.h>
+#include <piejam/audio/multichannel_buffer.h>
+#include <piejam/audio/pcm_descriptor.h>
+#include <piejam/audio/pcm_hw_params.h>
+#include <piejam/audio/pcm_io_config.h>
+#include <piejam/ladspa/plugin.h>
+#include <piejam/ladspa/plugin_descriptor.h>
+#include <piejam/ladspa/port_descriptor.h>
+#include <piejam/ladspa/processor_factory.h>
+#include <piejam/midi/event.h>
+#include <piejam/midi/input_event_handler.h>
 #include <piejam/thread/worker.h>
 #include <piejam/tuple_element_compare.h>
 
@@ -493,8 +495,9 @@ audio_engine_middleware::process_engine_action(
                             id,
                             audio_stream_buffer(
                                     std::in_place,
-                                    std::move(buffer),
-                                    stream->get().num_channels()));
+                                    audio::multichannel_layout::interleaved,
+                                    stream->get().num_channels(),
+                                    std::move(buffer)));
                 }
             }
         }

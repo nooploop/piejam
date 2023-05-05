@@ -6,7 +6,7 @@
 
 #include <piejam/gui/model/ScopeLines.h>
 
-#include <piejam/audio/interleaved_view.h>
+#include <piejam/audio/multichannel_view.h>
 #include <piejam/functional/operators.h>
 #include <piejam/math.h>
 #include <piejam/range/indices.h>
@@ -46,14 +46,16 @@ public:
 
     auto operator()(AudioStreamListener::Stream const& stream) -> ScopeLines
     {
-        auto const frames = stream.channels_cast<NumChannels>();
+        auto const typed_stream =
+                stream
+                        .cast<audio::multichannel_layout_interleaved,
+                              NumChannels>();
 
         ScopeLines result;
-        FrameConverter convert;
 
-        for (std::span<float const, NumChannels> const frame : frames)
+        for (auto const frame : typed_stream.frames())
         {
-            float const sample = convert(frame);
+            float const sample = FrameConverter{}(frame);
 
             if (m_accNumSamples) [[likely]]
             {

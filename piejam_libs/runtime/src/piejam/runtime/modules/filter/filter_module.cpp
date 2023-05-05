@@ -4,7 +4,6 @@
 
 #include <piejam/runtime/modules/filter/filter_module.h>
 
-#include <piejam/entity_map.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -12,6 +11,9 @@
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_maps_access.h>
+
+#include <piejam/audio/multichannel_buffer.h>
+#include <piejam/entity_map.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>

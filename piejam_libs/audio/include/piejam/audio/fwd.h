@@ -30,11 +30,10 @@ class period_count;
 class period_size;
 class sample_rate;
 
-template <class T, std::size_t NumChannels>
-struct interleaved_view;
+enum class multichannel_layout : bool;
+template <class T, class Layout, std::size_t>
+class multichannel_view;
 template <class T>
-using dynamic_interleaved_view = interleaved_view<T, std::dynamic_extent>;
-template <class T, std::size_t NumChannels>
-class interleaved_vector;
+class multichannel_buffer;
 
 } // namespace piejam::audio

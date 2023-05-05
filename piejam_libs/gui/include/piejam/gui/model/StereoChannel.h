@@ -34,8 +34,7 @@ using StereoChannel = StereoChannelClass::Value;
 template <StereoChannel SC>
 struct StereoFrameValue
 {
-    constexpr auto
-    operator()(std::span<float const, 2> const frame) const noexcept -> float
+    constexpr auto operator()(auto const frame) const noexcept -> float
     {
         switch (SC)
         {

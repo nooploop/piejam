@@ -4,8 +4,7 @@
 
 #include <piejam/gui/model/StreamChannelsBisector.h>
 
-#include <piejam/audio/interleaved_vector.h>
-#include <piejam/audio/interleaved_view.h>
+#include <piejam/audio/multichannel_buffer.h>
 
 namespace piejam::gui::model
 {
@@ -16,30 +15,33 @@ StreamChannelsBisector::update(Stream const& input)
     BOOST_ASSERT(input.num_channels() % 2 == 0);
 
     auto const num_channels = input.num_channels() / 2;
-    auto const vector_size = num_channels * input.num_frames();
-    audio::interleaved_vector<float> first(
-            std::vector<float>(vector_size),
-            num_channels);
-    audio::interleaved_vector<float> second(
-            std::vector<float>(vector_size),
-            num_channels);
+    auto const buffer_size = num_channels * input.num_frames();
+    audio::multichannel_buffer<float> first(
+            input.layout(),
+            num_channels,
+            std::vector<float>(buffer_size));
+    audio::multichannel_buffer<float> second(
+            input.layout(),
+            num_channels,
+            std::vector<float>(buffer_size));
 
-    auto itF = first.begin();
-    auto itS = second.begin();
-    for (auto itIn = input.begin(); itIn != input.end(); ++itIn, ++itF, ++itS)
+    auto itF = first.frames().begin();
+    auto itS = second.frames().begin();
+    for (auto itIn = input.frames().begin(); itIn != input.frames().end();
+         ++itIn, ++itF, ++itS)
     {
-        BOOST_ASSERT(itF != first.end());
-        BOOST_ASSERT(itS != second.end());
+        BOOST_ASSERT(itF != first.frames().end());
+        BOOST_ASSERT(itS != second.frames().end());
 
         auto itInMid = std::next(itIn->begin(), num_channels);
         std::copy(itIn->begin(), itInMid, itF->begin());
         std::copy(itInMid, itIn->end(), itS->begin());
     }
 
-    BOOST_ASSERT(itF == first.end());
-    BOOST_ASSERT(itS == second.end());
+    BOOST_ASSERT(itF == first.frames().end());
+    BOOST_ASSERT(itS == second.frames().end());
 
-    bisected(first.frames(), second.frames());
+    bisected(std::as_const(first).view(), std::as_const(second).view());
 }
 
 } // namespace piejam::gui::model

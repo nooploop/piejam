@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/fwd.h>
+#include <piejam/audio/multichannel_view.h>
 
 #include <QObject>
 
@@ -16,7 +16,7 @@ class AudioStreamListener : public QObject
     Q_OBJECT
 
 public:
-    using Stream = audio::dynamic_interleaved_view<float const>;
+    using Stream = audio::multichannel_view<float const>;
 
     virtual void update(Stream const&) = 0;
 };
