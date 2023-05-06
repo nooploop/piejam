@@ -12,7 +12,6 @@
 #include <piejam/midi/event.h>
 #include <piejam/midi/event_handler.h>
 #include <piejam/midi/input_event_handler.h>
-#include <piejam/tuple_element_compare.h>
 
 #include <fmt/format.h>
 
@@ -114,9 +113,10 @@ private:
 
     auto is_update_relevant(alsa::midi_device_removed const& op) const -> bool
     {
-        return algorithm::contains_if(
+        return algorithm::contains(
                 m_alsa_input_devices,
-                tuple::element<1>.equal_to(std::cref(op.device)));
+                op.device,
+                &alsa_input_devices_t::value_type::second);
     }
 
     auto is_update_relevant(alsa::midi_device_event const& op) const -> bool
@@ -139,9 +139,10 @@ private:
     auto process_midi_device_update(alsa::midi_device_removed const& op)
             -> device_update
     {
-        auto it = std::ranges::find_if(
+        auto it = std::ranges::find(
                 m_alsa_input_devices,
-                tuple::element<1>.equal_to(std::cref(op.device)));
+                op.device,
+                &alsa_input_devices_t::value_type::second);
 
         BOOST_ASSERT(it != m_alsa_input_devices.end());
 
@@ -164,7 +165,9 @@ private:
             m_midi_io.client_id(),
             m_midi_io.in_port()};
 
-    std::unordered_map<device_id_t, alsa::midi_device> m_alsa_input_devices;
+    using alsa_input_devices_t =
+            std::unordered_map<device_id_t, alsa::midi_device>;
+    alsa_input_devices_t m_alsa_input_devices;
 };
 
 auto
