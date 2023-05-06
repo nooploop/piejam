@@ -4,6 +4,7 @@
 
 #include <piejam/entity_map.h>
 
+#include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
 #include <algorithm>
@@ -53,14 +54,15 @@ TEST(entity_map, remove_remove)
 TEST(entity_map, add_add_add)
 {
     entity_map<int> sut;
-    sut.add(2);
-    sut.add(3);
-    sut.add(5);
-    EXPECT_TRUE(std::ranges::equal(
+    auto id1 = sut.add(2);
+    auto id2 = sut.add(3);
+    auto id3 = sut.add(5);
+    EXPECT_THAT(
             sut,
-            std::initializer_list<int>{2, 3, 5},
-            std::equal_to<>{},
-            &entity_map<int>::map_t::value_type::second));
+            testing::ElementsAre(
+                    std::make_pair(id1, 2),
+                    std::make_pair(id2, 3),
+                    std::make_pair(id3, 5)));
 }
 
 } // namespace piejam::test

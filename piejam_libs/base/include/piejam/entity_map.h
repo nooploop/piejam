@@ -22,39 +22,59 @@ class entity_map
 public:
     using id_t = entity_id<Entity>;
     using map_t = boost::container::flat_map<id_t, Entity>;
+    using value_type = typename map_t::value_type;
 
-    auto empty() const noexcept { return m_map->empty(); }
-    auto size() const noexcept { return m_map->size(); }
+    [[nodiscard]] auto empty() const noexcept
+    {
+        return m_map->empty();
+    }
 
-    auto begin() const noexcept { return m_map->begin(); }
-    auto end() const noexcept { return m_map->end(); }
+    [[nodiscard]] auto size() const noexcept
+    {
+        return m_map->size();
+    }
 
-    auto contains(id_t const id) const noexcept { return m_map->contains(id); }
+    [[nodiscard]] auto begin() const noexcept
+    {
+        return m_map->begin();
+    }
 
-    auto find(id_t const id) const noexcept -> Entity const*
+    [[nodiscard]] auto end() const noexcept
+    {
+        return m_map->end();
+    }
+
+    [[nodiscard]] auto contains(id_t const id) const noexcept
+    {
+        return m_map->contains(id);
+    }
+
+    [[nodiscard]] auto find(id_t const id) const noexcept -> Entity const*
     {
         auto it = m_map->find(id);
         return it != m_map->end() ? std::addressof(it->second) : nullptr;
     }
 
-    auto operator[](id_t const id) const noexcept -> Entity const&
+    [[nodiscard]] auto operator[](id_t const id) const noexcept -> Entity const&
     {
         auto it = m_map->find(id);
         BOOST_ASSERT(it != m_map->end());
         return it->second;
     }
 
-    template <std::convertible_to<Entity> V>
-    auto add(V&& v) -> id_t
+    template <class... Args>
+    [[nodiscard]] auto add(Args&&... args) -> id_t
     {
         auto id = id_t::generate();
-        m_map.update([id, &v](map_t& m) {
-            m.emplace_hint(m.end(), id, std::forward<V>(v));
+        m_map.update([&, id](map_t& m) {
+            m.emplace_hint(
+                    m.end(),
+                    std::piecewise_construct,
+                    std::forward_as_tuple(id),
+                    std::forward_as_tuple(std::forward<Args>(args)...));
         });
         return id;
     }
-
-    auto add() -> id_t { return add(Entity{}); }
 
     template <std::invocable<Entity&> U>
     auto update(id_t const id, U&& u)
@@ -73,7 +93,9 @@ public:
             for (auto const id : ids)
             {
                 if (auto it = m.find(id); it != m.end())
+                {
                     u(id, it->second);
+                }
             }
         });
     }
@@ -83,7 +105,9 @@ public:
     {
         m_map.update([&u](map_t& m) {
             for (auto&& [id, value] : m)
+            {
                 u(id, value);
+            }
         });
     }
 
@@ -97,7 +121,9 @@ public:
     {
         m_map.update([&](map_t& m) {
             for (id_t const id : ids)
+            {
                 m.erase(id);
+            }
         });
     }
 
