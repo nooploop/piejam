@@ -8,7 +8,6 @@ target_sources(piejam_range INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/range/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/range/indices.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/range/iota.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/range/span_iterator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/range/stride_iterator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/range/strided_span.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/range/table_view.h
