@@ -54,13 +54,15 @@ template <class B>
 constexpr bool is_box_v = is_box<B>::value;
 
 template <class From, class To>
-concept convertible_to_box_value =
-        std::is_convertible_v<From, To> && !is_box_v<std::decay_t<From>>;
+concept convertible_to_box_value = std::is_convertible_v<From, To> && !
+is_box_v<std::remove_cvref_t<From>>;
 
 template <class T, class Eq>
 class box
 {
 public:
+    using value_type = T;
+
     box()
         : box(std::in_place, T{})
     {
@@ -78,12 +80,25 @@ public:
     {
     }
 
-    auto get() const noexcept -> T const& { return *m_value; }
+    auto get() const noexcept -> T const&
+    {
+        return *m_value;
+    }
 
-    operator T const&() const noexcept { return *m_value; }
+    operator T const&() const noexcept
+    {
+        return *m_value;
+    }
 
-    auto operator*() const noexcept -> T const& { return *m_value; }
-    auto operator->() const noexcept -> T const* { return m_value.get(); }
+    auto operator*() const noexcept -> T const&
+    {
+        return *m_value;
+    }
+
+    auto operator->() const noexcept -> T const*
+    {
+        return m_value.get();
+    }
 
     template <convertible_to_box_value<T const> U>
     auto operator=(U&& value) -> box&
