@@ -43,7 +43,8 @@ public:
     [[nodiscard]] auto get_learned_midi() const
             -> std::optional<midi::external_event>;
 
-    [[nodiscard]] auto get_stream(audio_stream_id) const -> std::vector<float>;
+    [[nodiscard]] auto get_stream(audio_stream_id) const
+            -> audio::multichannel_buffer<float>::vector;
 
     [[nodiscard]] auto
     rebuild(state const&,

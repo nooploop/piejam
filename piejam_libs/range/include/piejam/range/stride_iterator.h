@@ -13,16 +13,26 @@
 namespace piejam::range
 {
 
+namespace detail
+{
+
+template <class Iterator, std::iter_difference_t<Iterator> Stride>
+using stride_iterator_category = std::conditional_t<
+        std::random_access_iterator<Iterator> && Stride == 1,
+        std::contiguous_iterator_tag,
+        typename std::iterator_traits<Iterator>::iterator_category>;
+
+} // namespace detail
+
 inline constexpr std::ptrdiff_t dynamic_stride{};
 
 template <
         class Iterator,
-        typename std::iterator_traits<Iterator>::difference_type Stride =
-                dynamic_stride>
+        std::iter_difference_t<Iterator> Stride = dynamic_stride>
 class stride_iterator
     : public boost::stl_interfaces::iterator_interface<
               stride_iterator<Iterator, Stride>,
-              typename std::iterator_traits<Iterator>::iterator_category,
+              detail::stride_iterator_category<Iterator, Stride>,
               typename std::iterator_traits<Iterator>::value_type,
               typename std::iterator_traits<Iterator>::reference,
               typename std::iterator_traits<Iterator>::pointer,
@@ -30,13 +40,15 @@ class stride_iterator
 {
     using base_type = boost::stl_interfaces::iterator_interface<
             stride_iterator<Iterator, Stride>,
-            typename std::iterator_traits<Iterator>::iterator_category,
+            detail::stride_iterator_category<Iterator, Stride>,
             typename std::iterator_traits<Iterator>::value_type,
             typename std::iterator_traits<Iterator>::reference,
             typename std::iterator_traits<Iterator>::pointer,
             typename std::iterator_traits<Iterator>::difference_type>;
 
 public:
+    using iterator_category = typename base_type::iterator_category;
+
     // clang-format off
 
     constexpr stride_iterator()

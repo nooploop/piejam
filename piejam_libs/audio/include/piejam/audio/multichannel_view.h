@@ -15,7 +15,7 @@
 namespace piejam::audio
 {
 
-struct multichannel_layout_unspecified;
+struct multichannel_layout_runtime_defined;
 using multichannel_layout_interleaved = std::integral_constant<
         multichannel_layout,
         multichannel_layout::interleaved>;
@@ -27,19 +27,21 @@ inline constexpr std::size_t dynamic_channels{};
 
 template <
         class T,
-        class Layout = multichannel_layout_unspecified,
+        class Layout = multichannel_layout_runtime_defined,
         std::size_t NumChannels = dynamic_channels>
 class multichannel_view
 {
     using difference_type = typename range::table_view<T>::difference_type;
+
+    static inline constexpr bool layout_is_runtime_defined =
+            std::is_same_v<Layout, multichannel_layout_runtime_defined>;
 
 public:
     constexpr multichannel_view(
             std::span<T> data,
             multichannel_layout l,
             std::size_t num_channels) noexcept
-        requires(std::is_same_v<Layout, multichannel_layout_unspecified> &&
-                 NumChannels == dynamic_channels)
+        requires(layout_is_runtime_defined && NumChannels == dynamic_channels)
         : m_data{std::move(data)}
         , m_layout{l}
         , m_num_channels{num_channels}
@@ -51,8 +53,7 @@ public:
     constexpr multichannel_view(
             std::span<T> data,
             std::size_t num_channels) noexcept
-        requires(!std::is_same_v<Layout, multichannel_layout_unspecified> &&
-                 NumChannels == dynamic_channels)
+        requires(!layout_is_runtime_defined && NumChannels == dynamic_channels)
         : m_data{std::move(data)}
         , m_layout{Layout::value}
         , m_num_channels{num_channels}
@@ -64,8 +65,7 @@ public:
     constexpr multichannel_view(
             std::span<T> data,
             multichannel_layout l) noexcept
-        requires(std::is_same_v<Layout, multichannel_layout_unspecified> &&
-                 NumChannels != dynamic_channels)
+        requires(layout_is_runtime_defined && NumChannels != dynamic_channels)
         : m_data{std::move(data)}
         , m_layout{l}
         , m_num_channels{NumChannels}
@@ -74,8 +74,7 @@ public:
     }
 
     explicit constexpr multichannel_view(std::span<T> data) noexcept
-        requires(!std::is_same_v<Layout, multichannel_layout_unspecified> &&
-                 NumChannels != dynamic_channels)
+        requires(!layout_is_runtime_defined && NumChannels != dynamic_channels)
         : m_data{std::move(data)}
         , m_layout{Layout::value}
         , m_num_channels{NumChannels}
@@ -85,7 +84,9 @@ public:
 
     [[nodiscard]] constexpr auto layout() const noexcept -> multichannel_layout
     {
-        if constexpr (std::is_same_v<Layout, multichannel_layout_unspecified>)
+        if constexpr (std::is_same_v<
+                              Layout,
+                              multichannel_layout_runtime_defined>)
         {
             return m_layout;
         }
@@ -112,7 +113,7 @@ public:
 
     [[nodiscard]] constexpr auto channels() const noexcept
     {
-        if constexpr (std::is_same_v<Layout, multichannel_layout_unspecified>)
+        if constexpr (layout_is_runtime_defined)
         {
             switch (layout())
             {
@@ -203,7 +204,9 @@ public:
 
     [[nodiscard]] constexpr auto frames() const noexcept
     {
-        if constexpr (std::is_same_v<Layout, multichannel_layout_unspecified>)
+        if constexpr (std::is_same_v<
+                              Layout,
+                              multichannel_layout_runtime_defined>)
         {
             switch (layout())
             {
@@ -300,7 +303,9 @@ public:
     template <class ToLayout, std::size_t ToNumChannels>
     [[nodiscard]] constexpr auto cast() const noexcept
     {
-        if constexpr (std::is_same_v<ToLayout, multichannel_layout_unspecified>)
+        if constexpr (std::is_same_v<
+                              ToLayout,
+                              multichannel_layout_runtime_defined>)
         {
             if constexpr (ToNumChannels == dynamic_channels)
             {
@@ -332,6 +337,13 @@ public:
                 return multichannel_view<T, ToLayout, ToNumChannels>{m_data};
             }
         }
+    }
+
+    template <std::size_t ToNumChannels>
+        requires(!layout_is_runtime_defined)
+    [[nodiscard]] constexpr auto channels_cast() const noexcept
+    {
+        return cast<Layout, ToNumChannels>();
     }
 
 private:

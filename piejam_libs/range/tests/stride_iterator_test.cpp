@@ -26,6 +26,7 @@ TEST(stride_iterator, static_asserts)
                   stride_iterator<std::forward_list<int>::iterator>>);
     static_assert(
             std::input_iterator<stride_iterator<std::istream_iterator<int>>>);
+    static_assert(std::contiguous_iterator<stride_iterator<int const*, 1>>);
 }
 
 TEST(stride_iterator, pre_increment)

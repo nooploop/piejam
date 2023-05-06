@@ -31,9 +31,9 @@ class period_size;
 class sample_rate;
 
 enum class multichannel_layout : bool;
-template <class T, class Layout, std::size_t>
+template <class T, class Layout, std::size_t NumChannels>
 class multichannel_view;
-template <class T>
+template <class T, class Layout>
 class multichannel_buffer;
 
 } // namespace piejam::audio

@@ -15,15 +15,14 @@ StreamChannelsBisector::update(Stream const& input)
     BOOST_ASSERT(input.num_channels() % 2 == 0);
 
     auto const num_channels = input.num_channels() / 2;
-    auto const buffer_size = num_channels * input.num_frames();
     audio::multichannel_buffer<float> first(
             input.layout(),
             num_channels,
-            std::vector<float>(buffer_size));
+            input.num_frames());
     audio::multichannel_buffer<float> second(
             input.layout(),
             num_channels,
-            std::vector<float>(buffer_size));
+            input.num_frames());
 
     auto itF = first.frames().begin();
     auto itS = second.frames().begin();

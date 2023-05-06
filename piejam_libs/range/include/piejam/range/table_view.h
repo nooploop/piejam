@@ -22,22 +22,29 @@ template <
         std::ptrdiff_t MinorStep = dynamic_stride>
 class table_view
 {
+    template <class U>
+    using minor_span_type = std::conditional_t<
+            MinorStep == 1,
+            std::span<T>,
+            strided_span<U, MinorStep>>;
+
 public:
     template <class U>
     class major_index_iterator
         : public boost::stl_interfaces::iterator_interface<
                   major_index_iterator<U>,
                   std::random_access_iterator_tag,
-                  strided_span<U, MinorStep>,
-                  strided_span<U, MinorStep> const&,
-                  strided_span<U, MinorStep> const*>
+                  minor_span_type<U>,
+                  minor_span_type<U> const&,
+                  minor_span_type<U> const*>
     {
+
     public:
         using iterator_category = std::random_access_iterator_tag;
-        using value_type = strided_span<U, MinorStep>;
+        using value_type = minor_span_type<U>;
+        using reference = value_type const&;
+        using pointer = value_type const*;
         using difference_type = std::ptrdiff_t;
-        using pointer = strided_span<U, MinorStep> const*;
-        using reference = strided_span<U, MinorStep> const&;
 
         constexpr major_index_iterator() noexcept = default;
 
@@ -82,10 +89,19 @@ public:
         [[nodiscard]] constexpr auto
         operator==(major_index_iterator const& other) const noexcept -> bool
         {
-            return m_stride.data() == other.m_stride.data() &&
-                   m_stride.size() == other.m_stride.size() &&
-                   m_stride.stride() == other.m_stride.stride() &&
-                   m_step == other.m_step;
+            if constexpr (std::is_same_v<std::span<U>, value_type>)
+            {
+                return m_stride.data() == other.m_stride.data() &&
+                       m_stride.size() == other.m_stride.size() &&
+                       m_step == other.m_step;
+            }
+            else
+            {
+                return m_stride.data() == other.m_stride.data() &&
+                       m_stride.size() == other.m_stride.size() &&
+                       m_stride.stride() == other.m_stride.stride() &&
+                       m_step == other.m_step;
+            }
         }
 
         [[nodiscard]] constexpr auto operator*() const noexcept -> reference
@@ -114,7 +130,12 @@ public:
         operator-(major_index_iterator const& other) const noexcept
         {
             BOOST_ASSERT(m_stride.size() == other.m_stride.size());
-            BOOST_ASSERT(m_stride.stride() == other.m_stride.stride());
+            if constexpr (std::is_same_v<
+                                  strided_span<U, MinorStep>,
+                                  value_type>)
+            {
+                BOOST_ASSERT(m_stride.stride() == other.m_stride.stride());
+            }
             BOOST_ASSERT(step() == other.step());
             return (m_stride.data() - other.m_stride.data()) / step();
         }
@@ -125,7 +146,7 @@ public:
             return MajorStep == dynamic_stride ? m_step : MajorStep;
         }
 
-        strided_span<U, MinorStep> m_stride;
+        value_type m_stride;
         difference_type m_step{MajorStep == dynamic_stride ? 1 : MajorStep};
     };
 
@@ -213,8 +234,7 @@ public:
     }
 
     [[nodiscard]] constexpr auto
-    operator[](size_type major_index) const noexcept
-            -> strided_span<T, MinorStep>
+    operator[](size_type major_index) const noexcept -> minor_span_type<T>
     {
         if constexpr (MinorStep == dynamic_stride)
         {
@@ -352,6 +372,24 @@ transform(
     {
         std::ranges::transform(*src_it, dst_it->begin(), op);
     }
+}
+
+template <
+        class T,
+        std::size_t TMajorSize,
+        std::size_t TMinorSize,
+        std::ptrdiff_t TMajorStep,
+        std::ptrdiff_t TMinorStep,
+        class U,
+        std::size_t UMajorSize,
+        std::size_t UMinorSize,
+        std::ptrdiff_t UMajorStep,
+        std::ptrdiff_t UMinorStep>
+auto
+copy(table_view<T, TMajorSize, TMinorSize, TMajorStep, TMinorStep> const& src,
+     table_view<U, UMajorSize, UMinorSize, UMajorStep, UMinorStep> const& dst)
+{
+    transform(src, dst, std::identity{});
 }
 
 template <

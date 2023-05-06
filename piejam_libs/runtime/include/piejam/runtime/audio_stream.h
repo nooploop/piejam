@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/fwd.h>
+#include <piejam/audio/multichannel_buffer.h>
 #include <piejam/box.h>
 #include <piejam/fwd.h>
 

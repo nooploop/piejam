@@ -8,6 +8,8 @@
 
 #include <piejam/range/table_view.h>
 
+#include <mipp.h>
+
 #include <boost/assert.hpp>
 
 #include <span>
@@ -16,33 +18,40 @@
 namespace piejam::audio
 {
 
-template <class T>
+template <class T, class Layout = multichannel_layout_runtime_defined>
 class multichannel_buffer
 {
+    static inline constexpr auto default_layout = std::conditional_t<
+            std::is_same_v<Layout, multichannel_layout_runtime_defined>,
+            multichannel_layout_non_interleaved,
+            Layout>::value;
+
 public:
+    using vector = mipp::vector<T>;
+
+    multichannel_buffer() noexcept = default;
+
     explicit multichannel_buffer(std::size_t num_channels)
-        : multichannel_buffer{
-                  multichannel_layout::non_interleaved,
-                  num_channels,
-                  0}
+        : m_num_channels{num_channels}
     {
+        BOOST_ASSERT(num_channels > 0);
     }
 
     multichannel_buffer(std::size_t num_channels, std::size_t num_frames)
-        : multichannel_buffer{
-                  multichannel_layout::non_interleaved,
-                  num_channels,
-                  num_frames}
+        : m_num_channels{num_channels}
+        , m_data(num_channels * num_frames)
     {
+        BOOST_ASSERT(num_channels > 0);
     }
 
     multichannel_buffer(
             multichannel_layout layout,
             std::size_t num_channels,
             std::size_t num_frames)
+        requires(std::is_same_v<Layout, multichannel_layout_runtime_defined>)
         : m_layout{layout}
         , m_num_channels{num_channels}
-        , m_data(num_channels * num_frames, T{})
+        , m_data(num_channels * num_frames)
     {
         BOOST_ASSERT(num_channels > 0);
     }
@@ -50,7 +59,8 @@ public:
     multichannel_buffer(
             multichannel_layout l,
             std::size_t num_channels,
-            std::vector<T> data)
+            vector data)
+        requires(std::is_same_v<Layout, multichannel_layout_runtime_defined>)
         : m_layout{l}
         , m_num_channels{num_channels}
         , m_data{std::move(data)}
@@ -59,14 +69,51 @@ public:
         BOOST_ASSERT(m_data.size() % num_channels == 0);
     }
 
+    multichannel_buffer(std::size_t num_channels, vector data)
+        requires(!std::is_same_v<Layout, multichannel_layout_runtime_defined>)
+        : m_num_channels{num_channels}
+        , m_data{std::move(data)}
+    {
+        BOOST_ASSERT(num_channels > 0);
+        BOOST_ASSERT(m_data.size() % num_channels == 0);
+    }
+
     [[nodiscard]] auto view() noexcept
     {
-        return multichannel_view{std::span{m_data}, m_layout, m_num_channels};
+        if constexpr (std::is_same_v<
+                              Layout,
+                              multichannel_layout_runtime_defined>)
+        {
+            return multichannel_view<T, Layout>{
+                    std::span{m_data},
+                    m_layout,
+                    m_num_channels};
+        }
+        else
+        {
+            return multichannel_view<T, Layout>{
+                    std::span{m_data},
+                    m_num_channels};
+        }
     }
 
     [[nodiscard]] auto view() const noexcept
     {
-        return multichannel_view{std::span{m_data}, m_layout, m_num_channels};
+        if constexpr (std::is_same_v<
+                              Layout,
+                              multichannel_layout_runtime_defined>)
+        {
+            return multichannel_view<std::add_const_t<T>, Layout>{
+                    std::span{m_data},
+                    m_layout,
+                    m_num_channels};
+        }
+        else
+        {
+            return multichannel_view<std::add_const_t<T>, Layout>{
+                    std::span{m_data},
+                    m_num_channels};
+        }
     }
 
     [[nodiscard]] auto layout() const noexcept -> multichannel_layout
@@ -109,20 +156,20 @@ public:
         return view().frames();
     }
 
-    [[nodiscard]] auto samples() noexcept
+    [[nodiscard]] auto samples() noexcept -> std::span<T>
     {
         return m_data;
     }
 
-    [[nodiscard]] auto samples() const noexcept
+    [[nodiscard]] auto samples() const noexcept -> std::span<T const>
     {
         return m_data;
     }
 
 private:
-    multichannel_layout m_layout{multichannel_layout::non_interleaved};
-    std::size_t m_num_channels{};
-    std::vector<T> m_data;
+    multichannel_layout m_layout{default_layout};
+    std::size_t m_num_channels{1};
+    vector m_data;
 };
 
 } // namespace piejam::audio
