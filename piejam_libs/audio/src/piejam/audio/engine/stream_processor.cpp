@@ -8,7 +8,7 @@
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/range/iota.h>
-#include <piejam/range/stride_iterator.h>
+#include <piejam/range/stride_pointer_iterator.h>
 
 #include <boost/assert.hpp>
 #include <boost/hof/match.hpp>

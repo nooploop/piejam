@@ -10,15 +10,12 @@ namespace piejam::range
 {
 
 template <class Iterator>
-class stride_iterator;
+class stride_pointer_iterator;
 
 template <class T>
 class strided_span;
 
 template <class T>
 class table_view;
-
-template <class T, std::size_t SpanExtent>
-class span_iterator;
 
 } // namespace piejam::range

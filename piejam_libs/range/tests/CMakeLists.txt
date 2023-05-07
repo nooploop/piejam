@@ -8,7 +8,7 @@ endif()
 
 add_executable(piejam_range_test
     ${CMAKE_CURRENT_SOURCE_DIR}/indices_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/stride_iterator_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/stride_pointer_iterator_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/strided_span_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/table_view_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/zip_test.cpp
