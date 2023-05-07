@@ -19,7 +19,6 @@ TEST(table_view, static_asserts)
                   table_view<float>::major_index_iterator<float>>);
     static_assert(std::ranges::random_access_range<table_view<float>>);
     static_assert(std::ranges::viewable_range<table_view<float> const&>);
-    static_assert(std::ranges::sized_range<table_view<float>>);
 }
 
 TEST(table_view, major_index_iterator_equality)

@@ -7,9 +7,9 @@
 #include <piejam/range/strided_span.h>
 
 #include <boost/assert.hpp>
-#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <algorithm>
+#include <span>
 
 namespace piejam::range
 {
@@ -31,18 +31,12 @@ class table_view
 public:
     template <class U>
     class major_index_iterator
-        : public boost::stl_interfaces::iterator_interface<
-                  major_index_iterator<U>,
-                  std::random_access_iterator_tag,
-                  minor_span_type<U>,
-                  minor_span_type<U> const&,
-                  minor_span_type<U> const*>
     {
 
     public:
         using iterator_category = std::random_access_iterator_tag;
         using value_type = minor_span_type<U>;
-        using reference = value_type const&;
+        using reference = value_type;
         using pointer = value_type const*;
         using difference_type = std::ptrdiff_t;
 
@@ -54,7 +48,7 @@ public:
                 std::size_t const minor_size,
                 difference_type const minor_step) noexcept
             requires(MinorStep == dynamic_stride)
-            : m_stride{data, minor_size, minor_step}
+            : m_minor_span{data, minor_size, minor_step}
             , m_step{step}
         {
             BOOST_ASSERT(
@@ -74,7 +68,7 @@ public:
                 std::size_t const minor_size,
                 difference_type const minor_step) noexcept
             requires(MinorStep != dynamic_stride)
-            : m_stride{data, minor_size}
+            : m_minor_span{data, minor_size}
             , m_step{step}
         {
             BOOST_ASSERT(
@@ -86,67 +80,162 @@ public:
             BOOST_ASSERT(MinorStep == minor_step);
         }
 
-        [[nodiscard]] constexpr auto
-        operator==(major_index_iterator const& other) const noexcept -> bool
-        {
-            if constexpr (std::is_same_v<std::span<U>, value_type>)
-            {
-                return m_stride.data() == other.m_stride.data() &&
-                       m_stride.size() == other.m_stride.size() &&
-                       m_step == other.m_step;
-            }
-            else
-            {
-                return m_stride.data() == other.m_stride.data() &&
-                       m_stride.size() == other.m_stride.size() &&
-                       m_stride.stride() == other.m_stride.stride() &&
-                       m_step == other.m_step;
-            }
-        }
-
         [[nodiscard]] constexpr auto operator*() const noexcept -> reference
         {
-            return m_stride;
+            return m_minor_span;
         }
 
-        [[nodiscard]] constexpr auto operator+=(std::ptrdiff_t n) noexcept
+        [[nodiscard]] constexpr auto operator->() const noexcept -> pointer
+        {
+            return &m_minor_span;
+        }
+
+        constexpr auto operator[](difference_type n) const noexcept -> reference
+        {
+            return *(*this + n);
+        }
+
+        constexpr auto operator+=(std::ptrdiff_t n) noexcept
                 -> major_index_iterator&
         {
             if constexpr (MinorStep == dynamic_stride)
             {
-                m_stride = {
-                        m_stride.data() + n * step(),
-                        m_stride.size(),
-                        m_stride.stride()};
+                m_minor_span = {
+                        m_minor_span.data() + n * step(),
+                        m_minor_span.size(),
+                        m_minor_span.stride()};
             }
             else
             {
-                m_stride = {m_stride.data() + n * step(), m_stride.size()};
+                m_minor_span = {
+                        m_minor_span.data() + n * step(),
+                        m_minor_span.size()};
             }
             return *this;
         }
 
+        constexpr auto operator++() noexcept -> major_index_iterator&
+        {
+            *this += 1;
+            return *this;
+        }
+
+        constexpr auto operator++(int) noexcept -> major_index_iterator
+        {
+            major_index_iterator temp(*this);
+            ++(*this);
+            return temp;
+        }
+
+        constexpr auto operator--() noexcept -> major_index_iterator&
+        {
+            *this += -1;
+            return *this;
+        }
+
+        constexpr auto operator--(int) noexcept -> major_index_iterator
+        {
+            major_index_iterator temp(*this);
+            --(*this);
+            return temp;
+        }
+
+        constexpr auto operator+(difference_type n) const noexcept
+                -> major_index_iterator
+        {
+            major_index_iterator temp(*this);
+            return temp += n;
+        }
+
+        friend constexpr auto
+        operator+(difference_type n, major_index_iterator const& it) noexcept
+                -> major_index_iterator
+        {
+            return it + n;
+        }
+
+        constexpr auto operator-=(difference_type n) noexcept
+                -> major_index_iterator&
+        {
+            return *this += -n;
+        }
+
+        constexpr auto operator-(difference_type n) const noexcept
+                -> major_index_iterator
+        {
+            major_index_iterator temp(*this);
+            return temp -= n;
+        }
+
         [[nodiscard]] constexpr auto
         operator-(major_index_iterator const& other) const noexcept
+                -> difference_type
         {
-            BOOST_ASSERT(m_stride.size() == other.m_stride.size());
-            if constexpr (std::is_same_v<
-                                  strided_span<U, MinorStep>,
-                                  value_type>)
-            {
-                BOOST_ASSERT(m_stride.stride() == other.m_stride.stride());
-            }
-            BOOST_ASSERT(step() == other.step());
-            return (m_stride.data() - other.m_stride.data()) / step();
+            verify_precondition(other);
+            return (m_minor_span.data() - other.m_stride.data()) / step();
+        }
+
+        [[nodiscard]] constexpr auto
+        operator==(major_index_iterator const& rhs) const noexcept -> bool
+        {
+            verify_precondition(rhs);
+            return m_minor_span.data() == rhs.m_minor_span.data();
+        }
+
+        [[nodiscard]] constexpr auto
+        operator!=(major_index_iterator const& rhs) const noexcept -> bool
+        {
+            return !(*this == rhs);
+        }
+
+        [[nodiscard]] constexpr auto
+        operator<(major_index_iterator const& rhs) const noexcept -> bool
+        {
+            verify_precondition(rhs);
+            return m_minor_span.data() < rhs.m_stride.data();
+        }
+
+        [[nodiscard]] constexpr auto
+        operator>(major_index_iterator const& rhs) const noexcept -> bool
+        {
+            return rhs < *this;
+        }
+
+        [[nodiscard]] constexpr auto
+        operator<=(major_index_iterator const& rhs) const noexcept -> bool
+        {
+            return !(rhs < *this);
+        }
+
+        [[nodiscard]] constexpr auto
+        operator>=(major_index_iterator const& rhs) const noexcept -> bool
+        {
+            return !(*this < rhs);
         }
 
     private:
+        constexpr auto
+        verify_precondition(major_index_iterator const& rhs) const noexcept
+        {
+            BOOST_ASSERT(step() == rhs.step());
+            BOOST_ASSERT(m_minor_span.size() == rhs.m_minor_span.size());
+            if constexpr (MinorStep != 1)
+            {
+                BOOST_ASSERT(
+                        m_minor_span.stride() == rhs.m_minor_span.stride());
+                BOOST_ASSERT(
+                        (m_minor_span.data() - rhs.m_minor_span.data()) %
+                                m_minor_span.stride() ==
+                        0);
+            }
+        }
+
         [[nodiscard]] constexpr auto step() const noexcept -> difference_type
         {
             return MajorStep == dynamic_stride ? m_step : MajorStep;
         }
 
-        value_type m_stride;
+        value_type m_minor_span;
         difference_type m_step{MajorStep == dynamic_stride ? 1 : MajorStep};
     };
 

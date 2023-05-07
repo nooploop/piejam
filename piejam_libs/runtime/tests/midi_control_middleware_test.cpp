@@ -80,7 +80,7 @@ TEST_F(midi_control_middleware_test, refresh_midi_devices_and_add_update)
     EXPECT_EQ(dev_id, st.midi_inputs->at(0));
 
     ASSERT_TRUE(st.midi_devices->contains(dev_id));
-    EXPECT_EQ("test", st.midi_devices->at(dev_id).name);
+    EXPECT_EQ("test", *st.midi_devices->at(dev_id).name);
     EXPECT_EQ(false, st.midi_devices->at(dev_id).enabled);
 }
 
@@ -139,7 +139,7 @@ TEST_F(midi_control_middleware_test,
     EXPECT_EQ(dev_id, st.midi_inputs->at(0));
 
     ASSERT_TRUE(st.midi_devices->contains(dev_id));
-    EXPECT_EQ("test", st.midi_devices->at(dev_id).name);
+    EXPECT_EQ("test", *st.midi_devices->at(dev_id).name);
     EXPECT_EQ(false, st.midi_devices->at(dev_id).enabled);
 }
 

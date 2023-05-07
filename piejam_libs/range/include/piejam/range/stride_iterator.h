@@ -5,7 +5,6 @@
 #pragma once
 
 #include <boost/assert.hpp>
-#include <boost/stl_interfaces/iterator_interface.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -13,165 +12,172 @@
 namespace piejam::range
 {
 
-namespace detail
-{
-
-template <class Iterator, std::iter_difference_t<Iterator> Stride>
-using stride_iterator_category = std::conditional_t<
-        std::random_access_iterator<Iterator> && Stride == 1,
-        std::contiguous_iterator_tag,
-        typename std::iterator_traits<Iterator>::iterator_category>;
-
-} // namespace detail
-
 inline constexpr std::ptrdiff_t dynamic_stride{};
 
-template <
-        class Iterator,
-        std::iter_difference_t<Iterator> Stride = dynamic_stride>
+template <typename T, std::ptrdiff_t Stride = dynamic_stride>
 class stride_iterator
-    : public boost::stl_interfaces::iterator_interface<
-              stride_iterator<Iterator, Stride>,
-              detail::stride_iterator_category<Iterator, Stride>,
-              typename std::iterator_traits<Iterator>::value_type,
-              typename std::iterator_traits<Iterator>::reference,
-              typename std::iterator_traits<Iterator>::pointer,
-              typename std::iterator_traits<Iterator>::difference_type>
 {
-    using base_type = boost::stl_interfaces::iterator_interface<
-            stride_iterator<Iterator, Stride>,
-            detail::stride_iterator_category<Iterator, Stride>,
-            typename std::iterator_traits<Iterator>::value_type,
-            typename std::iterator_traits<Iterator>::reference,
-            typename std::iterator_traits<Iterator>::pointer,
-            typename std::iterator_traits<Iterator>::difference_type>;
-
 public:
-    using iterator_category = typename base_type::iterator_category;
+    using iterator_category = std::conditional_t<
+            Stride == 1,
+            std::contiguous_iterator_tag,
+            std::random_access_iterator_tag>;
+    using value_type = T;
+    using pointer = T*;
+    using reference = T&;
+    using difference_type = std::ptrdiff_t;
 
-    // clang-format off
+    constexpr stride_iterator() noexcept = default;
 
-    constexpr stride_iterator()
-            noexcept(std::is_nothrow_default_constructible_v<Iterator>) = default;
-
-    constexpr stride_iterator(
-            Iterator const& it,
-            typename base_type::difference_type stride)
-            noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
-        requires (Stride == dynamic_stride)
-        : m_it{it}
-        , m_stride{stride}
-    {
-        BOOST_ASSERT(m_stride > dynamic_stride);
-    }
-
-    explicit constexpr stride_iterator(
-            Iterator const& it)
-            noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
-        requires (Stride != dynamic_stride)
-        : m_it{it}
+    explicit constexpr stride_iterator(pointer ptr) noexcept
+        requires(Stride != dynamic_stride)
+        : m_p(ptr)
     {
     }
 
-    constexpr stride_iterator(
-            Iterator&& it,
-            typename base_type::difference_type stride)
-            noexcept(std::is_nothrow_move_constructible_v<Iterator>)
-        requires (Stride == dynamic_stride)
-        : m_it{std::move(it)}
-        , m_stride{stride}
+    constexpr stride_iterator(pointer ptr, difference_type stride) noexcept
+        requires(Stride == dynamic_stride)
+        : m_p(ptr)
+        , m_stride(stride)
     {
-        BOOST_ASSERT(m_stride > 0);
+        BOOST_ASSERT(stride != 0);
     }
 
-    explicit constexpr stride_iterator(
-            Iterator&& it)
-            noexcept(std::is_nothrow_move_constructible_v<Iterator>)
-        requires (Stride != dynamic_stride)
-        : m_it{std::move(it)}
-    {
-        BOOST_ASSERT(m_stride > 0);
-    }
-
-    // clang-format on
-
-    [[nodiscard]] constexpr auto stride() const noexcept ->
-            typename base_type::difference_type
+    [[nodiscard]] constexpr auto stride() const noexcept -> difference_type
     {
         return Stride == dynamic_stride ? m_stride : Stride;
     }
 
-    auto operator++() -> stride_iterator&
-        requires requires(Iterator it) { ++it; }
+    [[nodiscard]] constexpr auto operator*() const noexcept -> reference
     {
-        std::advance(m_it, stride());
+        return *m_p;
+    }
+
+    [[nodiscard]] constexpr auto operator->() const noexcept -> pointer
+    {
+        return m_p;
+    }
+
+    constexpr auto operator[](difference_type n) const noexcept -> reference
+    {
+        return *(m_p + n * stride());
+    }
+
+    constexpr auto operator++() noexcept -> stride_iterator&
+    {
+        m_p += stride();
         return *this;
     }
 
-    using base_type::operator++;
-
-    auto operator--() -> stride_iterator&
-        requires requires(Iterator it) { --it; }
+    constexpr auto operator++(int) noexcept -> stride_iterator
     {
-        std::advance(m_it, -stride());
+        stride_iterator temp(*this);
+        ++(*this);
+        return temp;
+    }
+
+    constexpr auto operator--() noexcept -> stride_iterator&
+    {
+        m_p -= stride();
         return *this;
     }
 
-    using base_type::operator--;
-
-    [[nodiscard]] constexpr auto operator*() noexcept -> decltype(auto)
+    constexpr auto operator--(int) noexcept -> stride_iterator
     {
-        return *m_it;
+        stride_iterator temp(*this);
+        --(*this);
+        return temp;
     }
 
-    [[nodiscard]] constexpr auto operator*() const noexcept -> decltype(auto)
+    constexpr auto operator+=(difference_type n) noexcept -> stride_iterator&
     {
-        return *m_it;
-    }
-
-    constexpr auto operator+=(typename base_type::difference_type n)
-            -> stride_iterator&
-        requires requires(Iterator it) { it + n; }
-    {
-        std::advance(m_it, n * stride());
+        m_p += n * stride();
         return *this;
     }
 
-    [[nodiscard]] friend constexpr auto
-    operator==(stride_iterator const& lhs, stride_iterator const& rhs) noexcept
-            -> bool
+    constexpr auto operator+(difference_type n) const noexcept
+            -> stride_iterator
     {
-        return lhs.m_it == rhs.m_it && lhs.stride() == rhs.stride();
+        stride_iterator temp(*this);
+        return temp += n;
+    }
+
+    friend constexpr auto
+    operator+(difference_type n, stride_iterator const& it) noexcept
+            -> stride_iterator
+    {
+        return it + n;
+    }
+
+    constexpr auto operator-=(difference_type n) noexcept -> stride_iterator&
+    {
+        return *this += -n;
+    }
+
+    constexpr auto operator-(difference_type n) const noexcept
+            -> stride_iterator
+    {
+        stride_iterator temp(*this);
+        return temp -= n;
     }
 
     [[nodiscard]] constexpr auto
-    operator-(stride_iterator const& rhs) const noexcept ->
-            typename base_type::difference_type
-        requires requires(
-                Iterator l,
-                Iterator r,
-                typename base_type::difference_type s) { (l - r) / s; }
+    operator-(stride_iterator const& rhs) const noexcept -> difference_type
     {
-        BOOST_ASSERT(stride() == rhs.stride());
-        return (m_it - rhs.m_it) / m_stride;
+        verify_precondition(rhs);
+        return (m_p - rhs.m_p) / stride();
+    }
+
+    [[nodiscard]] constexpr auto
+    operator==(stride_iterator const& rhs) const noexcept -> bool
+    {
+        verify_precondition(rhs);
+        return m_p == rhs.m_p;
+    }
+
+    [[nodiscard]] constexpr auto
+    operator!=(stride_iterator const& rhs) const noexcept -> bool
+    {
+        return !(*this == rhs);
+    }
+
+    [[nodiscard]] constexpr auto
+    operator<(stride_iterator const& rhs) const noexcept -> bool
+    {
+        verify_precondition(rhs);
+        return m_p < rhs.m_p;
+    }
+
+    [[nodiscard]] constexpr auto
+    operator>(stride_iterator const& rhs) const noexcept -> bool
+    {
+        return rhs < *this;
+    }
+
+    [[nodiscard]] constexpr auto
+    operator<=(stride_iterator const& rhs) const noexcept -> bool
+    {
+        return !(rhs < *this);
+    }
+
+    [[nodiscard]] constexpr auto
+    operator>=(stride_iterator const& rhs) const noexcept -> bool
+    {
+        return !(*this < rhs);
     }
 
 private:
-    Iterator m_it{};
-    typename base_type::difference_type m_stride{
-            Stride == dynamic_stride ? 1 : Stride};
+    void verify_precondition(stride_iterator const& rhs) const
+    {
+        BOOST_ASSERT(stride() == rhs.stride());
+        BOOST_ASSERT((m_p - rhs.m_p) % stride() == 0);
+    }
+
+    pointer m_p{};
+    difference_type m_stride{Stride == dynamic_stride ? 1 : Stride};
 };
 
-template <class Iterator>
-stride_iterator(
-        Iterator const&,
-        typename std::iterator_traits<Iterator>::difference_type)
-        -> stride_iterator<Iterator>;
-
-template <class Iterator>
-stride_iterator(
-        Iterator&&,
-        typename std::iterator_traits<Iterator>::difference_type)
-        -> stride_iterator<Iterator>;
+template <class T>
+stride_iterator(T*, std::ptrdiff_t) -> stride_iterator<T>;
 
 } // namespace piejam::range

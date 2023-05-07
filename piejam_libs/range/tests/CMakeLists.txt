@@ -14,7 +14,7 @@ add_executable(piejam_range_test
     ${CMAKE_CURRENT_SOURCE_DIR}/zip_test.cpp
 )
 target_link_libraries(piejam_range_test gtest_driver piejam_range)
-target_compile_options(piejam_range_test PRIVATE -Wall -Wextra -Werror -pedantic-errors)
+target_compile_options(piejam_range_test PRIVATE -Wall -Wextra -Werror -pedantic-errors -fconcepts-diagnostics-depth=2)
 
 add_test(NAME piejam_range_test COMMAND piejam_range_test)
 

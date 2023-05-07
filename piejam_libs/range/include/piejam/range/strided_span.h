@@ -26,8 +26,8 @@ public:
     using const_pointer = T const*;
     using reference = T&;
     using const_reference = T const&;
-    using iterator = stride_iterator<pointer, Stride>;
-    using const_iterator = stride_iterator<const_pointer, Stride>;
+    using iterator = stride_iterator<T, Stride>;
+    using const_iterator = stride_iterator<T const, Stride>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -51,8 +51,6 @@ public:
         , m_size(size)
     {
     }
-
-    constexpr strided_span(strided_span const&) noexcept = default;
 
     [[nodiscard]] constexpr auto begin() const noexcept -> iterator
     {
