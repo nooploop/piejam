@@ -16,7 +16,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/numeric/rolling_mean.h>
 #include <piejam/range/iota.h>
-#include <piejam/range/table_view.h>
+#include <piejam/range/strided_span.h>
 #include <piejam/system/device.h>
 
 #include <sound/asound.h>
@@ -137,17 +137,15 @@ struct interleaved_reader final : pcm_reader
     convert(std::size_t const channel, std::span<float> const buffer) noexcept
     {
         BOOST_ASSERT(channel < m_num_channels);
-        range::table_view<pcm_sample_t<F>> interleaved(
-                m_read_buffer.data(),
-                m_num_channels,
-                m_period_size.get(),
-                1,
-                m_num_channels);
+        BOOST_ASSERT(m_period_size.get() == buffer.size());
 
-        BOOST_ASSERT(interleaved[channel].size() == buffer.size());
+        range::strided_span<pcm_sample_t<F>> interleaved{
+                m_read_buffer.data() + channel,
+                buffer.size(),
+                static_cast<std::ptrdiff_t>(m_num_channels)};
 
         std::ranges::transform(
-                interleaved[channel],
+                interleaved,
                 buffer.begin(),
                 &pcm_convert::from<F>);
     }
@@ -279,40 +277,35 @@ struct interleaved_writer final : pcm_writer
             std::size_t const channel,
             pcm_output_source_buffer_t const& buffer)
     {
-        std::visit(
-                [this, channel](auto const& b) { convert(channel, b); },
-                buffer);
+        std::visit([=, this](auto const& b) { convert(channel, b); }, buffer);
     }
 
     void convert(std::size_t const channel, std::span<float const> const buffer)
     {
         BOOST_ASSERT(channel < m_num_channels);
-        range::table_view<pcm_sample_t<F>> interleaved(
-                m_write_buffer.data(),
-                m_num_channels,
-                m_period_size.get(),
-                1,
-                m_num_channels);
+        BOOST_ASSERT(m_period_size.get() == buffer.size());
 
-        BOOST_ASSERT(buffer.size() == interleaved[channel].size());
+        range::strided_span<pcm_sample_t<F>> interleaved{
+                m_write_buffer.data() + channel,
+                m_period_size.get(),
+                static_cast<std::ptrdiff_t>(m_num_channels)};
 
         std::ranges::transform(
                 buffer,
-                interleaved[channel].begin(),
+                interleaved.begin(),
                 &pcm_convert::to<F>);
     }
 
     void convert(std::size_t const channel, float const constant)
     {
         BOOST_ASSERT(channel < m_num_channels);
-        range::table_view<pcm_sample_t<F>> interleaved(
-                m_write_buffer.data(),
-                m_num_channels,
-                m_period_size.get(),
-                1,
-                m_num_channels);
 
-        std::ranges::fill(interleaved[channel], pcm_convert::to<F>(constant));
+        range::strided_span<pcm_sample_t<F>> interleaved{
+                m_write_buffer.data() + channel,
+                m_period_size.get(),
+                static_cast<std::ptrdiff_t>(m_num_channels)};
+
+        std::ranges::fill(interleaved, pcm_convert::to<F>(constant));
     }
 
     auto converter() const noexcept -> std::span<converter_f const> override
