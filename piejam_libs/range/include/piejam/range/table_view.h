@@ -90,7 +90,8 @@ public:
             return &m_minor_span;
         }
 
-        constexpr auto operator[](difference_type n) const noexcept -> reference
+        [[nodiscard]] constexpr auto
+        operator[](difference_type n) const noexcept -> reference
         {
             return *(*this + n);
         }
@@ -120,7 +121,8 @@ public:
             return *this;
         }
 
-        constexpr auto operator++(int) noexcept -> major_index_iterator
+        [[nodiscard]] constexpr auto operator++(int) noexcept
+                -> major_index_iterator
         {
             major_index_iterator temp(*this);
             ++(*this);
@@ -133,21 +135,22 @@ public:
             return *this;
         }
 
-        constexpr auto operator--(int) noexcept -> major_index_iterator
+        [[nodiscard]] constexpr auto operator--(int) noexcept
+                -> major_index_iterator
         {
             major_index_iterator temp(*this);
             --(*this);
             return temp;
         }
 
-        constexpr auto operator+(difference_type n) const noexcept
+        [[nodiscard]] constexpr auto operator+(difference_type n) const noexcept
                 -> major_index_iterator
         {
             major_index_iterator temp(*this);
             return temp += n;
         }
 
-        friend constexpr auto
+        [[nodiscard]] friend constexpr auto
         operator+(difference_type n, major_index_iterator const& it) noexcept
                 -> major_index_iterator
         {
@@ -160,7 +163,7 @@ public:
             return *this += -n;
         }
 
-        constexpr auto operator-(difference_type n) const noexcept
+        [[nodiscard]] constexpr auto operator-(difference_type n) const noexcept
                 -> major_index_iterator
         {
             major_index_iterator temp(*this);

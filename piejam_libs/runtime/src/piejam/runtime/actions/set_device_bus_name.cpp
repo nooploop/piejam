@@ -32,12 +32,16 @@ set_device_bus_name::reduce(state const& st) const -> state
                 if (io_dir == io_direction::input)
                 {
                     if (bus.in == route_name)
+                    {
                         bus.in = bus_id;
+                    }
                 }
                 else
                 {
                     if (bus.out == route_name)
+                    {
                         bus.out = bus_id;
+                    }
                 }
             });
 

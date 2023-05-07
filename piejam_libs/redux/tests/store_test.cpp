@@ -114,7 +114,9 @@ struct move_only_middleware
     move_only_middleware(move_only_middleware&&) noexcept = default;
     move_only_middleware(move_only_middleware const&) = delete;
 
-    void operator()(action_t const&) {}
+    void operator()(action_t const&)
+    {
+    }
 };
 
 TEST(store, apply_move_only_middlewares)

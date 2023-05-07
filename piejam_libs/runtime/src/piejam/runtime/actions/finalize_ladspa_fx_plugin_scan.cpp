@@ -16,12 +16,10 @@ namespace piejam::runtime::actions
 static void
 filter_fx_plugins(std::vector<ladspa::plugin_descriptor>& plugins)
 {
-    boost::remove_erase_if(
-            plugins,
-            [](ladspa::plugin_descriptor const& pd) {
-                return (pd.num_inputs != pd.num_outputs) ||
-                       (pd.num_inputs != 1 && pd.num_inputs != 2);
-            });
+    boost::remove_erase_if(plugins, [](ladspa::plugin_descriptor const& pd) {
+        return (pd.num_inputs != pd.num_outputs) ||
+               (pd.num_inputs != 1 && pd.num_inputs != 2);
+    });
 }
 
 static void

@@ -15,11 +15,19 @@ void
 configuration::apply() const
 {
     if (affinity)
+    {
         this_thread::set_affinity(*affinity);
+    }
+
     if (realtime_priority)
+    {
         this_thread::set_realtime_priority(*realtime_priority);
+    }
+
     if (name)
+    {
         this_thread::set_name(*name);
+    }
 }
 
 } // namespace piejam::thread

@@ -27,8 +27,14 @@ public:
         return "midi_learn";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 0; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
 
     auto event_inputs() const noexcept -> event_ports override
     {
@@ -79,7 +85,9 @@ public:
         else
         {
             for (auto const& ev : in)
+            {
                 out.insert(ev.offset(), ev.value());
+            }
         }
     }
 

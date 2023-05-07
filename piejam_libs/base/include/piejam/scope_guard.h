@@ -19,7 +19,10 @@ struct on_scope_exit
     {
     }
 
-    ~on_scope_exit() { m_f(); }
+    ~on_scope_exit()
+    {
+        m_f();
+    }
 
     on_scope_exit(on_scope_exit const&) = delete;
     on_scope_exit(on_scope_exit&&) = delete;

@@ -18,7 +18,10 @@ struct tst_action
 
 struct thunk_action : tst_action
 {
-    thunk_action() { is_thunk_action = true; }
+    thunk_action()
+    {
+        is_thunk_action = true;
+    }
 
     std::function<void(get_state_f<int> const&, dispatch_f<tst_action> const&)>
             payload;

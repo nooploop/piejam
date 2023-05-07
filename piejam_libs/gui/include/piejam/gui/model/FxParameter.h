@@ -39,7 +39,11 @@ public:
             piejam::gui::model::FxParameterKeyId const&);
     ~FxParameter();
 
-    auto name() const noexcept -> QString const& { return m_name; }
+    auto name() const noexcept -> QString const&
+    {
+        return m_name;
+    }
+
     void setName(QString const& x)
     {
         if (m_name != x)
@@ -49,7 +53,11 @@ public:
         }
     }
 
-    auto value() const noexcept -> double { return m_value; }
+    auto value() const noexcept -> double
+    {
+        return m_value;
+    }
+
     void setValue(double x)
     {
         if (m_value != x)
@@ -75,7 +83,11 @@ public:
         }
     }
 
-    auto stepped() const noexcept -> bool { return m_stepped; }
+    auto stepped() const noexcept -> bool
+    {
+        return m_stepped;
+    }
+
     void setStepped(bool x)
     {
         if (m_stepped != x)
@@ -85,7 +97,11 @@ public:
         }
     }
 
-    auto minValue() const noexcept -> double { return m_minValue; }
+    auto minValue() const noexcept -> double
+    {
+        return m_minValue;
+    }
+
     void setMinValue(double x)
     {
         if (m_minValue != x)
@@ -95,7 +111,11 @@ public:
         }
     }
 
-    auto maxValue() const noexcept -> double { return m_maxValue; }
+    auto maxValue() const noexcept -> double
+    {
+        return m_maxValue;
+    }
+
     void setMaxValue(double x)
     {
         if (m_maxValue != x)
@@ -107,7 +127,11 @@ public:
 
     Q_INVOKABLE QString intValueToString(int value);
 
-    auto isSwitch() const noexcept -> bool { return m_isSwitch; }
+    auto isSwitch() const noexcept -> bool
+    {
+        return m_isSwitch;
+    }
+
     void setIsSwitch(bool x)
     {
         if (m_isSwitch != x)
@@ -117,7 +141,11 @@ public:
         }
     }
 
-    auto switchValue() const noexcept -> bool { return m_switchValue; }
+    auto switchValue() const noexcept -> bool
+    {
+        return m_switchValue;
+    }
+
     void setSwitchValue(bool x)
     {
         if (m_switchValue != x)

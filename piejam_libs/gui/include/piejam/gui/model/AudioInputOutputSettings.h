@@ -33,7 +33,11 @@ protected:
 public:
     ~AudioInputOutputSettings();
 
-    auto channels() -> QStringList { return m_channels; }
+    auto channels() -> QStringList
+    {
+        return m_channels;
+    }
+
     void setChannels(QStringList const& channels)
     {
         if (m_channels != channels)

@@ -29,10 +29,14 @@ struct midi_assignment_processor_test : testing::Test
         proc = make_midi_assignment_processor(assigns);
 
         for (auto const& ev_port : proc->event_outputs())
+        {
             ev_out_bufs.add(ev_port);
+        }
 
         for (auto const& ev_port : proc->event_inputs())
+        {
             ev_in_bufs.add(ev_port);
+        }
 
         ev_in_bufs.set(0, ev_in_buf);
     }

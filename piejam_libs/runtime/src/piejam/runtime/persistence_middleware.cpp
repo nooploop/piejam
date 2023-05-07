@@ -37,13 +37,17 @@ struct persistence_action_visitor : private generic_action_visitor<void>
     void operator()(actions::load_app_config const& a)
     {
         if (!std::filesystem::exists(a.file))
+        {
             return;
+        }
 
         try
         {
             std::ifstream in(a.file);
             if (!in.is_open())
+            {
                 throw std::runtime_error("could not open config file");
+            }
 
             actions::apply_app_config action;
             action.conf = persistence::load_app_config(in);
@@ -66,13 +70,17 @@ struct persistence_action_visitor : private generic_action_visitor<void>
     void operator()(actions::load_session const& a)
     {
         if (!std::filesystem::exists(a.file))
+        {
             return;
+        }
 
         try
         {
             std::ifstream in(a.file);
             if (!in.is_open())
+            {
                 throw std::runtime_error("could not open session file");
+            }
 
             dispatch(actions::apply_session(persistence::load_session(in)));
         }

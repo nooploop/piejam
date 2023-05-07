@@ -16,8 +16,7 @@
 namespace piejam::runtime::components
 {
 
-auto
-make_mixer_channel_input(mixer::channel const&)
+auto make_mixer_channel_input(mixer::channel const&)
         -> std::unique_ptr<audio::engine::component>;
 
 auto make_mixer_channel_output(

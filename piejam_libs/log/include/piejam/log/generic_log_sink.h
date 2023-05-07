@@ -31,7 +31,10 @@ protected:
     {
         m_sink_it(msg);
     }
-    void flush_() override { m_flush(); }
+    void flush_() override
+    {
+        m_flush();
+    }
 
 private:
     sink_it_fn_t m_sink_it;

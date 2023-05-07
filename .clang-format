@@ -86,7 +86,7 @@ IncludeIsMainSourceRegex: ''
 IndentCaseLabels: true
 IndentGotoLabels: true
 IndentPPDirectives: None
-IndentRequires: true
+IndentRequiresClause: true
 IndentWidth:     4
 IndentWrappedFunctionNames: false
 InsertBraces: true
@@ -111,6 +111,7 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Left
 ReflowComments:  true
+RequiresClausePosition: OwnLine
 SortIncludes:    true
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false

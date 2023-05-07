@@ -35,7 +35,10 @@ public:
             runtime::fx::module_id);
     ~FxFilter();
 
-    auto type() const noexcept -> Type override final { return Type::Filter; }
+    auto type() const noexcept -> Type override final
+    {
+        return Type::Filter;
+    }
 
     bool spectogramActive() const noexcept;
 

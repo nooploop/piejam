@@ -72,14 +72,18 @@ public:
     void set(parameter::id_t<P> id, V&& value) const
     {
         if (auto proc = find_processor(id))
+        {
             proc->set(std::forward<V>(value));
+        }
     }
 
     template <class P, class F>
     auto consume(parameter::id_t<P> id, F&& f) const
     {
         if (auto proc = find_processor(id))
+        {
             proc->consume(std::forward<F>(f));
+        }
     }
 
     bool has_expired() const noexcept
@@ -87,7 +91,10 @@ public:
         return (has_expired<Parameter>() || ...);
     }
 
-    void clear_expired() { (clear_expired<Parameter>(), ...); }
+    void clear_expired()
+    {
+        (clear_expired<Parameter>(), ...);
+    }
 
 private:
     template <class P>

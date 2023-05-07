@@ -61,14 +61,20 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint, bool control_input)
                 "not supported");
 
         if (control_input && !LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor))
+        {
             spdlog::error("Lower bound not specified on int control input.");
+        }
+
         int const min =
                 LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor)
                         ? boost::numeric_cast<int>(std::round(hint.LowerBound))
                         : std::numeric_limits<int>::min();
 
         if (control_input && !LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor))
+        {
             spdlog::error("Upper bound not specified on int control input.");
+        }
+
         int const max =
                 LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor)
                         ? boost::numeric_cast<int>(std::round(hint.UpperBound))
@@ -152,13 +158,19 @@ to_port_type_descriptor(LADSPA_PortRangeHint const& hint, bool control_input)
                 "not supported");
 
         if (control_input && !LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor))
+        {
             spdlog::error("Lower bound not specified on float control input.");
+        }
+
         float const min = LADSPA_IS_HINT_BOUNDED_BELOW(hint_descriptor)
                                   ? hint.LowerBound
                                   : std::numeric_limits<float>::lowest();
 
         if (control_input && !LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor))
+        {
             spdlog::error("Upper bound not specified on float control input.");
+        }
+
         float const max = LADSPA_IS_HINT_BOUNDED_ABOVE(hint_descriptor)
                                   ? hint.UpperBound
                                   : std::numeric_limits<float>::max();
@@ -243,13 +255,17 @@ public:
     void activate() const noexcept
     {
         if (m_descriptor.activate)
+        {
             m_descriptor.activate(m_handle);
+        }
     }
 
     void deactivate() const noexcept
     {
         if (m_descriptor.deactivate)
+        {
             m_descriptor.deactivate(m_handle);
+        }
     }
 
     void connect_port(unsigned long port, LADSPA_Data* data) const noexcept
@@ -262,7 +278,10 @@ public:
         m_descriptor.run(m_handle, num_samples);
     }
 
-    void cleanup() const noexcept { m_descriptor.cleanup(m_handle); }
+    void cleanup() const noexcept
+    {
+        m_descriptor.cleanup(m_handle);
+    }
 
 private:
     LADSPA_Descriptor const& m_descriptor;
@@ -308,8 +327,15 @@ struct control_input
     {
     }
 
-    auto offset() const -> std::size_t { return m_offset; }
-    auto data() const -> float const& { return m_data; }
+    auto offset() const -> std::size_t
+    {
+        return m_offset;
+    }
+
+    auto data() const -> float const&
+    {
+        return m_data;
+    }
 
     void initialize(
             audio::engine::event_input_buffers const& ev_in_bufs,
@@ -318,7 +344,10 @@ struct control_input
         m_initialize(*this, ev_in_bufs, buf_index);
     }
 
-    void advance() { m_advance(*this); }
+    void advance()
+    {
+        m_advance(*this);
+    }
 
 private:
     template <class T>
@@ -421,9 +450,11 @@ public:
 
         m_control_outputs.reserve(control_outputs.size());
         for (auto const& pd : control_outputs)
+        {
             m_instance.connect_port(
                     pd.index,
                     &m_control_outputs.emplace_back());
+        }
 
         m_instance.activate();
     }
@@ -439,7 +470,10 @@ public:
         return "ladspa_fx";
     }
 
-    auto name() const noexcept -> std::string_view override { return m_name; }
+    auto name() const noexcept -> std::string_view override
+    {
+        return m_name;
+    }
 
     auto num_inputs() const noexcept -> std::size_t override
     {
@@ -467,7 +501,9 @@ public:
 
         BOOST_ASSERT(ctx.event_inputs.size() == m_event_inputs.size());
         for (std::size_t i : range::indices(ctx.event_inputs))
+        {
             m_control_inputs[i].initialize(ctx.event_inputs, i);
+        }
 
         BOOST_ASSERT(m_input_port_indices.size() == ctx.inputs.size());
         BOOST_ASSERT(m_output_port_indices.size() == ctx.outputs.size());
@@ -520,7 +556,9 @@ public:
             for (control_input& ci : m_control_inputs)
             {
                 while (min_offset == ci.offset())
+                {
                     ci.advance();
+                }
             }
 
             offset = min_offset;
@@ -641,7 +679,9 @@ private:
             -> LADSPA_Descriptor const*
     {
         if (!d)
+        {
             throw std::runtime_error("Could not get LADSPA descriptor.");
+        }
         return d;
     }
 

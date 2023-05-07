@@ -27,7 +27,10 @@ public:
             runtime::fx::module_id);
     ~FxGenericModule();
 
-    auto type() const noexcept -> Type override { return Type::Generic; }
+    auto type() const noexcept -> Type override
+    {
+        return Type::Generic;
+    }
 
     auto parameters() noexcept -> FxParametersList*;
     auto parameters() const noexcept -> FxParametersList const*;

@@ -27,7 +27,10 @@ public:
                 subscriber.observe(std::move(sel), std::forward<Handler>(h)));
     }
 
-    void erase(Id id) { m_conns.erase(id); }
+    void erase(Id id)
+    {
+        m_conns.erase(id);
+    }
 
 private:
     std::unordered_multimap<Id, subscription> m_conns;

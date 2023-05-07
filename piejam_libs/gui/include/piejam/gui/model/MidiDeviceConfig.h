@@ -24,7 +24,11 @@ public:
             runtime::subscriber&,
             midi::device_id_t);
 
-    auto name() const noexcept -> QString const& { return m_name; }
+    auto name() const noexcept -> QString const&
+    {
+        return m_name;
+    }
+
     void setName(QString const& x)
     {
         if (m_name != x)
@@ -34,7 +38,11 @@ public:
         }
     }
 
-    auto enabled() const noexcept -> bool { return m_enabled; }
+    auto enabled() const noexcept -> bool
+    {
+        return m_enabled;
+    }
+
     void setEnabled(bool x)
     {
         if (m_enabled != x)

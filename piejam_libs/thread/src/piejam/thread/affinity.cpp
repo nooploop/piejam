@@ -20,7 +20,9 @@ set_affinity(int const cpu)
     int const status =
             pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
     if (status)
+    {
         throw std::system_error(status, std::generic_category());
+    }
 }
 
 } // namespace piejam::this_thread

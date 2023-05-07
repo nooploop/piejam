@@ -29,7 +29,11 @@ public:
             runtime::subscriber&,
             runtime::device_io::bus_id);
 
-    auto name() const noexcept -> QString const& { return m_name; }
+    auto name() const noexcept -> QString const&
+    {
+        return m_name;
+    }
+
     void setName(QString const& x)
     {
         if (m_name != x)
@@ -41,7 +45,11 @@ public:
 
     Q_INVOKABLE void changeName(QString const&);
 
-    auto mono() const noexcept -> bool { return m_mono; }
+    auto mono() const noexcept -> bool
+    {
+        return m_mono;
+    }
+
     void setMono(bool const x)
     {
         if (m_mono != x)
@@ -51,7 +59,11 @@ public:
         }
     }
 
-    auto monoChannel() const noexcept -> unsigned { return m_monoChannel; }
+    auto monoChannel() const noexcept -> unsigned
+    {
+        return m_monoChannel;
+    }
+
     void setMonoChannel(unsigned const x)
     {
         if (m_monoChannel != x)

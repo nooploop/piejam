@@ -16,9 +16,20 @@ to_json(nlohmann::json& j, parameter_value_assignment const& p)
 {
     struct fx_parameter_value_to_json
     {
-        auto operator()(float x) const { return nlohmann::json{{"float", x}}; }
-        auto operator()(int x) const { return nlohmann::json{{"int", x}}; }
-        auto operator()(bool x) const { return nlohmann::json{{"bool", x}}; }
+        auto operator()(float x) const
+        {
+            return nlohmann::json{{"float", x}};
+        }
+
+        auto operator()(int x) const
+        {
+            return nlohmann::json{{"int", x}};
+        }
+
+        auto operator()(bool x) const
+        {
+            return nlohmann::json{{"bool", x}};
+        }
     };
 
     j = {{"key", p.key},

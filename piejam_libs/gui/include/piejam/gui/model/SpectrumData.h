@@ -17,7 +17,10 @@ class SpectrumData : public QObject
 {
     Q_OBJECT
 public:
-    auto get() const noexcept -> SpectrumDataPoints { return m_dataPoints; }
+    auto get() const noexcept -> SpectrumDataPoints
+    {
+        return m_dataPoints;
+    }
 
     void set(SpectrumDataPoints const& dataPoints)
     {

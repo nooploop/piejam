@@ -51,7 +51,9 @@ AudioInputOutputSettings::onSubscribe()
                 QStringList channels;
                 channels.push_back("-");
                 for (std::size_t n = 0; n < num_input_channels; ++n)
+                {
                     channels.push_back(QString::number(n + 1));
+                }
 
                 setChannels(channels);
             });

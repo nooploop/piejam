@@ -25,11 +25,17 @@ FxBrowserEntryLADSPA::FxBrowserEntryLADSPA(
 
     setName(QString::fromStdString(m_pd.name));
     setSection(s_section_ladspa);
+
     if (!m_pd.name.empty())
+    {
         setAuthor(QString::fromStdString(m_pd.author));
+    }
+
     if (!m_pd.copyright.empty())
+    {
         setDescription(QString("Copyright / License: %1")
                                .arg(QString::fromStdString(m_pd.copyright)));
+    }
 }
 
 void

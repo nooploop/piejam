@@ -17,7 +17,10 @@ class StringList final : public QObject
     Q_PROPERTY(int focused READ focused NOTIFY focusedChanged FINAL)
 
 public:
-    auto elements() const -> QStringList const& { return m_elements; }
+    auto elements() const -> QStringList const&
+    {
+        return m_elements;
+    }
     void setElements(QStringList const& x)
     {
         if (m_elements != x)
@@ -28,7 +31,10 @@ public:
         }
     }
 
-    auto focused() const -> int { return m_focused; }
+    auto focused() const -> int
+    {
+        return m_focused;
+    }
     void setFocused(int const x)
     {
         if (m_focused != x)

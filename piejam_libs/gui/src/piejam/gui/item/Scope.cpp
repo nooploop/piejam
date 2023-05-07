@@ -29,7 +29,10 @@ public:
         setFlag(Blending, m_color.alpha() != 0xff);
     }
 
-    auto color() const noexcept -> QColor const& { return m_color; }
+    auto color() const noexcept -> QColor const&
+    {
+        return m_color;
+    }
 
     auto compare(QSGMaterial const* const other) const noexcept -> int override
     {
@@ -104,7 +107,9 @@ public:
             program()->setUniformValue(m_idColor, v);
         }
         if (state.isMatrixDirty())
+        {
             program()->setUniformValue(m_idMatrix, state.combinedMatrix());
+        }
     }
 
 private:

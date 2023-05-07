@@ -18,11 +18,25 @@ struct tst_action
 
 struct batch_action : tst_action
 {
-    batch_action() { is_batch_action = true; }
+    batch_action()
+    {
+        is_batch_action = true;
+    }
 
-    [[nodiscard]] auto empty() const -> bool { return batched_actions.empty(); }
-    [[nodiscard]] auto begin() const { return batched_actions.begin(); }
-    [[nodiscard]] auto end() const { return batched_actions.end(); }
+    [[nodiscard]] auto empty() const -> bool
+    {
+        return batched_actions.empty();
+    }
+
+    [[nodiscard]] auto begin() const
+    {
+        return batched_actions.begin();
+    }
+
+    [[nodiscard]] auto end() const
+    {
+        return batched_actions.end();
+    }
 
     std::vector<tst_action> batched_actions;
 };
@@ -44,9 +58,13 @@ struct batch_middleware_test : testing::Test
     void next(tst_action const&)
     {
         if (m_batching)
+        {
             ++batched_count;
+        }
         else
+        {
             ++unbatched_count;
+        }
     }
 };
 

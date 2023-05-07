@@ -38,7 +38,9 @@ TYPED_TEST(bitops_toggle_0_6, enable)
 {
     using type = typename TestFixture::type;
     for (int i = 0; i <= 6; ++i)
+    {
         EXPECT_EQ(type{1} << i, toggle(type{}, i));
+    }
 }
 
 TEST(bitops_toggle, enable_int8_7)
@@ -71,7 +73,9 @@ TYPED_TEST(bitops_toggle_7_14, enable)
 {
     using type = typename TestFixture::type;
     for (int i = 7; i <= 14; ++i)
+    {
         EXPECT_EQ(type{1} << i, toggle(type{}, i));
+    }
 }
 
 TEST(bitops_toggle, enable_int16_15)

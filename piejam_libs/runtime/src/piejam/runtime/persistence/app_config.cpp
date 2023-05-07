@@ -117,7 +117,8 @@ template <size_t Version>
 static void upgrade(nlohmann::json&);
 
 template <size_t... I>
-static auto make_upgrade_functions_array(std::index_sequence<I...>)
+static auto
+make_upgrade_functions_array(std::index_sequence<I...>)
         -> upgrade_functions_array
 {
     return upgrade_functions_array{{upgrade<I>...}};
@@ -145,7 +146,9 @@ upgrade_app_config(nlohmann::json& conf)
 
         assert(file_version > prev_version);
         if (file_version <= prev_version)
+        {
             throw std::runtime_error("cannot upgrade config file");
+        }
     }
 }
 
@@ -157,10 +160,14 @@ load_app_config(std::istream& in) -> app_config
     auto const file_version = get_version(json_conf);
 
     if (file_version > current_app_config_version)
+    {
         throw std::runtime_error("app config version is too new");
+    }
 
     if (file_version < current_app_config_version)
+    {
         upgrade_app_config(json_conf);
+    }
 
     assert(current_app_config_version == get_version(json_conf));
 

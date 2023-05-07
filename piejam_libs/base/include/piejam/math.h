@@ -14,14 +14,14 @@ namespace piejam::math
 {
 
 template <class T>
-constexpr auto
+[[nodiscard]] constexpr auto
 pow3(T const x) noexcept -> T
 {
     return x * x * x;
 }
 
 template <std::floating_point T>
-constexpr auto
+[[nodiscard]] constexpr auto
 linear_to_dB(T const linear, T const min_linear = T{}) -> T
 {
     static_assert(std::numeric_limits<T>::is_iec559, "IEEE 754 required");
@@ -31,7 +31,7 @@ linear_to_dB(T const linear, T const min_linear = T{}) -> T
 }
 
 template <std::floating_point T>
-constexpr auto
+[[nodiscard]] constexpr auto
 dB_to_linear(T const dB) -> T
 {
     return dB == -std::numeric_limits<T>::infinity()
@@ -40,18 +40,25 @@ dB_to_linear(T const dB) -> T
 }
 
 template <class T>
-constexpr auto
-clamp(T v, T const min, T const max) -> T requires(std::is_arithmetic_v<T>)
+[[nodiscard]] constexpr auto
+clamp(T v, T const min, T const max) -> T
+    requires(std::is_arithmetic_v<T>)
 {
     if (v < min)
+    {
         v = min;
+    }
+
     if (v > max)
+    {
         v = max;
+    }
+
     return v;
 }
 
 template <std::floating_point T>
-constexpr auto
+[[nodiscard]] constexpr auto
 linear_map(
         T const v,
         T const src_lo,

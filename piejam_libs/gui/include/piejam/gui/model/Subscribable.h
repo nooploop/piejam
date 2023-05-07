@@ -42,7 +42,10 @@ protected:
         return m_store_dispatch;
     }
 
-    auto dispatch(runtime::action const& a) const { m_store_dispatch(a); }
+    auto dispatch(runtime::action const& a) const
+    {
+        m_store_dispatch(a);
+    }
 
     template <class Value>
     auto observe_once(runtime::selector<Value> const& sel)
@@ -68,10 +71,15 @@ protected:
         m_updateTimerId = Model::startTimer(t);
     }
 
-    virtual void onSubscribe() {}
+    virtual void onSubscribe()
+    {
+    }
 
 private:
-    void subscribe() override { onSubscribe(); }
+    void subscribe() override
+    {
+        onSubscribe();
+    }
     void unsubscribe() override
     {
         m_subs.erase(m_subs_id);

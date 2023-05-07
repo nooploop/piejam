@@ -49,10 +49,21 @@ public:
         return "midi_input";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 0; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
 
-    auto event_inputs() const noexcept -> event_ports override { return {}; }
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    auto event_inputs() const noexcept -> event_ports override
+    {
+        return {};
+    }
+
     auto event_outputs() const noexcept -> event_ports override
     {
         static std::array const s_event_outs{audio::engine::event_port(

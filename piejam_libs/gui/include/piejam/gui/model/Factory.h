@@ -62,9 +62,15 @@ public:
         return m_midiInputSettings.get();
     }
 
-    auto mixer() const -> piejam::gui::model::Mixer* { return m_mixer.get(); }
+    auto mixer() const -> piejam::gui::model::Mixer*
+    {
+        return m_mixer.get();
+    }
 
-    auto info() const -> piejam::gui::model::Info* { return m_info.get(); }
+    auto info() const -> piejam::gui::model::Info*
+    {
+        return m_info.get();
+    }
 
     auto fxBrowser() const -> piejam::gui::model::FxBrowser*
     {

@@ -53,7 +53,8 @@ to_normalized_dB(float_ const&, float const value) -> float
 {
     constexpr float const twenty_div_log_10 = 20.f / std::log(10.f);
     float const value_dB = std::log(value) * twenty_div_log_10;
-    return (value_dB - Interval_dB::min) / (Interval_dB::max - Interval_dB::min);
+    return (value_dB - Interval_dB::min) /
+           (Interval_dB::max - Interval_dB::min);
 }
 
 [[nodiscard]] inline constexpr auto
@@ -66,8 +67,8 @@ template <class Interval_dB>
 [[nodiscard]] constexpr auto
 from_normalized_dB(float_ const&, float const norm_value) -> float
 {
-    float const value_dB =
-            norm_value * (Interval_dB::max - Interval_dB::min) + Interval_dB::min;
+    float const value_dB = norm_value * (Interval_dB::max - Interval_dB::min) +
+                           Interval_dB::min;
     return std::pow(10.f, value_dB / 20.f);
 }
 

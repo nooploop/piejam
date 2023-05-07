@@ -34,7 +34,11 @@ class Info final : public Subscribable<SubscribableModel>
 public:
     Info(runtime::store_dispatch, runtime::subscriber&);
 
-    auto audioLoad() const noexcept -> double { return m_audioLoad; }
+    auto audioLoad() const noexcept -> double
+    {
+        return m_audioLoad;
+    }
+
     void setAudioLoad(double audioLoad)
     {
         if (std::abs(m_audioLoad - audioLoad) > 1.e-3)
@@ -44,7 +48,11 @@ public:
         }
     }
 
-    auto xruns() const noexcept -> unsigned { return m_xruns; }
+    auto xruns() const noexcept -> unsigned
+    {
+        return m_xruns;
+    }
+
     void setXRuns(unsigned xruns)
     {
         if (m_xruns != xruns)
@@ -54,7 +62,11 @@ public:
         }
     }
 
-    auto cpuLoad() const noexcept -> QList<float> { return m_cpuLoad; }
+    auto cpuLoad() const noexcept -> QList<float>
+    {
+        return m_cpuLoad;
+    }
+
     void setCpuLoad(QList<float> x)
     {
         if (m_cpuLoad != x)
@@ -64,7 +76,11 @@ public:
         }
     }
 
-    auto cpuTemp() const noexcept -> int { return m_cpuTemp; }
+    auto cpuTemp() const noexcept -> int
+    {
+        return m_cpuTemp;
+    }
+
     void setCpuTemp(int x)
     {
         if (m_cpuTemp != x)
@@ -74,7 +90,11 @@ public:
         }
     }
 
-    auto recording() const noexcept -> bool { return m_recording; }
+    auto recording() const noexcept -> bool
+    {
+        return m_recording;
+    }
+
     void setRecording(bool x)
     {
         if (m_recording != x)
@@ -86,7 +106,11 @@ public:
 
     Q_INVOKABLE void changeRecording(bool);
 
-    auto midiLearn() const noexcept -> bool { return m_midiLearn; }
+    auto midiLearn() const noexcept -> bool
+    {
+        return m_midiLearn;
+    }
+
     void setMidiLearn(bool x)
     {
         if (m_midiLearn != x)
@@ -96,7 +120,11 @@ public:
         }
     }
 
-    auto logData() const -> QStringList { return m_logData; }
+    auto logData() const -> QStringList
+    {
+        return m_logData;
+    }
+
     void addLogMessage(QString const& msg)
     {
         m_logData.push_back(msg);
@@ -109,9 +137,16 @@ public:
         }
     }
 
-    auto logMessage() const -> QString { return m_logMessage; }
+    auto logMessage() const -> QString
+    {
+        return m_logMessage;
+    }
 
-    auto diskUsage() const noexcept -> int { return m_diskUsage; }
+    auto diskUsage() const noexcept -> int
+    {
+        return m_diskUsage;
+    }
+
     void setDiskUsage(int const x)
     {
         if (m_diskUsage != x)

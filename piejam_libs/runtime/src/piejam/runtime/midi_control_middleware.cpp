@@ -167,7 +167,9 @@ midi_control_middleware::process_midi_control_action(
     for (auto const& [id, config] : *mw_fs.get_state().midi_devices)
     {
         if (config.enabled)
+        {
             next_action.enabled_midi_devices.emplace_back(config.name);
+        }
     }
 
     mw_fs.next(next_action);
@@ -225,7 +227,9 @@ midi_control_middleware::process_midi_control_action(
             [&param_update](auto const& id) { param_update.push_back(id); });
 
     if (!param_update.empty())
+    {
         mw_fs.next(param_update);
+    }
 }
 
 } // namespace piejam::runtime

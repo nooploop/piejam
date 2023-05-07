@@ -28,12 +28,18 @@ struct fftwf_allocator
         return static_cast<T*>(fftwf_malloc(sizeof(T) * n));
     }
 
-    void deallocate(T* p, std::size_t) { fftwf_free(p); }
+    void deallocate(T* p, std::size_t)
+    {
+        fftwf_free(p);
+    }
 };
 
 struct fftwf_plan_deleter
 {
-    void operator()(fftwf_plan p) { fftwf_destroy_plan(p); }
+    void operator()(fftwf_plan p)
+    {
+        fftwf_destroy_plan(p);
+    }
 };
 
 } // namespace

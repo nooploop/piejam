@@ -36,7 +36,11 @@ public:
             runtime::fx::module_id);
     ~FxModule();
 
-    auto name() const noexcept -> QString const& { return m_name; }
+    auto name() const noexcept -> QString const&
+    {
+        return m_name;
+    }
+
     void setName(QString const& x)
     {
         if (m_name != x)
@@ -46,7 +50,11 @@ public:
         }
     }
 
-    bool bypassed() const noexcept { return m_bypassed; }
+    bool bypassed() const noexcept
+    {
+        return m_bypassed;
+    }
+
     void setBypassed(bool const x)
     {
         if (m_bypassed != x)
@@ -56,7 +64,11 @@ public:
         }
     }
 
-    auto canMoveLeft() const noexcept -> bool { return m_canMoveLeft; }
+    auto canMoveLeft() const noexcept -> bool
+    {
+        return m_canMoveLeft;
+    }
+
     void setCanMoveLeft(bool x)
     {
         if (m_canMoveLeft != x)
@@ -66,7 +78,11 @@ public:
         }
     }
 
-    auto canMoveRight() const noexcept -> bool { return m_canMoveRight; }
+    auto canMoveRight() const noexcept -> bool
+    {
+        return m_canMoveRight;
+    }
+
     void setCanMoveRight(bool x)
     {
         if (m_canMoveRight != x)

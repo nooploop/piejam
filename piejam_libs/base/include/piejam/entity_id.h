@@ -26,7 +26,10 @@ struct entity_id
 
     constexpr auto operator<=>(entity_id const& other) const noexcept = default;
 
-    [[nodiscard]] constexpr auto valid() const noexcept -> bool { return m_id; }
+    [[nodiscard]] constexpr auto valid() const noexcept -> bool
+    {
+        return m_id;
+    }
 
     static auto generate() noexcept -> entity_id<EntityTag>
     {

@@ -40,7 +40,11 @@ public:
     auto periodSizes() -> StringList*;
     auto periodCounts() -> StringList*;
 
-    auto bufferLatency() const noexcept -> double { return m_bufferLatency; }
+    auto bufferLatency() const noexcept -> double
+    {
+        return m_bufferLatency;
+    }
+
     void setBufferLatency(double x)
     {
         if (m_bufferLatency != x)

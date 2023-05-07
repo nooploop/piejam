@@ -28,7 +28,10 @@ public:
     auto operator=(device const&) -> device& = delete;
     auto operator=(device&& other) noexcept -> device&;
 
-    explicit operator bool() const noexcept { return m_fd != invalid; }
+    explicit operator bool() const noexcept
+    {
+        return m_fd != invalid;
+    }
 
     [[nodiscard]] auto ioctl(unsigned long request) noexcept -> std::error_code;
 

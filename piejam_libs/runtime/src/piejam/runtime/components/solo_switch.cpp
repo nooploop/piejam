@@ -42,8 +42,15 @@ public:
         return "solo_switch";
     }
 
-    auto num_inputs() const noexcept -> std::size_t override { return 0; }
-    auto num_outputs() const noexcept -> std::size_t override { return 0; }
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
 
     auto event_inputs() const noexcept -> event_ports override
     {
@@ -71,7 +78,9 @@ public:
         }
 
         if (!send_update)
+        {
             return;
+        }
 
         if (m_solo_group.any())
         {
@@ -126,11 +135,25 @@ public:
     {
     }
 
-    auto inputs() const -> endpoints override { return {}; }
-    auto outputs() const -> endpoints override { return {}; }
+    auto inputs() const -> endpoints override
+    {
+        return {};
+    }
 
-    auto event_inputs() const -> endpoints override { return {}; }
-    auto event_outputs() const -> endpoints override { return m_event_outputs; }
+    auto outputs() const -> endpoints override
+    {
+        return {};
+    }
+
+    auto event_inputs() const -> endpoints override
+    {
+        return {};
+    }
+
+    auto event_outputs() const -> endpoints override
+    {
+        return m_event_outputs;
+    }
 
     void connect(audio::engine::graph& g) const override
     {
@@ -155,7 +178,9 @@ private:
         std::vector<std::shared_ptr<audio::engine::processor>> result;
 
         for (auto&& [param_id, channel_id] : solo_group)
+        {
             result.emplace_back(param_procs.make_processor(param_id, "solo"));
+        }
 
         return result;
     }

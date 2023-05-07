@@ -20,4 +20,4 @@ using to = std::index_sequence<Is...>;
 static inline constexpr std::index_sequence<0> mono;
 static inline constexpr std::index_sequence<0, 1> stereo;
 
-} // namespace piejam::audio::engine
+} // namespace piejam::audio::engine::endpoint_ports

@@ -47,7 +47,9 @@ struct dummy_midi_input_controller final : public midi_input_controller
         return false;
     }
 
-    auto deactivate_input_device(midi::device_id_t) -> void override {}
+    auto deactivate_input_device(midi::device_id_t) -> void override
+    {
+    }
 
     auto make_input_event_handler()
             -> std::unique_ptr<midi::input_event_handler> override

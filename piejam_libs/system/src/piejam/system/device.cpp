@@ -21,7 +21,9 @@ device::device(std::filesystem::path const& pathname)
     : m_fd(::open(pathname.c_str(), O_RDONLY))
 {
     if (m_fd < 0)
+    {
         throw std::system_error(errno, std::generic_category());
+    }
 }
 
 device::device(device&& other) noexcept
@@ -32,14 +34,18 @@ device::device(device&& other) noexcept
 device::~device()
 {
     if (m_fd != invalid)
+    {
         ::close(m_fd);
+    }
 }
 
 auto
 device::operator=(device&& other) noexcept -> device&
 {
     if (m_fd != invalid)
+    {
         BOOST_VERIFY(!::close(m_fd));
+    }
 
     m_fd = std::exchange(other.m_fd, invalid);
     return *this;
@@ -50,7 +56,9 @@ device::ioctl(unsigned long const request) noexcept -> std::error_code
 {
     BOOST_ASSERT(m_fd != invalid);
     if (-1 == ::ioctl(m_fd, request))
+    {
         return std::error_code(errno, std::generic_category());
+    }
 
     return {};
 }
@@ -66,7 +74,9 @@ device::ioctl(
     boost::ignore_unused(size);
 
     if (-1 == ::ioctl(m_fd, request, p))
+    {
         return std::error_code(errno, std::generic_category());
+    }
 
     return {};
 }
@@ -88,7 +98,9 @@ device::read(std::span<std::byte> const buffer) noexcept
 {
     auto const res = ::read(m_fd, buffer.data(), buffer.size());
     if (res < 0)
+    {
         return std::error_code(errno, std::generic_category());
+    }
 
     return static_cast<std::size_t>(res);
 }
@@ -98,15 +110,23 @@ device::set_nonblock(bool const set) -> std::error_code
 {
     int flags = ::fcntl(m_fd, F_GETFL);
     if (-1 == flags)
+    {
         return std::error_code(errno, std::generic_category());
+    }
 
     if (set)
+    {
         flags |= O_NONBLOCK;
+    }
     else
+    {
         flags &= ~O_NONBLOCK;
+    }
 
     if (-1 == ::fcntl(m_fd, F_SETFL, flags))
+    {
         return std::error_code(errno, std::generic_category());
+    }
 
     return {};
 }

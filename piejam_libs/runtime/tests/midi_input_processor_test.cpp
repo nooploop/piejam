@@ -37,7 +37,9 @@ struct midi_input_processor_test : testing::Test
         ev_out_bufs.set_event_memory(&ev_buf_mem.memory_resource());
 
         for (auto const& ev_port : proc->event_outputs())
+        {
             ev_out_bufs.add(ev_port);
+        }
     }
 
     audio::engine::event_buffer_memory ev_buf_mem{1024};

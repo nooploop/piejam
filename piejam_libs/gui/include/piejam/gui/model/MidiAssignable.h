@@ -22,7 +22,11 @@ public:
             runtime::subscriber&,
             runtime::midi_assignment_id const&);
 
-    auto assignment() const -> QString { return m_assignment; }
+    auto assignment() const -> QString
+    {
+        return m_assignment;
+    }
+
     void setAssignment(QString const& x)
     {
         if (m_assignment != x)

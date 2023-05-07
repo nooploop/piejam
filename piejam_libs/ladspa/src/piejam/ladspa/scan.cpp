@@ -65,7 +65,9 @@ scan_file(std::filesystem::path const& file) -> std::vector<plugin_descriptor>
             });
         }
         else
+        {
             break;
+        }
     }
 
     return result;

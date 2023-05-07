@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/entity_id.h>
 #include <piejam/gui/model/FxBrowserEntry.h>
+#include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/runtime/mixer_fwd.h>
 
 namespace piejam::gui::model

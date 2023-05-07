@@ -24,7 +24,11 @@ class FxBrowserEntry : public Subscribable<SubscribableModel>
 public:
     using Subscribable<SubscribableModel>::Subscribable;
 
-    auto name() const noexcept -> QString const& { return m_name; }
+    auto name() const noexcept -> QString const&
+    {
+        return m_name;
+    }
+
     void setName(QString const& x)
     {
         if (m_name != x)
@@ -34,7 +38,11 @@ public:
         }
     }
 
-    auto section() const noexcept -> QString const& { return m_section; }
+    auto section() const noexcept -> QString const&
+    {
+        return m_section;
+    }
+
     void setSection(QString const& x)
     {
         if (m_section != x)
@@ -58,7 +66,10 @@ public:
         }
     }
 
-    auto author() const noexcept -> QString const& { return m_author; }
+    auto author() const noexcept -> QString const&
+    {
+        return m_author;
+    }
 
     void setAuthor(QString const& x)
     {

@@ -15,14 +15,18 @@ BM_spsc_slot_int(benchmark::State& state)
     piejam::thread::spsc_slot<int> slot;
     std::jthread pusher([i = int{}, &slot](std::stop_token stoken) mutable {
         while (!stoken.stop_requested())
+        {
             slot.push(i++);
+        }
     });
 
     int r{};
     for (auto _ : state)
     {
         while (!slot.pull(r))
+        {
             ;
+        }
     }
 }
 

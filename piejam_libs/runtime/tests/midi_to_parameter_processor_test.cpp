@@ -27,10 +27,14 @@ struct midi_to_bool_parameter_processor_test : testing::Test
     {
         ev_out_bufs.set_event_memory(&ev_buf_mem.memory_resource());
         for (auto const& ev_port : proc->event_outputs())
+        {
             ev_out_bufs.add(ev_port);
+        }
 
         for (auto const& ev_port : proc->event_inputs())
+        {
             ev_in_bufs.add(ev_port);
+        }
 
         ev_in_bufs.set(0, ev_in_buf);
     }
@@ -91,10 +95,14 @@ struct midi_to_float_parameter_processor_test
     {
         ev_out_bufs.set_event_memory(&ev_buf_mem.memory_resource());
         for (auto const& ev_port : proc->event_outputs())
+        {
             ev_out_bufs.add(ev_port);
+        }
 
         for (auto const& ev_port : proc->event_inputs())
+        {
             ev_in_bufs.add(ev_port);
+        }
 
         ev_in_bufs.set(0, ev_in_buf);
     }
@@ -155,10 +163,14 @@ struct midi_to_int_parameter_processor_test
     {
         ev_out_bufs.set_event_memory(&ev_buf_mem.memory_resource());
         for (auto const& ev_port : proc->event_outputs())
+        {
             ev_out_bufs.add(ev_port);
+        }
 
         for (auto const& ev_port : proc->event_inputs())
+        {
             ev_in_bufs.add(ev_port);
+        }
 
         ev_in_bufs.set(0, ev_in_buf);
     }

@@ -54,10 +54,14 @@ default_channels(state const& st, io_direction io_dir, audio::bus_type bus_type)
         device_io::bus const* const bus = st.device_io_state.buses.find(bus_id);
         BOOST_ASSERT(bus);
         if (auto ch = bus->channels.left; ch != npos)
+        {
             assigned_channels[ch] = true;
+        }
 
         if (auto ch = bus->channels.right; ch != npos)
+        {
             assigned_channels[ch] = true;
+        }
     }
 
     auto it = std::ranges::find(assigned_channels, false);
@@ -70,7 +74,9 @@ default_channels(state const& st, io_direction io_dir, audio::bus_type bus_type)
     if (bus_type == audio::bus_type::stereo)
     {
         if (it != assigned_channels.end())
+        {
             it = std::find(std::next(it), assigned_channels.end(), false);
+        }
 
         channels.right = it != assigned_channels.end()
                                  ? std::distance(assigned_channels.begin(), it)

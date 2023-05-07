@@ -13,7 +13,9 @@ static void
 update_channel(std::size_t& cur_ch, std::size_t const num_chs)
 {
     if (cur_ch >= num_chs)
+    {
         cur_ch = npos;
+    }
 }
 
 template <io_direction D>
