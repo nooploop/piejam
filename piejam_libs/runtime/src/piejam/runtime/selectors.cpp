@@ -25,40 +25,40 @@
 namespace piejam::runtime::selectors
 {
 
-const selector<sample_rate> select_sample_rate(
+selector<sample_rate> const select_sample_rate(
         [get_sample_rates = memo(boxify_result(&runtime::sample_rates))](
                 state const& st) -> sample_rate {
             return {get_sample_rates(st.input.hw_params, st.output.hw_params),
                     st.sample_rate};
         });
 
-const selector<period_size> select_period_size(
+selector<period_size> const select_period_size(
         [get_period_sizes = memo(boxify_result(&runtime::period_sizes))](
                 state const& st) -> period_size {
             return {get_period_sizes(st.input.hw_params, st.output.hw_params),
                     st.period_size};
         });
 
-const selector<period_count> select_period_count(
+selector<period_count> const select_period_count(
         [get = memo(boxify_result(&runtime::period_counts))](state const& st)
                 -> period_count {
             return {get(st.input.hw_params, st.output.hw_params),
                     st.period_count};
         });
 
-const selector<float> select_buffer_latency([](state const& st) {
+selector<float> const select_buffer_latency([](state const& st) {
     return st.sample_rate.get() != 0
                    ? (st.period_size.get() * st.period_count.get() * 1000.f) /
                              st.sample_rate.as_float()
                    : 0.f;
 });
 
-const selector<input_devices>
+selector<input_devices> const
         select_input_devices([](state const& st) -> input_devices {
             return {st.pcm_devices, st.input.index};
         });
 
-const selector<output_devices>
+selector<output_devices> const
         select_output_devices([](state const& st) -> output_devices {
             return {st.pcm_devices, st.output.index};
         });
@@ -95,10 +95,10 @@ make_device_bus_list_selector(io_direction const bd)
     }
 }
 
-const selector<boxed_vector<mixer::channel_id>> select_mixer_input_channels(
+selector<boxed_vector<mixer::channel_id>> const select_mixer_input_channels(
         [](state const& st) { return st.mixer_state.inputs; });
 
-const selector<mixer::channel_id> select_mixer_main_channel(
+selector<mixer::channel_id> const select_mixer_main_channel(
         [](state const& st) { return st.mixer_state.main; });
 
 auto
@@ -199,7 +199,7 @@ make_mixer_device_routes(
     return result;
 }
 
-const selector<boxed_vector<mixer_device_route>>
+selector<boxed_vector<mixer_device_route>> const
         select_mixer_mono_input_devices(
                 [get = memo(boxify_result(&make_mixer_device_routes))](
                         state const& st) mutable {
@@ -209,7 +209,7 @@ const selector<boxed_vector<mixer_device_route>>
                             audio::bus_type::mono);
                 });
 
-const selector<boxed_vector<mixer_device_route>>
+selector<boxed_vector<mixer_device_route>> const
         select_mixer_stereo_input_devices(
                 [get = memo(boxify_result(&make_mixer_device_routes))](
                         state const& st) mutable {
@@ -219,7 +219,7 @@ const selector<boxed_vector<mixer_device_route>>
                             audio::bus_type::stereo);
                 });
 
-const selector<boxed_vector<mixer_device_route>> select_mixer_output_devices(
+selector<boxed_vector<mixer_device_route>> const select_mixer_output_devices(
         [get = memo(boxify_result(&make_mixer_device_routes))](
                 state const& st) mutable {
             return get(
@@ -502,7 +502,7 @@ make_bus_channel_selector(
     __builtin_unreachable();
 }
 
-const selector<boxed_vector<midi::device_id_t>> select_midi_input_devices(
+selector<boxed_vector<midi::device_id_t>> const select_midi_input_devices(
         [](state const& st) -> boxed_vector<midi::device_id_t> {
             return st.midi_inputs;
         });
@@ -869,23 +869,23 @@ make_midi_assignment_selector(midi_assignment_id const id)
     };
 }
 
-const selector<bool> select_midi_learning([](state const& st) {
+selector<bool> const select_midi_learning([](state const& st) {
     return st.midi_learning.has_value();
 });
 
-const selector<fx::registry> select_fx_registry([](state const& st) {
+selector<fx::registry> const select_fx_registry([](state const& st) {
     return st.fx_registry;
 });
 
-const selector<bool> select_recording([](state const& st) {
+selector<bool> const select_recording([](state const& st) {
     return st.recording;
 });
 
-const selector<std::size_t> select_xruns([](state const& st) {
+selector<std::size_t> const select_xruns([](state const& st) {
     return st.xruns;
 });
 
-const selector<float> select_cpu_load([](state const& st) {
+selector<float> const select_cpu_load([](state const& st) {
     return st.cpu_load;
 });
 

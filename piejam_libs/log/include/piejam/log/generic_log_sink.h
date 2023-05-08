@@ -27,7 +27,7 @@ public:
     }
 
 protected:
-    void sink_it_(const spdlog::details::log_msg& msg) override
+    void sink_it_(spdlog::details::log_msg const& msg) override
     {
         m_sink_it(msg);
     }

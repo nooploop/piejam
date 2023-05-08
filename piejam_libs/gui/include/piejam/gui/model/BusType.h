@@ -8,8 +8,6 @@
 
 #include <piejam/audio/types.h>
 
-#include <span>
-
 namespace piejam::gui::model
 {
 

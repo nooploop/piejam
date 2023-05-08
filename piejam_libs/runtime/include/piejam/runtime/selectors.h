@@ -34,33 +34,33 @@ template <class Value>
 using selector = reselect::selector<Value, state>;
 
 using sample_rate = std::pair<box<audio::sample_rates_t>, audio::sample_rate>;
-extern const selector<sample_rate> select_sample_rate;
+extern selector<sample_rate> const select_sample_rate;
 
 using period_size = std::pair<box<audio::period_sizes_t>, audio::period_size>;
-extern const selector<period_size> select_period_size;
+extern selector<period_size> const select_period_size;
 
 using period_count =
         std::pair<box<audio::period_counts_t>, audio::period_count>;
-extern const selector<period_count> select_period_count;
+extern selector<period_count> const select_period_count;
 
-extern const selector<float> select_buffer_latency;
+extern selector<float> const select_buffer_latency;
 
 //! \todo input_devices/output_devices could get a reduced value, not the whole
 //! pcm_io_descriptors
 using input_devices = std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
-extern const selector<input_devices> select_input_devices;
+extern selector<input_devices> const select_input_devices;
 
 using output_devices = std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
-extern const selector<output_devices> select_output_devices;
+extern selector<output_devices> const select_output_devices;
 
 auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 
 auto make_device_bus_list_selector(io_direction)
         -> selector<box<device_io::bus_list_t>>;
 
-extern const selector<boxed_vector<mixer::channel_id>>
+extern selector<boxed_vector<mixer::channel_id>> const
         select_mixer_input_channels;
-extern const selector<mixer::channel_id> select_mixer_main_channel;
+extern selector<mixer::channel_id> const select_mixer_main_channel;
 
 auto make_mixer_channel_bus_type_selector(mixer::channel_id)
         -> selector<audio::bus_type>;
@@ -85,11 +85,11 @@ struct mixer_device_route
     auto operator==(mixer_device_route const&) const noexcept -> bool = default;
 };
 
-extern const selector<boxed_vector<mixer_device_route>>
+extern selector<boxed_vector<mixer_device_route>> const
         select_mixer_mono_input_devices;
-extern const selector<boxed_vector<mixer_device_route>>
+extern selector<boxed_vector<mixer_device_route>> const
         select_mixer_stereo_input_devices;
-extern const selector<boxed_vector<mixer_device_route>>
+extern selector<boxed_vector<mixer_device_route>> const
         select_mixer_output_devices;
 
 struct mixer_channel_route
@@ -145,7 +145,7 @@ auto make_bus_type_selector(device_io::bus_id) -> selector<audio::bus_type>;
 auto make_bus_channel_selector(device_io::bus_id, audio::bus_channel)
         -> selector<std::size_t>;
 
-extern const selector<boxed_vector<midi::device_id_t>>
+extern selector<boxed_vector<midi::device_id_t>> const
         select_midi_input_devices;
 
 auto make_midi_device_name_selector(midi::device_id_t)
@@ -194,13 +194,13 @@ auto make_level_parameter_value_selector(stereo_level_parameter_id)
 auto make_midi_assignment_selector(midi_assignment_id)
         -> selector<std::optional<midi_assignment>>;
 
-extern const selector<bool> select_midi_learning;
+extern selector<bool> const select_midi_learning;
 
-extern const selector<fx::registry> select_fx_registry;
+extern selector<fx::registry> const select_fx_registry;
 
-extern const selector<bool> select_recording;
+extern selector<bool> const select_recording;
 
-extern const selector<std::size_t> select_xruns;
-extern const selector<float> select_cpu_load;
+extern selector<std::size_t> const select_xruns;
+extern selector<float> const select_cpu_load;
 
 } // namespace piejam::runtime::selectors
