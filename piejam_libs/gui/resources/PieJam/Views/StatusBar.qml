@@ -111,13 +111,6 @@ Item {
         subscribed: root.visible
     }
 
-    Binding {
-        when: root.model
-        target: Info
-        property: "logMessage"
-        value: root.model.logMessage
-    }
-
     Connections {
         target: root.model
 

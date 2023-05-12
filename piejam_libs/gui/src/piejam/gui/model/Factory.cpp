@@ -22,6 +22,7 @@
 #include <piejam/gui/model/FxScope.h>
 #include <piejam/gui/model/FxSpectrum.h>
 #include <piejam/gui/model/Info.h>
+#include <piejam/gui/model/Log.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/gui/model/MidiDeviceConfig.h>
 #include <piejam/gui/model/MidiInputSettings.h>
@@ -59,6 +60,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();
     qRegisterMetaType<piejam::gui::model::DbScaleData*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
+    qRegisterMetaType<piejam::gui::model::Log*>();
     qRegisterMetaType<piejam::gui::model::FxParameter*>();
     qRegisterMetaType<piejam::gui::model::FxChain*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
@@ -139,6 +141,7 @@ Factory::Factory(
               state_change_subscriber))
     , m_mixer(std::make_unique<Mixer>(dispatch, state_change_subscriber))
     , m_info(std::make_unique<Info>(dispatch, state_change_subscriber))
+    , m_log(std::make_unique<Log>(dispatch, state_change_subscriber))
     , m_fxBrowser(
               std::make_unique<FxBrowser>(dispatch, state_change_subscriber))
 {

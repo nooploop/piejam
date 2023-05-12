@@ -11,6 +11,8 @@ import QtQuick.VirtualKeyboard.Settings 2.15
 
 import QtQml 2.15
 
+import "../Controls"
+
 Item {
     id: root
 
@@ -37,6 +39,27 @@ Item {
             display: AbstractButton.IconOnly
 
             onClicked: { content.currentIndex = 2 }
+        }
+
+        InfoToolButton {
+            id: btnLog
+
+            property int lastMessagesCount: 0
+            property var logMessages: root.modelFactory.log.logMessages
+
+            anchors.bottom: btnSettings.top
+
+            icon.width: 24
+            icon.height: 24
+            icon.source: "qrc:///images/icons/info.svg"
+            display: AbstractButton.IconOnly
+
+            onClicked: {
+                lastMessagesCount = logMessages.length
+                content.currentIndex = 4
+            }
+
+            info: logMessages.length === lastMessagesCount ? "" : logMessages.length - lastMessagesCount
         }
 
         ToolButton {
@@ -74,7 +97,7 @@ Item {
         anchors.top: statusBar.bottom
         anchors.bottom: parent.bottom
 
-        currentIndex: 1
+        currentIndex: 2
 
         Power {
             id: powerPane
@@ -106,6 +129,12 @@ Item {
 
             chainModel: root.modelFactory.mixer.fxChains
             browser: root.modelFactory.fxBrowser
+        }
+
+        Log {
+            id: logPane
+
+            logMessages: root.modelFactory.log.logMessages
         }
     }
 

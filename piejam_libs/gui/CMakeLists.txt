@@ -53,6 +53,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxStreamKeyId.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/GenericListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Info.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Log.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MidiAssignable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MidiDeviceConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MidiInputSettings.h
@@ -93,6 +94,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxSpectrum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxStream.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Info.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Log.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MidiAssignable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MidiDeviceConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MidiInputSettings.cpp

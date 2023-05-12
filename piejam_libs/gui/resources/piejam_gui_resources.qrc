@@ -77,5 +77,8 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/chevron-up.svg</file>
         <file>images/icons/arrow-expand-vertical.svg</file>
         <file>PieJam/Controls/Circle.qml</file>
+        <file>PieJam/Views/Log.qml</file>
+        <file>images/icons/info.svg</file>
+        <file>PieJam/Controls/InfoToolButton.qml</file>
     </qresource>
 </RCC>

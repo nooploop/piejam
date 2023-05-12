@@ -11,10 +11,9 @@ import QtQml 2.15
 Item {
     id: root
 
-    property string logMessage: ""
     property string quickTip: ""
 
-    readonly property string message: quickTipTimer.running ? quickTip : logMessage
+    readonly property string message: quickTipTimer.running ? quickTip : ""
 
     Timer {
         id: quickTipTimer

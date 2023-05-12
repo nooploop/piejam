@@ -4,13 +4,10 @@
 
 #include <piejam/gui/model/Info.h>
 
-#include <piejam/log/generic_log_sink.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/recording.h>
 #include <piejam/runtime/actions/request_info_update.h>
 #include <piejam/runtime/selectors.h>
-
-#include <spdlog/spdlog.h>
 
 namespace piejam::gui::model
 {
@@ -20,16 +17,6 @@ Info::Info(
         runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
 {
-    spdlog::default_logger()->sinks().push_back(
-            std::make_shared<log::generic_log_sink_mt>(
-                    [this](spdlog::details::log_msg const& msg) {
-                        auto qtMsg = QString::fromStdString(fmt::format(
-                                "[{}] {}",
-                                spdlog::level::to_string_view(msg.level),
-                                msg.payload));
-                        addLogMessage(qtMsg);
-                    },
-                    []() {}));
 }
 
 void

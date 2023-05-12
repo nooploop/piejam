@@ -26,9 +26,6 @@ class Info final : public Subscribable<SubscribableModel>
     Q_PROPERTY(int cpuTemp READ cpuTemp NOTIFY cpuTempChanged FINAL)
     Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged FINAL)
     Q_PROPERTY(bool midiLearn READ midiLearn NOTIFY midiLearnChanged FINAL)
-    Q_PROPERTY(QStringList logData READ logData NOTIFY logDataChanged FINAL)
-    Q_PROPERTY(
-            QString logMessage READ logMessage NOTIFY logMessageChanged FINAL)
     Q_PROPERTY(int diskUsage READ diskUsage NOTIFY diskUsageChanged FINAL)
 
 public:
@@ -67,7 +64,7 @@ public:
         return m_cpuLoad;
     }
 
-    void setCpuLoad(QList<float> x)
+    void setCpuLoad(QList<float> const& x)
     {
         if (m_cpuLoad != x)
         {
@@ -120,28 +117,6 @@ public:
         }
     }
 
-    auto logData() const -> QStringList
-    {
-        return m_logData;
-    }
-
-    void addLogMessage(QString const& msg)
-    {
-        m_logData.push_back(msg);
-        emit logDataChanged();
-
-        if (m_logMessage != msg)
-        {
-            m_logMessage = msg;
-            emit logMessageChanged();
-        }
-    }
-
-    auto logMessage() const -> QString
-    {
-        return m_logMessage;
-    }
-
     auto diskUsage() const noexcept -> int
     {
         return m_diskUsage;
@@ -164,8 +139,6 @@ signals:
     void cpuTempChanged();
     void recordingChanged();
     void midiLearnChanged();
-    void logDataChanged();
-    void logMessageChanged();
     void diskUsageChanged();
 
 private:
@@ -177,8 +150,6 @@ private:
     int m_cpuTemp{};
     bool m_recording{};
     bool m_midiLearn{};
-    QStringList m_logData;
-    QString m_logMessage;
     int m_diskUsage{};
 };
 

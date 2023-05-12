@@ -22,6 +22,7 @@ class FxModuleContent;
 using FxModulesList = GenericListModel<FxModule>;
 
 class Info;
+class Log;
 
 class Mixer;
 class MixerChannel;
