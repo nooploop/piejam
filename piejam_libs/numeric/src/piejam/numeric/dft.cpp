@@ -75,9 +75,15 @@ dft::dft(std::size_t const size)
 dft::~dft() = default;
 
 auto
-dft::input_size() const noexcept -> std::size_t
+dft::size() const noexcept -> std::size_t
 {
     return m_impl->input_size;
+}
+
+auto
+dft::input_buffer() const noexcept -> std::span<float>
+{
+    return m_impl->in_buffer;
 }
 
 auto
@@ -87,15 +93,9 @@ dft::output_size() const noexcept -> std::size_t
 }
 
 auto
-dft::process(std::span<float const> const in)
-        -> std::span<std::complex<float> const>
+dft::process() -> std::span<std::complex<float> const>
 {
-    BOOST_ASSERT(in.size() == m_impl->input_size);
-
-    std::ranges::copy(in, m_impl->in_buffer.begin());
-
     fftwf_execute(m_impl->plan.get());
-
     return m_impl->out_buffer;
 }
 

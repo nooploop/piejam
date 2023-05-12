@@ -6,6 +6,7 @@
 
 #include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/BusType.h>
+#include <piejam/gui/model/DFTResolution.h>
 #include <piejam/gui/model/SpectrumDataPoint.h>
 #include <piejam/gui/model/StereoChannel.h>
 
@@ -25,6 +26,7 @@ public:
 
     void setBusType(BusType);
     void setSampleRate(audio::sample_rate);
+    void setResolution(DFTResolution);
     void setActive(bool active);
     void setChannel(StereoChannel);
 

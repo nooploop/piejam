@@ -35,6 +35,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusType.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleTick.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DFTResolution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntry.h

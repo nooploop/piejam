@@ -11,7 +11,7 @@ namespace piejam::numeric::window
 {
 
 [[nodiscard]] constexpr auto
-hamming(std::size_t const n, std::size_t const size) noexcept -> float
+hamming(std::size_t const size, std::size_t const n) noexcept -> float
 {
     constexpr float const two_pi = 2.f * std::numbers::pi_v<float>;
     float const two_pi_div_size_minus_1 = two_pi / (size - 1);
@@ -20,13 +20,13 @@ hamming(std::size_t const n, std::size_t const size) noexcept -> float
 
 template <std::size_t Size>
 [[nodiscard]] constexpr auto
-hamming(std::size_t const n) noexcept -> float
+hamming_c(std::size_t const n) noexcept -> float
 {
-    return hamming(n, Size);
+    return hamming(Size, n);
 }
 
 [[nodiscard]] constexpr auto
-hann(std::size_t const n, std::size_t const size) noexcept -> float
+hann(std::size_t const size, std::size_t const n) noexcept -> float
 {
     constexpr float const two_pi = 2.f * std::numbers::pi_v<float>;
     float const two_pi_div_size_minus_1 = two_pi / (size - 1);
@@ -35,9 +35,9 @@ hann(std::size_t const n, std::size_t const size) noexcept -> float
 
 template <std::size_t Size>
 [[nodiscard]] constexpr auto
-hann(std::size_t const n) noexcept -> float
+hann_c(std::size_t const n) noexcept -> float
 {
-    return hann(n, Size);
+    return hann(Size, n);
 }
 
 } // namespace piejam::numeric::window

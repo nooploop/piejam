@@ -25,9 +25,8 @@ template <std::floating_point T>
 linear_to_dB(T const linear, T const min_linear = T{}) -> T
 {
     static_assert(std::numeric_limits<T>::is_iec559, "IEEE 754 required");
-    constexpr auto const twenty_div_log_10 = T{20} / std::log(T{10});
     return linear <= min_linear ? -std::numeric_limits<T>::infinity()
-                                : std::log(linear) * twenty_div_log_10;
+                                : std::log10(linear) * 20.f;
 }
 
 template <std::floating_point T>
