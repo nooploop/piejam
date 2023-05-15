@@ -43,7 +43,6 @@ TEST(row_major_table_view, index_access)
     table_view<int> sut(arr.data(), 2, 3, 4, 1);
 
     ASSERT_EQ(2, sut.major_size());
-
     EXPECT_THAT(sut[0], testing::ElementsAre(1, 2, 3));
     EXPECT_THAT(sut[1], testing::ElementsAre(4, 5, 6));
 }
@@ -58,17 +57,10 @@ TEST(row_major_table_view, transpose)
 
     auto sut = transpose(tv);
 
-    auto col1 = *sut.begin();
-    std::array expected_col1{1, 4};
-    EXPECT_TRUE(std::equal(col1.begin(), col1.end(), expected_col1.begin()));
-
-    auto col2 = *std::next(sut.begin());
-    std::array expected_col2{2, 5};
-    EXPECT_TRUE(std::equal(col2.begin(), col2.end(), expected_col2.begin()));
-
-    auto col3 = *std::next(sut.begin(), 2);
-    std::array expected_col3{3, 6};
-    EXPECT_TRUE(std::equal(col3.begin(), col3.end(), expected_col3.begin()));
+    ASSERT_EQ(sut.major_size(), 3);
+    EXPECT_THAT(sut[0], testing::ElementsAre(1, 4));
+    EXPECT_THAT(sut[1], testing::ElementsAre(2, 5));
+    EXPECT_THAT(sut[2], testing::ElementsAre(3, 6));
 }
 
 TEST(row_major_table_view, stepped_columns)
@@ -79,13 +71,9 @@ TEST(row_major_table_view, stepped_columns)
 
     table_view<int> sut(arr.data(), 2, 3, 5, 2);
 
-    auto row1 = *sut.begin();
-    std::array expected_row1{1, 2, 3};
-    EXPECT_TRUE(std::equal(row1.begin(), row1.end(), expected_row1.begin()));
-
-    auto row2 = *std::next(sut.begin());
-    std::array expected_row2{4, 5, 6};
-    EXPECT_TRUE(std::equal(row2.begin(), row2.end(), expected_row2.begin()));
+    ASSERT_EQ(2, sut.major_size());
+    EXPECT_THAT(sut[0], testing::ElementsAre(1, 2, 3));
+    EXPECT_THAT(sut[1], testing::ElementsAre(4, 5, 6));
 }
 
 TEST(row_major_table_view, stepped_columns_transpose)
@@ -98,17 +86,10 @@ TEST(row_major_table_view, stepped_columns_transpose)
 
     auto sut = transpose(tv);
 
-    auto col1 = *sut.begin();
-    std::array expected_col1{1, 4};
-    EXPECT_TRUE(std::equal(col1.begin(), col1.end(), expected_col1.begin()));
-
-    auto col2 = *std::next(sut.begin());
-    std::array expected_col2{2, 5};
-    EXPECT_TRUE(std::equal(col2.begin(), col2.end(), expected_col2.begin()));
-
-    auto col3 = *std::next(sut.begin(), 2);
-    std::array expected_col3{3, 6};
-    EXPECT_TRUE(std::equal(col3.begin(), col3.end(), expected_col3.begin()));
+    ASSERT_EQ(sut.major_size(), 3);
+    EXPECT_THAT(sut[0], testing::ElementsAre(1, 4));
+    EXPECT_THAT(sut[1], testing::ElementsAre(2, 5));
+    EXPECT_THAT(sut[2], testing::ElementsAre(3, 6));
 }
 
 TEST(column_major_table_view, iterate_and_compare)
@@ -119,17 +100,10 @@ TEST(column_major_table_view, iterate_and_compare)
 
     table_view<int> sut(arr.data(), 3, 2, 1, 4);
 
-    auto col1 = *sut.begin();
-    std::array expected_col1{1, 4};
-    EXPECT_TRUE(std::equal(col1.begin(), col1.end(), expected_col1.begin()));
-
-    auto col2 = *std::next(sut.begin());
-    std::array expected_col2{2, 5};
-    EXPECT_TRUE(std::equal(col2.begin(), col2.end(), expected_col2.begin()));
-
-    auto col3 = *std::next(sut.begin(), 2);
-    std::array expected_col3{3, 6};
-    EXPECT_TRUE(std::equal(col3.begin(), col3.end(), expected_col3.begin()));
+    ASSERT_EQ(sut.major_size(), 3);
+    EXPECT_THAT(sut[0], testing::ElementsAre(1, 4));
+    EXPECT_THAT(sut[1], testing::ElementsAre(2, 5));
+    EXPECT_THAT(sut[2], testing::ElementsAre(3, 6));
 }
 
 TEST(column_major_table_view, transpose)
@@ -142,13 +116,9 @@ TEST(column_major_table_view, transpose)
 
     auto sut = transpose(tv);
 
-    auto row1 = *sut.begin();
-    std::array expected_row1{1, 2, 3};
-    EXPECT_TRUE(std::equal(row1.begin(), row1.end(), expected_row1.begin()));
-
-    auto row2 = *std::next(sut.begin());
-    std::array expected_row2{4, 5, 6};
-    EXPECT_TRUE(std::equal(row2.begin(), row2.end(), expected_row2.begin()));
+    ASSERT_EQ(2, sut.major_size());
+    EXPECT_THAT(sut[0], testing::ElementsAre(1, 2, 3));
+    EXPECT_THAT(sut[1], testing::ElementsAre(4, 5, 6));
 }
 
 TEST(table_view, compile_time_minor_step)
@@ -185,7 +155,6 @@ TEST(table_view, compile_time_major_step)
             sut(arr.data(), 2, 3, 4, 1);
 
     ASSERT_EQ(2, sut.major_size());
-
     EXPECT_THAT(sut[0], testing::ElementsAre(1, 2, 3));
     EXPECT_THAT(sut[1], testing::ElementsAre(4, 5, 6));
 }
@@ -198,29 +167,15 @@ TEST(table_view, fill)
 
     table_view<int> sut(arr.data(), 2, 3, 4, 1);
 
-    ASSERT_TRUE(std::equal(
-            sut[0].begin(),
-            sut[0].end(),
-            std::array{1, 2, 3}.begin()));
-    ASSERT_TRUE(std::equal(
-            sut[1].begin(),
-            sut[1].end(),
-            std::array{4, 5, 6}.begin()));
+    ASSERT_EQ(2, sut.major_size());
+    ASSERT_THAT(sut[0], testing::ElementsAre(1, 2, 3));
+    ASSERT_THAT(sut[1], testing::ElementsAre(4, 5, 6));
 
     fill(sut, 23);
 
-    EXPECT_TRUE(std::equal(
-            sut[0].begin(),
-            sut[0].end(),
-            std::array{23, 23, 23}.begin()));
-    EXPECT_TRUE(std::equal(
-            sut[1].begin(),
-            sut[1].end(),
-            std::array{23, 23, 23}.begin()));
-    EXPECT_TRUE(std::equal(
-            arr.begin(),
-            arr.end(),
-            std::array{23, 23, 23, 0, 23, 23, 23, 0}.begin()));
+    EXPECT_THAT(sut[0], testing::ElementsAre(23, 23, 23));
+    EXPECT_THAT(sut[1], testing::ElementsAre(23, 23, 23));
+    EXPECT_THAT(arr, testing::ElementsAre(23, 23, 23, 0, 23, 23, 23, 0));
 }
 
 TEST(table_view_as_const, data_stays_same)

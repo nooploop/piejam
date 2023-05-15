@@ -228,7 +228,7 @@ public:
                         m_minor_span.stride() == rhs.m_minor_span.stride());
                 BOOST_ASSERT(
                         (m_minor_span.data() - rhs.m_minor_span.data()) %
-                                m_minor_span.stride() ==
+                                step() ==
                         0);
             }
         }
