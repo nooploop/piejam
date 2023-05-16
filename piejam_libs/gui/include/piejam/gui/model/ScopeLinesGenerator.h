@@ -27,6 +27,7 @@ public:
     void setActive(bool active);
     void setStereoChannel(StereoChannel);
 
+    void clear();
     void update(Stream const&) override;
 
 signals:

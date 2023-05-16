@@ -208,6 +208,12 @@ ScopeLinesGenerator::setStereoChannel(StereoChannel const channel)
 }
 
 void
+ScopeLinesGenerator::clear()
+{
+    m_impl->updateGenerator();
+}
+
+void
 ScopeLinesGenerator::update(Stream const& stream)
 {
     generated(m_impl->generator(stream));

@@ -116,26 +116,7 @@ public:
         return &m_linesB;
     }
 
-    Q_INVOKABLE void clear()
-    {
-        m_linesA.get().clear();
-
-        if (m_activeA)
-        {
-            m_linesA.get().resize(m_viewSize);
-        }
-
-        m_linesA.update();
-
-        m_linesB.get().clear();
-
-        if (m_activeB)
-        {
-            m_linesB.get().resize(m_viewSize);
-        }
-
-        m_linesB.update();
-    }
+    Q_INVOKABLE void clear();
 
 signals:
     void samplesPerLineChanged();

@@ -21,8 +21,8 @@ struct FxScope::Impl
 {
     runtime::fx::module_id fx_mod_id;
 
-    ScopeLinesGenerator accumulatorA;
-    ScopeLinesGenerator accumulatorB;
+    ScopeLinesGenerator generatorA;
+    ScopeLinesGenerator generatorB;
 
     std::unique_ptr<AudioStreamProvider> streamA;
     std::unique_ptr<AudioStreamProvider> streamB;
@@ -52,13 +52,13 @@ FxScope::FxScope(
 
     connectSubscribableChild(*m_impl->streamA);
 
-    m_impl->streamA->setListener(&m_impl->accumulatorA);
-    m_impl->accumulatorA.setStreamType(m_busType);
-    m_impl->accumulatorA.setActive(activeA());
-    m_impl->accumulatorA.setStereoChannel(channelA());
+    m_impl->streamA->setListener(&m_impl->generatorA);
+    m_impl->generatorA.setStreamType(m_busType);
+    m_impl->generatorA.setActive(activeA());
+    m_impl->generatorA.setStereoChannel(channelA());
 
     QObject::connect(
-            &m_impl->accumulatorA,
+            &m_impl->generatorA,
             &ScopeLinesGenerator::generated,
             this,
             [this](ScopeLines const& addedLines) {
@@ -75,13 +75,13 @@ FxScope::FxScope(
 
         connectSubscribableChild(*m_impl->streamB);
 
-        m_impl->streamB->setListener(&m_impl->accumulatorB);
-        m_impl->accumulatorB.setStreamType(m_busType);
-        m_impl->accumulatorB.setActive(activeB());
-        m_impl->accumulatorB.setStereoChannel(channelB());
+        m_impl->streamB->setListener(&m_impl->generatorB);
+        m_impl->generatorB.setStreamType(m_busType);
+        m_impl->generatorB.setActive(activeB());
+        m_impl->generatorB.setStereoChannel(channelB());
 
         QObject::connect(
-                &m_impl->accumulatorB,
+                &m_impl->generatorB,
                 &ScopeLinesGenerator::generated,
                 this,
                 [this](ScopeLines const& addedLines) {
@@ -108,8 +108,8 @@ FxScope::setSamplesPerLine(int const x)
     if (m_samplesPerLine != x)
     {
         m_samplesPerLine = x;
-        m_impl->accumulatorA.setSamplesPerLine(x);
-        m_impl->accumulatorB.setSamplesPerLine(x);
+        m_impl->generatorA.setSamplesPerLine(x);
+        m_impl->generatorB.setSamplesPerLine(x);
         emit samplesPerLineChanged();
     }
 }
@@ -120,7 +120,7 @@ FxScope::changeActiveA(bool const active)
     if (m_activeA != active)
     {
         m_activeA = active;
-        m_impl->accumulatorA.setActive(active);
+        m_impl->generatorA.setActive(active);
         emit activeAChanged();
 
         clear();
@@ -133,8 +133,10 @@ FxScope::changeChannelA(piejam::gui::model::StereoChannel const x)
     if (m_channelA != x)
     {
         m_channelA = x;
-        m_impl->accumulatorA.setStereoChannel(x);
+        m_impl->generatorA.setStereoChannel(x);
         emit channelAChanged();
+
+        clear();
     }
 }
 
@@ -144,7 +146,7 @@ FxScope::changeActiveB(bool const active)
     if (m_activeB != active)
     {
         m_activeB = active;
-        m_impl->accumulatorB.setActive(active);
+        m_impl->generatorB.setActive(active);
         emit activeBChanged();
 
         clear();
@@ -157,9 +159,34 @@ FxScope::changeChannelB(piejam::gui::model::StereoChannel const x)
     if (m_channelB != x)
     {
         m_channelB = x;
-        m_impl->accumulatorB.setStereoChannel(x);
+        m_impl->generatorB.setStereoChannel(x);
         emit channelBChanged();
+
+        clear();
     }
+}
+
+void
+FxScope::clear()
+{
+    m_linesA.get().clear();
+    m_linesB.get().clear();
+
+    if (m_activeA)
+    {
+        m_linesA.get().resize(m_viewSize);
+    }
+
+    if (m_activeB)
+    {
+        m_linesB.get().resize(m_viewSize);
+    }
+
+    m_impl->generatorA.clear();
+    m_impl->generatorB.clear();
+
+    m_linesA.update();
+    m_linesB.update();
 }
 
 } // namespace piejam::gui::model

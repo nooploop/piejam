@@ -27,34 +27,27 @@ Item {
     onBypassedChanged: if (root.bypassed && root.content) root.content.clear()
 
     PJItems.Scope {
-        id: scope
+        id: scopeA
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: resolutionSlider.top
 
-        linesA: root.content ? root.content.dataA : null
-        colorA: Material.color(Material.Pink)
+        lines: root.content ? root.content.dataA : null
+        color: Material.color(Material.Pink)
+    }
 
-        linesB: root.content ? root.content.dataB : null
-        colorB: Material.color(Material.Blue)
+    PJItems.Scope {
+        id: scopeB
 
-        Binding {
-            when: root.content
-            target: root.content
-            property: "viewSize"
-            value: scope.width
-            restoreMode: Binding.RestoreBinding
-        }
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: resolutionSlider.top
 
-        Binding {
-            when: root.content
-            target: root.content
-            property: "samplesPerLine"
-            value: Math.pow(2, resolutionSlider.value)
-            restoreMode: Binding.RestoreBinding
-        }
+        lines: root.content ? root.content.dataB : null
+        color: Material.color(Material.Blue)
     }
 
     Slider {
@@ -106,6 +99,22 @@ Item {
 
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+    }
+
+    Binding {
+        when: root.content
+        target: root.content
+        property: "viewSize"
+        value: scopeA.width
+        restoreMode: Binding.RestoreBinding
+    }
+
+    Binding {
+        when: root.content
+        target: root.content
+        property: "samplesPerLine"
+        value: Math.pow(2, resolutionSlider.value)
+        restoreMode: Binding.RestoreBinding
     }
 
     ModelSubscription {

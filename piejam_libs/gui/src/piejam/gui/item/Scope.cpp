@@ -134,19 +134,14 @@ ScopePointMaterial::createShader() const -> QSGMaterialShader*
 struct Scope::Impl
 {
     bool transformMatrixDirty{true};
-    bool linesADirty{true};
-    bool linesBDirty{true};
-    bool colorADirty{true};
-    bool colorBDirty{true};
+    bool linesDirty{true};
+    bool colorDirty{true};
 
-    model::ScopeLinesObject* linesA{};
-    model::ScopeLinesObject* linesB{};
+    model::ScopeLinesObject* lines{};
 
     QMetaObject::Connection linesAChangedConnection;
-    QMetaObject::Connection linesBChangedConnection;
 
-    QColor colorA{255, 0, 0};
-    QColor colorB{0, 0, 255};
+    QColor color{255, 0, 0};
 };
 
 Scope::Scope(QQuickItem* parent)
@@ -163,27 +158,27 @@ Scope::Scope(QQuickItem* parent)
 Scope::~Scope() = default;
 
 auto
-Scope::linesA() const noexcept -> model::ScopeLinesObject*
+Scope::lines() const noexcept -> model::ScopeLinesObject*
 {
-    return m_impl->linesA;
+    return m_impl->lines;
 }
 
 void
-Scope::setLinesA(model::ScopeLinesObject* x)
+Scope::setLines(model::ScopeLinesObject* x)
 {
-    if (m_impl->linesA != x)
+    if (m_impl->lines != x)
     {
-        m_impl->linesA = x;
-        emit linesAChanged();
+        m_impl->lines = x;
+        emit linesChanged();
 
-        if (m_impl->linesA)
+        if (m_impl->lines)
         {
             m_impl->linesAChangedConnection = QObject::connect(
-                    m_impl->linesA,
+                    m_impl->lines,
                     &model::ScopeLinesObject::changed,
                     this,
                     [this]() {
-                        m_impl->linesADirty = true;
+                        m_impl->linesDirty = true;
                         update();
                     });
         }
@@ -192,80 +187,26 @@ Scope::setLinesA(model::ScopeLinesObject* x)
             QObject::disconnect(m_impl->linesAChangedConnection);
         }
 
-        m_impl->linesADirty = true;
+        m_impl->linesDirty = true;
         update();
     }
 }
 
 auto
-Scope::linesB() const noexcept -> model::ScopeLinesObject*
+Scope::color() const noexcept -> QColor const&
 {
-    return m_impl->linesB;
+    return m_impl->color;
 }
 
 void
-Scope::setLinesB(model::ScopeLinesObject* x)
+Scope::setColor(QColor const& c)
 {
-    if (m_impl->linesB != x)
+    if (m_impl->color != c)
     {
-        m_impl->linesB = x;
-        emit linesBChanged();
+        m_impl->color = c;
+        emit colorChanged();
 
-        if (m_impl->linesB)
-        {
-            m_impl->linesBChangedConnection = QObject::connect(
-                    m_impl->linesB,
-                    &model::ScopeLinesObject::changed,
-                    this,
-                    [this]() {
-                        m_impl->linesBDirty = true;
-                        update();
-                    });
-        }
-        else
-        {
-            QObject::disconnect(m_impl->linesBChangedConnection);
-        }
-
-        m_impl->linesBDirty = true;
-        update();
-    }
-}
-
-auto
-Scope::colorA() const noexcept -> QColor const&
-{
-    return m_impl->colorA;
-}
-
-void
-Scope::setColorA(QColor const& c)
-{
-    if (m_impl->colorA != c)
-    {
-        m_impl->colorA = c;
-        emit colorAChanged();
-
-        m_impl->colorADirty = true;
-        update();
-    }
-}
-
-auto
-Scope::colorB() const noexcept -> QColor const&
-{
-    return m_impl->colorB;
-}
-
-void
-Scope::setColorB(QColor const& c)
-{
-    if (m_impl->colorB != c)
-    {
-        m_impl->colorB = c;
-        emit colorBChanged();
-
-        m_impl->colorBDirty = true;
+        m_impl->colorDirty = true;
         update();
     }
 }
@@ -280,16 +221,10 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
         node = new QSGTransformNode();
         node->appendChildNode(updateGeometry(
                 nullptr,
-                m_impl->linesA,
-                m_impl->colorA,
-                m_impl->linesADirty,
-                m_impl->colorADirty));
-        node->appendChildNode(updateGeometry(
-                nullptr,
-                m_impl->linesB,
-                m_impl->colorB,
-                m_impl->linesBDirty,
-                m_impl->colorBDirty));
+                m_impl->lines,
+                m_impl->color,
+                m_impl->linesDirty,
+                m_impl->colorDirty));
 
         updateTransformMatrix(*node);
     }
@@ -306,20 +241,10 @@ Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
         BOOST_VERIFY(
                 geometryNodeA == updateGeometry(
                                          geometryNodeA,
-                                         m_impl->linesA,
-                                         m_impl->colorA,
-                                         m_impl->linesADirty,
-                                         m_impl->colorADirty));
-
-        auto* geometryNodeB = geometryNodeA->nextSibling();
-        BOOST_ASSERT(geometryNodeB);
-        BOOST_VERIFY(
-                geometryNodeB == updateGeometry(
-                                         geometryNodeB,
-                                         m_impl->linesB,
-                                         m_impl->colorB,
-                                         m_impl->linesBDirty,
-                                         m_impl->colorBDirty));
+                                         m_impl->lines,
+                                         m_impl->color,
+                                         m_impl->linesDirty,
+                                         m_impl->colorDirty));
     }
 
     return node;
