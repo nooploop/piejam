@@ -22,83 +22,85 @@ Item {
 
     implicitWidth: 636
 
-    onVisibleChanged: if (root.content) root.content.clear()
+    onVisibleChanged: if (root.content)
+                          root.content.clear()
 
-    onBypassedChanged: if (root.bypassed && root.content) root.content.clear()
+    onBypassedChanged: if (root.bypassed && root.content)
+                           root.content.clear()
 
-    PJItems.Scope {
-        id: scopeA
+    ColumnLayout {
+        anchors.fill: parent
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: resolutionSlider.top
+        Frame {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        lines: root.content ? root.content.dataA : null
-        color: Material.color(Material.Pink)
-    }
+            PJItems.Scope {
+                id: scopeA
 
-    PJItems.Scope {
-        id: scopeB
+                anchors.fill: parent
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: resolutionSlider.top
+                lines: root.content ? root.content.dataA : null
+                color: Material.color(Material.Pink)
+            }
 
-        lines: root.content ? root.content.dataB : null
-        color: Material.color(Material.Blue)
-    }
+            PJItems.Scope {
+                id: scopeB
 
-    Slider {
-        id: resolutionSlider
+                anchors.fill: parent
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: root.content && root.content.busType == PJModels.BusType.Stereo
-                        ? channelASelector.top
-                        : parent.bottom
+                lines: root.content ? root.content.dataB : null
+                color: Material.color(Material.Blue)
+            }
+        }
 
-        from: 0
-        to: 11
-        stepSize: 1
-        value: 8
-    }
+        Slider {
+            id: resolutionSlider
 
-    StereoChannelSelector {
-        id: channelASelector
+            Layout.fillWidth: true
 
-        visible: root.content && root.content.busType == PJModels.BusType.Stereo
+            from: 0
+            to: 11
+            stepSize: 1
+            value: 8
+        }
 
-        name: "A"
-        active: root.content ? root.content.activeA : false
-        channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
+        RowLayout {
+            Layout.fillWidth: true
 
-        Material.accent: Material.Pink
+            visible: root.content
+                     && root.content.busType == PJModels.BusType.Stereo
 
-        onActiveToggled: root.content.changeActiveA(!active)
-        onChannelSelected: root.content.changeChannelA(ch)
+            StereoChannelSelector {
+                id: channelASelector
 
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-    }
+                name: "A"
+                active: root.content ? root.content.activeA : false
+                channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
 
-    StereoChannelSelector {
-        id: channelBSelector
+                Material.accent: Material.Pink
 
-        visible: root.content && root.content.busType == PJModels.BusType.Stereo
+                onActiveToggled: root.content.changeActiveA(!active)
+                onChannelSelected: root.content.changeChannelA(ch)
+            }
 
-        name: "B"
-        active: root.content ? root.content.activeB : false
-        channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
+            Item {
+                Layout.fillWidth: true
+            }
 
-        Material.accent: Material.Blue
+            StereoChannelSelector {
+                id: channelBSelector
 
-        onActiveToggled: root.content.changeActiveB(!active)
-        onChannelSelected: root.content.changeChannelB(ch)
+                name: "B"
+                active: root.content ? root.content.activeB : false
+                channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
 
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+                Material.accent: Material.Blue
+
+                onActiveToggled: root.content.changeActiveB(!active)
+                onChannelSelected: root.content.changeChannelB(ch)
+            }
+        }
     }
 
     Binding {

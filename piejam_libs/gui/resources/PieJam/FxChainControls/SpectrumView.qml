@@ -20,24 +20,62 @@ Item {
 
     implicitWidth: 636
 
-    PJItems.Spectrum {
-        id: spectrum
+    ColumnLayout {
+        anchors.fill: parent
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: root.content && root.content.busType == PJModels.BusType.Stereo
-                        ? channelASelector.top
-                        : parent.bottom
+        PJItems.Spectrum {
+            id: spectrum
 
-        spectrumAData: root.content ? root.content.dataA : null
-        spectrumAColor: Material.color(Material.Pink)
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        spectrumBData: root.content ? root.content.dataB : null
-        spectrumBColor: Material.color(Material.Blue)
+            spectrumAData: root.content ? root.content.dataA : null
+            spectrumAColor: Material.color(Material.Pink)
+
+            spectrumBData: root.content ? root.content.dataB : null
+            spectrumBColor: Material.color(Material.Blue)
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            visible: root.content
+                     && root.content.busType == PJModels.BusType.Stereo
+
+            StereoChannelSelector {
+                id: channelASelector
+
+                name: "A"
+                active: root.content && root.content.activeA
+                channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
+
+                Material.accent: Material.Pink
+
+                onActiveToggled: root.content.changeActiveA(!active)
+                onChannelSelected: root.content.changeChannelA(ch)
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            StereoChannelSelector {
+                id: channelBSelector
+
+                name: "B"
+                active: root.content && root.content.activeB
+                channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
+
+                Material.accent: Material.Blue
+
+                onActiveToggled: root.content.changeActiveB(!active)
+                onChannelSelected: root.content.changeChannelB(ch)
+            }
+        }
     }
 
-    onBypassedChanged: if (root.bypassed && root.content) root.content.clear()
+    onBypassedChanged: if (root.bypassed && root.content)
+                           root.content.clear()
 
     Repeater {
         model: spectrum.levelLabels
@@ -61,44 +99,9 @@ Item {
 
             font.pointSize: 6
 
-            text: modelData.value >= 1000 ? (modelData.value / 1000) + " kHz" : modelData.value + " Hz"
+            text: modelData.value >= 1000 ? (modelData.value / 1000)
+                                            + " kHz" : modelData.value + " Hz"
         }
-    }
-
-    StereoChannelSelector {
-        id: channelASelector
-
-        visible: root.content && root.content.busType == PJModels.BusType.Stereo
-
-        name: "A"
-        active: root.content ? root.content.activeA : false
-        channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
-
-        Material.accent: Material.Pink
-
-        onActiveToggled: root.content.changeActiveA(!active)
-        onChannelSelected: root.content.changeChannelA(ch)
-
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-    }
-
-    StereoChannelSelector {
-        id: channelBSelector
-
-        visible: root.content && root.content.busType == PJModels.BusType.Stereo
-
-        name: "B"
-        active: root.content ? root.content.activeB : false
-        channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
-
-        Material.accent: Material.Blue
-
-        onActiveToggled: root.content.changeActiveB(!active)
-        onChannelSelected: root.content.changeChannelB(ch)
-
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
     }
 
     ModelSubscription {
