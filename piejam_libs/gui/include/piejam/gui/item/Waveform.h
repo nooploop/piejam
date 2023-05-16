@@ -13,23 +13,24 @@
 namespace piejam::gui::item
 {
 
-class Scope : public QQuickItem
+class Waveform : public QQuickItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* lines READ lines WRITE
-                       setLines NOTIFY linesChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformData READ
+                       waveformData WRITE setWaveformData NOTIFY
+                               waveformDataChanged FINAL)
 
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged FINAL)
 
     QML_ELEMENT
 
 public:
-    Scope(QQuickItem* parent = nullptr);
-    ~Scope();
+    Waveform(QQuickItem* parent = nullptr);
+    ~Waveform();
 
-    auto lines() const noexcept -> model::ScopeLinesObject*;
-    void setLines(model::ScopeLinesObject*);
+    auto waveformData() const noexcept -> model::WaveformDataObject*;
+    void setWaveformData(model::WaveformDataObject*);
 
     auto color() const noexcept -> QColor const&;
     void setColor(QColor const&);
@@ -37,17 +38,11 @@ public:
     auto updatePaintNode(QSGNode*, UpdatePaintNodeData*) -> QSGNode* override;
 
 signals:
-    void linesChanged();
+    void waveformDataChanged();
     void colorChanged();
 
 private:
     void updateTransformMatrix(QSGTransformNode&);
-    auto updateGeometry(
-            QSGNode*,
-            model::ScopeLinesObject const*,
-            QColor const&,
-            bool& dirtyGeometry,
-            bool& dirtyMaterial) -> QSGNode*;
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;

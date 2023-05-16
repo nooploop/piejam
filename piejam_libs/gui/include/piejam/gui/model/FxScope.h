@@ -6,9 +6,9 @@
 
 #include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/FxModuleContent.h>
-#include <piejam/gui/model/ScopeLinesObject.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/Subscribable.h>
+#include <piejam/gui/model/WaveformDataObject.h>
 #include <piejam/gui/model/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 
@@ -28,10 +28,10 @@ class FxScope final : public Subscribable<FxModuleContent>
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
     Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataA READ dataA CONSTANT
-                       FINAL)
-    Q_PROPERTY(piejam::gui::model::ScopeLinesObject* dataB READ dataB CONSTANT
-                       FINAL)
+    Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
+                       waveformDataA CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataB READ
+                       waveformDataB CONSTANT FINAL)
     Q_PROPERTY(bool activeA READ activeA NOTIFY activeAChanged FINAL)
     Q_PROPERTY(bool activeB READ activeB NOTIFY activeBChanged FINAL)
     Q_PROPERTY(piejam::gui::model::StereoChannel channelA READ channelA NOTIFY
@@ -92,9 +92,9 @@ public:
 
     Q_INVOKABLE void changeChannelA(piejam::gui::model::StereoChannel);
 
-    auto dataA() noexcept -> ScopeLinesObject*
+    auto waveformDataA() noexcept -> WaveformDataObject*
     {
-        return &m_linesA;
+        return &m_waveformDataA;
     }
 
     auto activeB() const noexcept -> bool
@@ -111,9 +111,9 @@ public:
 
     Q_INVOKABLE void changeChannelB(piejam::gui::model::StereoChannel);
 
-    auto dataB() noexcept -> ScopeLinesObject*
+    auto waveformDataB() noexcept -> WaveformDataObject*
     {
-        return &m_linesB;
+        return &m_waveformDataB;
     }
 
     Q_INVOKABLE void clear();
@@ -137,10 +137,10 @@ private:
     BusType m_busType;
     bool m_activeA{true};
     StereoChannel m_channelA{StereoChannel::Left};
-    ScopeLinesObject m_linesA;
+    WaveformDataObject m_waveformDataA;
     bool m_activeB{false};
     StereoChannel m_channelB{StereoChannel::Right};
-    ScopeLinesObject m_linesB;
+    WaveformDataObject m_waveformDataB;
 };
 
 } // namespace piejam::gui::model

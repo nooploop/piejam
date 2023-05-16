@@ -14,13 +14,13 @@
 namespace piejam::gui::model
 {
 
-class ScopeLinesGenerator final : public AudioStreamListener
+class WaveformDataGenerator final : public AudioStreamListener
 {
     Q_OBJECT
 
 public:
-    ScopeLinesGenerator();
-    ~ScopeLinesGenerator() override;
+    WaveformDataGenerator();
+    ~WaveformDataGenerator() override;
 
     void setStreamType(piejam::gui::model::BusType streamType);
     void setSamplesPerLine(int x);
@@ -31,7 +31,7 @@ public:
     void update(Stream const&) override;
 
 signals:
-    void generated(piejam::gui::model::ScopeLines const&);
+    void generated(piejam::gui::model::WaveformData const&);
 
 private:
     struct Impl;

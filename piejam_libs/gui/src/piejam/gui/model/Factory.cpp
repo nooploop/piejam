@@ -4,8 +4,8 @@
 
 #include <piejam/gui/model/Factory.h>
 
-#include <piejam/gui/item/Scope.h>
 #include <piejam/gui/item/Spectrum.h>
+#include <piejam/gui/item/Waveform.h>
 #include <piejam/gui/model/AudioDeviceSettings.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
 #include <piejam/gui/model/AudioStreamListener.h>
@@ -70,7 +70,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::AudioStreamListener*>();
     qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
     qRegisterMetaType<piejam::gui::model::FxScope*>();
-    qRegisterMetaType<piejam::gui::model::ScopeLinesObject*>();
+    qRegisterMetaType<piejam::gui::model::WaveformDataObject*>();
     qRegisterMetaType<piejam::gui::model::FxSpectrum*>();
     qRegisterMetaType<piejam::gui::model::SpectrumData*>();
     qRegisterMetaType<piejam::gui::model::FxFilter*>();
@@ -91,7 +91,11 @@ runRegistration()
             "FxModuleContent",
             "Not createable");
 
-    qmlRegisterType<piejam::gui::item::Scope>("PieJam.Items", 1, 0, "Scope");
+    qmlRegisterType<piejam::gui::item::Waveform>(
+            "PieJam.Items",
+            1,
+            0,
+            "Waveform");
     qmlRegisterType<piejam::gui::item::Spectrum>(
             "PieJam.Items",
             1,

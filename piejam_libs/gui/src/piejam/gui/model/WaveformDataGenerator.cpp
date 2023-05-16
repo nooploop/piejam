@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/ScopeLinesGenerator.h>
+#include <piejam/gui/model/WaveformDataGenerator.h>
 
-#include <piejam/gui/model/ScopeLines.h>
+#include <piejam/gui/model/WaveformData.h>
 
 #include <piejam/audio/multichannel_view.h>
 #include <piejam/functional/operators.h>
@@ -23,9 +23,9 @@ namespace
 
 struct InactiveGenerator
 {
-    auto operator()(AudioStreamListener::Stream const&) -> ScopeLines
+    auto operator()(AudioStreamListener::Stream const&) -> WaveformData
     {
-        return ScopeLines{};
+        return WaveformData{};
     }
 };
 
@@ -44,9 +44,9 @@ public:
     {
     }
 
-    auto operator()(AudioStreamListener::Stream const& stream) -> ScopeLines
+    auto operator()(AudioStreamListener::Stream const& stream) -> WaveformData
     {
-        ScopeLines result;
+        WaveformData result;
 
         BOOST_ASSERT(
                 stream.layout() == audio::multichannel_layout::non_interleaved);
@@ -104,7 +104,7 @@ private:
 
 } // namespace
 
-struct ScopeLinesGenerator::Impl
+struct WaveformDataGenerator::Impl
 {
     BusType streamType{BusType::Mono};
     int samplesPerLine{1};
@@ -112,7 +112,7 @@ struct ScopeLinesGenerator::Impl
     StereoChannel channel{StereoChannel::Left};
 
     using Generate =
-            std::function<ScopeLines(AudioStreamListener::Stream const&)>;
+            std::function<WaveformData(AudioStreamListener::Stream const&)>;
     Generate generator{InactiveGenerator{}};
 
     auto makeGenerator() const -> Generate
@@ -171,21 +171,21 @@ struct ScopeLinesGenerator::Impl
     }
 };
 
-ScopeLinesGenerator::ScopeLinesGenerator()
+WaveformDataGenerator::WaveformDataGenerator()
     : m_impl(std::make_unique<Impl>())
 {
 }
 
-ScopeLinesGenerator::~ScopeLinesGenerator() = default;
+WaveformDataGenerator::~WaveformDataGenerator() = default;
 
 void
-ScopeLinesGenerator::setStreamType(piejam::gui::model::BusType const streamType)
+WaveformDataGenerator::setStreamType(piejam::gui::model::BusType const streamType)
 {
     m_impl->updateGeneratorProperty(m_impl->streamType, streamType);
 }
 
 void
-ScopeLinesGenerator::setSamplesPerLine(int const samplesPerLine)
+WaveformDataGenerator::setSamplesPerLine(int const samplesPerLine)
 {
     if (samplesPerLine <= 0)
     {
@@ -196,25 +196,25 @@ ScopeLinesGenerator::setSamplesPerLine(int const samplesPerLine)
 }
 
 void
-ScopeLinesGenerator::setActive(bool const active)
+WaveformDataGenerator::setActive(bool const active)
 {
     m_impl->updateGeneratorProperty(m_impl->active, active);
 }
 
 void
-ScopeLinesGenerator::setStereoChannel(StereoChannel const channel)
+WaveformDataGenerator::setStereoChannel(StereoChannel const channel)
 {
     m_impl->updateGeneratorProperty(m_impl->channel, channel);
 }
 
 void
-ScopeLinesGenerator::clear()
+WaveformDataGenerator::clear()
 {
     m_impl->updateGenerator();
 }
 
 void
-ScopeLinesGenerator::update(Stream const& stream)
+WaveformDataGenerator::update(Stream const& stream)
 {
     generated(m_impl->generator(stream));
 }

@@ -48,9 +48,9 @@ class AudioStreamListener;
 class AudioStreamProvider;
 using AudioStreamProviderList = GenericListModel<AudioStreamProvider>;
 
-class ScopeLinesObject;
-class ScopeLines;
-class ScopeLinesGenerator;
+class WaveformDataObject;
+class WaveformData;
+class WaveformDataGenerator;
 
 class SpectrumData;
 

@@ -4,24 +4,24 @@
 
 #pragma once
 
-#include <piejam/gui/model/ScopeLines.h>
+#include <piejam/gui/model/WaveformData.h>
 
 #include <QObject>
 
 namespace piejam::gui::model
 {
 
-class ScopeLinesObject final : public QObject
+class WaveformDataObject final : public QObject
 {
     Q_OBJECT
 
 public:
-    auto get() noexcept -> ScopeLines&
+    auto get() noexcept -> WaveformData&
     {
         return m_lines;
     }
 
-    auto get() const noexcept -> ScopeLines const&
+    auto get() const noexcept -> WaveformData const&
     {
         return m_lines;
     }
@@ -35,9 +35,9 @@ signals:
     void changed();
 
 private:
-    ScopeLines m_lines;
+    WaveformData m_lines;
 };
 
 } // namespace piejam::gui::model
 
-Q_DECLARE_METATYPE(piejam::gui::model::ScopeLinesObject*)
+Q_DECLARE_METATYPE(piejam::gui::model::WaveformDataObject*)

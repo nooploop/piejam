@@ -5,7 +5,7 @@
 #include <piejam/gui/model/FxScope.h>
 
 #include <piejam/gui/model/FxStream.h>
-#include <piejam/gui/model/ScopeLinesGenerator.h>
+#include <piejam/gui/model/WaveformDataGenerator.h>
 
 #include <piejam/audio/types.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
@@ -21,8 +21,8 @@ struct FxScope::Impl
 {
     runtime::fx::module_id fx_mod_id;
 
-    ScopeLinesGenerator generatorA;
-    ScopeLinesGenerator generatorB;
+    WaveformDataGenerator generatorA;
+    WaveformDataGenerator generatorB;
 
     std::unique_ptr<AudioStreamProvider> streamA;
     std::unique_ptr<AudioStreamProvider> streamB;
@@ -59,11 +59,11 @@ FxScope::FxScope(
 
     QObject::connect(
             &m_impl->generatorA,
-            &ScopeLinesGenerator::generated,
+            &WaveformDataGenerator::generated,
             this,
-            [this](ScopeLines const& addedLines) {
-                dataA()->get().shift_push_back(addedLines);
-                dataA()->update();
+            [this](WaveformData const& addedLines) {
+                waveformDataA()->get().shift_push_back(addedLines);
+                waveformDataA()->update();
             });
 
     if (m_busType == BusType::Stereo)
@@ -82,11 +82,11 @@ FxScope::FxScope(
 
         QObject::connect(
                 &m_impl->generatorB,
-                &ScopeLinesGenerator::generated,
+                &WaveformDataGenerator::generated,
                 this,
-                [this](ScopeLines const& addedLines) {
-                    dataB()->get().shift_push_back(addedLines);
-                    dataB()->update();
+                [this](WaveformData const& addedLines) {
+                    waveformDataB()->get().shift_push_back(addedLines);
+                    waveformDataB()->update();
                 });
     }
 }
@@ -169,24 +169,24 @@ FxScope::changeChannelB(piejam::gui::model::StereoChannel const x)
 void
 FxScope::clear()
 {
-    m_linesA.get().clear();
-    m_linesB.get().clear();
+    m_waveformDataA.get().clear();
+    m_waveformDataB.get().clear();
 
     if (m_activeA)
     {
-        m_linesA.get().resize(m_viewSize);
+        m_waveformDataA.get().resize(m_viewSize);
     }
 
     if (m_activeB)
     {
-        m_linesB.get().resize(m_viewSize);
+        m_waveformDataB.get().resize(m_viewSize);
     }
 
     m_impl->generatorA.clear();
     m_impl->generatorB.clear();
 
-    m_linesA.update();
-    m_linesB.update();
+    m_waveformDataA.update();
+    m_waveformDataB.update();
 }
 
 } // namespace piejam::gui::model

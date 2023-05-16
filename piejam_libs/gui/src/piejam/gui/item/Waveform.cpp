@@ -2,13 +2,15 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/item/Scope.h>
+#include <piejam/gui/item/Waveform.h>
 
-#include <piejam/gui/model/ScopeLinesObject.h>
+#include <piejam/gui/model/WaveformDataObject.h>
 
 #include <QQuickWindow>
 #include <QSGFlatColorMaterial>
 #include <QSGMaterial>
+
+#include <boost/polymorphic_cast.hpp>
 
 namespace piejam::gui::item
 {
@@ -16,7 +18,7 @@ namespace piejam::gui::item
 namespace
 {
 
-class ScopePointMaterial : public QSGMaterial
+class WaveformPointMaterial : public QSGMaterial
 {
 public:
     auto type() const noexcept -> QSGMaterialType* override;
@@ -36,7 +38,9 @@ public:
 
     auto compare(QSGMaterial const* const other) const noexcept -> int override
     {
-        auto const material = static_cast<ScopePointMaterial const*>(other);
+        auto const* const material =
+                boost::polymorphic_downcast<WaveformPointMaterial const*>(
+                        other);
         return m_color.rgba() - material->color().rgba();
     }
 
@@ -45,7 +49,7 @@ private:
 };
 
 // We need this custom shader to be able to set the PointSize in OpenGLES.
-class ScopePointShader final : public QSGMaterialShader
+class WaveformPointShader final : public QSGMaterialShader
 {
 public:
     inline static QSGMaterialType type;
@@ -90,11 +94,12 @@ public:
 
         Q_ASSERT(
                 oldEffect == nullptr || newEffect->type() == oldEffect->type());
-        ScopePointMaterial* oldMaterial =
-                static_cast<ScopePointMaterial*>(oldEffect);
-        ScopePointMaterial* newMaterial =
-                static_cast<ScopePointMaterial*>(newEffect);
+        auto* const oldMaterial =
+                boost::polymorphic_downcast<WaveformPointMaterial*>(oldEffect);
+        auto* const newMaterial =
+                boost::polymorphic_downcast<WaveformPointMaterial*>(newEffect);
         QColor const& c = newMaterial->color();
+
         if (oldMaterial == nullptr || c != oldMaterial->color() ||
             state.isOpacityDirty())
         {
@@ -106,6 +111,7 @@ public:
                     opacity);
             program()->setUniformValue(m_idColor, v);
         }
+
         if (state.isMatrixDirty())
         {
             program()->setUniformValue(m_idMatrix, state.combinedMatrix());
@@ -118,155 +124,21 @@ private:
 };
 
 auto
-ScopePointMaterial::type() const noexcept -> QSGMaterialType*
+WaveformPointMaterial::type() const noexcept -> QSGMaterialType*
 {
-    return &ScopePointShader::type;
+    return &WaveformPointShader::type;
 }
 
 auto
-ScopePointMaterial::createShader() const -> QSGMaterialShader*
+WaveformPointMaterial::createShader() const -> QSGMaterialShader*
 {
-    return new ScopePointShader;
-}
-
-} // namespace
-
-struct Scope::Impl
-{
-    bool transformMatrixDirty{true};
-    bool linesDirty{true};
-    bool colorDirty{true};
-
-    model::ScopeLinesObject* lines{};
-
-    QMetaObject::Connection linesAChangedConnection;
-
-    QColor color{255, 0, 0};
-};
-
-Scope::Scope(QQuickItem* parent)
-    : QQuickItem(parent)
-    , m_impl(std::make_unique<Impl>())
-{
-    setFlag(ItemHasContents);
-    connect(this, &Scope::heightChanged, [this]() {
-        m_impl->transformMatrixDirty = true;
-        update();
-    });
-}
-
-Scope::~Scope() = default;
-
-auto
-Scope::lines() const noexcept -> model::ScopeLinesObject*
-{
-    return m_impl->lines;
-}
-
-void
-Scope::setLines(model::ScopeLinesObject* x)
-{
-    if (m_impl->lines != x)
-    {
-        m_impl->lines = x;
-        emit linesChanged();
-
-        if (m_impl->lines)
-        {
-            m_impl->linesAChangedConnection = QObject::connect(
-                    m_impl->lines,
-                    &model::ScopeLinesObject::changed,
-                    this,
-                    [this]() {
-                        m_impl->linesDirty = true;
-                        update();
-                    });
-        }
-        else
-        {
-            QObject::disconnect(m_impl->linesAChangedConnection);
-        }
-
-        m_impl->linesDirty = true;
-        update();
-    }
+    return new WaveformPointShader;
 }
 
 auto
-Scope::color() const noexcept -> QColor const&
-{
-    return m_impl->color;
-}
-
-void
-Scope::setColor(QColor const& c)
-{
-    if (m_impl->color != c)
-    {
-        m_impl->color = c;
-        emit colorChanged();
-
-        m_impl->colorDirty = true;
-        update();
-    }
-}
-
-auto
-Scope::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*) -> QSGNode*
-{
-    QSGTransformNode* node{};
-
-    if (!oldNode)
-    {
-        node = new QSGTransformNode();
-        node->appendChildNode(updateGeometry(
-                nullptr,
-                m_impl->lines,
-                m_impl->color,
-                m_impl->linesDirty,
-                m_impl->colorDirty));
-
-        updateTransformMatrix(*node);
-    }
-    else
-    {
-        node = static_cast<QSGTransformNode*>(oldNode);
-        if (m_impl->transformMatrixDirty)
-        {
-            updateTransformMatrix(*node);
-        }
-
-        auto* geometryNodeA = node->firstChild();
-        BOOST_ASSERT(geometryNodeA);
-        BOOST_VERIFY(
-                geometryNodeA == updateGeometry(
-                                         geometryNodeA,
-                                         m_impl->lines,
-                                         m_impl->color,
-                                         m_impl->linesDirty,
-                                         m_impl->colorDirty));
-    }
-
-    return node;
-}
-
-void
-Scope::updateTransformMatrix(QSGTransformNode& node)
-{
-    QMatrix4x4 m;
-    m.scale(1, size().height() / -2.f);
-    m.translate(0, -1);
-    node.setMatrix(m);
-
-    node.markDirty(QSGNode::DirtyMatrix);
-
-    m_impl->transformMatrixDirty = false;
-}
-
-auto
-Scope::updateGeometry(
-        QSGNode* oldNode,
-        model::ScopeLinesObject const* lines,
+updateGeometry(
+        QSGNode* const oldNode,
+        model::WaveformDataObject const* const waveformData,
         QColor const& color,
         bool& dirtyGeometry,
         bool& dirtyMaterial) -> QSGNode*
@@ -279,12 +151,12 @@ Scope::updateGeometry(
     auto setVertexX = [](QSGGeometry::Point2D* vertices, int vertexCount) {
         for (int i = 0, e = vertexCount / 2; i < e; ++i, vertices += 2)
         {
-            vertices[0].x = i;
-            vertices[1].x = i;
+            vertices[0].x = static_cast<float>(i);
+            vertices[1].x = static_cast<float>(i);
         }
     };
 
-    auto const numLines = lines ? lines->get().size() : 0;
+    auto const numLines = waveformData ? waveformData->get().size() : 0;
 
     if (!oldNode)
     {
@@ -311,7 +183,7 @@ Scope::updateGeometry(
         pointsNode->setGeometry(pointsGeometry);
         pointsNode->setFlag(QSGNode::OwnsGeometry);
 
-        ScopePointMaterial* pointsMaterial = new ScopePointMaterial;
+        WaveformPointMaterial* pointsMaterial = new WaveformPointMaterial;
         pointsMaterial->setColor(color);
         pointsNode->setMaterial(pointsMaterial);
         pointsNode->setFlag(QSGNode::OwnsMaterial);
@@ -320,11 +192,12 @@ Scope::updateGeometry(
     }
     else
     {
-        node = static_cast<QSGGeometryNode*>(oldNode);
+        node = boost::polymorphic_downcast<QSGGeometryNode*>(oldNode);
         geometry = node->geometry();
 
         BOOST_ASSERT(node->childCount() == 1);
-        pointsNode = static_cast<QSGGeometryNode*>(node->firstChild());
+        pointsNode = boost::polymorphic_downcast<QSGGeometryNode*>(
+                node->firstChild());
         pointsGeometry = pointsNode->geometry();
 
         if (static_cast<std::size_t>(geometry->vertexCount()) != numLines * 2)
@@ -340,10 +213,10 @@ Scope::updateGeometry(
 
     if (dirtyGeometry)
     {
-        if (lines)
+        if (waveformData)
         {
             QSGGeometry::Point2D* vertices = geometry->vertexDataAsPoint2D();
-            for (float const y : lines->get().ys())
+            for (float const y : waveformData->get().ys())
             {
                 vertices->y = y;
                 ++vertices;
@@ -363,8 +236,10 @@ Scope::updateGeometry(
 
     if (dirtyMaterial)
     {
-        static_cast<QSGFlatColorMaterial*>(node->material())->setColor(color);
-        static_cast<ScopePointMaterial*>(pointsNode->material())
+        boost::polymorphic_downcast<QSGFlatColorMaterial*>(node->material())
+                ->setColor(color);
+        boost::polymorphic_downcast<WaveformPointMaterial*>(
+                pointsNode->material())
                 ->setColor(color);
 
         node->markDirty(QSGNode::DirtyMaterial);
@@ -374,6 +249,141 @@ Scope::updateGeometry(
     }
 
     return node;
+}
+
+} // namespace
+
+struct Waveform::Impl
+{
+    bool transformMatrixDirty{true};
+    bool waveformDataDirty{true};
+    bool colorDirty{true};
+
+    model::WaveformDataObject* waveformData{};
+
+    QMetaObject::Connection waveformDataChangedConnection;
+
+    QColor color{255, 0, 0};
+};
+
+Waveform::Waveform(QQuickItem* parent)
+    : QQuickItem(parent)
+    , m_impl(std::make_unique<Impl>())
+{
+    setFlag(ItemHasContents);
+    connect(this, &Waveform::heightChanged, [this]() {
+        m_impl->transformMatrixDirty = true;
+        update();
+    });
+}
+
+Waveform::~Waveform() = default;
+
+auto
+Waveform::waveformData() const noexcept -> model::WaveformDataObject*
+{
+    return m_impl->waveformData;
+}
+
+void
+Waveform::setWaveformData(model::WaveformDataObject* x)
+{
+    if (m_impl->waveformData != x)
+    {
+        m_impl->waveformData = x;
+        emit waveformDataChanged();
+
+        if (m_impl->waveformData)
+        {
+            m_impl->waveformDataChangedConnection = QObject::connect(
+                    m_impl->waveformData,
+                    &model::WaveformDataObject::changed,
+                    this,
+                    [this]() {
+                        m_impl->waveformDataDirty = true;
+                        update();
+                    });
+        }
+        else
+        {
+            QObject::disconnect(m_impl->waveformDataChangedConnection);
+        }
+
+        m_impl->waveformDataDirty = true;
+        update();
+    }
+}
+
+auto
+Waveform::color() const noexcept -> QColor const&
+{
+    return m_impl->color;
+}
+
+void
+Waveform::setColor(QColor const& c)
+{
+    if (m_impl->color != c)
+    {
+        m_impl->color = c;
+        emit colorChanged();
+
+        m_impl->colorDirty = true;
+        update();
+    }
+}
+
+auto
+Waveform::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*)
+        -> QSGNode*
+{
+    QSGTransformNode* node{};
+
+    if (!oldNode)
+    {
+        node = new QSGTransformNode();
+        node->appendChildNode(updateGeometry(
+                nullptr,
+                m_impl->waveformData,
+                m_impl->color,
+                m_impl->waveformDataDirty,
+                m_impl->colorDirty));
+
+        updateTransformMatrix(*node);
+    }
+    else
+    {
+        node = boost::polymorphic_downcast<QSGTransformNode*>(oldNode);
+        if (m_impl->transformMatrixDirty)
+        {
+            updateTransformMatrix(*node);
+        }
+
+        auto* geometryNode = node->firstChild();
+        BOOST_ASSERT(geometryNode);
+        BOOST_VERIFY(
+                geometryNode == updateGeometry(
+                                        geometryNode,
+                                        m_impl->waveformData,
+                                        m_impl->color,
+                                        m_impl->waveformDataDirty,
+                                        m_impl->colorDirty));
+    }
+
+    return node;
+}
+
+void
+Waveform::updateTransformMatrix(QSGTransformNode& node)
+{
+    QMatrix4x4 m;
+    m.scale(1, size().height() / -2.f);
+    m.translate(0, -1);
+    node.setMatrix(m);
+
+    node.markDirty(QSGNode::DirtyMatrix);
+
+    m_impl->transformMatrixDirty = false;
 }
 
 } // namespace piejam::gui::item

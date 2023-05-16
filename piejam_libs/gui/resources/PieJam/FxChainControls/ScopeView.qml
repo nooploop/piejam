@@ -35,21 +35,21 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            PJItems.Scope {
-                id: scopeA
+            PJItems.Waveform {
+                id: waveformA
 
                 anchors.fill: parent
 
-                lines: root.content ? root.content.dataA : null
+                waveformData: root.content ? root.content.waveformDataA : null
                 color: Material.color(Material.Pink)
             }
 
-            PJItems.Scope {
-                id: scopeB
+            PJItems.Waveform {
+                id: waveformB
 
                 anchors.fill: parent
 
-                lines: root.content ? root.content.dataB : null
+                waveformData: root.content ? root.content.waveformDataB : null
                 color: Material.color(Material.Blue)
             }
         }
@@ -107,7 +107,7 @@ Item {
         when: root.content
         target: root.content
         property: "viewSize"
-        value: scopeA.width
+        value: waveformA.width
         restoreMode: Binding.RestoreBinding
     }
 
