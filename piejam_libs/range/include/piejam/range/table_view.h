@@ -175,7 +175,7 @@ public:
                 -> difference_type
         {
             verify_precondition(other);
-            return (m_minor_span.data() - other.m_stride.data()) / step();
+            return (m_minor_span.data() - other.m_minor_span.data()) / step();
         }
 
         [[nodiscard]] constexpr auto
@@ -195,7 +195,7 @@ public:
         operator<(major_index_iterator const& rhs) const noexcept -> bool
         {
             verify_precondition(rhs);
-            return m_minor_span.data() < rhs.m_stride.data();
+            return m_minor_span.data() < rhs.m_minor_span.data();
         }
 
         [[nodiscard]] constexpr auto
