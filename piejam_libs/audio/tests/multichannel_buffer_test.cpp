@@ -123,4 +123,29 @@ TEST(multichannel_buffer, interleaved_frames_after_cast)
     EXPECT_THAT(frames[2], testing::ElementsAre(5.f, 6.f));
 }
 
+TEST(multichannel_view, non_interleaved_channels_subview)
+{
+    multichannel_buffer buf{
+            multichannel_layout::non_interleaved,
+            2,
+            multichannel_buffer<float>::vector{1.f, 2.f, 3.f, 4.f, 5.f, 6.f}};
+
+    auto channels = buf.view().channels_subview(1, 1).channels();
+    ASSERT_EQ(1, channels.major_size());
+    EXPECT_THAT(channels[0], testing::ElementsAre(4.f, 5.f, 6.f));
+}
+
+TEST(multichannel_view, interleaved_frames_subview)
+{
+    multichannel_buffer buf{
+            multichannel_layout::interleaved,
+            2,
+            multichannel_buffer<float>::vector{1.f, 2.f, 3.f, 4.f, 5.f, 6.f}};
+
+    auto frames = buf.view().frames_subview(1, 2).frames();
+    ASSERT_EQ(2, frames.major_size());
+    EXPECT_THAT(frames[0], testing::ElementsAre(3.f, 4.f));
+    EXPECT_THAT(frames[1], testing::ElementsAre(5.f, 6.f));
+}
+
 } // namespace piejam::audio::test

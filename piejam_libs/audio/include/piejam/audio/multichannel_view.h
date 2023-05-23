@@ -202,6 +202,36 @@ public:
         }
     }
 
+    [[nodiscard]] constexpr auto channels_subview(
+            std::size_t start_channel,
+            std::size_t num_channels_subview) const noexcept
+        requires(!std::is_same_v<Layout, multichannel_layout_interleaved>)
+    {
+        BOOST_ASSERT(num_channels_subview > 0);
+        BOOST_ASSERT(start_channel + num_channels_subview <= num_channels());
+        BOOST_ASSERT(layout() == multichannel_layout::non_interleaved);
+
+        if constexpr (std::is_same_v<
+                              Layout,
+                              multichannel_layout_runtime_defined>)
+        {
+            return multichannel_view<T>{
+                    std::span{
+                            channels()[start_channel].data(),
+                            num_channels_subview * num_frames()},
+                    layout(),
+                    num_channels_subview};
+        }
+        else
+        {
+            return multichannel_view<T, Layout>{
+                    std::span{
+                            channels()[start_channel].data(),
+                            num_channels_subview * num_frames()},
+                    num_channels_subview};
+        }
+    }
+
     [[nodiscard]] constexpr auto frames() const noexcept
     {
         if constexpr (std::is_same_v<
@@ -292,6 +322,36 @@ public:
                         static_cast<difference_type>(num_channels()),
                         1};
             }
+        }
+    }
+
+    [[nodiscard]] constexpr auto frames_subview(
+            std::size_t start_frame,
+            std::size_t num_frames_subview) const noexcept
+        requires(!std::is_same_v<Layout, multichannel_layout_non_interleaved>)
+    {
+        BOOST_ASSERT(num_frames_subview > 0);
+        BOOST_ASSERT(start_frame + num_frames_subview <= num_frames());
+        BOOST_ASSERT(layout() == multichannel_layout::interleaved);
+
+        if constexpr (std::is_same_v<
+                              Layout,
+                              multichannel_layout_runtime_defined>)
+        {
+            return multichannel_view<T>{
+                    std::span{
+                            frames()[start_frame].data(),
+                            num_frames_subview * num_channels()},
+                    layout(),
+                    num_channels()};
+        }
+        else
+        {
+            return multichannel_view<T, Layout>{
+                    std::span{
+                            channels()[start_frame].data(),
+                            num_frames_subview * num_channels()},
+                    num_channels()};
         }
     }
 
