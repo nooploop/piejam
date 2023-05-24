@@ -24,8 +24,8 @@ class FxScope final : public Subscribable<FxModuleContent>
     Q_OBJECT
 
     Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
-    Q_PROPERTY(int samplesPerLine READ samplesPerLine WRITE setSamplesPerLine
-                       NOTIFY samplesPerLineChanged FINAL)
+    Q_PROPERTY(int samplesPerPixel READ samplesPerPixel WRITE setSamplesPerPixel
+                       NOTIFY samplesPerPixelChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
@@ -52,12 +52,12 @@ public:
 
     auto busType() const noexcept -> BusType;
 
-    auto samplesPerLine() const noexcept -> int
+    auto samplesPerPixel() const noexcept -> int
     {
-        return m_samplesPerLine;
+        return m_samplesPerPixel;
     }
 
-    void setSamplesPerLine(int x);
+    void setSamplesPerPixel(int x);
 
     auto viewSize() const noexcept -> int
     {
@@ -116,7 +116,7 @@ public:
     Q_INVOKABLE void clear();
 
 signals:
-    void samplesPerLineChanged();
+    void samplesPerPixelChanged();
     void viewSizeChanged();
     void activeAChanged();
     void activeBChanged();
@@ -127,7 +127,7 @@ private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
-    int m_samplesPerLine{1};
+    int m_samplesPerPixel{1};
     int m_viewSize{};
     BusType m_busType;
     bool m_activeA{true};

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/AudioStreamListener.h>
+#include <piejam/gui/model/AudioStream.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
@@ -21,7 +21,7 @@ public:
     Q_INVOKABLE virtual void requestUpdate() = 0;
 
 signals:
-    void captured(AudioStreamListener::Stream);
+    void captured(AudioStream);
 };
 
 } // namespace piejam::gui::model

@@ -4,6 +4,7 @@
 
 #include <piejam/gui/model/WaveformDataGenerator.h>
 
+#include <piejam/gui/model/StreamProcessor.h>
 #include <piejam/gui/model/WaveformData.h>
 
 #include <piejam/audio/multichannel_view.h>
@@ -21,11 +22,15 @@ namespace piejam::gui::model
 namespace
 {
 
-struct InactiveGenerator
+struct InactiveGenerator final : SubStreamProcessor<WaveformData>
 {
-    auto operator()(AudioStreamListener::Stream const&) -> WaveformData
+    auto process(AudioStream const&) -> WaveformData
     {
         return WaveformData{};
+    }
+
+    void clear()
+    {
     }
 };
 
@@ -36,15 +41,15 @@ clip(float const v) -> float
 }
 
 template <StereoChannel SC>
-class Generator
+class Generator final : public SubStreamProcessor<WaveformData>
 {
 public:
-    Generator(int const samplesPerPoint)
-        : m_samplesPerPoint{samplesPerPoint}
+    Generator(int const samplesPerPixel)
+        : m_samplesPerPixel{samplesPerPixel}
     {
     }
 
-    auto operator()(AudioStreamListener::Stream const& stream) -> WaveformData
+    auto process(AudioStream const& stream) -> WaveformData override
     {
         WaveformData result;
 
@@ -78,7 +83,7 @@ public:
 
             ++m_accNumSamples;
 
-            if (m_accNumSamples >= m_samplesPerPoint)
+            if (m_accNumSamples >= m_samplesPerPixel)
             {
                 result.push_back(clip(m_accY0), clip(m_accY1));
 
@@ -89,23 +94,73 @@ public:
         return result;
     }
 
+    void clear() override
+    {
+        m_accY0 = 0;
+        m_accY1 = 0;
+        m_accNumSamples = 0;
+    }
+
 private:
-    int m_samplesPerPoint{1};
+    int m_samplesPerPixel{1};
 
     float m_accY0{};
     float m_accY1{};
     int m_accNumSamples{};
 };
 
-struct GeneratorConfig
+struct Args
 {
-    BusType busType;
-    bool active{false};
-    StereoChannel channel{StereoChannel::Left};
+    int samplesPerPixel{1};
+};
 
-    // substream info
-    std::size_t startChannel{};
-    std::size_t numChannels{};
+struct Factory
+{
+    auto operator()(SubStreamProcessorConfig const& config, Args const& args)
+            -> std::unique_ptr<SubStreamProcessor<WaveformData>>
+    {
+        if (config.active)
+        {
+            switch (config.busType)
+            {
+                case BusType::Mono:
+                    return std::make_unique<Generator<StereoChannel::Left>>(
+                            args.samplesPerPixel);
+
+                case BusType::Stereo:
+                    switch (config.channel)
+                    {
+                        case StereoChannel::Left:
+                            return std::make_unique<
+                                    Generator<StereoChannel::Left>>(
+                                    args.samplesPerPixel);
+
+                        case StereoChannel::Right:
+                            return std::make_unique<
+                                    Generator<StereoChannel::Right>>(
+                                    args.samplesPerPixel);
+
+                        case StereoChannel::Middle:
+                            return std::make_unique<
+                                    Generator<StereoChannel::Middle>>(
+                                    args.samplesPerPixel);
+
+                        case StereoChannel::Side:
+                            return std::make_unique<
+                                    Generator<StereoChannel::Side>>(
+                                    args.samplesPerPixel);
+
+                        default:
+                            BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
+                            return std::make_unique<InactiveGenerator>();
+                    }
+            }
+        }
+        else
+        {
+            return std::make_unique<InactiveGenerator>();
+        }
+    }
 };
 
 } // namespace
@@ -113,95 +168,11 @@ struct GeneratorConfig
 struct WaveformDataGenerator::Impl
 {
     Impl(std::span<BusType const> substreamConfigs)
-        : generators(substreamConfigs.size(), InactiveGenerator{})
-        , results(substreamConfigs.size())
+        : streamProcessor{std::move(substreamConfigs)}
     {
-        std::size_t startChannel{};
-        for (BusType const busType : substreamConfigs)
-        {
-            auto& config =
-                    generatorConfigs.emplace_back(GeneratorConfig{busType});
-            config.startChannel = startChannel;
-            config.numChannels = num_channels(toBusType(busType));
-
-            startChannel += config.numChannels;
-        }
     }
 
-    void updateGenerator(std::size_t substreamIndex)
-    {
-        BOOST_ASSERT(substreamIndex < generatorConfigs.size());
-        auto const& config = generatorConfigs[substreamIndex];
-
-        BOOST_ASSERT(substreamIndex < generators.size());
-        auto& generator = generators[substreamIndex];
-
-        if (config.active)
-        {
-            switch (config.busType)
-            {
-                case BusType::Mono:
-                    generator = Generator<StereoChannel::Left>{samplesPerLine};
-                    break;
-
-                case BusType::Stereo:
-                    switch (config.channel)
-                    {
-                        case StereoChannel::Left:
-                            generator = Generator<StereoChannel::Left>{
-                                    samplesPerLine};
-                            break;
-
-                        case StereoChannel::Right:
-                            generator = Generator<StereoChannel::Right>{
-                                    samplesPerLine};
-                            break;
-
-                        case StereoChannel::Middle:
-                            generator = Generator<StereoChannel::Middle>{
-                                    samplesPerLine};
-                            break;
-
-                        case StereoChannel::Side:
-                            generator = Generator<StereoChannel::Side>{
-                                    samplesPerLine};
-                            break;
-
-                        default:
-                            BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
-                            generator = InactiveGenerator{};
-                            break;
-                    }
-            }
-        }
-        else
-        {
-            generator = InactiveGenerator{};
-        }
-    }
-
-    template <class T>
-    void updateGeneratorProperty(T& member, T value)
-    {
-        if (member != value)
-        {
-            member = std::move(value);
-
-            for (std::size_t substreamIndex : range::indices(generatorConfigs))
-            {
-                updateGenerator(substreamIndex);
-            }
-        }
-    }
-
-    using Generate =
-            std::function<WaveformData(AudioStreamListener::Stream const&)>;
-
-    std::vector<Generate> generators;
-    std::vector<WaveformData> results;
-    std::vector<GeneratorConfig> generatorConfigs;
-
-    int samplesPerLine{1};
+    StreamProcessor<Args, WaveformData, Factory> streamProcessor;
 };
 
 WaveformDataGenerator::WaveformDataGenerator(
@@ -213,14 +184,16 @@ WaveformDataGenerator::WaveformDataGenerator(
 WaveformDataGenerator::~WaveformDataGenerator() = default;
 
 void
-WaveformDataGenerator::setSamplesPerLine(int const samplesPerLine)
+WaveformDataGenerator::setSamplesPerPixel(int const samplesPerPixel)
 {
-    if (samplesPerLine <= 0)
+    if (samplesPerPixel <= 0)
     {
-        throw std::invalid_argument("samplesPerPoint must be positive");
+        throw std::invalid_argument("samplesPerPixel must be positive");
     }
 
-    m_impl->updateGeneratorProperty(m_impl->samplesPerLine, samplesPerLine);
+    m_impl->streamProcessor.updateProperty(
+            m_impl->streamProcessor.args.samplesPerPixel,
+            samplesPerPixel);
 }
 
 void
@@ -228,10 +201,7 @@ WaveformDataGenerator::setActive(
         std::size_t const substreamIndex,
         bool const active)
 {
-    BOOST_ASSERT(substreamIndex < m_impl->generatorConfigs.size());
-    m_impl->updateGeneratorProperty(
-            m_impl->generatorConfigs[substreamIndex].active,
-            active);
+    m_impl->streamProcessor.setActive(substreamIndex, active);
 }
 
 void
@@ -239,37 +209,20 @@ WaveformDataGenerator::setStereoChannel(
         std::size_t const substreamIndex,
         StereoChannel const channel)
 {
-    BOOST_ASSERT(substreamIndex < m_impl->generatorConfigs.size());
-    m_impl->updateGeneratorProperty(
-            m_impl->generatorConfigs[substreamIndex].channel,
-            channel);
+    m_impl->streamProcessor.setStereoChannel(substreamIndex, channel);
 }
 
 void
 WaveformDataGenerator::clear()
 {
-    for (std::size_t substreamIndex : range::indices(m_impl->generatorConfigs))
-    {
-        m_impl->updateGenerator(substreamIndex);
-    }
+    m_impl->streamProcessor.clear();
 }
 
 void
-WaveformDataGenerator::update(Stream const& stream)
+WaveformDataGenerator::update(AudioStream const& stream)
 {
-    for (std::size_t substreamIndex : range::indices(m_impl->generatorConfigs))
-    {
-        auto const& config = m_impl->generatorConfigs[substreamIndex];
-
-        BOOST_ASSERT(substreamIndex < m_impl->generators.size());
-        BOOST_ASSERT(substreamIndex < m_impl->results.size());
-        m_impl->results[substreamIndex] =
-                m_impl->generators[substreamIndex](stream.channels_subview(
-                        config.startChannel,
-                        config.numChannels));
-    }
-
-    generated(m_impl->results);
+    m_impl->streamProcessor.process(stream);
+    generated(m_impl->streamProcessor.results);
 }
 
 } // namespace piejam::gui::model

@@ -114,7 +114,7 @@ Item {
     Binding {
         when: root.content
         target: root.content
-        property: "samplesPerLine"
+        property: "samplesPerPixel"
         value: Math.pow(2, resolutionSlider.value)
         restoreMode: Binding.RestoreBinding
     }

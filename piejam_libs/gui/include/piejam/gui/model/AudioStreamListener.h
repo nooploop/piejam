@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/multichannel_view.h>
+#include <piejam/gui/model/AudioStream.h>
 
 #include <QObject>
 
@@ -16,11 +16,7 @@ class AudioStreamListener : public QObject
     Q_OBJECT
 
 public:
-    using Stream = audio::multichannel_view<
-            float const,
-            audio::multichannel_layout_non_interleaved>;
-
-    virtual void update(Stream const&) = 0;
+    virtual void update(AudioStream const&) = 0;
 };
 
 } // namespace piejam::gui::model

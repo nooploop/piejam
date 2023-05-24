@@ -106,7 +106,7 @@ FxSpectrum::FxSpectrum(
                 m_impl->stream.get(),
                 &AudioStreamProvider::captured,
                 &m_impl->dataGenerator,
-                [this](AudioStreamListener::Stream stream) {
+                [this](AudioStream const& stream) {
                     auto const buf = duplicate_channels(stream);
                     m_impl->dataGenerator.update(buf.view());
                 });

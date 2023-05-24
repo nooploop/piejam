@@ -4,6 +4,8 @@
 
 #include <piejam/gui/model/SpectrumDataGenerator.h>
 
+#include <piejam/gui/model/StreamProcessor.h>
+
 #include <piejam/algorithm/shift_push_back.h>
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/sample_rate.h>
@@ -55,22 +57,32 @@ dftForResolution(DFTResolution const resolution) -> numeric::dft&
     }
 }
 
-struct InactiveGenerator
+struct InactiveGenerator final : SubStreamProcessor<SpectrumDataPoints>
 {
-    auto operator()(AudioStreamListener::Stream const&) -> SpectrumDataPoints
+    auto process(AudioStream const&) -> SpectrumDataPoints override
     {
         return SpectrumDataPoints();
     }
+
+    void clear() override
+    {
+    }
+};
+
+struct Args
+{
+    audio::sample_rate sampleRate{48000};
+    DFTResolution resolution{DFTResolution::Low};
 };
 
 template <StereoChannel SC>
-class Generator
+class Generator final : public SubStreamProcessor<SpectrumDataPoints>
 {
 public:
-    Generator(DFTResolution resolution, audio::sample_rate const sampleRate)
-        : m_dft{dftForResolution(resolution)}
+    Generator(Args const& args)
+        : m_dft{dftForResolution(args.resolution)}
     {
-        float const binSize = sampleRate.as_float() / m_dft.size();
+        float const binSize = args.sampleRate.as_float() / m_dft.size();
         for (std::size_t const i : range::iota(m_dft.output_size()))
         {
             m_dataPoints[i].frequency_Hz = i * binSize;
@@ -84,8 +96,7 @@ public:
         return in > prev ? in : in + 0.85f * (prev - in);
     }
 
-    auto operator()(AudioStreamListener::Stream const& stream)
-            -> SpectrumDataPoints
+    auto process(AudioStream const& stream) -> SpectrumDataPoints override
     {
         BOOST_ASSERT(
                 stream.layout() == audio::multichannel_layout::non_interleaved);
@@ -128,6 +139,10 @@ public:
         return m_dataPoints;
     }
 
+    void clear() override
+    {
+    }
+
 private:
     numeric::dft& m_dft;
     std::vector<float> m_dftPrepareBuffer{std::vector<float>(m_dft.size())};
@@ -138,15 +153,49 @@ private:
             std::vector<SpectrumDataPoint>(m_dft.output_size())};
 };
 
-struct GeneratorConfig
+struct Factory
 {
-    BusType busType;
-    bool active{false};
-    StereoChannel channel{StereoChannel::Left};
+    auto operator()(SubStreamProcessorConfig const& config, Args const& args)
+            -> std::unique_ptr<SubStreamProcessor<SpectrumDataPoints>>
+    {
+        if (config.active)
+        {
+            switch (config.busType)
+            {
+                case BusType::Mono:
+                    return std::make_unique<Generator<StereoChannel::Left>>(
+                            args);
 
-    // substream info
-    std::size_t startChannel{};
-    std::size_t numChannels{};
+                case BusType::Stereo:
+                    switch (config.channel)
+                    {
+                        case StereoChannel::Left:
+                            return std::make_unique<
+                                    Generator<StereoChannel::Left>>(args);
+
+                        case StereoChannel::Right:
+                            return std::make_unique<
+                                    Generator<StereoChannel::Right>>(args);
+
+                        case StereoChannel::Middle:
+                            return std::make_unique<
+                                    Generator<StereoChannel::Middle>>(args);
+
+                        case StereoChannel::Side:
+                            return std::make_unique<
+                                    Generator<StereoChannel::Side>>(args);
+
+                        default:
+                            BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
+                            return std::make_unique<InactiveGenerator>();
+                    }
+            }
+        }
+        else
+        {
+            return std::make_unique<InactiveGenerator>();
+        }
+    }
 };
 
 } // namespace
@@ -154,102 +203,11 @@ struct GeneratorConfig
 struct SpectrumDataGenerator::Impl
 {
     Impl(std::span<BusType const> substreamConfigs)
-        : generators(substreamConfigs.size(), InactiveGenerator{})
-        , results(substreamConfigs.size())
+        : streamProcessor{std::move(substreamConfigs)}
     {
-        std::size_t startChannel{};
-        for (BusType const busType : substreamConfigs)
-        {
-            auto& config =
-                    generatorConfigs.emplace_back(GeneratorConfig{busType});
-            config.startChannel = startChannel;
-            config.numChannels = num_channels(toBusType(busType));
-
-            startChannel += config.numChannels;
-        }
     }
 
-    void updateGenerator(std::size_t const substreamIndex)
-    {
-        BOOST_ASSERT(substreamIndex < generatorConfigs.size());
-        auto const& config = generatorConfigs[substreamIndex];
-
-        BOOST_ASSERT(substreamIndex < generators.size());
-        auto& generator = generators[substreamIndex];
-
-        if (config.active)
-        {
-            switch (config.busType)
-            {
-                case BusType::Mono:
-                    generator = Generator<StereoChannel::Left>{
-                            resolution,
-                            sampleRate};
-                    break;
-
-                case BusType::Stereo:
-                    switch (config.channel)
-                    {
-                        case StereoChannel::Left:
-                            generator = Generator<StereoChannel::Left>{
-                                    resolution,
-                                    sampleRate};
-                            break;
-
-                        case StereoChannel::Right:
-                            generator = Generator<StereoChannel::Right>{
-                                    resolution,
-                                    sampleRate};
-                            break;
-
-                        case StereoChannel::Middle:
-                            generator = Generator<StereoChannel::Middle>{
-                                    resolution,
-                                    sampleRate};
-                            break;
-
-                        case StereoChannel::Side:
-                            generator = Generator<StereoChannel::Side>{
-                                    resolution,
-                                    sampleRate};
-                            break;
-
-                        default:
-                            BOOST_ASSERT_MSG(false, "Unknown StereoChannel");
-                            generator = InactiveGenerator{};
-                            break;
-                    }
-            }
-        }
-        else
-        {
-            generator = InactiveGenerator{};
-        }
-    }
-
-    template <class T>
-    void updateGeneratorProperty(T& member, T value)
-    {
-        if (member != value)
-        {
-            member = std::move(value);
-
-            for (std::size_t substreamIndex : range::indices(generatorConfigs))
-            {
-                updateGenerator(substreamIndex);
-            }
-        }
-    }
-
-    using Generate = std::function<SpectrumDataPoints(
-            AudioStreamListener::Stream const&)>;
-
-    std::vector<Generate> generators;
-    std::vector<SpectrumDataPoints> results;
-    std::vector<GeneratorConfig> generatorConfigs;
-
-    audio::sample_rate sampleRate{48000};
-    DFTResolution resolution{DFTResolution::Low};
+    StreamProcessor<Args, SpectrumDataPoints, Factory> streamProcessor;
 };
 
 SpectrumDataGenerator::SpectrumDataGenerator(
@@ -263,13 +221,17 @@ SpectrumDataGenerator::~SpectrumDataGenerator() = default;
 void
 SpectrumDataGenerator::setSampleRate(audio::sample_rate const sampleRate)
 {
-    m_impl->updateGeneratorProperty(m_impl->sampleRate, sampleRate);
+    m_impl->streamProcessor.updateProperty(
+            m_impl->streamProcessor.args.sampleRate,
+            sampleRate);
 }
 
 void
 SpectrumDataGenerator::setResolution(DFTResolution const resolution)
 {
-    m_impl->updateGeneratorProperty(m_impl->resolution, resolution);
+    m_impl->streamProcessor.updateProperty(
+            m_impl->streamProcessor.args.resolution,
+            resolution);
 }
 
 void
@@ -277,10 +239,7 @@ SpectrumDataGenerator::setActive(
         std::size_t const substreamIndex,
         bool const active)
 {
-    BOOST_ASSERT(substreamIndex < m_impl->generatorConfigs.size());
-    m_impl->updateGeneratorProperty(
-            m_impl->generatorConfigs[substreamIndex].active,
-            active);
+    m_impl->streamProcessor.setActive(substreamIndex, active);
 }
 
 void
@@ -288,28 +247,14 @@ SpectrumDataGenerator::setChannel(
         std::size_t const substreamIndex,
         StereoChannel const channel)
 {
-    BOOST_ASSERT(substreamIndex < m_impl->generatorConfigs.size());
-    m_impl->updateGeneratorProperty(
-            m_impl->generatorConfigs[substreamIndex].channel,
-            channel);
+    m_impl->streamProcessor.setStereoChannel(substreamIndex, channel);
 }
 
 void
-SpectrumDataGenerator::update(Stream const& stream)
+SpectrumDataGenerator::update(AudioStream const& stream)
 {
-    for (std::size_t substreamIndex : range::indices(m_impl->generatorConfigs))
-    {
-        auto const& config = m_impl->generatorConfigs[substreamIndex];
-
-        BOOST_ASSERT(substreamIndex < m_impl->generators.size());
-        BOOST_ASSERT(substreamIndex < m_impl->results.size());
-        m_impl->results[substreamIndex] =
-                m_impl->generators[substreamIndex](stream.channels_subview(
-                        config.startChannel,
-                        config.numChannels));
-    }
-
-    generated(m_impl->results);
+    m_impl->streamProcessor.process(stream);
+    generated(m_impl->streamProcessor.results);
 }
 
 } // namespace piejam::gui::model

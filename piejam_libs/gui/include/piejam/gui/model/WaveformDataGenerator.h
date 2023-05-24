@@ -22,14 +22,14 @@ public:
     WaveformDataGenerator(std::span<BusType const> substreamConfigs);
     ~WaveformDataGenerator() override;
 
-    void setSamplesPerLine(int x);
+    void setSamplesPerPixel(int x);
 
     void setActive(std::size_t substreamIndex, bool active);
     void setStereoChannel(std::size_t substreamIndex, StereoChannel);
 
     void clear();
 
-    void update(Stream const&) override;
+    void update(AudioStream const&) override;
 
 signals:
     void generated(std::span<piejam::gui::model::WaveformData const>);

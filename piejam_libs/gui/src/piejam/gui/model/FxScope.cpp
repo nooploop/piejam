@@ -110,7 +110,7 @@ FxScope::FxScope(
                 m_impl->stream.get(),
                 &AudioStreamProvider::captured,
                 &m_impl->waveformGenerator,
-                [this](AudioStreamListener::Stream stream) {
+                [this](AudioStream const& stream) {
                     auto const buf = duplicate_channels(stream);
                     m_impl->waveformGenerator.update(buf.view());
                 });
@@ -134,14 +134,13 @@ FxScope::busType() const noexcept -> BusType
 }
 
 void
-FxScope::setSamplesPerLine(int const x)
+FxScope::setSamplesPerPixel(int const x)
 {
-    if (m_samplesPerLine != x)
+    if (m_samplesPerPixel != x)
     {
-        m_samplesPerLine = x;
-        m_impl->waveformGenerator.setSamplesPerLine(x);
-        m_impl->waveformGenerator.setSamplesPerLine(x);
-        emit samplesPerLineChanged();
+        m_samplesPerPixel = x;
+        m_impl->waveformGenerator.setSamplesPerPixel(x);
+        emit samplesPerPixelChanged();
     }
 }
 
