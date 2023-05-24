@@ -11,7 +11,6 @@
 #include <piejam/gui/model/FxStreamKeyId.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
-#include <piejam/gui/model/StreamStereoSplitter.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>

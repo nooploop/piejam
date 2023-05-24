@@ -67,7 +67,6 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataPoint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StereoChannel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StreamStereoSplitter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Subscribable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SubscribableModel.h
@@ -105,7 +104,6 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelPerform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerDbScales.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/SpectrumDataGenerator.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StreamStereoSplitter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/WaveformDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
 )
