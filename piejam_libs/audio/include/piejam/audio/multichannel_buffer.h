@@ -179,4 +179,20 @@ private:
     vector m_data;
 };
 
+template <class T, std::size_t NumChannels>
+auto
+duplicate_channels(
+        multichannel_view<T, multichannel_layout_non_interleaved, NumChannels>
+                src)
+{
+    using buffer_t = multichannel_buffer<
+            std::remove_const_t<T>,
+            audio::multichannel_layout_non_interleaved>;
+    typename buffer_t::vector samples;
+    samples.reserve(src.samples().size() * 2);
+    samples.insert(samples.end(), src.samples().begin(), src.samples().end());
+    samples.insert(samples.end(), src.samples().begin(), src.samples().end());
+    return buffer_t{src.num_channels() * 2, std::move(samples)};
+}
+
 } // namespace piejam::audio
