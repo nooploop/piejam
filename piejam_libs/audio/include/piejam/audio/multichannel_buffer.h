@@ -6,8 +6,6 @@
 
 #include <piejam/audio/multichannel_view.h>
 
-#include <piejam/range/table_view.h>
-
 #include <mipp.h>
 
 #include <boost/assert.hpp>
@@ -116,9 +114,18 @@ public:
         }
     }
 
-    [[nodiscard]] auto layout() const noexcept -> multichannel_layout
+    [[nodiscard]] constexpr auto layout() const noexcept -> multichannel_layout
     {
-        return m_layout;
+        if constexpr (std::is_same_v<
+                              Layout,
+                              multichannel_layout_runtime_defined>)
+        {
+            return m_layout;
+        }
+        else
+        {
+            return Layout::value;
+        }
     }
 
     [[nodiscard]] auto empty() const noexcept -> bool
@@ -126,7 +133,7 @@ public:
         return m_data.empty();
     }
 
-    [[nodiscard]] auto num_channels() const noexcept -> std::size_t
+    [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
     {
         return m_num_channels;
     }
