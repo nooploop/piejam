@@ -80,6 +80,7 @@ private:
     {
         onSubscribe();
     }
+
     void unsubscribe() override
     {
         m_subs.erase(m_subs_id);

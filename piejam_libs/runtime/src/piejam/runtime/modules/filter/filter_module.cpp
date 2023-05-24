@@ -128,7 +128,9 @@ make_module(
                                                      &to_resonance_string})}},
             .streams = fx::module_streams{
                     {to_underlying(stream_key::in_out),
-                     streams.add(audio_stream_buffer(std::in_place, 4))}}};
+                     streams.add(audio_stream_buffer(
+                             std::in_place,
+                             num_channels(bus_type) * 2))}}};
 }
 
 } // namespace piejam::runtime::modules::filter

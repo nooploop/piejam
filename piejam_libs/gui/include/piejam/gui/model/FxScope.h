@@ -23,11 +23,11 @@ class FxScope final : public Subscribable<FxModuleContent>
 {
     Q_OBJECT
 
+    Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
     Q_PROPERTY(int samplesPerLine READ samplesPerLine WRITE setSamplesPerLine
                        NOTIFY samplesPerLineChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
                        waveformDataA CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataB READ
@@ -50,6 +50,8 @@ public:
         return Type::Scope;
     }
 
+    auto busType() const noexcept -> BusType;
+
     auto samplesPerLine() const noexcept -> int
     {
         return m_samplesPerLine;
@@ -71,11 +73,6 @@ public:
 
             clear();
         }
-    }
-
-    auto busType() const noexcept -> BusType
-    {
-        return m_busType;
     }
 
     auto activeA() const noexcept -> bool
@@ -127,8 +124,6 @@ signals:
     void channelBChanged();
 
 private:
-    void onSubscribe() override;
-
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 

@@ -20,8 +20,7 @@ class FxFilter final : public Subscribable<FxModuleContent>
 
     Q_PROPERTY(piejam::gui::model::SpectrumData* dataIn READ dataIn CONSTANT)
     Q_PROPERTY(piejam::gui::model::SpectrumData* dataOut READ dataOut CONSTANT)
-    Q_PROPERTY(bool spectogramActive READ spectogramActive NOTIFY
-                       spectogramActiveChanged FINAL)
+
     Q_PROPERTY(piejam::gui::model::FxParameter* filterType READ filterType
                        CONSTANT)
     Q_PROPERTY(piejam::gui::model::FxParameter* cutoff READ cutoff CONSTANT)
@@ -40,10 +39,6 @@ public:
         return Type::Filter;
     }
 
-    bool spectogramActive() const noexcept;
-
-    Q_INVOKABLE void changeSpectogramActive(bool active);
-
     auto dataIn() noexcept -> SpectrumData*;
     auto dataOut() noexcept -> SpectrumData*;
 
@@ -52,9 +47,6 @@ public:
     auto filterType() -> FxParameter*;
     auto cutoff() -> FxParameter*;
     auto resonance() -> FxParameter*;
-
-signals:
-    void spectogramActiveChanged();
 
 private:
     void onSubscribe() override;

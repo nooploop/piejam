@@ -6,7 +6,6 @@
 
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
-#include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxParameter.h>
 #include <piejam/runtime/selectors.h>

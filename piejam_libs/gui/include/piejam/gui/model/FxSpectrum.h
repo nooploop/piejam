@@ -45,10 +45,7 @@ public:
         return Type::Spectrum;
     }
 
-    auto busType() const noexcept -> BusType
-    {
-        return m_busType;
-    }
+    auto busType() const noexcept -> BusType;
 
     auto activeA() const noexcept -> bool
     {
@@ -106,7 +103,6 @@ private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
-    BusType m_busType;
     bool m_activeA{true};
     StereoChannel m_channelA{StereoChannel::Left};
     SpectrumData m_spectrumDataA;

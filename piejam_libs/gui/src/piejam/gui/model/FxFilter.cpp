@@ -23,16 +23,15 @@ namespace piejam::gui::model
 
 struct FxFilter::Impl
 {
-    runtime::fx::module_id fx_mod_id;
+    Impl(BusType busType)
+        : dataGenerator{std::array{busType, busType}}
+    {
+    }
 
-    bool spectogramActive{true};
+    SpectrumDataGenerator dataGenerator;
+
     SpectrumData spectrumDataIn;
     SpectrumData spectrumDataOut;
-
-    StreamStereoSplitter bisector;
-
-    SpectrumDataGenerator dataGeneratorIn;
-    SpectrumDataGenerator dataGeneratorOut;
 
     std::unique_ptr<AudioStreamProvider> inOutStream;
 
@@ -46,11 +45,14 @@ FxFilter::FxFilter(
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(fx_mod_id))
 {
-    auto const parameters =
-            observe_once(runtime::selectors::make_fx_module_parameters_selector(
-                    m_impl->fx_mod_id));
+    auto const busType = toBusType(observe_once(
+            runtime::selectors::make_fx_module_bus_type_selector(fx_mod_id)));
+
+    m_impl = std::make_unique<Impl>(busType);
+
+    auto const parameters = observe_once(
+            runtime::selectors::make_fx_module_parameters_selector(fx_mod_id));
 
     constexpr auto filterTypeKey =
             to_underlying(runtime::modules::filter::parameter_key::type);
@@ -79,9 +81,8 @@ FxFilter::FxFilter(
             FxParameterKeyId{.key = resonanceKey, .id = resonanceId});
     connectSubscribableChild(*m_impl->resonanceParam);
 
-    auto const streams =
-            observe_once(runtime::selectors::make_fx_module_streams_selector(
-                    m_impl->fx_mod_id));
+    auto const streams = observe_once(
+            runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
 
     constexpr auto streamKey =
             to_underlying(runtime::modules::filter::stream_key::in_out);
@@ -94,39 +95,28 @@ FxFilter::FxFilter(
 
     connectSubscribableChild(*m_impl->inOutStream);
 
-    m_impl->dataGeneratorIn.setActive(spectogramActive());
-    m_impl->dataGeneratorIn.setChannel(StereoChannel::Middle);
+    auto stereoChannel = busType == BusType::Mono ? StereoChannel::Left
+                                                  : StereoChannel::Middle;
+    m_impl->dataGenerator.setActive(0, true);
+    m_impl->dataGenerator.setChannel(0, stereoChannel);
 
-    m_impl->dataGeneratorOut.setActive(spectogramActive());
-    m_impl->dataGeneratorOut.setChannel(StereoChannel::Middle);
-
-    QObject::connect(
-            &m_impl->bisector,
-            &StreamStereoSplitter::splitted,
-            &m_impl->dataGeneratorOut,
-            [this](std::vector<AudioStreamListener::Stream> inOut) {
-                BOOST_ASSERT(inOut.size() == 2);
-                m_impl->dataGeneratorIn.update(inOut[0]);
-                m_impl->dataGeneratorOut.update(inOut[1]);
-            });
+    m_impl->dataGenerator.setActive(1, true);
+    m_impl->dataGenerator.setChannel(1, stereoChannel);
 
     QObject::connect(
-            &m_impl->dataGeneratorIn,
+            &m_impl->dataGenerator,
             &SpectrumDataGenerator::generated,
             this,
-            [this](SpectrumDataPoints const& dataPoints) {
-                dataIn()->set(dataPoints);
+            [this](std::span<SpectrumDataPoints const> const dataPoints) {
+                m_impl->spectrumDataIn.set(dataPoints[0]);
+                m_impl->spectrumDataOut.set(dataPoints[1]);
             });
 
     QObject::connect(
-            &m_impl->dataGeneratorOut,
-            &SpectrumDataGenerator::generated,
-            this,
-            [this](SpectrumDataPoints const& dataPoints) {
-                dataOut()->set(dataPoints);
-            });
-
-    m_impl->inOutStream->setListener(&m_impl->bisector);
+            m_impl->inOutStream.get(),
+            &AudioStreamProvider::captured,
+            &m_impl->dataGenerator,
+            &SpectrumDataGenerator::update);
 }
 
 FxFilter::~FxFilter() = default;
@@ -134,29 +124,8 @@ FxFilter::~FxFilter() = default;
 void
 FxFilter::onSubscribe()
 {
-    auto const& srs = observe_once(runtime::selectors::select_sample_rate);
-    m_impl->dataGeneratorIn.setSampleRate(srs.second);
-    m_impl->dataGeneratorOut.setSampleRate(srs.second);
-
-    requestUpdates(std::chrono::milliseconds{16}, [this]() {
-        m_impl->inOutStream->requestUpdate();
-    });
-}
-
-bool
-FxFilter::spectogramActive() const noexcept
-{
-    return m_impl->spectogramActive;
-}
-
-void
-FxFilter::changeSpectogramActive(bool const active)
-{
-    if (m_impl->spectogramActive != active)
-    {
-        m_impl->spectogramActive = active;
-        emit spectogramActiveChanged();
-    }
+    m_impl->dataGenerator.setSampleRate(
+            observe_once(runtime::selectors::select_sample_rate).second);
 }
 
 auto

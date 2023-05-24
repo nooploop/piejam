@@ -31,7 +31,9 @@ make_module(audio::bus_type const bus_type, audio_streams_cache& streams)
             .parameters = fx::module_parameters{},
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),
-                     streams.add(audio_stream_buffer(std::in_place, 2))}}};
+                     streams.add(audio_stream_buffer(
+                             std::in_place,
+                             audio::num_channels(bus_type)))}}};
 }
 
 } // namespace piejam::runtime::modules::spectrum

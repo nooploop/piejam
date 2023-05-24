@@ -19,19 +19,20 @@ class WaveformDataGenerator final : public AudioStreamListener
     Q_OBJECT
 
 public:
-    WaveformDataGenerator();
+    WaveformDataGenerator(std::span<BusType const> substreamConfigs);
     ~WaveformDataGenerator() override;
 
-    void setStreamType(piejam::gui::model::BusType streamType);
     void setSamplesPerLine(int x);
-    void setActive(bool active);
-    void setStereoChannel(StereoChannel);
+
+    void setActive(std::size_t substreamIndex, bool active);
+    void setStereoChannel(std::size_t substreamIndex, StereoChannel);
 
     void clear();
+
     void update(Stream const&) override;
 
 signals:
-    void generated(piejam::gui::model::WaveformData const&);
+    void generated(std::span<piejam::gui::model::WaveformData const>);
 
 private:
     struct Impl;

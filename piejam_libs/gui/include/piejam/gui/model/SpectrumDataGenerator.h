@@ -13,6 +13,7 @@
 #include <piejam/audio/fwd.h>
 
 #include <memory>
+#include <span>
 
 namespace piejam::gui::model
 {
@@ -21,19 +22,19 @@ class SpectrumDataGenerator final : public AudioStreamListener
 {
     Q_OBJECT
 public:
-    SpectrumDataGenerator();
+    SpectrumDataGenerator(std::span<BusType const> substreamConfigs);
     ~SpectrumDataGenerator() override;
 
-    void setBusType(BusType);
     void setSampleRate(audio::sample_rate);
     void setResolution(DFTResolution);
-    void setActive(bool active);
-    void setChannel(StereoChannel);
+
+    void setActive(std::size_t substreamIndex, bool active);
+    void setChannel(std::size_t substreamIndex, StereoChannel);
 
     void update(Stream const&) override;
 
 signals:
-    void generated(piejam::gui::model::SpectrumDataPoints const&);
+    void generated(std::span<piejam::gui::model::SpectrumDataPoints const>);
 
 private:
     struct Impl;

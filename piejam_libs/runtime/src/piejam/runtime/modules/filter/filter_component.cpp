@@ -4,7 +4,6 @@
 
 #include <piejam/runtime/modules/filter/filter_component.h>
 
-#include <piejam/audio/components/remap_channels.h>
 #include <piejam/audio/dsp/biquad_filter.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/event_converter_processor.h>
@@ -184,6 +183,7 @@ public:
     {
         return 1;
     }
+
     auto num_outputs() const noexcept -> std::size_t override
     {
         return 1;
@@ -321,24 +321,12 @@ make_in_out_stream(
         processors::stream_processor_factory& stream_proc_factory,
         std::size_t const buffer_capacity_per_channel)
 {
-    auto in_out_stream = components::make_stream(
+    return components::make_stream(
             stream_id,
             stream_proc_factory,
-            4,
+            num_channels(bus_type) * 2,
             buffer_capacity_per_channel,
             "filter_in_out");
-
-    switch (bus_type)
-    {
-        case audio::bus_type::mono:
-            return audio::components::make_remap_channels(
-                    std::move(in_out_stream),
-                    audio::engine::endpoint_ports::from<0, 2>{},
-                    audio::engine::endpoint_ports::to<0, 2>{});
-
-        case audio::bus_type::stereo:
-            return in_out_stream;
-    }
 }
 
 template <std::size_t... Channel>

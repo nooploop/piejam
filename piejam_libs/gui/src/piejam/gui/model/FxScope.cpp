@@ -17,15 +17,43 @@
 namespace piejam::gui::model
 {
 
+namespace
+{
+
+auto
+substreamConfigs(BusType busType) -> std::span<BusType const>
+{
+    switch (busType)
+    {
+        case BusType::Mono:
+        {
+            static std::array const configs{BusType::Mono};
+            return configs;
+        }
+
+        case BusType::Stereo:
+        {
+            static std::array const configs{BusType::Stereo, BusType::Stereo};
+            return configs;
+        }
+    }
+}
+
+} // namespace
+
 struct FxScope::Impl
 {
-    runtime::fx::module_id fx_mod_id;
+    Impl(BusType busType)
+        : busType{busType}
+        , waveformGenerator{substreamConfigs(busType)}
+    {
+    }
 
-    WaveformDataGenerator generatorA;
-    WaveformDataGenerator generatorB;
+    BusType busType;
 
-    std::unique_ptr<AudioStreamProvider> streamA;
-    std::unique_ptr<AudioStreamProvider> streamB;
+    WaveformDataGenerator waveformGenerator;
+
+    std::unique_ptr<AudioStreamProvider> stream;
 };
 
 FxScope::FxScope(
@@ -33,9 +61,9 @@ FxScope::FxScope(
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(fx_mod_id))
-    , m_busType{toBusType(observe_once(
-              runtime::selectors::make_fx_module_bus_type_selector(fx_mod_id)))}
+    , m_impl(std::make_unique<Impl>(toBusType(
+              observe_once(runtime::selectors::make_fx_module_bus_type_selector(
+                      fx_mod_id)))))
 {
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
@@ -45,61 +73,64 @@ FxScope::FxScope(
     auto const streamId = streams->at(streamKey);
     FxStreamKeyId fxStreamKeyId{.key = streamKey, .id = streamId};
 
-    m_impl->streamA = std::make_unique<FxStream>(
+    m_impl->stream = std::make_unique<FxStream>(
             dispatch(),
             this->state_change_subscriber(),
             fxStreamKeyId);
 
-    connectSubscribableChild(*m_impl->streamA);
+    connectSubscribableChild(*m_impl->stream);
 
-    m_impl->streamA->setListener(&m_impl->generatorA);
-    m_impl->generatorA.setStreamType(m_busType);
-    m_impl->generatorA.setActive(activeA());
-    m_impl->generatorA.setStereoChannel(channelA());
-
-    QObject::connect(
-            &m_impl->generatorA,
-            &WaveformDataGenerator::generated,
-            this,
-            [this](WaveformData const& addedLines) {
-                waveformDataA()->get().shift_push_back(addedLines);
-                waveformDataA()->update();
-            });
+    m_impl->waveformGenerator.setActive(0, activeA());
+    m_impl->waveformGenerator.setStereoChannel(0, channelA());
 
     if (m_busType == BusType::Stereo)
     {
-        m_impl->streamB = std::make_unique<FxStream>(
-                dispatch(),
-                this->state_change_subscriber(),
-                fxStreamKeyId);
+        m_impl->waveformGenerator.setActive(1, activeB());
+        m_impl->waveformGenerator.setStereoChannel(1, channelB());
+    }
 
-        connectSubscribableChild(*m_impl->streamB);
+    QObject::connect(
+            &m_impl->waveformGenerator,
+            &WaveformDataGenerator::generated,
+            this,
+            [this](std::span<WaveformData const> addedLines) {
+                waveformDataA()->get().shift_push_back(addedLines[0]);
+                waveformDataA()->update();
 
-        m_impl->streamB->setListener(&m_impl->generatorB);
-        m_impl->generatorB.setStreamType(m_busType);
-        m_impl->generatorB.setActive(activeB());
-        m_impl->generatorB.setStereoChannel(channelB());
-
-        QObject::connect(
-                &m_impl->generatorB,
-                &WaveformDataGenerator::generated,
-                this,
-                [this](WaveformData const& addedLines) {
-                    waveformDataB()->get().shift_push_back(addedLines);
+                if (m_impl->busType == BusType::Stereo)
+                {
+                    waveformDataB()->get().shift_push_back(addedLines[1]);
                     waveformDataB()->update();
+                }
+            });
+
+    if (m_impl->busType == BusType::Stereo)
+    {
+        QObject::connect(
+                m_impl->stream.get(),
+                &AudioStreamProvider::captured,
+                &m_impl->waveformGenerator,
+                [this](AudioStreamListener::Stream stream) {
+                    auto const buf = duplicate_channels(stream);
+                    m_impl->waveformGenerator.update(buf.view());
                 });
+    }
+    else
+    {
+        QObject::connect(
+                m_impl->stream.get(),
+                &AudioStreamProvider::captured,
+                &m_impl->waveformGenerator,
+                &WaveformDataGenerator::update);
     }
 }
 
 FxScope::~FxScope() = default;
 
-void
-FxScope::onSubscribe()
+auto
+FxScope::busType() const noexcept -> BusType
 {
-    requestUpdates(std::chrono::milliseconds{16}, [this]() {
-        m_impl->streamA->requestUpdate();
-        // no need to update streamB, since it points to same stream as streamA
-    });
+    return m_impl->busType;
 }
 
 void
@@ -108,8 +139,8 @@ FxScope::setSamplesPerLine(int const x)
     if (m_samplesPerLine != x)
     {
         m_samplesPerLine = x;
-        m_impl->generatorA.setSamplesPerLine(x);
-        m_impl->generatorB.setSamplesPerLine(x);
+        m_impl->waveformGenerator.setSamplesPerLine(x);
+        m_impl->waveformGenerator.setSamplesPerLine(x);
         emit samplesPerLineChanged();
     }
 }
@@ -120,7 +151,7 @@ FxScope::changeActiveA(bool const active)
     if (m_activeA != active)
     {
         m_activeA = active;
-        m_impl->generatorA.setActive(active);
+        m_impl->waveformGenerator.setActive(0, active);
         emit activeAChanged();
 
         clear();
@@ -133,7 +164,7 @@ FxScope::changeChannelA(piejam::gui::model::StereoChannel const x)
     if (m_channelA != x)
     {
         m_channelA = x;
-        m_impl->generatorA.setStereoChannel(x);
+        m_impl->waveformGenerator.setStereoChannel(0, x);
         emit channelAChanged();
 
         clear();
@@ -146,7 +177,7 @@ FxScope::changeActiveB(bool const active)
     if (m_activeB != active)
     {
         m_activeB = active;
-        m_impl->generatorB.setActive(active);
+        m_impl->waveformGenerator.setActive(1, active);
         emit activeBChanged();
 
         clear();
@@ -159,7 +190,7 @@ FxScope::changeChannelB(piejam::gui::model::StereoChannel const x)
     if (m_channelB != x)
     {
         m_channelB = x;
-        m_impl->generatorB.setStereoChannel(x);
+        m_impl->waveformGenerator.setStereoChannel(1, x);
         emit channelBChanged();
 
         clear();
@@ -182,8 +213,7 @@ FxScope::clear()
         m_waveformDataB.get().resize(m_viewSize);
     }
 
-    m_impl->generatorA.clear();
-    m_impl->generatorB.clear();
+    m_impl->waveformGenerator.clear();
 
     m_waveformDataA.update();
     m_waveformDataB.update();

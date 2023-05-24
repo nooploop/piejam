@@ -8,7 +8,6 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
 
-#include <piejam/audio/components/remap_channels.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/endpoint_ports.h>
 #include <piejam/audio/sample_rate.h>
@@ -26,24 +25,12 @@ make_component(
         processors::stream_processor_factory& stream_proc_factory)
         -> std::unique_ptr<audio::engine::component>
 {
-    auto stereo_stream = components::make_stream(
+    return components::make_stream(
             fx_mod.streams->at(to_underlying(stream_key::input)),
             stream_proc_factory,
-            2,
+            num_channels(fx_mod.bus_type),
             sample_rate.to_samples(std::chrono::milliseconds(120)),
             "spectrum");
-
-    switch (fx_mod.bus_type)
-    {
-        case audio::bus_type::mono:
-            return audio::components::make_remap_channels(
-                    std::move(stereo_stream),
-                    audio::engine::endpoint_ports::mono,
-                    audio::engine::endpoint_ports::mono);
-
-        case audio::bus_type::stereo:
-            return stereo_stream;
-    }
 }
 
 } // namespace piejam::runtime::modules::spectrum
