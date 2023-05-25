@@ -21,7 +21,7 @@ public:
     Q_INVOKABLE virtual void requestUpdate() = 0;
 
 signals:
-    void captured(AudioStream);
+    void captured(piejam::gui::model::AudioStream);
 };
 
 } // namespace piejam::gui::model

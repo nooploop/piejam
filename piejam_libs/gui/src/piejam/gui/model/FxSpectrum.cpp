@@ -4,8 +4,10 @@
 
 #include <piejam/gui/model/FxSpectrum.h>
 
+#include <piejam/gui/model/AudioStreamChannelDuplicator.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
+
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
@@ -50,6 +52,7 @@ struct FxSpectrum::Impl
     BusType busType;
 
     SpectrumDataGenerator dataGenerator;
+    AudioStreamChannelDuplicator channelDuplicator;
 
     std::unique_ptr<AudioStreamProvider> stream;
 };
@@ -105,11 +108,14 @@ FxSpectrum::FxSpectrum(
         QObject::connect(
                 m_impl->stream.get(),
                 &AudioStreamProvider::captured,
+                &m_impl->channelDuplicator,
+                &AudioStreamChannelDuplicator::update);
+
+        QObject::connect(
+                &m_impl->channelDuplicator,
+                &AudioStreamChannelDuplicator::duplicated,
                 &m_impl->dataGenerator,
-                [this](AudioStream const& stream) {
-                    auto const buf = duplicate_channels(stream);
-                    m_impl->dataGenerator.update(buf.view());
-                });
+                &SpectrumDataGenerator::update);
     }
     else
     {

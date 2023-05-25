@@ -10,7 +10,7 @@ namespace piejam::gui::model
 {
 
 using AudioStream = audio::multichannel_view<
-    float const,
-    audio::multichannel_layout_non_interleaved>;
+        float const,
+        audio::multichannel_layout_non_interleaved>;
 
-}
+} // namespace piejam::gui::model

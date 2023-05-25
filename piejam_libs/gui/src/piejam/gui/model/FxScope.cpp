@@ -4,6 +4,7 @@
 
 #include <piejam/gui/model/FxScope.h>
 
+#include <piejam/gui/model/AudioStreamChannelDuplicator.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/WaveformDataGenerator.h>
 
@@ -50,8 +51,8 @@ struct FxScope::Impl
     }
 
     BusType busType;
-
     WaveformDataGenerator waveformGenerator;
+    AudioStreamChannelDuplicator channelDuplicator;
 
     std::unique_ptr<AudioStreamProvider> stream;
 };
@@ -109,11 +110,14 @@ FxScope::FxScope(
         QObject::connect(
                 m_impl->stream.get(),
                 &AudioStreamProvider::captured,
+                &m_impl->channelDuplicator,
+                &AudioStreamChannelDuplicator::update);
+
+        QObject::connect(
+                &m_impl->channelDuplicator,
+                &AudioStreamChannelDuplicator::duplicated,
                 &m_impl->waveformGenerator,
-                [this](AudioStream const& stream) {
-                    auto const buf = duplicate_channels(stream);
-                    m_impl->waveformGenerator.update(buf.view());
-                });
+                &WaveformDataGenerator::update);
     }
     else
     {
