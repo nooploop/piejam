@@ -6,8 +6,10 @@
 
 #include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/FxModuleContent.h>
+#include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/Subscribable.h>
+#include <piejam/gui/model/TriggerSlope.h>
 #include <piejam/gui/model/WaveformDataObject.h>
 #include <piejam/gui/model/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -28,16 +30,32 @@ class FxScope final : public Subscribable<FxModuleContent>
                        NOTIFY samplesPerPixelChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
+    Q_PROPERTY(TriggerSource triggerSource READ triggerSource WRITE
+                       setTriggerSource NOTIFY triggerSourceChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::TriggerSlope triggerSlope READ triggerSlope
+                       WRITE setTriggerSlope NOTIFY triggerSlopeChanged FINAL)
+    Q_PROPERTY(double triggerLevel READ triggerLevel WRITE setTriggerLevel
+                       NOTIFY triggerLevelChanged FINAL)
+    Q_PROPERTY(int holdTime READ holdTime WRITE setHoldTime NOTIFY
+                       holdTimeChanged FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
                        waveformDataA CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataB READ
                        waveformDataB CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeData* scopeDataA READ scopeDataA
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeData* scopeDataB READ scopeDataB
+                       CONSTANT FINAL)
     Q_PROPERTY(bool activeA READ activeA NOTIFY activeAChanged FINAL)
     Q_PROPERTY(bool activeB READ activeB NOTIFY activeBChanged FINAL)
     Q_PROPERTY(piejam::gui::model::StereoChannel channelA READ channelA NOTIFY
                        channelAChanged FINAL)
     Q_PROPERTY(piejam::gui::model::StereoChannel channelB READ channelB NOTIFY
                        channelBChanged FINAL)
+    Q_PROPERTY(int scopeResolution READ scopeResolution WRITE setScopeResolution
+                       NOTIFY scopeResolutionChanged FINAL)
+    Q_PROPERTY(
+            bool freeze READ freeze WRITE setFreeze NOTIFY freezeChanged FINAL)
 
 public:
     FxScope(runtime::store_dispatch,
@@ -64,16 +82,44 @@ public:
         return m_viewSize;
     }
 
-    void setViewSize(int const x)
-    {
-        if (m_viewSize != x)
-        {
-            m_viewSize = x;
-            emit viewSizeChanged();
+    void setViewSize(int const x);
 
-            clear();
-        }
+    enum class TriggerSource
+    {
+        StreamA,
+        StreamB,
+        Free
+    };
+
+    Q_ENUM(TriggerSource)
+
+    auto triggerSource() const noexcept -> TriggerSource
+    {
+        return m_triggerSource;
     }
+
+    void setTriggerSource(TriggerSource);
+
+    auto triggerSlope() const noexcept -> TriggerSlope
+    {
+        return m_triggerSlope;
+    }
+
+    void setTriggerSlope(TriggerSlope);
+
+    auto triggerLevel() const noexcept -> double
+    {
+        return m_triggerLevel;
+    }
+
+    void setTriggerLevel(double triggerLevel);
+
+    auto holdTime() const noexcept -> int
+    {
+        return m_holdTime;
+    }
+
+    void setHoldTime(int holdTimeInMS);
 
     auto activeA() const noexcept -> bool
     {
@@ -92,6 +138,11 @@ public:
     auto waveformDataA() noexcept -> WaveformDataObject*
     {
         return &m_waveformDataA;
+    }
+
+    auto scopeDataA() noexcept -> ScopeData*
+    {
+        return &m_scopeDataA;
     }
 
     auto activeB() const noexcept -> bool
@@ -113,29 +164,63 @@ public:
         return &m_waveformDataB;
     }
 
+    auto scopeDataB() noexcept -> ScopeData*
+    {
+        return &m_scopeDataB;
+    }
+
+    auto scopeResolution() const noexcept -> int
+    {
+        return m_scopeResolution;
+    }
+
+    void setScopeResolution(int);
+
+    auto freeze() const noexcept -> bool
+    {
+        return m_freeze;
+    }
+
+    void setFreeze(bool);
+
     Q_INVOKABLE void clear();
 
 signals:
     void samplesPerPixelChanged();
     void viewSizeChanged();
+    void triggerSourceChanged();
+    void triggerSlopeChanged();
+    void triggerLevelChanged();
+    void holdTimeChanged();
     void activeAChanged();
     void activeBChanged();
     void channelAChanged();
     void channelBChanged();
+    void scopeResolutionChanged();
+    void freezeChanged();
 
 private:
+    void onSubscribe() override;
+
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
     int m_samplesPerPixel{1};
     int m_viewSize{};
-    BusType m_busType;
-    bool m_activeA{true};
-    StereoChannel m_channelA{StereoChannel::Left};
+    TriggerSource m_triggerSource{TriggerSource::StreamA};
+    TriggerSlope m_triggerSlope{TriggerSlope::RisingEdge};
+    double m_triggerLevel{0};
+    int m_holdTime{80};
     WaveformDataObject m_waveformDataA;
-    bool m_activeB{false};
-    StereoChannel m_channelB{StereoChannel::Right};
     WaveformDataObject m_waveformDataB;
+    ScopeData m_scopeDataA;
+    ScopeData m_scopeDataB;
+    bool m_activeA{true};
+    bool m_activeB{false};
+    StereoChannel m_channelA{StereoChannel::Left};
+    StereoChannel m_channelB{StereoChannel::Right};
+    int m_scopeResolution{1};
+    bool m_freeze{};
 };
 
 } // namespace piejam::gui::model

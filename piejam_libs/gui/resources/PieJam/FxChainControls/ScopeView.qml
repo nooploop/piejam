@@ -28,51 +28,117 @@ Item {
     onBypassedChanged: if (root.bypassed && root.content)
                            root.content.clear()
 
+    QtObject {
+        id: privates
+
+        readonly property bool isStereo: root.content && root.content.busType == PJModels.BusType.Stereo
+    }
+
     ColumnLayout {
+
         anchors.fill: parent
 
-        Frame {
+        StackLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            PJItems.Waveform {
-                id: waveformA
+            currentIndex: settings.mode == "Free" ? 1 : 0
 
-                anchors.fill: parent
+            Frame {
+                id: scopeView
 
-                waveformData: root.content ? root.content.waveformDataA : null
-                color: Material.color(Material.Pink)
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                PJItems.Scope {
+                    id: scopeA
+
+                    anchors.fill: parent
+
+                    scopeData: root.content ? root.content.scopeDataA : null
+                    color: Material.color(Material.Pink)
+                }
+
+                PJItems.Scope {
+                    id: scopeB
+
+                    anchors.fill: parent
+
+                    visible: privates.isStereo && (root.content ? root.content.activeB : false)
+
+                    scopeData: root.content ? root.content.scopeDataB : null
+                    color: Material.color(Material.Blue)
+                }
             }
 
-            PJItems.Waveform {
-                id: waveformB
+            Frame {
+                id: waveformView
 
-                anchors.fill: parent
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                waveformData: root.content ? root.content.waveformDataB : null
-                color: Material.color(Material.Blue)
+                PJItems.Waveform {
+                    id: waveformA
+
+                    anchors.fill: parent
+
+                    waveformData: root.content ? root.content.waveformDataA : null
+                    color: Material.color(Material.Pink)
+                }
+
+                PJItems.Waveform {
+                    id: waveformB
+
+                    anchors.fill: parent
+
+                    visible: privates.isStereo && (root.content ? root.content.activeB : false)
+
+                    waveformData: root.content ? root.content.waveformDataB : null
+                    color: Material.color(Material.Blue)
+                }
             }
+
         }
 
-        Slider {
-            id: resolutionSlider
+        ScopeSettings {
+            id: settings
+
+            isStereo: privates.isStereo
+
+            Binding on triggerSlope {
+                when: root.content
+                value: root.content.triggerSlope
+                restoreMode: Binding.RestoreBinding
+            }
+
+            Binding on triggerLevel {
+                when: root.content
+                value: root.content.triggerLevel * 100
+                restoreMode: Binding.RestoreBinding
+            }
+
+            Binding on holdTime {
+                when: root.content
+                value: root.content.holdTime
+                restoreMode: Binding.RestoreBinding
+            }
 
             Layout.fillWidth: true
+        }
 
-            from: 0
-            to: 11
-            stepSize: 1
-            value: 8
+        ToolSeparator {
+            orientation: Qt.Horizontal
+            Layout.fillWidth: true
         }
 
         RowLayout {
-            Layout.fillWidth: true
 
-            visible: root.content
-                     && root.content.busType == PJModels.BusType.Stereo
+            Layout.fillWidth: true
 
             StereoChannelSelector {
                 id: channelASelector
+
+                visible: privates.isStereo
 
                 name: "A"
                 active: root.content ? root.content.activeA : false
@@ -84,12 +150,14 @@ Item {
                 onChannelSelected: root.content.changeChannelA(ch)
             }
 
-            Item {
-                Layout.fillWidth: true
+            ToolSeparator {
+                visible: privates.isStereo
             }
 
             StereoChannelSelector {
                 id: channelBSelector
+
+                visible: privates.isStereo
 
                 name: "B"
                 active: root.content ? root.content.activeB : false
@@ -100,6 +168,75 @@ Item {
                 onActiveToggled: root.content.changeActiveB(!active)
                 onChannelSelected: root.content.changeChannelB(ch)
             }
+
+            ToolSeparator {
+                visible: privates.isStereo
+            }
+
+            StackLayout {
+                currentIndex: settings.mode == "Free" ? 1 : 0
+
+                Layout.fillWidth: true
+                Layout.maximumHeight: 40
+
+                Slider {
+                    id: scopeResolutionSlider
+
+                    Layout.fillWidth: true
+
+                    from: 1
+                    to: 8
+                    stepSize: 1
+
+                    value: root.content ? root.content.scopeResolution : 1
+                    onMoved: if (root.content) root.content.scopeResolution = value
+
+//                    Binding on value {
+//                        when: root.content
+//                        value: root.content.scopeResolution
+//                        restoreMode: Binding.RestoreBinding
+//                    }
+
+//                    Binding {
+//                        when: root.content
+//                        target: root.content
+//                        property: "scopeResolution"
+//                        value: scopeResolutionSlider.value
+//                        restoreMode: Binding.RestoreBinding
+//                    }
+                }
+
+                Slider {
+                    id: waveformResolutionSlider
+
+                    Layout.fillWidth: true
+
+                    from: 0
+                    to: 11
+                    stepSize: 1
+                    value: 8
+                }
+            }
+
+            ToolSeparator {}
+
+            Button {
+                id: freezeButton
+
+                icon.width: 24
+                icon.height: 24
+                icon.source: "qrc:///images/icons/snow.svg"
+
+                implicitWidth: 32
+                implicitHeight: 40
+
+                checkable: true
+
+                Binding on checked {
+                    when: root.content
+                    value: root.content.freeze
+                }
+            }
         }
     }
 
@@ -107,7 +244,38 @@ Item {
         when: root.content
         target: root.content
         property: "viewSize"
-        value: waveformA.width
+        value: settings.mode == "Free" ? waveformA.width : scopeA.width
+        restoreMode: Binding.RestoreBinding
+    }
+
+    Binding {
+        when: root.content
+        target: root.content
+        property: "triggerSource"
+        value: settings.mode === "Trigger B" ? PJModels.FxScope.TriggerSource.StreamB : PJModels.FxScope.TriggerSource.StreamA
+    }
+
+    Binding {
+        when: root.content
+        target: root.content
+        property: "triggerSlope"
+        value: settings.triggerSlope
+        restoreMode: Binding.RestoreBinding
+    }
+
+    Binding {
+        when: root.content
+        target: root.content
+        property: "triggerLevel"
+        value: settings.triggerLevel / 100
+        restoreMode: Binding.RestoreBinding
+    }
+
+    Binding {
+        when: root.content
+        target: root.content
+        property: "holdTime"
+        value: settings.holdTime
         restoreMode: Binding.RestoreBinding
     }
 
@@ -115,7 +283,15 @@ Item {
         when: root.content
         target: root.content
         property: "samplesPerPixel"
-        value: Math.pow(2, resolutionSlider.value)
+        value: Math.pow(2, waveformResolutionSlider.value)
+        restoreMode: Binding.RestoreBinding
+    }
+
+    Binding {
+        when: root.content
+        target: root.content
+        property: "freeze"
+        value: freezeButton.checked
         restoreMode: Binding.RestoreBinding
     }
 

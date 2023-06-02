@@ -4,6 +4,7 @@
 
 #include <piejam/gui/model/Factory.h>
 
+#include <piejam/gui/item/Scope.h>
 #include <piejam/gui/item/Spectrum.h>
 #include <piejam/gui/item/Waveform.h>
 #include <piejam/gui/model/AudioDeviceSettings.h>
@@ -31,9 +32,11 @@
 #include <piejam/gui/model/MixerChannelEdit.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
 #include <piejam/gui/model/MixerDbScales.h>
+#include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/StringList.h>
+#include <piejam/gui/model/TriggerSlope.h>
 
 #include <mutex>
 
@@ -71,6 +74,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
     qRegisterMetaType<piejam::gui::model::FxScope*>();
     qRegisterMetaType<piejam::gui::model::WaveformDataObject*>();
+    qRegisterMetaType<piejam::gui::model::ScopeData*>();
     qRegisterMetaType<piejam::gui::model::FxSpectrum*>();
     qRegisterMetaType<piejam::gui::model::SpectrumData*>();
     qRegisterMetaType<piejam::gui::model::FxFilter*>();
@@ -91,6 +95,13 @@ runRegistration()
             "FxModuleContent",
             "Not createable");
 
+    qmlRegisterUncreatableType<piejam::gui::model::FxScope>(
+            "PieJam.Models",
+            1,
+            0,
+            "FxScope",
+            "Not createable");
+
     qmlRegisterType<piejam::gui::item::Waveform>(
             "PieJam.Items",
             1,
@@ -101,6 +112,15 @@ runRegistration()
             1,
             0,
             "Spectrum");
+    qmlRegisterType<piejam::gui::item::Scope>("PieJam.Items", 1, 0, "Scope");
+
+    qRegisterMetaType<piejam::gui::model::TriggerSlope>();
+    qmlRegisterUncreatableType<piejam::gui::model::TriggerSlopeClass>(
+            "PieJam.Models",
+            1,
+            0,
+            "TriggerSlope",
+            "Not creatable as it is an enum type");
 
     qRegisterMetaType<piejam::gui::model::StereoChannel>();
     qmlRegisterUncreatableType<piejam::gui::model::StereoChannelClass>(

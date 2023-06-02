@@ -25,6 +25,7 @@ set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)
 add_library(piejam_gui STATIC
     ${RESOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/generic_list_model_edit_script_executor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/Scope.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/Spectrum.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/Waveform.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioDeviceSettings.h
@@ -65,6 +66,8 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelEdit.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelPerform.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerDbScales.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/ScopeData.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/ScopeDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataPoint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataGenerator.h
@@ -73,11 +76,13 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Subscribable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SubscribableModel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/TriggerSlope.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/WaveformData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/WaveformDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/WaveformDataObject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/qt_log.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Spectrum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Waveform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioDeviceSettings.cpp
@@ -107,6 +112,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelEdit.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelPerform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerDbScales.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/ScopeDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/SpectrumDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/WaveformDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp

@@ -205,7 +205,7 @@ WaveformDataGenerator::setActive(
 }
 
 void
-WaveformDataGenerator::setStereoChannel(
+WaveformDataGenerator::setChannel(
         std::size_t const substreamIndex,
         StereoChannel const channel)
 {

@@ -54,6 +54,8 @@ class WaveformDataGenerator;
 
 class SpectrumData;
 
+class ScopeData;
+
 class MidiDeviceConfig;
 using MidiDeviceList = GenericListModel<MidiDeviceConfig>;
 

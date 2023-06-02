@@ -25,7 +25,7 @@ public:
     void setSamplesPerPixel(int x);
 
     void setActive(std::size_t substreamIndex, bool active);
-    void setStereoChannel(std::size_t substreamIndex, StereoChannel);
+    void setChannel(std::size_t substreamIndex, StereoChannel);
 
     void clear();
 

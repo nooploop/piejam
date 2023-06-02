@@ -80,5 +80,10 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Views/Log.qml</file>
         <file>images/icons/info.svg</file>
         <file>PieJam/Controls/InfoToolButton.qml</file>
+        <file>PieJam/FxChainControls/ScopeSettings.qml</file>
+        <file>PieJam/Controls/QuickSpinBox.qml</file>
+        <file>images/icons/falling_edge.svg</file>
+        <file>images/icons/rising_edge.svg</file>
+        <file>images/icons/snow.svg</file>
     </qresource>
 </RCC>

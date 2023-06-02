@@ -1,0 +1,28 @@
+ <!--
+SPDX-FileCopyrightText: Dimitrij Kotrev
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<svg
+   width="16.0px"
+   height="16.0px"
+   viewBox="0 0 16.0 16.0"
+   version="1.1"
+   id="SVGRoot"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs301" />
+  <g
+     id="layer1">
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 2,14 H 8 V 2 h 6"
+       id="path325" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 7,9 H 9 L 8,6 Z"
+       id="path327" />
+  </g>
+</svg>
