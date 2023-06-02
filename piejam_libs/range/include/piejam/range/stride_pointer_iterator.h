@@ -179,6 +179,7 @@ private:
     {
         BOOST_ASSERT(stride() == rhs.stride());
         BOOST_ASSERT((m_p - rhs.m_p) % stride() == 0);
+        (void)rhs;
     }
 
     pointer m_p{};

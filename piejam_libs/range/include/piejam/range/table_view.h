@@ -231,6 +231,7 @@ public:
                                 step() ==
                         0);
             }
+            (void)rhs;
         }
 
         [[nodiscard]] constexpr auto step() const noexcept -> difference_type

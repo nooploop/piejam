@@ -487,7 +487,7 @@ audio_engine_middleware::process_engine_action(
         for (auto const& id : a.streams)
         {
             auto const& st = mw_fs.get_state();
-            if (audio_stream_buffer const* stream = st.streams.find(id))
+            if (audio_stream_buffer const* stream = st.streams.find(id); stream)
             {
                 if (auto captured = m_engine->get_stream(id);
                     !captured->empty())
