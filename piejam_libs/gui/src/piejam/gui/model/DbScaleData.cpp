@@ -6,7 +6,7 @@
 
 #include <piejam/gui/model/DbScaleTick.h>
 
-#include <piejam/in_interval.h>
+#include <piejam/functional/in_interval.h>
 #include <piejam/math.h>
 
 #include <QObject>

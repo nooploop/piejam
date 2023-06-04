@@ -10,7 +10,7 @@
 #include <piejam/gui/model/WaveformDataGenerator.h>
 
 #include <piejam/audio/types.h>
-#include <piejam/in_interval.h>
+#include <piejam/functional/in_interval.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>

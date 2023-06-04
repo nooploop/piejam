@@ -4,8 +4,8 @@
 
 #include <piejam/gui/item/Spectrum.h>
 
+#include <piejam/functional/in_interval.h>
 #include <piejam/gui/model/SpectrumData.h>
-#include <piejam/in_interval.h>
 #include <piejam/math.h>
 
 #include <QSGFlatColorMaterial>

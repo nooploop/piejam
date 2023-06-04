@@ -7,7 +7,7 @@
 #include <piejam/gui/model/StreamProcessor.h>
 
 #include <piejam/audio/sample_rate.h>
-#include <piejam/in_interval.h>
+#include <piejam/functional/in_interval.h>
 #include <piejam/math.h>
 
 #include <boost/assert.hpp>
