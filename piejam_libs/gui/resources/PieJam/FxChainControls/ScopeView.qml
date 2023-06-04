@@ -190,20 +190,6 @@ Item {
 
                     value: root.content ? root.content.scopeResolution : 1
                     onMoved: if (root.content) root.content.scopeResolution = value
-
-//                    Binding on value {
-//                        when: root.content
-//                        value: root.content.scopeResolution
-//                        restoreMode: Binding.RestoreBinding
-//                    }
-
-//                    Binding {
-//                        when: root.content
-//                        target: root.content
-//                        property: "scopeResolution"
-//                        value: scopeResolutionSlider.value
-//                        restoreMode: Binding.RestoreBinding
-//                    }
                 }
 
                 Slider {
@@ -253,6 +239,7 @@ Item {
         target: root.content
         property: "triggerSource"
         value: settings.mode === "Trigger B" ? PJModels.FxScope.TriggerSource.StreamB : PJModels.FxScope.TriggerSource.StreamA
+        restoreMode: Binding.RestoreBinding
     }
 
     Binding {
