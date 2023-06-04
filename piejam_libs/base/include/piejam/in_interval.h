@@ -7,32 +7,44 @@
 namespace piejam
 {
 
-template <class T>
-constexpr auto
-in_closed(T const& v, T const& lo, T const& hi) noexcept -> bool
+struct
 {
-    return lo <= v && v <= hi;
-}
+    template <class T>
+    constexpr auto
+    operator()(T const& v, T const& lo, T const& hi) const noexcept -> bool
+    {
+        return lo <= v && v <= hi;
+    }
+} const in_closed;
 
-template <class T>
-constexpr auto
-in_open(T const& v, T const& lo, T const& hi) noexcept -> bool
+struct
 {
-    return lo < v && v < hi;
-}
+    template <class T>
+    constexpr auto
+    operator()(T const& v, T const& lo, T const& hi) const noexcept -> bool
+    {
+        return lo < v && v < hi;
+    }
+} const in_open;
 
-template <class T>
-constexpr auto
-in_left_open(T const& v, T const& lo, T const& hi) noexcept -> bool
+struct
 {
-    return lo < v && v <= hi;
-}
+    template <class T>
+    constexpr auto
+    operator()(T const& v, T const& lo, T const& hi) const noexcept -> bool
+    {
+        return lo < v && v <= hi;
+    }
+} const in_left_open;
 
-template <class T>
-constexpr auto
-in_right_open(T const& v, T const& lo, T const& hi) noexcept -> bool
+struct
 {
-    return lo <= v && v < hi;
-}
+    template <class T>
+    constexpr auto
+    operator()(T const& v, T const& lo, T const& hi) const noexcept -> bool
+    {
+        return lo <= v && v < hi;
+    }
+} const in_right_open;
 
 } // namespace piejam
