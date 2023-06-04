@@ -6,6 +6,8 @@
 
 #include <piejam/gui/model/DbScaleData.h>
 
+#include <piejam/math.h>
+
 namespace piejam::gui::model
 {
 
