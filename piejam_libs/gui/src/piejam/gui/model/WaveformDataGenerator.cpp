@@ -29,6 +29,10 @@ struct InactiveGenerator final : SubStreamProcessor<WaveformData>
         return WaveformData{};
     }
 
+    void drop(std::size_t)
+    {
+    }
+
     void clear()
     {
     }
@@ -92,6 +96,10 @@ public:
         }
 
         return result;
+    }
+
+    void drop(std::size_t /*frames*/) override
+    {
     }
 
     void clear() override

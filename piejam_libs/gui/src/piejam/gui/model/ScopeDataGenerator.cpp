@@ -37,13 +37,21 @@ struct InactiveGenerator final : SubStreamProcessor<ScopeData::Samples>
     {
     }
 
-    auto process(AudioStream const& stream) -> ScopeData::Samples override
+    auto process(AudioStream const& stream) -> ScopeData::Samples
     {
         m_captured.resize(m_captured.size() + stream.num_frames());
         return m_captured;
     }
 
-    void clear() override
+    void drop(std::size_t const frames)
+    {
+        BOOST_ASSERT(frames < m_captured.size());
+        m_captured.erase(
+                m_captured.begin(),
+                std::next(m_captured.begin() + frames));
+    }
+
+    void clear()
     {
         m_captured.clear();
     }
@@ -78,7 +86,10 @@ public:
         }();
 
         auto const streamFramesSubRange = boost::make_iterator_range(
-                std::next(streamFrames.begin(), m_restFrames),
+                std::next(
+                        streamFrames.begin(),
+                        m_restFrames == 0 ? 0
+                                          : m_args.resolution - m_restFrames),
                 streamFrames.end());
 
         boost::push_back(
@@ -95,6 +106,14 @@ public:
         m_restFrames = streamFramesSubRange.size() % m_args.resolution;
 
         return m_captured;
+    }
+
+    void drop(std::size_t const frames) override
+    {
+        BOOST_ASSERT(frames < m_captured.size());
+        m_captured.erase(
+                m_captured.begin(),
+                std::next(m_captured.begin() + frames));
     }
 
     void clear() override
@@ -307,6 +326,7 @@ ScopeDataGenerator::update(AudioStream const& stream)
 
     auto const triggerStreamSamples =
             m_impl->streamProcessor.results[m_impl->triggerStream];
+    auto const capturedSize = triggerStreamSamples.size();
     auto const windowSize = m_impl->windowSize;
 
     switch (m_impl->state)
@@ -334,12 +354,15 @@ ScopeDataGenerator::update(AudioStream const& stream)
                 m_impl->streamProcessor.clear();
                 m_impl->state = ScopeDataGeneratorState::Hold;
             }
+            else if (capturedSize > windowSize * 2)
+            {
+                m_impl->streamProcessor.drop(capturedSize - windowSize);
+            }
             break;
         }
 
         case ScopeDataGeneratorState::Hold:
         {
-            auto const capturedSize = triggerStreamSamples.size();
             auto const holdTimeSize =
                     m_impl->sampleRate.to_samples(m_impl->holdTime);
             if (capturedSize >= holdTimeSize)

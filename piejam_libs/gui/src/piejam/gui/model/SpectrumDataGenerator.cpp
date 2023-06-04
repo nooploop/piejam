@@ -59,12 +59,16 @@ dftForResolution(DFTResolution const resolution) -> numeric::dft&
 
 struct InactiveGenerator final : SubStreamProcessor<SpectrumDataPoints>
 {
-    auto process(AudioStream const&) -> SpectrumDataPoints override
+    auto process(AudioStream const&) -> SpectrumDataPoints
     {
         return SpectrumDataPoints();
     }
 
-    void clear() override
+    void drop(std::size_t)
+    {
+    }
+
+    void clear()
     {
     }
 };
@@ -137,6 +141,10 @@ public:
         }
 
         return m_dataPoints;
+    }
+
+    void drop(std::size_t) override
+    {
     }
 
     void clear() override

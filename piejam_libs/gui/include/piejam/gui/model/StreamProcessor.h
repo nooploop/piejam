@@ -33,6 +33,7 @@ struct SubStreamProcessor
     virtual ~SubStreamProcessor() = default;
 
     virtual auto process(AudioStream const&) -> Result = 0;
+    virtual void drop(std::size_t frames) = 0;
     virtual void clear() = 0;
 };
 
@@ -71,6 +72,14 @@ struct StreamProcessor
                     processors[substreamIndex]->process(stream.channels_subview(
                             config.startChannel,
                             config.numChannels));
+        }
+    }
+
+    void drop(std::size_t const frames)
+    {
+        for (auto&& processor : processors)
+        {
+            processor->drop(frames);
         }
     }
 
