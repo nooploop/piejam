@@ -7,7 +7,7 @@
 #include <piejam/gui/model/StreamProcessor.h>
 
 #include <piejam/audio/sample_rate.h>
-#include <piejam/functional/in_interval.h>
+#include <piejam/functional/edge_detect.h>
 #include <piejam/math.h>
 
 #include <boost/assert.hpp>
@@ -168,21 +168,16 @@ findTrigger(
     auto itFirst = samples.begin();
     auto itLast = std::next(samples.begin(), samples.size() - windowSize);
 
-    auto itFound = trigger == TriggerSlope::RisingEdge
-                           ? std::adjacent_find(
-                                     itFirst,
-                                     itLast,
-                                     [=](auto lo, auto hi) {
-                                         return lo <= triggerLevel &&
-                                                triggerLevel < hi;
-                                     })
-                           : std::adjacent_find(
-                                     itFirst,
-                                     itLast,
-                                     [=](auto lo, auto hi) {
-                                         return lo >= triggerLevel &&
-                                                triggerLevel > hi;
-                                     });
+    auto itFound =
+            trigger == TriggerSlope::RisingEdge
+                    ? std::adjacent_find(
+                              itFirst,
+                              itLast,
+                              std::bind_front(rising_edge, triggerLevel))
+                    : std::adjacent_find(
+                              itFirst,
+                              itLast,
+                              std::bind_front(falling_edge, triggerLevel));
 
     if (itFound == itLast)
     {
@@ -195,8 +190,7 @@ findTrigger(
 enum class ScopeDataGeneratorState
 {
     WaitingForTrigger,
-    Hold,
-    Freeze
+    Hold
 };
 
 } // namespace
@@ -294,6 +288,11 @@ void
 ScopeDataGenerator::setFreeze(bool const freeze)
 {
     m_impl->freeze = freeze;
+
+    if (!freeze)
+    {
+        clear();
+    }
 }
 
 void
@@ -350,9 +349,6 @@ ScopeDataGenerator::update(AudioStream const& stream)
             }
             break;
         }
-
-        case ScopeDataGeneratorState::Freeze:
-            break;
 
         default:
             break;
