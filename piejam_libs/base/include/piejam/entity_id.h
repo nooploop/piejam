@@ -28,19 +28,19 @@ struct entity_id
 
     [[nodiscard]] constexpr auto valid() const noexcept -> bool
     {
-        return m_id;
+        return m_id != 0u;
     }
 
     static auto generate() noexcept -> entity_id<EntityTag>
     {
         static id_t s_id{};
-        return {++s_id};
+        return entity_id{++s_id};
     }
 
 private:
     using id_t = std::size_t;
 
-    constexpr entity_id(id_t const id) noexcept
+    constexpr explicit entity_id(id_t const id) noexcept
         : m_id(id)
     {
     }
