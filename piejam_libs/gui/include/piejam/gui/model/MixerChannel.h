@@ -24,6 +24,7 @@ class MixerChannel final : public Subscribable<SubscribableModel>
                        CONSTANT FINAL)
     Q_PROPERTY(
             piejam::gui::model::MixerChannelEdit* edit READ edit CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::MixerChannelFx* fx READ fx CONSTANT FINAL)
 
 public:
     MixerChannel(
@@ -34,6 +35,7 @@ public:
 
     auto perform() const -> MixerChannelPerform*;
     auto edit() const -> MixerChannelEdit*;
+    auto fx() const -> MixerChannelFx*;
 
 private:
     void onSubscribe() override;

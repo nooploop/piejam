@@ -45,6 +45,7 @@ using set_mixer_channel_input = set_mixer_channel_route<io_direction::input>;
 using set_mixer_channel_output = set_mixer_channel_route<io_direction::output>;
 struct move_mixer_channel_left;
 struct move_mixer_channel_right;
+struct show_fx_browser;
 
 struct request_parameters_update;
 struct request_info_update;
@@ -66,9 +67,10 @@ struct finalize_ladspa_fx_plugin_scan;
 struct load_ladspa_fx_plugin;
 struct insert_ladspa_fx_module;
 struct insert_missing_ladspa_fx_module;
-struct move_fx_module_left;
-struct move_fx_module_right;
+struct move_fx_module_up;
+struct move_fx_module_down;
 struct toggle_fx_module_bypass;
+struct toggle_focused_fx_module_bypass;
 
 struct start_midi_learning;
 struct stop_midi_learning;

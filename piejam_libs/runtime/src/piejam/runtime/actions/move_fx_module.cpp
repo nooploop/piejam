@@ -12,15 +12,17 @@ namespace piejam::runtime::actions
 {
 
 auto
-move_fx_module_left::reduce(state const& st) const -> state
+move_fx_module_up::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
     new_st.mixer_state.channels.update(
-            fx_chain_id,
-            [this](mixer::channel& mixer_channel) {
-                mixer_channel.fx_chain.update([this](fx::chain_t& fx_chain) {
-                    if (auto it = std::ranges::find(fx_chain, fx_mod_id);
+            st.gui_state.focused_fx_chain_id,
+            [&](mixer::channel& mixer_channel) {
+                mixer_channel.fx_chain.update([&](fx::chain_t& fx_chain) {
+                    if (auto it = std::ranges::find(
+                                fx_chain,
+                                st.gui_state.focused_fx_mod_id);
                         it != fx_chain.end() && it != fx_chain.begin())
                     {
                         std::iter_swap(it, std::prev(it));
@@ -32,15 +34,17 @@ move_fx_module_left::reduce(state const& st) const -> state
 }
 
 auto
-move_fx_module_right::reduce(state const& st) const -> state
+move_fx_module_down::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
     new_st.mixer_state.channels.update(
-            fx_chain_id,
-            [this](mixer::channel& mixer_channel) {
-                mixer_channel.fx_chain.update([this](fx::chain_t& fx_chain) {
-                    if (auto it = std::ranges::find(fx_chain, fx_mod_id);
+            st.gui_state.focused_fx_chain_id,
+            [&](mixer::channel& mixer_channel) {
+                mixer_channel.fx_chain.update([&](fx::chain_t& fx_chain) {
+                    if (auto it = std::ranges::find(
+                                fx_chain,
+                                st.gui_state.focused_fx_mod_id);
                         it != fx_chain.end() && std::next(it) != fx_chain.end())
                     {
                         std::iter_swap(it, std::next(it));

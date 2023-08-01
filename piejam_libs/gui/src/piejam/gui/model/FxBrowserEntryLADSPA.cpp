@@ -4,6 +4,7 @@
 
 #include <piejam/gui/model/FxBrowserEntryLADSPA.h>
 
+#include <piejam/npos.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/replace_fx_module.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
@@ -44,28 +45,16 @@ FxBrowserEntryLADSPA::onSubscribe()
 }
 
 void
-FxBrowserEntryLADSPA::insertModule(
-        unsigned const chainIndex,
-        unsigned const pos)
+FxBrowserEntryLADSPA::appendModule()
 {
     runtime::actions::load_ladspa_fx_plugin action;
-    action.fx_chain_id = chainIdFromIndex(chainIndex);
-    action.position = pos;
+    action.fx_chain_id =
+            observe_once(runtime::selectors::select_fx_browser_fx_chain);
+    action.position = npos;
     action.plugin_id = m_pd.id;
     action.name = m_pd.name;
+    action.show_fx_module = true;
     dispatch(action);
-}
-
-void
-FxBrowserEntryLADSPA::replaceModule(
-        unsigned const chainIndex,
-        unsigned const pos)
-{
-    dispatch(runtime::actions::replace_fx_module(
-            chainIdFromIndex(chainIndex),
-            pos,
-            m_pd.id,
-            m_pd.name));
 }
 
 } // namespace piejam::gui::model

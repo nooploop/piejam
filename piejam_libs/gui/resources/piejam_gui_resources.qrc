@@ -25,11 +25,8 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
         <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
         <file>PieJam/MixerControls/ChannelControls.qml</file>
-        <file>PieJam/Views/FxChain.qml</file>
-        <file>PieJam/FxChainControls/FxChainModule.qml</file>
         <file>PieJam/FxChainControls/ParameterControl.qml</file>
         <file>PieJam/Util/DbConvert.js</file>
-        <file>PieJam/FxChainControls/FxBrowser.qml</file>
         <file>PieJam/Controls/HeaderLabel.qml</file>
         <file>PieJam/Views/Settings.qml</file>
         <file>PieJam/SettingsControls/AudioSettings.qml</file>
@@ -85,5 +82,9 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/falling_edge.svg</file>
         <file>images/icons/rising_edge.svg</file>
         <file>images/icons/snow.svg</file>
+        <file>PieJam/Controls/VerticalToolBar.qml</file>
+        <file>PieJam/MixerControls/ChannelFxStrip.qml</file>
+        <file>PieJam/Views/FxBrowser.qml</file>
+        <file>PieJam/Views/FxModule.qml</file>
     </qresource>
 </RCC>

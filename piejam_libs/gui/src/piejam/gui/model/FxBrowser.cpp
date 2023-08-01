@@ -9,6 +9,7 @@
 #include <piejam/gui/model/FxBrowserEntryInternal.h>
 #include <piejam/gui/model/FxBrowserEntryLADSPA.h>
 #include <piejam/gui/model/GenericListModel.h>
+#include <piejam/runtime/actions/root_view_actions.h>
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/selectors.h>
 
@@ -105,6 +106,14 @@ FxBrowser::setBusTypeFilter(BusType busType)
 {
     m_impl->bus_type_filter = toBusType(busType);
     m_impl->updateEntries(dispatch(), state_change_subscriber());
+}
+
+void
+FxBrowser::showMixer()
+{
+    runtime::actions::set_root_view_mode action;
+    action.mode = runtime::root_view_mode::mixer;
+    dispatch(action);
 }
 
 void

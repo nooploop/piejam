@@ -11,6 +11,11 @@ Item {
 
     readonly property int perform: 0
     readonly property int edit: 1
+    readonly property int fx: 2
 
-    default property int mode: root.perform
+    property int mode: root.perform
+
+    function switchMode(newMode) {
+        root.mode = root.mode === newMode ? root.perform : newMode
+    }
 }

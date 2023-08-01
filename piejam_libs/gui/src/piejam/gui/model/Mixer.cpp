@@ -7,7 +7,6 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
-#include <piejam/gui/model/FxChain.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/runtime/actions/mixer_actions.h>
@@ -27,7 +26,6 @@ struct Mixer::Impl
     runtime::mixer::channel_ids_t allChannelIds;
     std::unique_ptr<MixerChannel> mainChannel;
     MixerChannelsList inputChannels;
-    FxChainList fxChains;
 };
 
 Mixer::Mixer(
@@ -60,12 +58,6 @@ Mixer::mainChannel() const -> MixerChannel*
     return m_impl->mainChannel.get();
 }
 
-auto
-Mixer::fxChains() -> FxChainList*
-{
-    return &m_impl->fxChains;
-}
-
 void
 Mixer::onSubscribe()
 {
@@ -84,27 +76,12 @@ Mixer::onSubscribe()
 
                 m_impl->inputs = bus_infos;
 
-                auto prevAllChannelIds = m_impl->allChannelIds;
-
                 m_impl->allChannelIds.clear();
 
                 // main channel must be added first, for correct order in
                 // fxchains list
                 m_impl->allChannelIds.emplace_back(m_impl->mainChannelId);
                 boost::range::push_back(m_impl->allChannelIds, *m_impl->inputs);
-
-                algorithm::apply_edit_script(
-                        algorithm::edit_script(
-                                prevAllChannelIds,
-                                m_impl->allChannelIds),
-                        generic_list_model_edit_script_executor{
-                                *fxChains(),
-                                [this](auto const& channelId) {
-                                    return std::make_unique<FxChain>(
-                                            dispatch(),
-                                            state_change_subscriber(),
-                                            channelId);
-                                }});
             });
 }
 

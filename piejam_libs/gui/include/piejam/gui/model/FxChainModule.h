@@ -15,19 +15,20 @@
 namespace piejam::gui::model
 {
 
-class FxModule : public Subscribable<SubscribableModel>
+class FxChainModule : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
-    Q_PROPERTY(bool bypassed READ bypassed NOTIFY bypassedChanged FINAL)
-
-    Q_PROPERTY(piejam::gui::model::FxModuleContent* content READ content NOTIFY
-                       contentChanged FINAL)
+    Q_PROPERTY(bool focused READ focused NOTIFY focusedChanged FINAL)
 
 public:
-    FxModule(runtime::store_dispatch, runtime::subscriber&);
-    ~FxModule();
+    FxChainModule(
+            runtime::store_dispatch,
+            runtime::subscriber&,
+            runtime::mixer::channel_id fx_chain_id,
+            runtime::fx::module_id);
+    ~FxChainModule();
 
     auto name() const noexcept -> QString const&
     {
@@ -43,28 +44,27 @@ public:
         }
     }
 
-    bool bypassed() const noexcept
+    auto focused() const noexcept -> bool
     {
-        return m_bypassed;
+        return m_focused;
     }
 
-    void setBypassed(bool const x)
+    void setFocused(bool x)
     {
-        if (m_bypassed != x)
+        if (m_focused != x)
         {
-            m_bypassed = x;
-            emit bypassedChanged();
+            m_focused = x;
+            emit focusedChanged();
         }
     }
 
-    auto content() noexcept -> FxModuleContent*;
-
-    Q_INVOKABLE void toggleBypass();
+    Q_INVOKABLE void remove();
+    Q_INVOKABLE void focus();
+    Q_INVOKABLE void showFxModule();
 
 signals:
     void nameChanged();
-    void bypassedChanged();
-    void contentChanged();
+    void focusedChanged();
 
 private:
     void onSubscribe() override;
@@ -73,7 +73,7 @@ private:
     std::unique_ptr<Impl> m_impl;
 
     QString m_name;
-    bool m_bypassed{};
+    bool m_focused{};
 };
 
 } // namespace piejam::gui::model

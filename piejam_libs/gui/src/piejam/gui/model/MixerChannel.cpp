@@ -5,6 +5,7 @@
 #include <piejam/gui/model/MixerChannel.h>
 
 #include <piejam/gui/model/MixerChannelEdit.h>
+#include <piejam/gui/model/MixerChannelFx.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
 
 namespace piejam::gui::model
@@ -14,6 +15,7 @@ struct MixerChannel::Impl
 {
     std::unique_ptr<MixerChannelPerform> m_perform;
     std::unique_ptr<MixerChannelEdit> m_edit;
+    std::unique_ptr<MixerChannelFx> m_fx;
 };
 
 MixerChannel::MixerChannel(
@@ -27,6 +29,10 @@ MixerChannel::MixerChannel(
                       state_change_subscriber,
                       id),
               std::make_unique<MixerChannelEdit>(
+                      store_dispatch,
+                      state_change_subscriber,
+                      id),
+              std::make_unique<MixerChannelFx>(
                       store_dispatch,
                       state_change_subscriber,
                       id)))
@@ -50,6 +56,12 @@ auto
 MixerChannel::edit() const -> MixerChannelEdit*
 {
     return m_impl->m_edit.get();
+}
+
+auto
+MixerChannel::fx() const -> MixerChannelFx*
+{
+    return m_impl->m_fx.get();
 }
 
 } // namespace piejam::gui::model

@@ -11,7 +11,9 @@ import QtQuick.VirtualKeyboard.Settings 2.15
 
 import QtQml 2.15
 
+import ".."
 import "../Controls"
+import "../MixerControls"
 
 Item {
     id: root
@@ -38,7 +40,12 @@ Item {
             icon.source: "qrc:///images/icons/tune-vertical.svg"
             display: AbstractButton.IconOnly
 
-            onClicked: { content.currentIndex = 2 }
+            onClicked: {
+                if (root.modelFactory.rootView.mode === 0)
+                    MixerViewSettings.switchMode(MixerViewSettings.perform)
+                else
+                    root.modelFactory.rootView.showMixer()
+            }
         }
 
         InfoToolButton {
@@ -56,7 +63,7 @@ Item {
 
             onClicked: {
                 lastMessagesCount = logMessages.length
-                content.currentIndex = 4
+                root.modelFactory.rootView.showInfo()
             }
 
             info: logMessages.length === lastMessagesCount ? "" : logMessages.length - lastMessagesCount
@@ -72,7 +79,7 @@ Item {
             icon.source: "qrc:///images/icons/cog.svg"
             display: AbstractButton.IconOnly
 
-            onClicked: { content.currentIndex = 1 }
+            onClicked: root.modelFactory.rootView.showSettings()
         }
 
         ToolButton {
@@ -85,7 +92,7 @@ Item {
             icon.source: "qrc:///images/icons/power.svg"
             display: AbstractButton.IconOnly
 
-            onClicked: { content.currentIndex = 0 }
+            onClicked: root.modelFactory.rootView.showPower()
         }
     }
 
@@ -97,10 +104,18 @@ Item {
         anchors.top: statusBar.bottom
         anchors.bottom: parent.bottom
 
-        currentIndex: 2
+        currentIndex: root.modelFactory.rootView.mode
 
-        Power {
-            id: powerPane
+        Mixer {
+            id: mixerPane
+
+            model: root.modelFactory.mixer
+        }
+
+        Log {
+            id: logPane
+
+            logMessages: root.modelFactory.log.logMessages
         }
 
         Settings {
@@ -112,29 +127,20 @@ Item {
             midiInputModel: root.modelFactory.midiInputSettings
         }
 
-        Mixer {
-            id: mixerPane
-
-            model: root.modelFactory.mixer
-
-            onFxButtonClicked: {
-                fxChainPane.chainIndex = index
-                root.modelFactory.fxBrowser.setBusTypeFilter(busType)
-                content.currentIndex = 3
-            }
+        Power {
+            id: powerPane
         }
 
-        FxChain {
-            id: fxChainPane
+        FxBrowser {
+            id: fxBrowserPane
 
-            chainModel: root.modelFactory.mixer.fxChains
-            browser: root.modelFactory.fxBrowser
+            model: root.modelFactory.fxBrowser
         }
 
-        Log {
-            id: logPane
+        FxModule {
+            id: fxModulePane
 
-            logMessages: root.modelFactory.log.logMessages
+            model: root.modelFactory.fxModule
         }
     }
 
@@ -174,5 +180,10 @@ Item {
         target: VirtualKeyboardSettings
         property: "fullScreenMode"
         value: Qt.inputMethod.visible
+    }
+
+    ModelSubscription {
+        target: root.modelFactory.rootView
+        subscribed: root.visible
     }
 }

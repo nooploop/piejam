@@ -31,6 +31,7 @@ struct insert_internal_fx_module final
     fx::internal type{};
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
+    bool show_fx_module{};
 
     [[nodiscard]] auto reduce(state const&) const -> state override;
 };
@@ -45,6 +46,7 @@ struct load_ladspa_fx_plugin final
     std::string name;
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
+    bool show_fx_module{};
 };
 
 struct insert_ladspa_fx_module final
@@ -58,6 +60,7 @@ struct insert_ladspa_fx_module final
     std::span<ladspa::port_descriptor const> control_inputs;
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
+    bool show_fx_module{};
 
     [[nodiscard]] auto reduce(state const& st) const -> state override;
 };

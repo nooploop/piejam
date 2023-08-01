@@ -11,23 +11,30 @@ Item {
 
     property var content: null
 
-    implicitWidth: listView.contentWidth
+    implicitWidth: 400
+
+    ModelSubscription {
+        target: root.content
+        subscribed: root.visible
+    }
 
     ListView {
         id: listView
 
-        width: contentWidth
-
-        orientation: Qt.Horizontal
+        anchors.fill: parent
 
         spacing: 4
+        clip: true
+        orientation: ListView.Horizontal
+        boundsBehavior: Flickable.StopAtBounds
+        boundsMovement: Flickable.StopAtBounds
 
         model: if (root.content) root.content.parameters
 
         delegate: ParameterControl {
             paramModel: model.item
 
-            height: root.height
+            height: parent ? parent.height : undefined
 
             ModelSubscription {
                 target: model.item

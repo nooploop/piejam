@@ -18,17 +18,6 @@ auto make_replace_fx_module_action(
         state const&,
         mixer::channel_id fx_chain_id,
         std::size_t position,
-        fx::internal) -> batch_action;
-
-auto replace_fx_module(
-        mixer::channel_id fx_chain_id,
-        std::size_t position,
-        fx::internal) -> thunk_action;
-
-auto make_replace_fx_module_action(
-        state const&,
-        mixer::channel_id fx_chain_id,
-        std::size_t position,
         ladspa::plugin_id_t,
         std::string_view name,
         std::vector<fx::parameter_value_assignment> const& initial_values,

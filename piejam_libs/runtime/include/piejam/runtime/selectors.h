@@ -165,10 +165,8 @@ auto make_fx_module_bus_type_selector(fx::module_id)
 auto make_fx_module_bypass_selector(fx::module_id) -> selector<bool>;
 auto make_fx_module_parameters_selector(fx::module_id)
         -> selector<box<fx::module_parameters>>;
-auto make_fx_module_can_move_left_selector(mixer::channel_id, fx::module_id)
-        -> selector<bool>;
-auto make_fx_module_can_move_right_selector(mixer::channel_id, fx::module_id)
-        -> selector<bool>;
+auto make_fx_module_can_move_up_selector(mixer::channel_id) -> selector<bool>;
+auto make_fx_module_can_move_down_selector(mixer::channel_id) -> selector<bool>;
 auto make_fx_parameter_name_selector(fx::parameter_id)
         -> selector<boxed_string>;
 auto make_fx_parameter_value_string_selector(fx::parameter_id)
@@ -202,5 +200,13 @@ extern selector<bool> const select_recording;
 
 extern selector<std::size_t> const select_xruns;
 extern selector<float> const select_cpu_load;
+
+extern selector<root_view_mode> const select_root_view_mode;
+extern selector<mixer::channel_id> const select_fx_browser_fx_chain;
+
+extern selector<mixer::channel_id> const select_focused_fx_chain;
+extern selector<fx::module_id> const select_focused_fx_module;
+extern selector<boxed_string> const select_focused_fx_module_name;
+extern selector<bool> const select_focused_fx_module_bypassed;
 
 } // namespace piejam::runtime::selectors

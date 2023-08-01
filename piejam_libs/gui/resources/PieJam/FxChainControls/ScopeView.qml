@@ -105,21 +105,33 @@ Item {
 
             isStereo: privates.isStereo
 
-            Binding on triggerSlope {
+            triggerSlope: root.content ? root.content.triggerSlope : PJModels.TriggerSlope.RisingEdge
+
+            Binding {
                 when: root.content
-                value: root.content.triggerSlope
+                target: root.content
+                property: "triggerSlope"
+                value: settings.triggerSlope
                 restoreMode: Binding.RestoreBinding
             }
 
-            Binding on triggerLevel {
+            triggerLevel: root.content ? root.content.triggerLevel * 100 : 0
+
+            Binding {
                 when: root.content
-                value: root.content.triggerLevel * 100
+                target: root.content
+                property: "triggerLevel"
+                value: settings.triggerLevel / 100
                 restoreMode: Binding.RestoreBinding
             }
 
-            Binding on holdTime {
+            holdTime: root.content ? root.content.holdTime : 80
+
+            Binding {
                 when: root.content
-                value: root.content.holdTime
+                target: root.content
+                property: "holdTime"
+                value: settings.holdTime
                 restoreMode: Binding.RestoreBinding
             }
 
@@ -217,10 +229,14 @@ Item {
                 implicitHeight: 40
 
                 checkable: true
+                checked: root.content && root.content.freeze
 
-                Binding on checked {
+                Binding {
                     when: root.content
-                    value: root.content.freeze
+                    target: root.content
+                    property: "freeze"
+                    value: freezeButton.checked
+                    restoreMode: Binding.RestoreBinding
                 }
             }
         }

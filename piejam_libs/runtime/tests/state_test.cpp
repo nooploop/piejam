@@ -105,7 +105,7 @@ TEST_F(state_with_one_fx, remove_fx)
     EXPECT_EQ(1u, sut.fx_modules.size());
     ASSERT_TRUE(sut.fx_modules.contains(fx_mod_id));
 
-    remove_fx_module(sut, fx_mod_id);
+    remove_fx_module(sut, bus_id, fx_mod_id);
 
     EXPECT_TRUE(sut.fx_modules.empty());
     EXPECT_FALSE(sut.fx_modules.contains(fx_mod_id));

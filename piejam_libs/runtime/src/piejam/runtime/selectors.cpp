@@ -661,28 +661,38 @@ make_fx_module_parameters_selector(fx::module_id const fx_mod_id)
 }
 
 auto
-make_fx_module_can_move_left_selector(
-        mixer::channel_id const fx_chain_id,
-        fx::module_id const fx_mod_id) -> selector<bool>
+make_fx_module_can_move_up_selector(mixer::channel_id const fx_chain_id)
+        -> selector<bool>
 {
     return [=](state const& st) -> bool {
+        if (fx_chain_id != st.gui_state.focused_fx_chain_id)
+        {
+            return false;
+        }
+
         mixer::channel const* const mixer_channel =
                 st.mixer_state.channels.find(fx_chain_id);
         return mixer_channel && !mixer_channel->fx_chain->empty() &&
-               mixer_channel->fx_chain->front() != fx_mod_id;
+               mixer_channel->fx_chain->front() !=
+                       st.gui_state.focused_fx_mod_id;
     };
 }
 
 auto
-make_fx_module_can_move_right_selector(
-        mixer::channel_id const fx_chain_id,
-        fx::module_id const fx_mod_id) -> selector<bool>
+make_fx_module_can_move_down_selector(mixer::channel_id const fx_chain_id)
+        -> selector<bool>
 {
     return [=](state const& st) -> bool {
+        if (fx_chain_id != st.gui_state.focused_fx_chain_id)
+        {
+            return false;
+        }
+
         mixer::channel const* const mixer_channel =
                 st.mixer_state.channels.find(fx_chain_id);
         return mixer_channel && !mixer_channel->fx_chain->empty() &&
-               mixer_channel->fx_chain->back() != fx_mod_id;
+               mixer_channel->fx_chain->back() !=
+                       st.gui_state.focused_fx_mod_id;
     };
 }
 
@@ -887,6 +897,36 @@ selector<std::size_t> const select_xruns([](state const& st) {
 
 selector<float> const select_cpu_load([](state const& st) {
     return st.cpu_load;
+});
+
+selector<root_view_mode> const select_root_view_mode([](state const& st) {
+    return st.gui_state.root_view_mode_;
+});
+
+selector<mixer::channel_id> const select_fx_browser_fx_chain(
+        [](state const& st) { return st.gui_state.fx_browser_fx_chain_id; });
+
+selector<mixer::channel_id> const select_focused_fx_chain([](state const& st) {
+    return st.gui_state.focused_fx_chain_id;
+});
+
+selector<fx::module_id> const select_focused_fx_module([](state const& st) {
+    return st.gui_state.focused_fx_mod_id;
+});
+
+selector<boxed_string> const select_focused_fx_module_name([](state const& st) {
+    static boxed_string s_empty_name;
+
+    fx::module const* const fx_mod =
+            st.fx_modules.find(st.gui_state.focused_fx_mod_id);
+    return fx_mod ? fx_mod->name : s_empty_name;
+});
+
+selector<bool> const
+select_focused_fx_module_bypassed([](state const& st) -> bool {
+    fx::module const* const fx_mod =
+            st.fx_modules.find(st.gui_state.focused_fx_mod_id);
+    return fx_mod && fx_mod->bypassed;
 });
 
 } // namespace piejam::runtime::selectors

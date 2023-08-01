@@ -44,7 +44,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryInternal.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryLADSPA.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChain.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChainModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxFilter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxGenericModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
@@ -64,8 +64,10 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelEdit.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelFx.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelPerform.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerDbScales.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/RootView.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/ScopeData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/ScopeDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumData.h
@@ -92,10 +94,9 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/DbScaleData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Factory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryInternal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryLADSPA.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxChain.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxChainModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxGenericModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxModule.cpp
@@ -111,8 +112,10 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Mixer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelEdit.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelFx.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerChannelPerform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/MixerDbScales.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/RootView.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/ScopeDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/SpectrumDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/WaveformDataGenerator.cpp

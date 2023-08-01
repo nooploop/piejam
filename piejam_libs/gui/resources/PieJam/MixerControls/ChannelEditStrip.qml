@@ -17,7 +17,6 @@ Item {
     property bool deletable: true
 
     implicitWidth: 132
-    implicitHeight: 400
 
     Frame {
         id: frame

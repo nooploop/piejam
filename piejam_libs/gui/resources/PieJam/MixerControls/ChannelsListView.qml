@@ -11,8 +11,6 @@ import PieJam.Models 1.0 as PJModels
 ListView {
     id: root
 
-    signal fxButtonClicked(int index, int busType)
-
     spacing: 2
     clip: true
     orientation: ListView.Horizontal
@@ -25,9 +23,10 @@ ListView {
         anchors.bottom: parent.bottom
 
         perform.model: model.item.perform
-        perform.onFxButtonClicked: root.fxButtonClicked(model.index, busType)
 
         edit.model: model.item.edit
+
+        fx.model: model.item.fx
     }
 }
 

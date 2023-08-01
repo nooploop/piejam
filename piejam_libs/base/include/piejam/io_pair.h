@@ -41,10 +41,10 @@ struct io_pair
     }
 
     constexpr io_pair(io_pair const&) = default;
-    constexpr io_pair(io_pair&&) = default;
+    constexpr io_pair(io_pair&&) noexcept = default;
 
     constexpr auto operator=(io_pair const&) -> io_pair& = default;
-    constexpr auto operator=(io_pair&&) -> io_pair& = default;
+    constexpr auto operator=(io_pair&&) noexcept -> io_pair& = default;
 
     constexpr auto operator==(io_pair const&) const noexcept -> bool = default;
 

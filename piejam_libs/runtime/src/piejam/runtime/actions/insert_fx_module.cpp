@@ -17,13 +17,20 @@ insert_internal_fx_module::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    runtime::insert_internal_fx_module(
+    auto fx_mod_id = runtime::insert_internal_fx_module(
             new_st,
             fx_chain_id,
             position,
             type,
             initial_values,
             midi_assignments);
+
+    if (show_fx_module)
+    {
+        new_st.gui_state.focused_fx_chain_id = fx_chain_id;
+        new_st.gui_state.focused_fx_mod_id = fx_mod_id;
+        new_st.gui_state.root_view_mode_ = runtime::root_view_mode::fx_module;
+    }
 
     return new_st;
 }
@@ -33,7 +40,7 @@ insert_ladspa_fx_module::reduce(state const& st) const -> state
 {
     auto new_st = st;
 
-    runtime::insert_ladspa_fx_module(
+    auto fx_mod_id = runtime::insert_ladspa_fx_module(
             new_st,
             fx_chain_id,
             position,
@@ -42,6 +49,13 @@ insert_ladspa_fx_module::reduce(state const& st) const -> state
             control_inputs,
             initial_values,
             midi_assignments);
+
+    if (show_fx_module)
+    {
+        new_st.gui_state.focused_fx_chain_id = fx_chain_id;
+        new_st.gui_state.focused_fx_mod_id = fx_mod_id;
+        new_st.gui_state.root_view_mode_ = runtime::root_view_mode::fx_module;
+    }
 
     return new_st;
 }

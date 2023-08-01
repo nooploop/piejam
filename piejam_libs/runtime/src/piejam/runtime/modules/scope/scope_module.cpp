@@ -26,7 +26,7 @@ make_module(audio::bus_type const bus_type, audio_streams_cache& streams)
 
     return fx::module{
             .fx_instance_id = fx::internal::scope,
-            .name = "Oscilloscope"s,
+            .name = "Scope"s,
             .bus_type = bus_type,
             .parameters = fx::module_parameters{},
             .streams = fx::module_streams{

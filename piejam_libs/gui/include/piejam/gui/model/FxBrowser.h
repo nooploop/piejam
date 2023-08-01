@@ -27,6 +27,8 @@ public:
 
     Q_INVOKABLE void setBusTypeFilter(piejam::gui::model::BusType busType);
 
+    Q_INVOKABLE void showMixer();
+
 private:
     void onSubscribe() override;
 

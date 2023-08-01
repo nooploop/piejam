@@ -80,19 +80,13 @@ public:
         }
     }
 
-    Q_INVOKABLE virtual void
-    insertModule(unsigned chainIndex, unsigned pos) = 0;
-    Q_INVOKABLE virtual void
-    replaceModule(unsigned chainIndex, unsigned pos) = 0;
+    Q_INVOKABLE virtual void appendModule() = 0;
 
 signals:
     void nameChanged();
     void sectionChanged();
     void descriptionChanged();
     void authorChanged();
-
-protected:
-    auto chainIdFromIndex(unsigned chainIndex) -> runtime::mixer::channel_id;
 
 private:
     QString m_name;

@@ -8,6 +8,7 @@ import QtQuick.Layouts 1.15
 Item {
     property alias perform: performStrip
     property alias edit: editStrip
+    property alias fx: fxStrip
 
     implicitWidth: 132
     implicitHeight: 400
@@ -15,7 +16,7 @@ Item {
     StackLayout {
         anchors.fill: parent
 
-        currentIndex: MixerViewSettings.mode == MixerViewSettings.perform ? 0 : 1
+        currentIndex: MixerViewSettings.mode
 
         ChannelPerformStrip {
             id: performStrip
@@ -24,6 +25,9 @@ Item {
         ChannelEditStrip {
             id: editStrip
         }
-    }
 
+        ChannelFxStrip {
+            id: fxStrip
+        }
+    }
 }

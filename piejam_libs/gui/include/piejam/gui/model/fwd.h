@@ -15,11 +15,10 @@ class StringList;
 class AudioDeviceSettings;
 class AudioInputOutputSettings;
 
-class FxChain;
-using FxChainList = GenericListModel<FxChain>;
+class FxChainModule;
+using FxChainModulesList = GenericListModel<FxChainModule>;
 class FxModule;
 class FxModuleContent;
-using FxModulesList = GenericListModel<FxModule>;
 
 class Info;
 class Log;
@@ -29,6 +28,7 @@ class MixerChannel;
 using MixerChannelsList = GenericListModel<MixerChannel>;
 class MixerChannelPerform;
 class MixerChannelEdit;
+class MixerChannelFx;
 class DbScaleData;
 
 class BusConfig;
@@ -62,5 +62,7 @@ using MidiDeviceList = GenericListModel<MidiDeviceConfig>;
 class MidiInputSettings;
 
 class MidiAssignable;
+
+class RootView;
 
 } // namespace piejam::gui::model

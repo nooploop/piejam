@@ -30,7 +30,7 @@ Item {
 
         EnumButtonGroup {
             paramModel: root.content ? root.content.filterType : null
-            buttonHeight: 46
+            buttonHeight: 44
         }
     }
 

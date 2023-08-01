@@ -314,7 +314,7 @@ insert_internal_fx_module(
     return fx_mod_id;
 }
 
-void
+auto
 insert_ladspa_fx_module(
         state& st,
         mixer::channel_id const mixer_channel_id,
@@ -324,6 +324,7 @@ insert_ladspa_fx_module(
         std::span<ladspa::port_descriptor const> const control_inputs,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
+        -> fx::module_id
 {
     BOOST_ASSERT(mixer_channel_id != mixer::channel_id{});
 
@@ -335,14 +336,14 @@ insert_ladspa_fx_module(
 
     fx::parameters_t fx_params = st.fx_parameters;
 
-    fx_chain.emplace(
-            std::next(fx_chain.begin(), insert_pos),
-            st.fx_modules.add(modules::ladspa_fx::make_module(
-                    instance_id,
-                    plugin_desc.name,
-                    bus_type,
-                    control_inputs,
-                    fx_parameter_factory{st.params, fx_params})));
+    auto fx_mod_id = st.fx_modules.add(modules::ladspa_fx::make_module(
+            instance_id,
+            plugin_desc.name,
+            bus_type,
+            control_inputs,
+            fx_parameter_factory{st.params, fx_params}));
+
+    fx_chain.emplace(std::next(fx_chain.begin(), insert_pos), fx_mod_id);
 
     st.fx_parameters = std::move(fx_params);
 
@@ -360,6 +361,8 @@ insert_ladspa_fx_module(
             [&](fx::ladspa_instances& fx_ladspa_instances) {
                 fx_ladspa_instances.emplace(instance_id, plugin_desc);
             });
+
+    return fx_mod_id;
 }
 
 void
@@ -387,16 +390,6 @@ insert_missing_ladspa_fx_module(
     });
 }
 
-static auto
-find_mixer_channel_containing_fx_module(
-        mixer::channels_t const& channels,
-        fx::module_id const fx_mod_id)
-{
-    return std::ranges::find_if(channels, [fx_mod_id](auto const& id_bus) {
-        return algorithm::contains(*id_bus.second.fx_chain, fx_mod_id);
-    });
-}
-
 template <class P>
 static auto
 remove_midi_assignement_for_parameter(state& st, parameter::id_t<P> id)
@@ -420,29 +413,31 @@ remove_parameter(state& st, parameter::id_t<P> id)
 }
 
 void
-remove_fx_module(state& st, fx::module_id const fx_mod_id)
+remove_fx_module(
+        state& st,
+        mixer::channel_id const fx_chain_id,
+        fx::module_id const fx_mod_id)
 {
     fx::module const& fx_mod = st.fx_modules[fx_mod_id];
 
-    auto it = find_mixer_channel_containing_fx_module(
-            st.mixer_state.channels,
-            fx_mod_id);
-    BOOST_ASSERT(it != st.mixer_state.channels.end());
-
     st.mixer_state.channels.update(
-            it->first,
+            fx_chain_id,
             [fx_mod_id](mixer::channel& mixer_channel) {
+                BOOST_ASSERT(algorithm::contains(
+                        *mixer_channel.fx_chain,
+                        fx_mod_id));
                 remove_erase(mixer_channel.fx_chain, fx_mod_id);
             });
 
-    fx::parameters_t fx_params = st.fx_parameters;
-    for (auto&& [key, fx_param_id] : *fx_mod.parameters)
-    {
-        std::visit([&st](auto&& id) { remove_parameter(st, id); }, fx_param_id);
-        fx_params.erase(fx_param_id);
-    }
-
-    st.fx_parameters = std::move(fx_params);
+    st.fx_parameters.update([&](fx::parameters_t& fx_params) {
+        for (auto&& [key, fx_param_id] : *fx_mod.parameters)
+        {
+            std::visit(
+                    [&st](auto&& id) { remove_parameter(st, id); },
+                    fx_param_id);
+            fx_params.erase(fx_param_id);
+        }
+    });
 
     st.fx_modules.remove(fx_mod_id);
 

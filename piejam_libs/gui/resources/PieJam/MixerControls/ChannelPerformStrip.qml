@@ -17,10 +17,7 @@ Item {
 
     property var model
 
-    signal fxButtonClicked(int busType)
-
     implicitWidth: 132
-    implicitHeight: 400
 
     Frame {
         id: frame
@@ -83,20 +80,6 @@ Item {
                 volumeFaderScale: PJModels.MixerDbScales.volumeFaderScale
 
                 onFaderMoved: root.model.changeVolume(newVolume)
-            }
-
-            Button {
-                id: fxButton
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 36
-
-                text: qsTr("fx")
-
-                padding: 6
-
-                onClicked: root.fxButtonClicked(
-                               root.model ? root.model.busType : PJModels.BusType.Mono)
             }
 
             ChannelControls {

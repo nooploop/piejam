@@ -15,7 +15,6 @@ Item {
     signal addStereoClicked()
 
     implicitWidth: 132
-    implicitHeight: 400
 
     Frame {
         id: frame

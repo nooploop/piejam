@@ -34,6 +34,7 @@
 #include <piejam/runtime/parameter_maps.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/recorder.h>
+#include <piejam/runtime/root_view_mode.h>
 #include <piejam/runtime/selected_device.h>
 
 #include <functional>
@@ -82,6 +83,16 @@ struct state
 
     std::size_t xruns{};
     float cpu_load{};
+
+    struct
+    {
+        root_view_mode root_view_mode_{};
+
+        mixer::channel_id fx_browser_fx_chain_id;
+
+        mixer::channel_id focused_fx_chain_id;
+        fx::module_id focused_fx_mod_id;
+    } gui_state;
 };
 
 auto make_initial_state() -> state;
@@ -123,7 +134,7 @@ auto insert_internal_fx_module(
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> fx::module_id;
-void insert_ladspa_fx_module(
+auto insert_ladspa_fx_module(
         state&,
         mixer::channel_id,
         std::size_t position,
@@ -131,14 +142,18 @@ void insert_ladspa_fx_module(
         ladspa::plugin_descriptor const&,
         std::span<const ladspa::port_descriptor> control_inputs,
         std::vector<fx::parameter_value_assignment> const& initial_values,
-        std::vector<fx::parameter_midi_assignment> const& midi_assigns);
+        std::vector<fx::parameter_midi_assignment> const& midi_assigns)
+        -> fx::module_id;
 void insert_missing_ladspa_fx_module(
         state&,
         mixer::channel_id,
         std::size_t position,
         fx::unavailable_ladspa const&,
         std::string_view name);
-void remove_fx_module(state&, fx::module_id fx_mod_id);
+void remove_fx_module(
+        state&,
+        mixer::channel_id fx_chain_id,
+        fx::module_id fx_mod_id);
 
 void update_midi_assignments(state&, midi_assignments_map const&);
 

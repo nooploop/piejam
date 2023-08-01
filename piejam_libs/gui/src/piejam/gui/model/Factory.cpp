@@ -15,7 +15,7 @@
 #include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/FxBrowser.h>
-#include <piejam/gui/model/FxChain.h>
+#include <piejam/gui/model/FxChainModule.h>
 #include <piejam/gui/model/FxFilter.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxModuleContent.h>
@@ -30,8 +30,10 @@
 #include <piejam/gui/model/Mixer.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/model/MixerChannelEdit.h>
+#include <piejam/gui/model/MixerChannelFx.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
 #include <piejam/gui/model/MixerDbScales.h>
+#include <piejam/gui/model/RootView.h>
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/StereoChannel.h>
@@ -60,17 +62,19 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::Mixer*>();
     qRegisterMetaType<piejam::gui::model::MixerChannel*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelEdit*>();
+    qRegisterMetaType<piejam::gui::model::MixerChannelFx*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();
     qRegisterMetaType<piejam::gui::model::DbScaleData*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::Log*>();
     qRegisterMetaType<piejam::gui::model::FxParameter*>();
-    qRegisterMetaType<piejam::gui::model::FxChain*>();
+    qRegisterMetaType<piejam::gui::model::FxChainModule*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
     qRegisterMetaType<piejam::gui::model::MidiAssignable*>();
     qRegisterMetaType<piejam::gui::model::AudioStreamProvider*>();
     qRegisterMetaType<piejam::gui::model::AudioStreamListener*>();
+    qRegisterMetaType<piejam::gui::model::FxModule*>();
     qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
     qRegisterMetaType<piejam::gui::model::FxScope*>();
     qRegisterMetaType<piejam::gui::model::WaveformDataObject*>();
@@ -78,6 +82,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::FxSpectrum*>();
     qRegisterMetaType<piejam::gui::model::SpectrumData*>();
     qRegisterMetaType<piejam::gui::model::FxFilter*>();
+    qRegisterMetaType<piejam::gui::model::RootView*>();
 
     qRegisterMetaType<piejam::gui::item::SpectrumScaleLabel>();
 
@@ -168,6 +173,8 @@ Factory::Factory(
     , m_log(std::make_unique<Log>(dispatch, state_change_subscriber))
     , m_fxBrowser(
               std::make_unique<FxBrowser>(dispatch, state_change_subscriber))
+    , m_fxModule(std::make_unique<FxModule>(dispatch, state_change_subscriber))
+    , m_rootView(std::make_unique<RootView>(dispatch, state_change_subscriber))
 {
     static std::once_flag s_registered;
     std::call_once(s_registered, &runRegistration);

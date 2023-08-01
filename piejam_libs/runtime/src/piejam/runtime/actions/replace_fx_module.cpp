@@ -21,48 +21,6 @@ make_replace_fx_module_action(
         state const& st,
         mixer::channel_id const fx_chain_id,
         std::size_t const position,
-        fx::internal const fx_type) -> batch_action
-{
-    batch_action batch;
-
-    mixer::channel const& mixer_channel = st.mixer_state.channels[fx_chain_id];
-
-    if (position < mixer_channel.fx_chain->size())
-    {
-        auto delete_action = std::make_unique<actions::delete_fx_module>();
-        delete_action->fx_mod_id = (*mixer_channel.fx_chain)[position];
-        batch.push_back(std::move(delete_action));
-    }
-
-    auto insert_action = std::make_unique<actions::insert_internal_fx_module>();
-    insert_action->fx_chain_id = fx_chain_id;
-    insert_action->position = position;
-    insert_action->type = fx_type;
-    batch.push_back(std::move(insert_action));
-
-    return batch;
-}
-
-auto
-replace_fx_module(
-        mixer::channel_id fx_chain_id,
-        std::size_t const position,
-        fx::internal const fx_type) -> thunk_action
-{
-    return [=](auto&& get_state, auto&& dispatch) {
-        dispatch(make_replace_fx_module_action(
-                get_state(),
-                fx_chain_id,
-                position,
-                fx_type));
-    };
-}
-
-auto
-make_replace_fx_module_action(
-        state const& st,
-        mixer::channel_id const fx_chain_id,
-        std::size_t const position,
         ladspa::plugin_id_t const plugin_id,
         std::string_view const name,
         std::vector<fx::parameter_value_assignment> const& initial_values,
@@ -76,6 +34,7 @@ make_replace_fx_module_action(
     if (position < mixer_channel.fx_chain->size())
     {
         auto delete_action = std::make_unique<actions::delete_fx_module>();
+        delete_action->fx_chain_id = fx_chain_id;
         delete_action->fx_mod_id = (*mixer_channel.fx_chain)[position];
         batch.push_back(std::move(delete_action));
     }

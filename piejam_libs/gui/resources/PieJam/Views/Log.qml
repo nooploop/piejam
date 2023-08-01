@@ -15,7 +15,7 @@ ViewPane {
 
     Frame {
         anchors.fill: parent
-        anchors.margins: 4
+        anchors.margins: 8
 
         ListView {
             id: messages

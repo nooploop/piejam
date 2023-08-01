@@ -5,12 +5,14 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 import QtQml 2.15
 
 import PieJam.Models 1.0 as PJModels
 
 import ".."
+import "../Controls"
 import "../MixerControls"
 
 ViewPane {
@@ -18,17 +20,15 @@ ViewPane {
 
     property var model
 
-    signal fxButtonClicked(int index, int busType)
-
     Rectangle {
         id: leftBorderShadow
 
         width: 4
         anchors.left: parent.left
-
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         z: 100
+
         gradient: Gradient {
 
             orientation: Gradient.Horizontal
@@ -56,8 +56,6 @@ ViewPane {
         anchors.leftMargin: 0
 
         model: root.model.inputChannels
-
-        onFxButtonClicked: root.fxButtonClicked(index + 1, busType)
 
         header: Item {
             width: 8
@@ -129,37 +127,29 @@ ViewPane {
         active: root.model.mainChannel !== null
 
         sourceComponent: ChannelStrip {
-
             perform.model: root.model.mainChannel.perform
-            perform.onFxButtonClicked: root.fxButtonClicked(0, busType)
 
             edit.model: root.model.mainChannel.edit
             edit.deletable: false
+
+            fx.model: root.model.mainChannel.fx
         }
 
     }
 
-
-    Rectangle {
+    VerticalToolBar {
         id: mixerToolbar
-
-        width: 48
 
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
 
-        color: Material.color(Material.Grey, Material.Shade800)
-
         Button {
             id: editButton
 
-            width: 32
-            height: 44
-
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.margins: 4
+            Layout.preferredWidth: 32
+            Layout.preferredHeight: 40
+            Layout.alignment: Qt.AlignHCenter
 
             icon.width: 24
             icon.height: 24
@@ -169,12 +159,28 @@ ViewPane {
             checkable: true
             checked: MixerViewSettings.mode === MixerViewSettings.edit
 
-            onClicked: {
-                if (MixerViewSettings.mode === MixerViewSettings.edit)
-                    MixerViewSettings.mode = MixerViewSettings.perform
-                else
-                    MixerViewSettings.mode = MixerViewSettings.edit
-            }
+            onClicked: MixerViewSettings.switchMode(MixerViewSettings.edit)
+        }
+
+        Button {
+            id: fxButton
+
+            Layout.preferredWidth: 32
+            Layout.preferredHeight: 40
+            Layout.alignment: Qt.AlignHCenter
+
+            text: "FX"
+            font.pixelSize: 12
+
+            checkable: true
+            checked: MixerViewSettings.mode === MixerViewSettings.fx
+
+            onClicked: MixerViewSettings.switchMode(MixerViewSettings.fx)
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
     }
 

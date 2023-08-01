@@ -20,8 +20,7 @@ public:
             runtime::subscriber&,
             ladspa::plugin_descriptor const&);
 
-    void insertModule(unsigned chainIndex, unsigned pos) override;
-    void replaceModule(unsigned chainIndex, unsigned pos) override;
+    void appendModule() override;
 
 private:
     void onSubscribe() override;

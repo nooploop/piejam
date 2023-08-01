@@ -47,4 +47,7 @@ class midi_input_controller;
 
 using middleware_functors = redux::middleware_functors<state, action>;
 
+enum class root_view_mode : int;
+enum class fx_browser_add_mode : int;
+
 } // namespace piejam::runtime

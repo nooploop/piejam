@@ -4,13 +4,14 @@
 
 #include <piejam/gui/model/FxBrowserEntryInternal.h>
 
+#include <piejam/npos.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/replace_fx_module.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/selectors.h>
-#include <piejam/runtime/ui/thunk_action.h>
+#include <piejam/runtime/ui/batch_action.h>
 
 namespace piejam::gui::model
 {
@@ -38,7 +39,7 @@ FxBrowserEntryInternal::FxBrowserEntryInternal(
             break;
 
         case runtime::fx::internal::scope:
-            setName(tr("Oscilloscope"));
+            setName(tr("Scope"));
             setDescription(tr("Observe audio signal."));
             break;
 
@@ -55,26 +56,15 @@ FxBrowserEntryInternal::onSubscribe()
 }
 
 void
-FxBrowserEntryInternal::insertModule(
-        unsigned const chainIndex,
-        unsigned const pos)
+FxBrowserEntryInternal::appendModule()
 {
     runtime::actions::insert_internal_fx_module action;
-    action.fx_chain_id = chainIdFromIndex(chainIndex);
-    action.position = pos;
+    action.fx_chain_id =
+            observe_once(runtime::selectors::select_fx_browser_fx_chain);
+    action.position = npos;
     action.type = m_fx_type;
+    action.show_fx_module = true;
     dispatch(action);
-}
-
-void
-FxBrowserEntryInternal::replaceModule(
-        unsigned const chainIndex,
-        unsigned const pos)
-{
-    dispatch(runtime::actions::replace_fx_module(
-            chainIdFromIndex(chainIndex),
-            pos,
-            m_fx_type));
 }
 
 } // namespace piejam::gui::model

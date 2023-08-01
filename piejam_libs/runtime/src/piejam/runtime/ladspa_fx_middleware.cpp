@@ -64,6 +64,7 @@ ladspa_fx_middleware::process_ladspa_fx_action(
             next_action.control_inputs = m_ladspa_control.control_inputs(id);
             next_action.initial_values = a.initial_values;
             next_action.midi_assignments = a.midi_assignments;
+            next_action.show_fx_module = a.show_fx_module;
 
             mw_fs.next(next_action);
 

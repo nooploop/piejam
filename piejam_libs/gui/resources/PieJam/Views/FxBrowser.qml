@@ -10,22 +10,10 @@ import QtQuick.Layouts 1.15
 import ".."
 import "../Controls"
 
-Item {
+ViewPane {
     id: root
 
-    enum AddMode
-    {
-        Insert,
-        Replace
-    }
-
-    property int addMode: FxBrowser.AddMode.Insert
-    property int chainIndex: 0
-    property int insertPosition: 0
     property var model
-
-    signal addClicked()
-    signal cancelClicked()
 
     Frame {
         id: infoFrame
@@ -57,6 +45,7 @@ Item {
 
     Frame {
         id: fxListFrame
+
         width: 300
         anchors.left: parent.left
         anchors.top: parent.top
@@ -69,11 +58,14 @@ Item {
             property var currentEntry
 
             anchors.fill: parent
+
             clip: true
+            boundsBehavior: Flickable.StopAtBounds
+            boundsMovement: Flickable.StopAtBounds
+            reuseItems: true
 
             model: root.model.entries
 
-            reuseItems: true
 
             delegate: Button {
                 width: parent ? parent.width : implicitWidth
@@ -115,28 +107,23 @@ Item {
         anchors.bottom: parent.bottom
         anchors.margins: 8
 
-        text: root.addMode === FxBrowser.AddMode.Insert ? qsTr("Insert") : qsTr("Replace")
+        text: qsTr("Insert")
 
         enabled: fxList.currentIndex != -1
 
-        onClicked: {
-            if (root.addMode === FxBrowser.AddMode.Insert)
-                fxList.currentEntry.insertModule(root.chainIndex, root.insertPosition)
-            else
-                fxList.currentEntry.replaceModule(root.chainIndex, root.insertPosition)
-            root.addClicked()
-        }
+        onClicked: fxList.currentEntry.appendModule()
     }
 
     Button {
         id: cancelButton
+
         width: 96
         text: qsTr("Cancel")
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: 8
 
-        onClicked: cancelClicked()
+        onClicked: root.model.showMixer()
     }
 
     ModelSubscription {
