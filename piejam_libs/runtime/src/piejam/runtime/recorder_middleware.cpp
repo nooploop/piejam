@@ -10,7 +10,6 @@
 #include <piejam/runtime/actions/update_streams.h>
 #include <piejam/runtime/generic_action_visitor.h>
 #include <piejam/runtime/middleware_functors.h>
-#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/update_state_action.h>
@@ -80,7 +79,7 @@ struct recorder_action_visitor
         for (auto const& [mixer_channel_id, mixer_channel] :
              st.mixer_state.channels)
         {
-            if (!get_parameter_value(st.params, mixer_channel.record))
+            if (!st.params.get(mixer_channel.record))
             {
                 continue;
             }

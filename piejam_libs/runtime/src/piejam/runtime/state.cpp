@@ -15,7 +15,6 @@
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
 #include <piejam/runtime/modules/tool/tool_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
-#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/tuple_element_compare.h>
 
 #include <boost/hof/match.hpp>
@@ -100,10 +99,7 @@ make_initial_state() -> state
             [](mixer::channel& mixer_channel) {
                 mixer_channel.out = piejam::default_t{};
             });
-    set_parameter_value(
-            st.params,
-            st.mixer_state.channels[st.mixer_state.main].record,
-            true);
+    st.params.set(st.mixer_state.channels[st.mixer_state.main].record, true);
     return st;
 }
 
@@ -181,7 +177,7 @@ static void
 apply_parameter_values(
         std::vector<fx::parameter_value_assignment> const& values,
         fx::module const& fx_mod,
-        parameter_maps& params)
+        parameter::maps_collection& params)
 {
     for (auto&& [key, value] : values)
     {
@@ -192,13 +188,13 @@ apply_parameter_values(
             std::visit(
                     boost::hof::match(
                             [&params](float_parameter_id id, float v) {
-                                set_parameter_value(params, id, v);
+                                params.set(id, v);
                             },
                             [&params](int_parameter_id id, int v) {
-                                set_parameter_value(params, id, v);
+                                params.set(id, v);
                             },
                             [&params](bool_parameter_id id, bool v) {
-                                set_parameter_value(params, id, v);
+                                params.set(id, v);
                             },
                             [](auto&&, auto&&) { BOOST_ASSERT(false); }),
                     fx_param_id,
@@ -402,7 +398,7 @@ template <class P>
 static auto
 remove_parameter(state& st, parameter::id_t<P> id)
 {
-    remove_parameter(st.params, id);
+    st.params.remove(id);
 
     if constexpr (boost::mp11::mp_contains<
                           midi_assignment_id,
@@ -507,33 +503,22 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
             .bus_type = bus_type,
             .in = {},
             .out = st.mixer_state.main,
-            .volume = add_parameter(
-                    st.params,
-                    parameter::float_{
-                            .default_value = 1.f,
-                            .min = 0.f,
-                            .max = 4.f,
-                            .to_normalized = &to_normalized_volume,
-                            .from_normalized = &from_normalized_volume}),
-            .pan_balance = add_parameter(
-                    st.params,
-                    parameter::float_{
-                            .default_value = 0.f,
-                            .min = -1.f,
-                            .max = 1.f,
-                            .to_normalized = &parameter::to_normalized_linear,
-                            .from_normalized =
-                                    &parameter::from_normalized_linear}),
-            .record = add_parameter(
-                    st.params,
-                    parameter::bool_{.default_value = false}),
-            .mute = add_parameter(
-                    st.params,
-                    parameter::bool_{.default_value = false}),
-            .solo = add_parameter(
-                    st.params,
-                    parameter::bool_{.default_value = false}),
-            .level = add_parameter(st.params, parameter::stereo_level{}),
+            .volume = st.params.add(parameter::float_{
+                    .default_value = 1.f,
+                    .min = 0.f,
+                    .max = 4.f,
+                    .to_normalized = &to_normalized_volume,
+                    .from_normalized = &from_normalized_volume}),
+            .pan_balance = st.params.add(parameter::float_{
+                    .default_value = 0.f,
+                    .min = -1.f,
+                    .max = 1.f,
+                    .to_normalized = &parameter::to_normalized_linear,
+                    .from_normalized = &parameter::from_normalized_linear}),
+            .record = st.params.add(parameter::bool_{.default_value = false}),
+            .mute = st.params.add(parameter::bool_{.default_value = false}),
+            .solo = st.params.add(parameter::bool_{.default_value = false}),
+            .level = st.params.add(parameter::stereo_level{}),
             .fx_chain = {}});
     emplace_back(st.mixer_state.inputs, bus_id);
     return bus_id;

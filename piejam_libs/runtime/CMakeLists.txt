@@ -100,8 +100,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/int_.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/maps_collection.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_maps.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_maps_access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/access.h
@@ -191,7 +189,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/spectrum/spectrum_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/tool/tool_component.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/tool/tool_module.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/parameter_maps.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_midi_assignments.cpp

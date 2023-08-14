@@ -6,7 +6,6 @@
 
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
-#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/solo_group.h>
 #include <piejam/runtime/state.h>
 
@@ -721,8 +720,7 @@ make_fx_parameter_value_string_selector(fx::parameter_id const param_id)
         {
             return std::visit(
                     [it, &st](auto&& id) {
-                        return it->second.value_to_string(
-                                get_parameter_value(st.params, id));
+                        return it->second.value_to_string(st.params.get(id));
                     },
                     param_id);
         }
@@ -778,7 +776,7 @@ make_bool_parameter_value_selector(bool_parameter_id const param_id)
             return *value;
         }
 
-        value = get_parameter_cached_value(st.params, param_id);
+        value = st.params.get_cached(param_id);
         return value && *value;
     };
 }
@@ -794,7 +792,7 @@ make_float_parameter_value_selector(float_parameter_id const param_id)
             return *value;
         }
 
-        value = get_parameter_cached_value(st.params, param_id);
+        value = st.params.get_cached(param_id);
         return value ? *value : float{};
     };
 }
@@ -805,9 +803,9 @@ make_float_parameter_normalized_value_selector(
 {
     return [param_id](state const& st) -> float {
         if (float_parameter const* const param =
-                    find_parameter(st.params, param_id))
+                    st.params.get_parameter(param_id))
         {
-            float const value = get_parameter_value(st.params, param_id);
+            float const value = st.params.get(param_id);
             BOOST_ASSERT(param->to_normalized);
             return param->to_normalized(*param, value);
         }
@@ -826,7 +824,7 @@ make_int_parameter_value_selector(int_parameter_id const param_id)
             return *value;
         }
 
-        value = get_parameter_cached_value(st.params, param_id);
+        value = st.params.get_cached(param_id);
         return value ? *value : int{};
     };
 }
@@ -836,7 +834,7 @@ make_int_parameter_min_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        auto const* const param = find_parameter(st.params, param_id);
+        auto const* const param = st.params.get_parameter(param_id);
         return param ? param->min : 0;
     };
 }
@@ -846,7 +844,7 @@ make_int_parameter_max_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        auto const* const param = find_parameter(st.params, param_id);
+        auto const* const param = st.params.get_parameter(param_id);
         return param ? param->max : 0;
     };
 }
@@ -862,7 +860,7 @@ make_level_parameter_value_selector(stereo_level_parameter_id const param_id)
             return *value;
         }
 
-        value = get_parameter_cached_value(st.params, param_id);
+        value = st.params.get_cached(param_id);
         return value ? *value : stereo_level{};
     };
 }

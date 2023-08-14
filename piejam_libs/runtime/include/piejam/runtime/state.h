@@ -31,7 +31,7 @@
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
-#include <piejam/runtime/parameter_maps.h>
+#include <piejam/runtime/parameter/maps_collection.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/recorder.h>
 #include <piejam/runtime/root_view_mode.h>
@@ -61,7 +61,7 @@ struct state
     boxed_vector<midi::device_id_t> midi_inputs;
     box<midi_devices_t> midi_devices;
 
-    parameter_maps params;
+    parameter::maps_collection params;
     audio_streams_cache streams;
 
     fx::registry fx_registry{fx::make_default_registry()};

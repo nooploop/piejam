@@ -4,7 +4,6 @@
 
 #include <piejam/runtime/actions/set_parameter_value.h>
 
-#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
 
 #include <boost/assert.hpp>
@@ -17,7 +16,7 @@ auto
 set_parameter_value<Parameter>::reduce(state const& st) const -> state
 {
     auto new_st = st;
-    runtime::set_parameter_value(new_st.params, id, value);
+    new_st.params.set(id, value);
     return new_st;
 }
 

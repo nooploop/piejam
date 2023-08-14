@@ -5,7 +5,7 @@
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
 
 #include <piejam/runtime/actions/set_parameter_value.h>
-#include <piejam/runtime/parameter_maps_access.h>
+#include <piejam/runtime/parameter/maps_collection.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
@@ -19,10 +19,11 @@ set_float_parameter_normalized(
 {
     return [=](auto const& get_state, auto const& dispatch) {
         state const& st = get_state();
-        float_parameter const& param = get_parameter(st.params, param_id);
+        float_parameter const* const param = st.params.get_parameter(param_id);
+        BOOST_ASSERT(param);
         dispatch(set_float_parameter{
                 param_id,
-                param.from_normalized(param, norm_value)});
+                param->from_normalized(*param, norm_value)});
     };
 }
 

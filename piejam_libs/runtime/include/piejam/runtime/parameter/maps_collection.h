@@ -5,27 +5,39 @@
 #pragma once
 
 #include <piejam/runtime/parameter/fwd.h>
+#include <piejam/runtime/parameter/map.h>
+
+#include <boost/container/flat_map.hpp>
 
 #include <memory>
-#include <tuple>
+#include <typeindex>
 
 namespace piejam::runtime::parameter
 {
 
-template <class... Parameter>
 class maps_collection
 {
 public:
     template <class P>
     auto get_map() const -> map<P> const&
     {
-        return std::get<map<P>>(m_maps);
+        return *static_cast<map<P> const*>(m_maps.at(typeid(P)).get());
     }
 
     template <class P>
     auto get_map() -> map<P>&
     {
-        return std::get<map<P>>(m_maps);
+        auto it = m_maps.find(typeid(P));
+
+        if (it == m_maps.end()) [[unlikely]]
+        {
+            it = m_maps.emplace(
+                               std::type_index{typeid(P)},
+                               std::make_shared<map<P>>())
+                         .first;
+        }
+
+        return *static_cast<map<P>*>(it->second.get());
     }
 
     template <class P>
@@ -90,7 +102,7 @@ public:
     }
 
 private:
-    std::tuple<map<Parameter>...> m_maps;
+    boost::container::flat_map<std::type_index, std::shared_ptr<void>> m_maps;
 };
 
 } // namespace piejam::runtime::parameter

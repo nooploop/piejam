@@ -10,7 +10,7 @@
 #include <piejam/runtime/fx_parameter_factory.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
-#include <piejam/runtime/parameter_maps_access.h>
+#include <piejam/runtime/parameter/int_.h>
 
 #include <piejam/audio/multichannel_buffer.h>
 #include <piejam/entity_map.h>

@@ -4,7 +4,7 @@
 
 #include <piejam/runtime/actions/update_parameter_values.h>
 
-#include <piejam/runtime/parameter_maps_access.h>
+#include <piejam/runtime/parameter/maps_collection.h>
 #include <piejam/runtime/state.h>
 
 #include <boost/mp11/tuple.hpp>
@@ -18,7 +18,7 @@ update_parameter_values::reduce(state const& st) const -> state
     auto new_st = st;
 
     boost::mp11::tuple_for_each(values, [&new_st](auto const& id_value_pairs) {
-        set_parameter_values(new_st.params, id_value_pairs);
+        new_st.params.set(id_value_pairs);
     });
 
     return new_st;

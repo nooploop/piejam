@@ -30,7 +30,6 @@
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/midi_input_controller.h>
-#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/batch_action.h>
 
@@ -439,9 +438,7 @@ audio_engine_middleware::process_engine_action(
 
     if (m_engine)
     {
-        m_engine->set_parameter_value(
-                a.id,
-                get_parameter_value(mw_fs.get_state().params, a.id));
+        m_engine->set_parameter_value(a.id, mw_fs.get_state().params.get(a.id));
     }
 }
 

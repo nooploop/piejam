@@ -35,7 +35,6 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/mixer.h>
-#include <piejam/runtime/parameter_maps_access.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/runtime/processors/midi_assignment_processor.h>
 #include <piejam/runtime/processors/midi_input_processor.h>
@@ -233,7 +232,7 @@ make_midi_processors(
 auto
 make_midi_assignment_processors(
         midi_assignments_map const& assignments,
-        parameter_maps const& params,
+        parameter::maps_collection const& params,
         processor_map& procs,
         processor_map& prev_procs)
 {
@@ -250,7 +249,7 @@ make_midi_assignment_processors(
     {
         std::visit(
                 [&](auto const& param_id) {
-                    auto const& param = get_parameter(params, param_id);
+                    auto const& param = *params.get_parameter(param_id);
 
                     std::tuple const proc_id{param_id, assignment};
                     if (auto proc = prev_procs.find(proc_id))
@@ -805,9 +804,8 @@ audio_engine::rebuild(
     auto const solo_groups = runtime::solo_groups(st.mixer_state.channels);
     make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 
-    m_impl->param_procs.initialize([&st](auto const id) {
-        return find_parameter_value(st.params, id);
-    });
+    m_impl->param_procs.initialize(
+            [&st](auto const id) { return st.params.find(id); });
 
     processor_map procs;
 

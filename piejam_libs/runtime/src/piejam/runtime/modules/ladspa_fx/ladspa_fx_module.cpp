@@ -12,7 +12,6 @@
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
-#include <piejam/runtime/parameter_maps_access.h>
 
 #include <boost/container/flat_map.hpp>
 
