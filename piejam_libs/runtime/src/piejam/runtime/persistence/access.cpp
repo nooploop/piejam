@@ -85,7 +85,8 @@ save_app_config(
     }
     catch (std::exception const& err)
     {
-        spdlog::error("could not save config file: {}", err.what());
+        auto const* const message = err.what();
+        spdlog::error("could not save config file: {}", message);
     }
 }
 
@@ -322,7 +323,8 @@ save_session(std::filesystem::path const& file, state const& st)
     }
     catch (std::exception const& err)
     {
-        spdlog::error("save_session: {}", err.what());
+        auto const* const message = err.what();
+        spdlog::error("save_session: {}", message);
     }
 }
 

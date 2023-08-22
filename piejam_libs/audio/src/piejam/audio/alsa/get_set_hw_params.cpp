@@ -49,9 +49,8 @@ test_interval_value(
     {
         if (err != std::make_error_code(std::errc::invalid_argument))
         {
-            spdlog::error(
-                    "get_hw_params/test_interval_value: {}",
-                    err.message());
+            auto const message = err.message();
+            spdlog::error("get_hw_params/test_interval_value: {}", message);
         }
 
         return false;

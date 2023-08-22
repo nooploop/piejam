@@ -611,7 +611,8 @@ audio_engine_middleware::open_device(middleware_functors const& mw_fs)
     }
     catch (std::exception const& err)
     {
-        spdlog::error("opening device failed: {}", err.what());
+        auto const* const message = err.what();
+        spdlog::error("opening device failed: {}", message);
     }
 }
 

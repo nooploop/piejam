@@ -31,7 +31,8 @@ instance_manager_processor_factory::load(plugin_descriptor const& pd)
     }
     catch (std::exception const& err)
     {
-        spdlog::error("Loading LADSPA fx plugin failed: {}", err.what());
+        auto const* const message = err.what();
+        spdlog::error("Loading LADSPA fx plugin failed: {}", message);
         return {};
     }
 }

@@ -66,9 +66,8 @@ struct recorder_action_visitor
         std::error_code ec;
         if (!std::filesystem::create_directories(take_dir, ec))
         {
-            spdlog::error(
-                    "Could not create recordings directory: {}",
-                    ec.message());
+            auto const message = ec.message();
+            spdlog::error("Could not create recordings directory: {}", message);
             return;
         }
 
@@ -112,9 +111,10 @@ struct recorder_action_visitor
                 }
                 else
                 {
+                    auto const* const message = sndfile.strError();
                     spdlog::error(
                             "Could not create file for recording: {}",
-                            sndfile.strError());
+                            message);
                 }
             }
             else
@@ -195,10 +195,12 @@ struct recorder_action_visitor
                         it->second.writef(write_data.data(), num_frames);
                 if (static_cast<std::size_t>(written) < num_frames)
                 {
+                    auto const frames_not_written = num_frames - written;
+                    auto const* const message = it->second.strError();
                     spdlog::warn(
                             "Could not write {} frames: {}",
-                            num_frames - written,
-                            it->second.strError());
+                            frames_not_written,
+                            message);
                 }
             }
         }

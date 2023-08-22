@@ -55,7 +55,8 @@ soundcards() -> std::vector<soundcard>
 
                 if (auto err = fd.ioctl(SNDRV_CTL_IOCTL_CARD_INFO, card_info))
                 {
-                    spdlog::error("soundcards: {}", err.message());
+                    auto const message = err.message();
+                    spdlog::error("soundcards: {}", message);
                 }
                 else
                 {
@@ -86,7 +87,8 @@ get_devices(soundcard const& sc, int stream_type) -> std::vector<snd_pcm_info>
     {
         if (auto err = fd.ioctl(SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE, device))
         {
-            spdlog::error("get_devices: {}", err.message());
+            auto const message = err.message();
+            spdlog::error("get_devices: {}", message);
             break;
         }
 
@@ -107,12 +109,13 @@ get_devices(soundcard const& sc, int stream_type) -> std::vector<snd_pcm_info>
                     std::make_error_code(std::errc::no_such_file_or_directory);
             if (err != error_to_ignore)
             {
-                spdlog::error("get_devices: {}", err.message());
+                auto const message = err.message();
+                spdlog::error("get_devices: {}", message);
             }
         }
         else
         {
-            devices.emplace_back(std::move(info));
+            devices.emplace_back(info);
         }
     } while (device != -1);
 

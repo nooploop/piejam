@@ -71,7 +71,9 @@ config_file_path(piejam::runtime::locations const& locs)
     BOOST_ASSERT(!locs.config_dir.empty());
 
     if (!std::filesystem::exists(locs.config_dir))
+    {
         std::filesystem::create_directories(locs.config_dir);
+    }
 
     return locs.config_dir / "piejam.config";
 }
@@ -153,9 +155,11 @@ main(int argc, char* argv[]) -> int
                 }
                 else
                 {
+                    auto const action_name =
+                            boost::core::demangle(typeid(a).name());
                     spdlog::warn(
                             "non-reducible action detected: {}",
-                            boost::core::demangle(typeid(a).name()));
+                            action_name);
                     return st;
                 }
             },
@@ -221,7 +225,9 @@ main(int argc, char* argv[]) -> int
 
     store.subscribe([&state_change_subscriber, &batching](auto const& state) {
         if (!batching)
+        {
             state_change_subscriber.notify(state);
+        }
     });
 
     store.dispatch(runtime::actions::scan_ladspa_fx_plugins("/usr/lib/ladspa"));
@@ -234,7 +240,9 @@ main(int argc, char* argv[]) -> int
 
     engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
     if (engine.rootObjects().isEmpty())
+    {
         return -1;
+    }
 
     QObject::connect(
             &engine,

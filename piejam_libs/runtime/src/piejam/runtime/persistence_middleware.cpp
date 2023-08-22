@@ -55,7 +55,8 @@ struct persistence_action_visitor : private generic_action_visitor<void>
         }
         catch (std::exception const& err)
         {
-            spdlog::error("could not load config file: {}", err.what());
+            auto const* const message = err.what();
+            spdlog::error("could not load config file: {}", message);
         }
     }
 
@@ -86,7 +87,8 @@ struct persistence_action_visitor : private generic_action_visitor<void>
         }
         catch (std::exception const& err)
         {
-            spdlog::error("load_session: {}", err.what());
+            auto const* const message = err.what();
+            spdlog::error("load_session: {}", message);
         }
     }
 

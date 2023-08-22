@@ -93,7 +93,8 @@ scan_directory(std::filesystem::path const& dir)
             }
             catch (std::system_error const& err)
             {
-                spdlog::error("LADSPA fx plugin scan: {}", err.what());
+                auto const* const message = err.what();
+                spdlog::error("LADSPA fx plugin scan: {}", message);
             }
         }
     }

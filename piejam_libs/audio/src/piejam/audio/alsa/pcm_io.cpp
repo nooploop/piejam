@@ -123,7 +123,8 @@ pcm_io::close()
     {
         if (auto err = output_fd.ioctl(SNDRV_PCM_IOCTL_UNLINK))
         {
-            spdlog::error("pcm_io::close: {}", err.message());
+            auto const message = err.message();
+            spdlog::error("pcm_io::close: {}", message);
         }
     }
 }
@@ -170,7 +171,8 @@ pcm_io::stop()
     }
     else if (auto err = m_process_thread->error())
     {
-        spdlog::error("Process thread stopped with: {}", err.message());
+        auto const message = err.message();
+        spdlog::error("Process thread stopped with: {}", message);
     }
 
     m_process_thread.reset();
@@ -178,7 +180,8 @@ pcm_io::stop()
     system::device& fd = m_input_fd ? m_input_fd : m_output_fd;
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_DROP))
     {
-        spdlog::error("pcm_io::stop: {}", err.message());
+        auto const message = err.message();
+        spdlog::error("pcm_io::stop: {}", message);
     }
 }
 
