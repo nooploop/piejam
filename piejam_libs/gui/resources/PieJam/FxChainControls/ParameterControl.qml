@@ -7,6 +7,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
+import PieJam.Models 1.0
+
 import ".."
 import "../Controls"
 
@@ -89,12 +91,12 @@ Item {
             anchors.fill: parent
             anchors.margins: 8
 
-            currentIndex: root.paramModel ? (root.paramModel.isSwitch ? 2 : (root.paramModel.stepped ? 1 : 0)) : 0
+            currentIndex: root.paramModel ? root.paramModel.type : -1
 
             ParameterTouchstrip {
                 id: valueTouchstrip
 
-                value: root.paramModel ? root.paramModel.value : 0
+                value: root.paramModel && root.paramModel.type === FxParameter.Type.Float ? root.paramModel.value : 0
 
                 onChangeValue: {
                     if (root.paramModel)
@@ -105,10 +107,10 @@ Item {
             EnumSlider {
                 id: valueSlider
 
-                from: root.paramModel ? root.paramModel.minValue : 0.0
-                to: root.paramModel ? root.paramModel.maxValue : 1.0
+                from: root.paramModel && root.paramModel.type === FxParameter.Type.Int ? root.paramModel.minValue : 0.0
+                to: root.paramModel && root.paramModel.type === FxParameter.Type.Int ? root.paramModel.maxValue : 1.0
 
-                value: root.paramModel ? root.paramModel.value : 0
+                value: root.paramModel && root.paramModel.type === FxParameter.Type.Int ? root.paramModel.value : 0
 
                 onChangeValue: {
                     if (root.paramModel)
@@ -121,13 +123,14 @@ Item {
             Switch {
                 id: toggleSwitch
 
-                checked: root.paramModel ? root.paramModel.switchValue : false
+                checked: root.paramModel && root.paramModel.type === FxParameter.Type.Bool ? root.paramModel.value : false
 
                 onToggled: {
                     if (root.paramModel)
-                        root.paramModel.changeSwitchValue(toggleSwitch.checked)
-
-                    Info.quickTip = "<b>" + nameLabel.text + "</b>: " + (root.switchValue ? "on" : "off")
+                    {
+                        root.paramModel.changeValue(toggleSwitch.checked)
+                        Info.quickTip = "<b>" + nameLabel.text + "</b>: " + (root.paramModel.value ? "on" : "off")
+                    }
                 }
             }
         }

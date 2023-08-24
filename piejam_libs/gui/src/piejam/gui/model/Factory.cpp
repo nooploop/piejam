@@ -14,9 +14,12 @@
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/DbScaleData.h>
+#include <piejam/gui/model/FxBoolParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>
 #include <piejam/gui/model/FxFilter.h>
+#include <piejam/gui/model/FxFloatParameter.h>
+#include <piejam/gui/model/FxIntParameter.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/FxParameter.h>
@@ -68,6 +71,9 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::Log*>();
     qRegisterMetaType<piejam::gui::model::FxParameter*>();
+    qRegisterMetaType<piejam::gui::model::FxBoolParameter*>();
+    qRegisterMetaType<piejam::gui::model::FxIntParameter*>();
+    qRegisterMetaType<piejam::gui::model::FxFloatParameter*>();
     qRegisterMetaType<piejam::gui::model::FxChainModule*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
@@ -98,6 +104,13 @@ runRegistration()
             1,
             0,
             "FxModuleContent",
+            "Not createable");
+
+    qmlRegisterUncreatableType<piejam::gui::model::FxParameter>(
+            "PieJam.Models",
+            1,
+            0,
+            "FxParameter",
             "Not createable");
 
     qmlRegisterUncreatableType<piejam::gui::model::FxScope>(

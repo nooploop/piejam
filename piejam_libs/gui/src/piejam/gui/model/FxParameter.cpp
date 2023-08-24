@@ -4,6 +4,9 @@
 
 #include <piejam/gui/model/FxParameter.h>
 
+#include <piejam/gui/model/FxBoolParameter.h>
+#include <piejam/gui/model/FxFloatParameter.h>
+#include <piejam/gui/model/FxIntParameter.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/math.h>
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
@@ -14,6 +17,8 @@
 #include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
+
+#include <boost/hof/match.hpp>
 
 #include <fmt/format.h>
 
@@ -38,49 +43,32 @@ FxParameter::FxParameter(
                       state_change_subscriber,
                       param.id)))
 {
-    setStepped(std::holds_alternative<runtime::int_parameter_id>(
-            m_impl->param.id));
-    setIsSwitch(std::holds_alternative<runtime::bool_parameter_id>(
-            m_impl->param.id));
+    setName(QString::fromStdString(*observe_once(
+            runtime::selectors::make_fx_parameter_name_selector(param.id))));
 }
 
 FxParameter::~FxParameter() = default;
 
+auto
+FxParameter::type() const noexcept -> Type
+{
+    return std::visit(
+            boost::hof::match(
+                    [&](runtime::bool_parameter_id const&) {
+                        return Type::Bool;
+                    },
+                    [&](runtime::float_parameter_id const&) {
+                        return Type::Float;
+                    },
+                    [&](runtime::int_parameter_id const&) {
+                        return Type::Int;
+                    }),
+            m_impl->param.id);
+}
+
 void
 FxParameter::onSubscribe()
 {
-    observe(runtime::selectors::make_fx_parameter_name_selector(
-                    m_impl->param.id),
-            [this](boxed_string const& name) {
-                setName(QString::fromStdString(*name));
-            });
-
-    if (auto id = std::get_if<runtime::float_parameter_id>(&m_impl->param.id))
-    {
-        observe(runtime::selectors::
-                        make_float_parameter_normalized_value_selector(*id),
-                [this](float const value) { setValue(value); });
-    }
-    else if (
-            auto id = std::get_if<runtime::int_parameter_id>(&m_impl->param.id))
-    {
-        observe(runtime::selectors::make_int_parameter_min_selector(*id),
-                [this](int const min) { setMinValue(min); });
-
-        observe(runtime::selectors::make_int_parameter_max_selector(*id),
-                [this](int const max) { setMaxValue(max); });
-
-        observe(runtime::selectors::make_int_parameter_value_selector(*id),
-                [this](int const value) { setValue(value); });
-    }
-    else if (
-            auto id =
-                    std::get_if<runtime::bool_parameter_id>(&m_impl->param.id))
-    {
-        observe(runtime::selectors::make_bool_parameter_value_selector(*id),
-                [this](bool const value) { setSwitchValue(value); });
-    }
-
     observe(runtime::selectors::make_fx_parameter_value_string_selector(
                     m_impl->param.id),
             [this](std::string const& text) {
@@ -88,58 +76,49 @@ FxParameter::onSubscribe()
             });
 }
 
-QString
-FxParameter::intValueToString(int value)
-{
-    if (auto id = std::get_if<runtime::int_parameter_id>(&m_impl->param.id))
-    {
-        return QString::fromStdString(observe_once(
-                runtime::selectors::make_fx_parameter_value_string_selector(
-                        *id,
-                        value)));
-    }
-
-    return QString::number(value);
-}
-
-void
-FxParameter::changeValue(double value)
-{
-    if (auto id = std::get_if<runtime::float_parameter_id>(&m_impl->param.id))
-    {
-        dispatch(runtime::actions::set_float_parameter_normalized(*id, value));
-    }
-    else if (
-            auto id = std::get_if<runtime::int_parameter_id>(&m_impl->param.id))
-    {
-        dispatch(runtime::actions::set_int_parameter(
-                *id,
-                static_cast<int>(value)));
-    }
-    else
-    {
-        BOOST_ASSERT_MSG(false, "not float nor int parameter");
-    }
-}
-
-void
-FxParameter::changeSwitchValue(bool value)
-{
-    if (auto id = std::get_if<runtime::bool_parameter_id>(&m_impl->param.id))
-    {
-        dispatch(runtime::actions::set_bool_parameter(*id, value));
-        return;
-    }
-    else
-    {
-        BOOST_ASSERT_MSG(false, "not a bool parameter");
-    }
-}
-
 auto
 FxParameter::midi() const -> MidiAssignable*
 {
     return m_impl->midi.get();
+}
+
+auto
+FxParameter::paramKeyId() const -> FxParameterKeyId
+{
+    return m_impl->param;
+}
+
+auto
+makeFxParameter(
+        runtime::store_dispatch dispatch,
+        runtime::subscriber& state_change_subscriber,
+        piejam::gui::model::FxParameterKeyId const& paramKeyId)
+        -> std::unique_ptr<FxParameter>
+{
+    return std::visit(
+            boost::hof::match(
+                    [&](runtime::bool_parameter_id const&)
+                            -> std::unique_ptr<FxParameter> {
+                        return std::make_unique<FxBoolParameter>(
+                                dispatch,
+                                state_change_subscriber,
+                                paramKeyId);
+                    },
+                    [&](runtime::float_parameter_id const&)
+                            -> std::unique_ptr<FxParameter> {
+                        return std::make_unique<FxFloatParameter>(
+                                dispatch,
+                                state_change_subscriber,
+                                paramKeyId);
+                    },
+                    [&](runtime::int_parameter_id const&)
+                            -> std::unique_ptr<FxParameter> {
+                        return std::make_unique<FxIntParameter>(
+                                dispatch,
+                                state_change_subscriber,
+                                paramKeyId);
+                    }),
+            paramKeyId.id);
 }
 
 } // namespace piejam::gui::model

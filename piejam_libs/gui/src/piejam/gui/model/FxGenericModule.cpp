@@ -7,12 +7,15 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
-#include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/FxBoolParameter.h>
+#include <piejam/gui/model/FxFloatParameter.h>
+#include <piejam/gui/model/FxIntParameter.h>
 #include <piejam/gui/model/FxParameterKeyId.h>
 #include <piejam/runtime/selectors.h>
 
 #include <boost/container/flat_map.hpp>
 #include <boost/hof/construct.hpp>
+#include <boost/hof/match.hpp>
 #include <boost/hof/unpack.hpp>
 
 namespace piejam::gui::model
@@ -75,7 +78,7 @@ FxGenericModule::onSubscribe()
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *parameters(),
                                 [this](FxParameterKeyId const& paramKeyId) {
-                                    return std::make_unique<FxParameter>(
+                                    return makeFxParameter(
                                             dispatch(),
                                             state_change_subscriber(),
                                             paramKeyId);

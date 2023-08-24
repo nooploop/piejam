@@ -20,7 +20,7 @@ Repeater {
         width: root.buttonWidth
         height: root.buttonHeight
 
-        text: root.paramModel.intValueToString(value)
+        text: root.paramModel.valueToString(value)
 
         checkable: true
         autoExclusive: true

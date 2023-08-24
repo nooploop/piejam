@@ -5,7 +5,8 @@
 #include <piejam/gui/model/FxFilter.h>
 
 #include <piejam/gui/model/AudioStreamProvider.h>
-#include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/FxFloatParameter.h>
+#include <piejam/gui/model/FxIntParameter.h>
 #include <piejam/gui/model/FxParameterKeyId.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/FxStreamKeyId.h>
@@ -34,16 +35,16 @@ struct FxFilter::Impl
 
     std::unique_ptr<AudioStreamProvider> inOutStream;
 
-    std::unique_ptr<FxParameter> filterTypeParam;
-    std::unique_ptr<FxParameter> cutoffParam;
-    std::unique_ptr<FxParameter> resonanceParam;
+    std::unique_ptr<FxIntParameter> filterTypeParam;
+    std::unique_ptr<FxFloatParameter> cutoffParam;
+    std::unique_ptr<FxFloatParameter> resonanceParam;
 };
 
 FxFilter::FxFilter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
-    : Subscribable(store_dispatch, state_change_subscriber)
+    : Subscribable{store_dispatch, state_change_subscriber}
 {
     auto const busType = toBusType(observe_once(
             runtime::selectors::make_fx_module_bus_type_selector(fx_mod_id)));
@@ -55,29 +56,32 @@ FxFilter::FxFilter(
 
     constexpr auto filterTypeKey =
             to_underlying(runtime::modules::filter::parameter_key::type);
-    auto const filterTypeId = parameters.get().at(filterTypeKey);
-    m_impl->filterTypeParam = std::make_unique<FxParameter>(
+    m_impl->filterTypeParam = std::make_unique<FxIntParameter>(
             dispatch(),
             this->state_change_subscriber(),
-            FxParameterKeyId{.key = filterTypeKey, .id = filterTypeId});
+            FxParameterKeyId{
+                    .key = filterTypeKey,
+                    .id = parameters.get().at(filterTypeKey)});
     connectSubscribableChild(*m_impl->filterTypeParam);
 
     constexpr auto cutoffKey =
             to_underlying(runtime::modules::filter::parameter_key::cutoff);
-    auto const cutoffId = parameters.get().at(cutoffKey);
-    m_impl->cutoffParam = std::make_unique<FxParameter>(
+    m_impl->cutoffParam = std::make_unique<FxFloatParameter>(
             dispatch(),
             this->state_change_subscriber(),
-            FxParameterKeyId{.key = cutoffKey, .id = cutoffId});
+            FxParameterKeyId{
+                    .key = cutoffKey,
+                    .id = parameters.get().at(cutoffKey)});
     connectSubscribableChild(*m_impl->cutoffParam);
 
     constexpr auto resonanceKey =
             to_underlying(runtime::modules::filter::parameter_key::resonance);
-    auto const resonanceId = parameters.get().at(resonanceKey);
-    m_impl->resonanceParam = std::make_unique<FxParameter>(
+    m_impl->resonanceParam = std::make_unique<FxFloatParameter>(
             dispatch(),
             this->state_change_subscriber(),
-            FxParameterKeyId{.key = resonanceKey, .id = resonanceId});
+            FxParameterKeyId{
+                    .key = resonanceKey,
+                    .id = parameters.get().at(resonanceKey)});
     connectSubscribableChild(*m_impl->resonanceParam);
 
     auto const streams = observe_once(

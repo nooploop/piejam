@@ -40,13 +40,16 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleTick.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DFTResolution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBoolParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryInternal.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryLADSPA.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChainModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxFilter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxFloatParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxGenericModule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxIntParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleContent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxParameter.h
@@ -93,12 +96,15 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/BusConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/DbScaleData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Factory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBoolParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryInternal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryLADSPA.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxChainModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxFilter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxFloatParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxGenericModule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxIntParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxScope.cpp
