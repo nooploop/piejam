@@ -10,6 +10,7 @@ namespace piejam::gui::model
 template <class ListItem>
 class GenericListModel;
 
+class EnumListModel;
 class StringList;
 
 class AudioDeviceSettings;

@@ -14,7 +14,7 @@
 namespace piejam::gui::model
 {
 
-class FxIntParameter final : public FxParameter
+class FxIntParameter : public FxParameter
 {
     Q_OBJECT
 

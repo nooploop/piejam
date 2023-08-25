@@ -185,6 +185,8 @@ auto make_float_parameter_normalized_value_selector(float_parameter_id)
 auto make_int_parameter_value_selector(int_parameter_id) -> selector<int>;
 auto make_int_parameter_min_selector(int_parameter_id) -> selector<int>;
 auto make_int_parameter_max_selector(int_parameter_id) -> selector<int>;
+auto make_int_parameter_enum_values_selector(int_parameter_id)
+        -> selector<std::vector<std::pair<std::string, int>>>;
 
 auto make_level_parameter_value_selector(stereo_level_parameter_id)
         -> selector<stereo_level>;

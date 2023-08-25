@@ -850,6 +850,29 @@ make_int_parameter_max_selector(int_parameter_id const param_id)
 }
 
 auto
+make_int_parameter_enum_values_selector(int_parameter_id const param_id)
+        -> selector<std::vector<std::pair<std::string, int>>>
+{
+    return [param_id](state const& st) {
+        std::vector<std::pair<std::string, int>> result;
+
+        auto const* const param = st.params.get_parameter(param_id);
+        auto const it = st.fx_parameters->find(param_id);
+        if (param && it != st.fx_parameters->end())
+        {
+            auto const& fx_param = it->second;
+
+            for (int value = param->min; value <= param->max; ++value)
+            {
+                result.emplace_back(fx_param.value_to_string(value), value);
+            }
+        }
+
+        return result;
+    };
+}
+
+auto
 make_level_parameter_value_selector(stereo_level_parameter_id const param_id)
         -> selector<stereo_level>
 {

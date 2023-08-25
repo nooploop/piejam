@@ -39,6 +39,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleTick.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DFTResolution.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/EnumListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBoolParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowser.h
@@ -126,6 +127,8 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/SpectrumDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/WaveformDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
+    include/piejam/gui/model/FxEnumParameter.h
+    src/piejam/gui/model/FxEnumParameter.cpp
 )
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_gui

@@ -4,7 +4,6 @@
 
 #include <piejam/gui/model/FxIntParameter.h>
 
-#include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_.h>

@@ -14,6 +14,7 @@
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/DbScaleData.h>
+#include <piejam/gui/model/EnumListModel.h>
 #include <piejam/gui/model/FxBoolParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>
@@ -59,6 +60,7 @@ runRegistration()
 {
     initResources();
 
+    qRegisterMetaType<piejam::gui::model::EnumListModel*>();
     qRegisterMetaType<piejam::gui::model::StringList*>();
     qRegisterMetaType<piejam::gui::model::AudioDeviceSettings*>();
     qRegisterMetaType<piejam::gui::model::AudioInputOutputSettings*>();
