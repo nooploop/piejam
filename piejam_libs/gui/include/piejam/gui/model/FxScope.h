@@ -33,8 +33,8 @@ class FxScope final : public Subscribable<FxModuleContent>
                        triggerSource CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FxEnumParameter* triggerSlope READ
                        triggerSlope CONSTANT FINAL)
-    Q_PROPERTY(double triggerLevel READ triggerLevel WRITE setTriggerLevel
-                       NOTIFY triggerLevelChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::FxFloatParameter* triggerLevel READ
+                       triggerLevel CONSTANT FINAL)
     Q_PROPERTY(int holdTime READ holdTime WRITE setHoldTime NOTIFY
                        holdTimeChanged FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
@@ -96,12 +96,7 @@ public:
 
     auto triggerSlope() const noexcept -> FxEnumParameter*;
 
-    auto triggerLevel() const noexcept -> double
-    {
-        return m_triggerLevel;
-    }
-
-    void setTriggerLevel(double triggerLevel);
+    auto triggerLevel() const noexcept -> FxFloatParameter*;
 
     auto holdTime() const noexcept -> int
     {
@@ -177,7 +172,6 @@ public:
 signals:
     void samplesPerPixelChanged();
     void viewSizeChanged();
-    void triggerLevelChanged();
     void holdTimeChanged();
     void activeAChanged();
     void activeBChanged();
@@ -191,13 +185,13 @@ private:
 
     void onTriggerSourceChanged();
     void onTriggerSlopeChanged();
+    void onTriggerLevelChanged();
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
     int m_samplesPerPixel{1};
     int m_viewSize{};
-    double m_triggerLevel{0};
     int m_holdTime{80};
     WaveformDataObject m_waveformDataA;
     WaveformDataObject m_waveformDataB;

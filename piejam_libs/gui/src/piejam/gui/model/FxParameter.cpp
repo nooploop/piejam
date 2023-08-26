@@ -8,7 +8,9 @@
 #include <piejam/gui/model/FxFloatParameter.h>
 #include <piejam/gui/model/FxIntParameter.h>
 #include <piejam/gui/model/MidiAssignable.h>
+#include <piejam/integral_constant.h>
 #include <piejam/math.h>
+#include <piejam/runtime/actions/reset_fx_parameter_to_default_value.h>
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -18,12 +20,22 @@
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
-#include <boost/hof/match.hpp>
+#include <boost/mp11/map.hpp>
 
 #include <fmt/format.h>
 
 namespace piejam::gui::model
 {
+
+namespace
+{
+
+using parameter_id_to_FxParameter = boost::mp11::mp_list<
+        boost::mp11::mp_list<runtime::bool_parameter_id, FxBoolParameter>,
+        boost::mp11::mp_list<runtime::float_parameter_id, FxFloatParameter>,
+        boost::mp11::mp_list<runtime::int_parameter_id, FxIntParameter>>;
+
+} // namespace
 
 struct FxParameter::Impl
 {
@@ -53,16 +65,12 @@ auto
 FxParameter::type() const noexcept -> Type
 {
     return std::visit(
-            boost::hof::match(
-                    [&](runtime::bool_parameter_id const&) {
-                        return Type::Bool;
-                    },
-                    [&](runtime::float_parameter_id const&) {
-                        return Type::Float;
-                    },
-                    [&](runtime::int_parameter_id const&) {
-                        return Type::Int;
-                    }),
+            []<class T>(T const&) -> Type {
+                return boost::mp11::mp_at_c<
+                        boost::mp11::
+                                mp_map_find<parameter_id_to_FxParameter, T>,
+                        1>::StaticType;
+            },
             m_impl->param.id);
 }
 
@@ -82,6 +90,13 @@ FxParameter::midi() const -> MidiAssignable*
     return m_impl->midi.get();
 }
 
+void
+FxParameter::resetToDefault()
+{
+    dispatch(runtime::actions::reset_fx_parameter_to_default_value(
+            m_impl->param.id));
+}
+
 auto
 FxParameter::paramKeyId() const -> FxParameterKeyId
 {
@@ -96,28 +111,16 @@ makeFxParameter(
         -> std::unique_ptr<FxParameter>
 {
     return std::visit(
-            boost::hof::match(
-                    [&](runtime::bool_parameter_id const&)
-                            -> std::unique_ptr<FxParameter> {
-                        return std::make_unique<FxBoolParameter>(
-                                dispatch,
-                                state_change_subscriber,
-                                paramKeyId);
-                    },
-                    [&](runtime::float_parameter_id const&)
-                            -> std::unique_ptr<FxParameter> {
-                        return std::make_unique<FxFloatParameter>(
-                                dispatch,
-                                state_change_subscriber,
-                                paramKeyId);
-                    },
-                    [&](runtime::int_parameter_id const&)
-                            -> std::unique_ptr<FxParameter> {
-                        return std::make_unique<FxIntParameter>(
-                                dispatch,
-                                state_change_subscriber,
-                                paramKeyId);
-                    }),
+            [&]<class T>(T const&) -> std::unique_ptr<FxParameter> {
+                using FxParameterType = boost::mp11::mp_at_c<
+                        boost::mp11::
+                                mp_map_find<parameter_id_to_FxParameter, T>,
+                        1>;
+                return std::make_unique<FxParameterType>(
+                        dispatch,
+                        state_change_subscriber,
+                        paramKeyId);
+            },
             paramKeyId.id);
 }
 

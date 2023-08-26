@@ -29,6 +29,8 @@ public:
             piejam::gui::model::FxParameterKeyId const&);
     ~FxIntParameter();
 
+    static inline constexpr auto StaticType = Type::Int;
+
     auto value() const noexcept -> int
     {
         return m_value;

@@ -40,13 +40,17 @@ FxFloatParameter::onSubscribe()
 {
     FxParameter::onSubscribe();
 
-    observe(runtime::selectors::make_float_parameter_normalized_value_selector(
+    observe(runtime::selectors::make_float_parameter_value_selector(
                     m_impl->param_id),
             [this](float const value) { setValue(value); });
+
+    observe(runtime::selectors::make_float_parameter_normalized_value_selector(
+                    m_impl->param_id),
+            [this](float const value) { setNormalizedValue(value); });
 }
 
 void
-FxFloatParameter::changeValue(double value)
+FxFloatParameter::changeNormalizedValue(double value)
 {
     dispatch(runtime::actions::set_float_parameter_normalized(
             m_impl->param_id,

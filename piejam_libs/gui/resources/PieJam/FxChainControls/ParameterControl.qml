@@ -96,11 +96,11 @@ Item {
             ParameterTouchstrip {
                 id: valueTouchstrip
 
-                value: root.paramModel && root.paramModel.type === FxParameter.Type.Float ? root.paramModel.value : 0
+                value: root.paramModel && root.paramModel.type === FxParameter.Type.Float ? root.paramModel.normalizedValue : 0
 
                 onChangeValue: {
                     if (root.paramModel)
-                        root.paramModel.changeValue(newValue)
+                        root.paramModel.changeNormalizedValue(newValue)
                 }
             }
 

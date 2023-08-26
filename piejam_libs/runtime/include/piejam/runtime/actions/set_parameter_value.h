@@ -33,4 +33,8 @@ struct set_parameter_value final
     typename Parameter::value_type value{};
 };
 
+template <class Parameter, class V>
+set_parameter_value(parameter::id_t<Parameter>, V&&)
+        -> set_parameter_value<Parameter>;
+
 } // namespace piejam::runtime::actions

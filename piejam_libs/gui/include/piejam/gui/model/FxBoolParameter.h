@@ -27,6 +27,8 @@ public:
             piejam::gui::model::FxParameterKeyId const&);
     ~FxBoolParameter();
 
+    static inline constexpr auto StaticType = Type::Bool;
+
     auto value() const noexcept -> bool
     {
         return m_value;

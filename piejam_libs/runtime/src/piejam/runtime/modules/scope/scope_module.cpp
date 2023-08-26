@@ -9,6 +9,8 @@
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx_parameter_factory.h>
+#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/int_.h>
 #include <piejam/to_underlying.h>
 
@@ -120,7 +122,23 @@ make_module(
                                      fx::parameter{
                                              .name = "Trigger Slope",
                                              .value_to_string =
-                                                     &to_trigger_slope_string})}},
+                                                     &to_trigger_slope_string})},
+                            {to_underlying(parameter_key::trigger_level),
+                             fx_params_factory.make_parameter(
+                                     float_parameter{
+                                             .default_value = 0.f,
+                                             .min = -1.f,
+                                             .max = 1.f,
+                                             .to_normalized =
+                                                     &parameter::
+                                                             to_normalized_linear,
+                                             .from_normalized =
+                                                     &parameter::
+                                                             from_normalized_linear},
+                                     fx::parameter{
+                                             .name = "Trigger Level",
+                                             .value_to_string = fx::
+                                                     make_default_float_parameter_value_to_string()})}},
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),
                      streams.add(audio_stream_buffer(

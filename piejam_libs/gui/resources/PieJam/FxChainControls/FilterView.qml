@@ -136,18 +136,18 @@ Item {
         XYPad {
             anchors.fill: parent
 
-            posX: root.content ? root.content.cutoff.value : 0
-            posY: root.content ? 1 - root.content.resonance.value : 0
+            posX: root.content ? root.content.cutoff.normalizedValue : 0
+            posY: root.content ? 1 - root.content.resonance.normalizedValue : 0
 
             handleRadius: 6
             handleColor: Material.color(Material.Yellow, Material.Shade400)
 
             onChangePos: {
                 if (root.content)
-                    root.content.cutoff.changeValue(x)
+                    root.content.cutoff.changeNormalizedValue(x)
 
                 if (root.content)
-                    root.content.resonance.changeValue(1 - y)
+                    root.content.resonance.changeNormalizedValue(1 - y)
             }
         }
     }

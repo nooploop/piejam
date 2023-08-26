@@ -18,6 +18,9 @@ Item {
 
     property var textFromValue: function (value) { return value }
 
+    signal changeValue(real newValue)
+    signal reset()
+
     implicitWidth: 96
     implicitHeight: 40
 
@@ -37,7 +40,7 @@ Item {
         onClicked: decrement(step)
 
         function decrement(step) {
-            root.value = Math.max(root.from, root.value - step)
+            root.changeValue(Math.max(root.from, root.value - step))
         }
     }
 
@@ -50,6 +53,13 @@ Item {
         anchors.right: incButton.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+
+
+        MouseArea {
+            anchors.fill: parent
+
+            onDoubleClicked: root.reset()
+        }
     }
 
     Button {
@@ -68,7 +78,7 @@ Item {
         onClicked: increment(step)
 
         function increment(step) {
-            root.value = Math.min(root.to, root.value + step)
+            root.changeValue(Math.min(root.to, root.value + step))
         }
     }
 

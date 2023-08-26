@@ -81,5 +81,6 @@
         <file>PieJam/Views/FxBrowser.qml</file>
         <file>PieJam/Views/FxModule.qml</file>
         <file>PieJam/FxChainControls/EnumComboBox.qml</file>
+        <file>PieJam/FxChainControls/ParameterQuickSpinBox.qml</file>
     </qresource>
 </RCC>

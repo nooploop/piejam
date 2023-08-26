@@ -15,9 +15,9 @@ Item {
     id: root
 
     property bool isStereo: false
-    property alias triggerSource: modeComboBox.paramModel
+    property alias triggerSource: triggerSourceComboBox.paramModel
     property alias triggerSlope: triggerButtons.paramModel
-    property alias triggerLevel: triggerLevelSpinBox.value
+    property var triggerLevel: null
     property alias holdTime: holdTimeSpinBox.value
 
     implicitHeight: 64
@@ -33,7 +33,7 @@ Item {
             }
 
             EnumComboBox {
-                id: modeComboBox
+                id: triggerSourceComboBox
 
                 implicitWidth: 128
                 implicitHeight: 40
@@ -46,7 +46,7 @@ Item {
 
         ColumnLayout {
 
-            enabled: modeComboBox.currentText !== "Free"
+            enabled: triggerSourceComboBox.currentText !== "Free"
 
             Label {
                 text: "Slope"
@@ -70,28 +70,18 @@ Item {
         }
 
         ColumnLayout {
-
-            enabled: modeComboBox.currentText !== "Free"
+            enabled: triggerSourceComboBox.currentText !== "Free"
 
             Label {
                 text: "Trigger Level"
                 topPadding: 4
             }
 
-            QuickSpinBox {
-                id: triggerLevelSpinBox
-
-                from: -100
-                to: 100
-                step: 1
-                bigStep: 5
-                value: 0
+            ParameterQuickSpinBox {
+                paramModel: root.triggerLevel
+                stepScale: .5
 
                 implicitWidth: 112
-
-                textFromValue: function(value) {
-                    return (value / 100).toFixed(2)
-                }
             }
         }
 
@@ -101,7 +91,7 @@ Item {
 
         ColumnLayout {
 
-            enabled: modeComboBox.currentText !== "Free"
+            enabled: triggerSourceComboBox.currentText !== "Free"
 
             Label {
                 text: "Hold Time"

@@ -71,6 +71,8 @@ public:
 
     auto midi() const -> MidiAssignable*;
 
+    Q_INVOKABLE void resetToDefault();
+
 signals:
     void nameChanged();
     void valueStringChanged();

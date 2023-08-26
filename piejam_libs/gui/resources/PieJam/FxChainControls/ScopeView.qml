@@ -109,15 +109,7 @@ Item {
 
             triggerSlope: root.content ? root.content.triggerSlope : null
 
-            triggerLevel: root.content ? root.content.triggerLevel * 100 : 0
-
-            Binding {
-                when: root.content
-                target: root.content
-                property: "triggerLevel"
-                value: settings.triggerLevel / 100
-                restoreMode: Binding.RestoreBinding
-            }
+            triggerLevel: root.content ? root.content.triggerLevel : null
 
             holdTime: root.content ? root.content.holdTime : 80
 
@@ -241,14 +233,6 @@ Item {
         target: root.content
         property: "viewSize"
         value: root.content && root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? waveformA.width : scopeA.width
-        restoreMode: Binding.RestoreBinding
-    }
-
-    Binding {
-        when: root.content
-        target: root.content
-        property: "triggerLevel"
-        value: settings.triggerLevel / 100
         restoreMode: Binding.RestoreBinding
     }
 

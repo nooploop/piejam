@@ -19,6 +19,8 @@ class FxFloatParameter : public FxParameter
     Q_OBJECT
 
     Q_PROPERTY(double value READ value NOTIFY valueChanged FINAL)
+    Q_PROPERTY(double normalizedValue READ normalizedValue NOTIFY
+                       normalizedValueChanged FINAL)
 
 public:
     FxFloatParameter(
@@ -27,15 +29,23 @@ public:
             piejam::gui::model::FxParameterKeyId const&);
     ~FxFloatParameter();
 
+    static inline constexpr auto StaticType = Type::Float;
+
     auto value() const noexcept -> double
     {
         return m_value;
     }
 
-    Q_INVOKABLE void changeValue(double);
+    auto normalizedValue() const noexcept -> double
+    {
+        return m_normalizedValue;
+    }
+
+    Q_INVOKABLE void changeNormalizedValue(double);
 
 signals:
     void valueChanged();
+    void normalizedValueChanged();
 
 private:
     void onSubscribe() override;
@@ -49,10 +59,20 @@ private:
         }
     }
 
+    void setNormalizedValue(double x)
+    {
+        if (m_normalizedValue != x)
+        {
+            m_normalizedValue = x;
+            emit normalizedValueChanged();
+        }
+    }
+
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
     double m_value{};
+    double m_normalizedValue{};
 };
 
 } // namespace piejam::gui::model
