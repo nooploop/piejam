@@ -15,8 +15,8 @@ Item {
     id: root
 
     property bool isStereo: false
-    property alias mode: modeComboBox.paramModel
-    property int triggerSlope: PJModels.TriggerSlope.RisingEdge
+    property alias triggerSource: modeComboBox.paramModel
+    property alias triggerSlope: triggerButtons.paramModel
     property alias triggerLevel: triggerLevelSpinBox.value
     property alias holdTime: holdTimeSpinBox.value
 
@@ -53,41 +53,14 @@ Item {
                 topPadding: 4
             }
 
-            ButtonGroup {
-                buttons: triggerButtons.children
-            }
-
             RowLayout {
-                id: triggerButtons
 
-                Button {
-                    implicitWidth: 32
-                    implicitHeight: 40
+                EnumButtonGroup {
+                    id: triggerButtons
 
-                    icon.width: 24
-                    icon.height: 24
-                    icon.source: "qrc:///images/icons/rising_edge.svg"
-
-                    autoExclusive: true
-                    checkable: true
-                    checked: root.triggerSlope == PJModels.TriggerSlope.RisingEdge
-
-                    onClicked: root.triggerSlope = PJModels.TriggerSlope.RisingEdge
-                }
-
-                Button {
-                    implicitWidth: 32
-                    implicitHeight: 40
-
-                    icon.width: 24
-                    icon.height: 24
-                    icon.source: "qrc:///images/icons/falling_edge.svg"
-
-                    autoExclusive: true
-                    checkable: true
-                    checked: root.triggerSlope == PJModels.TriggerSlope.FallingEdge
-
-                    onClicked: root.triggerSlope = PJModels.TriggerSlope.FallingEdge
+                    buttonImplicitWidth: 32
+                    buttonImplicitHeight: 40
+                    icons: ["qrc:///images/icons/rising_edge.svg", "qrc:///images/icons/falling_edge.svg"]
                 }
             }
         }

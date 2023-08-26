@@ -4,14 +4,14 @@
 
 #include <piejam/gui/model/FxScope.h>
 
+#include <piejam/audio/types.h>
+#include <piejam/functional/in_interval.h>
 #include <piejam/gui/model/AudioStreamChannelDuplicator.h>
 #include <piejam/gui/model/FxEnumParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/ScopeDataGenerator.h>
+#include <piejam/gui/model/TriggerSlope.h>
 #include <piejam/gui/model/WaveformDataGenerator.h>
-
-#include <piejam/audio/types.h>
-#include <piejam/functional/in_interval.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
@@ -56,12 +56,13 @@ struct FxScope::Impl
 
     BusType busType;
 
-    std::unique_ptr<FxEnumParameter> triggerSource;
-    std::unique_ptr<AudioStreamProvider> stream;
-
     WaveformDataGenerator waveformGenerator;
     AudioStreamChannelDuplicator channelDuplicator;
     ScopeDataGenerator scopeDataGenerator;
+
+    std::unique_ptr<FxEnumParameter> triggerSource;
+    std::unique_ptr<FxEnumParameter> triggerSlope;
+    std::unique_ptr<AudioStreamProvider> stream;
 };
 
 FxScope::FxScope(
@@ -85,6 +86,16 @@ FxScope::FxScope(
                     .key = triggerSourceKey,
                     .id = parameters->at(triggerSourceKey)});
     connectSubscribableChild(*m_impl->triggerSource);
+
+    auto const triggerSlopeKey = to_underlying(
+            runtime::modules::scope::parameter_key::trigger_slope);
+    m_impl->triggerSlope = std::make_unique<FxEnumParameter>(
+            dispatch(),
+            this->state_change_subscriber(),
+            FxParameterKeyId{
+                    .key = triggerSlopeKey,
+                    .id = parameters->at(triggerSlopeKey)});
+    connectSubscribableChild(*m_impl->triggerSlope);
 
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
@@ -180,6 +191,12 @@ FxScope::FxScope(
             &FxEnumParameter::valueChanged,
             this,
             &FxScope::onTriggerSourceChanged);
+
+    QObject::connect(
+            m_impl->triggerSlope.get(),
+            &FxEnumParameter::valueChanged,
+            this,
+            &FxScope::onTriggerSlopeChanged);
 }
 
 FxScope::~FxScope() = default;
@@ -194,6 +211,12 @@ auto
 FxScope::triggerSource() const noexcept -> FxEnumParameter*
 {
     return m_impl->triggerSource.get();
+}
+
+auto
+FxScope::triggerSlope() const noexcept -> FxEnumParameter*
+{
+    return m_impl->triggerSlope.get();
 }
 
 void
@@ -217,17 +240,6 @@ FxScope::setViewSize(int const x)
         emit viewSizeChanged();
 
         clear();
-    }
-}
-
-void
-FxScope::setTriggerSlope(TriggerSlope x)
-{
-    if (m_triggerSlope != x)
-    {
-        m_triggerSlope = x;
-        m_impl->scopeDataGenerator.setTriggerSlope(x);
-        emit triggerSlopeChanged();
     }
 }
 
@@ -398,6 +410,13 @@ FxScope::onTriggerSourceChanged()
     }
 
     clear();
+}
+
+void
+FxScope::onTriggerSlopeChanged()
+{
+    m_impl->scopeDataGenerator.setTriggerSlope(
+            static_cast<TriggerSlope>(m_impl->triggerSlope->value()));
 }
 
 } // namespace piejam::gui::model

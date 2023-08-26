@@ -20,9 +20,16 @@ enum class mode : int
     trigger_b,
 };
 
+enum class trigger_slope : int
+{
+    rising_edge,
+    falling_edge
+};
+
 enum class parameter_key : fx::parameter_key
 {
-    mode
+    mode,
+    trigger_slope
 };
 
 enum class stream_key : fx::stream_key

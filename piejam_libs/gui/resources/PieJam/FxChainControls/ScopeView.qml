@@ -105,17 +105,9 @@ Item {
 
             isStereo: privates.isStereo
 
-            mode: root.content ? root.content.triggerSource : null
+            triggerSource: root.content ? root.content.triggerSource : null
 
-            triggerSlope: root.content ? root.content.triggerSlope : PJModels.TriggerSlope.RisingEdge
-
-            Binding {
-                when: root.content
-                target: root.content
-                property: "triggerSlope"
-                value: settings.triggerSlope
-                restoreMode: Binding.RestoreBinding
-            }
+            triggerSlope: root.content ? root.content.triggerSlope : null
 
             triggerLevel: root.content ? root.content.triggerLevel * 100 : 0
 
@@ -249,14 +241,6 @@ Item {
         target: root.content
         property: "viewSize"
         value: root.content && root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? waveformA.width : scopeA.width
-        restoreMode: Binding.RestoreBinding
-    }
-
-    Binding {
-        when: root.content
-        target: root.content
-        property: "triggerSlope"
-        value: settings.triggerSlope
         restoreMode: Binding.RestoreBinding
     }
 

@@ -56,6 +56,22 @@ to_mode_string(int const n) -> std::string
     }
 }
 
+auto
+to_trigger_slope_string(int const n) -> std::string
+{
+    switch (n)
+    {
+        case to_underlying(trigger_slope::rising_edge):
+            return "Rising Edge";
+
+        case to_underlying(trigger_slope::falling_edge):
+            return "Falling Edge";
+
+        default:
+            return "ERROR";
+    }
+}
+
 } // namespace
 
 auto
@@ -92,7 +108,19 @@ make_module(
                                                                                stereo>
                                                              : &to_mode_string<
                                                                        audio::bus_type::
-                                                                               mono>})}},
+                                                                               mono>})},
+                            {to_underlying(parameter_key::trigger_slope),
+                             fx_params_factory.make_parameter(
+                                     int_parameter{
+                                             .default_value = to_underlying(
+                                                     trigger_slope::
+                                                             rising_edge),
+                                             .min = 0,
+                                             .max = 1},
+                                     fx::parameter{
+                                             .name = "Trigger Slope",
+                                             .value_to_string =
+                                                     &to_trigger_slope_string})}},
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),
                      streams.add(audio_stream_buffer(

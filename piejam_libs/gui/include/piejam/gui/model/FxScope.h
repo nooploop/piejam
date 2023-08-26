@@ -9,7 +9,6 @@
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/Subscribable.h>
-#include <piejam/gui/model/TriggerSlope.h>
 #include <piejam/gui/model/WaveformDataObject.h>
 #include <piejam/gui/model/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -31,9 +30,9 @@ class FxScope final : public Subscribable<FxModuleContent>
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
     Q_PROPERTY(piejam::gui::model::FxEnumParameter* triggerSource READ
-                       triggerSource CONSTANT)
-    Q_PROPERTY(piejam::gui::model::TriggerSlope triggerSlope READ triggerSlope
-                       WRITE setTriggerSlope NOTIFY triggerSlopeChanged FINAL)
+                       triggerSource CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxEnumParameter* triggerSlope READ
+                       triggerSlope CONSTANT FINAL)
     Q_PROPERTY(double triggerLevel READ triggerLevel WRITE setTriggerLevel
                        NOTIFY triggerLevelChanged FINAL)
     Q_PROPERTY(int holdTime READ holdTime WRITE setHoldTime NOTIFY
@@ -95,12 +94,7 @@ public:
 
     auto triggerSource() const noexcept -> FxEnumParameter*;
 
-    auto triggerSlope() const noexcept -> TriggerSlope
-    {
-        return m_triggerSlope;
-    }
-
-    void setTriggerSlope(TriggerSlope);
+    auto triggerSlope() const noexcept -> FxEnumParameter*;
 
     auto triggerLevel() const noexcept -> double
     {
@@ -183,7 +177,6 @@ public:
 signals:
     void samplesPerPixelChanged();
     void viewSizeChanged();
-    void triggerSlopeChanged();
     void triggerLevelChanged();
     void holdTimeChanged();
     void activeAChanged();
@@ -197,13 +190,13 @@ private:
     void onSubscribe() override;
 
     void onTriggerSourceChanged();
+    void onTriggerSlopeChanged();
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
     int m_samplesPerPixel{1};
     int m_viewSize{};
-    TriggerSlope m_triggerSlope{TriggerSlope::RisingEdge};
     double m_triggerLevel{0};
     int m_holdTime{80};
     WaveformDataObject m_waveformDataA;

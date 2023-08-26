@@ -9,19 +9,24 @@ Repeater {
     id: root
 
     property var paramModel: null
-    property int buttonWidth: 64
-    property int buttonHeight: 48
+    property int buttonImplicitWidth: 64
+    property int buttonImplicitHeight: 48
+    property var icons: null
 
     model: root.paramModel ? root.paramModel.values : null
 
     delegate: Button {
-        width: root.buttonWidth
-        height: root.buttonHeight
+        implicitWidth: root.buttonImplicitWidth
+        implicitHeight: root.buttonImplicitHeight
 
         text: model.text
 
         checkable: true
         autoExclusive: true
+
+        icon.source: root.icons ? root.icons[model.index] : ""
+
+        display: icons ? AbstractButton.IconOnly : AbstractButton.TextOnly
 
         checked: model.value === root.paramModel.value
 
