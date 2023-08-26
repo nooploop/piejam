@@ -61,7 +61,7 @@ public:
     auto roleNames() const -> QHash<int, QByteArray> override
     {
         static QHash<int, QByteArray> s_roles = {
-                {Qt::DisplayRole, "display"},
+                {Qt::DisplayRole, "text"},
                 {ValueRole, "value"}};
         return s_roles;
     }

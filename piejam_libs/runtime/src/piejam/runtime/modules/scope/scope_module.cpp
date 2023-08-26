@@ -4,12 +4,13 @@
 
 #include <piejam/runtime/modules/scope/scope_module.h>
 
+#include <piejam/audio/multichannel_buffer.h>
 #include <piejam/entity_map.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/fx_parameter_factory.h>
+#include <piejam/runtime/parameter/int_.h>
 #include <piejam/to_underlying.h>
-
-#include <piejam/audio/multichannel_buffer.h>
 
 #include <fmt/format.h>
 
@@ -18,9 +19,50 @@
 namespace piejam::runtime::modules::scope
 {
 
+namespace
+{
+
+template <audio::bus_type BT>
 auto
-make_module(audio::bus_type const bus_type, audio_streams_cache& streams)
-        -> fx::module
+to_mode_string(int const n) -> std::string
+{
+    if constexpr (BT == audio::bus_type::stereo)
+    {
+        switch (n)
+        {
+            case to_underlying(mode::free):
+                return "Free";
+            case to_underlying(mode::trigger_a):
+                return "Trigger A";
+            case to_underlying(mode::trigger_b):
+                return "Trigger B";
+
+            default:
+                return "ERROR";
+        }
+    }
+    else
+    {
+        switch (n)
+        {
+            case to_underlying(mode::free):
+                return "Free";
+            case to_underlying(mode::trigger_a):
+                return "Trigger A";
+
+            default:
+                return "ERROR";
+        }
+    }
+}
+
+} // namespace
+
+auto
+make_module(
+        audio::bus_type const bus_type,
+        fx_parameter_factory const& fx_params_factory,
+        audio_streams_cache& streams) -> fx::module
 {
     using namespace std::string_literals;
 
@@ -28,7 +70,29 @@ make_module(audio::bus_type const bus_type, audio_streams_cache& streams)
             .fx_instance_id = fx::internal::scope,
             .name = "Scope"s,
             .bus_type = bus_type,
-            .parameters = fx::module_parameters{},
+            .parameters =
+                    fx::module_parameters{
+                            {to_underlying(parameter_key::mode),
+                             fx_params_factory.make_parameter(
+                                     int_parameter{
+                                             .default_value = to_underlying(
+                                                     mode::trigger_a),
+                                             .min = 0,
+                                             .max = bus_type == audio::bus_type::
+                                                                            stereo
+                                                            ? 2
+                                                            : 1},
+                                     fx::parameter{
+                                             .name = "Trigger Source",
+                                             .value_to_string =
+                                                     bus_type == audio::bus_type::
+                                                                             stereo
+                                                             ? &to_mode_string<
+                                                                       audio::bus_type::
+                                                                               stereo>
+                                                             : &to_mode_string<
+                                                                       audio::bus_type::
+                                                                               mono>})}},
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),
                      streams.add(audio_stream_buffer(

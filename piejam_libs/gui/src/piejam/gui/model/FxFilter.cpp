@@ -5,8 +5,8 @@
 #include <piejam/gui/model/FxFilter.h>
 
 #include <piejam/gui/model/AudioStreamProvider.h>
+#include <piejam/gui/model/FxEnumParameter.h>
 #include <piejam/gui/model/FxFloatParameter.h>
-#include <piejam/gui/model/FxIntParameter.h>
 #include <piejam/gui/model/FxParameterKeyId.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/FxStreamKeyId.h>
@@ -35,7 +35,7 @@ struct FxFilter::Impl
 
     std::unique_ptr<AudioStreamProvider> inOutStream;
 
-    std::unique_ptr<FxIntParameter> filterTypeParam;
+    std::unique_ptr<FxEnumParameter> filterTypeParam;
     std::unique_ptr<FxFloatParameter> cutoffParam;
     std::unique_ptr<FxFloatParameter> resonanceParam;
 };
@@ -56,7 +56,7 @@ FxFilter::FxFilter(
 
     constexpr auto filterTypeKey =
             to_underlying(runtime::modules::filter::parameter_key::type);
-    m_impl->filterTypeParam = std::make_unique<FxIntParameter>(
+    m_impl->filterTypeParam = std::make_unique<FxEnumParameter>(
             dispatch(),
             this->state_change_subscriber(),
             FxParameterKeyId{
@@ -151,7 +151,7 @@ FxFilter::clear()
 }
 
 auto
-FxFilter::filterType() -> FxParameter*
+FxFilter::filterType() -> FxEnumParameter*
 {
     return m_impl->filterTypeParam.get();
 }

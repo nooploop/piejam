@@ -21,7 +21,7 @@ class FxFilter final : public Subscribable<FxModuleContent>
     Q_PROPERTY(piejam::gui::model::SpectrumData* dataIn READ dataIn CONSTANT)
     Q_PROPERTY(piejam::gui::model::SpectrumData* dataOut READ dataOut CONSTANT)
 
-    Q_PROPERTY(piejam::gui::model::FxParameter* filterType READ filterType
+    Q_PROPERTY(piejam::gui::model::FxEnumParameter* filterType READ filterType
                        CONSTANT)
     Q_PROPERTY(piejam::gui::model::FxParameter* cutoff READ cutoff CONSTANT)
     Q_PROPERTY(
@@ -44,7 +44,7 @@ public:
 
     Q_INVOKABLE void clear();
 
-    auto filterType() -> FxParameter*;
+    auto filterType() -> FxEnumParameter*;
     auto cutoff() -> FxParameter*;
     auto resonance() -> FxParameter*;
 

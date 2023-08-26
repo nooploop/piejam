@@ -13,11 +13,25 @@
 namespace piejam::runtime::modules::scope
 {
 
+enum class mode : int
+{
+    free,
+    trigger_a,
+    trigger_b,
+};
+
+enum class parameter_key : fx::parameter_key
+{
+    mode
+};
+
 enum class stream_key : fx::stream_key
 {
     input
 };
 
-auto make_module(audio::bus_type, audio_streams_cache&) -> fx::module;
+auto
+make_module(audio::bus_type, fx_parameter_factory const&, audio_streams_cache&)
+        -> fx::module;
 
 } // namespace piejam::runtime::modules::scope

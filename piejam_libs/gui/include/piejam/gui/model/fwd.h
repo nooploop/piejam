@@ -40,6 +40,10 @@ using BusNamesList = GenericListModel<BusName>;
 
 class FxParameter;
 using FxParametersList = GenericListModel<FxParameter>;
+class FxBoolParameter;
+class FxIntParameter;
+class FxEnumParameter;
+class FxFloatParameter;
 
 class FxBrowser;
 class FxBrowserEntry;

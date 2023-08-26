@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2021 Dimitrij Kotrev
-
-SPDX-License-Identifier: CC0-1.0
--->
-
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
@@ -86,5 +80,6 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/MixerControls/ChannelFxStrip.qml</file>
         <file>PieJam/Views/FxBrowser.qml</file>
         <file>PieJam/Views/FxModule.qml</file>
+        <file>PieJam/FxChainControls/EnumComboBox.qml</file>
     </qresource>
 </RCC>

@@ -12,21 +12,19 @@ Repeater {
     property int buttonWidth: 64
     property int buttonHeight: 48
 
-    model: root.paramModel ? root.paramModel.maxValue - root.paramModel.minValue + 1 : 0
+    model: root.paramModel ? root.paramModel.values : null
 
     delegate: Button {
-        property int value: modelData + root.paramModel.minValue
-
         width: root.buttonWidth
         height: root.buttonHeight
 
-        text: root.paramModel.valueToString(value)
+        text: model.text
 
         checkable: true
         autoExclusive: true
 
-        checked: value === root.paramModel.value
+        checked: model.value === root.paramModel.value
 
-        onClicked: root.paramModel.changeValue(value)
+        onClicked: root.paramModel.changeValue(model.value)
     }
 }

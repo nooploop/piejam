@@ -5,6 +5,7 @@
 #include <piejam/gui/model/FxScope.h>
 
 #include <piejam/gui/model/AudioStreamChannelDuplicator.h>
+#include <piejam/gui/model/FxEnumParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/ScopeDataGenerator.h>
 #include <piejam/gui/model/WaveformDataGenerator.h>
@@ -54,11 +55,13 @@ struct FxScope::Impl
     }
 
     BusType busType;
+
+    std::unique_ptr<FxEnumParameter> triggerSource;
+    std::unique_ptr<AudioStreamProvider> stream;
+
     WaveformDataGenerator waveformGenerator;
     AudioStreamChannelDuplicator channelDuplicator;
     ScopeDataGenerator scopeDataGenerator;
-
-    std::unique_ptr<AudioStreamProvider> stream;
 };
 
 FxScope::FxScope(
@@ -70,19 +73,28 @@ FxScope::FxScope(
               observe_once(runtime::selectors::make_fx_module_bus_type_selector(
                       fx_mod_id)))))
 {
+    auto const parameters = observe_once(
+            runtime::selectors::make_fx_module_parameters_selector(fx_mod_id));
+
+    auto const triggerSourceKey =
+            to_underlying(runtime::modules::scope::parameter_key::mode);
+    m_impl->triggerSource = std::make_unique<FxEnumParameter>(
+            dispatch(),
+            this->state_change_subscriber(),
+            FxParameterKeyId{
+                    .key = triggerSourceKey,
+                    .id = parameters->at(triggerSourceKey)});
+    connectSubscribableChild(*m_impl->triggerSource);
+
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
 
     constexpr auto streamKey =
             to_underlying(runtime::modules::scope::stream_key::input);
-    auto const streamId = streams->at(streamKey);
-    FxStreamKeyId fxStreamKeyId{.key = streamKey, .id = streamId};
-
     m_impl->stream = std::make_unique<FxStream>(
             dispatch(),
             this->state_change_subscriber(),
-            fxStreamKeyId);
-
+            FxStreamKeyId{.key = streamKey, .id = streams->at(streamKey)});
     connectSubscribableChild(*m_impl->stream);
 
     m_impl->waveformGenerator.setActive(0, activeA());
@@ -162,6 +174,12 @@ FxScope::FxScope(
                 &m_impl->scopeDataGenerator,
                 &ScopeDataGenerator::update);
     }
+
+    QObject::connect(
+            m_impl->triggerSource.get(),
+            &FxEnumParameter::valueChanged,
+            this,
+            &FxScope::onTriggerSourceChanged);
 }
 
 FxScope::~FxScope() = default;
@@ -170,6 +188,12 @@ auto
 FxScope::busType() const noexcept -> BusType
 {
     return m_impl->busType;
+}
+
+auto
+FxScope::triggerSource() const noexcept -> FxEnumParameter*
+{
+    return m_impl->triggerSource.get();
 }
 
 void
@@ -191,33 +215,6 @@ FxScope::setViewSize(int const x)
         m_viewSize = x;
         m_impl->scopeDataGenerator.setWindowSize(static_cast<std::size_t>(x));
         emit viewSizeChanged();
-
-        clear();
-    }
-}
-
-void
-FxScope::setTriggerSource(TriggerSource x)
-{
-    if (m_triggerSource != x)
-    {
-        m_triggerSource = x;
-
-        switch (x)
-        {
-            case TriggerSource::StreamA:
-                m_impl->scopeDataGenerator.setTriggerStream(0);
-                break;
-
-            case TriggerSource::StreamB:
-                m_impl->scopeDataGenerator.setTriggerStream(1);
-                break;
-
-            default:
-                break;
-        }
-
-        emit triggerSourceChanged();
 
         clear();
     }
@@ -380,6 +377,27 @@ FxScope::onSubscribe()
 {
     m_impl->scopeDataGenerator.setSampleRate(
             observe_once(runtime::selectors::select_sample_rate).second);
+}
+
+void
+FxScope::onTriggerSourceChanged()
+{
+    switch (static_cast<runtime::fx::parameter_key>(
+            m_impl->triggerSource->value()))
+    {
+        case to_underlying(runtime::modules::scope::mode::trigger_a):
+            m_impl->scopeDataGenerator.setTriggerStream(0);
+            break;
+
+        case to_underlying(runtime::modules::scope::mode::trigger_b):
+            m_impl->scopeDataGenerator.setTriggerStream(1);
+            break;
+
+        default:
+            break;
+    }
+
+    clear();
 }
 
 } // namespace piejam::gui::model

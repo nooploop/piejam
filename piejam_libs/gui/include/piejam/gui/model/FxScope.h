@@ -30,8 +30,8 @@ class FxScope final : public Subscribable<FxModuleContent>
                        NOTIFY samplesPerPixelChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
-    Q_PROPERTY(TriggerSource triggerSource READ triggerSource WRITE
-                       setTriggerSource NOTIFY triggerSourceChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::FxEnumParameter* triggerSource READ
+                       triggerSource CONSTANT)
     Q_PROPERTY(piejam::gui::model::TriggerSlope triggerSlope READ triggerSlope
                        WRITE setTriggerSlope NOTIFY triggerSlopeChanged FINAL)
     Q_PROPERTY(double triggerLevel READ triggerLevel WRITE setTriggerLevel
@@ -86,19 +86,14 @@ public:
 
     enum class TriggerSource
     {
+        Free,
         StreamA,
         StreamB,
-        Free
     };
 
     Q_ENUM(TriggerSource)
 
-    auto triggerSource() const noexcept -> TriggerSource
-    {
-        return m_triggerSource;
-    }
-
-    void setTriggerSource(TriggerSource);
+    auto triggerSource() const noexcept -> FxEnumParameter*;
 
     auto triggerSlope() const noexcept -> TriggerSlope
     {
@@ -188,7 +183,6 @@ public:
 signals:
     void samplesPerPixelChanged();
     void viewSizeChanged();
-    void triggerSourceChanged();
     void triggerSlopeChanged();
     void triggerLevelChanged();
     void holdTimeChanged();
@@ -202,12 +196,13 @@ signals:
 private:
     void onSubscribe() override;
 
+    void onTriggerSourceChanged();
+
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
     int m_samplesPerPixel{1};
     int m_viewSize{};
-    TriggerSource m_triggerSource{TriggerSource::StreamA};
     TriggerSlope m_triggerSlope{TriggerSlope::RisingEdge};
     double m_triggerLevel{0};
     int m_holdTime{80};

@@ -101,10 +101,12 @@ FxModule::onSubscribe()
 
     observe(runtime::selectors::select_focused_fx_module,
             [this](auto fx_mod_id) {
-                m_impl->content = makeModuleContent(
+                auto content = makeModuleContent(
                         dispatch(),
                         state_change_subscriber(),
                         fx_mod_id);
+
+                std::swap(m_impl->content, content);
 
                 emit contentChanged();
             });

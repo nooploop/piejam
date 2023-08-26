@@ -18,6 +18,7 @@
 #include <piejam/gui/model/FxBoolParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>
+#include <piejam/gui/model/FxEnumParameter.h>
 #include <piejam/gui/model/FxFilter.h>
 #include <piejam/gui/model/FxFloatParameter.h>
 #include <piejam/gui/model/FxIntParameter.h>
@@ -74,6 +75,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::Log*>();
     qRegisterMetaType<piejam::gui::model::FxParameter*>();
     qRegisterMetaType<piejam::gui::model::FxBoolParameter*>();
+    qRegisterMetaType<piejam::gui::model::FxEnumParameter*>();
     qRegisterMetaType<piejam::gui::model::FxIntParameter*>();
     qRegisterMetaType<piejam::gui::model::FxFloatParameter*>();
     qRegisterMetaType<piejam::gui::model::FxChainModule*>();

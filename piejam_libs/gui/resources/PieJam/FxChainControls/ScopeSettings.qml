@@ -15,7 +15,7 @@ Item {
     id: root
 
     property bool isStereo: false
-    property alias mode: modeComboBox.currentText
+    property alias mode: modeComboBox.paramModel
     property int triggerSlope: PJModels.TriggerSlope.RisingEdge
     property alias triggerLevel: triggerLevelSpinBox.value
     property alias holdTime: holdTimeSpinBox.value
@@ -32,13 +32,11 @@ Item {
                 topPadding: 4
             }
 
-            ComboBox {
+            EnumComboBox {
                 id: modeComboBox
 
                 implicitWidth: 128
                 implicitHeight: 40
-
-                model: root.isStereo ? ["Trigger A", "Trigger B", "Free"] : ["Trigger", "Free"]
             }
         }
 

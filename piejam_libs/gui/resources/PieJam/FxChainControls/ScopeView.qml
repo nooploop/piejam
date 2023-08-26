@@ -42,7 +42,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            currentIndex: settings.mode == "Free" ? 1 : 0
+            currentIndex: root.content ? (root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? 1 : 0) : -1
 
             Frame {
                 id: scopeView
@@ -104,6 +104,8 @@ Item {
             id: settings
 
             isStereo: privates.isStereo
+
+            mode: root.content ? root.content.triggerSource : null
 
             triggerSlope: root.content ? root.content.triggerSlope : PJModels.TriggerSlope.RisingEdge
 
@@ -186,7 +188,7 @@ Item {
             }
 
             StackLayout {
-                currentIndex: settings.mode == "Free" ? 1 : 0
+                currentIndex: root.content ? (root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? 1 : 0) : -1
 
                 Layout.fillWidth: true
                 Layout.maximumHeight: 40
@@ -246,15 +248,7 @@ Item {
         when: root.content
         target: root.content
         property: "viewSize"
-        value: settings.mode == "Free" ? waveformA.width : scopeA.width
-        restoreMode: Binding.RestoreBinding
-    }
-
-    Binding {
-        when: root.content
-        target: root.content
-        property: "triggerSource"
-        value: settings.mode === "Trigger B" ? PJModels.FxScope.TriggerSource.StreamB : PJModels.FxScope.TriggerSource.StreamA
+        value: root.content && root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? waveformA.width : scopeA.width
         restoreMode: Binding.RestoreBinding
     }
 

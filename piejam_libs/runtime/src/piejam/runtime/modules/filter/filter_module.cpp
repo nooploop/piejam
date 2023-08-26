@@ -4,6 +4,8 @@
 
 #include <piejam/runtime/modules/filter/filter_module.h>
 
+#include <piejam/audio/multichannel_buffer.h>
+#include <piejam/entity_map.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter.h>
@@ -11,9 +13,6 @@
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/int_.h>
-
-#include <piejam/audio/multichannel_buffer.h>
-#include <piejam/entity_map.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
@@ -26,7 +25,7 @@ namespace piejam::runtime::modules::filter
 namespace
 {
 
-static auto
+auto
 to_type_string(int const n) -> std::string
 {
     switch (n)
@@ -51,14 +50,14 @@ to_type_string(int const n) -> std::string
     }
 }
 
-static auto
+auto
 to_cutoff_string(float const f)
 {
     return f < 1000.f ? fmt::format("{:.2f} Hz", f)
                       : fmt::format("{:.2f} kHz", f / 1000.f);
 }
 
-static auto
+auto
 to_resonance_string(float const r)
 {
     auto p = r * 100;
