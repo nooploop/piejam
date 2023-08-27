@@ -36,9 +36,9 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusType.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DFTResolution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleTick.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DFTResolution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/EnumListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBoolParameter.h
@@ -47,12 +47,14 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryInternal.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryLADSPA.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChainModule.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxEnumParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxFilter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxFloatParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxGenericModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxIntParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleContent.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleContentSubscribable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxParameterKeyId.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxScope.h
@@ -75,8 +77,8 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/ScopeData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/ScopeDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumData.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataPoint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataGenerator.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataPoint.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StereoChannel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StreamProcessor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
@@ -102,6 +104,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryInternal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryLADSPA.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxChainModule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxEnumParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxFloatParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxGenericModule.cpp
@@ -127,8 +130,6 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/SpectrumDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/WaveformDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
-    include/piejam/gui/model/FxEnumParameter.h
-    src/piejam/gui/model/FxEnumParameter.cpp
 )
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_gui

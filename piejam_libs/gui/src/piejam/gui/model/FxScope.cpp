@@ -65,28 +65,14 @@ struct FxScope::Impl
     std::unique_ptr<FxEnumParameter> triggerSlope;
     std::unique_ptr<FxFloatParameter> triggerLevel;
     std::unique_ptr<FxFloatParameter> holdTime;
-    std::unique_ptr<AudioStreamProvider> stream;
+    std::unique_ptr<FxStream> stream;
 };
-
-template <class Parameter, class Parameters>
-void
-FxScope::makeParameter(
-        std::size_t key,
-        std::unique_ptr<Parameter>& param,
-        Parameters const& parameters)
-{
-    param = std::make_unique<Parameter>(
-            dispatch(),
-            this->state_change_subscriber(),
-            FxParameterKeyId{.key = key, .id = parameters->at(key)});
-    connectSubscribableChild(*param);
-}
 
 FxScope::FxScope(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
-    : Subscribable(store_dispatch, state_change_subscriber)
+    : FxModuleContentSubscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(toBusType(
               observe_once(runtime::selectors::make_fx_module_bus_type_selector(
                       fx_mod_id)))))
@@ -94,56 +80,35 @@ FxScope::FxScope(
     auto const parameters = observe_once(
             runtime::selectors::make_fx_module_parameters_selector(fx_mod_id));
 
-    auto const triggerSourceKey =
-            to_underlying(runtime::modules::scope::parameter_key::mode);
-    m_impl->triggerSource = std::make_unique<FxEnumParameter>(
-            dispatch(),
-            this->state_change_subscriber(),
-            FxParameterKeyId{
-                    .key = triggerSourceKey,
-                    .id = parameters->at(triggerSourceKey)});
-    connectSubscribableChild(*m_impl->triggerSource);
+    makeParameter(
+            to_underlying(runtime::modules::scope::parameter_key::mode),
+            m_impl->triggerSource,
+            *parameters);
 
-    auto const triggerSlopeKey = to_underlying(
-            runtime::modules::scope::parameter_key::trigger_slope);
-    m_impl->triggerSlope = std::make_unique<FxEnumParameter>(
-            dispatch(),
-            this->state_change_subscriber(),
-            FxParameterKeyId{
-                    .key = triggerSlopeKey,
-                    .id = parameters->at(triggerSlopeKey)});
-    connectSubscribableChild(*m_impl->triggerSlope);
+    makeParameter(
+            to_underlying(
+                    runtime::modules::scope::parameter_key::trigger_slope),
+            m_impl->triggerSlope,
+            *parameters);
 
-    auto const triggerLevelKey = to_underlying(
-            runtime::modules::scope::parameter_key::trigger_level);
-    m_impl->triggerLevel = std::make_unique<FxFloatParameter>(
-            dispatch(),
-            this->state_change_subscriber(),
-            FxParameterKeyId{
-                    .key = triggerLevelKey,
-                    .id = parameters->at(triggerLevelKey)});
-    connectSubscribableChild(*m_impl->triggerLevel);
+    makeParameter(
+            to_underlying(
+                    runtime::modules::scope::parameter_key::trigger_level),
+            m_impl->triggerLevel,
+            *parameters);
 
-    auto const holdTimeKey =
-            to_underlying(runtime::modules::scope::parameter_key::hold_time);
-    m_impl->holdTime = std::make_unique<FxFloatParameter>(
-            dispatch(),
-            this->state_change_subscriber(),
-            FxParameterKeyId{
-                    .key = holdTimeKey,
-                    .id = parameters->at(holdTimeKey)});
-    connectSubscribableChild(*m_impl->holdTime);
+    makeParameter(
+            to_underlying(runtime::modules::scope::parameter_key::hold_time),
+            m_impl->holdTime,
+            *parameters);
 
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
 
-    constexpr auto streamKey =
-            to_underlying(runtime::modules::scope::stream_key::input);
-    m_impl->stream = std::make_unique<FxStream>(
-            dispatch(),
-            this->state_change_subscriber(),
-            FxStreamKeyId{.key = streamKey, .id = streams->at(streamKey)});
-    connectSubscribableChild(*m_impl->stream);
+    makeStream(
+            to_underlying(runtime::modules::scope::stream_key::input),
+            m_impl->stream,
+            *streams);
 
     m_impl->waveformGenerator.setActive(0, activeA());
     m_impl->waveformGenerator.setChannel(0, channelA());

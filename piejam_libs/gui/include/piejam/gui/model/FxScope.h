@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/BusType.h>
-#include <piejam/gui/model/FxModuleContent.h>
+#include <piejam/gui/model/FxModuleContentSubscribable.h>
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/Subscribable.h>
@@ -20,7 +20,7 @@
 namespace piejam::gui::model
 {
 
-class FxScope final : public Subscribable<FxModuleContent>
+class FxScope final : public FxModuleContentSubscribable
 {
     Q_OBJECT
 
@@ -181,12 +181,6 @@ private:
     void onTriggerSlopeChanged();
     void onTriggerLevelChanged();
     void onHoldTimeChanged();
-
-    template <class Parameter, class Parameters>
-    void makeParameter(
-            std::size_t key,
-            std::unique_ptr<Parameter>& param,
-            Parameters const& parameters);
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
