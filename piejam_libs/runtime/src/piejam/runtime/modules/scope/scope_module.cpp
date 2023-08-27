@@ -74,6 +74,13 @@ to_trigger_slope_string(int const n) -> std::string
     }
 }
 
+auto
+to_hold_time_string(float const time) -> std::string
+{
+    return time > 1000.f ? fmt::format("{:1.2f} s", time / 1000.f)
+                         : fmt::format("{:.0f} ms", time);
+}
+
 } // namespace
 
 auto
@@ -138,7 +145,23 @@ make_module(
                                      fx::parameter{
                                              .name = "Trigger Level",
                                              .value_to_string = fx::
-                                                     make_default_float_parameter_value_to_string()})}},
+                                                     make_default_float_parameter_value_to_string()})},
+                            {to_underlying(parameter_key::hold_time),
+                             fx_params_factory.make_parameter(
+                                     float_parameter{
+                                             .default_value = 80.f,
+                                             .min = 16.f,
+                                             .max = 1600.f,
+                                             .to_normalized =
+                                                     &parameter::
+                                                             to_normalized_linear,
+                                             .from_normalized =
+                                                     &parameter::
+                                                             from_normalized_linear},
+                                     fx::parameter{
+                                             .name = "Hold Time",
+                                             .value_to_string =
+                                                     &to_hold_time_string})}},
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),
                      streams.add(audio_stream_buffer(

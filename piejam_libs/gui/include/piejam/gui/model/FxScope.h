@@ -35,8 +35,8 @@ class FxScope final : public Subscribable<FxModuleContent>
                        triggerSlope CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FxFloatParameter* triggerLevel READ
                        triggerLevel CONSTANT FINAL)
-    Q_PROPERTY(int holdTime READ holdTime WRITE setHoldTime NOTIFY
-                       holdTimeChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::FxFloatParameter* holdTime READ holdTime
+                       CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
                        waveformDataA CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataB READ
@@ -98,12 +98,7 @@ public:
 
     auto triggerLevel() const noexcept -> FxFloatParameter*;
 
-    auto holdTime() const noexcept -> int
-    {
-        return m_holdTime;
-    }
-
-    void setHoldTime(int holdTimeInMS);
+    auto holdTime() const noexcept -> FxFloatParameter*;
 
     auto activeA() const noexcept -> bool
     {
@@ -172,7 +167,6 @@ public:
 signals:
     void samplesPerPixelChanged();
     void viewSizeChanged();
-    void holdTimeChanged();
     void activeAChanged();
     void activeBChanged();
     void channelAChanged();
@@ -186,13 +180,19 @@ private:
     void onTriggerSourceChanged();
     void onTriggerSlopeChanged();
     void onTriggerLevelChanged();
+    void onHoldTimeChanged();
+
+    template <class Parameter, class Parameters>
+    void makeParameter(
+            std::size_t key,
+            std::unique_ptr<Parameter>& param,
+            Parameters const& parameters);
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
     int m_samplesPerPixel{1};
     int m_viewSize{};
-    int m_holdTime{80};
     WaveformDataObject m_waveformDataA;
     WaveformDataObject m_waveformDataB;
     ScopeData m_scopeDataA;

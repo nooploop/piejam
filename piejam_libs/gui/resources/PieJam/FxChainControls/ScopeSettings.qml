@@ -18,7 +18,7 @@ Item {
     property var triggerSource: null
     property var triggerSlope: null
     property var triggerLevel: null
-    property alias holdTime: holdTimeSpinBox.value
+    property var holdTime: null
 
     implicitHeight: 64
 
@@ -41,8 +41,8 @@ Item {
             EnumComboBox {
                 paramModel: root.triggerSource
 
-                implicitWidth: 128
-                implicitHeight: 40
+                Layout.preferredWidth: 128
+                Layout.preferredHeight: 40
             }
         }
 
@@ -86,7 +86,7 @@ Item {
                 paramModel: root.triggerLevel
                 stepScale: .5
 
-                implicitWidth: 112
+                Layout.preferredWidth: 112
             }
         }
 
@@ -102,20 +102,10 @@ Item {
                 topPadding: 4
             }
 
-            QuickSpinBox {
-                id: holdTimeSpinBox
+            ParameterQuickSpinBox {
+                paramModel: root.holdTime
 
-                from: 16
-                to: 1600
-                step: 16
-                bigStep: 160
-                value: 80
-
-                implicitWidth: 128
-
-                textFromValue: function(value) {
-                    return value >= 1000 ? ((value / 1000).toFixed(2) + " s" )  : (value + " ms")
-                }
+                Layout.preferredWidth: 132
             }
         }
 

@@ -64,8 +64,23 @@ struct FxScope::Impl
     std::unique_ptr<FxEnumParameter> triggerSource;
     std::unique_ptr<FxEnumParameter> triggerSlope;
     std::unique_ptr<FxFloatParameter> triggerLevel;
+    std::unique_ptr<FxFloatParameter> holdTime;
     std::unique_ptr<AudioStreamProvider> stream;
 };
+
+template <class Parameter, class Parameters>
+void
+FxScope::makeParameter(
+        std::size_t key,
+        std::unique_ptr<Parameter>& param,
+        Parameters const& parameters)
+{
+    param = std::make_unique<Parameter>(
+            dispatch(),
+            this->state_change_subscriber(),
+            FxParameterKeyId{.key = key, .id = parameters->at(key)});
+    connectSubscribableChild(*param);
+}
 
 FxScope::FxScope(
         runtime::store_dispatch store_dispatch,
@@ -109,6 +124,16 @@ FxScope::FxScope(
                     .id = parameters->at(triggerLevelKey)});
     connectSubscribableChild(*m_impl->triggerLevel);
 
+    auto const holdTimeKey =
+            to_underlying(runtime::modules::scope::parameter_key::hold_time);
+    m_impl->holdTime = std::make_unique<FxFloatParameter>(
+            dispatch(),
+            this->state_change_subscriber(),
+            FxParameterKeyId{
+                    .key = holdTimeKey,
+                    .id = parameters->at(holdTimeKey)});
+    connectSubscribableChild(*m_impl->holdTime);
+
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
 
@@ -124,8 +149,8 @@ FxScope::FxScope(
     m_impl->waveformGenerator.setChannel(0, channelA());
     m_impl->scopeDataGenerator.setActive(0, activeA());
     m_impl->scopeDataGenerator.setChannel(0, channelA());
-    m_impl->scopeDataGenerator.setHoldTime(
-            std::chrono::milliseconds{m_holdTime});
+    m_impl->scopeDataGenerator.setHoldTime(std::chrono::milliseconds{
+            static_cast<int>(m_impl->holdTime->value())});
 
     if (m_impl->busType == BusType::Stereo)
     {
@@ -215,6 +240,12 @@ FxScope::FxScope(
             &FxFloatParameter::valueChanged,
             this,
             &FxScope::onTriggerLevelChanged);
+
+    QObject::connect(
+            m_impl->holdTime.get(),
+            &FxFloatParameter::valueChanged,
+            this,
+            &FxScope::onHoldTimeChanged);
 }
 
 FxScope::~FxScope() = default;
@@ -243,6 +274,12 @@ FxScope::triggerLevel() const noexcept -> FxFloatParameter*
     return m_impl->triggerLevel.get();
 }
 
+auto
+FxScope::holdTime() const noexcept -> FxFloatParameter*
+{
+    return m_impl->holdTime.get();
+}
+
 void
 FxScope::setSamplesPerPixel(int const x)
 {
@@ -264,23 +301,6 @@ FxScope::setViewSize(int const x)
         emit viewSizeChanged();
 
         clear();
-    }
-}
-
-void
-FxScope::setHoldTime(int holdTime)
-{
-    if (holdTime < 16 || holdTime > 1600)
-    {
-        return;
-    }
-
-    if (m_holdTime != holdTime)
-    {
-        m_holdTime = holdTime;
-        m_impl->scopeDataGenerator.setHoldTime(
-                std::chrono::milliseconds{m_holdTime});
-        emit holdTimeChanged();
     }
 }
 
@@ -431,6 +451,13 @@ FxScope::onTriggerLevelChanged()
 {
     m_impl->scopeDataGenerator.setTriggerLevel(
             static_cast<float>(m_impl->triggerLevel->value()));
+}
+
+void
+FxScope::onHoldTimeChanged()
+{
+    m_impl->scopeDataGenerator.setHoldTime(std::chrono::milliseconds{
+            static_cast<int>(m_impl->holdTime->value())});
 }
 
 } // namespace piejam::gui::model

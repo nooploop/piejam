@@ -111,15 +111,7 @@ Item {
 
             triggerLevel: root.content ? root.content.triggerLevel : null
 
-            holdTime: root.content ? root.content.holdTime : 80
-
-            Binding {
-                when: root.content
-                target: root.content
-                property: "holdTime"
-                value: settings.holdTime
-                restoreMode: Binding.RestoreBinding
-            }
+            holdTime: root.content ? root.content.holdTime : null
 
             Layout.fillWidth: true
         }
@@ -233,14 +225,6 @@ Item {
         target: root.content
         property: "viewSize"
         value: root.content && root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? waveformA.width : scopeA.width
-        restoreMode: Binding.RestoreBinding
-    }
-
-    Binding {
-        when: root.content
-        target: root.content
-        property: "holdTime"
-        value: settings.holdTime
         restoreMode: Binding.RestoreBinding
     }
 

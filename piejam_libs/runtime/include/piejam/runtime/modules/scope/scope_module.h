@@ -31,6 +31,7 @@ enum class parameter_key : fx::parameter_key
     mode,
     trigger_slope,
     trigger_level,
+    hold_time,
 };
 
 enum class stream_key : fx::stream_key
