@@ -9,6 +9,7 @@ import QtQuick.Controls.Material 2.15
 import PieJam.Models 1.0
 
 import ".."
+import "../Controls"
 
 Item {
     id: root
@@ -30,5 +31,11 @@ Item {
                 Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + (private_.paramModel.value ? "on" : "off")
             }
         }
+    }
+
+    MidiAssignArea {
+        anchors.fill: parent
+
+        model: private_.paramModel ? private_.paramModel.midi : null
     }
 }

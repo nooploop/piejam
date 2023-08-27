@@ -29,7 +29,7 @@ Item {
                            root.content.clear()
 
     QtObject {
-        id: privates
+        id: private_
 
         readonly property bool isStereo: root.content && root.content.busType == PJModels.BusType.Stereo
     }
@@ -42,7 +42,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            currentIndex: root.content ? (root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? 1 : 0) : -1
+            currentIndex: root.content ? (root.content.mode.value === PJModels.FxScope.Mode.Free ? 1 : 0) : -1
 
             Frame {
                 id: scopeView
@@ -64,7 +64,7 @@ Item {
 
                     anchors.fill: parent
 
-                    visible: privates.isStereo && (root.content ? root.content.activeB : false)
+                    visible: private_.isStereo && (root.content ? root.content.activeB : false)
 
                     scopeData: root.content ? root.content.scopeDataB : null
                     color: Material.color(Material.Blue)
@@ -91,7 +91,7 @@ Item {
 
                     anchors.fill: parent
 
-                    visible: privates.isStereo && (root.content ? root.content.activeB : false)
+                    visible: private_.isStereo && (root.content ? root.content.activeB : false)
 
                     waveformData: root.content ? root.content.waveformDataB : null
                     color: Material.color(Material.Blue)
@@ -101,16 +101,11 @@ Item {
         }
 
         ScopeSettings {
-            id: settings
+            isStereo: private_.isStereo
 
-            isStereo: privates.isStereo
-
-            triggerSource: root.content ? root.content.triggerSource : null
-
+            mode: root.content ? root.content.mode : null
             triggerSlope: root.content ? root.content.triggerSlope : null
-
             triggerLevel: root.content ? root.content.triggerLevel : null
-
             holdTime: root.content ? root.content.holdTime : null
 
             Layout.fillWidth: true
@@ -128,7 +123,7 @@ Item {
             StereoChannelSelector {
                 id: channelASelector
 
-                visible: privates.isStereo
+                visible: private_.isStereo
 
                 name: "A"
                 active: root.content ? root.content.activeA : false
@@ -141,13 +136,13 @@ Item {
             }
 
             ToolSeparator {
-                visible: privates.isStereo
+                visible: private_.isStereo
             }
 
             StereoChannelSelector {
                 id: channelBSelector
 
-                visible: privates.isStereo
+                visible: private_.isStereo
 
                 name: "B"
                 active: root.content ? root.content.activeB : false
@@ -160,11 +155,11 @@ Item {
             }
 
             ToolSeparator {
-                visible: privates.isStereo
+                visible: private_.isStereo
             }
 
             StackLayout {
-                currentIndex: root.content ? (root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? 1 : 0) : -1
+                currentIndex: root.content ? (root.content.mode.value === PJModels.FxScope.Mode.Free ? 1 : 0) : -1
 
                 Layout.fillWidth: true
                 Layout.maximumHeight: 40
@@ -224,7 +219,7 @@ Item {
         when: root.content
         target: root.content
         property: "viewSize"
-        value: root.content && root.content.triggerSource.value === PJModels.FxScope.TriggerSource.Free ? waveformA.width : scopeA.width
+        value: root.content && root.content.mode.value === PJModels.FxScope.Mode.Free ? waveformA.width : scopeA.width
         restoreMode: Binding.RestoreBinding
     }
 

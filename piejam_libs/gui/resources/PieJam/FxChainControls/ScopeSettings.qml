@@ -15,7 +15,7 @@ Item {
     id: root
 
     property bool isStereo: false
-    property var triggerSource: null
+    property var mode: null
     property var triggerSlope: null
     property var triggerLevel: null
     property var holdTime: null
@@ -25,7 +25,7 @@ Item {
     QtObject {
         id: private_
 
-        readonly property bool freeMode: root.triggerSource && root.triggerSource.value === PJModels.FxScope.TriggerSource.Free
+        readonly property bool freeMode: root.mode && root.mode.value === PJModels.FxScope.Mode.Free
     }
 
     RowLayout {
@@ -39,7 +39,7 @@ Item {
             }
 
             EnumComboBox {
-                paramModel: root.triggerSource
+                paramModel: root.mode
 
                 Layout.preferredWidth: 128
                 Layout.preferredHeight: 40
@@ -109,8 +109,20 @@ Item {
             }
         }
 
-        Item {
-            Layout.fillWidth: true
+        ToolSeparator {
+            Layout.fillHeight: true
+        }
+
+        ColumnLayout {
+            Label {
+                text: "Window Size"
+                topPadding: 4
+            }
+
+            Slider {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+            }
         }
     }
 }

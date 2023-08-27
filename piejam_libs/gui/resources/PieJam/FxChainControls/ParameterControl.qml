@@ -101,11 +101,5 @@ Item {
                 paramModel: root.paramModel
             }
         }
-
-        MidiAssignArea {
-            anchors.fill: controlStack
-
-            model: root.paramModel ? root.paramModel.midi : null
-        }
     }
 }

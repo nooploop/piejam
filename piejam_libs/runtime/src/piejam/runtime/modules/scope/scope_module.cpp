@@ -108,7 +108,7 @@ make_module(
                                                             ? 2
                                                             : 1},
                                      fx::parameter{
-                                             .name = "Trigger Source",
+                                             .name = "Mode",
                                              .value_to_string =
                                                      bus_type == audio::bus_type::
                                                                              stereo
@@ -127,7 +127,7 @@ make_module(
                                              .min = 0,
                                              .max = 1},
                                      fx::parameter{
-                                             .name = "Trigger Slope",
+                                             .name = "Slope",
                                              .value_to_string =
                                                      &to_trigger_slope_string})},
                             {to_underlying(parameter_key::trigger_level),

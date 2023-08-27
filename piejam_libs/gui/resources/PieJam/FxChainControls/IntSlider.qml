@@ -10,6 +10,7 @@ import QtQuick.Layouts 1.15
 import PieJam.Models 1.0
 
 import ".."
+import "../Controls"
 
 Item {
     id: root
@@ -70,5 +71,11 @@ Item {
 
             onClicked: private_.changeValue(Math.max(private_.value - 1, private_.from))
         }
+    }
+
+    MidiAssignArea {
+        anchors.fill: parent
+
+        model: private_.paramModel ? private_.paramModel.midi : null
     }
 }

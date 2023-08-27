@@ -90,4 +90,10 @@ Item {
             Layout.maximumHeight: 40
         }
     }
+
+    MidiAssignArea {
+        anchors.fill: parent
+
+        model: private_.paramModel ? private_.paramModel.midi : null
+    }
 }

@@ -61,7 +61,7 @@ struct FxScope::Impl
     AudioStreamChannelDuplicator channelDuplicator;
     ScopeDataGenerator scopeDataGenerator;
 
-    std::unique_ptr<FxEnumParameter> triggerSource;
+    std::unique_ptr<FxEnumParameter> mode;
     std::unique_ptr<FxEnumParameter> triggerSlope;
     std::unique_ptr<FxFloatParameter> triggerLevel;
     std::unique_ptr<FxFloatParameter> holdTime;
@@ -82,7 +82,7 @@ FxScope::FxScope(
 
     makeParameter(
             to_underlying(runtime::modules::scope::parameter_key::mode),
-            m_impl->triggerSource,
+            m_impl->mode,
             *parameters);
 
     makeParameter(
@@ -189,7 +189,7 @@ FxScope::FxScope(
     }
 
     QObject::connect(
-            m_impl->triggerSource.get(),
+            m_impl->mode.get(),
             &FxEnumParameter::valueChanged,
             this,
             &FxScope::onTriggerSourceChanged);
@@ -222,9 +222,9 @@ FxScope::busType() const noexcept -> BusType
 }
 
 auto
-FxScope::triggerSource() const noexcept -> FxEnumParameter*
+FxScope::mode() const noexcept -> FxEnumParameter*
 {
-    return m_impl->triggerSource.get();
+    return m_impl->mode.get();
 }
 
 auto
@@ -387,7 +387,7 @@ void
 FxScope::onTriggerSourceChanged()
 {
     switch (static_cast<runtime::fx::parameter_key>(
-            m_impl->triggerSource->value()))
+            m_impl->mode->value()))
     {
         case to_underlying(runtime::modules::scope::mode::trigger_a):
             m_impl->scopeDataGenerator.setTriggerStream(0);

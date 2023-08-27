@@ -29,8 +29,8 @@ class FxScope final : public FxModuleContentSubscribable
                        NOTIFY samplesPerPixelChanged FINAL)
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::FxEnumParameter* triggerSource READ
-                       triggerSource CONSTANT FINAL)
+    Q_PROPERTY(
+            piejam::gui::model::FxEnumParameter* mode READ mode CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FxEnumParameter* triggerSlope READ
                        triggerSlope CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FxFloatParameter* triggerLevel READ
@@ -83,16 +83,16 @@ public:
 
     void setViewSize(int const x);
 
-    enum class TriggerSource
+    enum class Mode
     {
         Free,
         StreamA,
         StreamB,
     };
 
-    Q_ENUM(TriggerSource)
+    Q_ENUM(Mode)
 
-    auto triggerSource() const noexcept -> FxEnumParameter*;
+    auto mode() const noexcept -> FxEnumParameter*;
 
     auto triggerSlope() const noexcept -> FxEnumParameter*;
 
