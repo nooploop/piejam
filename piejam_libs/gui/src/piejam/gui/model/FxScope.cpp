@@ -7,6 +7,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/functional/in_interval.h>
 #include <piejam/gui/model/AudioStreamChannelDuplicator.h>
+#include <piejam/gui/model/FxBoolParameter.h>
 #include <piejam/gui/model/FxEnumParameter.h>
 #include <piejam/gui/model/FxFloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
@@ -67,6 +68,10 @@ struct FxScope::Impl
     std::unique_ptr<FxFloatParameter> holdTime;
     std::unique_ptr<FxIntParameter> waveformWindowSize;
     std::unique_ptr<FxIntParameter> scopeWindowSize;
+    std::unique_ptr<FxBoolParameter> activeA;
+    std::unique_ptr<FxBoolParameter> activeB;
+    std::unique_ptr<FxEnumParameter> channelA;
+    std::unique_ptr<FxEnumParameter> channelB;
     std::unique_ptr<FxStream> stream;
 };
 
@@ -116,6 +121,28 @@ FxScope::FxScope(
             m_impl->scopeWindowSize,
             *parameters);
 
+    makeParameter(
+            to_underlying(
+                    runtime::modules::scope::parameter_key::stream_a_active),
+            m_impl->activeA,
+            *parameters);
+
+    makeParameter(
+            to_underlying(
+                    runtime::modules::scope::parameter_key::stream_b_active),
+            m_impl->activeB,
+            *parameters);
+
+    makeParameter(
+            to_underlying(runtime::modules::scope::parameter_key::channel_a),
+            m_impl->channelA,
+            *parameters);
+
+    makeParameter(
+            to_underlying(runtime::modules::scope::parameter_key::channel_b),
+            m_impl->channelB,
+            *parameters);
+
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
 
@@ -124,19 +151,18 @@ FxScope::FxScope(
             m_impl->stream,
             *streams);
 
-    m_impl->waveformGenerator.setActive(0, activeA());
-    m_impl->waveformGenerator.setChannel(0, channelA());
-    m_impl->scopeDataGenerator.setActive(0, activeA());
-    m_impl->scopeDataGenerator.setChannel(0, channelA());
-    m_impl->scopeDataGenerator.setHoldTime(std::chrono::milliseconds{
-            static_cast<int>(m_impl->holdTime->value())});
+    m_impl->waveformGenerator.setActive(0, false);
+    m_impl->waveformGenerator.setChannel(0, StereoChannel::Left);
+    m_impl->scopeDataGenerator.setActive(0, false);
+    m_impl->scopeDataGenerator.setChannel(0, StereoChannel::Left);
+    m_impl->scopeDataGenerator.setHoldTime(std::chrono::milliseconds{80});
 
     if (m_impl->busType == BusType::Stereo)
     {
-        m_impl->waveformGenerator.setActive(1, activeB());
-        m_impl->waveformGenerator.setChannel(1, channelB());
-        m_impl->scopeDataGenerator.setActive(1, activeB());
-        m_impl->scopeDataGenerator.setChannel(1, channelB());
+        m_impl->waveformGenerator.setActive(1, false);
+        m_impl->waveformGenerator.setChannel(1, StereoChannel::Right);
+        m_impl->scopeDataGenerator.setActive(1, false);
+        m_impl->scopeDataGenerator.setChannel(1, StereoChannel::Right);
     }
 
     QObject::connect(
@@ -237,6 +263,33 @@ FxScope::FxScope(
             &FxIntParameter::valueChanged,
             this,
             &FxScope::onScopeWindowSizeChanged);
+
+    QObject::connect(
+            m_impl->activeA.get(),
+            &FxBoolParameter::valueChanged,
+            this,
+            &FxScope::onActiveAChanged);
+
+    QObject::connect(
+            m_impl->channelA.get(),
+            &FxEnumParameter::valueChanged,
+            this,
+            &FxScope::onChannelAChanged);
+
+    if (m_impl->busType == BusType::Stereo)
+    {
+        QObject::connect(
+                m_impl->activeB.get(),
+                &FxBoolParameter::valueChanged,
+                this,
+                &FxScope::onActiveBChanged);
+
+        QObject::connect(
+                m_impl->channelB.get(),
+                &FxEnumParameter::valueChanged,
+                this,
+                &FxScope::onChannelBChanged);
+    }
 }
 
 FxScope::~FxScope() = default;
@@ -283,6 +336,30 @@ FxScope::scopeWindowSize() const noexcept -> FxIntParameter*
     return m_impl->scopeWindowSize.get();
 }
 
+auto
+FxScope::activeA() const noexcept -> FxBoolParameter*
+{
+    return m_impl->activeA.get();
+}
+
+auto
+FxScope::activeB() const noexcept -> FxBoolParameter*
+{
+    return m_impl->activeB.get();
+}
+
+auto
+FxScope::channelA() const noexcept -> FxEnumParameter*
+{
+    return m_impl->channelA.get();
+}
+
+auto
+FxScope::channelB() const noexcept -> FxEnumParameter*
+{
+    return m_impl->channelB.get();
+}
+
 void
 FxScope::setViewSize(int const x)
 {
@@ -291,62 +368,6 @@ FxScope::setViewSize(int const x)
         m_viewSize = x;
         m_impl->scopeDataGenerator.setWindowSize(static_cast<std::size_t>(x));
         emit viewSizeChanged();
-
-        clear();
-    }
-}
-
-void
-FxScope::changeActiveA(bool const active)
-{
-    if (m_activeA != active)
-    {
-        m_activeA = active;
-        m_impl->waveformGenerator.setActive(0, active);
-        m_impl->scopeDataGenerator.setActive(0, active);
-        emit activeAChanged();
-
-        clear();
-    }
-}
-
-void
-FxScope::changeChannelA(piejam::gui::model::StereoChannel const x)
-{
-    if (m_channelA != x)
-    {
-        m_channelA = x;
-        m_impl->waveformGenerator.setChannel(0, x);
-        m_impl->scopeDataGenerator.setChannel(0, x);
-        emit channelAChanged();
-
-        clear();
-    }
-}
-
-void
-FxScope::changeActiveB(bool const active)
-{
-    if (m_activeB != active)
-    {
-        m_activeB = active;
-        m_impl->waveformGenerator.setActive(1, active);
-        m_impl->scopeDataGenerator.setActive(1, active);
-        emit activeBChanged();
-
-        clear();
-    }
-}
-
-void
-FxScope::changeChannelB(piejam::gui::model::StereoChannel const x)
-{
-    if (m_channelB != x)
-    {
-        m_channelB = x;
-        m_impl->waveformGenerator.setChannel(1, x);
-        m_impl->scopeDataGenerator.setChannel(1, x);
-        emit channelBChanged();
 
         clear();
     }
@@ -371,12 +392,12 @@ FxScope::clear()
     m_scopeDataA.clear();
     m_scopeDataB.clear();
 
-    if (m_activeA)
+    if (m_impl->activeA->value())
     {
         m_waveformDataA.get().resize(m_viewSize);
     }
 
-    if (m_activeB)
+    if (m_impl->activeB->value())
     {
         m_waveformDataB.get().resize(m_viewSize);
     }
@@ -448,6 +469,46 @@ FxScope::onScopeWindowSizeChanged()
 {
     m_impl->scopeDataGenerator.setResolution(
             m_impl->scopeWindowSize->value() * 2 + 1);
+}
+
+void
+FxScope::onActiveAChanged()
+{
+    bool const active = m_impl->activeA->value();
+    m_impl->waveformGenerator.setActive(0, active);
+    m_impl->scopeDataGenerator.setActive(0, active);
+
+    clear();
+}
+
+void
+FxScope::onActiveBChanged()
+{
+    bool const active = m_impl->activeB->value();
+    m_impl->waveformGenerator.setActive(1, active);
+    m_impl->scopeDataGenerator.setActive(1, active);
+
+    clear();
+}
+
+void
+FxScope::onChannelAChanged()
+{
+    auto const x = StereoChannel{m_impl->channelA->value()};
+    m_impl->waveformGenerator.setChannel(0, x);
+    m_impl->scopeDataGenerator.setChannel(0, x);
+
+    clear();
+}
+
+void
+FxScope::onChannelBChanged()
+{
+    auto const x = StereoChannel{m_impl->channelB->value()};
+    m_impl->waveformGenerator.setChannel(1, x);
+    m_impl->scopeDataGenerator.setChannel(1, x);
+
+    clear();
 }
 
 } // namespace piejam::gui::model

@@ -46,13 +46,13 @@ Item {
                 id: channelASelector
 
                 name: "A"
-                active: root.content && root.content.activeA
-                channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
+//                active: root.content && root.content.activeA
+//                channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
 
                 Material.accent: Material.Pink
 
-                onActiveToggled: root.content.changeActiveA(!active)
-                onChannelSelected: root.content.changeChannelA(ch)
+//                onActiveToggled: root.content.changeActiveA(!active)
+//                onChannelSelected: root.content.changeChannelA(ch)
             }
 
             Item {
@@ -63,13 +63,13 @@ Item {
                 id: channelBSelector
 
                 name: "B"
-                active: root.content && root.content.activeB
-                channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
+//                active: root.content && root.content.activeB
+//                channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
 
                 Material.accent: Material.Blue
 
-                onActiveToggled: root.content.changeActiveB(!active)
-                onChannelSelected: root.content.changeChannelB(ch)
+//                onActiveToggled: root.content.changeActiveB(!active)
+//                onChannelSelected: root.content.changeChannelB(ch)
             }
         }
     }

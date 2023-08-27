@@ -11,6 +11,7 @@
 #include <piejam/runtime/fx_parameter_factory.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
+#include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
 #include <piejam/to_underlying.h>
 
@@ -28,16 +29,18 @@ template <audio::bus_type BT>
 auto
 to_mode_string(int const n) -> std::string
 {
+    using namespace std::string_literals;
+
     if constexpr (BT == audio::bus_type::stereo)
     {
         switch (n)
         {
             case to_underlying(mode::free):
-                return "Free";
+                return "Free"s;
             case to_underlying(mode::trigger_a):
-                return "Trigger A";
+                return "Trigger A"s;
             case to_underlying(mode::trigger_b):
-                return "Trigger B";
+                return "Trigger B"s;
 
             default:
                 return "ERROR";
@@ -48,9 +51,9 @@ to_mode_string(int const n) -> std::string
         switch (n)
         {
             case to_underlying(mode::free):
-                return "Free";
+                return "Free"s;
             case to_underlying(mode::trigger_a):
-                return "Trigger A";
+                return "Trigger"s;
 
             default:
                 return "ERROR";
@@ -61,13 +64,15 @@ to_mode_string(int const n) -> std::string
 auto
 to_trigger_slope_string(int const n) -> std::string
 {
+    using namespace std::string_literals;
+
     switch (n)
     {
         case to_underlying(trigger_slope::rising_edge):
-            return "Rising Edge";
+            return "Rising Edge"s;
 
         case to_underlying(trigger_slope::falling_edge):
-            return "Falling Edge";
+            return "Falling Edge"s;
 
         default:
             return "ERROR";
@@ -84,25 +89,51 @@ to_hold_time_string(float const time) -> std::string
 auto
 to_window_size_string(int const n) -> std::string
 {
+    using namespace std::string_literals;
+
     switch (n)
     {
         case to_underlying(window_size::very_small):
-            return "Very Small";
+            return "Very Small"s;
 
         case to_underlying(window_size::small):
-            return "Small";
+            return "Small"s;
 
         case to_underlying(window_size::middle):
-            return "Middle";
+            return "Middle"s;
 
         case to_underlying(window_size::large):
-            return "Large";
+            return "Large"s;
 
         case to_underlying(window_size::very_large):
-            return "Very Large";
+            return "Very Large"s;
 
         default:
-            return "ERROR";
+            return "ERROR"s;
+    }
+}
+
+auto
+to_stereo_channel_string(int const n) -> std::string
+{
+    using namespace std::string_literals;
+
+    switch (n)
+    {
+        case to_underlying(stereo_channel::left):
+            return "L"s;
+
+        case to_underlying(stereo_channel::right):
+            return "R"s;
+
+        case to_underlying(stereo_channel::middle):
+            return "M"s;
+
+        case to_underlying(stereo_channel::side):
+            return "S"s;
+
+        default:
+            return "ERROR"s;
     }
 }
 
@@ -213,6 +244,46 @@ make_module(
                                              .name = "Window Size",
                                              .value_to_string =
                                                      &to_window_size_string})},
+                            {to_underlying(parameter_key::stream_a_active),
+                             fx_params_factory.make_parameter(
+                                     bool_parameter{.default_value = true},
+                                     fx::parameter{
+                                             .name = "Stream A Active",
+                                             .value_to_string = fx::
+                                                     make_default_bool_parameter_value_to_string()})},
+                            {to_underlying(parameter_key::stream_b_active),
+                             fx_params_factory.make_parameter(
+                                     bool_parameter{.default_value = false},
+                                     fx::parameter{
+                                             .name = "Stream B Active",
+                                             .value_to_string = fx::
+                                                     make_default_bool_parameter_value_to_string()})},
+                            {to_underlying(parameter_key::channel_a),
+                             fx_params_factory.make_parameter(
+                                     int_parameter{
+                                             .default_value = to_underlying(
+                                                     stereo_channel::left),
+                                             .min = to_underlying(
+                                                     stereo_channel::_min),
+                                             .max = to_underlying(
+                                                     stereo_channel::_max)},
+                                     fx::parameter{
+                                             .name = "Channel A",
+                                             .value_to_string =
+                                                     &to_stereo_channel_string})},
+                            {to_underlying(parameter_key::channel_b),
+                             fx_params_factory.make_parameter(
+                                     int_parameter{
+                                             .default_value = to_underlying(
+                                                     stereo_channel::right),
+                                             .min = to_underlying(
+                                                     stereo_channel::_min),
+                                             .max = to_underlying(
+                                                     stereo_channel::_max)},
+                                     fx::parameter{
+                                             .name = "Channel B",
+                                             .value_to_string =
+                                                     &to_stereo_channel_string})},
                     },
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),

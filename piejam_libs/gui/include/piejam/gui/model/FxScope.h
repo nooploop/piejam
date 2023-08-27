@@ -40,6 +40,14 @@ class FxScope final : public FxModuleContentSubscribable
                        waveformWindowSize CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FxIntParameter* scopeWindowSize READ
                        scopeWindowSize CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxBoolParameter* activeA READ activeA
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxBoolParameter* activeB READ activeB
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelA READ channelA
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelB READ channelB
+                       CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
                        waveformDataA CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataB READ
@@ -48,12 +56,6 @@ class FxScope final : public FxModuleContentSubscribable
                        CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::ScopeData* scopeDataB READ scopeDataB
                        CONSTANT FINAL)
-    Q_PROPERTY(bool activeA READ activeA NOTIFY activeAChanged FINAL)
-    Q_PROPERTY(bool activeB READ activeB NOTIFY activeBChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::StereoChannel channelA READ channelA NOTIFY
-                       channelAChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::StereoChannel channelB READ channelB NOTIFY
-                       channelBChanged FINAL)
     Q_PROPERTY(
             bool freeze READ freeze WRITE setFreeze NOTIFY freezeChanged FINAL)
 
@@ -87,30 +89,15 @@ public:
     Q_ENUM(Mode)
 
     auto mode() const noexcept -> FxEnumParameter*;
-
     auto triggerSlope() const noexcept -> FxEnumParameter*;
-
     auto triggerLevel() const noexcept -> FxFloatParameter*;
-
     auto holdTime() const noexcept -> FxFloatParameter*;
-
     auto waveformWindowSize() const noexcept -> FxIntParameter*;
-
     auto scopeWindowSize() const noexcept -> FxIntParameter*;
-
-    auto activeA() const noexcept -> bool
-    {
-        return m_activeA;
-    }
-
-    Q_INVOKABLE void changeActiveA(bool active);
-
-    auto channelA() const noexcept -> StereoChannel
-    {
-        return m_channelA;
-    }
-
-    Q_INVOKABLE void changeChannelA(piejam::gui::model::StereoChannel);
+    auto activeA() const noexcept -> FxBoolParameter*;
+    auto activeB() const noexcept -> FxBoolParameter*;
+    auto channelA() const noexcept -> FxEnumParameter*;
+    auto channelB() const noexcept -> FxEnumParameter*;
 
     auto waveformDataA() noexcept -> WaveformDataObject*
     {
@@ -121,20 +108,6 @@ public:
     {
         return &m_scopeDataA;
     }
-
-    auto activeB() const noexcept -> bool
-    {
-        return m_activeB;
-    }
-
-    Q_INVOKABLE void changeActiveB(bool active);
-
-    auto channelB() const noexcept -> StereoChannel
-    {
-        return m_channelB;
-    }
-
-    Q_INVOKABLE void changeChannelB(piejam::gui::model::StereoChannel);
 
     auto waveformDataB() noexcept -> WaveformDataObject*
     {
@@ -156,13 +129,7 @@ public:
     Q_INVOKABLE void clear();
 
 signals:
-    void samplesPerPixelChanged();
     void viewSizeChanged();
-    void activeAChanged();
-    void activeBChanged();
-    void channelAChanged();
-    void channelBChanged();
-    void scopeResolutionChanged();
     void freezeChanged();
 
 private:
@@ -174,6 +141,10 @@ private:
     void onHoldTimeChanged();
     void onWaveformWindowSizeChanged();
     void onScopeWindowSizeChanged();
+    void onActiveAChanged();
+    void onActiveBChanged();
+    void onChannelAChanged();
+    void onChannelBChanged();
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
@@ -183,10 +154,6 @@ private:
     WaveformDataObject m_waveformDataB;
     ScopeData m_scopeDataA;
     ScopeData m_scopeDataB;
-    bool m_activeA{true};
-    bool m_activeB{false};
-    StereoChannel m_channelA{StereoChannel::Left};
-    StereoChannel m_channelB{StereoChannel::Right};
     bool m_freeze{};
 };
 

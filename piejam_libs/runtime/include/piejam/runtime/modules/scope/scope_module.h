@@ -35,6 +35,17 @@ enum class window_size : int
     very_large
 };
 
+enum class stereo_channel : int
+{
+    left,
+    right,
+    middle,
+    side,
+
+    _min = left,
+    _max = side,
+};
+
 enum class parameter_key : fx::parameter_key
 {
     mode,
@@ -43,6 +54,10 @@ enum class parameter_key : fx::parameter_key
     hold_time,
     waveform_window_size,
     scope_window_size,
+    stream_a_active,
+    stream_b_active,
+    channel_a,
+    channel_b
 };
 
 enum class stream_key : fx::stream_key

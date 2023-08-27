@@ -83,5 +83,6 @@
         <file>PieJam/FxChainControls/EnumComboBox.qml</file>
         <file>PieJam/FxChainControls/ParameterQuickSpinBox.qml</file>
         <file>PieJam/FxChainControls/ParameterSwitch.qml</file>
+        <file>PieJam/FxChainControls/ParameterToggleButton.qml</file>
     </qresource>
 </RCC>

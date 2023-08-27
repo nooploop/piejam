@@ -64,7 +64,7 @@ Item {
 
                     anchors.fill: parent
 
-                    visible: private_.isStereo && (root.content ? root.content.activeB : false)
+                    visible: private_.isStereo && (root.content && root.content.activeB.value)
 
                     scopeData: root.content ? root.content.scopeDataB : null
                     color: Material.color(Material.Blue)
@@ -91,7 +91,7 @@ Item {
 
                     anchors.fill: parent
 
-                    visible: private_.isStereo && (root.content ? root.content.activeB : false)
+                    visible: private_.isStereo && (root.content && root.content.activeB.value)
 
                     waveformData: root.content ? root.content.waveformDataB : null
                     color: Material.color(Material.Blue)
@@ -114,6 +114,7 @@ Item {
         RowLayout {
 
             Layout.fillWidth: true
+            Layout.preferredHeight: 40
 
             StereoChannelSelector {
                 id: channelASelector
@@ -121,13 +122,10 @@ Item {
                 visible: private_.isStereo
 
                 name: "A"
-                active: root.content ? root.content.activeA : false
-                channel: root.content ? root.content.channelA : PJModels.StereoChannel.Left
+                activeParam: root.content ? root.content.activeA : null
+                channelParam: root.content ? root.content.channelA : null
 
-                Material.accent: Material.Pink
-
-                onActiveToggled: root.content.changeActiveA(!active)
-                onChannelSelected: root.content.changeChannelA(ch)
+                Material.accent: root.content && root.content.activeA.value ? Material.Pink : Material.Grey
             }
 
             ToolSeparator {
@@ -140,13 +138,14 @@ Item {
                 visible: private_.isStereo
 
                 name: "B"
-                active: root.content ? root.content.activeB : false
-                channel: root.content ? root.content.channelB : PJModels.StereoChannel.Right
+                activeParam: root.content ? root.content.activeB : null
+                channelParam: root.content ? root.content.channelB : null
 
-                Material.accent: Material.Blue
+                Material.accent: root.content && root.content.activeB.value ? Material.Blue : Material.Grey
+            }
 
-                onActiveToggled: root.content.changeActiveB(!active)
-                onChannelSelected: root.content.changeChannelB(ch)
+            Item {
+                Layout.fillWidth: true
             }
 
             ToolSeparator {}
