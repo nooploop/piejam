@@ -15,12 +15,18 @@ Item {
     id: root
 
     property bool isStereo: false
-    property alias triggerSource: triggerSourceComboBox.paramModel
-    property alias triggerSlope: triggerButtons.paramModel
+    property var triggerSource: null
+    property var triggerSlope: null
     property var triggerLevel: null
     property alias holdTime: holdTimeSpinBox.value
 
     implicitHeight: 64
+
+    QtObject {
+        id: private_
+
+        readonly property bool freeMode: root.triggerSource && root.triggerSource.value === PJModels.FxScope.TriggerSource.Free
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -33,7 +39,7 @@ Item {
             }
 
             EnumComboBox {
-                id: triggerSourceComboBox
+                paramModel: root.triggerSource
 
                 implicitWidth: 128
                 implicitHeight: 40
@@ -45,23 +51,22 @@ Item {
         }
 
         ColumnLayout {
-
-            enabled: triggerSourceComboBox.currentText !== "Free"
+            enabled: !private_.freeMode
 
             Label {
                 text: "Slope"
                 topPadding: 4
             }
 
-            RowLayout {
+            EnumButtonGroup {
+                id: triggerButtons
 
-                EnumButtonGroup {
-                    id: triggerButtons
+                paramModel: root.triggerSlope
 
-                    buttonImplicitWidth: 32
-                    buttonImplicitHeight: 40
-                    icons: ["qrc:///images/icons/rising_edge.svg", "qrc:///images/icons/falling_edge.svg"]
-                }
+                icons: ["qrc:///images/icons/rising_edge.svg", "qrc:///images/icons/falling_edge.svg"]
+
+                Layout.preferredWidth: 64
+                Layout.preferredHeight: 40
             }
         }
 
@@ -70,7 +75,7 @@ Item {
         }
 
         ColumnLayout {
-            enabled: triggerSourceComboBox.currentText !== "Free"
+            enabled: !private_.freeMode
 
             Label {
                 text: "Trigger Level"
@@ -90,8 +95,7 @@ Item {
         }
 
         ColumnLayout {
-
-            enabled: triggerSourceComboBox.currentText !== "Free"
+            enabled: !private_.freeMode
 
             Label {
                 text: "Hold Time"

@@ -32,8 +32,6 @@ Item {
         radius: 2
 
         HeaderLabel {
-            id: nameLabel
-
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
@@ -51,8 +49,6 @@ Item {
         }
 
         Label {
-            id: valueLabel
-
             text: root.paramModel ? root.paramModel.valueString : "value"
 
             anchors.left: parent.left
@@ -94,50 +90,19 @@ Item {
             currentIndex: root.paramModel ? root.paramModel.type : -1
 
             ParameterTouchstrip {
-                id: valueTouchstrip
-
-                value: root.paramModel && root.paramModel.type === FxParameter.Type.Float ? root.paramModel.normalizedValue : 0
-
-                onChangeValue: {
-                    if (root.paramModel)
-                        root.paramModel.changeNormalizedValue(newValue)
-                }
+                paramModel: root.paramModel
             }
 
-            EnumSlider {
-                id: valueSlider
-
-                from: root.paramModel && root.paramModel.type === FxParameter.Type.Int ? root.paramModel.minValue : 0.0
-                to: root.paramModel && root.paramModel.type === FxParameter.Type.Int ? root.paramModel.maxValue : 1.0
-
-                value: root.paramModel && root.paramModel.type === FxParameter.Type.Int ? root.paramModel.value : 0
-
-                onChangeValue: {
-                    if (root.paramModel)
-                        root.paramModel.changeValue(newValue)
-
-                    Info.quickTip = "<b>" + nameLabel.text + "</b>: " + valueLabel.text
-                }
+            IntSlider {
+                paramModel: root.paramModel
             }
 
-            Switch {
-                id: toggleSwitch
-
-                checked: root.paramModel && root.paramModel.type === FxParameter.Type.Bool ? root.paramModel.value : false
-
-                onToggled: {
-                    if (root.paramModel)
-                    {
-                        root.paramModel.changeValue(toggleSwitch.checked)
-                        Info.quickTip = "<b>" + nameLabel.text + "</b>: " + (root.paramModel.value ? "on" : "off")
-                    }
-                }
+            ParameterSwitch {
+                paramModel: root.paramModel
             }
         }
 
         MidiAssignArea {
-            id: midiAssign
-
             anchors.fill: controlStack
 
             model: root.paramModel ? root.paramModel.midi : null

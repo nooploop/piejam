@@ -63,7 +63,7 @@
         <file>PieJam/Controls/BusyLoader.qml</file>
         <file>PieJam/FxChainControls/ParameterTouchstrip.qml</file>
         <file>PieJam/Controls/Touchstrip.qml</file>
-        <file>PieJam/FxChainControls/EnumSlider.qml</file>
+        <file>PieJam/FxChainControls/IntSlider.qml</file>
         <file>images/icons/chevron-down.svg</file>
         <file>images/icons/chevron-up.svg</file>
         <file>images/icons/arrow-expand-vertical.svg</file>
@@ -82,5 +82,6 @@
         <file>PieJam/Views/FxModule.qml</file>
         <file>PieJam/FxChainControls/EnumComboBox.qml</file>
         <file>PieJam/FxChainControls/ParameterQuickSpinBox.qml</file>
+        <file>PieJam/FxChainControls/ParameterSwitch.qml</file>
     </qresource>
 </RCC>

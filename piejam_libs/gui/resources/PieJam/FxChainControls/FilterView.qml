@@ -21,25 +21,19 @@ Item {
 
     implicitWidth: 636
 
-    Column {
+    EnumButtonGroup {
         id: filterTypeButtons
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
 
-        EnumButtonGroup {
-            paramModel: root.content ? root.content.filterType : null
-            buttonImplicitHeight: 44
-        }
-    }
+        width: 64
 
-    MidiAssignArea {
-        id: midiAssign
+        alignment: Qt.Vertical
+        spacing: 0
 
-        anchors.fill: filterTypeButtons
-
-        model: root.content ? root.content.filterType.midi : null
+        paramModel: root.content ? root.content.filterType : null
     }
 
     Row {

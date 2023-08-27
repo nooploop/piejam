@@ -28,6 +28,13 @@ public:
             piejam::gui::model::FxParameterKeyId const&);
     ~FxEnumParameter();
 
+    static inline constexpr auto StaticType = Type::Enum;
+
+    auto type() const noexcept -> Type override
+    {
+        return FxEnumParameter::StaticType;
+    }
+
     auto values() const noexcept -> EnumListModel*;
 
 private:

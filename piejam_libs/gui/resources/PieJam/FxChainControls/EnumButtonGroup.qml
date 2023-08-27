@@ -4,32 +4,65 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
-Repeater {
+import PieJam.Models 1.0
+
+import ".."
+import "../Controls"
+
+Item {
     id: root
 
     property var paramModel: null
-    property int buttonImplicitWidth: 64
-    property int buttonImplicitHeight: 48
     property var icons: null
+    property int alignment: Qt.Horizontal
+    property int spacing: 5
 
-    model: root.paramModel ? root.paramModel.values : null
+    QtObject {
+        id: private_
 
-    delegate: Button {
-        implicitWidth: root.buttonImplicitWidth
-        implicitHeight: root.buttonImplicitHeight
+        readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Enum ? root.paramModel : null
+    }
 
-        text: model.text
+    GridLayout {
+        anchors.fill: parent
 
-        checkable: true
-        autoExclusive: true
+        columns: root.alignment === Qt.Vertical ? 1 : Number.MAX_VALUE
+        rows: root.alignment === Qt.Horizontal ? 1 : Number.MAX_VALUE
+        columnSpacing: root.spacing
+        rowSpacing: root.spacing
 
-        icon.source: root.icons ? root.icons[model.index] : ""
+        Repeater {
+            model: private_.paramModel ? private_.paramModel.values : null
 
-        display: icons ? AbstractButton.IconOnly : AbstractButton.TextOnly
+            delegate: Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-        checked: model.value === root.paramModel.value
+                text: model.text
 
-        onClicked: root.paramModel.changeValue(model.value)
+                checkable: true
+                autoExclusive: true
+
+                icon.source: root.icons ? root.icons[model.index] : ""
+
+                display: icons ? AbstractButton.IconOnly : AbstractButton.TextOnly
+
+                checked: model.value === private_.paramModel.value
+
+                onClicked: {
+                    private_.paramModel.changeValue(model.value)
+                    Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
+                }
+            }
+        }
+    }
+
+    MidiAssignArea {
+        anchors.fill: parent
+
+        model: private_.paramModel ? private_.paramModel.midi : null
     }
 }

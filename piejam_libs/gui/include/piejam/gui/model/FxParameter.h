@@ -35,11 +35,12 @@ public:
         Float,
         Int,
         Bool,
+        Enum,
     };
 
     Q_ENUM(Type)
 
-    auto type() const noexcept -> Type;
+    virtual auto type() const noexcept -> Type;
 
     auto name() const noexcept -> QString const&
     {

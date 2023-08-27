@@ -5,24 +5,43 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+import PieJam.Models 1.0
+
+import ".."
+import "../Controls"
+
 Item {
     id: root
 
     property var paramModel: null
+
+    QtObject {
+        id: private_
+
+        readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Enum ? root.paramModel : null
+    }
 
     ComboBox {
         id: comboBox
 
         anchors.fill: parent;
 
-        model: root.paramModel ? root.paramModel.values : null
-        currentIndex: root.paramModel ? root.paramModel.value - root.paramModel.minValue : -1
+        model: private_.paramModel ? private_.paramModel.values : null
+        currentIndex: private_.paramModel ? private_.paramModel.value - private_.paramModel.minValue : -1
         textRole: "text"
         valueRole: "value"
 
         onActivated: {
-            if (root.paramModel)
-                root.paramModel.changeValue(root.paramModel.minValue + index)
+            if (private_.paramModel) {
+                private_.paramModel.changeValue(private_.paramModel.minValue + index)
+                Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
+            }
         }
+    }
+
+    MidiAssignArea {
+        anchors.fill: parent
+
+        model: private_.paramModel ? private_.paramModel.midi : null
     }
 }

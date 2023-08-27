@@ -7,15 +7,23 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
+import PieJam.Models 1.0
+
+import ".."
 import "../Controls"
 import "../Util/MathExt.js" as MathExt
 
 Item {
     id: root
 
-    property alias value: touchstrip.value
+    property var paramModel: null
 
-    signal changeValue(real newValue)
+    QtObject {
+        id: private_
+
+        readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Float ? root.paramModel : null
+        readonly property real value: private_.paramModel ? private_.paramModel.normalizedValue : 0
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -26,8 +34,6 @@ Item {
             spacing: 2
 
             Rectangle {
-                id: indicatorBackground
-
                 color: Material.backgroundColor
 
                 Layout.preferredWidth: 0.10 * parent.width
@@ -44,12 +50,12 @@ Item {
                     x: 0
                     y: parent.height - height
                     width: parent.width
-                    height: root.value * parent.height
+                    height: private_.value * parent.height
                 }
             }
 
             Touchstrip {
-                id: touchstrip
+                value: private_.value
 
                 relative: relButton.checked
 
@@ -59,7 +65,12 @@ Item {
                 Layout.topMargin: 2
                 Layout.bottomMargin: 2
 
-                onChangeValue: root.changeValue(newValue)
+                onChangeValue: {
+                    if (private_.paramModel) {
+                        private_.paramModel.changeNormalizedValue(newValue)
+                        Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
+                    }
+                }
             }
 
             Layout.fillWidth: true
