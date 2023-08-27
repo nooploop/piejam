@@ -81,6 +81,31 @@ to_hold_time_string(float const time) -> std::string
                          : fmt::format("{:.0f} ms", time);
 }
 
+auto
+to_window_size_string(int const n) -> std::string
+{
+    switch (n)
+    {
+        case to_underlying(window_size::very_small):
+            return "Very Small";
+
+        case to_underlying(window_size::small):
+            return "Small";
+
+        case to_underlying(window_size::middle):
+            return "Middle";
+
+        case to_underlying(window_size::large):
+            return "Large";
+
+        case to_underlying(window_size::very_large):
+            return "Very Large";
+
+        default:
+            return "ERROR";
+    }
+}
+
 } // namespace
 
 auto
@@ -161,7 +186,34 @@ make_module(
                                      fx::parameter{
                                              .name = "Hold Time",
                                              .value_to_string =
-                                                     &to_hold_time_string})}},
+                                                     &to_hold_time_string})},
+                            {to_underlying(parameter_key::waveform_window_size),
+                             fx_params_factory.make_parameter(
+                                     int_parameter{
+                                             .default_value = to_underlying(
+                                                     window_size::large),
+                                             .min = to_underlying(
+                                                     window_size::very_small),
+                                             .max = to_underlying(
+                                                     window_size::very_large)},
+                                     fx::parameter{
+                                             .name = "Window Size",
+                                             .value_to_string =
+                                                     &to_window_size_string})},
+                            {to_underlying(parameter_key::scope_window_size),
+                             fx_params_factory.make_parameter(
+                                     int_parameter{
+                                             .default_value = to_underlying(
+                                                     window_size::very_small),
+                                             .min = to_underlying(
+                                                     window_size::very_small),
+                                             .max = to_underlying(
+                                                     window_size::very_large)},
+                                     fx::parameter{
+                                             .name = "Window Size",
+                                             .value_to_string =
+                                                     &to_window_size_string})},
+                    },
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),
                      streams.add(audio_stream_buffer(

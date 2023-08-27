@@ -101,12 +101,7 @@ Item {
         }
 
         ScopeSettings {
-            isStereo: private_.isStereo
-
-            mode: root.content ? root.content.mode : null
-            triggerSlope: root.content ? root.content.triggerSlope : null
-            triggerLevel: root.content ? root.content.triggerLevel : null
-            holdTime: root.content ? root.content.holdTime : null
+            model: root.content
 
             Layout.fillWidth: true
         }
@@ -154,41 +149,6 @@ Item {
                 onChannelSelected: root.content.changeChannelB(ch)
             }
 
-            ToolSeparator {
-                visible: private_.isStereo
-            }
-
-            StackLayout {
-                currentIndex: root.content ? (root.content.mode.value === PJModels.FxScope.Mode.Free ? 1 : 0) : -1
-
-                Layout.fillWidth: true
-                Layout.maximumHeight: 40
-
-                Slider {
-                    id: scopeResolutionSlider
-
-                    Layout.fillWidth: true
-
-                    from: 1
-                    to: 8
-                    stepSize: 1
-
-                    value: root.content ? root.content.scopeResolution : 1
-                    onMoved: if (root.content) root.content.scopeResolution = value
-                }
-
-                Slider {
-                    id: waveformResolutionSlider
-
-                    Layout.fillWidth: true
-
-                    from: 0
-                    to: 11
-                    stepSize: 1
-                    value: 8
-                }
-            }
-
             ToolSeparator {}
 
             Button {
@@ -220,14 +180,6 @@ Item {
         target: root.content
         property: "viewSize"
         value: root.content && root.content.mode.value === PJModels.FxScope.Mode.Free ? waveformA.width : scopeA.width
-        restoreMode: Binding.RestoreBinding
-    }
-
-    Binding {
-        when: root.content
-        target: root.content
-        property: "samplesPerPixel"
-        value: Math.pow(2, waveformResolutionSlider.value)
         restoreMode: Binding.RestoreBinding
     }
 

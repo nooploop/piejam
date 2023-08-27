@@ -16,6 +16,8 @@ Item {
     id: root
 
     property var paramModel: null
+    property int orientation: Qt.Vertical
+    property bool stepButtonsVisible: true
 
     QtObject {
         id: private_
@@ -46,6 +48,8 @@ Item {
             Layout.fillWidth: true
 
             onClicked: private_.changeValue(Math.min(private_.value + 1, private_.to))
+
+            visible: root.stepButtonsVisible
         }
 
         Slider {
@@ -54,7 +58,7 @@ Item {
             value: private_.value
 
             stepSize: 1
-            orientation: Qt.Vertical
+            orientation: root.orientation
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -70,6 +74,8 @@ Item {
             Layout.fillWidth: true
 
             onClicked: private_.changeValue(Math.max(private_.value - 1, private_.from))
+
+            visible: root.stepButtonsVisible
         }
     }
 

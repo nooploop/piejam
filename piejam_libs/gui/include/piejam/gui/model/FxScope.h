@@ -25,8 +25,7 @@ class FxScope final : public FxModuleContentSubscribable
     Q_OBJECT
 
     Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
-    Q_PROPERTY(int samplesPerPixel READ samplesPerPixel WRITE setSamplesPerPixel
-                       NOTIFY samplesPerPixelChanged FINAL)
+
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
     Q_PROPERTY(
@@ -37,6 +36,10 @@ class FxScope final : public FxModuleContentSubscribable
                        triggerLevel CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FxFloatParameter* holdTime READ holdTime
                        CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxIntParameter* waveformWindowSize READ
+                       waveformWindowSize CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxIntParameter* scopeWindowSize READ
+                       scopeWindowSize CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
                        waveformDataA CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataB READ
@@ -51,8 +54,6 @@ class FxScope final : public FxModuleContentSubscribable
                        channelAChanged FINAL)
     Q_PROPERTY(piejam::gui::model::StereoChannel channelB READ channelB NOTIFY
                        channelBChanged FINAL)
-    Q_PROPERTY(int scopeResolution READ scopeResolution WRITE setScopeResolution
-                       NOTIFY scopeResolutionChanged FINAL)
     Q_PROPERTY(
             bool freeze READ freeze WRITE setFreeze NOTIFY freezeChanged FINAL)
 
@@ -68,13 +69,6 @@ public:
     }
 
     auto busType() const noexcept -> BusType;
-
-    auto samplesPerPixel() const noexcept -> int
-    {
-        return m_samplesPerPixel;
-    }
-
-    void setSamplesPerPixel(int x);
 
     auto viewSize() const noexcept -> int
     {
@@ -99,6 +93,10 @@ public:
     auto triggerLevel() const noexcept -> FxFloatParameter*;
 
     auto holdTime() const noexcept -> FxFloatParameter*;
+
+    auto waveformWindowSize() const noexcept -> FxIntParameter*;
+
+    auto scopeWindowSize() const noexcept -> FxIntParameter*;
 
     auto activeA() const noexcept -> bool
     {
@@ -148,13 +146,6 @@ public:
         return &m_scopeDataB;
     }
 
-    auto scopeResolution() const noexcept -> int
-    {
-        return m_scopeResolution;
-    }
-
-    void setScopeResolution(int);
-
     auto freeze() const noexcept -> bool
     {
         return m_freeze;
@@ -181,11 +172,12 @@ private:
     void onTriggerSlopeChanged();
     void onTriggerLevelChanged();
     void onHoldTimeChanged();
+    void onWaveformWindowSizeChanged();
+    void onScopeWindowSizeChanged();
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
-    int m_samplesPerPixel{1};
     int m_viewSize{};
     WaveformDataObject m_waveformDataA;
     WaveformDataObject m_waveformDataB;
@@ -195,7 +187,6 @@ private:
     bool m_activeB{false};
     StereoChannel m_channelA{StereoChannel::Left};
     StereoChannel m_channelB{StereoChannel::Right};
-    int m_scopeResolution{1};
     bool m_freeze{};
 };
 

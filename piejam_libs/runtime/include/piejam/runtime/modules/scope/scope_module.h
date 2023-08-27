@@ -26,12 +26,23 @@ enum class trigger_slope : int
     falling_edge
 };
 
+enum class window_size : int
+{
+    very_small,
+    small,
+    middle,
+    large,
+    very_large
+};
+
 enum class parameter_key : fx::parameter_key
 {
     mode,
     trigger_slope,
     trigger_level,
     hold_time,
+    waveform_window_size,
+    scope_window_size,
 };
 
 enum class stream_key : fx::stream_key

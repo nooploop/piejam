@@ -14,18 +14,21 @@ import "../Controls"
 Item {
     id: root
 
-    property bool isStereo: false
-    property var mode: null
-    property var triggerSlope: null
-    property var triggerLevel: null
-    property var holdTime: null
+    property var model: null
 
     implicitHeight: 64
 
     QtObject {
         id: private_
 
-        readonly property bool freeMode: root.mode && root.mode.value === PJModels.FxScope.Mode.Free
+        readonly property var mode: root.model ? root.model.mode : null
+        readonly property var triggerSlope: root.model ? root.model.triggerSlope : null
+        readonly property var triggerLevel: root.model ? root.model.triggerLevel : null
+        readonly property var holdTime: root.model ? root.model.holdTime : null
+        readonly property bool freeMode: private_.mode && private_.mode.value === PJModels.FxScope.Mode.Free
+        readonly property var windowSize: root.model
+                                          ? (private_.freeMode ? root.model.waveformWindowSize : root.model.scopeWindowSize)
+                                          : null
     }
 
     RowLayout {
@@ -39,7 +42,7 @@ Item {
             }
 
             EnumComboBox {
-                paramModel: root.mode
+                paramModel: private_.mode
 
                 Layout.preferredWidth: 128
                 Layout.preferredHeight: 40
@@ -61,7 +64,7 @@ Item {
             EnumButtonGroup {
                 id: triggerButtons
 
-                paramModel: root.triggerSlope
+                paramModel: private_.triggerSlope
 
                 icons: ["qrc:///images/icons/rising_edge.svg", "qrc:///images/icons/falling_edge.svg"]
 
@@ -83,7 +86,7 @@ Item {
             }
 
             ParameterQuickSpinBox {
-                paramModel: root.triggerLevel
+                paramModel: private_.triggerLevel
                 stepScale: .5
 
                 Layout.preferredWidth: 112
@@ -103,7 +106,7 @@ Item {
             }
 
             ParameterQuickSpinBox {
-                paramModel: root.holdTime
+                paramModel: private_.holdTime
 
                 Layout.preferredWidth: 132
             }
@@ -119,7 +122,12 @@ Item {
                 topPadding: 4
             }
 
-            Slider {
+            IntSlider {
+                paramModel: private_.windowSize
+
+                orientation: Qt.Horizontal
+                stepButtonsVisible: false
+
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
             }

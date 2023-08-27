@@ -250,7 +250,7 @@ ScopeDataGenerator::setSampleRate(audio::sample_rate const sampleRate)
 void
 ScopeDataGenerator::setResolution(std::size_t const resolution)
 {
-    BOOST_ASSERT(in_closed(resolution, std::size_t{1}, std::size_t{8}));
+    BOOST_ASSERT(in_closed(resolution, std::size_t{1}, std::size_t{9}));
     m_impl->streamProcessor.updateProperty(
             m_impl->streamProcessor.args.resolution,
             resolution);

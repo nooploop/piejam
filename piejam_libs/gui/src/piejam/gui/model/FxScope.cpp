@@ -65,6 +65,8 @@ struct FxScope::Impl
     std::unique_ptr<FxEnumParameter> triggerSlope;
     std::unique_ptr<FxFloatParameter> triggerLevel;
     std::unique_ptr<FxFloatParameter> holdTime;
+    std::unique_ptr<FxIntParameter> waveformWindowSize;
+    std::unique_ptr<FxIntParameter> scopeWindowSize;
     std::unique_ptr<FxStream> stream;
 };
 
@@ -100,6 +102,18 @@ FxScope::FxScope(
     makeParameter(
             to_underlying(runtime::modules::scope::parameter_key::hold_time),
             m_impl->holdTime,
+            *parameters);
+
+    makeParameter(
+            to_underlying(runtime::modules::scope::parameter_key::
+                                  waveform_window_size),
+            m_impl->waveformWindowSize,
+            *parameters);
+
+    makeParameter(
+            to_underlying(
+                    runtime::modules::scope::parameter_key::scope_window_size),
+            m_impl->scopeWindowSize,
             *parameters);
 
     auto const streams = observe_once(
@@ -211,6 +225,18 @@ FxScope::FxScope(
             &FxFloatParameter::valueChanged,
             this,
             &FxScope::onHoldTimeChanged);
+
+    QObject::connect(
+            m_impl->waveformWindowSize.get(),
+            &FxIntParameter::valueChanged,
+            this,
+            &FxScope::onWaveformWindowSizeChanged);
+
+    QObject::connect(
+            m_impl->scopeWindowSize.get(),
+            &FxIntParameter::valueChanged,
+            this,
+            &FxScope::onScopeWindowSizeChanged);
 }
 
 FxScope::~FxScope() = default;
@@ -245,15 +271,16 @@ FxScope::holdTime() const noexcept -> FxFloatParameter*
     return m_impl->holdTime.get();
 }
 
-void
-FxScope::setSamplesPerPixel(int const x)
+auto
+FxScope::waveformWindowSize() const noexcept -> FxIntParameter*
 {
-    if (m_samplesPerPixel != x)
-    {
-        m_samplesPerPixel = x;
-        m_impl->waveformGenerator.setSamplesPerPixel(x);
-        emit samplesPerPixelChanged();
-    }
+    return m_impl->waveformWindowSize.get();
+}
+
+auto
+FxScope::scopeWindowSize() const noexcept -> FxIntParameter*
+{
+    return m_impl->scopeWindowSize.get();
 }
 
 void
@@ -326,21 +353,6 @@ FxScope::changeChannelB(piejam::gui::model::StereoChannel const x)
 }
 
 void
-FxScope::setScopeResolution(int x)
-{
-    if (in_closed(x, 1, 8))
-    {
-        if (m_scopeResolution != x)
-        {
-            m_scopeResolution = x;
-            m_impl->scopeDataGenerator.setResolution(
-                    static_cast<std::size_t>(x));
-            emit scopeResolutionChanged();
-        }
-    }
-}
-
-void
 FxScope::setFreeze(bool x)
 {
     if (m_freeze != x)
@@ -386,8 +398,7 @@ FxScope::onSubscribe()
 void
 FxScope::onTriggerSourceChanged()
 {
-    switch (static_cast<runtime::fx::parameter_key>(
-            m_impl->mode->value()))
+    switch (static_cast<runtime::fx::parameter_key>(m_impl->mode->value()))
     {
         case to_underlying(runtime::modules::scope::mode::trigger_a):
             m_impl->scopeDataGenerator.setTriggerStream(0);
@@ -423,6 +434,20 @@ FxScope::onHoldTimeChanged()
 {
     m_impl->scopeDataGenerator.setHoldTime(std::chrono::milliseconds{
             static_cast<int>(m_impl->holdTime->value())});
+}
+
+void
+FxScope::onWaveformWindowSizeChanged()
+{
+    m_impl->waveformGenerator.setSamplesPerPixel(
+            std::pow(2, m_impl->waveformWindowSize->value() * 3));
+}
+
+void
+FxScope::onScopeWindowSizeChanged()
+{
+    m_impl->scopeDataGenerator.setResolution(
+            m_impl->scopeWindowSize->value() * 2 + 1);
 }
 
 } // namespace piejam::gui::model
