@@ -13,11 +13,35 @@
 namespace piejam::runtime::modules::spectrum
 {
 
+enum class stereo_channel : int
+{
+    left,
+    right,
+    middle,
+    side,
+
+    _min = left,
+    _max = side,
+};
+
+enum class parameter_key : fx::parameter_key
+{
+    stream_a_active,
+    stream_b_active,
+    channel_a,
+    channel_b,
+    gain_a,
+    gain_b,
+    freeze,
+};
+
 enum class stream_key : fx::stream_key
 {
     input
 };
 
-auto make_module(audio::bus_type, audio_streams_cache&) -> fx::module;
+auto
+make_module(audio::bus_type, fx_parameter_factory const&, audio_streams_cache&)
+        -> fx::module;
 
 } // namespace piejam::runtime::modules::spectrum

@@ -216,6 +216,7 @@ struct SpectrumDataGenerator::Impl
     }
 
     StreamProcessor<Args, SpectrumDataPoints, Factory> streamProcessor;
+    bool freeze{};
 };
 
 SpectrumDataGenerator::SpectrumDataGenerator(
@@ -259,8 +260,24 @@ SpectrumDataGenerator::setChannel(
 }
 
 void
+SpectrumDataGenerator::setFreeze(bool const freeze)
+{
+    m_impl->freeze = freeze;
+
+    if (!freeze)
+    {
+        m_impl->streamProcessor.clear();
+    }
+}
+
+void
 SpectrumDataGenerator::update(AudioStream const& stream)
 {
+    if (m_impl->freeze)
+    {
+        return;
+    }
+
     m_impl->streamProcessor.process(stream);
     generated(m_impl->streamProcessor.results);
 }

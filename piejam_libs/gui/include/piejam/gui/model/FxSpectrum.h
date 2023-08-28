@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/BusType.h>
-#include <piejam/gui/model/FxModuleContent.h>
+#include <piejam/gui/model/FxModuleContentSubscribable.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/Subscribable.h>
@@ -17,7 +17,7 @@
 namespace piejam::gui::model
 {
 
-class FxSpectrum final : public Subscribable<FxModuleContent>
+class FxSpectrum final : public FxModuleContentSubscribable
 {
     Q_OBJECT
 
@@ -26,12 +26,20 @@ class FxSpectrum final : public Subscribable<FxModuleContent>
             piejam::gui::model::SpectrumData* dataA READ dataA CONSTANT FINAL)
     Q_PROPERTY(
             piejam::gui::model::SpectrumData* dataB READ dataB CONSTANT FINAL)
-    Q_PROPERTY(bool activeA READ activeA NOTIFY activeAChanged FINAL)
-    Q_PROPERTY(bool activeB READ activeB NOTIFY activeBChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::StereoChannel channelA READ channelA NOTIFY
-                       channelAChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::StereoChannel channelB READ channelB NOTIFY
-                       channelBChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::FxBoolParameter* activeA READ activeA
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxBoolParameter* activeB READ activeB
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelA READ channelA
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelB READ channelB
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainA READ gainA CONSTANT
+                       FINAL)
+    Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainB READ gainB CONSTANT
+                       FINAL)
+    Q_PROPERTY(piejam::gui::model::FxBoolParameter* freeze READ freeze CONSTANT
+                       FINAL)
 
 public:
     FxSpectrum(
@@ -47,38 +55,18 @@ public:
 
     auto busType() const noexcept -> BusType;
 
-    auto activeA() const noexcept -> bool
-    {
-        return m_activeA;
-    }
-
-    Q_INVOKABLE void changeActiveA(bool const active);
-
-    auto channelA() const noexcept -> StereoChannel
-    {
-        return m_channelA;
-    }
-
-    Q_INVOKABLE void changeChannelA(piejam::gui::model::StereoChannel const x);
+    auto activeA() const noexcept -> FxBoolParameter*;
+    auto activeB() const noexcept -> FxBoolParameter*;
+    auto channelA() const noexcept -> FxEnumParameter*;
+    auto channelB() const noexcept -> FxEnumParameter*;
+    auto gainA() const noexcept -> FxFloatParameter*;
+    auto gainB() const noexcept -> FxFloatParameter*;
+    auto freeze() const noexcept -> FxBoolParameter*;
 
     auto dataA() noexcept -> SpectrumData*
     {
         return &m_spectrumDataA;
     }
-
-    auto activeB() const noexcept -> bool
-    {
-        return m_activeB;
-    }
-
-    Q_INVOKABLE void changeActiveB(bool const active);
-
-    auto channelB() const noexcept -> StereoChannel
-    {
-        return m_channelB;
-    }
-
-    Q_INVOKABLE void changeChannelB(piejam::gui::model::StereoChannel const x);
 
     auto dataB() noexcept -> SpectrumData*
     {
@@ -91,23 +79,21 @@ public:
         m_spectrumDataB.clear();
     }
 
-signals:
-    void activeAChanged();
-    void activeBChanged();
-    void channelAChanged();
-    void channelBChanged();
-
 private:
     void onSubscribe() override;
+
+    void onActiveAChanged();
+    void onActiveBChanged();
+    void onChannelAChanged();
+    void onChannelBChanged();
+    void onGainAChanged();
+    void onGainBChanged();
+    void onFreezeChanged();
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
-    bool m_activeA{true};
-    StereoChannel m_channelA{StereoChannel::Left};
     SpectrumData m_spectrumDataA;
-    bool m_activeB{false};
-    StereoChannel m_channelB{StereoChannel::Right};
     SpectrumData m_spectrumDataB;
 };
 

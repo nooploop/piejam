@@ -291,7 +291,10 @@ insert_internal_fx_module(
         case fx::internal::spectrum:
             fx_mod_id = make_internal_fx_module(
                     st.fx_modules,
-                    modules::spectrum::make_module(bus_type, st.streams));
+                    modules::spectrum::make_module(
+                            bus_type,
+                            fx_params_factory,
+                            st.streams));
             break;
     }
 
