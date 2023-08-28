@@ -30,7 +30,7 @@ struct dB_ival
 auto
 to_dB_string(float x) -> std::string
 {
-    return fmt::format("{:.1f} dB", (std::log(x) / std::log(10)) * 20.f);
+    return fmt::format("{:.1f} dB", std::log10(x) * 20.f);
 }
 
 } // namespace

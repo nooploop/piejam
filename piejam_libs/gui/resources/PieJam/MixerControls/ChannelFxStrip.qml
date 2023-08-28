@@ -137,7 +137,8 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 40
 
-                    text: "^"
+                    display: AbstractButton.IconOnly
+                    icon.source: "qrc:///images/icons/chevron-up.svg"
 
                     enabled: root.model && root.model.canMoveUpFxModule
 
@@ -157,7 +158,8 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 40
 
-                    text: "v"
+                    display: AbstractButton.IconOnly
+                    icon.source: "qrc:///images/icons/chevron-down.svg"
 
                     enabled: root.model && root.model.canMoveDownFxModule
 

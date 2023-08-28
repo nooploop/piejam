@@ -6,6 +6,7 @@
 
 #include <piejam/audio/types.h>
 #include <piejam/functional/in_interval.h>
+#include <piejam/gui/model/AudioStreamAmplifier.h>
 #include <piejam/gui/model/AudioStreamChannelDuplicator.h>
 #include <piejam/gui/model/FxBoolParameter.h>
 #include <piejam/gui/model/FxEnumParameter.h>
@@ -58,8 +59,9 @@ struct FxScope::Impl
 
     BusType busType;
 
-    WaveformDataGenerator waveformGenerator;
+    AudioStreamAmplifier channelAmplifier{busType == BusType::Stereo ? 2u : 1u};
     AudioStreamChannelDuplicator channelDuplicator;
+    WaveformDataGenerator waveformGenerator;
     ScopeDataGenerator scopeDataGenerator;
 
     std::unique_ptr<FxEnumParameter> mode;
@@ -72,6 +74,8 @@ struct FxScope::Impl
     std::unique_ptr<FxBoolParameter> activeB;
     std::unique_ptr<FxEnumParameter> channelA;
     std::unique_ptr<FxEnumParameter> channelB;
+    std::unique_ptr<FxFloatParameter> gainA;
+    std::unique_ptr<FxFloatParameter> gainB;
     std::unique_ptr<FxStream> stream;
 };
 
@@ -143,6 +147,16 @@ FxScope::FxScope(
             m_impl->channelB,
             *parameters);
 
+    makeParameter(
+            to_underlying(runtime::modules::scope::parameter_key::gain_a),
+            m_impl->gainA,
+            *parameters);
+
+    makeParameter(
+            to_underlying(runtime::modules::scope::parameter_key::gain_b),
+            m_impl->gainB,
+            *parameters);
+
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
 
@@ -204,12 +218,18 @@ FxScope::FxScope(
         QObject::connect(
                 &m_impl->channelDuplicator,
                 &AudioStreamChannelDuplicator::duplicated,
+                &m_impl->channelAmplifier,
+                &AudioStreamAmplifier::update);
+
+        QObject::connect(
+                &m_impl->channelAmplifier,
+                &AudioStreamAmplifier::amplified,
                 &m_impl->waveformGenerator,
                 &WaveformDataGenerator::update);
 
         QObject::connect(
-                &m_impl->channelDuplicator,
-                &AudioStreamChannelDuplicator::duplicated,
+                &m_impl->channelAmplifier,
+                &AudioStreamAmplifier::amplified,
                 &m_impl->scopeDataGenerator,
                 &ScopeDataGenerator::update);
     }
@@ -218,12 +238,18 @@ FxScope::FxScope(
         QObject::connect(
                 m_impl->stream.get(),
                 &AudioStreamProvider::captured,
+                &m_impl->channelAmplifier,
+                &AudioStreamAmplifier::update);
+
+        QObject::connect(
+                &m_impl->channelAmplifier,
+                &AudioStreamAmplifier::amplified,
                 &m_impl->waveformGenerator,
                 &WaveformDataGenerator::update);
 
         QObject::connect(
-                m_impl->stream.get(),
-                &AudioStreamProvider::captured,
+                &m_impl->channelAmplifier,
+                &AudioStreamAmplifier::amplified,
                 &m_impl->scopeDataGenerator,
                 &ScopeDataGenerator::update);
     }
@@ -276,6 +302,12 @@ FxScope::FxScope(
             this,
             &FxScope::onChannelAChanged);
 
+    QObject::connect(
+            m_impl->gainA.get(),
+            &FxFloatParameter::valueChanged,
+            this,
+            &FxScope::onGainAChanged);
+
     if (m_impl->busType == BusType::Stereo)
     {
         QObject::connect(
@@ -289,6 +321,12 @@ FxScope::FxScope(
                 &FxEnumParameter::valueChanged,
                 this,
                 &FxScope::onChannelBChanged);
+
+        QObject::connect(
+                m_impl->gainB.get(),
+                &FxFloatParameter::valueChanged,
+                this,
+                &FxScope::onGainBChanged);
     }
 }
 
@@ -358,6 +396,18 @@ auto
 FxScope::channelB() const noexcept -> FxEnumParameter*
 {
     return m_impl->channelB.get();
+}
+
+auto
+FxScope::gainA() const noexcept -> FxFloatParameter*
+{
+    return m_impl->gainA.get();
+}
+
+auto
+FxScope::gainB() const noexcept -> FxFloatParameter*
+{
+    return m_impl->gainB.get();
 }
 
 void
@@ -509,6 +559,18 @@ FxScope::onChannelBChanged()
     m_impl->scopeDataGenerator.setChannel(1, x);
 
     clear();
+}
+
+void
+FxScope::onGainAChanged()
+{
+    m_impl->channelAmplifier.setGain(0, m_impl->gainA->value());
+}
+
+void
+FxScope::onGainBChanged()
+{
+    m_impl->channelAmplifier.setGain(1, m_impl->gainB->value());
 }
 
 } // namespace piejam::gui::model

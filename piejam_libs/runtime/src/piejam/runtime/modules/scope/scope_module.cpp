@@ -137,6 +137,18 @@ to_stereo_channel_string(int const n) -> std::string
     }
 }
 
+struct dB_ival
+{
+    static constexpr auto min{-24.f};
+    static constexpr auto max{24.f};
+};
+
+auto
+to_dB_string(float x) -> std::string
+{
+    return fmt::format("{:.1f} dB", std::log10(x) * 20.f);
+}
+
 } // namespace
 
 auto
@@ -284,6 +296,50 @@ make_module(
                                              .name = "Channel B",
                                              .value_to_string =
                                                      &to_stereo_channel_string})},
+                            {to_underlying(parameter_key::gain_a),
+                             fx_params_factory.make_parameter(
+                                     float_parameter{
+                                             .default_value = 1.f,
+                                             .min = std::pow(
+                                                     10.f,
+                                                     dB_ival::min / 20.f),
+                                             .max = std::pow(
+                                                     10.f,
+                                                     dB_ival::max / 20.f),
+                                             .to_normalized =
+                                                     &parameter::
+                                                             to_normalized_dB<
+                                                                     dB_ival>,
+                                             .from_normalized =
+                                                     &runtime::parameter::
+                                                             from_normalized_dB<
+                                                                     dB_ival>},
+                                     fx::parameter{
+                                             .name = "Gain A"s,
+                                             .value_to_string =
+                                                     &to_dB_string})},
+                            {to_underlying(parameter_key::gain_b),
+                             fx_params_factory.make_parameter(
+                                     float_parameter{
+                                             .default_value = 1.f,
+                                             .min = std::pow(
+                                                     10.f,
+                                                     dB_ival::min / 20.f),
+                                             .max = std::pow(
+                                                     10.f,
+                                                     dB_ival::max / 20.f),
+                                             .to_normalized =
+                                                     &runtime::parameter::
+                                                             to_normalized_dB<
+                                                                     dB_ival>,
+                                             .from_normalized =
+                                                     &parameter::
+                                                             from_normalized_dB<
+                                                                     dB_ival>},
+                                     fx::parameter{
+                                             .name = "Gain B"s,
+                                             .value_to_string =
+                                                     &to_dB_string})},
                     },
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),

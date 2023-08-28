@@ -86,7 +86,7 @@ Item {
         property int counter: 0
 
         running: decButton.pressed
-        interval: 120
+        interval: 200
         repeat: true
         onTriggered: function () { decButton.decrement(counter > 10 ? bigStep : step); ++counter }
         onRunningChanged: counter = 0
@@ -96,7 +96,7 @@ Item {
         property int counter: 0
 
         running: incButton.pressed
-        interval: 120
+        interval: 200
         repeat: true
         onTriggered: function () { incButton.increment(counter > 10 ? bigStep : step); ++counter }
         onRunningChanged: counter = 0

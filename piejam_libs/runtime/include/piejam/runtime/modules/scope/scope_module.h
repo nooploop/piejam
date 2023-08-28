@@ -57,7 +57,9 @@ enum class parameter_key : fx::parameter_key
     stream_a_active,
     stream_b_active,
     channel_a,
-    channel_b
+    channel_b,
+    gain_a,
+    gain_b,
 };
 
 enum class stream_key : fx::stream_key

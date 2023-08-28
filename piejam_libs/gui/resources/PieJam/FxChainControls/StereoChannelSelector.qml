@@ -17,21 +17,22 @@ Item {
     property string name: "X"
     property var activeParam: null
     property var channelParam: null
+    property var gainParam: null
 
-    implicitWidth: 164
+    implicitWidth: 256
     implicitHeight: 40
 
     RowLayout {
 
         anchors.fill: parent
 
-        spacing: 4
+        spacing: 8
 
         ParameterToggleButton {
             paramModel: root.activeParam
 
             Layout.preferredWidth: 32
-            Layout.preferredHeight: 40
+            Layout.fillHeight: true
 
             text: root.name
             flat: true
@@ -41,7 +42,15 @@ Item {
             paramModel: root.channelParam
 
             Layout.preferredWidth: 128
-            Layout.preferredHeight: 40
+            Layout.fillHeight: true
+        }
+
+        ParameterQuickSpinBox {
+            paramModel: root.gainParam
+            stepScale: 1.04167
+
+            Layout.preferredWidth: 128
+            Layout.fillHeight: true
         }
     }
 }

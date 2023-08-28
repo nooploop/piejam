@@ -117,15 +117,16 @@ Item {
             Layout.preferredHeight: 40
 
             StereoChannelSelector {
-                id: channelASelector
-
                 visible: private_.isStereo
 
                 name: "A"
                 activeParam: root.content ? root.content.activeA : null
                 channelParam: root.content ? root.content.channelA : null
+                gainParam: root.content ? root.content.gainA : null
 
                 Material.accent: root.content && root.content.activeA.value ? Material.Pink : Material.Grey
+
+                Layout.fillWidth: true
             }
 
             ToolSeparator {
@@ -133,18 +134,30 @@ Item {
             }
 
             StereoChannelSelector {
-                id: channelBSelector
-
                 visible: private_.isStereo
 
                 name: "B"
                 activeParam: root.content ? root.content.activeB : null
                 channelParam: root.content ? root.content.channelB : null
+                gainParam: root.content ? root.content.gainB : null
 
                 Material.accent: root.content && root.content.activeB.value ? Material.Blue : Material.Grey
+
+                Layout.fillWidth: true
+            }
+
+            ParameterQuickSpinBox {
+                visible: !private_.isStereo
+
+                paramModel: root.content ? root.content.gainA : null
+                stepScale: 1.04167
+
+                Layout.preferredWidth: 128
             }
 
             Item {
+                visible: !private_.isStereo
+
                 Layout.fillWidth: true
             }
 

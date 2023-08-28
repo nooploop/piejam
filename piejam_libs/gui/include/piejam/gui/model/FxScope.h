@@ -48,6 +48,10 @@ class FxScope final : public FxModuleContentSubscribable
                        CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelB READ channelB
                        CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainA READ gainA CONSTANT
+                       FINAL)
+    Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainB READ gainB CONSTANT
+                       FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
                        waveformDataA CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataB READ
@@ -98,6 +102,8 @@ public:
     auto activeB() const noexcept -> FxBoolParameter*;
     auto channelA() const noexcept -> FxEnumParameter*;
     auto channelB() const noexcept -> FxEnumParameter*;
+    auto gainA() const noexcept -> FxFloatParameter*;
+    auto gainB() const noexcept -> FxFloatParameter*;
 
     auto waveformDataA() noexcept -> WaveformDataObject*
     {
@@ -145,6 +151,8 @@ private:
     void onActiveBChanged();
     void onChannelAChanged();
     void onChannelBChanged();
+    void onGainAChanged();
+    void onGainBChanged();
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;

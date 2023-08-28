@@ -31,6 +31,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioDeviceSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioInputOutputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStream.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamAmplifier.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamChannelDuplicator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamListener.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamProvider.h
@@ -95,6 +96,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Waveform.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioDeviceSettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioInputOutputSettings.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioStreamAmplifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioStreamChannelDuplicator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/BusConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/DbScaleData.cpp
