@@ -20,16 +20,17 @@ Item {
         id: private_
 
         readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Bool ? root.paramModel : null
+        readonly property bool value: private_.paramModel && private_.paramModel.value
     }
 
     Switch {
         anchors.fill: parent
 
-        checked: private_.paramModel && private_.paramModel.value
+        checked: private_.value
 
         onToggled: {
             if (private_.paramModel) {
-                private_.paramModel.changeValue(!checked)
+                private_.paramModel.changeValue(!private_.value)
                 Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
             }
         }
