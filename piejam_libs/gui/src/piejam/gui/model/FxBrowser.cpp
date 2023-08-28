@@ -102,13 +102,6 @@ FxBrowser::entries() noexcept -> FxBrowserList*
 }
 
 void
-FxBrowser::setBusTypeFilter(BusType busType)
-{
-    m_impl->bus_type_filter = toBusType(busType);
-    m_impl->updateEntries(dispatch(), state_change_subscriber());
-}
-
-void
 FxBrowser::showMixer()
 {
     runtime::actions::set_root_view_mode action;
@@ -119,11 +112,12 @@ FxBrowser::showMixer()
 void
 FxBrowser::onSubscribe()
 {
-    observe(runtime::selectors::select_fx_registry,
-            [this](runtime::fx::registry const& fx_registry) {
-                m_impl->fx_registry = fx_registry;
-                m_impl->updateEntries(dispatch(), state_change_subscriber());
-            });
+    m_impl->bus_type_filter = observe_once(
+            runtime::selectors::make_mixer_channel_bus_type_selector(
+                    observe_once(
+                            runtime::selectors::select_fx_browser_fx_chain)));
+    m_impl->fx_registry = observe_once(runtime::selectors::select_fx_registry);
+    m_impl->updateEntries(dispatch(), state_change_subscriber());
 }
 
 } // namespace piejam::gui::model
