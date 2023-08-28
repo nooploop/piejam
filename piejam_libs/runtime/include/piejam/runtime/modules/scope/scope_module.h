@@ -60,6 +60,7 @@ enum class parameter_key : fx::parameter_key
     channel_b,
     gain_a,
     gain_b,
+    freeze,
 };
 
 enum class stream_key : fx::stream_key

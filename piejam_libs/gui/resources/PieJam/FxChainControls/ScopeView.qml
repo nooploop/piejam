@@ -163,26 +163,17 @@ Item {
 
             ToolSeparator {}
 
-            Button {
-                id: freezeButton
+            ParameterToggleButton {
+                paramModel: root.content ? root.content.freeze : null
+
+                Layout.preferredWidth: 32
+                Layout.preferredHeight: 40
+
+                flat: false
 
                 icon.width: 24
                 icon.height: 24
                 icon.source: "qrc:///images/icons/snow.svg"
-
-                implicitWidth: 32
-                implicitHeight: 40
-
-                checkable: true
-                checked: root.content && root.content.freeze
-
-                Binding {
-                    when: root.content
-                    target: root.content
-                    property: "freeze"
-                    value: freezeButton.checked
-                    restoreMode: Binding.RestoreBinding
-                }
             }
         }
     }
@@ -192,14 +183,6 @@ Item {
         target: root.content
         property: "viewSize"
         value: root.content && root.content.mode.value === PJModels.FxScope.Mode.Free ? waveformA.width : scopeA.width
-        restoreMode: Binding.RestoreBinding
-    }
-
-    Binding {
-        when: root.content
-        target: root.content
-        property: "freeze"
-        value: freezeButton.checked
         restoreMode: Binding.RestoreBinding
     }
 

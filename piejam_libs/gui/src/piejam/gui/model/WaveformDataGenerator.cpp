@@ -181,6 +181,7 @@ struct WaveformDataGenerator::Impl
     }
 
     StreamProcessor<Args, WaveformData, Factory> streamProcessor;
+    bool freeze{};
 };
 
 WaveformDataGenerator::WaveformDataGenerator(
@@ -221,6 +222,17 @@ WaveformDataGenerator::setChannel(
 }
 
 void
+WaveformDataGenerator::setFreeze(bool const freeze)
+{
+    m_impl->freeze = freeze;
+
+    if (!freeze)
+    {
+        clear();
+    }
+}
+
+void
 WaveformDataGenerator::clear()
 {
     m_impl->streamProcessor.clear();
@@ -229,6 +241,11 @@ WaveformDataGenerator::clear()
 void
 WaveformDataGenerator::update(AudioStream const& stream)
 {
+    if (m_impl->freeze)
+    {
+        return;
+    }
+
     m_impl->streamProcessor.process(stream);
     generated(m_impl->streamProcessor.results);
 }

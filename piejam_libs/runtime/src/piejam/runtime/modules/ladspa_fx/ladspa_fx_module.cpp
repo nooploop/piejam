@@ -54,8 +54,8 @@ make_module_parameters(
                                                               from_normalized_linear},
                             fx::parameter{
                                     .name = port_desc.name,
-                                    .value_to_string = fx::
-                                            make_default_float_parameter_value_to_string()}));
+                                    .value_to_string =
+                                            std::in_place_type<float>}));
         }
         else if (
                 auto const* const p = std::get_if<piejam::ladspa::int_port>(
@@ -72,8 +72,8 @@ make_module_parameters(
                                     .max = p->max},
                             fx::parameter{
                                     .name = port_desc.name,
-                                    .value_to_string = fx::
-                                            make_default_int_parameter_value_to_string()}));
+                                    .value_to_string =
+                                            std::in_place_type<int>}));
         }
         else if (
                 auto const* const p = std::get_if<piejam::ladspa::bool_port>(
@@ -85,8 +85,8 @@ make_module_parameters(
                             bool_parameter{.default_value = p->default_value},
                             fx::parameter{
                                     .name = port_desc.name,
-                                    .value_to_string = fx::
-                                            make_default_bool_parameter_value_to_string()}));
+                                    .value_to_string =
+                                            std::in_place_type<bool>}));
         }
     }
 

@@ -15,25 +15,31 @@ Item {
     id: root
 
     property var paramModel: null
-    property alias flat: button.flat
+    property bool flat: false
     property alias text: button.text
+    property alias icon: button.icon
 
     QtObject {
         id: private_
 
         readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Bool ? root.paramModel : null
+        readonly property bool value: private_.paramModel && private_.paramModel.value
     }
 
     Button {
         id: button
 
+
         anchors.fill: parent
 
-        highlighted: private_.paramModel && private_.paramModel.value
+        flat: root.flat
+        checkable: !root.flat
+        checked: !root.flat && private_.value
+        highlighted: root.flat && private_.value
 
         onClicked: {
             if (private_.paramModel) {
-                private_.paramModel.changeValue(!highlighted)
+                private_.paramModel.changeValue(!private_.value)
                 Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
             }
         }

@@ -62,6 +62,14 @@ to_mode_string(int const n) -> std::string
 }
 
 auto
+to_mode_string(audio::bus_type bus_type)
+{
+    return bus_type == audio::bus_type::stereo
+                   ? &to_mode_string<audio::bus_type::stereo>
+                   : &to_mode_string<audio::bus_type::mono>;
+}
+
+auto
 to_trigger_slope_string(int const n) -> std::string
 {
     using namespace std::string_literals;
@@ -175,17 +183,9 @@ make_module(
                                                                             stereo
                                                             ? 2
                                                             : 1},
-                                     fx::parameter{
-                                             .name = "Mode",
-                                             .value_to_string =
-                                                     bus_type == audio::bus_type::
-                                                                             stereo
-                                                             ? &to_mode_string<
-                                                                       audio::bus_type::
-                                                                               stereo>
-                                                             : &to_mode_string<
-                                                                       audio::bus_type::
-                                                                               mono>})},
+                                     {.name = "Mode",
+                                      .value_to_string =
+                                              to_mode_string(bus_type)})},
                             {to_underlying(parameter_key::trigger_slope),
                              fx_params_factory.make_parameter(
                                      int_parameter{
@@ -194,10 +194,9 @@ make_module(
                                                              rising_edge),
                                              .min = 0,
                                              .max = 1},
-                                     fx::parameter{
-                                             .name = "Slope",
-                                             .value_to_string =
-                                                     &to_trigger_slope_string})},
+                                     {.name = "Slope",
+                                      .value_to_string =
+                                              &to_trigger_slope_string})},
                             {to_underlying(parameter_key::trigger_level),
                              fx_params_factory.make_parameter(
                                      float_parameter{
@@ -210,10 +209,9 @@ make_module(
                                              .from_normalized =
                                                      &parameter::
                                                              from_normalized_linear},
-                                     fx::parameter{
-                                             .name = "Trigger Level",
-                                             .value_to_string = fx::
-                                                     make_default_float_parameter_value_to_string()})},
+                                     {.name = "Trigger Level",
+                                      .value_to_string =
+                                              std::in_place_type<float>})},
                             {to_underlying(parameter_key::hold_time),
                              fx_params_factory.make_parameter(
                                      float_parameter{
@@ -226,10 +224,9 @@ make_module(
                                              .from_normalized =
                                                      &parameter::
                                                              from_normalized_linear},
-                                     fx::parameter{
-                                             .name = "Hold Time",
-                                             .value_to_string =
-                                                     &to_hold_time_string})},
+                                     {.name = "Hold Time",
+                                      .value_to_string =
+                                              &to_hold_time_string})},
                             {to_underlying(parameter_key::waveform_window_size),
                              fx_params_factory.make_parameter(
                                      int_parameter{
@@ -239,10 +236,9 @@ make_module(
                                                      window_size::very_small),
                                              .max = to_underlying(
                                                      window_size::very_large)},
-                                     fx::parameter{
-                                             .name = "Window Size",
-                                             .value_to_string =
-                                                     &to_window_size_string})},
+                                     {.name = "Window Size",
+                                      .value_to_string =
+                                              &to_window_size_string})},
                             {to_underlying(parameter_key::scope_window_size),
                              fx_params_factory.make_parameter(
                                      int_parameter{
@@ -252,24 +248,21 @@ make_module(
                                                      window_size::very_small),
                                              .max = to_underlying(
                                                      window_size::very_large)},
-                                     fx::parameter{
-                                             .name = "Window Size",
-                                             .value_to_string =
-                                                     &to_window_size_string})},
+                                     {.name = "Window Size",
+                                      .value_to_string =
+                                              &to_window_size_string})},
                             {to_underlying(parameter_key::stream_a_active),
                              fx_params_factory.make_parameter(
                                      bool_parameter{.default_value = true},
-                                     fx::parameter{
-                                             .name = "Stream A Active",
-                                             .value_to_string = fx::
-                                                     make_default_bool_parameter_value_to_string()})},
+                                     {.name = "Stream A Active",
+                                      .value_to_string =
+                                              std::in_place_type<bool>})},
                             {to_underlying(parameter_key::stream_b_active),
                              fx_params_factory.make_parameter(
                                      bool_parameter{.default_value = false},
-                                     fx::parameter{
-                                             .name = "Stream B Active",
-                                             .value_to_string = fx::
-                                                     make_default_bool_parameter_value_to_string()})},
+                                     {.name = "Stream B Active",
+                                      .value_to_string =
+                                              std::in_place_type<bool>})},
                             {to_underlying(parameter_key::channel_a),
                              fx_params_factory.make_parameter(
                                      int_parameter{
@@ -279,10 +272,9 @@ make_module(
                                                      stereo_channel::_min),
                                              .max = to_underlying(
                                                      stereo_channel::_max)},
-                                     fx::parameter{
-                                             .name = "Channel A",
-                                             .value_to_string =
-                                                     &to_stereo_channel_string})},
+                                     {.name = "Channel A",
+                                      .value_to_string =
+                                              &to_stereo_channel_string})},
                             {to_underlying(parameter_key::channel_b),
                              fx_params_factory.make_parameter(
                                      int_parameter{
@@ -292,10 +284,9 @@ make_module(
                                                      stereo_channel::_min),
                                              .max = to_underlying(
                                                      stereo_channel::_max)},
-                                     fx::parameter{
-                                             .name = "Channel B",
-                                             .value_to_string =
-                                                     &to_stereo_channel_string})},
+                                     {.name = "Channel B",
+                                      .value_to_string =
+                                              &to_stereo_channel_string})},
                             {to_underlying(parameter_key::gain_a),
                              fx_params_factory.make_parameter(
                                      float_parameter{
@@ -314,10 +305,8 @@ make_module(
                                                      &runtime::parameter::
                                                              from_normalized_dB<
                                                                      dB_ival>},
-                                     fx::parameter{
-                                             .name = "Gain A"s,
-                                             .value_to_string =
-                                                     &to_dB_string})},
+                                     {.name = "Gain A"s,
+                                      .value_to_string = &to_dB_string})},
                             {to_underlying(parameter_key::gain_b),
                              fx_params_factory.make_parameter(
                                      float_parameter{
@@ -336,10 +325,14 @@ make_module(
                                                      &parameter::
                                                              from_normalized_dB<
                                                                      dB_ival>},
-                                     fx::parameter{
-                                             .name = "Gain B"s,
-                                             .value_to_string =
-                                                     &to_dB_string})},
+                                     {.name = "Gain B"s,
+                                      .value_to_string = &to_dB_string})},
+                            {to_underlying(parameter_key::freeze),
+                             fx_params_factory.make_parameter(
+                                     bool_parameter{.default_value = false},
+                                     {.name = "Freeze",
+                                      .value_to_string =
+                                              std::in_place_type<bool>})},
                     },
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),

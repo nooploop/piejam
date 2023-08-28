@@ -52,6 +52,8 @@ class FxScope final : public FxModuleContentSubscribable
                        FINAL)
     Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainB READ gainB CONSTANT
                        FINAL)
+    Q_PROPERTY(piejam::gui::model::FxBoolParameter* freeze READ freeze CONSTANT
+                       FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
                        waveformDataA CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataB READ
@@ -60,8 +62,6 @@ class FxScope final : public FxModuleContentSubscribable
                        CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::ScopeData* scopeDataB READ scopeDataB
                        CONSTANT FINAL)
-    Q_PROPERTY(
-            bool freeze READ freeze WRITE setFreeze NOTIFY freezeChanged FINAL)
 
 public:
     FxScope(runtime::store_dispatch,
@@ -104,6 +104,7 @@ public:
     auto channelB() const noexcept -> FxEnumParameter*;
     auto gainA() const noexcept -> FxFloatParameter*;
     auto gainB() const noexcept -> FxFloatParameter*;
+    auto freeze() const noexcept -> FxBoolParameter*;
 
     auto waveformDataA() noexcept -> WaveformDataObject*
     {
@@ -124,13 +125,6 @@ public:
     {
         return &m_scopeDataB;
     }
-
-    auto freeze() const noexcept -> bool
-    {
-        return m_freeze;
-    }
-
-    void setFreeze(bool);
 
     Q_INVOKABLE void clear();
 
@@ -153,6 +147,7 @@ private:
     void onChannelBChanged();
     void onGainAChanged();
     void onGainBChanged();
+    void onFreezeChanged();
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
@@ -162,7 +157,6 @@ private:
     WaveformDataObject m_waveformDataB;
     ScopeData m_scopeDataA;
     ScopeData m_scopeDataB;
-    bool m_freeze{};
 };
 
 } // namespace piejam::gui::model

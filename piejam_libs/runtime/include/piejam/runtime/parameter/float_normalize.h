@@ -51,8 +51,7 @@ template <class Interval_dB>
 [[nodiscard]] constexpr auto
 to_normalized_dB(float_ const&, float const value) -> float
 {
-    constexpr float const twenty_div_log_10 = 20.f / std::log(10.f);
-    float const value_dB = std::log(value) * twenty_div_log_10;
+    float const value_dB = std::log10(value) * 20.f;
     return (value_dB - Interval_dB::min) /
            (Interval_dB::max - Interval_dB::min);
 }

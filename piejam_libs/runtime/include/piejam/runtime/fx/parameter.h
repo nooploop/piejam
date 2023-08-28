@@ -19,9 +19,14 @@ struct parameter_value_to_string
     using to_string_f =
             std::variant<float_to_string, int_to_string, bool_to_string>;
 
+    parameter_value_to_string(std::in_place_type_t<float>) noexcept;
     parameter_value_to_string(float_to_string) noexcept;
+
+    parameter_value_to_string(std::in_place_type_t<int>) noexcept;
     parameter_value_to_string(int_to_string) noexcept;
+
     parameter_value_to_string(bool_to_string) noexcept;
+    parameter_value_to_string(std::in_place_type_t<bool>) noexcept;
 
     auto operator()(float) const -> std::string;
     auto operator()(int) const -> std::string;
@@ -30,13 +35,6 @@ struct parameter_value_to_string
 private:
     to_string_f m_to_string;
 };
-
-auto make_default_float_parameter_value_to_string() noexcept
-        -> parameter_value_to_string;
-auto make_default_int_parameter_value_to_string() noexcept
-        -> parameter_value_to_string;
-auto make_default_bool_parameter_value_to_string() noexcept
-        -> parameter_value_to_string;
 
 struct parameter
 {

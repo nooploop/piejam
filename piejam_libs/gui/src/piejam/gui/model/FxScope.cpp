@@ -76,6 +76,7 @@ struct FxScope::Impl
     std::unique_ptr<FxEnumParameter> channelB;
     std::unique_ptr<FxFloatParameter> gainA;
     std::unique_ptr<FxFloatParameter> gainB;
+    std::unique_ptr<FxBoolParameter> freeze;
     std::unique_ptr<FxStream> stream;
 };
 
@@ -155,6 +156,11 @@ FxScope::FxScope(
     makeParameter(
             to_underlying(runtime::modules::scope::parameter_key::gain_b),
             m_impl->gainB,
+            *parameters);
+
+    makeParameter(
+            to_underlying(runtime::modules::scope::parameter_key::freeze),
+            m_impl->freeze,
             *parameters);
 
     auto const streams = observe_once(
@@ -328,6 +334,12 @@ FxScope::FxScope(
                 this,
                 &FxScope::onGainBChanged);
     }
+
+    QObject::connect(
+            m_impl->freeze.get(),
+            &FxBoolParameter::valueChanged,
+            this,
+            &FxScope::onFreezeChanged);
 }
 
 FxScope::~FxScope() = default;
@@ -410,6 +422,12 @@ FxScope::gainB() const noexcept -> FxFloatParameter*
     return m_impl->gainB.get();
 }
 
+auto
+FxScope::freeze() const noexcept -> FxBoolParameter*
+{
+    return m_impl->freeze.get();
+}
+
 void
 FxScope::setViewSize(int const x)
 {
@@ -420,17 +438,6 @@ FxScope::setViewSize(int const x)
         emit viewSizeChanged();
 
         clear();
-    }
-}
-
-void
-FxScope::setFreeze(bool x)
-{
-    if (m_freeze != x)
-    {
-        m_freeze = x;
-        m_impl->scopeDataGenerator.setFreeze(x);
-        emit freezeChanged();
     }
 }
 
@@ -571,6 +578,14 @@ void
 FxScope::onGainBChanged()
 {
     m_impl->channelAmplifier.setGain(1, m_impl->gainB->value());
+}
+
+void
+FxScope::onFreezeChanged()
+{
+    bool const freeze = m_impl->freeze->value();
+    m_impl->scopeDataGenerator.setFreeze(freeze);
+    m_impl->waveformGenerator.setFreeze(freeze);
 }
 
 } // namespace piejam::gui::model
