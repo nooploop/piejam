@@ -54,7 +54,7 @@ Item {
 
                 onClicked: {
                     private_.paramModel.changeValue(model.value)
-                    Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
+                    Info.showParameterValue(private_.paramModel)
                 }
             }
         }

@@ -44,14 +44,14 @@ Item {
         onChangeValue: {
             if (private_.paramModel) {
                 private_.paramModel.changeNormalizedValue(newValue / 10000)
-                Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.valueString
+                Info.showParameterValue(private_.paramModel)
             }
         }
 
         onReset: {
             if (private_.paramModel) {
                 private_.paramModel.resetToDefault()
-                Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.valueString
+                Info.showParameterValue(private_.paramModel)
             }
         }
     }

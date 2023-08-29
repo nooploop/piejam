@@ -34,7 +34,7 @@ Item {
         onActivated: {
             if (private_.paramModel) {
                 private_.paramModel.changeValue(private_.paramModel.minValue + index)
-                Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
+                Info.showParameterValue(private_.paramModel)
             }
         }
     }

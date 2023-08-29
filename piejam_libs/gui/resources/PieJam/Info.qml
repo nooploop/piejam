@@ -22,4 +22,9 @@ Item {
     }
 
     onQuickTipChanged: quickTipTimer.restart()
+
+    function showParameterValue(paramModel) {
+        console.assert(paramModel)
+        root.quickTip = "<b>" + paramModel.name + "</b>: " + paramModel.valueString
+    }
 }

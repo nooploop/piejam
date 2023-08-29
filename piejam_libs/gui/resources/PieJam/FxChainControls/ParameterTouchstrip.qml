@@ -68,7 +68,7 @@ Item {
                 onChangeValue: {
                     if (private_.paramModel) {
                         private_.paramModel.changeNormalizedValue(newValue)
-                        Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
+                        Info.showParameterValue(private_.paramModel)
                     }
                 }
             }

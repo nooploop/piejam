@@ -40,7 +40,7 @@ Item {
         onClicked: {
             if (private_.paramModel) {
                 private_.paramModel.changeValue(!private_.value)
-                Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
+                Info.showParameterValue(private_.paramModel)
             }
         }
     }

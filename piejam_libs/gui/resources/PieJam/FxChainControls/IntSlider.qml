@@ -30,7 +30,7 @@ Item {
         function changeValue(newValue) {
             if (private_.paramModel) {
                 private_.paramModel.changeValue(newValue)
-                Info.quickTip = "<b>" + private_.paramModel.name + "</b>: " + private_.paramModel.valueString
+                Info.showParameterValue(private_.paramModel)
             }
         }
     }
