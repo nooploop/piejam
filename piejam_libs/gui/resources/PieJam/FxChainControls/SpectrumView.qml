@@ -20,12 +20,6 @@ Item {
 
     implicitWidth: 636
 
-    QtObject {
-        id: private_
-
-        readonly property bool isStereo: root.content && root.content.busType == PJModels.BusType.Stereo
-    }
-
     ColumnLayout {
         anchors.fill: parent
 
@@ -42,68 +36,11 @@ Item {
             spectrumBColor: Material.color(Material.Blue)
         }
 
-        RowLayout {
+        StreamSourceSettings {
+            model: root.content
+
             Layout.fillWidth: true
-
-            StereoChannelSelector {
-                visible: private_.isStereo
-
-                name: "A"
-                activeParam: root.content ? root.content.activeA : null
-                channelParam: root.content ? root.content.channelA : null
-                gainParam: root.content ? root.content.gainA : null
-
-                Material.accent: root.content && root.content.activeA.value ? Material.Pink : Material.Grey
-
-                Layout.fillWidth: true
-            }
-
-            ToolSeparator {
-                visible: private_.isStereo
-            }
-
-            StereoChannelSelector {
-                visible: private_.isStereo
-
-                name: "B"
-                activeParam: root.content ? root.content.activeB : null
-                channelParam: root.content ? root.content.channelB : null
-                gainParam: root.content ? root.content.gainB : null
-
-                Material.accent: root.content && root.content.activeB.value ? Material.Blue : Material.Grey
-
-                Layout.fillWidth: true
-            }
-
-            ParameterQuickSpinBox {
-                visible: !private_.isStereo
-
-                paramModel: root.content ? root.content.gainA : null
-                stepScale: 1.04167
-
-                Layout.preferredWidth: 128
-            }
-
-            Item {
-                visible: !private_.isStereo
-
-                Layout.fillWidth: true
-            }
-
-            ToolSeparator {}
-
-            ParameterToggleButton {
-                paramModel: root.content ? root.content.freeze : null
-
-                Layout.preferredWidth: 32
-                Layout.preferredHeight: 40
-
-                flat: false
-
-                icon.width: 24
-                icon.height: 24
-                icon.source: "qrc:///images/icons/snow.svg"
-            }
+            Layout.preferredHeight: 48
         }
     }
 

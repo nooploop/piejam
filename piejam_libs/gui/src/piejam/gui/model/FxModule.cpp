@@ -93,6 +93,10 @@ FxModule::content() noexcept -> FxModuleContent*
 void
 FxModule::onSubscribe()
 {
+    setChainName(QString::fromStdString(observe_once(
+            runtime::selectors::make_mixer_channel_name_selector(observe_once(
+                    runtime::selectors::select_focused_fx_chain)))));
+
     setName(QString::fromStdString(
             *observe_once(runtime::selectors::select_focused_fx_module_name)));
 

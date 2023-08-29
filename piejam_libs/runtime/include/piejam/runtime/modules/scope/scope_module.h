@@ -18,21 +18,31 @@ enum class mode : int
     free,
     trigger_a,
     trigger_b,
+
+    trigger = trigger_a, // for mono
+
+    _min = free,
 };
 
 enum class trigger_slope : int
 {
     rising_edge,
-    falling_edge
+    falling_edge,
+
+    _min = rising_edge,
+    _max = falling_edge,
 };
 
 enum class window_size : int
 {
     very_small,
     small,
-    middle,
+    medium,
     large,
-    very_large
+    very_large,
+
+    _min = very_small,
+    _max = very_large,
 };
 
 enum class stereo_channel : int

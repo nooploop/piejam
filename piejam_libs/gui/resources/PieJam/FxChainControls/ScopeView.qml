@@ -31,11 +31,18 @@ Item {
     QtObject {
         id: private_
 
-        readonly property bool isStereo: root.content && root.content.busType == PJModels.BusType.Stereo
+        readonly property bool isStereo: root.content && root.content.busType === PJModels.BusType.Stereo
+        readonly property var mode: root.content ? root.content.mode : null
+        readonly property var triggerSlope: root.content ? root.content.triggerSlope : null
+        readonly property var triggerLevel: root.content ? root.content.triggerLevel : null
+        readonly property var holdTime: root.content ? root.content.holdTime : null
+        readonly property bool freeMode: private_.mode && private_.mode.value === PJModels.FxScope.Mode.Free
+        readonly property var windowSize: root.content
+                                          ? (private_.freeMode ? root.content.waveformWindowSize : root.content.scopeWindowSize)
+                                          : null
     }
 
     ColumnLayout {
-
         anchors.fill: parent
 
         StackLayout {
@@ -51,17 +58,15 @@ Item {
                 Layout.fillHeight: true
 
                 PJItems.Scope {
-                    id: scopeA
-
                     anchors.fill: parent
+
+                    visible: root.content && root.content.activeA.value
 
                     scopeData: root.content ? root.content.scopeDataA : null
                     color: Material.color(Material.Pink)
                 }
 
                 PJItems.Scope {
-                    id: scopeB
-
                     anchors.fill: parent
 
                     visible: private_.isStereo && (root.content && root.content.activeB.value)
@@ -78,17 +83,15 @@ Item {
                 Layout.fillHeight: true
 
                 PJItems.Waveform {
-                    id: waveformA
-
                     anchors.fill: parent
+
+                    visible: root.content && root.content.activeA.value
 
                     waveformData: root.content ? root.content.waveformDataA : null
                     color: Material.color(Material.Pink)
                 }
 
                 PJItems.Waveform {
-                    id: waveformB
-
                     anchors.fill: parent
 
                     visible: private_.isStereo && (root.content && root.content.activeB.value)
@@ -97,92 +100,138 @@ Item {
                     color: Material.color(Material.Blue)
                 }
             }
-
         }
 
-        ScopeSettings {
-            model: root.content
-
+        RowLayout {
             Layout.fillWidth: true
+            Layout.maximumHeight: 64
+
+            spacing: 0
+
+            ColumnLayout {
+
+                Label {
+                    text: "Mode"
+                    topPadding: 4
+                }
+
+                EnumComboBox {
+                    paramModel: private_.mode
+
+                    Layout.preferredWidth: 128
+                    Layout.preferredHeight: 40
+                }
+            }
+
+            ToolSeparator {
+                Layout.fillHeight: true
+            }
+
+            ColumnLayout {
+                enabled: !private_.freeMode
+
+                Label {
+                    text: "Slope"
+                    topPadding: 4
+                }
+
+                EnumButtonGroup {
+                    id: triggerButtons
+
+                    paramModel: private_.triggerSlope
+
+                    icons: ["qrc:///images/icons/rising_edge.svg", "qrc:///images/icons/falling_edge.svg"]
+
+                    Layout.preferredWidth: 64
+                    Layout.preferredHeight: 40
+                }
+            }
+
+            ToolSeparator {
+                Layout.fillHeight: true
+            }
+
+            ColumnLayout {
+                enabled: !private_.freeMode
+
+                Label {
+                    text: "Trigger Level"
+                    topPadding: 4
+                }
+
+                ParameterQuickSpinBox {
+                    paramModel: private_.triggerLevel
+                    stepScale: .5
+
+                    Layout.preferredWidth: 112
+                }
+            }
+
+            ToolSeparator {
+                Layout.fillHeight: true
+            }
+
+            ColumnLayout {
+                enabled: !private_.freeMode
+
+                Label {
+                    text: "Hold Time"
+                    topPadding: 4
+                }
+
+                ParameterQuickSpinBox {
+                    paramModel: private_.holdTime
+
+                    Layout.preferredWidth: 132
+                }
+            }
+
+            ToolSeparator {
+                Layout.fillHeight: true
+            }
+
+            ColumnLayout {
+                Label {
+                    text: "Window Size"
+                    topPadding: 4
+                }
+
+                IntSlider {
+                    paramModel: private_.windowSize
+
+                    orientation: Qt.Horizontal
+                    stepButtonsVisible: false
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 40
+                }
+            }
         }
 
         ToolSeparator {
             orientation: Qt.Horizontal
+
+            bottomPadding: 2
+            topPadding: 8
+
             Layout.fillWidth: true
         }
 
-        RowLayout {
+        StreamSourceSettings {
+            model: root.content
 
             Layout.fillWidth: true
-            Layout.preferredHeight: 40
-
-            StereoChannelSelector {
-                visible: private_.isStereo
-
-                name: "A"
-                activeParam: root.content ? root.content.activeA : null
-                channelParam: root.content ? root.content.channelA : null
-                gainParam: root.content ? root.content.gainA : null
-
-                Material.accent: root.content && root.content.activeA.value ? Material.Pink : Material.Grey
-
-                Layout.fillWidth: true
-            }
-
-            ToolSeparator {
-                visible: private_.isStereo
-            }
-
-            StereoChannelSelector {
-                visible: private_.isStereo
-
-                name: "B"
-                activeParam: root.content ? root.content.activeB : null
-                channelParam: root.content ? root.content.channelB : null
-                gainParam: root.content ? root.content.gainB : null
-
-                Material.accent: root.content && root.content.activeB.value ? Material.Blue : Material.Grey
-
-                Layout.fillWidth: true
-            }
-
-            ParameterQuickSpinBox {
-                visible: !private_.isStereo
-
-                paramModel: root.content ? root.content.gainA : null
-                stepScale: 1.04167
-
-                Layout.preferredWidth: 128
-            }
-
-            Item {
-                visible: !private_.isStereo
-
-                Layout.fillWidth: true
-            }
-
-            ToolSeparator {}
-
-            ParameterToggleButton {
-                paramModel: root.content ? root.content.freeze : null
-
-                Layout.preferredWidth: 32
-                Layout.preferredHeight: 40
-
-                flat: false
-
-                icon.width: 24
-                icon.height: 24
-                icon.source: "qrc:///images/icons/snow.svg"
-            }
+            Layout.preferredHeight: 48
         }
-    }
+   }
 
     Binding {
         when: root.content
         target: root.content
         property: "viewSize"
-        value: root.content && root.content.mode.value === PJModels.FxScope.Mode.Free ? waveformA.width : scopeA.width
+        value: root.content && root.content.mode.value === PJModels.FxScope.Mode.Free
+               ? waveformView.availableWidth
+               : scopeView.availableWidth
         restoreMode: Binding.RestoreBinding
     }
 

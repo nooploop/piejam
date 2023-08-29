@@ -53,6 +53,13 @@ struct dB_ival
 {
     static constexpr auto min{-24.f};
     static constexpr auto max{24.f};
+
+    static constexpr auto min_gain{std::pow(10.f, min / 20.f)};
+    static constexpr auto max_gain{std::pow(10.f, max / 20.f)};
+
+    static constexpr auto to_normalized = &parameter::to_normalized_dB<dB_ival>;
+    static constexpr auto from_normalized =
+            &parameter::from_normalized_dB<dB_ival>;
 };
 
 auto
@@ -117,40 +124,24 @@ make_module(
                              fx_params_factory.make_parameter(
                                      float_parameter{
                                              .default_value = 1.f,
-                                             .min = std::pow(
-                                                     10.f,
-                                                     dB_ival::min / 20.f),
-                                             .max = std::pow(
-                                                     10.f,
-                                                     dB_ival::max / 20.f),
+                                             .min = dB_ival::min_gain,
+                                             .max = dB_ival::max_gain,
                                              .to_normalized =
-                                                     &parameter::
-                                                             to_normalized_dB<
-                                                                     dB_ival>,
+                                                     dB_ival::to_normalized,
                                              .from_normalized =
-                                                     &runtime::parameter::
-                                                             from_normalized_dB<
-                                                                     dB_ival>},
+                                                     dB_ival::from_normalized},
                                      {.name = "Gain A"s,
                                       .value_to_string = &to_dB_string})},
                             {to_underlying(parameter_key::gain_b),
                              fx_params_factory.make_parameter(
                                      float_parameter{
                                              .default_value = 1.f,
-                                             .min = std::pow(
-                                                     10.f,
-                                                     dB_ival::min / 20.f),
-                                             .max = std::pow(
-                                                     10.f,
-                                                     dB_ival::max / 20.f),
+                                             .min = dB_ival::min_gain,
+                                             .max = dB_ival::max_gain,
                                              .to_normalized =
-                                                     &runtime::parameter::
-                                                             to_normalized_dB<
-                                                                     dB_ival>,
+                                                     dB_ival::to_normalized,
                                              .from_normalized =
-                                                     &parameter::
-                                                             from_normalized_dB<
-                                                                     dB_ival>},
+                                                     dB_ival::from_normalized},
                                      {.name = "Gain B"s,
                                       .value_to_string = &to_dB_string})},
                             {to_underlying(parameter_key::freeze),

@@ -137,7 +137,7 @@ ViewPane {
 
     }
 
-    VerticalToolBar {
+    ViewToolBar {
         id: mixerToolbar
 
         anchors.right: parent.right

@@ -15,7 +15,7 @@ class FxModuleContent : public SubscribableModel
     Q_OBJECT
 
 public:
-    enum class Type
+    enum class Type : int
     {
         Generic = 0,
         Filter,

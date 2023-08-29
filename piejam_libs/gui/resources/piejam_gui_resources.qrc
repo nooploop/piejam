@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 Dimitrij Kotrev
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
@@ -71,12 +77,10 @@
         <file>PieJam/Views/Log.qml</file>
         <file>images/icons/info.svg</file>
         <file>PieJam/Controls/InfoToolButton.qml</file>
-        <file>PieJam/FxChainControls/ScopeSettings.qml</file>
         <file>PieJam/Controls/QuickSpinBox.qml</file>
         <file>images/icons/falling_edge.svg</file>
         <file>images/icons/rising_edge.svg</file>
         <file>images/icons/snow.svg</file>
-        <file>PieJam/Controls/VerticalToolBar.qml</file>
         <file>PieJam/MixerControls/ChannelFxStrip.qml</file>
         <file>PieJam/Views/FxBrowser.qml</file>
         <file>PieJam/Views/FxModule.qml</file>
@@ -84,5 +88,7 @@
         <file>PieJam/FxChainControls/ParameterQuickSpinBox.qml</file>
         <file>PieJam/FxChainControls/ParameterSwitch.qml</file>
         <file>PieJam/FxChainControls/ParameterToggleButton.qml</file>
+        <file>PieJam/FxChainControls/StreamSourceSettings.qml</file>
+        <file>PieJam/Views/ViewToolBar.qml</file>
     </qresource>
 </RCC>

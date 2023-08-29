@@ -107,8 +107,8 @@ to_window_size_string(int const n) -> std::string
         case to_underlying(window_size::small):
             return "Small"s;
 
-        case to_underlying(window_size::middle):
-            return "Middle"s;
+        case to_underlying(window_size::medium):
+            return "Medium"s;
 
         case to_underlying(window_size::large):
             return "Large"s;
@@ -149,6 +149,13 @@ struct dB_ival
 {
     static constexpr auto min{-24.f};
     static constexpr auto max{24.f};
+
+    static constexpr auto min_gain{std::pow(10.f, min / 20.f)};
+    static constexpr auto max_gain{std::pow(10.f, max / 20.f)};
+
+    static constexpr auto to_normalized = &parameter::to_normalized_dB<dB_ival>;
+    static constexpr auto from_normalized =
+            &parameter::from_normalized_dB<dB_ival>;
 };
 
 auto
@@ -176,13 +183,19 @@ make_module(
                             {to_underlying(parameter_key::mode),
                              fx_params_factory.make_parameter(
                                      int_parameter{
-                                             .default_value = to_underlying(
-                                                     mode::trigger_a),
-                                             .min = 0,
-                                             .max = bus_type == audio::bus_type::
-                                                                            stereo
-                                                            ? 2
-                                                            : 1},
+                                             .default_value = bus_type_to(
+                                                     bus_type,
+                                                     to_underlying(
+                                                             mode::trigger),
+                                                     to_underlying(
+                                                             mode::trigger_a)),
+                                             .min = to_underlying(mode::_min),
+                                             .max = bus_type_to(
+                                                     bus_type,
+                                                     to_underlying(
+                                                             mode::trigger),
+                                                     to_underlying(
+                                                             mode::trigger_b))},
                                      {.name = "Mode",
                                       .value_to_string =
                                               to_mode_string(bus_type)})},
@@ -192,8 +205,10 @@ make_module(
                                              .default_value = to_underlying(
                                                      trigger_slope::
                                                              rising_edge),
-                                             .min = 0,
-                                             .max = 1},
+                                             .min = to_underlying(
+                                                     trigger_slope::_min),
+                                             .max = to_underlying(
+                                                     trigger_slope::_max)},
                                      {.name = "Slope",
                                       .value_to_string =
                                               &to_trigger_slope_string})},
@@ -233,9 +248,9 @@ make_module(
                                              .default_value = to_underlying(
                                                      window_size::large),
                                              .min = to_underlying(
-                                                     window_size::very_small),
+                                                     window_size::_min),
                                              .max = to_underlying(
-                                                     window_size::very_large)},
+                                                     window_size::_max)},
                                      {.name = "Window Size",
                                       .value_to_string =
                                               &to_window_size_string})},
@@ -245,9 +260,9 @@ make_module(
                                              .default_value = to_underlying(
                                                      window_size::very_small),
                                              .min = to_underlying(
-                                                     window_size::very_small),
+                                                     window_size::_min),
                                              .max = to_underlying(
-                                                     window_size::very_large)},
+                                                     window_size::_max)},
                                      {.name = "Window Size",
                                       .value_to_string =
                                               &to_window_size_string})},
@@ -291,40 +306,24 @@ make_module(
                              fx_params_factory.make_parameter(
                                      float_parameter{
                                              .default_value = 1.f,
-                                             .min = std::pow(
-                                                     10.f,
-                                                     dB_ival::min / 20.f),
-                                             .max = std::pow(
-                                                     10.f,
-                                                     dB_ival::max / 20.f),
+                                             .min = dB_ival::min_gain,
+                                             .max = dB_ival::max_gain,
                                              .to_normalized =
-                                                     &parameter::
-                                                             to_normalized_dB<
-                                                                     dB_ival>,
+                                                     dB_ival::to_normalized,
                                              .from_normalized =
-                                                     &runtime::parameter::
-                                                             from_normalized_dB<
-                                                                     dB_ival>},
+                                                     dB_ival::from_normalized},
                                      {.name = "Gain A"s,
                                       .value_to_string = &to_dB_string})},
                             {to_underlying(parameter_key::gain_b),
                              fx_params_factory.make_parameter(
                                      float_parameter{
                                              .default_value = 1.f,
-                                             .min = std::pow(
-                                                     10.f,
-                                                     dB_ival::min / 20.f),
-                                             .max = std::pow(
-                                                     10.f,
-                                                     dB_ival::max / 20.f),
+                                             .min = dB_ival::min_gain,
+                                             .max = dB_ival::max_gain,
                                              .to_normalized =
-                                                     &runtime::parameter::
-                                                             to_normalized_dB<
-                                                                     dB_ival>,
+                                                     dB_ival::to_normalized,
                                              .from_normalized =
-                                                     &parameter::
-                                                             from_normalized_dB<
-                                                                     dB_ival>},
+                                                     dB_ival::from_normalized},
                                      {.name = "Gain B"s,
                                       .value_to_string = &to_dB_string})},
                             {to_underlying(parameter_key::freeze),

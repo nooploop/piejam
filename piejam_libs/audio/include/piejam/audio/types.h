@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstddef>
+#include <utility>
 
 namespace piejam::audio
 {
@@ -15,16 +16,24 @@ enum class bus_type : bool
     stereo
 };
 
+template <class T>
 [[nodiscard]] constexpr auto
-num_channels(bus_type const b) -> std::size_t
+bus_type_to(bus_type const b, T&& mono_value, T&& stereo_value)
+        -> decltype(auto)
 {
     switch (b)
     {
         case bus_type::mono:
-            return 1;
+            return std::forward<T>(mono_value);
         case bus_type::stereo:
-            return 2;
+            return std::forward<T>(stereo_value);
     }
+}
+
+[[nodiscard]] constexpr auto
+num_channels(bus_type const b) -> std::size_t
+{
+    return bus_type_to(b, std::size_t{1}, std::size_t{2});
 }
 
 enum class bus_channel

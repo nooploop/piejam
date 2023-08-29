@@ -19,30 +19,32 @@ ViewPane {
 
     property var model
 
-    readonly property bool bypassed: root.model && root.model.bypassed
-
     ModelSubscription {
         target: root.model
         subscribed: root.visible
     }
 
-    Frame {
-        id: frame
+    QtObject {
+        id: private_
 
+        readonly property bool bypassed: root.model && root.model.bypassed
+        readonly property int contentType: root.model && root.model.content ? root.model.content.type : -1
+    }
+
+    RowLayout {
         anchors.fill: parent
-        anchors.margins: 8
 
         spacing: 0
 
         ColumnLayout {
-            anchors.fill: parent
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.margins: 8
 
             RowLayout {
                 Layout.fillWidth: true
 
                 Button {
-                    id: bypassButton
-
                     Layout.preferredWidth: 24
                     Layout.preferredHeight: 36
 
@@ -53,18 +55,16 @@ ViewPane {
                     padding: 8
 
                     checkable: true
-                    checked: !root.bypassed
+                    checked: !private_.bypassed
 
                     onClicked: if (root.model) root.model.toggleBypass()
                 }
 
                 HeaderLabel {
-                    id: nameLabel
-
                     Layout.fillWidth: true
                     Layout.preferredHeight: 24
 
-                    text: root.model ? root.model.name : ""
+                    text: root.model ? (root.model.chainName + " - " + root.model.name) : ""
                 }
             }
 
@@ -72,40 +72,14 @@ ViewPane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                currentIndex: {
-                    if (root.model && root.model.content) {
-                        switch (root.model.content.type) {
-                        case FxModuleContent.Type.Generic:
-                            return 0
-
-                        case FxModuleContent.Type.Filter:
-                            return 1
-
-                        case FxModuleContent.Type.Scope:
-                            return 2
-
-                        case FxModuleContent.Type.Spectrum:
-                            return 3
-
-                        default:
-                            console.log("unknown content type")
-                            return -1
-                        }
-                    }
-                    else
-                    {
-                        return -1
-                    }
-                }
+                currentIndex: private_.contentType
 
                 BusyLoader {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
                     sourceComponent: ParametersListView {
-                        content: root.model && root.model.content && root.model.content.type === FxModuleContent.Type.Generic
-                                 ? root.model.content
-                                 : null
+                        content: private_.contentType === FxModuleContent.Type.Generic ? root.model.content : null
                     }
                 }
 
@@ -114,10 +88,8 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: FilterView {
-                        content: root.model && root.model.content && root.model.content.type === FxModuleContent.Type.Filter
-                                 ? root.model.content
-                                 : null
-                        bypassed: root.bypassed
+                        content: private_.contentType === FxModuleContent.Type.Filter ? root.model.content : null
+                        bypassed: private_.bypassed
                     }
                 }
 
@@ -126,10 +98,8 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: ScopeView {
-                        content: root.model && root.model.content && root.model.content.type === FxModuleContent.Type.Scope
-                                 ? root.model.content
-                                 : null
-                        bypassed: root.bypassed
+                        content: private_.contentType === FxModuleContent.Type.Scope ? root.model.content : null
+                        bypassed: private_.bypassed
                     }
                 }
 
@@ -138,13 +108,15 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: SpectrumView {
-                        content: root.model && root.model.content && root.model.content.type === FxModuleContent.Type.Spectrum
-                                 ? root.model.content
-                                 : null
-                        bypassed: root.bypassed
+                        content: private_.contentType === FxModuleContent.Type.Spectrum ? root.model.content : null
+                        bypassed: private_.bypassed
                     }
                 }
             }
+        }
+
+        ViewToolBar {
+            Layout.fillHeight: true
         }
     }
 }
