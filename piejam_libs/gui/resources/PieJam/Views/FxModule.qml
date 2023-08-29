@@ -41,31 +41,11 @@ ViewPane {
             Layout.fillHeight: true
             Layout.margins: 8
 
-            RowLayout {
+            HeaderLabel {
                 Layout.fillWidth: true
+                Layout.preferredHeight: 24
 
-                Button {
-                    Layout.preferredWidth: 24
-                    Layout.preferredHeight: 36
-
-                    icon.width: 24
-                    icon.height: 24
-                    icon.source: "qrc:///images/icons/power.svg"
-                    display: AbstractButton.IconOnly
-                    padding: 8
-
-                    checkable: true
-                    checked: !private_.bypassed
-
-                    onClicked: if (root.model) root.model.toggleBypass()
-                }
-
-                HeaderLabel {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 24
-
-                    text: root.model ? (root.model.chainName + " - " + root.model.name) : ""
-                }
+                text: root.model ? (root.model.chainName + " - " + root.model.name) : ""
             }
 
             StackLayout {
@@ -117,6 +97,18 @@ ViewPane {
 
         ViewToolBar {
             Layout.fillHeight: true
+
+            ViewToolBarButton {
+                iconSource: "qrc:///images/icons/power.svg"
+                checked: !private_.bypassed
+
+                onClicked: if (root.model) root.model.toggleBypass()
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
         }
     }
 }

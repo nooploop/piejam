@@ -21,8 +21,6 @@ ViewPane {
     property var model
 
     Rectangle {
-        id: leftBorderShadow
-
         width: 4
         anchors.left: parent.left
         anchors.top: parent.top
@@ -144,35 +142,15 @@ ViewPane {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
 
-        Button {
-            id: editButton
-
-            Layout.preferredWidth: 32
-            Layout.preferredHeight: 40
-            Layout.alignment: Qt.AlignHCenter
-
-            icon.width: 24
-            icon.height: 24
-            icon.source: "qrc:///images/icons/pencil.svg"
-            display: AbstractButton.IconOnly
-
-            checkable: true
+        ViewToolBarButton {
+            iconSource: "qrc:///images/icons/pencil.svg"
             checked: MixerViewSettings.mode === MixerViewSettings.edit
 
             onClicked: MixerViewSettings.switchMode(MixerViewSettings.edit)
         }
 
-        Button {
-            id: fxButton
-
-            Layout.preferredWidth: 32
-            Layout.preferredHeight: 40
-            Layout.alignment: Qt.AlignHCenter
-
+        ViewToolBarButton {
             text: "FX"
-            font.pixelSize: 12
-
-            checkable: true
             checked: MixerViewSettings.mode === MixerViewSettings.fx
 
             onClicked: MixerViewSettings.switchMode(MixerViewSettings.fx)

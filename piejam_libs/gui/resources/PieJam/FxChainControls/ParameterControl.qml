@@ -66,6 +66,12 @@ Item {
             verticalAlignment: Text.AlignVCenter
             textFormat: Text.PlainText
             font.pixelSize: 12
+
+            MouseArea {
+                anchors.fill: parent
+
+                onDoubleClicked: if (root.paramModel) root.paramModel.resetToDefault()
+            }
         }
     }
 
