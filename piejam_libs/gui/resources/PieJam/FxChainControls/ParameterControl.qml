@@ -19,92 +19,88 @@ Item {
 
     implicitWidth: 82
 
-    Rectangle {
-        id: headerRect
+    ColumnLayout {
+        anchors.fill: parent
 
-        anchors.top: parent.top
-        anchors.right: parent.right
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 70
 
-        width: 82
-        height: 70
+            color: Material.color(Material.Grey, Material.Shade800)
+            radius: 2
 
-        color: Material.color(Material.Grey, Material.Shade800)
-        radius: 2
-
-        HeaderLabel {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-
-            height: 40
-
-            text: root.paramModel ? root.paramModel.name : "name"
-
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            textFormat: Text.PlainText
-            wrapMode: Text.WordWrap
-
-            backgroundColor: Material.color(Material.Grey, Material.Shade800)
-        }
-
-        Label {
-            text: root.paramModel ? root.paramModel.valueString : "value"
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.margins: 4
-
-            padding: 2
-            background: Rectangle {
-                color: Material.color(Material.Grey, Material.Shade700)
-                radius: 2
-            }
-
-            horizontalAlignment: Text.AlignRight
-            verticalAlignment: Text.AlignVCenter
-            textFormat: Text.PlainText
-            font.pixelSize: 12
-
-            MouseArea {
+            ColumnLayout {
                 anchors.fill: parent
 
-                onDoubleClicked: if (root.paramModel) root.paramModel.resetToDefault()
+                HeaderLabel {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 40
+
+                    text: root.paramModel ? root.paramModel.name : "name"
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    textFormat: Text.PlainText
+                    wrapMode: Text.WordWrap
+
+                    backgroundColor: Material.color(Material.Grey, Material.Shade800)
+                }
+
+                Label {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    text: root.paramModel ? root.paramModel.valueString : "value"
+
+                    padding: 2
+                    background: Rectangle {
+                        color: Material.color(Material.Grey, Material.Shade700)
+                        radius: 2
+                    }
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    textFormat: Text.PlainText
+                    font.pixelSize: 12
+
+                    MouseArea {
+                        anchors.fill: parent
+
+                        onDoubleClicked: {
+                            if (root.paramModel) {
+                                root.paramModel.resetToDefault()
+                                Info.showParameterValue(root.paramModel)
+                            }
+                        }
+                    }
+                }
             }
         }
-    }
 
-    Rectangle {
-        id: sliderRect
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        anchors.top: headerRect.bottom
-        anchors.topMargin: 4
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
+            color: Material.color(Material.Grey, Material.Shade800)
+            radius: 2
 
-        color: Material.color(Material.Grey, Material.Shade800)
-        radius: 2
+            StackLayout {
+                anchors.fill: parent
+                anchors.margins: 8
 
-        StackLayout {
-            id: controlStack
+                currentIndex: root.paramModel ? root.paramModel.type : -1
 
-            anchors.fill: parent
-            anchors.margins: 8
+                ParameterTouchstrip {
+                    paramModel: root.paramModel
+                }
 
-            currentIndex: root.paramModel ? root.paramModel.type : -1
+                IntSlider {
+                    paramModel: root.paramModel
+                }
 
-            ParameterTouchstrip {
-                paramModel: root.paramModel
-            }
-
-            IntSlider {
-                paramModel: root.paramModel
-            }
-
-            ParameterSwitch {
-                paramModel: root.paramModel
+                ParameterSwitch {
+                    paramModel: root.paramModel
+                }
             }
         }
     }

@@ -12,7 +12,7 @@ Rectangle {
 
     default property alias toolbarButtons: buttons.children
 
-    implicitWidth: 48
+    implicitWidth: 52
 
     color: Material.color(Material.Grey, Material.Shade800)
 
