@@ -5,10 +5,8 @@
 #pragma once
 
 #include <piejam/gui/model/AudioStreamListener.h>
-#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/ScopeData.h>
-#include <piejam/gui/model/StereoChannel.h>
-#include <piejam/gui/model/TriggerSlope.h>
+#include <piejam/gui/model/Types.h>
 
 #include <piejam/audio/fwd.h>
 

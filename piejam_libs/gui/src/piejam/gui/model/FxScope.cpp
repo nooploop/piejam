@@ -13,7 +13,6 @@
 #include <piejam/gui/model/FxFloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/ScopeDataGenerator.h>
-#include <piejam/gui/model/TriggerSlope.h>
 #include <piejam/gui/model/WaveformDataGenerator.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/selectors.h>

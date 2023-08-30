@@ -5,8 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/AudioStream.h>
-#include <piejam/gui/model/BusType.h>
-#include <piejam/gui/model/StereoChannel.h>
+#include <piejam/gui/model/Types.h>
 
 #include <piejam/algorithm/transform_to_vector.h>
 

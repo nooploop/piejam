@@ -30,7 +30,7 @@ dftForResolution(DFTResolution const resolution) -> numeric::dft&
 {
     switch (resolution)
     {
-        case DFTResolution::Middle:
+        case DFTResolution::Medium:
         {
             static numeric::dft s_dft{4096};
             return s_dft;

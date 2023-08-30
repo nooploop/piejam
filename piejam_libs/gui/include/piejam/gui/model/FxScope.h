@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/FxModuleContentSubscribable.h>
 #include <piejam/gui/model/ScopeData.h>
-#include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/Subscribable.h>
+#include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/WaveformDataObject.h>
 #include <piejam/gui/model/fwd.h>
 #include <piejam/runtime/fx/fwd.h>

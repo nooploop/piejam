@@ -36,8 +36,6 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamListener.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusConfig.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusType.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DFTResolution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleTick.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/EnumListModel.h
@@ -80,12 +78,11 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataPoint.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StereoChannel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StreamProcessor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Subscribable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SubscribableModel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/TriggerSlope.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Types.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/WaveformData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/WaveformDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/WaveformDataObject.h

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/BusType.h>
+#include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/StringList.h>
 #include <piejam/gui/model/Subscribable.h>

@@ -85,7 +85,7 @@ Item {
                 MenuItem {
                     enabled: root.model ? root.model.defaultInputIsValid : true
 
-                    text: root.model && (root.model.busType == PJModels.BusType.Mono) ? qsTr("None") : qsTr("Mix")
+                    text: root.model && (root.model.busType == PJModels.Types.BusType.Mono) ? qsTr("None") : qsTr("Mix")
 
                     onClicked: root.model.changeInputToDefault()
                 }

@@ -31,7 +31,7 @@ Item {
     QtObject {
         id: private_
 
-        readonly property bool isStereo: root.content && root.content.busType === PJModels.BusType.Stereo
+        readonly property bool isStereo: root.content && root.content.busType === PJModels.Types.BusType.Stereo
         readonly property var mode: root.content ? root.content.mode : null
         readonly property var triggerSlope: root.content ? root.content.triggerSlope : null
         readonly property var triggerLevel: root.content ? root.content.triggerLevel : null

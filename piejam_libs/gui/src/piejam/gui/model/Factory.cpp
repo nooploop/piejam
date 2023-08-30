@@ -12,7 +12,6 @@
 #include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/BusConfig.h>
-#include <piejam/gui/model/BusType.h>
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/EnumListModel.h>
 #include <piejam/gui/model/FxBoolParameter.h>
@@ -41,9 +40,8 @@
 #include <piejam/gui/model/RootView.h>
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/SpectrumData.h>
-#include <piejam/gui/model/StereoChannel.h>
 #include <piejam/gui/model/StringList.h>
-#include <piejam/gui/model/TriggerSlope.h>
+#include <piejam/gui/model/Types.h>
 
 #include <mutex>
 
@@ -136,28 +134,12 @@ runRegistration()
             "Spectrum");
     qmlRegisterType<piejam::gui::item::Scope>("PieJam.Items", 1, 0, "Scope");
 
-    qRegisterMetaType<piejam::gui::model::TriggerSlope>();
-    qmlRegisterUncreatableType<piejam::gui::model::TriggerSlopeClass>(
+    qmlRegisterUncreatableMetaObject(
+            piejam::gui::model::staticMetaObject,
             "PieJam.Models",
             1,
             0,
-            "TriggerSlope",
-            "Not creatable as it is an enum type");
-
-    qRegisterMetaType<piejam::gui::model::StereoChannel>();
-    qmlRegisterUncreatableType<piejam::gui::model::StereoChannelClass>(
-            "PieJam.Models",
-            1,
-            0,
-            "StereoChannel",
-            "Not creatable as it is an enum type");
-
-    qRegisterMetaType<piejam::gui::model::BusType>();
-    qmlRegisterUncreatableType<piejam::gui::model::BusTypeClass>(
-            "PieJam.Models",
-            1,
-            0,
-            "BusType",
+            "Types",
             "Not creatable as it is an enum type");
 
     qmlRegisterSingletonInstance<piejam::gui::model::MixerDbScales>(
