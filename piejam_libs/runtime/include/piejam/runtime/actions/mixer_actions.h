@@ -31,7 +31,7 @@ struct add_mixer_channel final
     audio::bus_type bus_type;
     bool auto_assign_input{};
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct delete_mixer_channel final
@@ -40,7 +40,7 @@ struct delete_mixer_channel final
 {
     mixer::channel_id mixer_channel_id{};
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 auto initiate_mixer_channel_deletion(mixer::channel_id) -> thunk_action;
@@ -51,7 +51,7 @@ struct set_mixer_channel_name final
     mixer::channel_id channel_id;
     std::string name;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 template <io_direction D>
@@ -62,7 +62,7 @@ struct set_mixer_channel_route final
     mixer::channel_id channel_id;
     mixer::io_address_t route;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct move_mixer_channel_left final
@@ -71,7 +71,7 @@ struct move_mixer_channel_left final
 {
     mixer::channel_id channel_id;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct move_mixer_channel_right final
@@ -80,7 +80,7 @@ struct move_mixer_channel_right final
 {
     mixer::channel_id channel_id;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

@@ -19,7 +19,7 @@ concept cloneable = requires(T const& x)
 // clang-format on
 
 template <class F, class State, class Action>
-concept reducer = std::is_invocable_r_v<State, F, State const&, Action const&>;
+concept reducer = std::is_invocable_r_v<void, F, State&, Action const&>;
 
 template <class F, class State>
 concept subscriber = std::is_invocable_v<F, State const&>;

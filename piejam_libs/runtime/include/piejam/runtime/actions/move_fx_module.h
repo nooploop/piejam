@@ -19,14 +19,14 @@ struct move_fx_module_up final
     : ui::cloneable_action<move_fx_module_up, reducible_action>
     , visitable_engine_action<move_fx_module_up>
 {
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct move_fx_module_down final
     : ui::cloneable_action<move_fx_module_down, reducible_action>
     , visitable_engine_action<move_fx_module_down>
 {
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

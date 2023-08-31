@@ -13,20 +13,16 @@
 namespace piejam::runtime::actions
 {
 
-auto
-update_streams::reduce(state const& st) const -> state
+void
+update_streams::reduce(state& st) const
 {
-    auto new_st = st;
-
     for (auto&& [id, buffer] : streams)
     {
-        new_st.streams.update(id, [&buffer](audio_stream_buffer& stored) {
+        st.streams.update(id, [&buffer](audio_stream_buffer& stored) {
             BOOST_ASSERT(stored->num_channels() == buffer->num_channels());
             stored = buffer;
         });
     }
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

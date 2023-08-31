@@ -33,7 +33,7 @@ struct insert_internal_fx_module final
     std::vector<fx::parameter_midi_assignment> midi_assignments;
     bool show_fx_module{};
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct load_ladspa_fx_plugin final
@@ -62,7 +62,7 @@ struct insert_ladspa_fx_module final
     std::vector<fx::parameter_midi_assignment> midi_assignments;
     bool show_fx_module{};
 
-    [[nodiscard]] auto reduce(state const& st) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct insert_missing_ladspa_fx_module final
@@ -73,7 +73,7 @@ struct insert_missing_ladspa_fx_module final
     fx::unavailable_ladspa unavailable_ladspa;
     std::string name;
 
-    [[nodiscard]] auto reduce(state const& st) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

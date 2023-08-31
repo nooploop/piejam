@@ -18,11 +18,7 @@ TEST(store,
      dispatch_will_modify_the_state_and_call_the_subscriber_with_new_state)
 {
     store<state_t, action_t> sut(
-            [](state_t const& s, action_t const& a) {
-                auto new_state = s;
-                new_state.push_back(a);
-                return new_state;
-            },
+            [](state_t& s, action_t const& a) { s.push_back(a); },
             state_t());
 
     state_t subscribed;
@@ -38,11 +34,7 @@ TEST(store,
      action_is_passed_to_middleware_to_reducer_and_state_passed_to_subscriber)
 {
     store<state_t, action_t> sut(
-            [](state_t const& s, action_t const& a) {
-                auto new_state = s;
-                new_state.push_back(a);
-                return new_state;
-            },
+            [](state_t& s, action_t const& a) { s.push_back(a); },
             state_t());
 
     bool middleware_called{};

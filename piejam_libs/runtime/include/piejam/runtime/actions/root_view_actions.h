@@ -21,7 +21,7 @@ struct set_root_view_mode final
 {
     root_view_mode mode;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct show_fx_browser final
@@ -29,7 +29,7 @@ struct show_fx_browser final
 {
     mixer::channel_id fx_chain_id;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

@@ -16,20 +16,18 @@
 namespace piejam::runtime::actions
 {
 
-auto
-add_mixer_channel::reduce(state const& st) const -> state
+void
+add_mixer_channel::reduce(state& st) const
 {
-    auto new_st = st;
-
     auto added_mixer_channel_id =
-            runtime::add_mixer_channel(new_st, name, bus_type);
+            runtime::add_mixer_channel(st, name, bus_type);
 
     if (auto_assign_input)
     {
-        for (auto bus_id : *new_st.device_io_state.inputs)
+        for (auto bus_id : *st.device_io_state.inputs)
         {
             auto it = std::ranges::find_if(
-                    new_st.mixer_state.channels,
+                    st.mixer_state.channels,
                     boost::hof::unpack([bus_id](
                                                mixer::channel_id,
                                                mixer::channel const&
@@ -40,10 +38,10 @@ add_mixer_channel::reduce(state const& st) const -> state
                                        bus_id;
                     }));
 
-            if (it == new_st.mixer_state.channels.end() &&
-                new_st.device_io_state.buses[bus_id].bus_type == bus_type)
+            if (it == st.mixer_state.channels.end() &&
+                st.device_io_state.buses[bus_id].bus_type == bus_type)
             {
-                new_st.mixer_state.channels.update(
+                st.mixer_state.channels.update(
                         added_mixer_channel_id,
                         [bus_id](mixer::channel& mixer_channel) {
                             mixer_channel.in = bus_id;
@@ -52,18 +50,12 @@ add_mixer_channel::reduce(state const& st) const -> state
             }
         }
     }
-
-    return new_st;
 }
 
-auto
-delete_mixer_channel::reduce(state const& st) const -> state
+void
+delete_mixer_channel::reduce(state& st) const
 {
-    auto new_st = st;
-
-    runtime::remove_mixer_channel(new_st, mixer_channel_id);
-
-    return new_st;
+    runtime::remove_mixer_channel(st, mixer_channel_id);
 }
 
 auto
@@ -99,71 +91,53 @@ initiate_mixer_channel_deletion(mixer::channel_id mixer_channel_id)
     };
 }
 
-auto
-set_mixer_channel_name::reduce(state const& st) const -> state
+void
+set_mixer_channel_name::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.mixer_state.channels.update(
+    st.mixer_state.channels.update(
             channel_id,
             [this](mixer::channel& mixer_channel) {
                 mixer_channel.name = name;
             });
-
-    return new_st;
 }
 
 template <io_direction D>
-auto
-set_mixer_channel_route<D>::reduce(state const& st) const -> state
+void
+set_mixer_channel_route<D>::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.mixer_state.channels.update(
+    st.mixer_state.channels.update(
             channel_id,
             [this](mixer::channel& mixer_channel) {
                 (D == io_direction::input ? mixer_channel.in
                                           : mixer_channel.out) = route;
             });
-
-    return new_st;
 }
 
-template auto
-set_mixer_channel_route<io_direction::input>::reduce(state const&) const
-        -> state;
-template auto
-set_mixer_channel_route<io_direction::output>::reduce(state const&) const
-        -> state;
+template void
+set_mixer_channel_route<io_direction::input>::reduce(state&) const;
+template void
+set_mixer_channel_route<io_direction::output>::reduce(state&) const;
 
-auto
-move_mixer_channel_left::reduce(state const& st) const -> state
+void
+move_mixer_channel_left::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.mixer_state.inputs.update([this](mixer::channel_ids_t& channel_ids) {
+    st.mixer_state.inputs.update([this](mixer::channel_ids_t& channel_ids) {
         auto it = std::ranges::find(channel_ids, channel_id);
         BOOST_ASSERT(it != channel_ids.end());
         BOOST_ASSERT(it != channel_ids.begin());
         std::iter_swap(it, std::prev(it));
     });
-
-    return new_st;
 }
 
-auto
-move_mixer_channel_right::reduce(state const& st) const -> state
+void
+move_mixer_channel_right::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.mixer_state.inputs.update([this](mixer::channel_ids_t& channel_ids) {
+    st.mixer_state.inputs.update([this](mixer::channel_ids_t& channel_ids) {
         auto it = std::ranges::find(channel_ids, channel_id);
         BOOST_ASSERT(it != channel_ids.end());
         BOOST_ASSERT(std::next(it) != channel_ids.begin());
         std::iter_swap(it, std::next(it));
     });
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

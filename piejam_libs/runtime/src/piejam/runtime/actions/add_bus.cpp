@@ -88,26 +88,24 @@ default_channels(state const& st, io_direction io_dir, audio::bus_type bus_type)
 
 } // namespace
 
-auto
-add_bus::reduce(state const& st) const -> state
+void
+add_bus::reduce(state& st) const
 {
-    auto new_st = st;
-
     BOOST_ASSERT(
             direction != io_direction::output ||
             type == audio::bus_type::stereo);
 
     auto added_bus_id = add_device_bus(
-            new_st,
-            default_bus_name(new_st, direction, type),
+            st,
+            default_bus_name(st, direction, type),
             direction,
             type,
-            default_channels(new_st, direction, type));
+            default_channels(st, direction, type));
 
     if (direction == io_direction::output)
     {
-        new_st.mixer_state.channels.update(
-                new_st.mixer_state.main,
+        st.mixer_state.channels.update(
+                st.mixer_state.main,
                 [added_bus_id](mixer::channel& mixer_channel) {
                     if (std::holds_alternative<default_t>(mixer_channel.out))
                     {
@@ -115,8 +113,6 @@ add_bus::reduce(state const& st) const -> state
                     }
                 });
     }
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

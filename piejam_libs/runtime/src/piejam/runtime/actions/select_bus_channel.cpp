@@ -9,12 +9,10 @@
 namespace piejam::runtime::actions
 {
 
-auto
-select_bus_channel::reduce(state const& st) const -> state
+void
+select_bus_channel::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.device_io_state.buses.update(bus_id, [this](device_io::bus& bus) {
+    st.device_io_state.buses.update(bus_id, [this](device_io::bus& bus) {
         switch (channel_selector)
         {
             case audio::bus_channel::mono:
@@ -30,8 +28,6 @@ select_bus_channel::reduce(state const& st) const -> state
                 break;
         }
     });
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

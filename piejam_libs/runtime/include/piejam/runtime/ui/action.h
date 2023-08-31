@@ -21,7 +21,7 @@ struct reducible_action : action
 {
     using state_t = State;
 
-    virtual auto reduce(State const&) const -> State = 0;
+    virtual auto reduce(State&) const -> void = 0;
 };
 
 } // namespace piejam::runtime::ui

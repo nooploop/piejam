@@ -21,7 +21,7 @@ struct apply_app_config final
 {
     persistence::app_config conf;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

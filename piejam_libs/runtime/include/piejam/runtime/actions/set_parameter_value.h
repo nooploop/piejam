@@ -27,7 +27,7 @@ struct set_parameter_value final
     {
     }
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 
     parameter::id_t<Parameter> id{};
     typename Parameter::value_type value{};

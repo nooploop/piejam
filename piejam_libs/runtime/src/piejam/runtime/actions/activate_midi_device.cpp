@@ -10,14 +10,12 @@
 namespace piejam::runtime::actions
 {
 
-auto
-activate_midi_device::reduce(state const& st) const -> state
+void
+activate_midi_device::reduce(state& st) const
 {
-    auto new_st = st;
-    new_st.midi_devices.update([this](midi_devices_t& devices) {
+    st.midi_devices.update([this](midi_devices_t& devices) {
         devices[device_id].enabled = true;
     });
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

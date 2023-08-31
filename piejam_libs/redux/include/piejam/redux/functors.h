@@ -10,7 +10,7 @@ namespace piejam::redux
 {
 
 template <class State, class Action>
-using reducer_f = std::function<State(State const&, Action const&)>;
+using reducer_f = std::function<void(State&, Action const&)>;
 
 template <class State>
 using subscriber_f = std::function<void(State const&)>;

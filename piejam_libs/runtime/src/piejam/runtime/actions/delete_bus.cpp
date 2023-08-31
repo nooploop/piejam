@@ -9,14 +9,10 @@
 namespace piejam::runtime::actions
 {
 
-auto
-delete_bus::reduce(state const& st) const -> state
+void
+delete_bus::reduce(state& st) const
 {
-    auto new_st = st;
-
-    remove_device_bus(new_st, bus_id);
-
-    return new_st;
+    remove_device_bus(st, bus_id);
 }
 
 } // namespace piejam::runtime::actions

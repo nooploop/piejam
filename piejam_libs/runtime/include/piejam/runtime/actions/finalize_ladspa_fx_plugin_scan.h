@@ -19,7 +19,7 @@ struct finalize_ladspa_fx_plugin_scan final
 {
     std::vector<ladspa::plugin_descriptor> plugins;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

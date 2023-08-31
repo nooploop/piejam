@@ -21,14 +21,14 @@ struct toggle_fx_module_bypass final
 {
     fx::module_id fx_mod_id;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct toggle_focused_fx_module_bypass final
     : ui::cloneable_action<toggle_focused_fx_module_bypass, reducible_action>
     , visitable_engine_action<toggle_focused_fx_module_bypass>
 {
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct focus_fx_module final
@@ -37,7 +37,7 @@ struct focus_fx_module final
     mixer::channel_id fx_chain_id;
     fx::module_id fx_mod_id;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct show_fx_module final
@@ -46,7 +46,7 @@ struct show_fx_module final
     mixer::channel_id fx_chain_id;
     fx::module_id fx_mod_id;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

@@ -39,7 +39,7 @@ struct update_parameter_values final
 
     [[nodiscard]] auto empty() const noexcept -> bool;
 
-    [[nodiscard]] auto reduce(state const& st) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

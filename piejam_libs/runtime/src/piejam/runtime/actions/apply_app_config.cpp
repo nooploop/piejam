@@ -42,24 +42,20 @@ apply_bus_configs(
     }
 }
 
-auto
-apply_app_config::reduce(state const& st) const -> state
+void
+apply_app_config::reduce(state& st) const
 {
-    auto new_st = st;
-
     apply_bus_configs<io_direction::input>(
-            new_st,
+            st,
             conf.input_bus_config,
-            new_st.input.hw_params->num_channels);
+            st.input.hw_params->num_channels);
 
     apply_bus_configs<io_direction::output>(
-            new_st,
+            st,
             conf.output_bus_config,
-            new_st.output.hw_params->num_channels);
+            st.output.hw_params->num_channels);
 
-    new_st.rec_session = conf.rec_session;
-
-    return new_st;
+    st.rec_session = conf.rec_session;
 }
 
 } // namespace piejam::runtime::actions

@@ -9,35 +9,23 @@
 namespace piejam::runtime::actions
 {
 
-auto
-start_midi_learning::reduce(state const& st) const -> state
+void
+start_midi_learning::reduce(state& st) const
 {
-    auto new_st = st;
-
     BOOST_ASSERT(is_valid_midi_assignment_id(assignment_id));
-    new_st.midi_learning = assignment_id;
-
-    return new_st;
+    st.midi_learning = assignment_id;
 }
 
-auto
-stop_midi_learning::reduce(state const& st) const -> state
+void
+stop_midi_learning::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.midi_learning.reset();
-
-    return new_st;
+    st.midi_learning.reset();
 }
 
-auto
-update_midi_assignments::reduce(state const& st) const -> state
+void
+update_midi_assignments::reduce(state& st) const
 {
-    auto new_st = st;
-
-    runtime::update_midi_assignments(new_st, assignments);
-
-    return new_st;
+    runtime::update_midi_assignments(st, assignments);
 }
 
 } // namespace piejam::runtime::actions

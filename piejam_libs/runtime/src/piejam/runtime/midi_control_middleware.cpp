@@ -50,12 +50,10 @@ struct update_midi_devices final
         }
     };
 
-    auto reduce(state const& st) const -> state override
+    void reduce(state& st) const override
     {
-        auto new_st = st;
-
-        auto midi_devices = *new_st.midi_devices;
-        auto midi_inputs = *new_st.midi_inputs;
+        auto midi_devices = *st.midi_devices;
+        auto midi_inputs = *st.midi_inputs;
 
         algorithm::for_each_visit(
                 updates,
@@ -63,10 +61,8 @@ struct update_midi_devices final
                         .midi_devices = midi_devices,
                         .midi_inputs = midi_inputs});
 
-        new_st.midi_devices = std::move(midi_devices);
-        new_st.midi_inputs = std::move(midi_inputs);
-
-        return new_st;
+        st.midi_devices = std::move(midi_devices);
+        st.midi_inputs = std::move(midi_inputs);
     }
 };
 
@@ -181,16 +177,15 @@ midi_control_middleware::process_midi_control_action(
         middleware_functors const& mw_fs,
         actions::apply_app_config const& action)
 {
-    auto const& st = mw_fs.get_state();
     for (std::string const& dev_name : action.conf.enabled_midi_input_devices)
     {
-        auto it = std::ranges::find_if(
-                *st.midi_devices,
-                [&](auto const& id_config) {
+        auto const& midi_devices = *mw_fs.get_state().midi_devices;
+        auto it =
+                std::ranges::find_if(midi_devices, [&](auto const& id_config) {
                     return std::get<1>(id_config).name == dev_name;
                 });
 
-        if (it != st.midi_devices->end())
+        if (it != midi_devices.end())
         {
             if (!it->second.enabled)
             {
@@ -219,11 +214,11 @@ midi_control_middleware::process_midi_control_action(
 {
     mw_fs.next(action);
 
-    auto const& st = mw_fs.get_state();
     actions::request_parameters_update param_update;
 
+    auto const& midi_assigns = *mw_fs.get_state().midi_assignments;
     algorithm::for_each_visit(
-            st.midi_assignments.get() | std::views::keys,
+            midi_assigns | std::views::keys,
             [&param_update](auto const& id) { param_update.push_back(id); });
 
     if (!param_update.empty())

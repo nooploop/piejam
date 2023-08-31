@@ -31,7 +31,7 @@ public:
         assert(m_reducer);
 
         m_dispatch = [this](Action const& action) {
-            m_state = m_reducer(m_state, action);
+            m_reducer(m_state, action);
             m_subscriber(m_state);
         };
     }

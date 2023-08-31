@@ -12,13 +12,11 @@
 namespace piejam::runtime::actions
 {
 
-auto
-insert_internal_fx_module::reduce(state const& st) const -> state
+void
+insert_internal_fx_module::reduce(state& st) const
 {
-    auto new_st = st;
-
     auto fx_mod_id = runtime::insert_internal_fx_module(
-            new_st,
+            st,
             fx_chain_id,
             position,
             type,
@@ -27,21 +25,17 @@ insert_internal_fx_module::reduce(state const& st) const -> state
 
     if (show_fx_module)
     {
-        new_st.gui_state.focused_fx_chain_id = fx_chain_id;
-        new_st.gui_state.focused_fx_mod_id = fx_mod_id;
-        new_st.gui_state.root_view_mode_ = runtime::root_view_mode::fx_module;
+        st.gui_state.focused_fx_chain_id = fx_chain_id;
+        st.gui_state.focused_fx_mod_id = fx_mod_id;
+        st.gui_state.root_view_mode_ = runtime::root_view_mode::fx_module;
     }
-
-    return new_st;
 }
 
-auto
-insert_ladspa_fx_module::reduce(state const& st) const -> state
+void
+insert_ladspa_fx_module::reduce(state& st) const
 {
-    auto new_st = st;
-
     auto fx_mod_id = runtime::insert_ladspa_fx_module(
-            new_st,
+            st,
             fx_chain_id,
             position,
             instance_id,
@@ -52,27 +46,21 @@ insert_ladspa_fx_module::reduce(state const& st) const -> state
 
     if (show_fx_module)
     {
-        new_st.gui_state.focused_fx_chain_id = fx_chain_id;
-        new_st.gui_state.focused_fx_mod_id = fx_mod_id;
-        new_st.gui_state.root_view_mode_ = runtime::root_view_mode::fx_module;
+        st.gui_state.focused_fx_chain_id = fx_chain_id;
+        st.gui_state.focused_fx_mod_id = fx_mod_id;
+        st.gui_state.root_view_mode_ = runtime::root_view_mode::fx_module;
     }
-
-    return new_st;
 }
 
-auto
-insert_missing_ladspa_fx_module::reduce(state const& st) const -> state
+void
+insert_missing_ladspa_fx_module::reduce(state& st) const
 {
-    auto new_st = st;
-
     runtime::insert_missing_ladspa_fx_module(
-            new_st,
+            st,
             fx_chain_id,
             position,
             unavailable_ladspa,
             name);
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

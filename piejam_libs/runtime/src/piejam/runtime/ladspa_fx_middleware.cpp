@@ -49,10 +49,9 @@ ladspa_fx_middleware::process_ladspa_fx_action(
         middleware_functors const& mw_fs,
         actions::load_ladspa_fx_plugin const& a)
 {
-    auto const& st = mw_fs.get_state();
-
-    if (auto plugin_desc =
-                find_ladspa_plugin_descriptor(st.fx_registry, a.plugin_id))
+    if (auto plugin_desc = find_ladspa_plugin_descriptor(
+                mw_fs.get_state().fx_registry,
+                a.plugin_id))
     {
         if (auto id = m_ladspa_control.load(*plugin_desc); id.valid())
         {
@@ -93,9 +92,7 @@ ladspa_fx_middleware::process_ladspa_fx_action(
         middleware_functors const& mw_fs,
         actions::delete_fx_module const& a)
 {
-    auto const& st = mw_fs.get_state();
-
-    fx::module const& fx_mod = st.fx_modules[a.fx_mod_id];
+    fx::module const& fx_mod = mw_fs.get_state().fx_modules[a.fx_mod_id];
 
     auto const fx_instance_id = fx_mod.fx_instance_id;
 

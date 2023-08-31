@@ -21,7 +21,7 @@ struct update_streams final
 {
     boost::container::flat_map<audio_stream_id, audio_stream_buffer> streams;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

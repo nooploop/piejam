@@ -146,12 +146,12 @@ main(int argc, char* argv[]) -> int
             redux::middleware_factory<runtime::state, runtime::action>;
 
     runtime::store store(
-            [](runtime::state const& st, runtime::action const& a) {
+            [](runtime::state& st, runtime::action const& a) -> void {
                 if (auto const* const ra =
                             dynamic_cast<runtime::reducible_action const*>(&a);
                     ra)
                 {
-                    return ra->reduce(st);
+                    ra->reduce(st);
                 }
                 else
                 {
@@ -160,7 +160,6 @@ main(int argc, char* argv[]) -> int
                     spdlog::warn(
                             "non-reducible action detected: {}",
                             action_name);
-                    return st;
                 }
             },
             runtime::make_initial_state());

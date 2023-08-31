@@ -9,25 +9,17 @@
 namespace piejam::runtime::actions
 {
 
-auto
-set_root_view_mode::reduce(state const& st) const -> state
+void
+set_root_view_mode::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.gui_state.root_view_mode_ = mode;
-
-    return new_st;
+    st.gui_state.root_view_mode_ = mode;
 }
 
-auto
-show_fx_browser::reduce(state const& st) const -> state
+void
+show_fx_browser::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.gui_state.fx_browser_fx_chain_id = fx_chain_id;
-    new_st.gui_state.root_view_mode_ = root_view_mode::fx_browser;
-
-    return new_st;
+    st.gui_state.fx_browser_fx_chain_id = fx_chain_id;
+    st.gui_state.root_view_mode_ = root_view_mode::fx_browser;
 }
 
 } // namespace piejam::runtime::actions

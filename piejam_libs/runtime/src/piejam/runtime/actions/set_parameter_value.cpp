@@ -12,12 +12,10 @@ namespace piejam::runtime::actions
 {
 
 template <class Parameter>
-auto
-set_parameter_value<Parameter>::reduce(state const& st) const -> state
+void
+set_parameter_value<Parameter>::reduce(state& st) const
 {
-    auto new_st = st;
-    new_st.params.set(id, value);
-    return new_st;
+    st.params.set(id, value);
 }
 
 template struct set_parameter_value<bool_parameter>;

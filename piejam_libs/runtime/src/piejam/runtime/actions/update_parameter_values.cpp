@@ -12,16 +12,12 @@
 namespace piejam::runtime::actions
 {
 
-auto
-update_parameter_values::reduce(state const& st) const -> state
+void
+update_parameter_values::reduce(state& st) const
 {
-    auto new_st = st;
-
-    boost::mp11::tuple_for_each(values, [&new_st](auto const& id_value_pairs) {
-        new_st.params.set(id_value_pairs);
+    boost::mp11::tuple_for_each(values, [&st](auto const& id_value_pairs) {
+        st.params.set(id_value_pairs);
     });
-
-    return new_st;
 }
 
 auto

@@ -9,49 +9,33 @@
 namespace piejam::runtime::actions
 {
 
-auto
-toggle_fx_module_bypass::reduce(state const& st) const -> state
+void
+toggle_fx_module_bypass::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.fx_modules.update(fx_mod_id, [](fx::module& fx_mod) {
+    st.fx_modules.update(fx_mod_id, [](fx::module& fx_mod) {
         fx_mod.bypassed = !fx_mod.bypassed;
     });
-
-    return new_st;
 }
 
-auto
-toggle_focused_fx_module_bypass::reduce(state const& st) const -> state
+void
+toggle_focused_fx_module_bypass::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.fx_modules.update(
+    st.fx_modules.update(
             st.gui_state.focused_fx_mod_id,
             [](fx::module& fx_mod) { fx_mod.bypassed = !fx_mod.bypassed; });
-
-    return new_st;
 }
 
-auto
-focus_fx_module::reduce(state const& st) const -> state
+void
+focus_fx_module::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.gui_state.focused_fx_chain_id = fx_chain_id;
-    new_st.gui_state.focused_fx_mod_id = fx_mod_id;
-
-    return new_st;
+    st.gui_state.focused_fx_chain_id = fx_chain_id;
+    st.gui_state.focused_fx_mod_id = fx_mod_id;
 }
 
-auto
-show_fx_module::reduce(state const& st) const -> state
+void
+show_fx_module::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.gui_state.root_view_mode_ = runtime::root_view_mode::fx_module;
-
-    return new_st;
+    st.gui_state.root_view_mode_ = runtime::root_view_mode::fx_module;
 }
 
 } // namespace piejam::runtime::actions

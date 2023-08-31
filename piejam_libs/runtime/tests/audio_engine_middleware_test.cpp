@@ -49,9 +49,8 @@ TEST_F(audio_engine_middleware_test,
             return std::make_unique<non_device_action>();
         }
 
-        [[nodiscard]] auto reduce(state const& st) const -> state override
+        void reduce(state&) const override
         {
-            return st;
         }
     } action;
     EXPECT_CALL(mf_mock, next(::testing::Ref(action)));
@@ -90,7 +89,7 @@ TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
     st.output.hw_params = default_hw_params;
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
-        st = dynamic_cast<reducible_action const&>(a).reduce(st);
+        dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(default_hw_params));
@@ -124,7 +123,7 @@ TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
     st.output.hw_params = default_hw_params;
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
-        st = dynamic_cast<reducible_action const&>(a).reduce(st);
+        dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(default_hw_params));
@@ -161,7 +160,7 @@ TEST_F(audio_engine_middleware_test,
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
-        st = dynamic_cast<reducible_action const&>(a).reduce(st);
+        dynamic_cast<reducible_action const&>(a).reduce(st);
     });
     EXPECT_CALL(audio_device_manager, hw_params(_, _, _))
             .WillRepeatedly(Return(hw_params));

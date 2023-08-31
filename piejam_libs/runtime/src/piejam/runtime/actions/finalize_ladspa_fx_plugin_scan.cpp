@@ -28,19 +28,15 @@ sort_fx_plugins(std::vector<ladspa::plugin_descriptor>& plugins)
     std::ranges::sort(plugins, {}, &ladspa::plugin_descriptor::name);
 }
 
-auto
-finalize_ladspa_fx_plugin_scan::reduce(state const& st) const -> state
+void
+finalize_ladspa_fx_plugin_scan::reduce(state& st) const
 {
-    auto new_st = st;
-
     auto fxs = fx::make_internal_fx_registry_entries();
     auto ladspa_plugins = plugins;
     filter_fx_plugins(ladspa_plugins);
     sort_fx_plugins(ladspa_plugins);
     boost::push_back(fxs, std::move(ladspa_plugins));
-    new_st.fx_registry.entries = std::move(fxs);
-
-    return new_st;
+    st.fx_registry.entries = std::move(fxs);
 }
 
 } // namespace piejam::runtime::actions

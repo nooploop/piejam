@@ -11,14 +11,12 @@
 namespace piejam::runtime::actions
 {
 
-auto
-delete_fx_module::reduce(state const& st) const -> state
+void
+delete_fx_module::reduce(state& st) const
 {
-    auto new_st = st;
-
-    if (new_st.gui_state.focused_fx_mod_id == fx_mod_id)
+    if (st.gui_state.focused_fx_mod_id == fx_mod_id)
     {
-        auto& mixer_channel = new_st.mixer_state.channels[fx_chain_id];
+        auto& mixer_channel = st.mixer_state.channels[fx_chain_id];
 
         auto next_focused_fx_mod_id = [&]() -> fx::module_id {
             BOOST_ASSERT(!mixer_channel.fx_chain->empty());
@@ -37,20 +35,18 @@ delete_fx_module::reduce(state const& st) const -> state
             }
         }();
 
-        remove_fx_module(new_st, fx_chain_id, fx_mod_id);
+        remove_fx_module(st, fx_chain_id, fx_mod_id);
 
-        new_st.gui_state.focused_fx_mod_id = next_focused_fx_mod_id;
+        st.gui_state.focused_fx_mod_id = next_focused_fx_mod_id;
         if (!next_focused_fx_mod_id.valid())
         {
-            new_st.gui_state.focused_fx_chain_id = {};
+            st.gui_state.focused_fx_chain_id = {};
         }
     }
     else
     {
-        remove_fx_module(new_st, fx_chain_id, fx_mod_id);
+        remove_fx_module(st, fx_chain_id, fx_mod_id);
     }
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

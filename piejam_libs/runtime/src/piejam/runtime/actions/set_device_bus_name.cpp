@@ -10,21 +10,18 @@
 namespace piejam::runtime::actions
 {
 
-auto
-set_device_bus_name::reduce(state const& st) const -> state
+void
+set_device_bus_name::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.device_io_state.buses.update(bus_id, [this](device_io::bus& bus) {
+    st.device_io_state.buses.update(bus_id, [this](device_io::bus& bus) {
         bus.name = name;
     });
 
-    auto const io_dir =
-            algorithm::contains(*new_st.device_io_state.inputs, bus_id)
-                    ? io_direction::input
-                    : io_direction::output;
+    auto const io_dir = algorithm::contains(*st.device_io_state.inputs, bus_id)
+                                ? io_direction::input
+                                : io_direction::output;
 
-    new_st.mixer_state.channels.update(
+    st.mixer_state.channels.update(
             [this,
              io_dir,
              route_name = mixer::io_address_t(mixer::missing_device_address(
@@ -44,8 +41,6 @@ set_device_bus_name::reduce(state const& st) const -> state
                     }
                 }
             });
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

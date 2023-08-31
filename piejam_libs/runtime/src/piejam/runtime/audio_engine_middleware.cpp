@@ -86,18 +86,16 @@ struct update_devices final
     audio::period_size period_size{};
     audio::period_count period_count{};
 
-    auto reduce(state const& st) const -> state override
+    void reduce(state& st) const override
     {
-        auto new_st = st;
+        st.pcm_devices = pcm_devices;
+        st.input = input;
+        st.output = output;
+        st.sample_rate = sample_rate;
+        st.period_size = period_size;
+        st.period_count = period_count;
 
-        new_st.pcm_devices = pcm_devices;
-        new_st.input = input;
-        new_st.output = output;
-        new_st.sample_rate = sample_rate;
-        new_st.period_size = period_size;
-        new_st.period_count = period_count;
-
-        new_st.device_io_state.buses.update(
+        st.device_io_state.buses.update(
                 *st.device_io_state.inputs,
                 [num_in_channels = input.hw_params->num_channels](
                         device_io::bus_id,
@@ -106,7 +104,7 @@ struct update_devices final
                     update_channel(bus.channels.right, num_in_channels);
                 });
 
-        new_st.device_io_state.buses.update(
+        st.device_io_state.buses.update(
                 *st.device_io_state.outputs,
                 [num_out_channels = output.hw_params->num_channels](
                         device_io::bus_id,
@@ -114,8 +112,6 @@ struct update_devices final
                     update_channel(bus.channels.left, num_out_channels);
                     update_channel(bus.channels.right, num_out_channels);
                 });
-
-        return new_st;
     }
 };
 
@@ -124,12 +120,10 @@ struct update_info final : ui::cloneable_action<update_info, reducible_action>
     std::size_t xruns{};
     float cpu_load{};
 
-    auto reduce(state const& st) const -> state override
+    void reduce(state& st) const override
     {
-        auto new_st = st;
-        new_st.xruns = xruns;
-        new_st.cpu_load = cpu_load;
-        return new_st;
+        st.xruns = xruns;
+        st.cpu_load = cpu_load;
     }
 };
 

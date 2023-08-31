@@ -54,11 +54,7 @@ TEST(queueing_middleware, if_currently_not_dispatching_proceed_to_next)
 {
     using make_mw_factory = middleware_factory<state_t, queaction>;
 
-    store_t store{[](state_t const& st, queaction const& a) {
-        auto new_st = st;
-        new_st.push_back(a.x);
-        return new_st;
-    }};
+    store_t store{[](state_t& st, queaction const& a) { st.push_back(a.x); }};
 
     store.apply_middleware(
             make_mw_factory::make<queueing_middleware<queaction>>());
@@ -74,11 +70,7 @@ TEST(queueing_middleware,
 {
     using make_mw_factory = middleware_factory<state_t, queaction>;
 
-    store_t store{[](state_t const& st, queaction const& a) {
-        auto new_st = st;
-        new_st.push_back(a.x);
-        return new_st;
-    }};
+    store_t store{[](state_t& st, queaction const& a) { st.push_back(a.x); }};
 
     store.apply_middleware(make_mw_factory::make<single_dispatch_middleware>());
 

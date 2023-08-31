@@ -20,14 +20,14 @@ struct start_midi_learning final
 {
     midi_assignment_id assignment_id;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct stop_midi_learning final
     : ui::cloneable_action<stop_midi_learning, reducible_action>
     , visitable_engine_action<stop_midi_learning>
 {
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 struct update_midi_assignments final
@@ -36,7 +36,7 @@ struct update_midi_assignments final
 {
     midi_assignments_map assignments;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

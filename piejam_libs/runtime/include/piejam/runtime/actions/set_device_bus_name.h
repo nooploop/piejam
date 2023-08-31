@@ -21,7 +21,7 @@ struct set_device_bus_name final
     device_io::bus_id bus_id;
     std::string name;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

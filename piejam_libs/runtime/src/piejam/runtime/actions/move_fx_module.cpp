@@ -11,12 +11,10 @@
 namespace piejam::runtime::actions
 {
 
-auto
-move_fx_module_up::reduce(state const& st) const -> state
+void
+move_fx_module_up::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.mixer_state.channels.update(
+    st.mixer_state.channels.update(
             st.gui_state.focused_fx_chain_id,
             [&](mixer::channel& mixer_channel) {
                 mixer_channel.fx_chain.update([&](fx::chain_t& fx_chain) {
@@ -29,16 +27,12 @@ move_fx_module_up::reduce(state const& st) const -> state
                     }
                 });
             });
-
-    return new_st;
 }
 
-auto
-move_fx_module_down::reduce(state const& st) const -> state
+void
+move_fx_module_down::reduce(state& st) const
 {
-    auto new_st = st;
-
-    new_st.mixer_state.channels.update(
+    st.mixer_state.channels.update(
             st.gui_state.focused_fx_chain_id,
             [&](mixer::channel& mixer_channel) {
                 mixer_channel.fx_chain.update([&](fx::chain_t& fx_chain) {
@@ -51,8 +45,6 @@ move_fx_module_down::reduce(state const& st) const -> state
                     }
                 });
             });
-
-    return new_st;
 }
 
 } // namespace piejam::runtime::actions

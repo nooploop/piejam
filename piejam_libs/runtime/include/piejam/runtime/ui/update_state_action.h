@@ -27,11 +27,9 @@ struct update_state_action final
     {
     }
 
-    auto reduce(State const& st) const -> State override
+    void reduce(State& st) const override
     {
-        auto new_st = st;
-        m_update_state(new_st);
-        return new_st;
+        m_update_state(st);
     }
 
 private:

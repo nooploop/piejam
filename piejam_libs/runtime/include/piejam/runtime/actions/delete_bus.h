@@ -20,7 +20,7 @@ struct delete_bus final
 {
     device_io::bus_id bus_id{};
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions

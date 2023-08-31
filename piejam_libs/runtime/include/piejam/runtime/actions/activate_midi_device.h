@@ -20,7 +20,7 @@ struct activate_midi_device final
 {
     midi::device_id_t device_id;
 
-    [[nodiscard]] auto reduce(state const&) const -> state override;
+    void reduce(state&) const override;
 };
 
 } // namespace piejam::runtime::actions
