@@ -14,7 +14,7 @@ Item {
 
     property alias value: slider.value
 
-    signal moved()
+    signal moved(real newValue)
 
     Slider {
         id: slider
@@ -47,6 +47,6 @@ Item {
             }
         }
 
-        onMoved: root.moved()
+        onMoved: root.moved(slider.value)
     }
 }

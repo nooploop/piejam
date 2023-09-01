@@ -35,29 +35,13 @@ SubscribableItem {
                 text: root.model ? root.model.name : ""
             }
 
-            BipolarSlider {
+            ParameterSymmetricBipolarSlider {
                 id: panControls
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
 
-                value: root.model ? root.model.panBalance : 0
-
-                onMoved: {
-                    root.model.changePanBalance(panControls.value)
-                    Info.show((root.model.busType === PJModels.BusType.Mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
-                            + panControls.value.toFixed(2))
-                }
-
-                MidiAssignArea {
-                    id: midiAssignPan
-
-                    model: root.model ? root.model.panMidi : null
-
-                    anchors.fill: parent
-                    anchors.topMargin: 1
-                    anchors.bottomMargin: 1
-                }
+                model: root.model ? root.model.panBalance : null
             }
 
             LevelMeterVolumeFader {

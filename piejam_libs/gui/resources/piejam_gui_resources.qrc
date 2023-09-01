@@ -19,7 +19,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/Util/MathExt.js</file>
         <file>PieJam/MixerControls/ChannelPerformStrip.qml</file>
-        <file>PieJam/Controls/BipolarSlider.qml</file>
+        <file>PieJam/Controls/SymmetricBipolarSlider.qml</file>
         <file>PieJam/SettingsControls/BusConfig.qml</file>
         <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
         <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
@@ -92,5 +92,6 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Views/ViewToolBarButton.qml</file>
         <file>PieJam/SubscribableItem.qml</file>
         <file>PieJam/Controls/ParameterToggleButton.qml</file>
+        <file>PieJam/Controls/ParameterSymmetricBipolarSlider.qml</file>
     </qresource>
 </RCC>

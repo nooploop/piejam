@@ -28,7 +28,8 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
     Q_PROPERTY(double volume READ volume NOTIFY volumeChanged FINAL)
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
-    Q_PROPERTY(double panBalance READ panBalance NOTIFY panBalanceChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::FloatParameter* panBalance READ panBalance
+                       CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::BoolParameter* record READ record CONSTANT
                        FINAL)
     Q_PROPERTY(piejam::gui::model::BoolParameter* solo READ solo CONSTANT FINAL)
@@ -38,8 +39,6 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
 
     Q_PROPERTY(piejam::gui::model::MidiAssignable* volumeMidi READ volumeMidi
                        CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::MidiAssignable* panMidi READ panMidi CONSTANT
-                       FINAL)
 
 public:
     MixerChannelPerform(
@@ -108,22 +107,7 @@ public:
         }
     }
 
-    auto panBalance() const noexcept -> double
-    {
-        return m_panBalance;
-    }
-
-    void setPanBalance(double const x)
-    {
-        if (m_panBalance != x)
-        {
-            m_panBalance = x;
-            emit panBalanceChanged();
-        }
-    }
-
-    Q_INVOKABLE void changePanBalance(double);
-
+    auto panBalance() const noexcept -> FloatParameter*;
     auto record() const noexcept -> BoolParameter*;
     auto solo() const noexcept -> BoolParameter*;
     auto mute() const noexcept -> BoolParameter*;
@@ -132,6 +116,18 @@ public:
     {
         return m_mutedBySolo;
     }
+
+    auto volumeMidi() const noexcept -> MidiAssignable*;
+
+signals:
+    void nameChanged();
+    void volumeChanged();
+    void levelLeftChanged();
+    void levelRightChanged();
+    void mutedBySoloChanged();
+
+private:
+    void onSubscribe() override;
 
     void setMutedBySolo(bool const x)
     {
@@ -142,20 +138,6 @@ public:
         }
     }
 
-    auto volumeMidi() const noexcept -> MidiAssignable*;
-    auto panMidi() const noexcept -> MidiAssignable*;
-
-signals:
-    void nameChanged();
-    void volumeChanged();
-    void levelLeftChanged();
-    void levelRightChanged();
-    void panBalanceChanged();
-    void mutedBySoloChanged();
-
-private:
-    void onSubscribe() override;
-
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
@@ -164,7 +146,6 @@ private:
     double m_volume{1.};
     double m_levelLeft{};
     double m_levelRight{};
-    double m_panBalance{};
     bool m_mutedBySolo{};
 };
 
