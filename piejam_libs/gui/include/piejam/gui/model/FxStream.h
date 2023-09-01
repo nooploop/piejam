@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/AudioStreamProvider.h>
-#include <piejam/gui/model/FxStreamKeyId.h>
+#include <piejam/gui/model/StreamId.h>
 #include <piejam/gui/model/Subscribable.h>
 
 #include <memory>
@@ -16,10 +16,7 @@ namespace piejam::gui::model
 class FxStream final : public Subscribable<AudioStreamProvider>
 {
 public:
-    FxStream(
-            runtime::store_dispatch,
-            runtime::subscriber&,
-            FxStreamKeyId const&);
+    FxStream(runtime::store_dispatch, runtime::subscriber&, StreamId const&);
     ~FxStream();
 
     void requestUpdate() override;

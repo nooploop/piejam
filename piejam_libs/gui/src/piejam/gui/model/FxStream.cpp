@@ -15,15 +15,15 @@ namespace piejam::gui::model
 
 struct FxStream::Impl
 {
-    FxStreamKeyId fxStreamKeyId;
+    StreamId streamId;
 };
 
 FxStream::FxStream(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxStreamKeyId const& fxStreamKeyId)
+        StreamId const& streamId)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(fxStreamKeyId))
+    , m_impl(std::make_unique<Impl>(streamId))
 {
 }
 
@@ -32,8 +32,7 @@ FxStream::~FxStream() = default;
 void
 FxStream::onSubscribe()
 {
-    observe(runtime::selectors::make_audio_stream_selector(
-                    m_impl->fxStreamKeyId.id),
+    observe(runtime::selectors::make_audio_stream_selector(m_impl->streamId),
             [this](runtime::audio_stream_buffer const& buf) {
                 if (!buf->empty())
                 {
@@ -50,7 +49,7 @@ void
 FxStream::requestUpdate()
 {
     runtime::actions::request_streams_update action;
-    action.streams.emplace(m_impl->fxStreamKeyId.id);
+    action.streams.emplace(m_impl->streamId);
     dispatch(action);
 }
 

@@ -56,7 +56,6 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxScope.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxSpectrum.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxStream.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxStreamKeyId.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/GenericListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/IntParameter.h
@@ -78,6 +77,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataGenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/SpectrumDataPoint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StreamId.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StreamProcessor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/StringList.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Subscribable.h

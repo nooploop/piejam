@@ -6,7 +6,7 @@
 
 #include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/ParameterId.h>
-#include <piejam/gui/model/FxStreamKeyId.h>
+#include <piejam/gui/model/StreamId.h>
 #include <piejam/gui/model/Subscribable.h>
 
 #include <memory>
@@ -22,29 +22,29 @@ public:
     using Base::Base;
 
 protected:
-    template <class Parameter, class Parameters>
+    template <class ParameterT, class Parameters>
     void makeParameter(
             std::size_t key,
-            std::unique_ptr<Parameter>& param,
+            std::unique_ptr<ParameterT>& param,
             Parameters const& parameters)
     {
-        param = std::make_unique<Parameter>(
+        param = std::make_unique<ParameterT>(
                 dispatch(),
                 this->state_change_subscriber(),
                 parameters.at(key));
         connectSubscribableChild(*param);
     }
 
-    template <class Stream, class Streams>
+    template <class StreamT, class Streams>
     void makeStream(
             std::size_t key,
-            std::unique_ptr<Stream>& stream,
+            std::unique_ptr<StreamT>& stream,
             Streams const& streams)
     {
-        stream = std::make_unique<Stream>(
+        stream = std::make_unique<StreamT>(
                 dispatch(),
                 this->state_change_subscriber(),
-                FxStreamKeyId{.key = key, .id = streams.at(key)});
+                streams.at(key));
         connectSubscribableChild(*stream);
     }
 };

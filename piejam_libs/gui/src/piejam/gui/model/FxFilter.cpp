@@ -8,7 +8,7 @@
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
-#include <piejam/gui/model/FxStreamKeyId.h>
+#include <piejam/gui/model/StreamId.h>
 #include <piejam/gui/model/ParameterId.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
