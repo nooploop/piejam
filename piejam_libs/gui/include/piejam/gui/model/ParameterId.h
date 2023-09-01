@@ -5,11 +5,11 @@
 #pragma once
 
 #include <piejam/entity_id.h>
-#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/ui_parameter.h>
 
 namespace piejam::gui::model
 {
 
-using FxParameterId = runtime::fx::parameter_id;
+using ParameterId = runtime::ui_parameter_id;
 
 } // namespace piejam::gui::model

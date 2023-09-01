@@ -8,9 +8,9 @@
 #include <piejam/functional/in_interval.h>
 #include <piejam/gui/model/AudioStreamAmplifier.h>
 #include <piejam/gui/model/AudioStreamChannelDuplicator.h>
-#include <piejam/gui/model/FxBoolParameter.h>
-#include <piejam/gui/model/FxEnumParameter.h>
-#include <piejam/gui/model/FxFloatParameter.h>
+#include <piejam/gui/model/BoolParameter.h>
+#include <piejam/gui/model/EnumParameter.h>
+#include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/ScopeDataGenerator.h>
 #include <piejam/gui/model/WaveformDataGenerator.h>
@@ -63,19 +63,19 @@ struct FxScope::Impl
     WaveformDataGenerator waveformGenerator;
     ScopeDataGenerator scopeDataGenerator;
 
-    std::unique_ptr<FxEnumParameter> mode;
-    std::unique_ptr<FxEnumParameter> triggerSlope;
-    std::unique_ptr<FxFloatParameter> triggerLevel;
-    std::unique_ptr<FxFloatParameter> holdTime;
-    std::unique_ptr<FxIntParameter> waveformWindowSize;
-    std::unique_ptr<FxIntParameter> scopeWindowSize;
-    std::unique_ptr<FxBoolParameter> activeA;
-    std::unique_ptr<FxBoolParameter> activeB;
-    std::unique_ptr<FxEnumParameter> channelA;
-    std::unique_ptr<FxEnumParameter> channelB;
-    std::unique_ptr<FxFloatParameter> gainA;
-    std::unique_ptr<FxFloatParameter> gainB;
-    std::unique_ptr<FxBoolParameter> freeze;
+    std::unique_ptr<EnumParameter> mode;
+    std::unique_ptr<EnumParameter> triggerSlope;
+    std::unique_ptr<FloatParameter> triggerLevel;
+    std::unique_ptr<FloatParameter> holdTime;
+    std::unique_ptr<IntParameter> waveformWindowSize;
+    std::unique_ptr<IntParameter> scopeWindowSize;
+    std::unique_ptr<BoolParameter> activeA;
+    std::unique_ptr<BoolParameter> activeB;
+    std::unique_ptr<EnumParameter> channelA;
+    std::unique_ptr<EnumParameter> channelB;
+    std::unique_ptr<FloatParameter> gainA;
+    std::unique_ptr<FloatParameter> gainB;
+    std::unique_ptr<BoolParameter> freeze;
     std::unique_ptr<FxStream> stream;
 };
 
@@ -261,55 +261,55 @@ FxScope::FxScope(
 
     QObject::connect(
             m_impl->mode.get(),
-            &FxEnumParameter::valueChanged,
+            &EnumParameter::valueChanged,
             this,
             &FxScope::onTriggerSourceChanged);
 
     QObject::connect(
             m_impl->triggerSlope.get(),
-            &FxEnumParameter::valueChanged,
+            &EnumParameter::valueChanged,
             this,
             &FxScope::onTriggerSlopeChanged);
 
     QObject::connect(
             m_impl->triggerLevel.get(),
-            &FxFloatParameter::valueChanged,
+            &FloatParameter::valueChanged,
             this,
             &FxScope::onTriggerLevelChanged);
 
     QObject::connect(
             m_impl->holdTime.get(),
-            &FxFloatParameter::valueChanged,
+            &FloatParameter::valueChanged,
             this,
             &FxScope::onHoldTimeChanged);
 
     QObject::connect(
             m_impl->waveformWindowSize.get(),
-            &FxIntParameter::valueChanged,
+            &IntParameter::valueChanged,
             this,
             &FxScope::onWaveformWindowSizeChanged);
 
     QObject::connect(
             m_impl->scopeWindowSize.get(),
-            &FxIntParameter::valueChanged,
+            &IntParameter::valueChanged,
             this,
             &FxScope::onScopeWindowSizeChanged);
 
     QObject::connect(
             m_impl->activeA.get(),
-            &FxBoolParameter::valueChanged,
+            &BoolParameter::valueChanged,
             this,
             &FxScope::onActiveAChanged);
 
     QObject::connect(
             m_impl->channelA.get(),
-            &FxEnumParameter::valueChanged,
+            &EnumParameter::valueChanged,
             this,
             &FxScope::onChannelAChanged);
 
     QObject::connect(
             m_impl->gainA.get(),
-            &FxFloatParameter::valueChanged,
+            &FloatParameter::valueChanged,
             this,
             &FxScope::onGainAChanged);
 
@@ -317,26 +317,26 @@ FxScope::FxScope(
     {
         QObject::connect(
                 m_impl->activeB.get(),
-                &FxBoolParameter::valueChanged,
+                &BoolParameter::valueChanged,
                 this,
                 &FxScope::onActiveBChanged);
 
         QObject::connect(
                 m_impl->channelB.get(),
-                &FxEnumParameter::valueChanged,
+                &EnumParameter::valueChanged,
                 this,
                 &FxScope::onChannelBChanged);
 
         QObject::connect(
                 m_impl->gainB.get(),
-                &FxFloatParameter::valueChanged,
+                &FloatParameter::valueChanged,
                 this,
                 &FxScope::onGainBChanged);
     }
 
     QObject::connect(
             m_impl->freeze.get(),
-            &FxBoolParameter::valueChanged,
+            &BoolParameter::valueChanged,
             this,
             &FxScope::onFreezeChanged);
 }
@@ -350,79 +350,79 @@ FxScope::busType() const noexcept -> BusType
 }
 
 auto
-FxScope::mode() const noexcept -> FxEnumParameter*
+FxScope::mode() const noexcept -> EnumParameter*
 {
     return m_impl->mode.get();
 }
 
 auto
-FxScope::triggerSlope() const noexcept -> FxEnumParameter*
+FxScope::triggerSlope() const noexcept -> EnumParameter*
 {
     return m_impl->triggerSlope.get();
 }
 
 auto
-FxScope::triggerLevel() const noexcept -> FxFloatParameter*
+FxScope::triggerLevel() const noexcept -> FloatParameter*
 {
     return m_impl->triggerLevel.get();
 }
 
 auto
-FxScope::holdTime() const noexcept -> FxFloatParameter*
+FxScope::holdTime() const noexcept -> FloatParameter*
 {
     return m_impl->holdTime.get();
 }
 
 auto
-FxScope::waveformWindowSize() const noexcept -> FxIntParameter*
+FxScope::waveformWindowSize() const noexcept -> IntParameter*
 {
     return m_impl->waveformWindowSize.get();
 }
 
 auto
-FxScope::scopeWindowSize() const noexcept -> FxIntParameter*
+FxScope::scopeWindowSize() const noexcept -> IntParameter*
 {
     return m_impl->scopeWindowSize.get();
 }
 
 auto
-FxScope::activeA() const noexcept -> FxBoolParameter*
+FxScope::activeA() const noexcept -> BoolParameter*
 {
     return m_impl->activeA.get();
 }
 
 auto
-FxScope::activeB() const noexcept -> FxBoolParameter*
+FxScope::activeB() const noexcept -> BoolParameter*
 {
     return m_impl->activeB.get();
 }
 
 auto
-FxScope::channelA() const noexcept -> FxEnumParameter*
+FxScope::channelA() const noexcept -> EnumParameter*
 {
     return m_impl->channelA.get();
 }
 
 auto
-FxScope::channelB() const noexcept -> FxEnumParameter*
+FxScope::channelB() const noexcept -> EnumParameter*
 {
     return m_impl->channelB.get();
 }
 
 auto
-FxScope::gainA() const noexcept -> FxFloatParameter*
+FxScope::gainA() const noexcept -> FloatParameter*
 {
     return m_impl->gainA.get();
 }
 
 auto
-FxScope::gainB() const noexcept -> FxFloatParameter*
+FxScope::gainB() const noexcept -> FloatParameter*
 {
     return m_impl->gainB.get();
 }
 
 auto
-FxScope::freeze() const noexcept -> FxBoolParameter*
+FxScope::freeze() const noexcept -> BoolParameter*
 {
     return m_impl->freeze.get();
 }

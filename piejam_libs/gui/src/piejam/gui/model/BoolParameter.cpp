@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2023  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/FxBoolParameter.h>
+#include <piejam/gui/model/BoolParameter.h>
 
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
@@ -17,27 +17,27 @@
 namespace piejam::gui::model
 {
 
-struct FxBoolParameter::Impl
+struct BoolParameter::Impl
 {
     runtime::bool_parameter_id param_id;
 };
 
-FxBoolParameter::FxBoolParameter(
+BoolParameter::BoolParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxParameterId const& param)
-    : FxParameter(store_dispatch, state_change_subscriber, param)
+        ParameterId const& param)
+    : Parameter(store_dispatch, state_change_subscriber, param)
     , m_impl{std::make_unique<Impl>(
               std::get<runtime::bool_parameter_id>(param))}
 {
 }
 
-FxBoolParameter::~FxBoolParameter() = default;
+BoolParameter::~BoolParameter() = default;
 
 void
-FxBoolParameter::onSubscribe()
+BoolParameter::onSubscribe()
 {
-    FxParameter::onSubscribe();
+    Parameter::onSubscribe();
 
     observe(runtime::selectors::make_bool_parameter_value_selector(
                     m_impl->param_id),
@@ -45,7 +45,7 @@ FxBoolParameter::onSubscribe()
 }
 
 void
-FxBoolParameter::changeValue(bool value)
+BoolParameter::changeValue(bool value)
 {
     dispatch(runtime::actions::set_bool_parameter(m_impl->param_id, value));
 }

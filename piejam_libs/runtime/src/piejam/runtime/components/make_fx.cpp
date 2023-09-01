@@ -6,6 +6,7 @@
 
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/pair.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fx/fwd.h>

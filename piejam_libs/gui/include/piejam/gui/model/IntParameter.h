@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -14,7 +14,7 @@
 namespace piejam::gui::model
 {
 
-class FxIntParameter : public FxParameter
+class IntParameter : public Parameter
 {
     Q_OBJECT
 
@@ -23,11 +23,11 @@ class FxIntParameter : public FxParameter
     Q_PROPERTY(int maxValue READ maxValue NOTIFY maxValueChanged FINAL)
 
 public:
-    FxIntParameter(
+    IntParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterId const&);
-    ~FxIntParameter();
+            piejam::gui::model::ParameterId const&);
+    ~IntParameter();
 
     static inline constexpr auto StaticType = Type::Int;
 

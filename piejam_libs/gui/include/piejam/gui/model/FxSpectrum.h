@@ -25,19 +25,19 @@ class FxSpectrum final : public FxModuleContentSubscribable
             piejam::gui::model::SpectrumData* dataA READ dataA CONSTANT FINAL)
     Q_PROPERTY(
             piejam::gui::model::SpectrumData* dataB READ dataB CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxBoolParameter* activeA READ activeA
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxBoolParameter* activeB READ activeB
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelA READ channelA
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelB READ channelB
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainA READ gainA CONSTANT
+    Q_PROPERTY(piejam::gui::model::BoolParameter* activeA READ activeA CONSTANT
                        FINAL)
-    Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainB READ gainB CONSTANT
+    Q_PROPERTY(piejam::gui::model::BoolParameter* activeB READ activeB CONSTANT
                        FINAL)
-    Q_PROPERTY(piejam::gui::model::FxBoolParameter* freeze READ freeze CONSTANT
+    Q_PROPERTY(piejam::gui::model::EnumParameter* channelA READ channelA
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::EnumParameter* channelB READ channelB
+                       CONSTANT FINAL)
+    Q_PROPERTY(
+            piejam::gui::model::FloatParameter* gainA READ gainA CONSTANT FINAL)
+    Q_PROPERTY(
+            piejam::gui::model::FloatParameter* gainB READ gainB CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::BoolParameter* freeze READ freeze CONSTANT
                        FINAL)
 
 public:
@@ -54,13 +54,13 @@ public:
 
     auto busType() const noexcept -> BusType;
 
-    auto activeA() const noexcept -> FxBoolParameter*;
-    auto activeB() const noexcept -> FxBoolParameter*;
-    auto channelA() const noexcept -> FxEnumParameter*;
-    auto channelB() const noexcept -> FxEnumParameter*;
-    auto gainA() const noexcept -> FxFloatParameter*;
-    auto gainB() const noexcept -> FxFloatParameter*;
-    auto freeze() const noexcept -> FxBoolParameter*;
+    auto activeA() const noexcept -> BoolParameter*;
+    auto activeB() const noexcept -> BoolParameter*;
+    auto channelA() const noexcept -> EnumParameter*;
+    auto channelB() const noexcept -> EnumParameter*;
+    auto gainA() const noexcept -> FloatParameter*;
+    auto gainB() const noexcept -> FloatParameter*;
+    auto freeze() const noexcept -> BoolParameter*;
 
     auto dataA() noexcept -> SpectrumData*
     {

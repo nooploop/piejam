@@ -6,9 +6,9 @@
 
 #include <piejam/gui/model/AudioStreamAmplifier.h>
 #include <piejam/gui/model/AudioStreamChannelDuplicator.h>
-#include <piejam/gui/model/FxBoolParameter.h>
-#include <piejam/gui/model/FxEnumParameter.h>
-#include <piejam/gui/model/FxFloatParameter.h>
+#include <piejam/gui/model/BoolParameter.h>
+#include <piejam/gui/model/EnumParameter.h>
+#include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
@@ -56,14 +56,14 @@ struct FxSpectrum::Impl
     AudioStreamAmplifier channelAmplifier{busType == BusType::Stereo ? 2u : 1u};
     AudioStreamChannelDuplicator channelDuplicator;
     SpectrumDataGenerator spectrumGenerator{substreamConfigs(busType)};
-
-    std::unique_ptr<FxBoolParameter> activeA;
-    std::unique_ptr<FxBoolParameter> activeB;
-    std::unique_ptr<FxEnumParameter> channelA;
-    std::unique_ptr<FxEnumParameter> channelB;
-    std::unique_ptr<FxFloatParameter> gainA;
-    std::unique_ptr<FxFloatParameter> gainB;
-    std::unique_ptr<FxBoolParameter> freeze;
+    
+    std::unique_ptr<BoolParameter> activeA;
+    std::unique_ptr<BoolParameter> activeB;
+    std::unique_ptr<EnumParameter> channelA;
+    std::unique_ptr<EnumParameter> channelB;
+    std::unique_ptr<FloatParameter> gainA;
+    std::unique_ptr<FloatParameter> gainB;
+    std::unique_ptr<BoolParameter> freeze;
     std::unique_ptr<FxStream> stream;
 };
 
@@ -183,19 +183,19 @@ FxSpectrum::FxSpectrum(
 
     QObject::connect(
             m_impl->activeA.get(),
-            &FxBoolParameter::valueChanged,
+            &BoolParameter::valueChanged,
             this,
             &FxSpectrum::onActiveAChanged);
 
     QObject::connect(
             m_impl->channelA.get(),
-            &FxEnumParameter::valueChanged,
+            &EnumParameter::valueChanged,
             this,
             &FxSpectrum::onChannelAChanged);
 
     QObject::connect(
             m_impl->gainA.get(),
-            &FxFloatParameter::valueChanged,
+            &FloatParameter::valueChanged,
             this,
             &FxSpectrum::onGainAChanged);
 
@@ -203,26 +203,26 @@ FxSpectrum::FxSpectrum(
     {
         QObject::connect(
                 m_impl->activeB.get(),
-                &FxBoolParameter::valueChanged,
+                &BoolParameter::valueChanged,
                 this,
                 &FxSpectrum::onActiveBChanged);
 
         QObject::connect(
                 m_impl->channelB.get(),
-                &FxEnumParameter::valueChanged,
+                &EnumParameter::valueChanged,
                 this,
                 &FxSpectrum::onChannelBChanged);
 
         QObject::connect(
                 m_impl->gainB.get(),
-                &FxFloatParameter::valueChanged,
+                &FloatParameter::valueChanged,
                 this,
                 &FxSpectrum::onGainBChanged);
     }
 
     QObject::connect(
             m_impl->freeze.get(),
-            &FxBoolParameter::valueChanged,
+            &BoolParameter::valueChanged,
             this,
             &FxSpectrum::onFreezeChanged);
 }
@@ -236,43 +236,43 @@ FxSpectrum::busType() const noexcept -> BusType
 }
 
 auto
-FxSpectrum::activeA() const noexcept -> FxBoolParameter*
+FxSpectrum::activeA() const noexcept -> BoolParameter*
 {
     return m_impl->activeA.get();
 }
 
 auto
-FxSpectrum::activeB() const noexcept -> FxBoolParameter*
+FxSpectrum::activeB() const noexcept -> BoolParameter*
 {
     return m_impl->activeB.get();
 }
 
 auto
-FxSpectrum::channelA() const noexcept -> FxEnumParameter*
+FxSpectrum::channelA() const noexcept -> EnumParameter*
 {
     return m_impl->channelA.get();
 }
 
 auto
-FxSpectrum::channelB() const noexcept -> FxEnumParameter*
+FxSpectrum::channelB() const noexcept -> EnumParameter*
 {
     return m_impl->channelB.get();
 }
 
 auto
-FxSpectrum::gainA() const noexcept -> FxFloatParameter*
+FxSpectrum::gainA() const noexcept -> FloatParameter*
 {
     return m_impl->gainA.get();
 }
 
 auto
-FxSpectrum::gainB() const noexcept -> FxFloatParameter*
+FxSpectrum::gainB() const noexcept -> FloatParameter*
 {
     return m_impl->gainB.get();
 }
 
 auto
-FxSpectrum::freeze() const noexcept -> FxBoolParameter*
+FxSpectrum::freeze() const noexcept -> BoolParameter*
 {
     return m_impl->freeze.get();
 }

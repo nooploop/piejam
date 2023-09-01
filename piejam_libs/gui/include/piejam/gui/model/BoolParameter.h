@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -14,18 +14,18 @@
 namespace piejam::gui::model
 {
 
-class FxBoolParameter final : public FxParameter
+class BoolParameter final : public Parameter
 {
     Q_OBJECT
 
     Q_PROPERTY(bool value READ value NOTIFY valueChanged FINAL)
 
 public:
-    FxBoolParameter(
+    BoolParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterId const&);
-    ~FxBoolParameter();
+            piejam::gui::model::ParameterId const&);
+    ~BoolParameter();
 
     static inline constexpr auto StaticType = Type::Bool;
 

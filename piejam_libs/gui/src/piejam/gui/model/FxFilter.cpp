@@ -5,11 +5,11 @@
 #include <piejam/gui/model/FxFilter.h>
 
 #include <piejam/gui/model/AudioStreamProvider.h>
-#include <piejam/gui/model/FxEnumParameter.h>
-#include <piejam/gui/model/FxFloatParameter.h>
-#include <piejam/gui/model/FxParameterId.h>
+#include <piejam/gui/model/EnumParameter.h>
+#include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/FxStreamKeyId.h>
+#include <piejam/gui/model/ParameterId.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
@@ -32,10 +32,10 @@ struct FxFilter::Impl
 
     SpectrumData spectrumDataIn;
     SpectrumData spectrumDataOut;
-
-    std::unique_ptr<FxEnumParameter> filterTypeParam;
-    std::unique_ptr<FxFloatParameter> cutoffParam;
-    std::unique_ptr<FxFloatParameter> resonanceParam;
+    
+    std::unique_ptr<EnumParameter> filterTypeParam;
+    std::unique_ptr<FloatParameter> cutoffParam;
+    std::unique_ptr<FloatParameter> resonanceParam;
     std::unique_ptr<FxStream> inOutStream;
 };
 
@@ -129,19 +129,19 @@ FxFilter::clear()
 }
 
 auto
-FxFilter::filterType() -> FxEnumParameter*
+FxFilter::filterType() -> EnumParameter*
 {
     return m_impl->filterTypeParam.get();
 }
 
 auto
-FxFilter::cutoff() -> FxParameter*
+FxFilter::cutoff() -> FloatParameter*
 {
     return m_impl->cutoffParam.get();
 }
 
 auto
-FxFilter::resonance() -> FxParameter*
+FxFilter::resonance() -> FloatParameter*
 {
     return m_impl->resonanceParam.get();
 }

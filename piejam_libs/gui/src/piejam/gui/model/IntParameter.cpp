@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2023  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/FxIntParameter.h>
+#include <piejam/gui/model/IntParameter.h>
 
 #include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/parameter/float_.h>
@@ -16,16 +16,16 @@
 namespace piejam::gui::model
 {
 
-struct FxIntParameter::Impl
+struct IntParameter::Impl
 {
     runtime::int_parameter_id param_id;
 };
 
-FxIntParameter::FxIntParameter(
+IntParameter::IntParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxParameterId const& param)
-    : FxParameter{store_dispatch, state_change_subscriber, param}
+        ParameterId const& param)
+    : Parameter{store_dispatch, state_change_subscriber, param}
     , m_impl{std::make_unique<Impl>(std::get<runtime::int_parameter_id>(param))}
 
 {
@@ -38,12 +38,12 @@ FxIntParameter::FxIntParameter(
                     m_impl->param_id)));
 }
 
-FxIntParameter::~FxIntParameter() = default;
+IntParameter::~IntParameter() = default;
 
 void
-FxIntParameter::onSubscribe()
+IntParameter::onSubscribe()
 {
-    FxParameter::onSubscribe();
+    Parameter::onSubscribe();
 
     observe(runtime::selectors::make_int_parameter_value_selector(
                     m_impl->param_id),
@@ -51,7 +51,7 @@ FxIntParameter::onSubscribe()
 }
 
 void
-FxIntParameter::changeValue(int value)
+IntParameter::changeValue(int value)
 {
     dispatch(runtime::actions::set_int_parameter(m_impl->param_id, value));
 }

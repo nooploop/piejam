@@ -14,16 +14,16 @@
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/EnumListModel.h>
-#include <piejam/gui/model/FxBoolParameter.h>
+#include <piejam/gui/model/BoolParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>
-#include <piejam/gui/model/FxEnumParameter.h>
+#include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FxFilter.h>
-#include <piejam/gui/model/FxFloatParameter.h>
-#include <piejam/gui/model/FxIntParameter.h>
+#include <piejam/gui/model/FloatParameter.h>
+#include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxModuleContent.h>
-#include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/FxScope.h>
 #include <piejam/gui/model/FxSpectrum.h>
 #include <piejam/gui/model/Info.h>
@@ -71,11 +71,11 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::DbScaleData*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::Log*>();
-    qRegisterMetaType<piejam::gui::model::FxParameter*>();
-    qRegisterMetaType<piejam::gui::model::FxBoolParameter*>();
-    qRegisterMetaType<piejam::gui::model::FxEnumParameter*>();
-    qRegisterMetaType<piejam::gui::model::FxIntParameter*>();
-    qRegisterMetaType<piejam::gui::model::FxFloatParameter*>();
+    qRegisterMetaType<piejam::gui::model::Parameter*>();
+    qRegisterMetaType<piejam::gui::model::BoolParameter*>();
+    qRegisterMetaType<piejam::gui::model::EnumParameter*>();
+    qRegisterMetaType<piejam::gui::model::IntParameter*>();
+    qRegisterMetaType<piejam::gui::model::FloatParameter*>();
     qRegisterMetaType<piejam::gui::model::FxChainModule*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
@@ -107,8 +107,8 @@ runRegistration()
             0,
             "FxModuleContent",
             "Not createable");
-
-    qmlRegisterUncreatableType<piejam::gui::model::FxParameter>(
+    
+    qmlRegisterUncreatableType<piejam::gui::model::Parameter>(
             "PieJam.Models",
             1,
             0,

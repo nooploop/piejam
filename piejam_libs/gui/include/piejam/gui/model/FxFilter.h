@@ -21,11 +21,11 @@ class FxFilter final : public FxModuleContentSubscribable
     Q_PROPERTY(piejam::gui::model::SpectrumData* dataIn READ dataIn CONSTANT)
     Q_PROPERTY(piejam::gui::model::SpectrumData* dataOut READ dataOut CONSTANT)
 
-    Q_PROPERTY(piejam::gui::model::FxEnumParameter* filterType READ filterType
+    Q_PROPERTY(piejam::gui::model::EnumParameter* filterType READ filterType
                        CONSTANT)
-    Q_PROPERTY(piejam::gui::model::FxParameter* cutoff READ cutoff CONSTANT)
-    Q_PROPERTY(
-            piejam::gui::model::FxParameter* resonance READ resonance CONSTANT)
+    Q_PROPERTY(piejam::gui::model::FloatParameter* cutoff READ cutoff CONSTANT)
+    Q_PROPERTY(piejam::gui::model::FloatParameter* resonance READ resonance
+                       CONSTANT)
 
 public:
     FxFilter(
@@ -44,9 +44,9 @@ public:
 
     Q_INVOKABLE void clear();
 
-    auto filterType() -> FxEnumParameter*;
-    auto cutoff() -> FxParameter*;
-    auto resonance() -> FxParameter*;
+    auto filterType() -> EnumParameter*;
+    auto cutoff() -> FloatParameter*;
+    auto resonance() -> FloatParameter*;
 
 private:
     void onSubscribe() override;

@@ -38,12 +38,12 @@ using BusConfigsList = GenericListModel<BusConfig>;
 class BusName;
 using BusNamesList = GenericListModel<BusName>;
 
-class FxParameter;
-using FxParametersList = GenericListModel<FxParameter>;
-class FxBoolParameter;
-class FxIntParameter;
-class FxEnumParameter;
-class FxFloatParameter;
+class Parameter;
+using FxParametersList = GenericListModel<Parameter>;
+class BoolParameter;
+class IntParameter;
+class EnumParameter;
+class FloatParameter;
 
 class FxBrowser;
 class FxBrowserEntry;

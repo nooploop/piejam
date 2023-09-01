@@ -243,7 +243,7 @@ insert_internal_fx_module(
         mixer::channel_id const mixer_channel_id,
         std::size_t const position,
         fx::internal const fx_type,
-        std::vector<fx::parameter_value_assignment> const& initial_assignments,
+        std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> fx::module_id
 {
@@ -300,7 +300,7 @@ insert_internal_fx_module(
 
     auto const& fx_mod = st.fx_modules[fx_chain[insert_pos]];
 
-    apply_parameter_values(initial_assignments, fx_mod, st.params);
+    apply_parameter_values(initial_values, fx_mod, st.params);
     apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
 
     st.mixer_state.channels.update(

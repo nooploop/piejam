@@ -27,31 +27,30 @@ class FxScope final : public FxModuleContentSubscribable
 
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
-    Q_PROPERTY(
-            piejam::gui::model::FxEnumParameter* mode READ mode CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxEnumParameter* triggerSlope READ
-                       triggerSlope CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxFloatParameter* triggerLevel READ
+    Q_PROPERTY(piejam::gui::model::EnumParameter* mode READ mode CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::EnumParameter* triggerSlope READ triggerSlope
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::FloatParameter* triggerLevel READ
                        triggerLevel CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxFloatParameter* holdTime READ holdTime
+    Q_PROPERTY(piejam::gui::model::FloatParameter* holdTime READ holdTime
                        CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxIntParameter* waveformWindowSize READ
+    Q_PROPERTY(piejam::gui::model::IntParameter* waveformWindowSize READ
                        waveformWindowSize CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxIntParameter* scopeWindowSize READ
+    Q_PROPERTY(piejam::gui::model::IntParameter* scopeWindowSize READ
                        scopeWindowSize CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxBoolParameter* activeA READ activeA
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxBoolParameter* activeB READ activeB
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelA READ channelA
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxEnumParameter* channelB READ channelB
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainA READ gainA CONSTANT
+    Q_PROPERTY(piejam::gui::model::BoolParameter* activeA READ activeA CONSTANT
                        FINAL)
-    Q_PROPERTY(piejam::gui::model::FxFloatParameter* gainB READ gainB CONSTANT
+    Q_PROPERTY(piejam::gui::model::BoolParameter* activeB READ activeB CONSTANT
                        FINAL)
-    Q_PROPERTY(piejam::gui::model::FxBoolParameter* freeze READ freeze CONSTANT
+    Q_PROPERTY(piejam::gui::model::EnumParameter* channelA READ channelA
+                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::EnumParameter* channelB READ channelB
+                       CONSTANT FINAL)
+    Q_PROPERTY(
+            piejam::gui::model::FloatParameter* gainA READ gainA CONSTANT FINAL)
+    Q_PROPERTY(
+            piejam::gui::model::FloatParameter* gainB READ gainB CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::BoolParameter* freeze READ freeze CONSTANT
                        FINAL)
     Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformDataA READ
                        waveformDataA CONSTANT FINAL)
@@ -91,19 +90,19 @@ public:
 
     Q_ENUM(Mode)
 
-    auto mode() const noexcept -> FxEnumParameter*;
-    auto triggerSlope() const noexcept -> FxEnumParameter*;
-    auto triggerLevel() const noexcept -> FxFloatParameter*;
-    auto holdTime() const noexcept -> FxFloatParameter*;
-    auto waveformWindowSize() const noexcept -> FxIntParameter*;
-    auto scopeWindowSize() const noexcept -> FxIntParameter*;
-    auto activeA() const noexcept -> FxBoolParameter*;
-    auto activeB() const noexcept -> FxBoolParameter*;
-    auto channelA() const noexcept -> FxEnumParameter*;
-    auto channelB() const noexcept -> FxEnumParameter*;
-    auto gainA() const noexcept -> FxFloatParameter*;
-    auto gainB() const noexcept -> FxFloatParameter*;
-    auto freeze() const noexcept -> FxBoolParameter*;
+    auto mode() const noexcept -> EnumParameter*;
+    auto triggerSlope() const noexcept -> EnumParameter*;
+    auto triggerLevel() const noexcept -> FloatParameter*;
+    auto holdTime() const noexcept -> FloatParameter*;
+    auto waveformWindowSize() const noexcept -> IntParameter*;
+    auto scopeWindowSize() const noexcept -> IntParameter*;
+    auto activeA() const noexcept -> BoolParameter*;
+    auto activeB() const noexcept -> BoolParameter*;
+    auto channelA() const noexcept -> EnumParameter*;
+    auto channelB() const noexcept -> EnumParameter*;
+    auto gainA() const noexcept -> FloatParameter*;
+    auto gainB() const noexcept -> FloatParameter*;
+    auto freeze() const noexcept -> BoolParameter*;
 
     auto waveformDataA() noexcept -> WaveformDataObject*
     {

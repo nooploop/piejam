@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxParameterId.h>
+#include <piejam/gui/model/ParameterId.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -12,7 +12,7 @@
 namespace piejam::gui::model
 {
 
-class FxParameter : public Subscribable<SubscribableModel>
+class Parameter : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -24,11 +24,11 @@ class FxParameter : public Subscribable<SubscribableModel>
             piejam::gui::model::MidiAssignable* midi READ midi CONSTANT FINAL)
 
 public:
-    FxParameter(
+    Parameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterId const&);
-    ~FxParameter();
+            piejam::gui::model::ParameterId const&);
+    ~Parameter();
 
     enum class Type
     {
@@ -81,7 +81,7 @@ signals:
 protected:
     void onSubscribe() override;
     
-    auto paramKeyId() const -> FxParameterId;
+    auto paramKeyId() const -> ParameterId;
 
 private:
     struct Impl;
@@ -91,10 +91,10 @@ private:
     QString m_valueString;
 };
 
-auto makeFxParameter(
+auto makeParameter(
         runtime::store_dispatch,
         runtime::subscriber&,
-        piejam::gui::model::FxParameterId const&)
-        -> std::unique_ptr<FxParameter>;
+        piejam::gui::model::ParameterId const&)
+        -> std::unique_ptr<Parameter>;
 
 } // namespace piejam::gui::model

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -14,7 +14,7 @@
 namespace piejam::gui::model
 {
 
-class FxFloatParameter : public FxParameter
+class FloatParameter : public Parameter
 {
     Q_OBJECT
 
@@ -23,11 +23,11 @@ class FxFloatParameter : public FxParameter
                        normalizedValueChanged FINAL)
 
 public:
-    FxFloatParameter(
+    FloatParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterId const&);
-    ~FxFloatParameter();
+            piejam::gui::model::ParameterId const&);
+    ~FloatParameter();
 
     static inline constexpr auto StaticType = Type::Float;
 

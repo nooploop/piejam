@@ -7,8 +7,8 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
-#include <piejam/gui/model/FxParameter.h>
-#include <piejam/gui/model/FxParameterId.h>
+#include <piejam/gui/model/Parameter.h>
+#include <piejam/gui/model/ParameterId.h>
 #include <piejam/runtime/selectors.h>
 
 #include <boost/container/flat_map.hpp>
@@ -27,7 +27,7 @@ fxParameterIds(runtime::fx::module_parameters const& params)
 {
     return algorithm::transform_to_vector(
             params | std::views::values,
-            boost::hof::construct<FxParameterId>());
+            boost::hof::construct<ParameterId>());
 }
 
 } // namespace
@@ -75,8 +75,8 @@ FxGenericModule::onSubscribe()
                                 fxParameterIds(*paramIds)),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *parameters(),
-                                [this](FxParameterId const& paramKeyId) {
-                                    return makeFxParameter(
+                                [this](ParameterId const& paramKeyId) {
+                                    return makeParameter(
                                             dispatch(),
                                             state_change_subscriber(),
                                             paramKeyId);

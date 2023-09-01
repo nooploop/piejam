@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2023  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/FxEnumParameter.h>
+#include <piejam/gui/model/EnumParameter.h>
 
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
@@ -14,7 +14,7 @@
 namespace piejam::gui::model
 {
 
-struct FxEnumParameter::Impl
+struct EnumParameter::Impl
 {
     Impl(std::vector<std::pair<std::string, int>> const& values)
         : values{values}
@@ -24,11 +24,11 @@ struct FxEnumParameter::Impl
     EnumListModel values;
 };
 
-FxEnumParameter::FxEnumParameter(
+EnumParameter::EnumParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxParameterId const& param)
-    : FxIntParameter{store_dispatch, state_change_subscriber, param}
+        ParameterId const& param)
+    : IntParameter{store_dispatch, state_change_subscriber, param}
     , m_impl{std::make_unique<Impl>(observe_once(
               runtime::selectors::make_int_parameter_enum_values_selector(
                       std::get<runtime::int_parameter_id>(param))))}
@@ -36,10 +36,10 @@ FxEnumParameter::FxEnumParameter(
 {
 }
 
-FxEnumParameter::~FxEnumParameter() = default;
+EnumParameter::~EnumParameter() = default;
 
 auto
-FxEnumParameter::values() const noexcept -> EnumListModel*
+EnumParameter::values() const noexcept -> EnumListModel*
 {
     return &m_impl->values;
 }

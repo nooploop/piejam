@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2023  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/FxFloatParameter.h>
+#include <piejam/gui/model/FloatParameter.h>
 
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/runtime/actions/set_float_parameter_normalized.h>
@@ -17,27 +17,27 @@
 namespace piejam::gui::model
 {
 
-struct FxFloatParameter::Impl
+struct FloatParameter::Impl
 {
     runtime::float_parameter_id param_id;
 };
 
-FxFloatParameter::FxFloatParameter(
+FloatParameter::FloatParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxParameterId const& param)
-    : FxParameter{store_dispatch, state_change_subscriber, param}
+        ParameterId const& param)
+    : Parameter{store_dispatch, state_change_subscriber, param}
     , m_impl{std::make_unique<Impl>(
               std::get<runtime::float_parameter_id>(param))}
 {
 }
 
-FxFloatParameter::~FxFloatParameter() = default;
+FloatParameter::~FloatParameter() = default;
 
 void
-FxFloatParameter::onSubscribe()
+FloatParameter::onSubscribe()
 {
-    FxParameter::onSubscribe();
+    Parameter::onSubscribe();
 
     observe(runtime::selectors::make_float_parameter_value_selector(
                     m_impl->param_id),
@@ -49,7 +49,7 @@ FxFloatParameter::onSubscribe()
 }
 
 void
-FxFloatParameter::changeNormalizedValue(double value)
+FloatParameter::changeNormalizedValue(double value)
 {
     dispatch(runtime::actions::set_float_parameter_normalized(
             m_impl->param_id,

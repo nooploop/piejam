@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/EnumListModel.h>
-#include <piejam/gui/model/FxIntParameter.h>
+#include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -15,24 +15,24 @@
 namespace piejam::gui::model
 {
 
-class FxEnumParameter final : public FxIntParameter
+class EnumParameter final : public IntParameter
 {
     Q_OBJECT
 
     Q_PROPERTY(QAbstractListModel* values READ values CONSTANT FINAL)
 
 public:
-    FxEnumParameter(
+    EnumParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterId const&);
-    ~FxEnumParameter();
+            piejam::gui::model::ParameterId const&);
+    ~EnumParameter() override;
 
     static inline constexpr auto StaticType = Type::Enum;
 
     auto type() const noexcept -> Type override
     {
-        return FxEnumParameter::StaticType;
+        return EnumParameter::StaticType;
     }
 
     auto values() const noexcept -> EnumListModel*;

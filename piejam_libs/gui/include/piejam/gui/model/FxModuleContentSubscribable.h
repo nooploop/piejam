@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/gui/model/FxModuleContent.h>
-#include <piejam/gui/model/FxParameterId.h>
+#include <piejam/gui/model/ParameterId.h>
 #include <piejam/gui/model/FxStreamKeyId.h>
 #include <piejam/gui/model/Subscribable.h>
 

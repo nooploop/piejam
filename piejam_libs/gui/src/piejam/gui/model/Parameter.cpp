@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/Parameter.h>
 
-#include <piejam/gui/model/FxBoolParameter.h>
-#include <piejam/gui/model/FxFloatParameter.h>
-#include <piejam/gui/model/FxIntParameter.h>
+#include <piejam/gui/model/BoolParameter.h>
+#include <piejam/gui/model/FloatParameter.h>
+#include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/integral_constant.h>
 #include <piejam/math.h>
@@ -30,22 +30,22 @@ namespace
 {
 
 using parameter_id_to_FxParameter = boost::mp11::mp_list<
-        boost::mp11::mp_list<runtime::bool_parameter_id, FxBoolParameter>,
-        boost::mp11::mp_list<runtime::float_parameter_id, FxFloatParameter>,
-        boost::mp11::mp_list<runtime::int_parameter_id, FxIntParameter>>;
+        boost::mp11::mp_list<runtime::bool_parameter_id, BoolParameter>,
+        boost::mp11::mp_list<runtime::float_parameter_id, FloatParameter>,
+        boost::mp11::mp_list<runtime::int_parameter_id, IntParameter>>;
 
 } // namespace
 
-struct FxParameter::Impl
+struct Parameter::Impl
 {
-    FxParameterId param;
+    ParameterId param;
     std::unique_ptr<MidiAssignable> midi;
 };
 
-FxParameter::FxParameter(
+Parameter::Parameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxParameterId const& param)
+        ParameterId const& param)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
               param,
@@ -58,10 +58,10 @@ FxParameter::FxParameter(
             runtime::selectors::make_fx_parameter_name_selector(param))));
 }
 
-FxParameter::~FxParameter() = default;
+Parameter::~Parameter() = default;
 
 auto
-FxParameter::type() const noexcept -> Type
+Parameter::type() const noexcept -> Type
 {
     return std::visit(
             []<class T>(T const&) -> Type {
@@ -74,7 +74,7 @@ FxParameter::type() const noexcept -> Type
 }
 
 void
-FxParameter::onSubscribe()
+Parameter::onSubscribe()
 {
     observe(runtime::selectors::make_fx_parameter_value_string_selector(
                     m_impl->param),
@@ -84,33 +84,33 @@ FxParameter::onSubscribe()
 }
 
 auto
-FxParameter::midi() const -> MidiAssignable*
+Parameter::midi() const -> MidiAssignable*
 {
     return m_impl->midi.get();
 }
 
 void
-FxParameter::resetToDefault()
+Parameter::resetToDefault()
 {
     dispatch(runtime::actions::reset_fx_parameter_to_default_value(
             m_impl->param));
 }
 
 auto
-FxParameter::paramKeyId() const -> FxParameterId
+Parameter::paramKeyId() const -> ParameterId
 {
     return m_impl->param;
 }
 
 auto
-makeFxParameter(
+makeParameter(
         runtime::store_dispatch dispatch,
         runtime::subscriber& state_change_subscriber,
-        piejam::gui::model::FxParameterId const& paramId)
-        -> std::unique_ptr<FxParameter>
+        piejam::gui::model::ParameterId const& paramId)
+        -> std::unique_ptr<Parameter>
 {
     return std::visit(
-            [&]<class T>(T const&) -> std::unique_ptr<FxParameter> {
+            [&]<class T>(T const&) -> std::unique_ptr<Parameter> {
                 using FxParameterType = boost::mp11::mp_at_c<
                         boost::mp11::
                                 mp_map_find<parameter_id_to_FxParameter, T>,
