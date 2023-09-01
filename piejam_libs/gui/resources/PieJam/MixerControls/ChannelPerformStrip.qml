@@ -27,8 +27,6 @@ SubscribableItem {
             spacing: 0
 
             HeaderLabel {
-                id: title
-
                 Layout.fillWidth: true
                 Layout.preferredHeight: 24
 
@@ -36,8 +34,6 @@ SubscribableItem {
             }
 
             ParameterSymmetricBipolarSlider {
-                id: panControls
-
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
 
@@ -48,23 +44,17 @@ SubscribableItem {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                volume: root.model ? root.model.volume : 0
+                volume: root.model ? root.model.volume : null
                 levelLeft: root.model ? root.model.levelLeft : 0
                 levelRight: root.model ? root.model.levelRight : 0
 
                 muted: root.model && (root.model.mute.value || root.model.mutedBySolo)
 
-                volumeMidi: root.model ? root.model.volumeMidi : null
-
                 levelMeterScale: PJModels.MixerDbScales.levelMeterScale
                 volumeFaderScale: PJModels.MixerDbScales.volumeFaderScale
-
-                onFaderMoved: root.model.changeVolume(newVolume)
             }
 
             ChannelControls {
-                id: channelControls
-
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
 

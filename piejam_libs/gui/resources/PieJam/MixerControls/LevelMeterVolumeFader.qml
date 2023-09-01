@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 
 import "../Controls"
 
@@ -11,41 +12,26 @@ Item {
 
     property alias levelLeft: meter.levelLeft
     property alias levelRight: meter.levelRight
-    property alias volume: fader.volume
+    property alias volume: fader.model
     property alias muted: meter.muted
-
-    property alias volumeMidi: midiAssign.model
 
     property alias levelMeterScale: meter.scaleData
     property alias volumeFaderScale: fader.scaleData
 
-    signal faderMoved(real newVolume)
+    RowLayout {
+        anchors.fill: parent
+        spacing: 0
 
-    width: 142
-    height: 400
+        LevelMeter {
+            id: meter
 
-    LevelMeter {
-        id: meter
+            Layout.fillHeight: true
+        }
 
-        anchors.right: fader.left
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-    }
+        VolumeFader {
+            id: fader
 
-    VolumeFader {
-        id: fader
-
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-
-        onMoved: root.faderMoved(newVolume)
-
-        MidiAssignArea {
-            id: midiAssign
-
-            anchors.fill: parent
+            Layout.fillHeight: true
         }
     }
 }

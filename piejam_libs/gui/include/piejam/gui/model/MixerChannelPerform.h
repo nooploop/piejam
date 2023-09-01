@@ -25,7 +25,8 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
 
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
-    Q_PROPERTY(double volume READ volume NOTIFY volumeChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::FloatParameter* volume READ volume CONSTANT
+                       FINAL)
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
     Q_PROPERTY(piejam::gui::model::FloatParameter* panBalance READ panBalance
@@ -37,15 +38,12 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
     Q_PROPERTY(
             bool mutedBySolo READ mutedBySolo NOTIFY mutedBySoloChanged FINAL)
 
-    Q_PROPERTY(piejam::gui::model::MidiAssignable* volumeMidi READ volumeMidi
-                       CONSTANT FINAL)
-
 public:
     MixerChannelPerform(
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::channel_id);
-    ~MixerChannelPerform();
+    ~MixerChannelPerform() override;
 
     auto name() const noexcept -> QString const&
     {
@@ -66,21 +64,7 @@ public:
         return m_busType;
     }
 
-    auto volume() const noexcept -> double
-    {
-        return m_volume;
-    }
-
-    void setVolume(double const x)
-    {
-        if (m_volume != x)
-        {
-            m_volume = x;
-            emit volumeChanged();
-        }
-    }
-
-    Q_INVOKABLE void changeVolume(double);
+    auto volume() const noexcept -> FloatParameter*;
 
     auto levelLeft() const noexcept -> double
     {
@@ -117,11 +101,8 @@ public:
         return m_mutedBySolo;
     }
 
-    auto volumeMidi() const noexcept -> MidiAssignable*;
-
 signals:
     void nameChanged();
-    void volumeChanged();
     void levelLeftChanged();
     void levelRightChanged();
     void mutedBySoloChanged();
@@ -143,7 +124,6 @@ private:
 
     QString m_name;
     BusType m_busType{BusType::Mono};
-    double m_volume{1.};
     double m_levelLeft{};
     double m_levelRight{};
     bool m_mutedBySolo{};

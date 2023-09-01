@@ -18,6 +18,8 @@
 #include <piejam/runtime/parameter_value_to_string.h>
 #include <piejam/tuple_element_compare.h>
 
+#include <fmt/format.h>
+
 #include <boost/hof/match.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
@@ -82,6 +84,13 @@ from_normalized_volume(float_parameter const& p, float const norm_value)
                 p,
                 (norm_value - 0.25f) / 0.75f);
     }
+}
+
+auto
+volume_to_string(float volume) -> std::string
+{
+    auto const volume_dB = math::linear_to_dB(volume);
+    return fmt::format("{:.1f} dB", volume_dB);
 }
 
 } // namespace
@@ -508,8 +517,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                             .max = 4.f,
                             .to_normalized = &to_normalized_volume,
                             .from_normalized = &from_normalized_volume},
-                    {.name = "Volume",
-                     .value_to_string = &float_parameter_value_to_string}),
+                    {.name = "Volume", .value_to_string = &volume_to_string}),
             .pan_balance = ui_param_factory.make_parameter(
                     parameter::float_{
                             .default_value = 0.f,

@@ -43,11 +43,8 @@ struct MixerChannelPerform::Impl
 {
     runtime::mixer::channel_id busId;
     audio::bus_type bus_type;
-    runtime::float_parameter_id volume;
+    std::unique_ptr<FloatParameter> volume;
     runtime::stereo_level_parameter_id level;
-
-    std::unique_ptr<MidiAssignable> volumeMidi;
-
     std::unique_ptr<FloatParameter> panBalance;
     std::unique_ptr<BoolParameter> record;
     std::unique_ptr<BoolParameter> solo;
@@ -64,19 +61,16 @@ MixerChannelPerform::MixerChannelPerform(
               observe_once(
                       runtime::selectors::make_mixer_channel_bus_type_selector(
                               id)),
-              observe_once(
-                      runtime::selectors::
-                              make_mixer_channel_volume_parameter_selector(id)),
-              observe_once(
-                      runtime::selectors::
-                              make_mixer_channel_level_parameter_selector(id)),
-              std::make_unique<MidiAssignable>(
+              std::make_unique<FloatParameter>(
                       store_dispatch,
                       state_change_subscriber,
                       observe_once(
                               runtime::selectors::
                                       make_mixer_channel_volume_parameter_selector(
                                               id))),
+              observe_once(
+                      runtime::selectors::
+                              make_mixer_channel_level_parameter_selector(id)),
               std::make_unique<FloatParameter>(
                       store_dispatch,
                       state_change_subscriber,
@@ -112,6 +106,12 @@ MixerChannelPerform::MixerChannelPerform(
 MixerChannelPerform::~MixerChannelPerform() = default;
 
 auto
+MixerChannelPerform::volume() const noexcept -> FloatParameter*
+{
+    return m_impl->volume.get();
+}
+
+auto
 MixerChannelPerform::panBalance() const noexcept -> FloatParameter*
 {
     return m_impl->panBalance.get();
@@ -143,13 +143,6 @@ MixerChannelPerform::onSubscribe()
                 setName(QString::fromStdString(*name));
             });
 
-    observe(runtime::selectors::make_float_parameter_value_selector(
-                    m_impl->volume),
-            [this](float x) {
-                setVolume(g_mixerDbScales.volumeFaderScale()->dBToPosition(
-                        toVolume(x)));
-            });
-
     observe(runtime::selectors::make_muted_by_solo_selector(m_impl->busId),
             [this](bool x) { setMutedBySolo(x); });
 
@@ -162,21 +155,6 @@ MixerChannelPerform::onSubscribe()
                         g_mixerDbScales.levelMeterScale()->dBToPosition(
                                 toLevel(x.right)));
             });
-}
-
-void
-MixerChannelPerform::changeVolume(double position)
-{
-    dispatch(runtime::actions::set_float_parameter(
-            m_impl->volume,
-            static_cast<float>(math::dB_to_linear(
-                    g_mixerDbScales.volumeFaderScale()->dBAt(position)))));
-}
-
-auto
-MixerChannelPerform::volumeMidi() const noexcept -> MidiAssignable*
-{
-    return m_impl->volumeMidi.get();
 }
 
 } // namespace piejam::gui::model

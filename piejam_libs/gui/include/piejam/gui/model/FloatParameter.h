@@ -41,6 +41,7 @@ public:
         return m_normalizedValue;
     }
 
+    Q_INVOKABLE void changeValue(double);
     Q_INVOKABLE void changeNormalizedValue(double);
 
 signals:

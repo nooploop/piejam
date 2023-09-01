@@ -7,16 +7,14 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import ".."
+import "../Controls"
 import "../Util/ColorExt.js" as ColorExt
 import "../Util/DbConvert.js" as DbConvert
 
-Item {
+SubscribableItem {
     id: root
 
-    property real volume
     property var scaleData
-
-    signal moved(real newVolume)
 
     implicitWidth: 50
     implicitHeight: 300
@@ -28,7 +26,7 @@ Item {
 
         padding: 6
 
-        value: root.volume
+        value: root.model ? root.scaleData.dBToPosition(DbConvert.linToDb(root.model.value)) : 0
 
         orientation: Qt.Vertical
 
@@ -56,10 +54,20 @@ Item {
         }
 
         onMoved: {
-            var newVolume = root.scaleData.dBAt(slider.value)
-            root.moved(slider.value)
-            Info.show("<b>Volume:</b> " + newVolume.toFixed(1) + " dB")
+            if (root.model) {
+                var newVolume = root.scaleData.dBAt(slider.value)
+                root.model.changeValue(DbConvert.dbToLin(newVolume))
+                Info.showParameterValue(root.model)
+            }
         }
+    }
+
+    MidiAssignArea {
+        id: midiAssign
+
+        anchors.fill: parent
+
+        model: root.model ? root.model.midi : null
     }
 }
 
