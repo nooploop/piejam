@@ -8,10 +8,10 @@
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
-#include <piejam/gui/model/StreamId.h>
 #include <piejam/gui/model/ParameterId.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
+#include <piejam/gui/model/StreamId.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
@@ -32,7 +32,7 @@ struct FxFilter::Impl
 
     SpectrumData spectrumDataIn;
     SpectrumData spectrumDataOut;
-    
+
     std::unique_ptr<EnumParameter> filterTypeParam;
     std::unique_ptr<FloatParameter> cutoffParam;
     std::unique_ptr<FloatParameter> resonanceParam;
@@ -43,7 +43,7 @@ FxFilter::FxFilter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
-    : FxModuleContentSubscribable{store_dispatch, state_change_subscriber}
+    : Subscribable{store_dispatch, state_change_subscriber}
 {
     auto const busType = observe_once(
             runtime::selectors::make_fx_module_bus_type_selector(fx_mod_id));

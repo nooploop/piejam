@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxModuleContentSubscribable.h>
+#include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/Types.h>
@@ -19,7 +19,7 @@
 namespace piejam::gui::model
 {
 
-class FxScope final : public FxModuleContentSubscribable
+class FxScope final : public Subscribable<FxModuleContent>
 {
     Q_OBJECT
 

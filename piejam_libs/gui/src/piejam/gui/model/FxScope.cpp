@@ -83,7 +83,7 @@ FxScope::FxScope(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
-    : FxModuleContentSubscribable(store_dispatch, state_change_subscriber)
+    : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(toBusType(
               observe_once(runtime::selectors::make_fx_module_bus_type_selector(
                       fx_mod_id)))))

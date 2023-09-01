@@ -52,7 +52,6 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxGenericModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleContent.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleContentSubscribable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxScope.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxSpectrum.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxStream.h

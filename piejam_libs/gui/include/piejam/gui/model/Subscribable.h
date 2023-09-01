@@ -75,6 +75,32 @@ protected:
     {
     }
 
+    template <class ParameterT, class Parameters>
+    void makeParameter(
+            std::size_t key,
+            std::unique_ptr<ParameterT>& param,
+            Parameters const& parameters)
+    {
+        param = std::make_unique<ParameterT>(
+                dispatch(),
+                this->state_change_subscriber(),
+                parameters.at(key));
+        Model::connectSubscribableChild(*param);
+    }
+
+    template <class StreamT, class Streams>
+    void makeStream(
+            std::size_t key,
+            std::unique_ptr<StreamT>& stream,
+            Streams const& streams)
+    {
+        stream = std::make_unique<StreamT>(
+                dispatch(),
+                this->state_change_subscriber(),
+                streams.at(key));
+        Model::connectSubscribableChild(*stream);
+    }
+
 private:
     void subscribe() override
     {

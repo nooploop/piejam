@@ -76,7 +76,7 @@ FxGenericModule::onSubscribe()
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *parameters(),
                                 [this](ParameterId const& paramKeyId) {
-                                    return makeParameter(
+                                    return model::makeParameter(
                                             dispatch(),
                                             state_change_subscriber(),
                                             paramKeyId);
