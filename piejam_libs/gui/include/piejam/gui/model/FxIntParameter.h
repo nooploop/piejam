@@ -26,7 +26,7 @@ public:
     FxIntParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterKeyId const&);
+            piejam::gui::model::FxParameterId const&);
     ~FxIntParameter();
 
     static inline constexpr auto StaticType = Type::Int;

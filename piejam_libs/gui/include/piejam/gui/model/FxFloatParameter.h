@@ -26,7 +26,7 @@ public:
     FxFloatParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterKeyId const&);
+            piejam::gui::model::FxParameterId const&);
     ~FxFloatParameter();
 
     static inline constexpr auto StaticType = Type::Float;

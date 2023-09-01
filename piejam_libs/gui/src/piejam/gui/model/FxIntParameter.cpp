@@ -24,10 +24,9 @@ struct FxIntParameter::Impl
 FxIntParameter::FxIntParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxParameterKeyId const& param)
+        FxParameterId const& param)
     : FxParameter{store_dispatch, state_change_subscriber, param}
-    , m_impl{std::make_unique<Impl>(
-              std::get<runtime::int_parameter_id>(param.id))}
+    , m_impl{std::make_unique<Impl>(std::get<runtime::int_parameter_id>(param))}
 
 {
     setMinValue(

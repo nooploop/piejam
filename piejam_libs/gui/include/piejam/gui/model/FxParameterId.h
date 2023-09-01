@@ -10,13 +10,6 @@
 namespace piejam::gui::model
 {
 
-struct FxParameterKeyId
-{
-    runtime::fx::parameter_key key;
-    runtime::fx::parameter_id id;
-
-    constexpr bool
-    operator==(FxParameterKeyId const& other) const noexcept = default;
-};
+using FxParameterId = runtime::fx::parameter_id;
 
 } // namespace piejam::gui::model

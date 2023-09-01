@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxParameterKeyId.h>
+#include <piejam/gui/model/FxParameterId.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -27,7 +27,7 @@ public:
     FxParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterKeyId const&);
+            piejam::gui::model::FxParameterId const&);
     ~FxParameter();
 
     enum class Type
@@ -80,8 +80,8 @@ signals:
 
 protected:
     void onSubscribe() override;
-
-    auto paramKeyId() const -> FxParameterKeyId;
+    
+    auto paramKeyId() const -> FxParameterId;
 
 private:
     struct Impl;
@@ -94,7 +94,7 @@ private:
 auto makeFxParameter(
         runtime::store_dispatch,
         runtime::subscriber&,
-        piejam::gui::model::FxParameterKeyId const&)
+        piejam::gui::model::FxParameterId const&)
         -> std::unique_ptr<FxParameter>;
 
 } // namespace piejam::gui::model

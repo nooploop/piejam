@@ -38,24 +38,24 @@ using parameter_id_to_FxParameter = boost::mp11::mp_list<
 
 struct FxParameter::Impl
 {
-    FxParameterKeyId param;
+    FxParameterId param;
     std::unique_ptr<MidiAssignable> midi;
 };
 
 FxParameter::FxParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxParameterKeyId const& param)
+        FxParameterId const& param)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
               param,
               std::make_unique<MidiAssignable>(
                       store_dispatch,
                       state_change_subscriber,
-                      param.id)))
+                      param)))
 {
     setName(QString::fromStdString(*observe_once(
-            runtime::selectors::make_fx_parameter_name_selector(param.id))));
+            runtime::selectors::make_fx_parameter_name_selector(param))));
 }
 
 FxParameter::~FxParameter() = default;
@@ -70,14 +70,14 @@ FxParameter::type() const noexcept -> Type
                                 mp_map_find<parameter_id_to_FxParameter, T>,
                         1>::StaticType;
             },
-            m_impl->param.id);
+            m_impl->param);
 }
 
 void
 FxParameter::onSubscribe()
 {
     observe(runtime::selectors::make_fx_parameter_value_string_selector(
-                    m_impl->param.id),
+                    m_impl->param),
             [this](std::string const& text) {
                 setValueString(QString::fromStdString(text));
             });
@@ -93,11 +93,11 @@ void
 FxParameter::resetToDefault()
 {
     dispatch(runtime::actions::reset_fx_parameter_to_default_value(
-            m_impl->param.id));
+            m_impl->param));
 }
 
 auto
-FxParameter::paramKeyId() const -> FxParameterKeyId
+FxParameter::paramKeyId() const -> FxParameterId
 {
     return m_impl->param;
 }
@@ -106,7 +106,7 @@ auto
 makeFxParameter(
         runtime::store_dispatch dispatch,
         runtime::subscriber& state_change_subscriber,
-        piejam::gui::model::FxParameterKeyId const& paramKeyId)
+        piejam::gui::model::FxParameterId const& paramId)
         -> std::unique_ptr<FxParameter>
 {
     return std::visit(
@@ -118,9 +118,9 @@ makeFxParameter(
                 return std::make_unique<FxParameterType>(
                         dispatch,
                         state_change_subscriber,
-                        paramKeyId);
+                        paramId);
             },
-            paramKeyId.id);
+            paramId);
 }
 
 } // namespace piejam::gui::model

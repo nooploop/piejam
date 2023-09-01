@@ -24,7 +24,7 @@ public:
     FxBoolParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterKeyId const&);
+            piejam::gui::model::FxParameterId const&);
     ~FxBoolParameter();
 
     static inline constexpr auto StaticType = Type::Bool;

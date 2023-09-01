@@ -7,16 +7,14 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
-#include <piejam/gui/model/FxBoolParameter.h>
-#include <piejam/gui/model/FxFloatParameter.h>
-#include <piejam/gui/model/FxIntParameter.h>
-#include <piejam/gui/model/FxParameterKeyId.h>
+#include <piejam/gui/model/FxParameter.h>
+#include <piejam/gui/model/FxParameterId.h>
 #include <piejam/runtime/selectors.h>
 
 #include <boost/container/flat_map.hpp>
 #include <boost/hof/construct.hpp>
-#include <boost/hof/match.hpp>
-#include <boost/hof/unpack.hpp>
+
+#include <ranges>
 
 namespace piejam::gui::model
 {
@@ -25,11 +23,11 @@ namespace
 {
 
 auto
-fxParameterKeyIds(runtime::fx::module_parameters const& params)
+fxParameterIds(runtime::fx::module_parameters const& params)
 {
     return algorithm::transform_to_vector(
-            params,
-            boost::hof::unpack(boost::hof::construct<FxParameterKeyId>()));
+            params | std::views::values,
+            boost::hof::construct<FxParameterId>());
 }
 
 } // namespace
@@ -73,11 +71,11 @@ FxGenericModule::onSubscribe()
             [this](box<runtime::fx::module_parameters> const& paramIds) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
-                                fxParameterKeyIds(*m_impl->param_ids),
-                                fxParameterKeyIds(*paramIds)),
+                                fxParameterIds(*m_impl->param_ids),
+                                fxParameterIds(*paramIds)),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *parameters(),
-                                [this](FxParameterKeyId const& paramKeyId) {
+                                [this](FxParameterId const& paramKeyId) {
                                     return makeFxParameter(
                                             dispatch(),
                                             state_change_subscriber(),

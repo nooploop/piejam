@@ -25,7 +25,7 @@ public:
     FxEnumParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::FxParameterKeyId const&);
+            piejam::gui::model::FxParameterId const&);
     ~FxEnumParameter();
 
     static inline constexpr auto StaticType = Type::Enum;

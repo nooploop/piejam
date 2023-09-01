@@ -7,7 +7,7 @@
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/FxEnumParameter.h>
 #include <piejam/gui/model/FxFloatParameter.h>
-#include <piejam/gui/model/FxParameterKeyId.h>
+#include <piejam/gui/model/FxParameterId.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/FxStreamKeyId.h>
 #include <piejam/gui/model/SpectrumData.h>

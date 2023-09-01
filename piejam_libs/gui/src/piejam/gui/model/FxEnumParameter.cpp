@@ -27,11 +27,11 @@ struct FxEnumParameter::Impl
 FxEnumParameter::FxEnumParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        FxParameterKeyId const& param)
+        FxParameterId const& param)
     : FxIntParameter{store_dispatch, state_change_subscriber, param}
     , m_impl{std::make_unique<Impl>(observe_once(
               runtime::selectors::make_int_parameter_enum_values_selector(
-                      std::get<runtime::int_parameter_id>(param.id))))}
+                      std::get<runtime::int_parameter_id>(param))))}
 
 {
 }
