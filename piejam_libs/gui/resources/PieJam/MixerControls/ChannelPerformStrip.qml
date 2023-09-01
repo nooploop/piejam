@@ -45,8 +45,8 @@ SubscribableItem {
 
                 onMoved: {
                     root.model.changePanBalance(panControls.value)
-                    Info.quickTip = (root.model.busType === PJModels.BusType.Mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
-                            + panControls.value.toFixed(2)
+                    Info.show((root.model.busType === PJModels.BusType.Mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
+                            + panControls.value.toFixed(2))
                 }
 
                 MidiAssignArea {
@@ -68,8 +68,7 @@ SubscribableItem {
                 levelLeft: root.model ? root.model.levelLeft : 0
                 levelRight: root.model ? root.model.levelRight : 0
 
-                muted: root.model ? (root.model.mute
-                                     || root.model.mutedBySolo) : false
+                muted: root.model && (root.model.mute.value || root.model.mutedBySolo)
 
                 volumeMidi: root.model ? root.model.volumeMidi : null
 
@@ -85,16 +84,9 @@ SubscribableItem {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 32
 
-                record: root.model ? root.model.record : false
-                mute: root.model ? root.model.mute : false
-                solo: root.model ? root.model.solo : false
-
-                muteMidi: root.model ? root.model.muteMidi : null
-                soloMidi: root.model ? root.model.soloMidi : null
-
-                onRecordToggled: root.model.changeRecord(!root.model.record)
-                onMuteToggled: root.model.changeMute(!root.model.mute)
-                onSoloToggled: root.model.changeSolo(!root.model.solo)
+                record: root.model ? root.model.record : null
+                mute: root.model ? root.model.mute : null
+                solo: root.model ? root.model.solo : null
             }
         }
     }

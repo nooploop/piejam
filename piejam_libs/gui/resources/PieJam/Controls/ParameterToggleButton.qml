@@ -28,7 +28,6 @@ SubscribableItem {
     Button {
         id: button
 
-
         anchors.fill: parent
 
         flat: root.flat

@@ -4,6 +4,7 @@
 
 #include <piejam/gui/model/MixerChannelPerform.h>
 
+#include <piejam/gui/model/BoolParameter.h>
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/gui/model/MixerDbScales.h>
@@ -43,15 +44,14 @@ struct MixerChannelPerform::Impl
     audio::bus_type bus_type;
     runtime::float_parameter_id volume;
     runtime::float_parameter_id panBalance;
-    runtime::bool_parameter_id record;
-    runtime::bool_parameter_id mute;
-    runtime::bool_parameter_id solo;
     runtime::stereo_level_parameter_id level;
 
     std::unique_ptr<MidiAssignable> volumeMidi;
     std::unique_ptr<MidiAssignable> panMidi;
-    std::unique_ptr<MidiAssignable> muteMidi;
-    std::unique_ptr<MidiAssignable> soloMidi;
+
+    std::unique_ptr<BoolParameter> record;
+    std::unique_ptr<BoolParameter> solo;
+    std::unique_ptr<BoolParameter> mute;
 };
 
 MixerChannelPerform::MixerChannelPerform(
@@ -73,15 +73,6 @@ MixerChannelPerform::MixerChannelPerform(
                                       id)),
               observe_once(
                       runtime::selectors::
-                              make_mixer_channel_record_parameter_selector(id)),
-              observe_once(
-                      runtime::selectors::
-                              make_mixer_channel_mute_parameter_selector(id)),
-              observe_once(
-                      runtime::selectors::
-                              make_mixer_channel_solo_parameter_selector(id)),
-              observe_once(
-                      runtime::selectors::
                               make_mixer_channel_level_parameter_selector(id)),
               std::make_unique<MidiAssignable>(
                       store_dispatch,
@@ -97,25 +88,50 @@ MixerChannelPerform::MixerChannelPerform(
                               runtime::selectors::
                                       make_mixer_channel_pan_balance_parameter_selector(
                                               id))),
-              std::make_unique<MidiAssignable>(
+              std::make_unique<BoolParameter>(
                       store_dispatch,
                       state_change_subscriber,
                       observe_once(
                               runtime::selectors::
-                                      make_mixer_channel_mute_parameter_selector(
+                                      make_mixer_channel_record_parameter_selector(
                                               id))),
-              std::make_unique<MidiAssignable>(
+              std::make_unique<BoolParameter>(
                       store_dispatch,
                       state_change_subscriber,
                       observe_once(
                               runtime::selectors::
                                       make_mixer_channel_solo_parameter_selector(
+                                              id))),
+              std::make_unique<BoolParameter>(
+                      store_dispatch,
+                      state_change_subscriber,
+                      observe_once(
+                              runtime::selectors::
+                                      make_mixer_channel_mute_parameter_selector(
                                               id)))))
     , m_busType(toBusType(m_impl->bus_type))
 {
 }
 
 MixerChannelPerform::~MixerChannelPerform() = default;
+
+auto
+MixerChannelPerform::record() const noexcept -> BoolParameter*
+{
+    return m_impl->record.get();
+}
+
+auto
+MixerChannelPerform::solo() const noexcept -> BoolParameter*
+{
+    return m_impl->solo.get();
+}
+
+auto
+MixerChannelPerform::mute() const noexcept -> BoolParameter*
+{
+    return m_impl->mute.get();
+}
 
 void
 MixerChannelPerform::onSubscribe()
@@ -135,18 +151,6 @@ MixerChannelPerform::onSubscribe()
     observe(runtime::selectors::make_float_parameter_value_selector(
                     m_impl->panBalance),
             [this](float x) { setPanBalance(x); });
-
-    observe(runtime::selectors::make_bool_parameter_value_selector(
-                    m_impl->record),
-            [this](bool x) { setRecord(x); });
-
-    observe(runtime::selectors::make_bool_parameter_value_selector(
-                    m_impl->mute),
-            [this](bool x) { setMute(x); });
-
-    observe(runtime::selectors::make_bool_parameter_value_selector(
-                    m_impl->solo),
-            [this](bool x) { setSolo(x); });
 
     observe(runtime::selectors::make_muted_by_solo_selector(m_impl->busId),
             [this](bool x) { setMutedBySolo(x); });
@@ -179,24 +183,6 @@ MixerChannelPerform::changePanBalance(double value)
             static_cast<float>(value)));
 }
 
-void
-MixerChannelPerform::changeRecord(bool value)
-{
-    dispatch(runtime::actions::set_bool_parameter(m_impl->record, value));
-}
-
-void
-MixerChannelPerform::changeMute(bool value)
-{
-    dispatch(runtime::actions::set_bool_parameter(m_impl->mute, value));
-}
-
-void
-MixerChannelPerform::changeSolo(bool value)
-{
-    dispatch(runtime::actions::set_bool_parameter(m_impl->solo, value));
-}
-
 auto
 MixerChannelPerform::volumeMidi() const noexcept -> MidiAssignable*
 {
@@ -207,18 +193,6 @@ auto
 MixerChannelPerform::panMidi() const noexcept -> MidiAssignable*
 {
     return m_impl->panMidi.get();
-}
-
-auto
-MixerChannelPerform::muteMidi() const noexcept -> MidiAssignable*
-{
-    return m_impl->muteMidi.get();
-}
-
-auto
-MixerChannelPerform::soloMidi() const noexcept -> MidiAssignable*
-{
-    return m_impl->soloMidi.get();
 }
 
 } // namespace piejam::gui::model

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <piejam/audio/types.h>
@@ -29,9 +29,10 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
     Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
     Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
     Q_PROPERTY(double panBalance READ panBalance NOTIFY panBalanceChanged FINAL)
-    Q_PROPERTY(bool record READ record NOTIFY recordChanged FINAL)
-    Q_PROPERTY(bool mute READ mute NOTIFY muteChanged FINAL)
-    Q_PROPERTY(bool solo READ solo NOTIFY soloChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::BoolParameter* record READ record CONSTANT
+                       FINAL)
+    Q_PROPERTY(piejam::gui::model::BoolParameter* solo READ solo CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::BoolParameter* mute READ mute CONSTANT FINAL)
     Q_PROPERTY(
             bool mutedBySolo READ mutedBySolo NOTIFY mutedBySoloChanged FINAL)
 
@@ -39,10 +40,6 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
                        CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::MidiAssignable* panMidi READ panMidi CONSTANT
                        FINAL)
-    Q_PROPERTY(piejam::gui::model::MidiAssignable* muteMidi READ muteMidi
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::MidiAssignable* soloMidi READ soloMidi
-                       CONSTANT FINAL)
 
 public:
     MixerChannelPerform(
@@ -127,53 +124,9 @@ public:
 
     Q_INVOKABLE void changePanBalance(double);
 
-    auto record() const noexcept -> bool
-    {
-        return m_record;
-    }
-
-    void setRecord(bool x)
-    {
-        if (m_record != x)
-        {
-            m_record = x;
-            emit recordChanged();
-        }
-    }
-
-    Q_INVOKABLE void changeRecord(bool);
-
-    auto mute() const noexcept -> bool
-    {
-        return m_mute;
-    }
-
-    void setMute(bool const x)
-    {
-        if (m_mute != x)
-        {
-            m_mute = x;
-            emit muteChanged();
-        }
-    }
-
-    Q_INVOKABLE void changeMute(bool);
-
-    auto solo() const noexcept -> bool
-    {
-        return m_solo;
-    }
-
-    void setSolo(bool const x)
-    {
-        if (m_solo != x)
-        {
-            m_solo = x;
-            emit soloChanged();
-        }
-    }
-
-    Q_INVOKABLE void changeSolo(bool);
+    auto record() const noexcept -> BoolParameter*;
+    auto solo() const noexcept -> BoolParameter*;
+    auto mute() const noexcept -> BoolParameter*;
 
     auto mutedBySolo() const noexcept -> bool
     {
@@ -191,20 +144,13 @@ public:
 
     auto volumeMidi() const noexcept -> MidiAssignable*;
     auto panMidi() const noexcept -> MidiAssignable*;
-    auto muteMidi() const noexcept -> MidiAssignable*;
-    auto soloMidi() const noexcept -> MidiAssignable*;
 
 signals:
-
     void nameChanged();
-    void monoChanged();
     void volumeChanged();
     void levelLeftChanged();
     void levelRightChanged();
     void panBalanceChanged();
-    void recordChanged();
-    void muteChanged();
-    void soloChanged();
     void mutedBySoloChanged();
 
 private:
@@ -219,9 +165,6 @@ private:
     double m_levelLeft{};
     double m_levelRight{};
     double m_panBalance{};
-    bool m_record{};
-    bool m_mute{};
-    bool m_solo{};
     bool m_mutedBySolo{};
 };
 

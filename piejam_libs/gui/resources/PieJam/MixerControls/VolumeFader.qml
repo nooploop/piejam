@@ -58,7 +58,7 @@ Item {
         onMoved: {
             var newVolume = root.scaleData.dBAt(slider.value)
             root.moved(slider.value)
-            Info.quickTip = "<b>Volume:</b> " + newVolume.toFixed(1) + " dB"
+            Info.show("<b>Volume:</b> " + newVolume.toFixed(1) + " dB")
         }
     }
 }

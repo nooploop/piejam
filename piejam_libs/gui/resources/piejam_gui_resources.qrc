@@ -87,10 +87,10 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/FxChainControls/EnumComboBox.qml</file>
         <file>PieJam/FxChainControls/ParameterQuickSpinBox.qml</file>
         <file>PieJam/FxChainControls/ParameterSwitch.qml</file>
-        <file>PieJam/FxChainControls/ParameterToggleButton.qml</file>
         <file>PieJam/FxChainControls/StreamSourceSettings.qml</file>
         <file>PieJam/Views/ViewToolBar.qml</file>
         <file>PieJam/Views/ViewToolBarButton.qml</file>
         <file>PieJam/SubscribableItem.qml</file>
+        <file>PieJam/Controls/ParameterToggleButton.qml</file>
     </qresource>
 </RCC>

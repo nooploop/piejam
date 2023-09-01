@@ -5,80 +5,49 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 import "../Controls"
 
 Item {
     id: root
 
-    property alias record: recordButton.checked
-    property alias solo: soloButton.checked
-    property alias mute: muteButton.checked
+    property var record: null
+    property var solo: null
+    property var mute: null
 
-    property alias muteMidi: midiAssignMute.model
-    property alias soloMidi: midiAssignSolo.model
-
-    signal recordToggled()
-    signal soloToggled()
-    signal muteToggled()
-
-    Row {
+    RowLayout {
         anchors.fill: parent
 
         spacing: 6
 
-        Button {
-            id: recordButton
+        ParameterToggleButton {
+            model: root.record
 
-            width: 32
-            height: 40
+            Layout.fillWidth: true
+            Layout.preferredHeight: 40
 
             text: qsTr("R")
-            checkable: true
             Material.accent: Material.Red
-
-            onToggled: root.recordToggled()
         }
 
-        Button {
-            id: soloButton
+        ParameterToggleButton {
+            model: root.solo
 
-            width: 32
-            height: 40
+            Layout.fillWidth: true
+            Layout.preferredHeight: 40
 
             text: qsTr("S")
-            checkable: true
             Material.accent: Material.Yellow
-
-            onToggled: root.soloToggled()
-
-            MidiAssignArea {
-                id: midiAssignSolo
-
-                anchors.fill: parent
-                anchors.topMargin: 1
-                anchors.bottomMargin: 1
-            }
         }
 
-        Button {
-            id: muteButton
+        ParameterToggleButton {
+            model: root.mute
 
-            width: 32
-            height: 40
+            Layout.fillWidth: true
+            Layout.preferredHeight: 40
 
             text: qsTr("M")
-            checkable: true
-
-            onToggled: root.muteToggled()
-
-            MidiAssignArea {
-                id: midiAssignMute
-
-                anchors.fill: parent
-                anchors.topMargin: 1
-                anchors.bottomMargin: 1
-            }
         }
     }
 }

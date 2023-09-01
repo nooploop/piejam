@@ -9,7 +9,7 @@ import QtQuick.Layouts 1.15
 
 import PieJam.Models 1.0 as PJModels
 
-import ".."
+import "../Controls"
 
 Item {
     id: root

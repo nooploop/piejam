@@ -11,9 +11,13 @@ import QtQml 2.15
 Item {
     id: root
 
-    property string quickTip: ""
+    readonly property string message: quickTipTimer.running ? private_.quickTip : ""
 
-    readonly property string message: quickTipTimer.running ? quickTip : ""
+    QtObject {
+        id: private_
+
+        property string quickTip: ""
+    }
 
     Timer {
         id: quickTipTimer
@@ -21,10 +25,13 @@ Item {
         interval: 2000
     }
 
-    onQuickTipChanged: quickTipTimer.restart()
+    function show(quickTip) {
+        private_.quickTip = quickTip
+        quickTipTimer.restart()
+    }
 
     function showParameterValue(paramModel) {
         console.assert(paramModel)
-        root.quickTip = "<b>" + paramModel.name + "</b>: " + paramModel.valueString
+        root.show("<b>" + paramModel.name + "</b>: " + paramModel.valueString)
     }
 }
