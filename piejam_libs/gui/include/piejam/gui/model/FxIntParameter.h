@@ -48,8 +48,6 @@ public:
         return m_maxValue;
     }
 
-    Q_INVOKABLE QString valueToString(int value);
-
 signals:
     void valueChanged();
     void minValueChanged();

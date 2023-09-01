@@ -6,9 +6,9 @@
 
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx_parameter_factory.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
+#include <piejam/runtime/parameter_factory.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
@@ -38,7 +38,7 @@ to_dB_string(float x) -> std::string
 auto
 make_module(
         audio::bus_type const bus_type,
-        fx_parameter_factory const& fx_params_factory) -> fx::module
+        ui_parameter_factory const& ui_params_factory) -> fx::module
 {
     using namespace std::string_literals;
 
@@ -50,14 +50,14 @@ make_module(
             .parameters =
                     fx::module_parameters{
                             {to_underlying(parameter_key::gain),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      runtime::float_parameter{
                                              .default_value = 1.f,
                                              .min = std::pow(10.f, dB_ival::min / 20.f),
                                              .max = std::pow(10.f, dB_ival::max / 20.f),
                                              .to_normalized = &runtime::parameter::to_normalized_dB<dB_ival>,
                                              .from_normalized = &runtime::parameter::from_normalized_dB<dB_ival>},
-                                     fx::parameter{
+                                     {
                                              .name = "Gain"s,
                                              .value_to_string = &to_dB_string})}},
             .streams = {}};

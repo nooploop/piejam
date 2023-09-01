@@ -7,7 +7,7 @@
 #include <piejam/entity_id.h>
 #include <piejam/runtime/actions/engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/parameter/maps_collection.h>
+#include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>

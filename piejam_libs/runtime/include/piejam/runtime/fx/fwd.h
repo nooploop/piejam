@@ -51,7 +51,6 @@ using parameter_midi_assignment = parameter_assignment<midi_assignment>;
 
 using module_parameters =
         boost::container::flat_map<parameter_key, parameter_id>;
-using parameters_t = boost::container::flat_map<parameter_id, parameter>;
 
 using stream_key = std::size_t;
 using module_streams = boost::container::flat_map<stream_key, audio_stream_id>;

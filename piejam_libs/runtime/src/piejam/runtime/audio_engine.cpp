@@ -33,7 +33,6 @@
 #include <piejam/runtime/device_io.h>
 #include <piejam/runtime/dynamic_key_shared_object_map.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/runtime/processors/midi_assignment_processor.h>
@@ -169,15 +168,19 @@ make_fx_chain_components(
         component_map& comps,
         component_map& prev_comps,
         fx::modules_t const& fx_modules,
-        fx::parameters_t const& fx_params,
+        ui_parameter_descriptors_map const& ui_params,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
         audio::sample_rate const sample_rate)
 {
     auto get_fx_param_name =
-            [&fx_params](fx::parameter_id id) -> std::string_view {
-        return *fx_params.at(id).name;
+            [&ui_params](fx::parameter_id id) -> std::string_view {
+        return std::visit(
+                [&](auto param_id) -> std::string_view {
+                    return *ui_params[param_id].name;
+                },
+                id);
     };
 
     for (auto const& [fx_mod_id, fx_mod] : fx_modules)
@@ -232,7 +235,7 @@ make_midi_processors(
 auto
 make_midi_assignment_processors(
         midi_assignments_map const& assignments,
-        parameter::maps_collection const& params,
+        parameters_map const& params,
         processor_map& procs,
         processor_map& prev_procs)
 {
@@ -249,7 +252,7 @@ make_midi_assignment_processors(
     {
         std::visit(
                 [&](auto const& param_id) {
-                    auto const& param = *params.get_parameter(param_id);
+                    auto const& param = params[param_id].param;
 
                     std::tuple const proc_id{param_id, assignment};
                     if (auto proc = prev_procs.find(proc_id))
@@ -796,7 +799,7 @@ audio_engine::rebuild(
             comps,
             m_impl->comps,
             st.fx_modules,
-            st.fx_parameters,
+            st.ui_params,
             m_impl->param_procs,
             m_impl->stream_procs,
             ladspa_fx_proc_factory,
@@ -804,8 +807,10 @@ audio_engine::rebuild(
     auto const solo_groups = runtime::solo_groups(st.mixer_state.channels);
     make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 
-    m_impl->param_procs.initialize(
-            [&st](auto const id) { return st.params.find(id); });
+    m_impl->param_procs.initialize([&st](auto const id) {
+        auto const* const desc = st.params.find(id);
+        return desc ? std::optional{desc->value.get()} : std::nullopt;
+    });
 
     processor_map procs;
 

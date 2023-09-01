@@ -8,11 +8,12 @@
 #include <piejam/entity_map.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx_parameter_factory.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
+#include <piejam/runtime/parameter_factory.h>
+#include <piejam/runtime/parameter_value_to_string.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
@@ -73,7 +74,7 @@ to_dB_string(float x) -> std::string
 auto
 make_module(
         audio::bus_type const bus_type,
-        fx_parameter_factory const& fx_params_factory,
+        ui_parameter_factory const& ui_params_factory,
         audio_streams_cache& streams) -> fx::module
 {
     using namespace std::string_literals;
@@ -85,19 +86,19 @@ make_module(
             .parameters =
                     fx::module_parameters{
                             {to_underlying(parameter_key::stream_a_active),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      bool_parameter{.default_value = true},
                                      {.name = "Stream A Active",
                                       .value_to_string =
-                                              std::in_place_type<bool>})},
+                                              &bool_parameter_value_to_string})},
                             {to_underlying(parameter_key::stream_b_active),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      bool_parameter{.default_value = false},
                                      {.name = "Stream B Active",
                                       .value_to_string =
-                                              std::in_place_type<bool>})},
+                                              &bool_parameter_value_to_string})},
                             {to_underlying(parameter_key::channel_a),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      int_parameter{
                                              .default_value = to_underlying(
                                                      stereo_channel::left),
@@ -109,7 +110,7 @@ make_module(
                                       .value_to_string =
                                               &to_stereo_channel_string})},
                             {to_underlying(parameter_key::channel_b),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      int_parameter{
                                              .default_value = to_underlying(
                                                      stereo_channel::right),
@@ -121,7 +122,7 @@ make_module(
                                       .value_to_string =
                                               &to_stereo_channel_string})},
                             {to_underlying(parameter_key::gain_a),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      float_parameter{
                                              .default_value = 1.f,
                                              .min = dB_ival::min_gain,
@@ -133,7 +134,7 @@ make_module(
                                      {.name = "Gain A"s,
                                       .value_to_string = &to_dB_string})},
                             {to_underlying(parameter_key::gain_b),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      float_parameter{
                                              .default_value = 1.f,
                                              .min = dB_ival::min_gain,
@@ -145,11 +146,11 @@ make_module(
                                      {.name = "Gain B"s,
                                       .value_to_string = &to_dB_string})},
                             {to_underlying(parameter_key::freeze),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      bool_parameter{.default_value = false},
                                      {.name = "Freeze",
                                       .value_to_string =
-                                              std::in_place_type<bool>})},
+                                              &bool_parameter_value_to_string})},
                     },
             .streams = fx::module_streams{
                     {to_underlying(stream_key::input),

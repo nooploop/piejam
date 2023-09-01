@@ -21,6 +21,6 @@ auto make_module(
         std::string const& name,
         audio::bus_type,
         std::span<piejam::ladspa::port_descriptor const> control_inputs,
-        fx_parameter_factory const&) -> fx::module;
+        ui_parameter_factory const&) -> fx::module;
 
 } // namespace piejam::runtime::modules::ladspa_fx

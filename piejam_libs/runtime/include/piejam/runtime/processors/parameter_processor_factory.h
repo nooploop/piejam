@@ -59,7 +59,7 @@ public:
             {
                 if (auto proc = weak_proc.lock())
                 {
-                    if (auto const* value = find_value(id))
+                    if (auto const value = find_value(id); value)
                     {
                         proc->set(*value);
                     }

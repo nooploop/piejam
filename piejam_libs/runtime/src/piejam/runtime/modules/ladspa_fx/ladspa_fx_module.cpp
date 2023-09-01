@@ -6,12 +6,12 @@
 
 #include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx/parameter.h>
-#include <piejam/runtime/fx_parameter_factory.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
+#include <piejam/runtime/parameter_factory.h>
+#include <piejam/runtime/parameter_value_to_string.h>
 
 #include <boost/container/flat_map.hpp>
 
@@ -21,7 +21,7 @@ namespace piejam::runtime::modules::ladspa_fx
 static auto
 make_module_parameters(
         std::span<piejam::ladspa::port_descriptor const> control_inputs,
-        fx_parameter_factory const& fx_params_factory) -> fx::module_parameters
+        ui_parameter_factory const& ui_params_factory) -> fx::module_parameters
 {
     fx::module_parameters module_params;
 
@@ -35,7 +35,7 @@ make_module_parameters(
 
             module_params.emplace(
                     port_desc.index,
-                    fx_params_factory.make_parameter(
+                    ui_params_factory.make_parameter(
                             float_parameter{
                                     .default_value = p->default_value,
                                     .min = p->min,
@@ -52,10 +52,9 @@ make_module_parameters(
                                                               from_normalized_log
                                                     : &runtime::parameter::
                                                               from_normalized_linear},
-                            fx::parameter{
-                                    .name = port_desc.name,
-                                    .value_to_string =
-                                            std::in_place_type<float>}));
+                            {.name = port_desc.name,
+                             .value_to_string =
+                                     &float_parameter_value_to_string}));
         }
         else if (
                 auto const* const p = std::get_if<piejam::ladspa::int_port>(
@@ -65,15 +64,14 @@ make_module_parameters(
 
             module_params.emplace(
                     port_desc.index,
-                    fx_params_factory.make_parameter(
+                    ui_params_factory.make_parameter(
                             int_parameter{
                                     .default_value = p->default_value,
                                     .min = p->min,
                                     .max = p->max},
-                            fx::parameter{
-                                    .name = port_desc.name,
-                                    .value_to_string =
-                                            std::in_place_type<int>}));
+                            {.name = port_desc.name,
+                             .value_to_string =
+                                     &int_parameter_value_to_string}));
         }
         else if (
                 auto const* const p = std::get_if<piejam::ladspa::bool_port>(
@@ -81,12 +79,11 @@ make_module_parameters(
         {
             module_params.emplace(
                     port_desc.index,
-                    fx_params_factory.make_parameter(
+                    ui_params_factory.make_parameter(
                             bool_parameter{.default_value = p->default_value},
-                            fx::parameter{
-                                    .name = port_desc.name,
-                                    .value_to_string =
-                                            std::in_place_type<bool>}));
+                            {.name = port_desc.name,
+                             .value_to_string =
+                                     &bool_parameter_value_to_string}));
         }
     }
 
@@ -99,14 +96,14 @@ make_module(
         std::string const& name,
         audio::bus_type const bus_type,
         std::span<const ladspa::port_descriptor> const control_inputs,
-        fx_parameter_factory const& fx_params_factory) -> fx::module
+        ui_parameter_factory const& ui_params_factory) -> fx::module
 {
     return fx::module{
             .fx_instance_id = instance_id,
             .name = name,
             .bus_type = bus_type,
             .parameters =
-                    make_module_parameters(control_inputs, fx_params_factory),
+                    make_module_parameters(control_inputs, ui_params_factory),
             .streams = {}};
 }
 

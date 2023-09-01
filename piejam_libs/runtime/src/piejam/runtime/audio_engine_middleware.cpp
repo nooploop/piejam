@@ -428,12 +428,12 @@ audio_engine_middleware::process_engine_action(
         middleware_functors const& mw_fs,
         actions::set_parameter_value<Parameter> const& a)
 {
-    mw_fs.next(a);
-
     if (m_engine)
     {
-        m_engine->set_parameter_value(a.id, mw_fs.get_state().params.get(a.id));
+        m_engine->set_parameter_value(a.id, a.value);
     }
+
+    mw_fs.next(a);
 }
 
 template <>

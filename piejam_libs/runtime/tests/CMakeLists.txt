@@ -10,7 +10,6 @@ add_executable(piejam_runtime_test
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_device_manager_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/audio_engine_middleware_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_key_shared_object_map_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/fx_parameter_id_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ladspa_fx_middleware_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ladspa_instance_manager_mock.h
     ${CMAKE_CURRENT_SOURCE_DIR}/ladspa_processor_factory_mock.h

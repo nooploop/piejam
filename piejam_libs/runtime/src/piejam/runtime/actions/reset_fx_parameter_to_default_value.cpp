@@ -22,13 +22,13 @@ reset_fx_parameter_to_default_value(fx::parameter_id const param_id)
         std::visit(
                 [&](auto&& typed_param_id) {
                     state const& st = get_state();
-                    if (auto const param =
-                                st.params.get_parameter(typed_param_id);
-                        param)
+                    if (auto const* const param_desc =
+                                st.params.find(typed_param_id);
+                        param_desc)
                     {
                         dispatch(set_parameter_value{
                                 typed_param_id,
-                                param->default_value});
+                                param_desc->param.default_value});
                     }
                 },
                 param_id);

@@ -5,7 +5,6 @@
 #include <piejam/gui/model/FxIntParameter.h>
 
 #include <piejam/runtime/actions/set_parameter_value.h>
-#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
@@ -56,15 +55,6 @@ void
 FxIntParameter::changeValue(int value)
 {
     dispatch(runtime::actions::set_int_parameter(m_impl->param_id, value));
-}
-
-QString
-FxIntParameter::valueToString(int value)
-{
-    return QString::fromStdString(observe_once(
-            runtime::selectors::make_fx_parameter_value_string_selector(
-                    m_impl->param_id,
-                    value)));
 }
 
 } // namespace piejam::gui::model

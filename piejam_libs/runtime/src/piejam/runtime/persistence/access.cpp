@@ -91,9 +91,7 @@ save_app_config(
 }
 
 static auto
-export_parameter_values(
-        fx::module const& fx_mod,
-        parameter::maps_collection const& params)
+export_parameter_values(fx::module const& fx_mod, parameters_map const& params)
         -> std::vector<fx::parameter_value_assignment>
 {
     std::vector<fx::parameter_value_assignment> result;
@@ -104,7 +102,7 @@ export_parameter_values(
                 [&](auto&& param) {
                     result.emplace_back(fx::parameter_value_assignment{
                             key,
-                            params.get(param)});
+                            params[param].value.get()});
                 },
                 fx_param_id);
     }
@@ -237,9 +235,9 @@ static auto
 export_mixer_parameters(state const& st, mixer::channel const& mixer_channel)
 {
     session::mixer_parameters result;
-    result.volume = st.params.get(mixer_channel.volume);
-    result.pan = st.params.get(mixer_channel.pan_balance);
-    result.mute = st.params.get(mixer_channel.mute);
+    result.volume = st.params[mixer_channel.volume].value.get();
+    result.pan = st.params[mixer_channel.pan_balance].value.get();
+    result.mute = st.params[mixer_channel.mute].value.get();
     return result;
 }
 

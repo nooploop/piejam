@@ -5,16 +5,17 @@
 #include <piejam/runtime/state.h>
 
 #include <piejam/algorithm/contains.h>
+#include <piejam/audio/types.h>
 #include <piejam/indexed_access.h>
 #include <piejam/ladspa/port_descriptor.h>
-#include <piejam/runtime/fx/parameter.h>
-#include <piejam/runtime/fx_parameter_factory.h>
 #include <piejam/runtime/modules/filter/filter_module.h>
 #include <piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h>
 #include <piejam/runtime/modules/scope/scope_module.h>
 #include <piejam/runtime/modules/spectrum/spectrum_module.h>
 #include <piejam/runtime/modules/tool/tool_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
+#include <piejam/runtime/parameter_factory.h>
+#include <piejam/runtime/parameter_value_to_string.h>
 #include <piejam/tuple_element_compare.h>
 
 #include <boost/hof/match.hpp>
@@ -99,7 +100,8 @@ make_initial_state() -> state
             [](mixer::channel& mixer_channel) {
                 mixer_channel.out = piejam::default_t{};
             });
-    st.params.set(st.mixer_state.channels[st.mixer_state.main].record, true);
+    st.params[st.mixer_state.channels[st.mixer_state.main].record].value.set(
+            true);
     return st;
 }
 
@@ -177,7 +179,7 @@ static void
 apply_parameter_values(
         std::vector<fx::parameter_value_assignment> const& values,
         fx::module const& fx_mod,
-        parameter::maps_collection& params)
+        parameters_map& params)
 {
     for (auto&& [key, value] : values)
     {
@@ -187,14 +189,10 @@ apply_parameter_values(
             auto const& fx_param_id = it->second;
             std::visit(
                     boost::hof::match(
-                            [&params](float_parameter_id id, float v) {
-                                params.set(id, v);
-                            },
-                            [&params](int_parameter_id id, int v) {
-                                params.set(id, v);
-                            },
-                            [&params](bool_parameter_id id, bool v) {
-                                params.set(id, v);
+                            [&params]<class P>(
+                                    parameter::id_t<P> id,
+                                    parameter::value_type_t<P> v) {
+                                params[id].value.set(v);
                             },
                             [](auto&&, auto&&) { BOOST_ASSERT(false); }),
                     fx_param_id,
@@ -257,9 +255,9 @@ insert_internal_fx_module(
     fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
-    fx::parameters_t fx_params = st.fx_parameters;
+    ui_parameter_descriptors_map& ui_params = st.ui_params;
 
-    fx_parameter_factory fx_params_factory{st.params, fx_params};
+    ui_parameter_factory ui_params_factory{st.params, ui_params};
 
     fx::module_id fx_mod_id;
     switch (fx_type)
@@ -267,7 +265,7 @@ insert_internal_fx_module(
         case fx::internal::tool:
             fx_mod_id = make_internal_fx_module(
                     st.fx_modules,
-                    modules::tool::make_module(bus_type, fx_params_factory));
+                    modules::tool::make_module(bus_type, ui_params_factory));
             break;
 
         case fx::internal::filter:
@@ -275,7 +273,7 @@ insert_internal_fx_module(
                     st.fx_modules,
                     modules::filter::make_module(
                             bus_type,
-                            fx_params_factory,
+                            ui_params_factory,
                             st.streams));
             break;
 
@@ -284,7 +282,7 @@ insert_internal_fx_module(
                     st.fx_modules,
                     modules::scope::make_module(
                             bus_type,
-                            fx_params_factory,
+                            ui_params_factory,
                             st.streams));
             break;
 
@@ -293,14 +291,12 @@ insert_internal_fx_module(
                     st.fx_modules,
                     modules::spectrum::make_module(
                             bus_type,
-                            fx_params_factory,
+                            ui_params_factory,
                             st.streams));
             break;
     }
 
     fx_chain.emplace(std::next(fx_chain.begin(), insert_pos), fx_mod_id);
-
-    st.fx_parameters = std::move(fx_params);
 
     auto const& fx_mod = st.fx_modules[fx_chain[insert_pos]];
 
@@ -336,18 +332,16 @@ insert_ladspa_fx_module(
     fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
-    fx::parameters_t fx_params = st.fx_parameters;
+    ui_parameter_descriptors_map& ui_params = st.ui_params;
 
     auto fx_mod_id = st.fx_modules.add(modules::ladspa_fx::make_module(
             instance_id,
             plugin_desc.name,
             bus_type,
             control_inputs,
-            fx_parameter_factory{st.params, fx_params}));
+            ui_parameter_factory{st.params, ui_params}));
 
     fx_chain.emplace(std::next(fx_chain.begin(), insert_pos), fx_mod_id);
-
-    st.fx_parameters = std::move(fx_params);
 
     auto const& fx_mod = st.fx_modules[fx_chain[insert_pos]];
     apply_parameter_values(initial_values, fx_mod, st.params);
@@ -405,6 +399,7 @@ static auto
 remove_parameter(state& st, parameter::id_t<P> id)
 {
     st.params.remove(id);
+    st.ui_params.remove(id);
 
     if constexpr (boost::mp11::mp_contains<
                           midi_assignment_id,
@@ -431,15 +426,10 @@ remove_fx_module(
                 remove_erase(mixer_channel.fx_chain, fx_mod_id);
             });
 
-    st.fx_parameters.update([&](fx::parameters_t& fx_params) {
-        for (auto&& [key, fx_param_id] : *fx_mod.parameters)
-        {
-            std::visit(
-                    [&st](auto&& id) { remove_parameter(st, id); },
-                    fx_param_id);
-            fx_params.erase(fx_param_id);
-        }
-    });
+    for (auto&& [key, fx_param_id] : *fx_mod.parameters)
+    {
+        std::visit([&st](auto&& id) { remove_parameter(st, id); }, fx_param_id);
+    }
 
     st.fx_modules.remove(fx_mod_id);
 
@@ -504,27 +494,46 @@ auto
 add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
         -> mixer::channel_id
 {
+    using namespace std::string_literals;
+    ui_parameter_factory ui_param_factory{st.params, st.ui_params};
     auto bus_id = st.mixer_state.channels.add(mixer::channel{
             .name = std::move(name),
             .bus_type = bus_type,
             .in = {},
             .out = st.mixer_state.main,
-            .volume = st.params.add(parameter::float_{
-                    .default_value = 1.f,
-                    .min = 0.f,
-                    .max = 4.f,
-                    .to_normalized = &to_normalized_volume,
-                    .from_normalized = &from_normalized_volume}),
-            .pan_balance = st.params.add(parameter::float_{
-                    .default_value = 0.f,
-                    .min = -1.f,
-                    .max = 1.f,
-                    .to_normalized = &parameter::to_normalized_linear,
-                    .from_normalized = &parameter::from_normalized_linear}),
-            .record = st.params.add(parameter::bool_{.default_value = false}),
-            .mute = st.params.add(parameter::bool_{.default_value = false}),
-            .solo = st.params.add(parameter::bool_{.default_value = false}),
-            .level = st.params.add(parameter::stereo_level{}),
+            .volume = ui_param_factory.make_parameter(
+                    parameter::float_{
+                            .default_value = 1.f,
+                            .min = 0.f,
+                            .max = 4.f,
+                            .to_normalized = &to_normalized_volume,
+                            .from_normalized = &from_normalized_volume},
+                    {.name = "Volume",
+                     .value_to_string = &float_parameter_value_to_string}),
+            .pan_balance = ui_param_factory.make_parameter(
+                    parameter::float_{
+                            .default_value = 0.f,
+                            .min = -1.f,
+                            .max = 1.f,
+                            .to_normalized = &parameter::to_normalized_linear,
+                            .from_normalized =
+                                    &parameter::from_normalized_linear},
+                    {.name = bus_type_to(bus_type, "Pan"s, "Balance"s),
+                     .value_to_string = &float_parameter_value_to_string}),
+            .record = ui_param_factory.make_parameter(
+                    parameter::bool_{.default_value = false},
+                    {.name = "Record",
+                     .value_to_string = &bool_parameter_value_to_string}),
+            .mute = ui_param_factory.make_parameter(
+                    parameter::bool_{.default_value = false},
+                    {.name = "Mute",
+                     .value_to_string = &bool_parameter_value_to_string}),
+            .solo = ui_param_factory.make_parameter(
+                    parameter::bool_{.default_value = false},
+                    {.name = "Solo",
+                     .value_to_string = &bool_parameter_value_to_string}),
+            .level = parameter_factory{st.params}.make_parameter(
+                    parameter::stereo_level{}),
             .fx_chain = {}});
     emplace_back(st.mixer_state.inputs, bus_id);
     return bus_id;

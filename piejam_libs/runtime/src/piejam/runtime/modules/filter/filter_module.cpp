@@ -8,11 +8,10 @@
 #include <piejam/entity_map.h>
 #include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx/parameter.h>
-#include <piejam/runtime/fx_parameter_factory.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/int_.h>
+#include <piejam/runtime/parameter_factory.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
@@ -71,7 +70,7 @@ to_resonance_string(float const r)
 auto
 make_module(
         audio::bus_type const bus_type,
-        fx_parameter_factory const& fx_params_factory,
+        ui_parameter_factory const& ui_params_factory,
         audio_streams_cache& streams) -> fx::module
 {
     using namespace std::string_literals;
@@ -83,18 +82,16 @@ make_module(
             .parameters =
                     fx::module_parameters{
                             {to_underlying(parameter_key::type),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      runtime::int_parameter{
                                              .default_value =
                                                      to_underlying(type::lp2),
                                              .min = 0,
                                              .max = 7},
-                                     fx::parameter{
-                                             .name = "Type",
-                                             .value_to_string =
-                                                     &to_type_string})},
+                                     {.name = "Type",
+                                      .value_to_string = &to_type_string})},
                             {to_underlying(parameter_key::cutoff),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      runtime::float_parameter{
                                              .default_value = 440.f,
                                              .min = 10.f,
@@ -105,12 +102,10 @@ make_module(
                                              .from_normalized =
                                                      &runtime::parameter::
                                                              from_normalized_log},
-                                     fx::parameter{
-                                             .name = "Cutoff"s,
-                                             .value_to_string =
-                                                     &to_cutoff_string})},
+                                     {.name = "Cutoff"s,
+                                      .value_to_string = &to_cutoff_string})},
                             {to_underlying(parameter_key::resonance),
-                             fx_params_factory.make_parameter(
+                             ui_params_factory.make_parameter(
                                      runtime::float_parameter{
                                              .default_value = 0.f,
                                              .min = 0.f,
@@ -121,10 +116,9 @@ make_module(
                                              .from_normalized =
                                                      &runtime::parameter::
                                                              from_normalized_linear},
-                                     fx::parameter{
-                                             .name = "Resonance"s,
-                                             .value_to_string =
-                                                     &to_resonance_string})}},
+                                     {.name = "Resonance"s,
+                                      .value_to_string =
+                                              &to_resonance_string})}},
             .streams = fx::module_streams{
                     {to_underlying(stream_key::in_out),
                      streams.add(audio_stream_buffer(

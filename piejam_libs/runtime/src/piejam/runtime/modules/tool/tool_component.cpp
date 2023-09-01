@@ -8,7 +8,6 @@
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/modules/tool/tool_module.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/to_underlying.h>

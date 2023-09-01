@@ -24,8 +24,13 @@ namespace piejam::runtime::actions
 struct update_parameter_values final
     : ui::cloneable_action<update_parameter_values, reducible_action>
 {
+    template <class Parameter>
+    using id_value_map_t = boost::container::flat_map<
+            parameter::id_t<Parameter>,
+            parameter::value_type_t<Parameter>>;
+
     using parameter_values_t = boost::mp11::mp_rename<
-            boost::mp11::mp_transform<parameter::id_value_map_t, parameters_t>,
+            boost::mp11::mp_transform<id_value_map_t, parameters_t>,
             std::tuple>;
 
     parameter_values_t values;
@@ -34,7 +39,7 @@ struct update_parameter_values final
     void
     push_back(parameter::id_t<P> const id, typename P::value_type const value)
     {
-        std::get<parameter::id_value_map_t<P>>(values).emplace(id, value);
+        std::get<id_value_map_t<P>>(values).emplace(id, value);
     }
 
     [[nodiscard]] auto empty() const noexcept -> bool;

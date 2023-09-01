@@ -67,11 +67,9 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_instances.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/ladspa_processor_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/parameter_assignment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/registry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/unavailable_ladspa.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx_parameter_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/generic_action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
@@ -100,9 +98,11 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/generic_value.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/int_.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/map.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/maps_collection.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_processor_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter_value_to_string.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameters_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fwd.h
@@ -141,6 +141,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/thunk_action_impl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui/update_state_action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui_parameter_descriptors_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/activate_midi_device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
@@ -175,7 +176,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/solo_switch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/stream.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/fx/parameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_assignment_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_control_middleware.cpp
@@ -191,6 +191,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/spectrum/spectrum_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/tool/tool_component.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/tool/tool_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/parameter_value_to_string.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_midi_assignments.cpp

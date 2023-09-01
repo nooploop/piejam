@@ -78,7 +78,7 @@ struct recorder_action_visitor
         for (auto const& [mixer_channel_id, mixer_channel] :
              st.mixer_state.channels)
         {
-            if (!st.params.get(mixer_channel.record))
+            if (!st.params[mixer_channel.record].value.get())
             {
                 continue;
             }

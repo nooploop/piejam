@@ -4,7 +4,6 @@
 
 #include <piejam/runtime/selectors.h>
 
-#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/solo_group.h>
 #include <piejam/runtime/state.h>
@@ -701,45 +700,34 @@ make_fx_parameter_name_selector(fx::parameter_id const fx_param_id)
 {
     return [fx_param_id](state const& st) -> boxed_string {
         static boxed_string s_empty;
-        if (auto it = st.fx_parameters->find(fx_param_id);
-            it != st.fx_parameters->end())
-        {
-            return it->second.name;
-        }
-        return s_empty;
+        return std::visit(
+                [&](auto param_id) {
+                    if (auto const* const desc = st.ui_params.find(param_id);
+                        desc)
+                    {
+                        return desc->name;
+                    }
+                    return s_empty;
+                },
+                fx_param_id);
     };
 }
 
 auto
-make_fx_parameter_value_string_selector(fx::parameter_id const param_id)
+make_fx_parameter_value_string_selector(fx::parameter_id const fx_param_id)
         -> selector<std::string>
 {
-    return [param_id](state const& st) -> std::string {
-        if (auto it = st.fx_parameters->find(param_id);
-            it != st.fx_parameters->end())
-        {
-            return std::visit(
-                    [it, &st](auto&& id) {
-                        return it->second.value_to_string(st.params.get(id));
-                    },
-                    param_id);
-        }
-        return {};
-    };
-}
-
-auto
-make_fx_parameter_value_string_selector(
-        fx::parameter_id const param_id,
-        int const value) -> selector<std::string>
-{
-    return [=](state const& st) -> std::string {
-        if (auto it = st.fx_parameters->find(param_id);
-            it != st.fx_parameters->end())
-        {
-            return it->second.value_to_string(value);
-        }
-        return std::to_string(value);
+    return [fx_param_id](state const& st) -> std::string {
+        return std::visit(
+                [&](auto param_id) {
+                    auto const* const desc = st.params.find(param_id);
+                    auto const* const ui_desc =
+                            desc ? st.ui_params.find(param_id) : nullptr;
+                    return desc && ui_desc
+                                   ? ui_desc->value_to_string(desc->value.get())
+                                   : std::string{};
+                },
+                fx_param_id);
     };
 }
 
@@ -765,36 +753,42 @@ make_audio_stream_selector(audio_stream_id stream_id)
     };
 }
 
+template <class P>
 auto
-make_bool_parameter_value_selector(bool_parameter_id const param_id)
-        -> selector<bool>
+make_parameter_value_selector(parameter::id_t<P> const param_id)
+        -> selector<parameter::value_type_t<P>>
 {
-    return [param_id, value = std::shared_ptr<bool const>()](
-                   state const& st) mutable -> bool {
+    return [param_id,
+            value = std::shared_ptr<parameter::value_type_t<P> const>{}](
+                   state const& st) mutable -> parameter::value_type_t<P> {
         if (value) [[likely]]
         {
             return *value;
         }
 
-        value = st.params.get_cached(param_id);
-        return value && *value;
+        if (auto const* const desc = st.params.find(param_id); desc)
+        {
+            value = desc->value.cached();
+            BOOST_ASSERT(value);
+            return *value;
+        }
+
+        return {};
     };
+}
+
+auto
+make_bool_parameter_value_selector(bool_parameter_id const param_id)
+        -> selector<bool>
+{
+    return make_parameter_value_selector(param_id);
 }
 
 auto
 make_float_parameter_value_selector(float_parameter_id const param_id)
         -> selector<float>
 {
-    return [param_id, value = std::shared_ptr<float const>()](
-                   state const& st) mutable -> float {
-        if (value) [[likely]]
-        {
-            return *value;
-        }
-
-        value = st.params.get_cached(param_id);
-        return value ? *value : float{};
-    };
+    return make_parameter_value_selector(param_id);
 }
 
 auto
@@ -802,14 +796,13 @@ make_float_parameter_normalized_value_selector(
         float_parameter_id const param_id) -> selector<float>
 {
     return [param_id](state const& st) -> float {
-        if (float_parameter const* const param =
-                    st.params.get_parameter(param_id))
+        if (auto const* const desc = st.params.find(param_id); desc)
         {
-            float const value = st.params.get(param_id);
-            BOOST_ASSERT(param->to_normalized);
-            return param->to_normalized(*param, value);
+            float const value = desc->value.get();
+            BOOST_ASSERT(desc->param.to_normalized);
+            return desc->param.to_normalized(desc->param, value);
         }
-        return {};
+        return 0.f;
     };
 }
 
@@ -817,16 +810,7 @@ auto
 make_int_parameter_value_selector(int_parameter_id const param_id)
         -> selector<int>
 {
-    return [param_id, value = std::shared_ptr<int const>()](
-                   state const& st) mutable -> int {
-        if (value) [[likely]]
-        {
-            return *value;
-        }
-
-        value = st.params.get_cached(param_id);
-        return value ? *value : int{};
-    };
+    return make_parameter_value_selector(param_id);
 }
 
 auto
@@ -834,8 +818,8 @@ make_int_parameter_min_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        auto const* const param = st.params.get_parameter(param_id);
-        return param ? param->min : 0;
+        auto const* const desc = st.params.find(param_id);
+        return desc ? desc->param.min : 0;
     };
 }
 
@@ -844,8 +828,8 @@ make_int_parameter_max_selector(int_parameter_id const param_id)
         -> selector<int>
 {
     return [param_id](state const& st) -> int {
-        auto const* const param = st.params.get_parameter(param_id);
-        return param ? param->max : 0;
+        auto const* const desc = st.params.find(param_id);
+        return desc ? desc->param.max : 1;
     };
 }
 
@@ -856,15 +840,13 @@ make_int_parameter_enum_values_selector(int_parameter_id const param_id)
     return [param_id](state const& st) {
         std::vector<std::pair<std::string, int>> result;
 
-        auto const* const param = st.params.get_parameter(param_id);
-        auto const it = st.fx_parameters->find(param_id);
-        if (param && it != st.fx_parameters->end())
+        auto const* const desc = st.params.find(param_id);
+        auto const* const ui_desc = st.ui_params.find(param_id);
+        if (desc && ui_desc)
         {
-            auto const& fx_param = it->second;
-
-            for (int value = param->min; value <= param->max; ++value)
+            for (int value = desc->param.min; value <= desc->param.max; ++value)
             {
-                result.emplace_back(fx_param.value_to_string(value), value);
+                result.emplace_back(ui_desc->value_to_string(value), value);
             }
         }
 
@@ -876,16 +858,7 @@ auto
 make_level_parameter_value_selector(stereo_level_parameter_id const param_id)
         -> selector<stereo_level>
 {
-    return [param_id, value = std::shared_ptr<stereo_level const>()](
-                   state const& st) mutable -> stereo_level {
-        if (value) [[likely]]
-        {
-            return *value;
-        }
-
-        value = st.params.get_cached(param_id);
-        return value ? *value : stereo_level{};
-    };
+    return make_parameter_value_selector(param_id);
 }
 
 auto

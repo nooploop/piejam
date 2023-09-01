@@ -4,127 +4,106 @@
 
 #pragma once
 
-#include <piejam/entity_map.h>
 #include <piejam/runtime/parameter/fwd.h>
-#include <piejam/tuple_element_compare.h>
 
 #include <boost/container/flat_map.hpp>
 
-#include <algorithm>
-#include <concepts>
 #include <memory>
-#include <vector>
+#include <typeindex>
 
 namespace piejam::runtime::parameter
 {
 
-template <class Parameter>
+template <template <class Parameter> class Value>
 class map
 {
 public:
-    using id_t = typename entity_map<Parameter>::id_t;
-    using value_type = typename Parameter::value_type;
+    template <class P>
+    using value_map = boost::container::flat_map<id_t<P>, Value<P>>;
 
-    using cached_type = std::shared_ptr<value_type>;
-    using const_cached_type = std::shared_ptr<value_type const>;
-    using cache_t = std::vector<cached_type>;
-
-    [[nodiscard]] auto empty() const noexcept -> bool
+    template <class P>
+    auto get_map() const -> value_map<P> const&
     {
-        return m_parameters.empty();
+        return *static_cast<value_map<P> const*>(m_maps.at(typeid(P)).get());
     }
 
-    [[nodiscard]] auto size() const noexcept -> std::size_t
+    template <class P>
+    auto get_map() -> value_map<P>&
     {
-        return m_parameters.size();
+        auto it = m_maps.find(typeid(P));
+
+        if (it == m_maps.end()) [[unlikely]]
+        {
+            it = m_maps.emplace(
+                               std::type_index{typeid(P)},
+                               std::make_shared<value_map<P>>())
+                         .first;
+        }
+
+        return *static_cast<value_map<P>*>(it->second.get());
     }
 
-    template <std::same_as<Parameter> P>
-    auto add(P&& p) -> id_t
+    template <class P, class... Args>
+    auto emplace(id_t<P> const id, Args&&... args)
     {
-        return add(std::forward<P>(p), p.default_value);
+        return BOOST_VERIFY(
+                get_map<P>()
+                        .emplace(
+                                std::piecewise_construct,
+                                std::forward_as_tuple(id),
+                                std::forward_as_tuple(
+                                        std::forward<Args>(args)...))
+                        .second);
     }
 
-    template <std::same_as<Parameter> P, std::convertible_to<value_type> V>
-    auto add(P&& p, V&& value) -> id_t
+    template <class P>
+    auto remove(id_t<P> const id) -> void
     {
-        auto id = m_parameters.add(std::forward<P>(p));
-        auto&& [it, inserted] = m_values.emplace(id, std::forward<V>(value));
-        BOOST_ASSERT(inserted);
-        m_cache->insert(
-                std::next(m_cache->begin(), m_values.index_of(it)),
-                std::make_shared<value_type>(it->second));
-        return id;
+        get_map<P>().erase(id);
     }
 
-    auto remove(id_t const id) -> void
+    template <class P>
+    auto contains(id_t<P> const id) const noexcept -> bool
     {
-        m_parameters.remove(id);
-        auto it = m_values.find(id);
-        m_cache->erase(std::next(m_cache->begin(), m_values.index_of(it)));
-        m_values.erase(it);
+        return get_map<P>().contains(id);
     }
 
-    auto contains(id_t const id) const noexcept -> bool
+    template <class P>
+    auto find(id_t<P> const id) const noexcept -> Value<P> const*
     {
-        return m_parameters.contains(id);
+        auto const& m = get_map<P>();
+        auto it = m.find(id);
+        return it != m.end() ? &it->second : nullptr;
     }
 
-    auto get_parameter(id_t const id) const noexcept -> Parameter const*
+    template <class P>
+    auto find(id_t<P> const id) noexcept -> Value<P>*
     {
-        return m_parameters.find(id);
+        auto& m = get_map<P>();
+        auto it = m.find(id);
+        return it != m.end() ? &it->second : nullptr;
     }
 
-    auto find(id_t const id) const noexcept -> value_type const*
+    template <class P>
+    auto operator[](id_t<P> const id) const noexcept -> Value<P> const&
     {
-        auto it = m_values.find(id);
-        return it != m_values.end() ? std::addressof(it->second) : nullptr;
-    }
-
-    auto get(id_t const id) const noexcept -> value_type const&
-    {
-        auto it = m_values.find(id);
-        BOOST_ASSERT(it != m_values.end());
+        auto const& m = get_map<P>();
+        auto it = m.find(id);
+        BOOST_ASSERT(it != m.end());
         return it->second;
     }
 
-    auto get_cached(id_t const id) const noexcept -> const_cached_type
+    template <class P>
+    auto operator[](id_t<P> const id) noexcept -> Value<P>&
     {
-        auto it = m_values.find(id);
-        return it != m_values.end() ? (*m_cache)[m_values.index_of(it)]
-                                    : nullptr;
-    }
-
-    template <std::convertible_to<value_type> V>
-    auto set(id_t const id, V&& value) -> void
-    {
-        auto it = m_values.find(id);
-        BOOST_ASSERT(it != m_values.end());
-        it->second = std::forward<V>(value);
-
-        *(*m_cache)[m_values.index_of(it)] = it->second;
-    }
-
-    auto set(id_value_map_t<Parameter> const& id_values)
-    {
-        auto it = m_values.begin();
-        for (auto&& [id, value] : id_values)
-        {
-            it = std::ranges::find_if(
-                    it,
-                    m_values.end(),
-                    tuple::element<0>.equal_to(id));
-            BOOST_ASSERT(it != m_values.end());
-            it->second = value;
-
-            *(*m_cache)[m_values.index_of(it)] = it->second;
-        }
+        auto& m = get_map<P>();
+        auto it = m.find(id);
+        BOOST_ASSERT(it != m.end());
+        return it->second;
     }
 
 private:
-    entity_map<Parameter> m_parameters;
-    id_value_map_t<Parameter> m_values;
-    std::shared_ptr<cache_t> m_cache{std::make_shared<cache_t>()};
+    boost::container::flat_map<std::type_index, std::shared_ptr<void>> m_maps;
 };
 
 } // namespace piejam::runtime::parameter

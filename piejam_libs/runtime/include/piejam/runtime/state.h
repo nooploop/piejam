@@ -21,7 +21,6 @@
 #include <piejam/runtime/device_io.h>
 #include <piejam/runtime/fx/ladspa_instances.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/midi_assignment.h>
@@ -31,11 +30,13 @@
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
-#include <piejam/runtime/parameter/maps_collection.h>
+#include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameters.h>
+#include <piejam/runtime/parameters_map.h>
 #include <piejam/runtime/recorder.h>
 #include <piejam/runtime/root_view_mode.h>
 #include <piejam/runtime/selected_device.h>
+#include <piejam/runtime/ui_parameter_descriptors_map.h>
 
 #include <functional>
 #include <optional>
@@ -61,13 +62,13 @@ struct state
     boxed_vector<midi::device_id_t> midi_inputs;
     box<midi_devices_t> midi_devices;
 
-    parameter::maps_collection params;
+    parameters_map params;
+    ui_parameter_descriptors_map ui_params;
     audio_streams_cache streams;
 
     fx::registry fx_registry{fx::make_default_registry()};
 
     fx::modules_t fx_modules;
-    box<fx::parameters_t> fx_parameters;
     box<fx::ladspa_instances> fx_ladspa_instances;
     fx::unavailable_ladspa_plugins fx_unavailable_ladspa_plugins;
 

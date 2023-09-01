@@ -21,18 +21,12 @@ struct int_;
 using stereo_level = generic_value<audio::pair<float>>;
 
 template <class Parameter>
-class map;
-
-class maps_collection;
-
-template <class Parameter>
 using id_t = entity_id<Parameter>;
+
+template <template <class> class Value>
+class map;
 
 template <class Parameter>
 using value_type_t = typename Parameter::value_type;
-
-template <class Parameter>
-using id_value_map_t =
-        boost::container::flat_map<id_t<Parameter>, value_type_t<Parameter>>;
 
 } // namespace piejam::runtime::parameter

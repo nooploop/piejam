@@ -4,7 +4,6 @@
 
 #include <piejam/gui/model/FxEnumParameter.h>
 
-#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>

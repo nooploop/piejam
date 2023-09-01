@@ -5,7 +5,6 @@
 #include <piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h>
 
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx/parameter.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 
 #include <piejam/audio/engine/component.h>

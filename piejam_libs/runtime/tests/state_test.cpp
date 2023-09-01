@@ -4,7 +4,7 @@
 
 #include <piejam/runtime/state.h>
 
-#include <piejam/runtime/parameter/maps_collection.h>
+#include <piejam/runtime/parameter/map.h>
 
 #include <gtest/gtest.h>
 
@@ -31,28 +31,28 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_channel)
 
     EXPECT_EQ("foo", *bus.name);
 
-    auto const& volume_param = *sut.params.get_parameter(bus.volume);
+    auto const& volume_param = sut.params[bus.volume].param;
     EXPECT_EQ(1.f, volume_param.default_value);
     EXPECT_EQ(0.f, volume_param.min);
     EXPECT_EQ(4.f, volume_param.max);
-    auto volume_value = sut.params.get(bus.volume);
+    auto volume_value = sut.params[bus.volume].value.get();
     EXPECT_EQ(1.f, volume_value);
 
-    auto const& pan_balance_param = *sut.params.get_parameter(bus.pan_balance);
+    auto const& pan_balance_param = sut.params[bus.pan_balance].param;
     EXPECT_EQ(0.f, pan_balance_param.default_value);
     EXPECT_EQ(-1.f, pan_balance_param.min);
     EXPECT_EQ(1.f, pan_balance_param.max);
-    auto pan_balance_value = sut.params.get(bus.pan_balance);
+    auto pan_balance_value = sut.params[bus.pan_balance].value.get();
     EXPECT_EQ(0.f, pan_balance_value);
 
-    auto const& mute_param = *sut.params.get_parameter(bus.mute);
+    auto const& mute_param = sut.params[bus.mute].param;
     EXPECT_EQ(false, mute_param.default_value);
-    auto mute_value = sut.params.get(bus.mute);
+    auto mute_value = sut.params[bus.mute].value.get();
     EXPECT_EQ(false, mute_value);
 
-    auto const& level_param = *sut.params.get_parameter(bus.level);
+    auto const& level_param = sut.params[bus.level].param;
     EXPECT_EQ(stereo_level{}, level_param.default_value);
-    auto level_value = sut.params.get(bus.level);
+    auto level_value = sut.params[bus.level].value.get();
     EXPECT_EQ(0.f, level_value.left);
     EXPECT_EQ(0.f, level_value.right);
 }
