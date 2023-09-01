@@ -19,7 +19,7 @@ SubscribableItem {
     QtObject {
         id: private_
 
-        readonly property var paramModel: root.model && root.model.type === FxParameter.Type.Float ? root.model : null
+        readonly property var paramModel: root.model && root.model.type === Parameter.Type.Float ? root.model : null
         readonly property real value: private_.paramModel ? private_.paramModel.normalizedValue : 0
     }
 

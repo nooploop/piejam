@@ -21,7 +21,7 @@ SubscribableItem {
     QtObject {
         id: private_
 
-        readonly property var paramModel: root.model && root.model.type === FxParameter.Type.Int  ? root.model : null
+        readonly property var paramModel: root.model && root.model.type === Parameter.Type.Int  ? root.model : null
         readonly property int from: private_.paramModel ? private_.paramModel.minValue : 0
         readonly property int to: private_.paramModel ? private_.paramModel.maxValue : 1
         readonly property int value: private_.paramModel ? private_.paramModel.value : 0

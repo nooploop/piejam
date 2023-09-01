@@ -11,22 +11,21 @@
 #include <piejam/gui/model/AudioInputOutputSettings.h>
 #include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
+#include <piejam/gui/model/BoolParameter.h>
 #include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/EnumListModel.h>
-#include <piejam/gui/model/BoolParameter.h>
+#include <piejam/gui/model/EnumParameter.h>
+#include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>
-#include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FxFilter.h>
-#include <piejam/gui/model/FloatParameter.h>
-#include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxModuleContent.h>
-#include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/FxScope.h>
 #include <piejam/gui/model/FxSpectrum.h>
 #include <piejam/gui/model/Info.h>
+#include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/Log.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/gui/model/MidiDeviceConfig.h>
@@ -37,6 +36,7 @@
 #include <piejam/gui/model/MixerChannelFx.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
 #include <piejam/gui/model/MixerDbScales.h>
+#include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/RootView.h>
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/SpectrumData.h>
@@ -107,12 +107,12 @@ runRegistration()
             0,
             "FxModuleContent",
             "Not createable");
-    
+
     qmlRegisterUncreatableType<piejam::gui::model::Parameter>(
             "PieJam.Models",
             1,
             0,
-            "FxParameter",
+            "Parameter",
             "Not createable");
 
     qmlRegisterUncreatableType<piejam::gui::model::FxScope>(

@@ -22,7 +22,7 @@ SubscribableItem {
     QtObject {
         id: private_
 
-        readonly property var paramModel: root.model && root.model.type === FxParameter.Type.Enum ? root.model : null
+        readonly property var paramModel: root.model && root.model.type === Parameter.Type.Enum ? root.model : null
     }
 
     GridLayout {
