@@ -13,10 +13,8 @@ import PieJam.Models 1.0 as PJModels
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
-
-    property var model
 
     implicitWidth: 132
 
@@ -121,7 +119,6 @@ Item {
                         }
                     }
 
-
                     ModelSubscription {
                         target: model.item
                         subscribed: visible
@@ -167,10 +164,5 @@ Item {
                 }
             }
        }
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 }

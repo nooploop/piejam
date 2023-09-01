@@ -12,10 +12,8 @@ import PieJam.Models 1.0 as PJModels
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
-
-    property var model
 
     implicitWidth: 132
 
@@ -47,8 +45,7 @@ Item {
 
                 onMoved: {
                     root.model.changePanBalance(panControls.value)
-                    Info.quickTip = (root.model.busType
-                                     == PJModels.BusType.Mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
+                    Info.quickTip = (root.model.busType === PJModels.BusType.Mono ? "<b>Pan:</b> " : "<b>Balance:</b> ")
                             + panControls.value.toFixed(2)
                 }
 
@@ -100,10 +97,5 @@ Item {
                 onSoloToggled: root.model.changeSolo(!root.model.solo)
             }
         }
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 }

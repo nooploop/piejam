@@ -10,10 +10,9 @@ import PieJam.Models 1.0 as PJModels
 
 import ".."
 
-Item {
+SubscribableItem {
     id: root
 
-    property var model
     property bool deletable: true
 
     implicitWidth: 132
@@ -238,10 +237,5 @@ Item {
                 onClicked: root.model.moveRight()
             }
         }
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 }

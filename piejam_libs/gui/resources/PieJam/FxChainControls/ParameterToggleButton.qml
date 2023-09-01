@@ -11,10 +11,9 @@ import PieJam.Models 1.0
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
 
-    property var paramModel: null
     property bool flat: false
     property alias text: button.text
     property alias icon: button.icon
@@ -22,7 +21,7 @@ Item {
     QtObject {
         id: private_
 
-        readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Bool ? root.paramModel : null
+        readonly property var paramModel: root.model && root.model.type === FxParameter.Type.Bool ? root.model : null
         readonly property bool value: private_.paramModel && private_.paramModel.value
     }
 

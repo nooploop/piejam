@@ -6,17 +6,10 @@ import QtQuick 2.15
 
 import ".."
 
-Item {
+SubscribableItem {
     id: root
 
-    property var content: null
-
     implicitWidth: 400
-
-    ModelSubscription {
-        target: root.content
-        subscribed: root.visible
-    }
 
     ListView {
         id: listView
@@ -29,17 +22,12 @@ Item {
         boundsBehavior: Flickable.StopAtBounds
         boundsMovement: Flickable.StopAtBounds
 
-        model: if (root.content) root.content.parameters
+        model: root.model ? root.model.parameters : null
 
         delegate: ParameterControl {
             paramModel: model.item
 
             height: parent ? parent.height : undefined
-
-            ModelSubscription {
-                target: model.item
-                subscribed: visible
-            }
         }
     }
 }

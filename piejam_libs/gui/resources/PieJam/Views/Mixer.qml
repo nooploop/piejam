@@ -18,8 +18,6 @@ import "../MixerControls"
 ViewPane {
     id: root
 
-    property var model
-
     Rectangle {
         width: 4
         anchors.left: parent.left
@@ -167,10 +165,5 @@ ViewPane {
         running: root.visible && MixerViewSettings.mode === MixerViewSettings.perform
         repeat: true
         onTriggered: root.model.requestLevelsUpdate()
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 }

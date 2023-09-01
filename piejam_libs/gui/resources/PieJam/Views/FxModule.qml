@@ -17,13 +17,6 @@ import "../FxChainControls"
 ViewPane {
     id: root
 
-    property var model
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
-    }
-
     QtObject {
         id: private_
 
@@ -59,7 +52,7 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: ParametersListView {
-                        content: private_.contentType === FxModuleContent.Type.Generic ? root.model.content : null
+                        model: private_.contentType === FxModuleContent.Type.Generic ? root.model.content : null
                     }
                 }
 
@@ -68,7 +61,7 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: FilterView {
-                        content: private_.contentType === FxModuleContent.Type.Filter ? root.model.content : null
+                        model: private_.contentType === FxModuleContent.Type.Filter ? root.model.content : null
                         bypassed: private_.bypassed
                     }
                 }
@@ -78,7 +71,7 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: ScopeView {
-                        content: private_.contentType === FxModuleContent.Type.Scope ? root.model.content : null
+                        model: private_.contentType === FxModuleContent.Type.Scope ? root.model.content : null
                         bypassed: private_.bypassed
                     }
                 }
@@ -88,7 +81,7 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: SpectrumView {
-                        content: private_.contentType === FxModuleContent.Type.Spectrum ? root.model.content : null
+                        model: private_.contentType === FxModuleContent.Type.Spectrum ? root.model.content : null
                         bypassed: private_.bypassed
                     }
                 }

@@ -8,10 +8,9 @@ import QtQuick.Layouts 1.15
 
 import ".."
 
-Item {
+SubscribableItem {
     id: root
 
-    property var model
     property bool showAddMono: true
     property bool showAddStereo: true
 
@@ -39,8 +38,8 @@ Item {
             stereoLeftChannelIndex: model.item.stereoLeftChannel
             stereoRightChannelIndex: model.item.stereoRightChannel
 
-            anchors.left: if (parent) parent.left
-            anchors.right: if (parent) parent.right
+            anchors.left: parent ? parent.left : undefined
+            anchors.right: parent ? parent.right : undefined
 
             onMonoChannelSelected: model.item.changeMonoChannel(ch)
             onStereoLeftChannelSelected: model.item.changeStereoLeftChannel(ch)
@@ -89,10 +88,5 @@ Item {
             onClicked: root.model.addStereoBus()
         }
 
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 }

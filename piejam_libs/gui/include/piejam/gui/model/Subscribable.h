@@ -85,7 +85,6 @@ protected:
                 dispatch(),
                 this->state_change_subscriber(),
                 parameters.at(key));
-        Model::connectSubscribableChild(*param);
     }
 
     template <class StreamT, class Streams>

@@ -29,7 +29,7 @@ Item {
         spacing: 8
 
         ParameterToggleButton {
-            paramModel: root.activeParam
+            model: root.activeParam
 
             Layout.preferredWidth: 32
             Layout.fillHeight: true
@@ -39,14 +39,14 @@ Item {
         }
 
         EnumButtonGroup {
-            paramModel: root.channelParam
+            model: root.channelParam
 
             Layout.preferredWidth: 128
             Layout.fillHeight: true
         }
 
         ParameterQuickSpinBox {
-            paramModel: root.gainParam
+            model: root.gainParam
             stepScale: 1.04167
 
             Layout.preferredWidth: 128

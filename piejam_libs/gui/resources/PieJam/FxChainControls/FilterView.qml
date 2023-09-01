@@ -13,10 +13,9 @@ import PieJam.Models 1.0 as PJModels
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
 
-    property var content: null
     property bool bypassed: false
 
     implicitWidth: 636
@@ -33,7 +32,7 @@ Item {
         alignment: Qt.Vertical
         spacing: 0
 
-        paramModel: root.content ? root.content.filterType : null
+        model: root.model ? root.model.filterType : null
     }
 
     Row {
@@ -51,7 +50,7 @@ Item {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
 
-            paramModel: root.content ? root.content.cutoff : null
+            paramModel: root.model ? root.model.cutoff : null
         }
 
         ParameterControl {
@@ -60,7 +59,7 @@ Item {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
 
-            paramModel: root.content ? root.content.resonance : null
+            paramModel: root.model ? root.model.resonance : null
         }
     }
 
@@ -75,10 +74,10 @@ Item {
         anchors.right: parameters.left
         anchors.rightMargin: 8
 
-        spectrumAData: root.content ? root.content.dataIn : null
+        spectrumAData: root.model ? root.model.dataIn : null
         spectrumAColor: Material.color(Material.Pink)
 
-        spectrumBData: root.content ? root.content.dataOut : null
+        spectrumBData: root.model ? root.model.dataOut : null
         spectrumBColor: Material.color(Material.Blue)
 
         // HACK: we reuse the level labels positions for resonance percentage labels
@@ -130,26 +129,21 @@ Item {
         XYPad {
             anchors.fill: parent
 
-            posX: root.content ? root.content.cutoff.normalizedValue : 0
-            posY: root.content ? 1 - root.content.resonance.normalizedValue : 0
+            posX: root.model ? root.model.cutoff.normalizedValue : 0
+            posY: root.model ? 1 - root.model.resonance.normalizedValue : 0
 
             handleRadius: 6
             handleColor: Material.color(Material.Yellow, Material.Shade400)
 
             onChangePos: {
-                if (root.content)
-                    root.content.cutoff.changeNormalizedValue(x)
+                if (root.model)
+                    root.model.cutoff.changeNormalizedValue(x)
 
-                if (root.content)
-                    root.content.resonance.changeNormalizedValue(1 - y)
+                if (root.model)
+                    root.model.resonance.changeNormalizedValue(1 - y)
             }
         }
     }
 
-    onBypassedChanged: if (root.bypassed && root.content) root.content.clear()
-
-    ModelSubscription {
-        target: root.content
-        subscribed: root.visible
-    }
+    onBypassedChanged: if (root.bypassed && root.model) root.model.clear()
 }

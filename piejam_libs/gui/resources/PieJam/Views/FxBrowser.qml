@@ -13,8 +13,6 @@ import "../Controls"
 ViewPane {
     id: root
 
-    property var model
-
     Frame {
         id: infoFrame
 
@@ -124,10 +122,5 @@ ViewPane {
         anchors.margins: 8
 
         onClicked: root.model.showMixer()
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 }

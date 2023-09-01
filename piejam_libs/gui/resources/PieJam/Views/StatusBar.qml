@@ -11,10 +11,8 @@ import QtQml 2.15
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
-
-    property var model
 
     implicitWidth: 800
     implicitHeight: 48
@@ -104,11 +102,6 @@ Item {
             cpuLoad: root.model.cpuLoad
             cpuTemp: root.model.cpuTemp
         }
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 
     Connections {

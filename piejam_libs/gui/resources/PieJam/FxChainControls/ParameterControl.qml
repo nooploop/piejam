@@ -91,15 +91,15 @@ Item {
                 currentIndex: root.paramModel ? root.paramModel.type : -1
 
                 ParameterTouchstrip {
-                    paramModel: root.paramModel
+                    model: root.paramModel
                 }
 
                 IntSlider {
-                    paramModel: root.paramModel
+                    model: root.paramModel
                 }
 
                 ParameterSwitch {
-                    paramModel: root.paramModel
+                    model: root.paramModel
                 }
             }
         }

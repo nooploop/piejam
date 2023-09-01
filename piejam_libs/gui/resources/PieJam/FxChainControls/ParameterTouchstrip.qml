@@ -13,15 +13,13 @@ import ".."
 import "../Controls"
 import "../Util/MathExt.js" as MathExt
 
-Item {
+SubscribableItem {
     id: root
-
-    property var paramModel: null
 
     QtObject {
         id: private_
 
-        readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Float ? root.paramModel : null
+        readonly property var paramModel: root.model && root.model.type === FxParameter.Type.Float ? root.model : null
         readonly property real value: private_.paramModel ? private_.paramModel.normalizedValue : 0
     }
 

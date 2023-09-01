@@ -12,10 +12,9 @@ import PieJam.Models 1.0
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
 
-    property var paramModel: null
     property var icons: null
     property int alignment: Qt.Horizontal
     property int spacing: 5
@@ -23,7 +22,7 @@ Item {
     QtObject {
         id: private_
 
-        readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Enum ? root.paramModel : null
+        readonly property var paramModel: root.model && root.model.type === FxParameter.Type.Enum ? root.model : null
     }
 
     GridLayout {

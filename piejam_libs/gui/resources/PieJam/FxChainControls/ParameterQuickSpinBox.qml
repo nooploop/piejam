@@ -12,10 +12,9 @@ import PieJam.Models 1.0
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
 
-    property var paramModel: null
     property real stepScale: 1
 
     implicitWidth: 96
@@ -24,7 +23,7 @@ Item {
     QtObject {
         id: private_
 
-        readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Float ? root.paramModel : null
+        readonly property var paramModel: root.model && root.model.type === FxParameter.Type.Float ? root.model : null
         readonly property string valueString: private_.paramModel ? private_.paramModel.valueString : "#"
     }
 
@@ -59,6 +58,6 @@ Item {
     MidiAssignArea {
         anchors.fill: parent
 
-        model: root.paramModel ? root.paramModel.midi : null
+        model: private_.paramModel ? private_.paramModel.midi : null
     }
 }

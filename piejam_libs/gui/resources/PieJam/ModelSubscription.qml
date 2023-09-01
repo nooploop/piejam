@@ -9,7 +9,7 @@ import QtQml 2.15
 Item {
     id: root
 
-    property var target
+    property var target: null
     property bool subscribed: false
 
     Binding {

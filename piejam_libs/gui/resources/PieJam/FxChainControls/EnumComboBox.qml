@@ -10,15 +10,13 @@ import PieJam.Models 1.0
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
-
-    property var paramModel: null
 
     QtObject {
         id: private_
 
-        readonly property var paramModel: root.paramModel && root.paramModel.type === FxParameter.Type.Enum ? root.paramModel : null
+        readonly property var paramModel: root.model && root.model.type === FxParameter.Type.Enum ? root.model : null
     }
 
     ComboBox {

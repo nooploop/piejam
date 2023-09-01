@@ -8,20 +8,8 @@ import QtQuick.Controls 2.15
 import ".."
 import "../SettingsControls"
 
-Item {
+SubscribableItem {
     id: root
-
-    // model:
-    //   .inputDevices : StringList
-    //   .outputDevices : StringList
-    //   .sampleRates : StringList
-    //   .periodSizes : StringList
-    //   selectInputDevice(index)
-    //   selectOutputDevice(index)
-    //   selectSamplerate(index)
-    //   selectPeriodSize(index)
-    //   refreshDeviceLists()
-    property var model
 
     implicitWidth: 752
     implicitHeight: 432
@@ -193,10 +181,5 @@ Item {
 
             text: root.model.bufferLatency.toFixed(2) + qsTr(" ms")
         }
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 }

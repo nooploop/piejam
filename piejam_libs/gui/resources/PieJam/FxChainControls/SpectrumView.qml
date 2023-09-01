@@ -12,10 +12,9 @@ import PieJam.Models 1.0 as PJModels
 
 import ".."
 
-Item {
+SubscribableItem {
     id: root
 
-    property var content: null
     property bool bypassed: false
 
     implicitWidth: 636
@@ -29,23 +28,23 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            spectrumAData: root.content ? root.content.dataA : null
+            spectrumAData: root.model ? root.model.dataA : null
             spectrumAColor: Material.color(Material.Pink)
 
-            spectrumBData: root.content ? root.content.dataB : null
+            spectrumBData: root.model ? root.model.dataB : null
             spectrumBColor: Material.color(Material.Blue)
         }
 
         StreamSourceSettings {
-            model: root.content
+            model: root.model
 
             Layout.fillWidth: true
             Layout.preferredHeight: 48
         }
     }
 
-    onBypassedChanged: if (root.bypassed && root.content)
-                           root.content.clear()
+    onBypassedChanged: if (root.bypassed && root.model)
+                           root.model.clear()
 
     Repeater {
         model: spectrum.levelLabels
@@ -72,10 +71,5 @@ Item {
             text: modelData.value >= 1000 ? (modelData.value / 1000)
                                             + " kHz" : modelData.value + " Hz"
         }
-    }
-
-    ModelSubscription {
-        target: root.content
-        subscribed: root.visible
     }
 }

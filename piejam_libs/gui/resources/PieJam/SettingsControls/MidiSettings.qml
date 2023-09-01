@@ -9,10 +9,8 @@ import QtQuick.Layouts 1.15
 
 import ".."
 
-Item {
+SubscribableItem {
     id: root
-
-    property var model
 
     TabBar {
         id: tabs
@@ -49,8 +47,8 @@ Item {
                 name: model.item.name
                 deviceEnabled: model.item.enabled
 
-                anchors.left: if (parent) parent.left
-                anchors.right: if (parent) parent.right
+                anchors.left: parent ? parent.left : undefined
+                anchors.right: parent ? parent.right : undefined
 
                 onEnabledToggled: model.item.changeEnabled(newEnabled)
 
@@ -60,10 +58,5 @@ Item {
                 }
             }
         }
-    }
-
-    ModelSubscription {
-        target: root.model
-        subscribed: root.visible
     }
 }

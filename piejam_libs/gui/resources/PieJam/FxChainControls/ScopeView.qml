@@ -14,31 +14,30 @@ import PieJam.Models 1.0 as PJModels
 
 import ".."
 
-Item {
+SubscribableItem {
     id: root
 
-    property var content: null
     property bool bypassed: false
 
     implicitWidth: 636
 
-    onVisibleChanged: if (root.content)
-                          root.content.clear()
+    onVisibleChanged: if (root.model)
+                          root.model.clear()
 
-    onBypassedChanged: if (root.bypassed && root.content)
-                           root.content.clear()
+    onBypassedChanged: if (root.bypassed && root.model)
+                           root.model.clear()
 
     QtObject {
         id: private_
 
-        readonly property bool isStereo: root.content && root.content.busType === PJModels.Types.BusType.Stereo
-        readonly property var mode: root.content ? root.content.mode : null
-        readonly property var triggerSlope: root.content ? root.content.triggerSlope : null
-        readonly property var triggerLevel: root.content ? root.content.triggerLevel : null
-        readonly property var holdTime: root.content ? root.content.holdTime : null
+        readonly property bool isStereo: root.model && root.model.busType === PJModels.Types.BusType.Stereo
+        readonly property var mode: root.model ? root.model.mode : null
+        readonly property var triggerSlope: root.model ? root.model.triggerSlope : null
+        readonly property var triggerLevel: root.model ? root.model.triggerLevel : null
+        readonly property var holdTime: root.model ? root.model.holdTime : null
         readonly property bool freeMode: private_.mode && private_.mode.value === PJModels.FxScope.Mode.Free
-        readonly property var windowSize: root.content
-                                          ? (private_.freeMode ? root.content.waveformWindowSize : root.content.scopeWindowSize)
+        readonly property var windowSize: root.model
+                                          ? (private_.freeMode ? root.model.waveformWindowSize : root.model.scopeWindowSize)
                                           : null
     }
 
@@ -49,7 +48,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            currentIndex: root.content ? (root.content.mode.value === PJModels.FxScope.Mode.Free ? 1 : 0) : -1
+            currentIndex: root.model ? (root.model.mode.value === PJModels.FxScope.Mode.Free ? 1 : 0) : -1
 
             Frame {
                 id: scopeView
@@ -60,18 +59,18 @@ Item {
                 PJItems.Scope {
                     anchors.fill: parent
 
-                    visible: root.content && root.content.activeA.value
+                    visible: root.model && root.model.activeA.value
 
-                    scopeData: root.content ? root.content.scopeDataA : null
+                    scopeData: root.model ? root.model.scopeDataA : null
                     color: Material.color(Material.Pink)
                 }
 
                 PJItems.Scope {
                     anchors.fill: parent
 
-                    visible: private_.isStereo && (root.content && root.content.activeB.value)
+                    visible: private_.isStereo && (root.model && root.model.activeB.value)
 
-                    scopeData: root.content ? root.content.scopeDataB : null
+                    scopeData: root.model ? root.model.scopeDataB : null
                     color: Material.color(Material.Blue)
                 }
             }
@@ -85,18 +84,18 @@ Item {
                 PJItems.Waveform {
                     anchors.fill: parent
 
-                    visible: root.content && root.content.activeA.value
+                    visible: root.model && root.model.activeA.value
 
-                    waveformData: root.content ? root.content.waveformDataA : null
+                    waveformData: root.model ? root.model.waveformDataA : null
                     color: Material.color(Material.Pink)
                 }
 
                 PJItems.Waveform {
                     anchors.fill: parent
 
-                    visible: private_.isStereo && (root.content && root.content.activeB.value)
+                    visible: private_.isStereo && (root.model && root.model.activeB.value)
 
-                    waveformData: root.content ? root.content.waveformDataB : null
+                    waveformData: root.model ? root.model.waveformDataB : null
                     color: Material.color(Material.Blue)
                 }
             }
@@ -116,7 +115,7 @@ Item {
                 }
 
                 EnumComboBox {
-                    paramModel: private_.mode
+                    model: private_.mode
 
                     Layout.preferredWidth: 128
                     Layout.preferredHeight: 40
@@ -138,7 +137,7 @@ Item {
                 EnumButtonGroup {
                     id: triggerButtons
 
-                    paramModel: private_.triggerSlope
+                    model: private_.triggerSlope
 
                     icons: ["qrc:///images/icons/rising_edge.svg", "qrc:///images/icons/falling_edge.svg"]
 
@@ -160,7 +159,7 @@ Item {
                 }
 
                 ParameterQuickSpinBox {
-                    paramModel: private_.triggerLevel
+                    model: private_.triggerLevel
                     stepScale: .5
 
                     Layout.preferredWidth: 112
@@ -180,7 +179,7 @@ Item {
                 }
 
                 ParameterQuickSpinBox {
-                    paramModel: private_.holdTime
+                    model: private_.holdTime
 
                     Layout.preferredWidth: 132
                 }
@@ -197,7 +196,7 @@ Item {
                 }
 
                 IntSlider {
-                    paramModel: private_.windowSize
+                    model: private_.windowSize
 
                     orientation: Qt.Horizontal
                     stepButtonsVisible: false
@@ -218,7 +217,7 @@ Item {
         }
 
         StreamSourceSettings {
-            model: root.content
+            model: root.model
 
             Layout.fillWidth: true
             Layout.preferredHeight: 48
@@ -226,17 +225,12 @@ Item {
    }
 
     Binding {
-        when: root.content
-        target: root.content
+        when: root.model
+        target: root.model
         property: "viewSize"
-        value: root.content && root.content.mode.value === PJModels.FxScope.Mode.Free
+        value: root.model && root.model.mode.value === PJModels.FxScope.Mode.Free
                ? waveformView.availableWidth
                : scopeView.availableWidth
         restoreMode: Binding.RestoreBinding
-    }
-
-    ModelSubscription {
-        target: root.content
-        subscribed: root.visible
     }
 }

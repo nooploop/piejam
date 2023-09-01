@@ -58,7 +58,7 @@ Item {
         ParameterQuickSpinBox {
             visible: !private_.isStereo
 
-            paramModel: root.model ? root.model.gainA : null
+            model: root.model ? root.model.gainA : null
             stepScale: 1.04167
 
             Layout.preferredWidth: 128
@@ -73,7 +73,7 @@ Item {
         ToolSeparator {}
 
         ParameterToggleButton {
-            paramModel: root.model ? root.model.freeze : null
+            model: root.model ? root.model.freeze : null
 
             Layout.preferredWidth: 32
             Layout.preferredHeight: 40
