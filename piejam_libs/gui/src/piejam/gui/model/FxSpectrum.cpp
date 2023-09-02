@@ -80,41 +80,41 @@ FxSpectrum::FxSpectrum(
             runtime::selectors::make_fx_module_parameters_selector(fx_mod_id));
 
     makeParameter(
-            to_underlying(
-                    runtime::modules::spectrum::parameter_key::stream_a_active),
             m_impl->activeA,
-            *parameters);
+            parameters->at(
+                    to_underlying(runtime::modules::spectrum::parameter_key::
+                                          stream_a_active)));
 
     makeParameter(
-            to_underlying(
-                    runtime::modules::spectrum::parameter_key::stream_b_active),
             m_impl->activeB,
-            *parameters);
+            parameters->at(
+                    to_underlying(runtime::modules::spectrum::parameter_key::
+                                          stream_b_active)));
 
     makeParameter(
-            to_underlying(runtime::modules::spectrum::parameter_key::channel_a),
             m_impl->channelA,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::spectrum::parameter_key::channel_a)));
 
     makeParameter(
-            to_underlying(runtime::modules::spectrum::parameter_key::channel_b),
             m_impl->channelB,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::spectrum::parameter_key::channel_b)));
 
     makeParameter(
-            to_underlying(runtime::modules::spectrum::parameter_key::gain_a),
             m_impl->gainA,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::spectrum::parameter_key::gain_a)));
 
     makeParameter(
-            to_underlying(runtime::modules::spectrum::parameter_key::gain_b),
             m_impl->gainB,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::spectrum::parameter_key::gain_b)));
 
     makeParameter(
-            to_underlying(runtime::modules::spectrum::parameter_key::freeze),
             m_impl->freeze,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::spectrum::parameter_key::freeze)));
 
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));

@@ -19,7 +19,7 @@ Item {
     QtObject {
         id: private_
 
-        readonly property bool isStereo: root.model && root.model.busType == PJModels.Types.BusType.Stereo
+        readonly property bool isStereo: root.model && root.model.busType === PJModels.Types.BusType.Stereo
     }
 
     RowLayout {

@@ -9,6 +9,8 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <memory>
+
 namespace piejam::gui::model
 {
 
@@ -80,7 +82,7 @@ signals:
 
 protected:
     void onSubscribe() override;
-    
+
     auto paramKeyId() const -> ParameterId;
 
 private:
@@ -94,7 +96,6 @@ private:
 auto makeParameter(
         runtime::store_dispatch,
         runtime::subscriber&,
-        piejam::gui::model::ParameterId const&)
-        -> std::unique_ptr<Parameter>;
+        piejam::gui::model::ParameterId const&) -> std::unique_ptr<Parameter>;
 
 } // namespace piejam::gui::model

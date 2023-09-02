@@ -27,8 +27,8 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
     Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FloatParameter* volume READ volume CONSTANT
                        FINAL)
-    Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
-    Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::StereoLevelParameter* level READ level
+                       CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FloatParameter* panBalance READ panBalance
                        CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::BoolParameter* record READ record CONSTANT
@@ -65,32 +65,7 @@ public:
     }
 
     auto volume() const noexcept -> FloatParameter*;
-
-    auto levelLeft() const noexcept -> double
-    {
-        return m_levelLeft;
-    }
-
-    auto levelRight() const noexcept -> double
-    {
-        return m_levelRight;
-    }
-
-    void setLevel(double left, double right)
-    {
-        if (m_levelLeft != left)
-        {
-            m_levelLeft = left;
-            emit levelLeftChanged();
-        }
-
-        if (m_levelRight != right)
-        {
-            m_levelRight = right;
-            emit levelRightChanged();
-        }
-    }
-
+    auto level() const noexcept -> StereoLevelParameter*;
     auto panBalance() const noexcept -> FloatParameter*;
     auto record() const noexcept -> BoolParameter*;
     auto solo() const noexcept -> BoolParameter*;
@@ -103,8 +78,6 @@ public:
 
 signals:
     void nameChanged();
-    void levelLeftChanged();
-    void levelRightChanged();
     void mutedBySoloChanged();
 
 private:
@@ -124,8 +97,6 @@ private:
 
     QString m_name;
     BusType m_busType{BusType::Mono};
-    double m_levelLeft{};
-    double m_levelRight{};
     bool m_mutedBySolo{};
 };
 

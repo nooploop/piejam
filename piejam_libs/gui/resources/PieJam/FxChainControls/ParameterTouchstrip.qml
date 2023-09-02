@@ -13,8 +13,10 @@ import ".."
 import "../Controls"
 import "../Util/MathExt.js" as MathExt
 
-SubscribableItem {
+Item {
     id: root
+
+    property var model: null
 
     QtObject {
         id: private_

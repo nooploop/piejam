@@ -40,6 +40,7 @@
 #include <piejam/gui/model/RootView.h>
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/SpectrumData.h>
+#include <piejam/gui/model/StereoLevelParameter.h>
 #include <piejam/gui/model/StringList.h>
 #include <piejam/gui/model/Types.h>
 
@@ -76,6 +77,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::EnumParameter*>();
     qRegisterMetaType<piejam::gui::model::IntParameter*>();
     qRegisterMetaType<piejam::gui::model::FloatParameter*>();
+    qRegisterMetaType<piejam::gui::model::StereoLevelParameter*>();
     qRegisterMetaType<piejam::gui::model::FxChainModule*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();

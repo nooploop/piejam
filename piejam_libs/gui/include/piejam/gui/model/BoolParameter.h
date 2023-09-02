@@ -5,9 +5,6 @@
 #pragma once
 
 #include <piejam/gui/model/Parameter.h>
-#include <piejam/gui/model/Subscribable.h>
-#include <piejam/gui/model/SubscribableModel.h>
-#include <piejam/gui/model/fwd.h>
 
 #include <memory>
 
@@ -25,7 +22,7 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             piejam::gui::model::ParameterId const&);
-    ~BoolParameter();
+    ~BoolParameter() override;
 
     static inline constexpr auto StaticType = Type::Bool;
 

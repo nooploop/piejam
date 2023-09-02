@@ -92,75 +92,71 @@ FxScope::FxScope(
             runtime::selectors::make_fx_module_parameters_selector(fx_mod_id));
 
     makeParameter(
-            to_underlying(runtime::modules::scope::parameter_key::mode),
             m_impl->mode,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::mode)));
 
     makeParameter(
-            to_underlying(
-                    runtime::modules::scope::parameter_key::trigger_slope),
             m_impl->triggerSlope,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::trigger_slope)));
 
     makeParameter(
-            to_underlying(
-                    runtime::modules::scope::parameter_key::trigger_level),
             m_impl->triggerLevel,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::trigger_level)));
 
     makeParameter(
-            to_underlying(runtime::modules::scope::parameter_key::hold_time),
             m_impl->holdTime,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::hold_time)));
 
     makeParameter(
-            to_underlying(runtime::modules::scope::parameter_key::
-                                  waveform_window_size),
             m_impl->waveformWindowSize,
-            *parameters);
+            parameters->at(
+                    to_underlying(runtime::modules::scope::parameter_key::
+                                          waveform_window_size)));
 
     makeParameter(
-            to_underlying(
-                    runtime::modules::scope::parameter_key::scope_window_size),
             m_impl->scopeWindowSize,
-            *parameters);
+            parameters->at(
+                    to_underlying(runtime::modules::scope::parameter_key::
+                                          scope_window_size)));
 
     makeParameter(
-            to_underlying(
-                    runtime::modules::scope::parameter_key::stream_a_active),
             m_impl->activeA,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::stream_a_active)));
 
     makeParameter(
-            to_underlying(
-                    runtime::modules::scope::parameter_key::stream_b_active),
             m_impl->activeB,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::stream_b_active)));
 
     makeParameter(
-            to_underlying(runtime::modules::scope::parameter_key::channel_a),
             m_impl->channelA,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::channel_a)));
 
     makeParameter(
-            to_underlying(runtime::modules::scope::parameter_key::channel_b),
             m_impl->channelB,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::channel_b)));
 
     makeParameter(
-            to_underlying(runtime::modules::scope::parameter_key::gain_a),
             m_impl->gainA,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::gain_a)));
 
     makeParameter(
-            to_underlying(runtime::modules::scope::parameter_key::gain_b),
             m_impl->gainB,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::gain_b)));
 
     makeParameter(
-            to_underlying(runtime::modules::scope::parameter_key::freeze),
             m_impl->freeze,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::scope::parameter_key::freeze)));
 
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
@@ -170,9 +166,9 @@ FxScope::FxScope(
             m_impl->stream,
             *streams);
 
-    m_impl->waveformGenerator.setActive(0, false);
+    m_impl->waveformGenerator.setActive(0, true);
     m_impl->waveformGenerator.setChannel(0, StereoChannel::Left);
-    m_impl->scopeDataGenerator.setActive(0, false);
+    m_impl->scopeDataGenerator.setActive(0, true);
     m_impl->scopeDataGenerator.setChannel(0, StereoChannel::Left);
     m_impl->scopeDataGenerator.setHoldTime(std::chrono::milliseconds{80});
 

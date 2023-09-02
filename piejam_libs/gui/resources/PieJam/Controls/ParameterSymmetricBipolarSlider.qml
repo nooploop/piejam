@@ -11,8 +11,10 @@ import PieJam.Models 1.0
 import ".."
 import "../Util/MathExt.js" as MathExt
 
-SubscribableItem {
+Item {
     id: root
+
+    property var model: null
 
     QtObject {
         id: private_

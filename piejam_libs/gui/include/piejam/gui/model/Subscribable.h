@@ -75,16 +75,16 @@ protected:
     {
     }
 
-    template <class ParameterT, class Parameters>
+    template <class ParameterT, class ParameterIdT>
     void makeParameter(
-            std::size_t key,
             std::unique_ptr<ParameterT>& param,
-            Parameters const& parameters)
+            ParameterIdT const param_id)
     {
         param = std::make_unique<ParameterT>(
                 dispatch(),
                 this->state_change_subscriber(),
-                parameters.at(key));
+                param_id);
+        Model::connectSubscribableChild(*param);
     }
 
     template <class StreamT, class Streams>
@@ -110,7 +110,7 @@ private:
     {
         m_subs.erase(m_subs_id);
 
-        if (m_updateTimerId)
+        if (m_updateTimerId != 0)
         {
             Model::killTimer(m_updateTimerId);
             m_updateTimerId = 0;

@@ -9,9 +9,8 @@
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/gui/model/MixerDbScales.h>
-#include <piejam/math.h>
+#include <piejam/gui/model/StereoLevelParameter.h>
 #include <piejam/runtime/actions/fwd.h>
-#include <piejam/runtime/actions/set_parameter_value.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/parameter/int_.h>
@@ -20,31 +19,12 @@
 namespace piejam::gui::model
 {
 
-namespace
-{
-
-[[nodiscard]] constexpr auto
-toLevel(float const l)
-{
-    constexpr auto min = math::dB_to_linear(-60.01f);
-    return math::linear_to_dB(l, min);
-}
-
-[[nodiscard]] constexpr auto
-toVolume(float const v)
-{
-    constexpr auto min = math::dB_to_linear(-60.01f);
-    return math::linear_to_dB(v, min);
-}
-
-} // namespace
-
 struct MixerChannelPerform::Impl
 {
     runtime::mixer::channel_id busId;
-    audio::bus_type bus_type;
+
+    std::unique_ptr<StereoLevelParameter> level;
     std::unique_ptr<FloatParameter> volume;
-    runtime::stereo_level_parameter_id level;
     std::unique_ptr<FloatParameter> panBalance;
     std::unique_ptr<BoolParameter> record;
     std::unique_ptr<BoolParameter> solo;
@@ -56,54 +36,55 @@ MixerChannelPerform::MixerChannelPerform(
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(
-              id,
-              observe_once(
-                      runtime::selectors::make_mixer_channel_bus_type_selector(
-                              id)),
-              std::make_unique<FloatParameter>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      observe_once(
-                              runtime::selectors::
-                                      make_mixer_channel_volume_parameter_selector(
-                                              id))),
-              observe_once(
-                      runtime::selectors::
-                              make_mixer_channel_level_parameter_selector(id)),
-              std::make_unique<FloatParameter>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      observe_once(
-                              runtime::selectors::
-                                      make_mixer_channel_pan_balance_parameter_selector(
-                                              id))),
-              std::make_unique<BoolParameter>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      observe_once(
-                              runtime::selectors::
-                                      make_mixer_channel_record_parameter_selector(
-                                              id))),
-              std::make_unique<BoolParameter>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      observe_once(
-                              runtime::selectors::
-                                      make_mixer_channel_solo_parameter_selector(
-                                              id))),
-              std::make_unique<BoolParameter>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      observe_once(
-                              runtime::selectors::
-                                      make_mixer_channel_mute_parameter_selector(
-                                              id)))))
-    , m_busType(toBusType(m_impl->bus_type))
+    , m_impl(std::make_unique<Impl>(id))
+    , m_busType(toBusType(observe_once(
+              runtime::selectors::make_mixer_channel_bus_type_selector(id))))
 {
+    makeParameter(
+            m_impl->level,
+            observe_once(
+                    runtime::selectors::
+                            make_mixer_channel_level_parameter_selector(id)));
+
+    makeParameter(
+            m_impl->volume,
+            observe_once(
+                    runtime::selectors::
+                            make_mixer_channel_volume_parameter_selector(id)));
+
+    makeParameter(
+            m_impl->panBalance,
+            observe_once(
+                    runtime::selectors::
+                            make_mixer_channel_pan_balance_parameter_selector(
+                                    id)));
+
+    makeParameter(
+            m_impl->record,
+            observe_once(
+                    runtime::selectors::
+                            make_mixer_channel_record_parameter_selector(id)));
+
+    makeParameter(
+            m_impl->solo,
+            observe_once(
+                    runtime::selectors::
+                            make_mixer_channel_solo_parameter_selector(id)));
+
+    makeParameter(
+            m_impl->mute,
+            observe_once(
+                    runtime::selectors::
+                            make_mixer_channel_mute_parameter_selector(id)));
 }
 
 MixerChannelPerform::~MixerChannelPerform() = default;
+
+auto
+MixerChannelPerform::level() const noexcept -> StereoLevelParameter*
+{
+    return m_impl->level.get();
+}
 
 auto
 MixerChannelPerform::volume() const noexcept -> FloatParameter*
@@ -145,16 +126,6 @@ MixerChannelPerform::onSubscribe()
 
     observe(runtime::selectors::make_muted_by_solo_selector(m_impl->busId),
             [this](bool x) { setMutedBySolo(x); });
-
-    observe(runtime::selectors::make_level_parameter_value_selector(
-                    m_impl->level),
-            [this](runtime::stereo_level const& x) {
-                setLevel(
-                        g_mixerDbScales.levelMeterScale()->dBToPosition(
-                                toLevel(x.left)),
-                        g_mixerDbScales.levelMeterScale()->dBToPosition(
-                                toLevel(x.right)));
-            });
 }
 
 } // namespace piejam::gui::model

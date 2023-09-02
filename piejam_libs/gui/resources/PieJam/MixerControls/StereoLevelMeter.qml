@@ -6,6 +6,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
+import "../Util/DbConvert.js" as DbConvert
+
 Item {
     id: root
 
@@ -70,7 +72,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 6
 
-            level: root.levelLeft
+            level: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(root.levelLeft)) : 0
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
@@ -87,7 +89,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 6
 
-            level: root.levelRight
+            level: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(root.levelRight)) : 0
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 

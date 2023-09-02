@@ -54,19 +54,19 @@ FxFilter::FxFilter(
             runtime::selectors::make_fx_module_parameters_selector(fx_mod_id));
 
     makeParameter(
-            to_underlying(runtime::modules::filter::parameter_key::type),
             m_impl->filterTypeParam,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::filter::parameter_key::type)));
 
     makeParameter(
-            to_underlying(runtime::modules::filter::parameter_key::cutoff),
             m_impl->cutoffParam,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::filter::parameter_key::cutoff)));
 
     makeParameter(
-            to_underlying(runtime::modules::filter::parameter_key::resonance),
             m_impl->resonanceParam,
-            *parameters);
+            parameters->at(to_underlying(
+                    runtime::modules::filter::parameter_key::resonance)));
 
     auto const streams = observe_once(
             runtime::selectors::make_fx_module_streams_selector(fx_mod_id));

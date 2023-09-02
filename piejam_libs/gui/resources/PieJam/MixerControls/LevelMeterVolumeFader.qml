@@ -10,8 +10,7 @@ import "../Controls"
 Item {
     id: root
 
-    property alias levelLeft: meter.levelLeft
-    property alias levelRight: meter.levelRight
+    property var level: null
     property alias volume: fader.model
     property alias muted: meter.muted
 
@@ -22,8 +21,11 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        LevelMeter {
+        StereoLevelMeter {
             id: meter
+
+            levelLeft: root.level ? root.level.levelLeft : 0
+            levelRight: root.level ? root.level.levelRight : 0
 
             Layout.fillHeight: true
         }

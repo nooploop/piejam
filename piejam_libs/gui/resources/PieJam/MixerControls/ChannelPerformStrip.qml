@@ -45,8 +45,7 @@ SubscribableItem {
                 Layout.fillHeight: true
 
                 volume: root.model ? root.model.volume : null
-                levelLeft: root.model ? root.model.levelLeft : 0
-                levelRight: root.model ? root.model.levelRight : 0
+                level: root.model ? root.model.level : null
 
                 muted: root.model && (root.model.mute.value || root.model.mutedBySolo)
 

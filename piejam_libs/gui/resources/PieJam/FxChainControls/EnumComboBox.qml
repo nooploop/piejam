@@ -10,8 +10,10 @@ import PieJam.Models 1.0
 import ".."
 import "../Controls"
 
-SubscribableItem {
+Item {
     id: root
+
+    property var model: null
 
     QtObject {
         id: private_

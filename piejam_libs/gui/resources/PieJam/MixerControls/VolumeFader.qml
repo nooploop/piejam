@@ -11,9 +11,10 @@ import "../Controls"
 import "../Util/ColorExt.js" as ColorExt
 import "../Util/DbConvert.js" as DbConvert
 
-SubscribableItem {
+Item {
     id: root
 
+    property var model: null
     property var scaleData
 
     implicitWidth: 50
