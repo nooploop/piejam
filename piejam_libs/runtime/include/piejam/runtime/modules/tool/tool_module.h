@@ -17,6 +17,8 @@ enum class parameter_key : fx::parameter_key
     gain
 };
 
-auto make_module(audio::bus_type, ui_parameter_factory const&) -> fx::module;
+auto
+make_module(audio::bus_type, parameters_map&, ui_parameter_descriptors_map&)
+        -> fx::module;
 
 } // namespace piejam::runtime::modules::tool

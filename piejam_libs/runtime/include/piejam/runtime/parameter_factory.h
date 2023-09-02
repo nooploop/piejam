@@ -7,7 +7,6 @@
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameters_map.h>
-#include <piejam/runtime/ui_parameter_descriptors_map.h>
 
 #include <boost/container/flat_map.hpp>
 

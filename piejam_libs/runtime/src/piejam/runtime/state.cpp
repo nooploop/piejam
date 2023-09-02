@@ -264,17 +264,16 @@ insert_internal_fx_module(
     fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
-    ui_parameter_descriptors_map& ui_params = st.ui_params;
-
-    ui_parameter_factory ui_params_factory{st.params, ui_params};
-
     fx::module_id fx_mod_id;
     switch (fx_type)
     {
         case fx::internal::tool:
             fx_mod_id = make_internal_fx_module(
                     st.fx_modules,
-                    modules::tool::make_module(bus_type, ui_params_factory));
+                    modules::tool::make_module(
+                            bus_type,
+                            st.params,
+                            st.ui_params));
             break;
 
         case fx::internal::filter:
@@ -282,7 +281,8 @@ insert_internal_fx_module(
                     st.fx_modules,
                     modules::filter::make_module(
                             bus_type,
-                            ui_params_factory,
+                            st.params,
+                            st.ui_params,
                             st.streams));
             break;
 
@@ -291,7 +291,8 @@ insert_internal_fx_module(
                     st.fx_modules,
                     modules::scope::make_module(
                             bus_type,
-                            ui_params_factory,
+                            st.params,
+                            st.ui_params,
                             st.streams));
             break;
 
@@ -300,7 +301,8 @@ insert_internal_fx_module(
                     st.fx_modules,
                     modules::spectrum::make_module(
                             bus_type,
-                            ui_params_factory,
+                            st.params,
+                            st.ui_params,
                             st.streams));
             break;
     }
@@ -341,14 +343,13 @@ insert_ladspa_fx_module(
     fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
-    ui_parameter_descriptors_map& ui_params = st.ui_params;
-
     auto fx_mod_id = st.fx_modules.add(modules::ladspa_fx::make_module(
             instance_id,
             plugin_desc.name,
             bus_type,
             control_inputs,
-            ui_parameter_factory{st.params, ui_params}));
+            st.params,
+            st.ui_params));
 
     fx_chain.emplace(std::next(fx_chain.begin(), insert_pos), fx_mod_id);
 
@@ -504,13 +505,13 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
         -> mixer::channel_id
 {
     using namespace std::string_literals;
-    ui_parameter_factory ui_param_factory{st.params, st.ui_params};
+    parameter_factory ui_params_factory{st.params, st.ui_params};
     auto bus_id = st.mixer_state.channels.add(mixer::channel{
             .name = std::move(name),
             .bus_type = bus_type,
             .in = {},
             .out = st.mixer_state.main,
-            .volume = ui_param_factory.make_parameter(
+            .volume = ui_params_factory.make_parameter(
                     parameter::float_{
                             .default_value = 1.f,
                             .min = 0.f,
@@ -518,7 +519,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                             .to_normalized = &to_normalized_volume,
                             .from_normalized = &from_normalized_volume},
                     {.name = "Volume", .value_to_string = &volume_to_string}),
-            .pan_balance = ui_param_factory.make_parameter(
+            .pan_balance = ui_params_factory.make_parameter(
                     parameter::float_{
                             .default_value = 0.f,
                             .min = -1.f,
@@ -528,15 +529,15 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                                     &parameter::from_normalized_linear},
                     {.name = bus_type_to(bus_type, "Pan"s, "Balance"s),
                      .value_to_string = &float_parameter_value_to_string}),
-            .record = ui_param_factory.make_parameter(
+            .record = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
                     {.name = "Record",
                      .value_to_string = &bool_parameter_value_to_string}),
-            .mute = ui_param_factory.make_parameter(
+            .mute = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
                     {.name = "Mute",
                      .value_to_string = &bool_parameter_value_to_string}),
-            .solo = ui_param_factory.make_parameter(
+            .solo = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
                     {.name = "Solo",
                      .value_to_string = &bool_parameter_value_to_string}),

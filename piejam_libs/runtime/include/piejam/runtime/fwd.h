@@ -41,16 +41,13 @@ using parameters_map = parameter::map<parameter_descriptor>;
 template <class Parameter>
 struct ui_parameter_descriptor;
 
-using ui_parameter_descriptors_map =
-        parameter::map<ui_parameter_descriptor>;
+using ui_parameter_descriptors_map = parameter::map<ui_parameter_descriptor>;
 
 using parameter_processor_factory = boost::mp11::
         mp_rename<parameters_t, processors::parameter_processor_factory>;
 
 template <template <class> class... Value>
 class parameter_factory;
-
-using ui_parameter_factory = parameter_factory<ui_parameter_descriptor>;
 
 struct midi_device_config;
 

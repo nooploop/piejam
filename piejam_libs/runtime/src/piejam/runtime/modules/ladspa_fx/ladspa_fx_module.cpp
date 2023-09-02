@@ -12,6 +12,7 @@
 #include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/parameter_factory.h>
 #include <piejam/runtime/parameter_value_to_string.h>
+#include <piejam/runtime/ui_parameter_descriptors_map.h>
 
 #include <boost/container/flat_map.hpp>
 
@@ -21,8 +22,11 @@ namespace piejam::runtime::modules::ladspa_fx
 static auto
 make_module_parameters(
         std::span<piejam::ladspa::port_descriptor const> control_inputs,
-        ui_parameter_factory const& ui_params_factory) -> fx::module_parameters
+        parameters_map& params,
+        ui_parameter_descriptors_map& ui_params) -> fx::module_parameters
 {
+    parameter_factory ui_params_factory{params, ui_params};
+
     fx::module_parameters module_params;
 
     for (auto const& port_desc : control_inputs)
@@ -96,14 +100,15 @@ make_module(
         std::string const& name,
         audio::bus_type const bus_type,
         std::span<const ladspa::port_descriptor> const control_inputs,
-        ui_parameter_factory const& ui_params_factory) -> fx::module
+        parameters_map& params,
+        ui_parameter_descriptors_map& ui_params) -> fx::module
 {
     return fx::module{
             .fx_instance_id = instance_id,
             .name = name,
             .bus_type = bus_type,
             .parameters =
-                    make_module_parameters(control_inputs, ui_params_factory),
+                    make_module_parameters(control_inputs, params, ui_params),
             .streams = {}};
 }
 

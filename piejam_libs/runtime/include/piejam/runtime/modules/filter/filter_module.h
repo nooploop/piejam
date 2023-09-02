@@ -38,8 +38,10 @@ enum class stream_key : fx::stream_key
     in_out
 };
 
-auto
-make_module(audio::bus_type, ui_parameter_factory const&, audio_streams_cache&)
-        -> fx::module;
+auto make_module(
+        audio::bus_type,
+        parameters_map& params,
+        ui_parameter_descriptors_map& ui_params,
+        audio_streams_cache&) -> fx::module;
 
 } // namespace piejam::runtime::modules::filter

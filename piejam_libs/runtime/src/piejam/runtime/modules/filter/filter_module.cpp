@@ -12,6 +12,7 @@
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/parameter_factory.h>
+#include <piejam/runtime/ui_parameter_descriptors_map.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
@@ -70,10 +71,13 @@ to_resonance_string(float const r)
 auto
 make_module(
         audio::bus_type const bus_type,
-        ui_parameter_factory const& ui_params_factory,
+        parameters_map& params,
+        ui_parameter_descriptors_map& ui_params,
         audio_streams_cache& streams) -> fx::module
 {
     using namespace std::string_literals;
+
+    parameter_factory ui_params_factory{params, ui_params};
 
     return fx::module{
             .fx_instance_id = fx::internal::filter,
