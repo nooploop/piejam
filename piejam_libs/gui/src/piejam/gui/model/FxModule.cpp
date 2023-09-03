@@ -21,6 +21,7 @@ namespace piejam::gui::model
 
 struct FxModule::Impl
 {
+    runtime::fx::module_id fx_mod_id;
     std::unique_ptr<FxModuleContent> content;
 };
 
@@ -104,15 +105,20 @@ FxModule::onSubscribe()
             [this](bool x) { setBypassed(x); });
 
     observe(runtime::selectors::select_focused_fx_module,
-            [this](auto fx_mod_id) {
-                auto content = makeModuleContent(
-                        dispatch(),
-                        state_change_subscriber(),
-                        fx_mod_id);
+            [this](runtime::fx::module_id const fx_mod_id) {
+                if (m_impl->fx_mod_id != fx_mod_id)
+                {
+                    m_impl->fx_mod_id = fx_mod_id;
 
-                std::swap(m_impl->content, content);
+                    auto content = makeModuleContent(
+                            dispatch(),
+                            state_change_subscriber(),
+                            fx_mod_id);
 
-                emit contentChanged();
+                    std::swap(m_impl->content, content);
+
+                    emit contentChanged();
+                }
             });
 }
 

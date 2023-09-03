@@ -20,15 +20,35 @@ class RootView final : public Subscribable<SubscribableModel>
     Q_OBJECT
 
     Q_PROPERTY(int mode READ mode NOTIFY modeChanged FINAL)
+    Q_PROPERTY(bool canShowFxModule READ canShowFxModule NOTIFY
+                       canShowFxModuleChanged FINAL)
 
 public:
     RootView(runtime::store_dispatch, runtime::subscriber&);
     ~RootView() override;
 
-    auto mode() -> int
+    auto mode() const -> int
     {
         return m_mode;
     }
+
+    auto canShowFxModule() const -> bool
+    {
+        return m_canShowFxModule;
+    }
+
+    Q_INVOKABLE void showMixer();
+    Q_INVOKABLE void showFxModule();
+    Q_INVOKABLE void showInfo();
+    Q_INVOKABLE void showSettings();
+    Q_INVOKABLE void showPower();
+
+signals:
+    void modeChanged();
+    void canShowFxModuleChanged();
+
+private:
+    void onSubscribe() override;
 
     void setMode(int x)
     {
@@ -39,20 +59,19 @@ public:
         }
     }
 
-    Q_INVOKABLE void showMixer();
-    Q_INVOKABLE void showInfo();
-    Q_INVOKABLE void showSettings();
-    Q_INVOKABLE void showPower();
-
-signals:
-    void modeChanged();
-
-private:
-    void onSubscribe() override;
+    void setCanShowFxModule(bool const x)
+    {
+        if (m_canShowFxModule != x)
+        {
+            m_canShowFxModule = x;
+            emit canShowFxModuleChanged();
+        }
+    }
 
     void switchRootViewMode(runtime::root_view_mode);
 
     int m_mode{};
+    bool m_canShowFxModule{};
 };
 
 } // namespace piejam::gui::model

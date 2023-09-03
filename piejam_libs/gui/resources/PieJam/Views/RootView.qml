@@ -51,6 +51,14 @@ Item {
                     }
                 }
 
+                ToolButton {
+                    text: "FX"
+
+                    enabled: root.modelFactory.rootView.canShowFxModule
+
+                    onClicked: root.modelFactory.rootView.showFxModule()
+                }
+
                 Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true

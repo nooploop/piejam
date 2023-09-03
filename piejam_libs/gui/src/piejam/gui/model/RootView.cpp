@@ -27,6 +27,12 @@ RootView::showMixer()
 }
 
 void
+RootView::showFxModule()
+{
+    switchRootViewMode(runtime::root_view_mode::fx_module);
+}
+
+void
 RootView::showInfo()
 {
     switchRootViewMode(runtime::root_view_mode::info);
@@ -50,6 +56,11 @@ RootView::onSubscribe()
     observe(runtime::selectors::select_root_view_mode,
             [this](runtime::root_view_mode mode) {
                 setMode(to_underlying(mode));
+            });
+
+    observe(runtime::selectors::select_focused_fx_module,
+            [&](runtime::fx::module_id const fx_mod_id) {
+                setCanShowFxModule(fx_mod_id.valid());
             });
 }
 
