@@ -21,7 +21,8 @@ ViewPane {
         id: private_
 
         readonly property bool bypassed: root.model && root.model.bypassed
-        readonly property int contentType: root.model && root.model.content ? root.model.content.type : -1
+        readonly property var content: root.model ? root.model.content : null
+        readonly property int contentType: private_.content ? private_.content.type : -1
     }
 
     RowLayout {
@@ -52,7 +53,7 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: ParametersListView {
-                        model: private_.contentType === FxModuleContent.Type.Generic ? root.model.content : null
+                        model: private_.contentType === FxModuleContent.Type.Generic ? private_.content : null
                     }
                 }
 
@@ -61,7 +62,7 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: FilterView {
-                        model: private_.contentType === FxModuleContent.Type.Filter ? root.model.content : null
+                        model: private_.contentType === FxModuleContent.Type.Filter ? private_.content : null
                         bypassed: private_.bypassed
                     }
                 }
@@ -71,7 +72,7 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: ScopeView {
-                        model: private_.contentType === FxModuleContent.Type.Scope ? root.model.content : null
+                        model: private_.contentType === FxModuleContent.Type.Scope ? private_.content : null
                         bypassed: private_.bypassed
                     }
                 }
@@ -81,7 +82,7 @@ ViewPane {
                     Layout.fillHeight: true
 
                     sourceComponent: SpectrumView {
-                        model: private_.contentType === FxModuleContent.Type.Spectrum ? root.model.content : null
+                        model: private_.contentType === FxModuleContent.Type.Spectrum ? private_.content : null
                         bypassed: private_.bypassed
                     }
                 }
