@@ -19,80 +19,108 @@
 namespace piejam::runtime::modules::ladspa_fx
 {
 
-static auto
-make_module_parameters(
-        std::span<piejam::ladspa::port_descriptor const> control_inputs,
-        parameters_map& params,
-        ui_parameter_descriptors_map& ui_params) -> fx::module_parameters
+namespace
 {
-    parameter_factory ui_params_factory{params, ui_params};
 
-    fx::module_parameters module_params;
-
-    for (auto const& port_desc : control_inputs)
+struct make_module_parameters
+{
+    make_module_parameters(
+            parameters_map& params,
+            ui_parameter_descriptors_map& ui_params)
+        : m_params{params}
+        , m_ui_params{ui_params}
     {
-        if (auto const* const p = std::get_if<piejam::ladspa::float_port>(
-                    &port_desc.type_desc))
-        {
-            bool const logarithmic =
-                    p->logarithmic && p->min > 0.f && p->max > 0.f;
-
-            module_params.emplace(
-                    port_desc.index,
-                    ui_params_factory.make_parameter(
-                            float_parameter{
-                                    .default_value = p->default_value,
-                                    .min = p->min,
-                                    .max = p->max,
-                                    .to_normalized =
-                                            logarithmic
-                                                    ? &runtime::parameter::
-                                                              to_normalized_log
-                                                    : &runtime::parameter::
-                                                              to_normalized_linear,
-                                    .from_normalized =
-                                            logarithmic
-                                                    ? &runtime::parameter::
-                                                              from_normalized_log
-                                                    : &runtime::parameter::
-                                                              from_normalized_linear},
-                            {.name = port_desc.name,
-                             .value_to_string =
-                                     &float_parameter_value_to_string}));
-        }
-        else if (
-                auto const* const p = std::get_if<piejam::ladspa::int_port>(
-                        &port_desc.type_desc))
-        {
-            BOOST_ASSERT(!p->logarithmic);
-
-            module_params.emplace(
-                    port_desc.index,
-                    ui_params_factory.make_parameter(
-                            int_parameter{
-                                    .default_value = p->default_value,
-                                    .min = p->min,
-                                    .max = p->max},
-                            {.name = port_desc.name,
-                             .value_to_string =
-                                     &int_parameter_value_to_string}));
-        }
-        else if (
-                auto const* const p = std::get_if<piejam::ladspa::bool_port>(
-                        &port_desc.type_desc))
-        {
-            module_params.emplace(
-                    port_desc.index,
-                    ui_params_factory.make_parameter(
-                            bool_parameter{.default_value = p->default_value},
-                            {.name = port_desc.name,
-                             .value_to_string =
-                                     &bool_parameter_value_to_string}));
-        }
     }
 
-    return module_params;
-}
+    auto operator()(std::span<piejam::ladspa::port_descriptor const>
+                            control_inputs) const
+    {
+        fx::module_parameters module_params;
+
+        for (auto const& port_desc : control_inputs)
+        {
+            std::visit(
+                    [&](auto const& p) {
+                        (*this)(module_params, port_desc, p);
+                    },
+                    port_desc.type_desc);
+        }
+
+        return module_params;
+    }
+
+private:
+    void operator()(
+            fx::module_parameters& module_params,
+            ladspa::port_descriptor const& port_desc,
+            ladspa::float_port const p) const
+    {
+        parameter_factory ui_params_factory{m_params, m_ui_params};
+
+        bool const logarithmic = p.logarithmic && p.min > 0.f && p.max > 0.f;
+
+        module_params.emplace(
+                port_desc.index,
+                ui_params_factory.make_parameter(
+                        float_parameter{
+                                .default_value = p.default_value,
+                                .min = p.min,
+                                .max = p.max,
+                                .to_normalized =
+                                        logarithmic
+                                                ? &parameter::to_normalized_log
+                                                : &parameter::
+                                                          to_normalized_linear,
+                                .from_normalized =
+                                        logarithmic
+                                                ? &parameter::
+                                                          from_normalized_log
+                                                : &parameter::
+                                                          from_normalized_linear},
+                        {.name = port_desc.name,
+                         .value_to_string = &float_parameter_value_to_string}));
+    }
+
+    void operator()(
+            fx::module_parameters& module_params,
+            ladspa::port_descriptor const& port_desc,
+            ladspa::int_port const p) const
+    {
+        parameter_factory ui_params_factory{m_params, m_ui_params};
+
+        BOOST_ASSERT(!p.logarithmic);
+
+        module_params.emplace(
+                port_desc.index,
+                ui_params_factory.make_parameter(
+                        int_parameter{
+                                .default_value = p.default_value,
+                                .min = p.min,
+                                .max = p.max},
+                        {.name = port_desc.name,
+                         .value_to_string = &int_parameter_value_to_string}));
+    }
+
+    void operator()(
+            fx::module_parameters& module_params,
+            ladspa::port_descriptor const& port_desc,
+            ladspa::bool_port const p) const
+    {
+        parameter_factory ui_params_factory{m_params, m_ui_params};
+
+        module_params.emplace(
+                port_desc.index,
+                ui_params_factory.make_parameter(
+                        bool_parameter{.default_value = p.default_value},
+                        {.name = port_desc.name,
+                         .value_to_string = &bool_parameter_value_to_string}));
+    }
+
+    parameters_map& m_params;
+    ui_parameter_descriptors_map& m_ui_params;
+};
+
+} // namespace
 
 auto
 make_module(
@@ -108,7 +136,7 @@ make_module(
             .name = name,
             .bus_type = bus_type,
             .parameters =
-                    make_module_parameters(control_inputs, params, ui_params),
+                    make_module_parameters{params, ui_params}(control_inputs),
             .streams = {}};
 }
 

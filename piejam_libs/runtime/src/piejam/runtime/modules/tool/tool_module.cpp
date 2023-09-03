@@ -61,7 +61,7 @@ make_module(
                     fx::module_parameters{
                             {to_underlying(parameter_key::gain),
                              ui_params_factory.make_parameter(
-                                     runtime::float_parameter{
+                                     float_parameter{
                                              .default_value = 1.f,
                                              .min = dB_ival::min_gain,
                                              .max = dB_ival::max_gain,

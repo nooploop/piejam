@@ -87,7 +87,7 @@ make_module(
                     fx::module_parameters{
                             {to_underlying(parameter_key::type),
                              ui_params_factory.make_parameter(
-                                     runtime::int_parameter{
+                                     int_parameter{
                                              .default_value =
                                                      to_underlying(type::lp2),
                                              .min = 0,
@@ -96,7 +96,7 @@ make_module(
                                       .value_to_string = &to_type_string})},
                             {to_underlying(parameter_key::cutoff),
                              ui_params_factory.make_parameter(
-                                     runtime::float_parameter{
+                                     float_parameter{
                                              .default_value = 440.f,
                                              .min = 10.f,
                                              .max = 20000.f,
@@ -110,7 +110,7 @@ make_module(
                                       .value_to_string = &to_cutoff_string})},
                             {to_underlying(parameter_key::resonance),
                              ui_params_factory.make_parameter(
-                                     runtime::float_parameter{
+                                     float_parameter{
                                              .default_value = 0.f,
                                              .min = 0.f,
                                              .max = 1.f,
