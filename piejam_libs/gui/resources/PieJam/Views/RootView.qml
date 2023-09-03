@@ -18,150 +18,132 @@ import "../MixerControls"
 Item {
     id: root
 
-    property var modelFactory
+    property var modelFactory: null
 
     implicitWidth: 800
     implicitHeight: 480
 
-    ToolBar {
-        id: toolBar
+    RowLayout {
+        anchors.fill: parent
 
-        width: 48
+        spacing: 0
 
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        ToolBar {
+            Layout.preferredWidth: 48
+            Layout.fillHeight: true
 
-        ToolButton {
-            id: btnMixer
+            ColumnLayout {
+                anchors.fill: parent
 
-            icon.width: 24
-            icon.height: 24
-            icon.source: "qrc:///images/icons/tune-vertical.svg"
-            display: AbstractButton.IconOnly
+                spacing: 0
 
-            onClicked: {
-                if (root.modelFactory.rootView.mode === 0)
-                    MixerViewSettings.switchMode(MixerViewSettings.perform)
-                else
-                    root.modelFactory.rootView.showMixer()
+                ToolButton {
+                    icon.width: 24
+                    icon.height: 24
+                    icon.source: "qrc:///images/icons/tune-vertical.svg"
+                    display: AbstractButton.IconOnly
+
+                    onClicked: {
+                        if (root.modelFactory.rootView.mode === 0)
+                            MixerViewSettings.switchMode(MixerViewSettings.perform)
+                        else
+                            root.modelFactory.rootView.showMixer()
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                InfoToolButton {
+                    property int lastMessagesCount: 0
+                    property var logMessages: root.modelFactory.log.logMessages
+
+                    icon.width: 24
+                    icon.height: 24
+                    icon.source: "qrc:///images/icons/info.svg"
+                    display: AbstractButton.IconOnly
+
+                    onClicked: {
+                        lastMessagesCount = logMessages.length
+                        root.modelFactory.rootView.showInfo()
+                    }
+
+                    info: logMessages.length === lastMessagesCount ? "" : logMessages.length - lastMessagesCount
+                }
+
+                ToolButton {
+                    icon.width: 24
+                    icon.height: 24
+                    icon.source: "qrc:///images/icons/cog.svg"
+                    display: AbstractButton.IconOnly
+
+                    onClicked: root.modelFactory.rootView.showSettings()
+                }
+
+                ToolButton {
+                    icon.width: 24
+                    icon.height: 24
+                    icon.source: "qrc:///images/icons/power.svg"
+                    display: AbstractButton.IconOnly
+
+                    onClicked: root.modelFactory.rootView.showPower()
+                }
             }
         }
 
-        InfoToolButton {
-            id: btnLog
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            property int lastMessagesCount: 0
-            property var logMessages: root.modelFactory.log.logMessages
+            spacing: 0
 
-            anchors.bottom: btnSettings.top
+            StatusBar {
+                Layout.fillWidth: true
 
-            icon.width: 24
-            icon.height: 24
-            icon.source: "qrc:///images/icons/info.svg"
-            display: AbstractButton.IconOnly
-
-            onClicked: {
-                lastMessagesCount = logMessages.length
-                root.modelFactory.rootView.showInfo()
+                model: root.modelFactory.info
             }
 
-            info: logMessages.length === lastMessagesCount ? "" : logMessages.length - lastMessagesCount
-        }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 2
 
-        ToolButton {
-            id: btnSettings
+                color: "#000000"
+            }
 
-            anchors.bottom: btnPower.top
+            StackLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-            icon.width: 24
-            icon.height: 24
-            icon.source: "qrc:///images/icons/cog.svg"
-            display: AbstractButton.IconOnly
+                currentIndex: root.modelFactory.rootView.mode
 
-            onClicked: root.modelFactory.rootView.showSettings()
-        }
+                Mixer {
+                    model: root.modelFactory.mixer
+                }
 
-        ToolButton {
-            id: btnPower
+                Log {
+                    logMessages: root.modelFactory.log.logMessages
+                }
 
-            anchors.bottom: parent.bottom
+                Settings {
+                    audioDeviceModel: root.modelFactory.audioDeviceSettings
+                    audioInputModel: root.modelFactory.audioInputSettings
+                    audioOutputModel: root.modelFactory.audioOutputSettings
+                    midiInputModel: root.modelFactory.midiInputSettings
+                }
 
-            icon.width: 24
-            icon.height: 24
-            icon.source: "qrc:///images/icons/power.svg"
-            display: AbstractButton.IconOnly
+                Power {
+                }
 
-            onClicked: root.modelFactory.rootView.showPower()
-        }
-    }
+                FxBrowser {
+                    model: root.modelFactory.fxBrowser
+                }
 
-    StackLayout {
-        id: content
-
-        anchors.left: toolBar.right
-        anchors.right: parent.right
-        anchors.top: statusBar.bottom
-        anchors.bottom: parent.bottom
-
-        currentIndex: root.modelFactory.rootView.mode
-
-        Mixer {
-            id: mixerPane
-
-            model: root.modelFactory.mixer
-        }
-
-        Log {
-            id: logPane
-
-            logMessages: root.modelFactory.log.logMessages
-        }
-
-        Settings {
-            id: audioSettingsPane
-
-            audioDeviceModel: root.modelFactory.audioDeviceSettings
-            audioInputModel: root.modelFactory.audioInputSettings
-            audioOutputModel: root.modelFactory.audioOutputSettings
-            midiInputModel: root.modelFactory.midiInputSettings
-        }
-
-        Power {
-            id: powerPane
-        }
-
-        FxBrowser {
-            id: fxBrowserPane
-
-            model: root.modelFactory.fxBrowser
-        }
-
-        FxModule {
-            id: fxModulePane
-
-            model: root.modelFactory.fxModule
-        }
-    }
-
-    StatusBar {
-        id: statusBar
-
-        anchors.left: toolBar.right
-        anchors.right: parent.right
-        anchors.top: parent.top
-
-        model: root.modelFactory.info
-
-        Rectangle {
-            id: statusBarSeparator
-
-            height: 2
-            color: "#000000"
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+                FxModule {
+                    model: root.modelFactory.fxModule
+                }
+            }
         }
     }
 
