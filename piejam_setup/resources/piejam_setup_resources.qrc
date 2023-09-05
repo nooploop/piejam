@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qtquickcontrols2.conf</file>
+        <file>Main.qml</file>
+        <file>boot_logo.png</file>
+    </qresource>
+</RCC>
