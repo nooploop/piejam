@@ -8,6 +8,7 @@
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
+#include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/audio/simd.h>
@@ -23,7 +24,8 @@ namespace piejam::audio::engine::test
 
 struct level_meter_processor_test : ::testing::Test
 {
-    level_meter_processor sut{sample_rate(48000)};
+    std::unique_ptr<processor> sut{
+            make_level_meter_processor(sample_rate(48000))};
     alignas(mipp::RequiredAlignment) std::array<float, 4> in_buf{};
     std::vector<audio_slice> in_buf_spans{in_buf};
     std::vector<std::reference_wrapper<audio_slice const>> in_bufs{
@@ -34,7 +36,7 @@ struct level_meter_processor_test : ::testing::Test
     level_meter_processor_test()
     {
         ev_out_bufs.set_event_memory(std::pmr::get_default_resource());
-        for (auto const& port : sut.event_outputs())
+        for (auto const& port : sut->event_outputs())
         {
             ev_out_bufs.add(port);
         }
@@ -46,7 +48,7 @@ TEST_F(level_meter_processor_test, new_peak_is_meassured_from_input_buffer)
     in_buf[0] = .7f;
     in_buf_spans[0] = std::span{in_buf.data(), 1};
 
-    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, 1});
+    sut->process({in_bufs, {}, {}, {}, ev_out_bufs, 1});
 
     ASSERT_EQ(1u, ev_out_bufs.get<float>(0).size());
     EXPECT_FLOAT_EQ(.7f, ev_out_bufs.get<float>(0).begin()->value());
@@ -58,7 +60,7 @@ TEST_F(level_meter_processor_test,
     in_buf[2] = .7f;
     in_buf[3] = .8f;
 
-    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, in_buf.size()});
+    sut->process({in_bufs, {}, {}, {}, ev_out_bufs, in_buf.size()});
 
     ASSERT_EQ(1u, ev_out_bufs.get<float>(0).size());
     EXPECT_FLOAT_EQ(.8f, ev_out_bufs.get<float>(0).begin()->value());
@@ -70,7 +72,7 @@ TEST_F(level_meter_processor_test,
     in_buf[2] = .7f;
     in_buf[3] = .5f;
 
-    sut.process({in_bufs, {}, {}, {}, ev_out_bufs, in_buf.size()});
+    sut->process({in_bufs, {}, {}, {}, ev_out_bufs, in_buf.size()});
 
     ASSERT_EQ(1u, ev_out_bufs.get<float>(0).size());
     EXPECT_LT(ev_out_bufs.get<float>(0).begin()->value(), .7f);

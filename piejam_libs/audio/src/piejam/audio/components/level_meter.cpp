@@ -27,10 +27,10 @@ class stereo_level_meter final : public engine::component
 {
 public:
     stereo_level_meter(sample_rate const sample_rate, std::string_view name)
-        : m_left_lm_proc(std::make_unique<engine::level_meter_processor>(
+        : m_left_lm_proc(engine::make_level_meter_processor(
                   sample_rate,
                   fmt::format("{} L", name)))
-        , m_right_lm_proc(std::make_unique<engine::level_meter_processor>(
+        , m_right_lm_proc(engine::make_level_meter_processor(
                   sample_rate,
                   fmt::format("{} R", name)))
     {
