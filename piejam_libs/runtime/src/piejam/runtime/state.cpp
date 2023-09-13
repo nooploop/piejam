@@ -541,7 +541,9 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                     parameter::bool_{.default_value = false},
                     {.name = "Solo",
                      .value_to_string = &bool_parameter_value_to_string}),
-            .level = parameter_factory{st.params}.make_parameter(
+            .peak_level = parameter_factory{st.params}.make_parameter(
+                    parameter::stereo_level{}),
+            .rms_level = parameter_factory{st.params}.make_parameter(
                     parameter::stereo_level{}),
             .fx_chain = {}});
     emplace_back(st.mixer_state.inputs, bus_id);
@@ -561,7 +563,8 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
     remove_parameter(st, mixer_channel.record);
     remove_parameter(st, mixer_channel.mute);
     remove_parameter(st, mixer_channel.solo);
-    remove_parameter(st, mixer_channel.level);
+    remove_parameter(st, mixer_channel.peak_level);
+    remove_parameter(st, mixer_channel.rms_level);
 
     BOOST_ASSERT_MSG(
             mixer_channel.fx_chain->empty(),

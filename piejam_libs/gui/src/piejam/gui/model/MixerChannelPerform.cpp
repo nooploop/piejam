@@ -23,7 +23,8 @@ struct MixerChannelPerform::Impl
 {
     runtime::mixer::channel_id busId;
 
-    std::unique_ptr<StereoLevelParameter> level;
+    std::unique_ptr<StereoLevelParameter> peakLevel;
+    std::unique_ptr<StereoLevelParameter> rmsLevel;
     std::unique_ptr<FloatParameter> volume;
     std::unique_ptr<FloatParameter> panBalance;
     std::unique_ptr<BoolParameter> record;
@@ -41,10 +42,18 @@ MixerChannelPerform::MixerChannelPerform(
               runtime::selectors::make_mixer_channel_bus_type_selector(id))))
 {
     makeParameter(
-            m_impl->level,
+            m_impl->peakLevel,
             observe_once(
                     runtime::selectors::
-                            make_mixer_channel_level_parameter_selector(id)));
+                            make_mixer_channel_peak_level_parameter_selector(
+                                    id)));
+
+    makeParameter(
+            m_impl->rmsLevel,
+            observe_once(
+                    runtime::selectors::
+                            make_mixer_channel_rms_level_parameter_selector(
+                                    id)));
 
     makeParameter(
             m_impl->volume,
@@ -81,9 +90,15 @@ MixerChannelPerform::MixerChannelPerform(
 MixerChannelPerform::~MixerChannelPerform() = default;
 
 auto
-MixerChannelPerform::level() const noexcept -> StereoLevelParameter*
+MixerChannelPerform::peakLevel() const noexcept -> StereoLevelParameter*
 {
-    return m_impl->level.get();
+    return m_impl->peakLevel.get();
+}
+
+auto
+MixerChannelPerform::rmsLevel() const noexcept -> StereoLevelParameter*
+{
+    return m_impl->rmsLevel.get();
 }
 
 auto

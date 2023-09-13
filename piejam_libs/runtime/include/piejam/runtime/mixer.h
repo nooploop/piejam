@@ -38,7 +38,8 @@ struct channel
     bool_parameter_id record;
     bool_parameter_id mute;
     bool_parameter_id solo;
-    stereo_level_parameter_id level;
+    stereo_level_parameter_id peak_level;
+    stereo_level_parameter_id rms_level;
 
     box<fx::chain_t> fx_chain{};
 

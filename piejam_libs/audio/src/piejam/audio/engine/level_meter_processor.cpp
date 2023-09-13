@@ -51,6 +51,7 @@ public:
     {
         static std::array s_ports{
                 event_port{std::in_place_type<float>, "peak_level"},
+                event_port{std::in_place_type<float>, "rms_level"},
         };
         return s_ports;
     }
@@ -85,6 +86,7 @@ level_meter_processor::process(engine::process_context const& ctx)
             ctx.inputs[0].get());
 
     ctx.event_outputs.get<float>(0).insert(0, m_lm.peak_level());
+    ctx.event_outputs.get<float>(1).insert(0, m_lm.rms_level());
 }
 
 } // namespace

@@ -65,8 +65,11 @@ public:
         , m_mute_solo(components::make_mute_solo(*mixer_channel.name))
         , m_level_meter(audio::components::make_stereo_level_meter(sample_rate))
         , m_peak_level_proc(param_procs.make_processor(
-                  mixer_channel.level,
-                  format_name(*mixer_channel.name, "stereo_level")))
+                  mixer_channel.peak_level,
+                  format_name(*mixer_channel.name, "peak_level")))
+        , m_rms_level_proc(param_procs.make_processor(
+                  mixer_channel.rms_level,
+                  format_name(*mixer_channel.name, "rms_level")))
     {
     }
 
@@ -128,6 +131,13 @@ public:
                 from<0>{},
                 *m_peak_level_proc,
                 to<0>{});
+
+        audio::engine::connect_event(
+                g,
+                *m_level_meter,
+                from<1>{},
+                *m_rms_level_proc,
+                to<0>{});
     }
 
 private:
@@ -141,6 +151,8 @@ private:
     std::unique_ptr<audio::engine::component> m_level_meter;
     std::shared_ptr<audio::engine::value_io_processor<stereo_level>>
             m_peak_level_proc;
+    std::shared_ptr<audio::engine::value_io_processor<stereo_level>>
+            m_rms_level_proc;
 
     std::array<audio::engine::graph_endpoint, 1> m_event_inputs{
             {m_mute_solo->event_inputs()[1]}};

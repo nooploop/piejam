@@ -11,13 +11,23 @@ import "../Util/DbConvert.js" as DbConvert
 Item {
     id: root
 
-    property real levelLeft: 0
-    property real levelRight: 0
+    property var peakLevel: null
+    property var rmsLevel: null
     property bool muted: false
     property var scaleData
 
     implicitWidth: dbScaleLeft.width + indicatorLeft.width + indicatorRight.width + dbScaleRight.width + 3 * controls.spacing
     implicitHeight: 300
+
+    QtObject {
+        id: private_
+
+        readonly property real peakLevelLeft: root.peakLevel ? root.peakLevel.levelLeft : 0
+        readonly property real peakLevelRight: root.peakLevel ? root.peakLevel.levelRight : 0
+
+        readonly property real rmsLevelLeft: root.rmsLevel ? root.rmsLevel.levelLeft : 0
+        readonly property real rmsLevelRight: root.rmsLevel ? root.rmsLevel.levelRight : 0
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -72,7 +82,8 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 6
 
-            level: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(root.levelLeft)) : 0
+            peakLevel: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(private_.peakLevelLeft)) : 0
+            rmsLevel: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(private_.rmsLevelLeft)) : 0
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
@@ -89,7 +100,8 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 6
 
-            level: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(root.levelRight)) : 0
+            peakLevel: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(private_.peakLevelRight)) : 0
+            rmsLevel: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(private_.rmsLevelRight)) : 0
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 

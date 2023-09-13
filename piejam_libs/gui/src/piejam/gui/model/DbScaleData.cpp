@@ -13,6 +13,7 @@
 #include <QVector>
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
 namespace piejam::gui::model
@@ -21,6 +22,7 @@ namespace piejam::gui::model
 float
 DbScaleData::dBToPosition(float const dB) const
 {
+    BOOST_ASSERT(!std::isnan(dB));
     BOOST_ASSERT(!m_ticks.empty());
 
     if (dB < m_ticks.front().dB)

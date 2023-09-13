@@ -166,13 +166,25 @@ make_mixer_channel_solo_parameter_selector(mixer::channel_id const channel_id)
 }
 
 auto
-make_mixer_channel_level_parameter_selector(mixer::channel_id const channel_id)
+make_mixer_channel_peak_level_parameter_selector(mixer::channel_id const channel_id)
         -> selector<stereo_level_parameter_id>
 {
     return [channel_id](state const& st) {
         mixer::channel const* const channel =
                 st.mixer_state.channels.find(channel_id);
-        return channel ? channel->level : stereo_level_parameter_id{};
+        return channel ? channel->peak_level : stereo_level_parameter_id{};
+    };
+}
+
+auto
+make_mixer_channel_rms_level_parameter_selector(
+        mixer::channel_id const channel_id)
+        -> selector<stereo_level_parameter_id>
+{
+    return [channel_id](state const& st) {
+        mixer::channel const* const channel =
+                st.mixer_state.channels.find(channel_id);
+        return channel ? channel->rms_level : stereo_level_parameter_id{};
     };
 }
 

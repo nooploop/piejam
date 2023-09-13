@@ -74,7 +74,9 @@ auto make_mixer_channel_mute_parameter_selector(mixer::channel_id)
         -> selector<bool_parameter_id>;
 auto make_mixer_channel_solo_parameter_selector(mixer::channel_id)
         -> selector<bool_parameter_id>;
-auto make_mixer_channel_level_parameter_selector(mixer::channel_id)
+auto make_mixer_channel_peak_level_parameter_selector(mixer::channel_id)
+        -> selector<stereo_level_parameter_id>;
+auto make_mixer_channel_rms_level_parameter_selector(mixer::channel_id)
         -> selector<stereo_level_parameter_id>;
 
 struct mixer_device_route

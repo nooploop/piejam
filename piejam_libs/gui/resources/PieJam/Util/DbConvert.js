@@ -7,7 +7,8 @@
 const twenty_div_log_10 = 20 / Math.log(10)
 
 function linToDb(x) {
-    return x === 0 ? Number.NEGATIVE_INFINITY : Math.log(x) * twenty_div_log_10
+    var res = x === 0 ? Number.NEGATIVE_INFINITY : Math.log(x) * twenty_div_log_10
+    return res
 }
 
 function dbToLin(x) {

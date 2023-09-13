@@ -23,7 +23,8 @@ request_mixer_levels_update(mixer::channel_ids_t channel_ids) -> thunk_action
 
         for (mixer::channel_id const bus_id : channel_ids)
         {
-            next_action.push_back(st.mixer_state.channels[bus_id].level);
+            next_action.push_back(st.mixer_state.channels[bus_id].peak_level);
+            next_action.push_back(st.mixer_state.channels[bus_id].rms_level);
         }
 
         dispatch(next_action);

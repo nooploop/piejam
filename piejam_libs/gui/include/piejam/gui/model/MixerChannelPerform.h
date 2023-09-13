@@ -27,7 +27,9 @@ class MixerChannelPerform final : public Subscribable<SubscribableModel>
     Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FloatParameter* volume READ volume CONSTANT
                        FINAL)
-    Q_PROPERTY(piejam::gui::model::StereoLevelParameter* level READ level
+    Q_PROPERTY(piejam::gui::model::StereoLevelParameter* peakLevel READ
+                       peakLevel CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::StereoLevelParameter* rmsLevel READ rmsLevel
                        CONSTANT FINAL)
     Q_PROPERTY(piejam::gui::model::FloatParameter* panBalance READ panBalance
                        CONSTANT FINAL)
@@ -65,7 +67,8 @@ public:
     }
 
     auto volume() const noexcept -> FloatParameter*;
-    auto level() const noexcept -> StereoLevelParameter*;
+    auto peakLevel() const noexcept -> StereoLevelParameter*;
+    auto rmsLevel() const noexcept -> StereoLevelParameter*;
     auto panBalance() const noexcept -> FloatParameter*;
     auto record() const noexcept -> BoolParameter*;
     auto solo() const noexcept -> BoolParameter*;

@@ -58,12 +58,15 @@ public:
 
     void connect(engine::graph& g) const override
     {
-        g.event.insert({*m_left_lm_proc, 0}, {*m_level_convert_proc, 0});
-        g.event.insert({*m_right_lm_proc, 0}, {*m_level_convert_proc, 1});
+        g.event.insert({*m_left_lm_proc, 0}, {*m_peak_level_convert_proc, 0});
+        g.event.insert({*m_right_lm_proc, 0}, {*m_peak_level_convert_proc, 1});
+
+        g.event.insert({*m_left_lm_proc, 1}, {*m_rms_level_convert_proc, 0});
+        g.event.insert({*m_right_lm_proc, 1}, {*m_rms_level_convert_proc, 1});
     }
 
 private:
-    static auto make_stereo_level_converter()
+    static auto make_stereo_level_converter(std::string_view name)
             -> std::unique_ptr<engine::processor>
     {
         using namespace std::string_view_literals;
@@ -78,18 +81,25 @@ private:
                             return {l, r};
                         },
                         s_input_names,
-                        s_output_names)};
+                        s_output_names,
+                        name)};
     }
 
     std::unique_ptr<engine::processor> m_left_lm_proc;
     std::unique_ptr<engine::processor> m_right_lm_proc;
-    std::unique_ptr<engine::processor> m_level_convert_proc{
-            make_stereo_level_converter()};
+    std::unique_ptr<engine::processor> m_peak_level_convert_proc{
+            make_stereo_level_converter("peak_level")};
+    std::unique_ptr<engine::processor> m_rms_level_convert_proc{
+            make_stereo_level_converter("rms_level")};
 
-    std::array<engine::graph_endpoint, 2> m_inputs{
-            {{*m_left_lm_proc, 0}, {*m_right_lm_proc, 0}}};
-    std::array<engine::graph_endpoint, 1> m_event_outputs{
-            {{*m_level_convert_proc, 0}}};
+    std::array<engine::graph_endpoint, 2> m_inputs{{
+            {*m_left_lm_proc, 0},
+            {*m_right_lm_proc, 0},
+    }};
+    std::array<engine::graph_endpoint, 2> m_event_outputs{{
+            {*m_peak_level_convert_proc, 0},
+            {*m_rms_level_convert_proc, 0},
+    }};
 };
 
 } // namespace

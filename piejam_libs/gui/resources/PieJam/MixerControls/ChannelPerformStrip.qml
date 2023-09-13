@@ -45,7 +45,8 @@ SubscribableItem {
                 Layout.fillHeight: true
 
                 volume: root.model ? root.model.volume : null
-                level: root.model ? root.model.level : null
+                peakLevel: root.model ? root.model.peakLevel : null
+                rmsLevel: root.model ? root.model.rmsLevel : null
 
                 muted: root.model && (root.model.mute.value || root.model.mutedBySolo)
 
@@ -55,7 +56,7 @@ SubscribableItem {
 
             ChannelControls {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 32
+                Layout.preferredHeight: 40
 
                 record: root.model ? root.model.record : null
                 mute: root.model ? root.model.mute : null

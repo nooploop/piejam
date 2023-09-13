@@ -6,6 +6,8 @@
 
 #include <piejam/audio/sample_rate.h>
 
+#include <boost/circular_buffer.hpp>
+
 #include <cmath>
 
 namespace piejam::audio
@@ -13,11 +15,17 @@ namespace piejam::audio
 
 class level_meter
 {
+    static inline constexpr float const peak_decay_time = 0.4f;  // in sec
+    static inline constexpr float const rms_measure_time = 0.8f; // in sec
+
 public:
     using value_type = float;
 
     explicit level_meter(sample_rate sr)
-        : m_g_release{std::pow(9.f, (-1.f / (0.4f * sr.as_float())))}
+        : m_g_release{std::pow(9.f, (-1.f / (peak_decay_time * sr.as_float())))}
+        , m_squared_history{
+                  static_cast<std::size_t>(rms_measure_time * sr.as_float()),
+                  0.f}
     {
     }
 
@@ -27,6 +35,10 @@ public:
         m_peak_level = abs_x > m_peak_level
                                ? abs_x
                                : abs_x + m_g_release * (m_peak_level - abs_x);
+
+        float const sq = x * x;
+        m_squared_sum = m_squared_sum - m_squared_history.front() + sq;
+        m_squared_history.push_back(sq);
     }
 
     [[nodiscard]] auto peak_level() const noexcept -> float
@@ -34,9 +46,23 @@ public:
         return m_peak_level;
     }
 
+    [[nodiscard]] auto rms_level() const noexcept -> float
+    {
+        if (m_squared_sum < 0.f)
+        {
+            m_squared_sum = 0.f;
+        }
+
+        return std::sqrt(
+                m_squared_sum / static_cast<float>(m_squared_history.size()));
+    }
+
 private:
     float m_peak_level{};
     float m_g_release{};
+
+    boost::circular_buffer<float> m_squared_history;
+    mutable float m_squared_sum{};
 };
 
 } // namespace piejam::audio
