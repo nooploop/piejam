@@ -22,18 +22,13 @@ More [documentation](https://piejam.readthedocs.io/en/stable/)
 * Mute and solo
 * Flexible routing between mixer channels
 * Fx chain per mixer channel
+* Fx modules:
+    * Filter
+    * Oscilloscope
+    * Spectrum Analyzer
 * Support for LADSPA plugins
 * Parameter control through MIDI CC
-* Recorder
+* Session Recorder
 
 #### Usage example
 ![Usage example](doc/images/usage.png "Usage example")
-
-## ChangeLog
-* v0.7.0 - Recorder
-* v0.6.0 - New modules: Oscilloscope and Spectrum Analyzer
-* v0.5.0 - MIDI CC parameter control. Flexible routing.
-* v0.4.0 - Fx chain and LADSPA fx plugins support.
-* v0.3.0 - Mute and solo. Modular audio engine.
-* v0.2.0 - In/out configuration. Panning and balance.
-* v0.1.0 - Initial release. Basic mixer.
