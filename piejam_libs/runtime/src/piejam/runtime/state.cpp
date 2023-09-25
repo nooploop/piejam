@@ -89,7 +89,7 @@ from_normalized_volume(float_parameter const& p, float const norm_value)
 auto
 volume_to_string(float volume) -> std::string
 {
-    auto const volume_dB = math::linear_to_dB(volume);
+    auto const volume_dB = math::to_dB(volume);
     return fmt::format("{:.1f} dB", volume_dB);
 }
 

@@ -49,7 +49,7 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_channel)
     EXPECT_EQ(false, mute_param.default_value);
     auto mute_value = sut.params[bus.mute].value.get();
     EXPECT_EQ(false, mute_value);
-    
+
     auto const& level_param = sut.params[bus.peak_level].param;
     EXPECT_EQ(stereo_level{}, level_param.default_value);
     auto level_value = sut.params[bus.peak_level].value.get();
@@ -64,7 +64,7 @@ TEST_F(state_with_one_mixer_input,
     ASSERT_EQ(2u, sut.params.get_map<float_parameter>().size());
     ASSERT_EQ(3u, sut.params.get_map<bool_parameter>().size());
     ASSERT_EQ(0u, sut.params.get_map<int_parameter>().size());
-    ASSERT_EQ(1u, sut.params.get_map<stereo_level_parameter>().size());
+    ASSERT_EQ(2u, sut.params.get_map<stereo_level_parameter>().size());
 
     remove_mixer_channel(sut, bus_id);
 

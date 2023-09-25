@@ -21,21 +21,21 @@ pow3(T const x) noexcept -> T
 }
 
 template <std::floating_point T>
+constexpr inline T negative_inf = -std::numeric_limits<T>::infinity();
+
+template <std::floating_point T>
 [[nodiscard]] constexpr auto
-linear_to_dB(T const linear, T const min_linear = T{}) -> T
+to_dB(T const log, T const min_log = T{}) -> T
 {
     static_assert(std::numeric_limits<T>::is_iec559, "IEEE 754 required");
-    return linear <= min_linear ? -std::numeric_limits<T>::infinity()
-                                : std::log10(linear) * 20.f;
+    return log <= min_log ? negative_inf<T> : std::log10(log) * T{20};
 }
 
 template <std::floating_point T>
 [[nodiscard]] constexpr auto
-dB_to_linear(T const dB) -> T
+from_dB(T const dB, T const min_dB = negative_inf<T>) -> T
 {
-    return dB == -std::numeric_limits<T>::infinity()
-                   ? T{}
-                   : std::pow(T{10}, dB / T{20});
+    return dB <= min_dB ? T{} : std::pow(T{10}, dB / T{20});
 }
 
 template <class T>

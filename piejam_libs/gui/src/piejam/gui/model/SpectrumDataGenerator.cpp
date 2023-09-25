@@ -133,11 +133,10 @@ public:
         BOOST_ASSERT(m_dataPoints.size() == m_dft.output_size());
         for (std::size_t const i : range::iota(m_dft.output_size()))
         {
-            m_dataPoints[i].level_linear = envelope(
-                    m_dataPoints[i].level_linear,
+            m_dataPoints[i].level = envelope(
+                    m_dataPoints[i].level,
                     std::abs(spectrum[i]) * (2.f / m_dft.size()));
-            m_dataPoints[i].level_dB =
-                    math::linear_to_dB(m_dataPoints[i].level_linear);
+            m_dataPoints[i].level_dB = math::to_dB(m_dataPoints[i].level);
         }
 
         return m_dataPoints;
