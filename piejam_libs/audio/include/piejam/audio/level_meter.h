@@ -36,7 +36,8 @@ public:
                                ? abs_x
                                : abs_x + m_g_release * (m_peak_level - abs_x);
 
-        float const sq = x * x;
+        double const xl = x;
+        double const sq = xl * xl;
         m_squared_sum = m_squared_sum - m_squared_history.front() + sq;
         m_squared_history.push_back(sq);
     }
@@ -48,21 +49,18 @@ public:
 
     [[nodiscard]] auto rms_level() const noexcept -> float
     {
-        if (m_squared_sum < 0.f)
-        {
-            m_squared_sum = 0.f;
-        }
+        double const squared_sum = std::max(m_squared_sum, 0.);
 
-        return std::sqrt(
-                m_squared_sum / static_cast<float>(m_squared_history.size()));
+        return static_cast<float>(std::sqrt(
+                squared_sum / static_cast<double>(m_squared_history.size())));
     }
 
 private:
     float m_peak_level{};
     float m_g_release{};
 
-    boost::circular_buffer<float> m_squared_history;
-    mutable float m_squared_sum{};
+    boost::circular_buffer<double> m_squared_history;
+    double m_squared_sum{};
 };
 
 } // namespace piejam::audio
