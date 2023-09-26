@@ -112,7 +112,7 @@ ViewPane {
         }
     }
 
-    Loader {
+    ChannelStrip {
         id: mainChannelStrip
 
         anchors.right: mixerToolbar.left
@@ -120,17 +120,11 @@ ViewPane {
         anchors.bottom: parent.bottom
         anchors.margins: 8
 
-        active: root.model.mainChannel !== null
+        perform: root.model.mainChannel.perform
+        edit: root.model.mainChannel.edit
+        fx: root.model.mainChannel.fx
 
-        sourceComponent: ChannelStrip {
-            perform.model: root.model.mainChannel.perform
-
-            edit.model: root.model.mainChannel.edit
-            edit.deletable: false
-
-            fx.model: root.model.mainChannel.fx
-        }
-
+        deletable: false
     }
 
     ViewToolBar {

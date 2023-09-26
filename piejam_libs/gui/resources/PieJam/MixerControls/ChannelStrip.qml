@@ -6,9 +6,13 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
 Item {
-    property alias perform: performStrip
-    property alias edit: editStrip
-    property alias fx: fxStrip
+    id: root
+
+    property var perform: null
+    property var edit: null
+    property var fx: null
+
+    property bool deletable: true
 
     implicitWidth: 132
     implicitHeight: 400
@@ -19,15 +23,17 @@ Item {
         currentIndex: MixerViewSettings.mode
 
         ChannelPerformStrip {
-            id: performStrip
+            model: root.perform
         }
 
         ChannelEditStrip {
-            id: editStrip
+            model: root.edit
+
+            deletable: root.deletable
         }
 
         ChannelFxStrip {
-            id: fxStrip
+            model: root.fx
         }
     }
 }

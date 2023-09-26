@@ -16,17 +16,14 @@ ListView {
     orientation: ListView.Horizontal
     boundsBehavior: Flickable.StopAtBounds
     boundsMovement: Flickable.StopAtBounds
-    reuseItems: true
 
     delegate: ChannelStrip {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
 
-        perform.model: model.item.perform
-
-        edit.model: model.item.edit
-
-        fx.model: model.item.fx
+        perform: model.item.perform
+        edit: model.item.edit
+        fx: model.item.fx
     }
 }
 
