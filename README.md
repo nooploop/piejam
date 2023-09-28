@@ -29,6 +29,3 @@ More [documentation](https://piejam.readthedocs.io/en/stable/)
 * Support for LADSPA plugins
 * Parameter control through MIDI CC
 * Session Recorder
-
-#### Usage example
-![Usage example](doc/images/usage.png "Usage example")
