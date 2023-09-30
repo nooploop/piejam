@@ -5,6 +5,9 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
+
+import PieJam.Items 1.0 as PJItems
 
 import "../Util/DbConvert.js" as DbConvert
 
@@ -16,7 +19,7 @@ Item {
     property bool muted: false
     property var scaleData
 
-    implicitWidth: dbScaleLeft.width + indicatorLeft.width + indicatorRight.width + dbScaleRight.width + 3 * controls.spacing
+    implicitWidth: 56
     implicitHeight: 300
 
     QtObject {
@@ -27,11 +30,6 @@ Item {
 
         readonly property real rmsLevelLeft: root.rmsLevel ? root.rmsLevel.levelLeft : 0
         readonly property real rmsLevelRight: root.rmsLevel ? root.rmsLevel.levelRight : 0
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        color: Material.backgroundColor
     }
 
     Gradient {
@@ -52,38 +50,57 @@ Item {
         GradientStop { position: 1; color: "#909090" }
     }
 
-    Row {
+    RowLayout {
         id: controls
 
         anchors.fill: parent
 
-        spacing: 1
+        spacing: 2
 
-        DbScale {
+        Item {
+            Layout.preferredWidth: 20
+            Layout.fillHeight: true
+
+            Repeater {
+                model: scaleData.ticks
+
+                delegate: Label {
+                    anchors.left: parent ? parent.left : undefined
+                    anchors.right: parent ? parent.right : undefined
+
+                    y: (1 - modelData.position) * (parent.height - 12)
+
+                    font.pixelSize: 10
+                    font.bold: true
+
+                    text: modelData.dB
+                    horizontalAlignment: Text.AlignRight
+                }
+            }
+        }
+
+        PJItems.DbScale {
             id: dbScaleLeft
 
-            height: parent.height
-
-            padding: 6
-
-            orientation: DbScale.Orientation.Right
-            backgroundColor: Material.backgroundColor
+            Layout.preferredWidth: 8
+            Layout.fillHeight: true
 
             scaleData: root.scaleData
+            color: Material.primaryTextColor
+            tickOffset: 6
+            edge: PJItems.DbScale.Edge.Right
         }
 
         LevelIndicator {
             id: indicatorLeft
 
-            width: 6
+            Layout.preferredWidth: 6
+            Layout.fillHeight: true
+            Layout.topMargin: 6
+            Layout.bottomMargin: 6
 
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 6
-            anchors.top: parent.top
-            anchors.topMargin: 6
-
-            peakLevel: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(private_.peakLevelLeft)) : 0
-            rmsLevel: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(private_.rmsLevelLeft)) : 0
+            peakLevel: scaleData ? scaleData.dBToPosition(DbConvert.to_dB(private_.peakLevelLeft)) : 0
+            rmsLevel: scaleData ? scaleData.dBToPosition(DbConvert.to_dB(private_.rmsLevelLeft)) : 0
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
@@ -93,32 +110,28 @@ Item {
         LevelIndicator {
             id: indicatorRight
 
-            width: 6
+            Layout.preferredWidth: 6
+            Layout.fillHeight: true
+            Layout.topMargin: 6
+            Layout.bottomMargin: 6
 
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 6
-            anchors.top: parent.top
-            anchors.topMargin: 6
-
-            peakLevel: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(private_.peakLevelRight)) : 0
-            rmsLevel: scaleData ? scaleData.dBToPosition(DbConvert.linToDb(private_.rmsLevelRight)) : 0
+            peakLevel: scaleData ? scaleData.dBToPosition(DbConvert.to_dB(private_.peakLevelRight)) : 0
+            rmsLevel: scaleData ? scaleData.dBToPosition(DbConvert.to_dB(private_.rmsLevelRight)) : 0
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
             fillColor: Material.backgroundColor
         }
 
-        DbScale {
+        PJItems.DbScale {
             id: dbScaleRight
 
-            height: parent.height
-
-            padding: 6
-
-            backgroundColor: Material.backgroundColor
+            Layout.preferredWidth: 8
+            Layout.fillHeight: true
 
             scaleData: root.scaleData
-            withText: false
+            color: Material.primaryTextColor
+            tickOffset: 6
         }
     }
 }

@@ -4,6 +4,7 @@
 
 #include <piejam/gui/model/Factory.h>
 
+#include <piejam/gui/item/DbScale.h>
 #include <piejam/gui/item/Scope.h>
 #include <piejam/gui/item/Spectrum.h>
 #include <piejam/gui/item/Waveform.h>
@@ -135,6 +136,11 @@ runRegistration()
             0,
             "Spectrum");
     qmlRegisterType<piejam::gui::item::Scope>("PieJam.Items", 1, 0, "Scope");
+    qmlRegisterType<piejam::gui::item::DbScale>(
+            "PieJam.Items",
+            1,
+            0,
+            "DbScale");
 
     qmlRegisterUncreatableMetaObject(
             piejam::gui::model::staticMetaObject,

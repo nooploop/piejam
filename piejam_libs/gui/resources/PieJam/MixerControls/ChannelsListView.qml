@@ -18,8 +18,8 @@ ListView {
     boundsMovement: Flickable.StopAtBounds
 
     delegate: ChannelStrip {
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.top: parent ? parent.top : undefined
+        anchors.bottom: parent ? parent.bottom : undefined
 
         perform: model.item.perform
         edit: model.item.edit

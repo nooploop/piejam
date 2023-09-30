@@ -20,7 +20,7 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        spacing: 0
+        spacing: 2
 
         StereoLevelMeter {
             id: meter
@@ -34,6 +34,7 @@ Item {
         VolumeFader {
             id: fader
 
+            Layout.fillWidth: true
             Layout.fillHeight: true
         }
     }

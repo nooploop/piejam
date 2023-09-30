@@ -25,6 +25,7 @@ set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)
 add_library(piejam_gui STATIC
     ${RESOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/generic_list_model_edit_script_executor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/DbScale.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/Scope.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/Spectrum.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/Waveform.h
@@ -88,6 +89,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/WaveformDataObject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/qt_log.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/DbScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Spectrum.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Waveform.cpp
