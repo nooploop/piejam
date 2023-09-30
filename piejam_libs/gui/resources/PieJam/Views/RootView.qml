@@ -130,26 +130,41 @@ Item {
                     model: root.modelFactory.mixer
                 }
 
-                Log {
-                    logMessages: root.modelFactory.log.logMessages
+                Loader {
+                    sourceComponent: Log {
+                        logMessages: root.modelFactory.log.logMessages
+                    }
+                    asynchronous: true
                 }
 
-                Settings {
-                    audioDeviceModel: root.modelFactory.audioDeviceSettings
-                    audioInputModel: root.modelFactory.audioInputSettings
-                    audioOutputModel: root.modelFactory.audioOutputSettings
-                    midiInputModel: root.modelFactory.midiInputSettings
+                Loader {
+                    sourceComponent: Settings {
+                        audioDeviceModel: root.modelFactory.audioDeviceSettings
+                        audioInputModel: root.modelFactory.audioInputSettings
+                        audioOutputModel: root.modelFactory.audioOutputSettings
+                        midiInputModel: root.modelFactory.midiInputSettings
+                    }
+                    asynchronous: true
                 }
 
-                Power {
+                Loader {
+                    sourceComponent: Power {
+                    }
+                    asynchronous: true
                 }
 
-                FxBrowser {
-                    model: root.modelFactory.fxBrowser
+                Loader {
+                    sourceComponent: FxBrowser {
+                        model: root.modelFactory.fxBrowser
+                    }
+                    asynchronous: true
                 }
 
-                FxModule {
-                    model: root.modelFactory.fxModule
+                Loader {
+                    sourceComponent: FxModule {
+                        model: root.modelFactory.fxModule
+                    }
+                    asynchronous: true
                 }
             }
         }
