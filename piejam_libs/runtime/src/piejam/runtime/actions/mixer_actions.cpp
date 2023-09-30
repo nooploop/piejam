@@ -78,6 +78,7 @@ initiate_mixer_channel_deletion(mixer::channel_id mixer_channel_id)
             for (fx::module_id const fx_mod_id : *mixer_channel.fx_chain)
             {
                 auto delete_fx_mod = std::make_unique<delete_fx_module>();
+                delete_fx_mod->fx_chain_id = mixer_channel_id;
                 delete_fx_mod->fx_mod_id = fx_mod_id;
                 batch.push_back(std::move(delete_fx_mod));
             }
