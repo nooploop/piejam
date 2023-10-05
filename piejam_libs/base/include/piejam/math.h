@@ -68,4 +68,12 @@ linear_map(
     return ((v - src_lo) / (src_hi - src_lo)) * (dst_hi - dst_lo) + dst_lo;
 }
 
+template <std::integral T>
+constexpr auto
+pos_mod(T x, T y)
+{
+    auto n = x % y;
+    return n < 0 ? n + y : n;
+}
+
 } // namespace piejam::math

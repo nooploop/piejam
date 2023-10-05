@@ -15,7 +15,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/dsp/biquad_filter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/dsp/envelope_follower.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/audio_slice.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/stream_ring_buffer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/clip_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/dag.h
@@ -46,13 +45,14 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/process.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_job.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_util.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_test_environment.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/processor_util.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/single_event_input_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/slice_algorithms.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/smoother_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/stream_processor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/stream_ring_buffer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/thread_context.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/value_io_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/verify_process_context.h
@@ -72,6 +72,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_sample_type.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/period_count.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/period_size.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pitch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/process_function.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/process_thread.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/sample_rate.h

@@ -35,6 +35,7 @@ add_executable(piejam_audio_test
     ${CMAKE_CURRENT_SOURCE_DIR}/pan_component_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pan_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pcm_convert_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/pitch_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/process_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/process_thread_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/processor_mock.h
