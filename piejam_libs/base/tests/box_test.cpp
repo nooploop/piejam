@@ -39,6 +39,28 @@ TEST(box, assign_operator)
     EXPECT_EQ(6, x.get());
 }
 
+TEST(box, move_ctor)
+{
+    box<int> x{5};
+    box<int> y{std::move(x)};
+
+    EXPECT_EQ(x.get(), 5);
+    EXPECT_EQ(y.get(), 5);
+}
+
+TEST(box, move_assign)
+{
+    box<int> x{5};
+    box<int> y{6};
+
+    ASSERT_EQ(y.get(), 6);
+
+    y = std::move(x);
+
+    EXPECT_EQ(x.get(), 5);
+    EXPECT_EQ(y.get(), 5);
+}
+
 TEST(box, cast_operator)
 {
     box<int> x(5);

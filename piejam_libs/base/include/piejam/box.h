@@ -54,8 +54,8 @@ template <class B>
 constexpr bool is_box_v = is_box<B>::value;
 
 template <class From, class To>
-concept convertible_to_box_value = std::is_convertible_v<From, To> && !
-is_box_v<std::remove_cvref_t<From>>;
+concept convertible_to_box_value =
+        std::is_convertible_v<From, To> && !is_box_v<std::remove_cvref_t<From>>;
 
 template <class T, class Eq>
 class box
@@ -78,6 +78,21 @@ public:
     box(std::in_place_t, Args&&... args)
         : m_value(std::make_shared<T const>(std::forward<Args>(args)...))
     {
+    }
+
+    box(box<T, Eq> const&) = default;
+
+    box(box<T, Eq>&& other) noexcept
+        : m_value{other.m_value}
+    {
+    }
+
+    auto operator=(box<T, Eq> const&) -> box<T, Eq>& = default;
+
+    auto operator=(box<T, Eq>&& other) noexcept -> box<T, Eq>&
+    {
+        m_value = other.m_value;
+        return *this;
     }
 
     auto get() const noexcept -> T const&
