@@ -125,6 +125,13 @@ runRegistration()
             "FxScope",
             "Not createable");
 
+    qmlRegisterUncreatableType<piejam::gui::model::RootView>(
+            "PieJam.Models",
+            1,
+            0,
+            "RootView",
+            "Not createable");
+
     qmlRegisterType<piejam::gui::item::Waveform>(
             "PieJam.Items",
             1,

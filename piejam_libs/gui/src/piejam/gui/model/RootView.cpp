@@ -55,7 +55,7 @@ RootView::onSubscribe()
 {
     observe(runtime::selectors::select_root_view_mode,
             [this](runtime::root_view_mode mode) {
-                setMode(to_underlying(mode));
+                setMode(static_cast<Mode>(mode));
             });
 
     observe(runtime::selectors::select_focused_fx_module,

@@ -11,6 +11,8 @@ import QtQuick.VirtualKeyboard.Settings 2.15
 
 import QtQml 2.15
 
+import PieJam.Models 1.0 as PJModels
+
 import ".."
 import "../Controls"
 import "../MixerControls"
@@ -44,7 +46,7 @@ Item {
                     display: AbstractButton.IconOnly
 
                     onClicked: {
-                        if (root.modelManager.rootView.mode === 0)
+                        if (root.modelManager.rootView.mode === PJModels.RootView.Mode.Mixer)
                             MixerViewSettings.switchMode(MixerViewSettings.perform)
                         else
                             root.modelManager.rootView.showMixer()

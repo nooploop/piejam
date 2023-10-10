@@ -19,7 +19,6 @@ class RootView final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(int mode READ mode NOTIFY modeChanged FINAL)
     Q_PROPERTY(bool canShowFxModule READ canShowFxModule NOTIFY
                        canShowFxModuleChanged FINAL)
 
@@ -27,7 +26,21 @@ public:
     RootView(runtime::store_dispatch, runtime::subscriber&);
     ~RootView() override;
 
-    auto mode() const -> int
+    enum class Mode : int
+    {
+        Mixer,
+        Info,
+        Settings,
+        Power,
+        FxBrowser,
+        FxModule,
+    };
+
+    Q_ENUM(Mode)
+
+    Q_PROPERTY(Mode mode READ mode NOTIFY modeChanged FINAL)
+
+    auto mode() const -> Mode
     {
         return m_mode;
     }
@@ -50,7 +63,7 @@ signals:
 private:
     void onSubscribe() override;
 
-    void setMode(int x)
+    void setMode(Mode x)
     {
         if (m_mode != x)
         {
@@ -70,7 +83,7 @@ private:
 
     void switchRootViewMode(runtime::root_view_mode);
 
-    int m_mode{};
+    Mode m_mode{};
     bool m_canShowFxModule{};
 };
 
