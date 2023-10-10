@@ -4,7 +4,7 @@
 
 #include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/gui/model/Factory.h>
+#include <piejam/gui/ModelManager.h>
 #include <piejam/gui/model/Info.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/ladspa/instance_manager_processor_factory.h>
@@ -231,11 +231,11 @@ main(int argc, char* argv[]) -> int
 
     store.dispatch(runtime::actions::scan_ladspa_fx_plugins("/usr/lib/ladspa"));
 
-    gui::model::Factory modelFactory(store, state_change_subscriber);
+    gui::ModelManager modelManager(store, state_change_subscriber);
 
     QQmlApplicationEngine engine;
     engine.addImportPath("qrc:/");
-    engine.rootContext()->setContextProperty("g_modelFactory", &modelFactory);
+    engine.rootContext()->setContextProperty("g_modelManager", &modelManager);
 
     engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
     if (engine.rootObjects().isEmpty())
@@ -263,15 +263,15 @@ main(int argc, char* argv[]) -> int
 
         store.dispatch(runtime::actions::request_recorder_streams_update());
 
-        modelFactory.info()->setCpuTemp(system::cpu_temp());
+        modelManager.info()->setCpuTemp(system::cpu_temp());
 
         avg_cpu_load.update();
         auto cpu_load_per_core = avg_cpu_load.per_core();
-        modelFactory.info()->setCpuLoad(QList<float>(
+        modelManager.info()->setCpuLoad(QList<float>(
                 cpu_load_per_core.begin(),
                 cpu_load_per_core.end()));
 
-        modelFactory.info()->setDiskUsage(static_cast<int>(
+        modelManager.info()->setDiskUsage(static_cast<int>(
                 std::round(system::disk_usage(locs.home_dir) * 100)));
     });
     timer->start(std::chrono::seconds(1));

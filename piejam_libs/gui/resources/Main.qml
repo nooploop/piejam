@@ -10,5 +10,5 @@ import PieJam.Views 1.0
 MainWindow {
     id: root
 
-    modelFactory: g_modelFactory
+    modelManager: g_modelManager
 }

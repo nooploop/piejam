@@ -18,7 +18,7 @@ import "../MixerControls"
 Item {
     id: root
 
-    property var modelFactory: null
+    property var modelManager: null
 
     implicitWidth: 800
     implicitHeight: 480
@@ -44,19 +44,19 @@ Item {
                     display: AbstractButton.IconOnly
 
                     onClicked: {
-                        if (root.modelFactory.rootView.mode === 0)
+                        if (root.modelManager.rootView.mode === 0)
                             MixerViewSettings.switchMode(MixerViewSettings.perform)
                         else
-                            root.modelFactory.rootView.showMixer()
+                            root.modelManager.rootView.showMixer()
                     }
                 }
 
                 ToolButton {
                     text: "FX"
 
-                    enabled: root.modelFactory.rootView.canShowFxModule
+                    enabled: root.modelManager.rootView.canShowFxModule
 
-                    onClicked: root.modelFactory.rootView.showFxModule()
+                    onClicked: root.modelManager.rootView.showFxModule()
                 }
 
                 Item {
@@ -66,7 +66,7 @@ Item {
 
                 InfoToolButton {
                     property int lastMessagesCount: 0
-                    property var logMessages: root.modelFactory.log.logMessages
+                    property var logMessages: root.modelManager.log.logMessages
 
                     icon.width: 24
                     icon.height: 24
@@ -75,7 +75,7 @@ Item {
 
                     onClicked: {
                         lastMessagesCount = logMessages.length
-                        root.modelFactory.rootView.showInfo()
+                        root.modelManager.rootView.showInfo()
                     }
 
                     info: logMessages.length === lastMessagesCount ? "" : logMessages.length - lastMessagesCount
@@ -87,7 +87,7 @@ Item {
                     icon.source: "qrc:///images/icons/cog.svg"
                     display: AbstractButton.IconOnly
 
-                    onClicked: root.modelFactory.rootView.showSettings()
+                    onClicked: root.modelManager.rootView.showSettings()
                 }
 
                 ToolButton {
@@ -96,7 +96,7 @@ Item {
                     icon.source: "qrc:///images/icons/power.svg"
                     display: AbstractButton.IconOnly
 
-                    onClicked: root.modelFactory.rootView.showPower()
+                    onClicked: root.modelManager.rootView.showPower()
                 }
             }
         }
@@ -110,7 +110,7 @@ Item {
             StatusBar {
                 Layout.fillWidth: true
 
-                model: root.modelFactory.info
+                model: root.modelManager.info
             }
 
             Rectangle {
@@ -124,25 +124,25 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                currentIndex: root.modelFactory.rootView.mode
+                currentIndex: root.modelManager.rootView.mode
 
                 Mixer {
-                    model: root.modelFactory.mixer
+                    model: root.modelManager.mixer
                 }
 
                 Loader {
                     sourceComponent: Log {
-                        logMessages: root.modelFactory.log.logMessages
+                        logMessages: root.modelManager.log.logMessages
                     }
                     asynchronous: true
                 }
 
                 Loader {
                     sourceComponent: Settings {
-                        audioDeviceModel: root.modelFactory.audioDeviceSettings
-                        audioInputModel: root.modelFactory.audioInputSettings
-                        audioOutputModel: root.modelFactory.audioOutputSettings
-                        midiInputModel: root.modelFactory.midiInputSettings
+                        audioDeviceModel: root.modelManager.audioDeviceSettings
+                        audioInputModel: root.modelManager.audioInputSettings
+                        audioOutputModel: root.modelManager.audioOutputSettings
+                        midiInputModel: root.modelManager.midiInputSettings
                     }
                     asynchronous: true
                 }
@@ -155,14 +155,14 @@ Item {
 
                 Loader {
                     sourceComponent: FxBrowser {
-                        model: root.modelFactory.fxBrowser
+                        model: root.modelManager.fxBrowser
                     }
                     asynchronous: true
                 }
 
                 Loader {
                     sourceComponent: FxModule {
-                        model: root.modelFactory.fxModule
+                        model: root.modelManager.fxModule
                     }
                     asynchronous: true
                 }
@@ -188,7 +188,7 @@ Item {
     }
 
     ModelSubscription {
-        target: root.modelFactory.rootView
+        target: root.modelManager.rootView
         subscribed: root.visible
     }
 }

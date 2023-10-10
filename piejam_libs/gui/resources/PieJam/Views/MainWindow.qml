@@ -10,7 +10,7 @@ import QtQuick.Window 2.15
 Window {
     id: root
 
-    property var modelFactory
+    property var modelManager: null
 
     width: 800
     height: 480
@@ -22,7 +22,7 @@ Window {
     RootView {
         anchors.fill: parent
 
-        modelFactory: root.modelFactory
+        modelManager: root.modelManager
 
         Component.onCompleted: root.visible = true
     }

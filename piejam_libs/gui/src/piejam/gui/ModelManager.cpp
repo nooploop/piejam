@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/Factory.h>
+#include <piejam/gui/ModelManager.h>
 
 #include <piejam/gui/item/DbScale.h>
 #include <piejam/gui/item/Scope.h>
@@ -53,7 +53,7 @@ initResources()
     Q_INIT_RESOURCE(piejam_gui_resources);
 }
 
-namespace piejam::gui::model
+namespace piejam::gui
 {
 
 static void
@@ -155,38 +155,43 @@ runRegistration()
             1,
             0,
             "MixerDbScales",
-            &g_mixerDbScales);
+            &model::g_mixerDbScales);
 }
 
-Factory::Factory(
+ModelManager::ModelManager(
         runtime::store_dispatch dispatch,
         runtime::subscriber& state_change_subscriber)
     : m_store_dispatch(dispatch)
     , m_state_change_subscriber(state_change_subscriber)
-    , m_audioDeviceSettings(std::make_unique<AudioDeviceSettings>(
+    , m_audioDeviceSettings(std::make_unique<model::AudioDeviceSettings>(
               dispatch,
               state_change_subscriber))
-    , m_audioInputSettings(std::make_unique<AudioInputSettings>(
+    , m_audioInputSettings(std::make_unique<model::AudioInputSettings>(
               dispatch,
               state_change_subscriber))
-    , m_audioOutputSettings(std::make_unique<AudioOutputSettings>(
+    , m_audioOutputSettings(std::make_unique<model::AudioOutputSettings>(
               dispatch,
               state_change_subscriber))
-    , m_midiInputSettings(std::make_unique<MidiInputSettings>(
+    , m_midiInputSettings(std::make_unique<model::MidiInputSettings>(
               dispatch,
               state_change_subscriber))
-    , m_mixer(std::make_unique<Mixer>(dispatch, state_change_subscriber))
-    , m_info(std::make_unique<Info>(dispatch, state_change_subscriber))
-    , m_log(std::make_unique<Log>(dispatch, state_change_subscriber))
-    , m_fxBrowser(
-              std::make_unique<FxBrowser>(dispatch, state_change_subscriber))
-    , m_fxModule(std::make_unique<FxModule>(dispatch, state_change_subscriber))
-    , m_rootView(std::make_unique<RootView>(dispatch, state_change_subscriber))
+    , m_mixer(std::make_unique<model::Mixer>(dispatch, state_change_subscriber))
+    , m_info(std::make_unique<model::Info>(dispatch, state_change_subscriber))
+    , m_log(std::make_unique<model::Log>(dispatch, state_change_subscriber))
+    , m_fxBrowser(std::make_unique<model::FxBrowser>(
+              dispatch,
+              state_change_subscriber))
+    , m_fxModule(std::make_unique<model::FxModule>(
+              dispatch,
+              state_change_subscriber))
+    , m_rootView(std::make_unique<model::RootView>(
+              dispatch,
+              state_change_subscriber))
 {
     static std::once_flag s_registered;
     std::call_once(s_registered, &runRegistration);
 }
 
-Factory::~Factory() = default;
+ModelManager::~ModelManager() = default;
 
-} // namespace piejam::gui::model
+} // namespace piejam::gui

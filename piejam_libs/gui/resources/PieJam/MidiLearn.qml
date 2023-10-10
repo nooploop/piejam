@@ -27,7 +27,7 @@ Item {
         }
     }
 
-    onActiveChanged: if (!active) stop()
+    onActiveChanged: if (!root.active) stop()
 
     QtObject {
         id: privates

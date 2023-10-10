@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/gui/model/Factory.h>
 #include <piejam/gui/model/fwd.h>
 #include <piejam/runtime/store_dispatch.h>
 #include <piejam/runtime/subscriber.h>
@@ -13,10 +12,10 @@
 
 #include <memory>
 
-namespace piejam::gui::model
+namespace piejam::gui
 {
 
-class Factory final : public QObject
+class ModelManager final : public QObject
 {
     Q_OBJECT
 
@@ -41,57 +40,55 @@ class Factory final : public QObject
     Q_PROPERTY(piejam::gui::model::RootView* rootView READ rootView CONSTANT)
 
 public:
-    Factory(runtime::store_dispatch, runtime::subscriber&);
-    ~Factory();
+    ModelManager(runtime::store_dispatch, runtime::subscriber&);
+    ~ModelManager();
 
-    auto audioDeviceSettings() const -> piejam::gui::model::AudioDeviceSettings*
+    auto audioDeviceSettings() const -> model::AudioDeviceSettings*
     {
         return m_audioDeviceSettings.get();
     }
 
-    auto audioInputSettings() const
-            -> piejam::gui::model::AudioInputOutputSettings*
+    auto audioInputSettings() const -> model::AudioInputOutputSettings*
     {
         return m_audioInputSettings.get();
     }
 
-    auto audioOutputSettings() const
-            -> piejam::gui::model::AudioInputOutputSettings*
+    auto audioOutputSettings() const -> model::AudioInputOutputSettings*
     {
         return m_audioOutputSettings.get();
     }
 
-    auto midiInputSettings() const -> piejam::gui::model::MidiInputSettings*
+    auto midiInputSettings() const -> model::MidiInputSettings*
     {
         return m_midiInputSettings.get();
     }
 
-    auto mixer() const -> piejam::gui::model::Mixer*
+    auto mixer() const -> model::Mixer*
     {
         return m_mixer.get();
     }
 
-    auto info() const -> piejam::gui::model::Info*
+    auto info() const -> model::Info*
     {
         return m_info.get();
     }
 
-    auto log() const -> piejam::gui::model::Log*
+    auto log() const -> model::Log*
     {
         return m_log.get();
     }
 
-    auto fxBrowser() const -> piejam::gui::model::FxBrowser*
+    auto fxBrowser() const -> model::FxBrowser*
     {
         return m_fxBrowser.get();
     }
 
-    auto fxModule() const -> piejam::gui::model::FxModule*
+    auto fxModule() const -> model::FxModule*
     {
         return m_fxModule.get();
     }
 
-    auto rootView() const -> piejam::gui::model::RootView*
+    auto rootView() const -> model::RootView*
     {
         return m_rootView.get();
     }
@@ -100,20 +97,17 @@ private:
     runtime::store_dispatch m_store_dispatch;
     runtime::subscriber& m_state_change_subscriber;
 
-    std::unique_ptr<piejam::gui::model::AudioDeviceSettings>
-            m_audioDeviceSettings;
-    std::unique_ptr<piejam::gui::model::AudioInputOutputSettings>
-            m_audioInputSettings;
-    std::unique_ptr<piejam::gui::model::AudioInputOutputSettings>
-            m_audioOutputSettings;
-    std::unique_ptr<piejam::gui::model::MidiInputSettings> m_midiInputSettings;
-    std::unique_ptr<piejam::gui::model::Mixer> m_mixer;
-    std::unique_ptr<piejam::gui::model::Info> m_info;
-    std::unique_ptr<piejam::gui::model::Log> m_log;
-    std::unique_ptr<piejam::gui::model::FxBrowser> m_fxBrowser;
-    std::unique_ptr<piejam::gui::model::FxModule> m_fxModule;
+    std::unique_ptr<model::AudioDeviceSettings> m_audioDeviceSettings;
+    std::unique_ptr<model::AudioInputOutputSettings> m_audioInputSettings;
+    std::unique_ptr<model::AudioInputOutputSettings> m_audioOutputSettings;
+    std::unique_ptr<model::MidiInputSettings> m_midiInputSettings;
+    std::unique_ptr<model::Mixer> m_mixer;
+    std::unique_ptr<model::Info> m_info;
+    std::unique_ptr<model::Log> m_log;
+    std::unique_ptr<model::FxBrowser> m_fxBrowser;
+    std::unique_ptr<model::FxModule> m_fxModule;
 
-    std::unique_ptr<piejam::gui::model::RootView> m_rootView;
+    std::unique_ptr<model::RootView> m_rootView;
 };
 
-} // namespace piejam::gui::model
+} // namespace piejam::gui
