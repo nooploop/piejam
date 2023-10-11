@@ -12,9 +12,6 @@ Pane {
 
     property var model: null
 
-    implicitWidth: 752
-    implicitHeight: 432
-
     padding: 0
 
     ModelSubscription {

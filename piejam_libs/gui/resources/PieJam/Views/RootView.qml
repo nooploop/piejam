@@ -22,9 +22,6 @@ Item {
 
     property var modelManager: null
 
-    implicitWidth: 800
-    implicitHeight: 480
-
     RowLayout {
         anchors.fill: parent
 
@@ -134,7 +131,7 @@ Item {
 
                 Loader {
                     sourceComponent: Log {
-                        logMessages: root.modelManager.log.logMessages
+                        model: root.modelManager.log
                     }
                     asynchronous: true
                 }

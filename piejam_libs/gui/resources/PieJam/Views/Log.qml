@@ -8,20 +8,16 @@ import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
 ViewPane {
-
     id: root
-
-    property alias logMessages: messages.model
 
     Frame {
         anchors.fill: parent
         anchors.margins: 8
 
         ListView {
-            id: messages
-
             anchors.fill: parent
 
+            model: root.model ? root.model.logMessages : null
             clip: true
 
             delegate: Label {

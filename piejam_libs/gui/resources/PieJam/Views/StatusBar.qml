@@ -5,6 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 import QtQml 2.15
 
@@ -14,93 +15,82 @@ import "../Controls"
 SubscribableItem {
     id: root
 
-    implicitWidth: 800
     implicitHeight: 48
 
     Rectangle {
-        id: statusBarBackground
-
         anchors.fill: parent
 
         color: Material.color(Material.Grey, Material.Shade800)
 
-        Label {
-            id: infoMessageLabel
+        RowLayout {
+            anchors.fill: parent
 
-            anchors.left: parent.left
-            anchors.right: recordButton.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.margins: 6
+            Label {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.topMargin: 6
+                Layout.bottomMargin: 6
+                Layout.leftMargin: 6
 
-            wrapMode: Text.WordWrap
-            textFormat: Text.RichText
-            clip: true
+                wrapMode: Text.WordWrap
+                textFormat: Text.RichText
+                clip: true
 
-            padding: 2
-            leftPadding: 4
-            rightPadding: 4
-            text: Info.message
+                padding: 2
+                leftPadding: 4
+                rightPadding: 4
+                text: Info.message
 
-            background: Rectangle {
-                color: Material.background
-                radius: 4
+                background: Rectangle {
+                    color: Material.background
+                    radius: 4
+                }
             }
-        }
 
-        Button {
-            id: recordButton
+            Button {
+                Layout.preferredWidth: 48
 
-            width: 48
+                checkable: true
+                Material.accent: Material.Red
 
-            anchors.right: midiLearn.left
-            anchors.rightMargin: 6
+                checked: root.model.recording
 
-            checkable: true
-            Material.accent: Material.Red
+                text: "REC"
 
-            checked: root.model.recording
-
-            text: "REC"
-
-            onClicked: root.model.changeRecording(checked)
-        }
-
-        Button {
-            id: midiLearn
-
-            width: 38
-
-            anchors.right: infoReadout.left
-            anchors.rightMargin: 6
-
-            checkable: true
-
-            icon.width: 24
-            icon.height: 24
-            icon.source: "qrc:///images/icons/midi-port.svg"
-            display: AbstractButton.IconOnly
-
-            Binding {
-                target: MidiLearn
-                property: "active"
-                value: midiLearn.checked
+                onClicked: root.model.changeRecording(checked)
             }
-        }
 
-        InfoReadout {
-            id: infoReadout
+            Button {
+                id: midiLearn
 
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.margins: 6
+                Layout.preferredWidth: 38
 
-            diskUsage: root.model.diskUsage
-            audioLoad: root.model.audioLoad
-            xruns: root.model.xruns
-            cpuLoad: root.model.cpuLoad
-            cpuTemp: root.model.cpuTemp
+                checkable: true
+
+                icon.width: 24
+                icon.height: 24
+                icon.source: "qrc:///images/icons/midi-port.svg"
+                display: AbstractButton.IconOnly
+
+                Binding {
+                    target: MidiLearn
+                    property: "active"
+                    value: midiLearn.checked
+                }
+            }
+
+            InfoReadout {
+                Layout.fillHeight: true
+                Layout.topMargin: 6
+                Layout.bottomMargin: 6
+                Layout.rightMargin: 6
+
+                diskUsage: root.model.diskUsage
+                audioLoad: root.model.audioLoad
+                xruns: root.model.xruns
+                cpuLoad: root.model.cpuLoad
+                cpuTemp: root.model.cpuTemp
+            }
         }
     }
 

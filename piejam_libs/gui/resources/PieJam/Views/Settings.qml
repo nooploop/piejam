@@ -10,8 +10,7 @@ import QtQuick.Layouts 1.15
 import "../Controls"
 import "../SettingsControls"
 
-ViewPane {
-
+Pane {
     id: root
 
     property alias audioDeviceModel: audioSettings.deviceModel
@@ -19,74 +18,67 @@ ViewPane {
     property alias audioOutputModel: audioSettings.outputModel
     property alias midiInputModel: midiSettings.model
 
-    property int currentIndex: 0
+    padding: 0
 
-    ColumnLayout {
-        id: tabBar
+    RowLayout {
+        anchors.fill: parent
 
-        width: 100
+        spacing: 0
 
-        TabButton {
-            id: audioTab
-            text: "Audio"
-            Layout.fillWidth: true
+        ListView {
+            id: tabButtons
 
-            checked: root.currentIndex == 0
+            Layout.preferredWidth: 96
+            Layout.fillHeight: true
 
-            onClicked: root.currentIndex = 0
-        }
+            spacing: 0
+            interactive: false
 
-        TabButton {
-            id: midiTab
-            text: "MIDI"
-            Layout.fillWidth: true
+            model: ["Audio", "MIDI"]
 
-            checked: root.currentIndex == 1
+            delegate: Button {
+                width: 96
 
-            onClicked: root.currentIndex = 1
-        }
-    }
+                flat: true
+                text: modelData
+                highlighted: ListView.isCurrentItem
 
-    Rectangle {
-        id: tabsShadow
-
-        width: 4
-
-        anchors.right: settings.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-
-            GradientStop {
-                position: 0
-                color: "#00000000"
-            }
-
-            GradientStop {
-                position: 1
-                color: "#000000"
+                onClicked: tabButtons.currentIndex = index
             }
         }
-    }
 
-    StackLayout {
-        id: settings
+        Rectangle {
+            Layout.preferredWidth: 4
+            Layout.fillHeight: true
 
-        anchors.left: tabBar.right
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
 
-        currentIndex: root.currentIndex
+                GradientStop {
+                    position: 0
+                    color: "#00000000"
+                }
 
-        AudioSettings {
-            id: audioSettings
+                GradientStop {
+                    position: 1
+                    color: "#000000"
+                }
+            }
         }
 
-        MidiSettings {
-            id: midiSettings
+        StackLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            currentIndex: tabButtons.currentIndex
+
+            AudioSettings {
+                id: audioSettings
+            }
+
+            MidiSettings {
+                id: midiSettings
+            }
         }
     }
 }
