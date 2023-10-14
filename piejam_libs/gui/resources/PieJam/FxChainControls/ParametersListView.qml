@@ -9,6 +9,8 @@ import ".."
 SubscribableItem {
     id: root
 
+    property bool bypassed: false
+
     implicitWidth: 400
 
     ListView {
