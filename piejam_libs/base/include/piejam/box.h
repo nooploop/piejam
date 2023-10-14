@@ -6,6 +6,8 @@
 
 #include <piejam/scope_guard.h>
 
+#include <boost/callable_traits/args.hpp>
+
 #include <memory>
 #include <utility>
 
@@ -125,6 +127,11 @@ public:
     template <std::invocable<T&> U>
     auto update(U&& u)
     {
+        static_assert(std::is_same_v<
+                      std::tuple_element_t<
+                              0,
+                              boost::callable_traits::args_t<U>>,
+                      T&>);
         auto value = std::make_shared<T>(*m_value);
         on_scope_exit on_exit([this, value]() { m_value = std::move(value); });
         return u(*value);
