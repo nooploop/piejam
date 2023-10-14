@@ -9,6 +9,7 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/fx_modules/tool/tool_module.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/internal_fx_component_factory.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/to_underlying.h>
 
@@ -79,8 +80,7 @@ private:
 } // namespace
 
 auto
-make_component(
-        runtime::components::internal_fx_component_factory_args const& args)
+make_component(runtime::internal_fx_component_factory_args const& args)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<component>(

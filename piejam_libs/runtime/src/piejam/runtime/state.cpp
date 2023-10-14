@@ -8,7 +8,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/indexed_access.h>
 #include <piejam/ladspa/port_descriptor.h>
-#include <piejam/runtime/modules/factory.h>
+#include <piejam/runtime/internal_fx_module_factory.h>
 #include <piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_factory.h>
@@ -263,7 +263,7 @@ insert_internal_fx_module(
 
     fx::module_id fx_mod_id = make_internal_fx_module(
             st.fx_modules,
-            modules::internal_fx_module_factories::lookup(fx_internal_id)({
+            internal_fx_module_factories::lookup(fx_internal_id)({
                     .bus_type = bus_type,
                     .sample_rate = st.sample_rate,
                     .params = st.params,

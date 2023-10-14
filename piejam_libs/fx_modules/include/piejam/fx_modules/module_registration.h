@@ -6,9 +6,9 @@
 
 #include <piejam/audio/engine/component.h>
 #include <piejam/gui/model/FxModuleContentFactory.h>
-#include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/modules/factory.h>
+#include <piejam/runtime/internal_fx_component_factory.h>
+#include <piejam/runtime/internal_fx_module_factory.h>
 
 #include <QString>
 
@@ -23,8 +23,8 @@ struct module_registration
 {
     std::string persistence_name;
 
-    runtime::modules::internal_fx_module_factory fx_module_factory;
-    runtime::components::internal_fx_component_factory fx_component_factory;
+    runtime::internal_fx_module_factory fx_module_factory;
+    runtime::internal_fx_component_factory fx_component_factory;
 
     QString fx_browser_entry_name;
     QString fx_browser_entry_description;

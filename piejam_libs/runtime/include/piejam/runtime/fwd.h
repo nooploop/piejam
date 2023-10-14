@@ -59,4 +59,6 @@ using middleware_functors = redux::middleware_functors<state, action>;
 enum class root_view_mode : int;
 enum class fx_browser_add_mode : int;
 
+struct internal_fx_component_factory_args;
+
 } // namespace piejam::runtime

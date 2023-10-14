@@ -71,6 +71,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/registry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/unavailable_ladspa.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/generic_action_visitor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/internal_fx_component_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/internal_fx_module_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/middleware_functors.h
@@ -82,7 +84,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi_input_controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_.h
@@ -99,6 +100,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/access.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fx_internal_id.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fx_midi_assignments.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fx_preset.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/midi_assignment.h
@@ -180,6 +182,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/parameter_value_to_string.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_internal_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_midi_assignments.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_preset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/midi_assignment.cpp
@@ -197,8 +200,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/state.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/store_dispatch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/thunk_action.cpp
-    include/piejam/runtime/persistence/fx_internal_id.h
-    src/piejam/runtime/persistence/fx_internal_id.cpp
 )
 
 find_package(nlohmann_json REQUIRED)

@@ -24,11 +24,11 @@ register_module(module_registration mod_reg) -> runtime::fx::internal_id
             id,
             std::move(mod_reg.persistence_name));
 
-    runtime::modules::internal_fx_module_factories::add_entry(
+    runtime::internal_fx_module_factories::add_entry(
             id,
             std::move(mod_reg.fx_module_factory));
 
-    runtime::components::internal_fx_component_factories::add_entry(
+    runtime::internal_fx_component_factories::add_entry(
             id,
             std::move(mod_reg.fx_component_factory));
 

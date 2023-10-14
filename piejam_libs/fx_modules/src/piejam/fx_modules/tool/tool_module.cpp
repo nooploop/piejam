@@ -45,7 +45,7 @@ to_dB_string(float x) -> std::string
 } // namespace
 
 auto
-make_module(runtime::modules::internal_fx_module_factory_args const& args)
+make_module(runtime::internal_fx_module_factory_args const& args)
         -> runtime::fx::module
 {
     using namespace std::string_literals;

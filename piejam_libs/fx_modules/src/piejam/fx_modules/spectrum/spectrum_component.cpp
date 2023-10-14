@@ -10,6 +10,7 @@
 #include <piejam/fx_modules/spectrum/spectrum_module.h>
 #include <piejam/runtime/components/stream.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/internal_fx_component_factory.h>
 #include <piejam/to_underlying.h>
 
 #include <boost/container/flat_map.hpp>
@@ -18,8 +19,7 @@ namespace piejam::fx_modules::spectrum
 {
 
 auto
-make_component(
-        runtime::components::internal_fx_component_factory_args const& args)
+make_component(runtime::internal_fx_component_factory_args const& args)
         -> std::unique_ptr<audio::engine::component>
 {
     return runtime::components::make_stream(

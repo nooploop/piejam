@@ -11,6 +11,7 @@
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/internal_fx_component_factory.h>
 #include <piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h>
 
 #include <boost/assert.hpp>

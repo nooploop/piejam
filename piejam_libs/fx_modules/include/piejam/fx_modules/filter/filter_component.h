@@ -6,7 +6,6 @@
 
 #include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/fwd.h>
-#include <piejam/runtime/components/make_fx.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 
@@ -16,8 +15,7 @@
 namespace piejam::fx_modules::filter
 {
 
-auto
-make_component(runtime::components::internal_fx_component_factory_args const&)
+auto make_component(runtime::internal_fx_component_factory_args const&)
         -> std::unique_ptr<audio::engine::component>;
 
 } // namespace piejam::fx_modules::filter

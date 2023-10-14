@@ -22,6 +22,7 @@
 #include <piejam/math.h>
 #include <piejam/runtime/components/stream.h>
 #include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/internal_fx_component_factory.h>
 #include <piejam/runtime/parameter_processor_factory.h>
 #include <piejam/runtime/processors/stream_processor_factory.h>
 #include <piejam/to_underlying.h>
@@ -335,8 +336,7 @@ class component final : public audio::engine::component
     static inline constexpr std::size_t num_channels = sizeof...(Channel);
 
 public:
-    component(
-            runtime::components::internal_fx_component_factory_args const& args)
+    component(runtime::internal_fx_component_factory_args const& args)
         : m_type_input_proc(runtime::processors::make_parameter_processor(
                   args.param_procs,
                   args.fx_mod.parameters->at(
@@ -480,7 +480,7 @@ private:
 template <std::size_t... Channel>
 auto
 make_component(
-        runtime::components::internal_fx_component_factory_args const& args,
+        runtime::internal_fx_component_factory_args const& args,
         std::index_sequence<Channel...>)
         -> std::unique_ptr<audio::engine::component>
 {
@@ -490,8 +490,7 @@ make_component(
 } // namespace
 
 auto
-make_component(
-        runtime::components::internal_fx_component_factory_args const& args)
+make_component(runtime::internal_fx_component_factory_args const& args)
         -> std::unique_ptr<audio::engine::component>
 {
     switch (args.fx_mod.bus_type)

@@ -70,7 +70,7 @@ to_resonance_string(float const r)
 } // namespace
 
 auto
-make_module(runtime::modules::internal_fx_module_factory_args const& args)
+make_module(runtime::internal_fx_module_factory_args const& args)
         -> runtime::fx::module
 {
     using namespace std::string_literals;

@@ -10,7 +10,7 @@
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 
-namespace piejam::runtime::modules
+namespace piejam::runtime
 {
 
 struct internal_fx_module_factory_args
@@ -30,4 +30,4 @@ using internal_fx_module_factories = registry_map<
         fx::internal_id,
         internal_fx_module_factory>;
 
-} // namespace piejam::runtime::modules
+} // namespace piejam::runtime
