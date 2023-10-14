@@ -4,12 +4,9 @@
 
 #include <piejam/gui/model/FxModule.h>
 
-#include <piejam/gui/model/FxFilter.h>
 #include <piejam/gui/model/FxGenericModule.h>
-#include <piejam/gui/model/FxScope.h>
-#include <piejam/gui/model/FxSpectrum.h>
+#include <piejam/gui/model/FxModuleContentFactory.h>
 #include <piejam/runtime/actions/fx_chain_actions.h>
-#include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/selectors.h>
 
@@ -37,34 +34,12 @@ makeModuleContent(
 
     return std::visit(
             boost::hof::match(
-                    [&](runtime::fx::internal fx_type)
+                    [&](runtime::fx::internal_id fx_type)
                             -> std::unique_ptr<FxModuleContent> {
-                        switch (fx_type)
-                        {
-                            case runtime::fx::internal::filter:
-                                return std::make_unique<FxFilter>(
-                                        store_dispatch,
-                                        state_change_subscriber,
-                                        fx_mod_id);
-
-                            case runtime::fx::internal::scope:
-                                return std::make_unique<FxScope>(
-                                        store_dispatch,
-                                        state_change_subscriber,
-                                        fx_mod_id);
-
-                            case runtime::fx::internal::spectrum:
-                                return std::make_unique<FxSpectrum>(
-                                        store_dispatch,
-                                        state_change_subscriber,
-                                        fx_mod_id);
-
-                            default:
-                                return std::make_unique<FxGenericModule>(
-                                        store_dispatch,
-                                        state_change_subscriber,
-                                        fx_mod_id);
-                        }
+                        return FxModuleContentFactories::lookup(fx_type)(
+                                store_dispatch,
+                                state_change_subscriber,
+                                fx_mod_id);
                     },
                     [&](auto const&) -> std::unique_ptr<FxModuleContent> {
                         return std::make_unique<FxGenericModule>(

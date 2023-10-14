@@ -20,11 +20,9 @@
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>
-#include <piejam/gui/model/FxFilter.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxModuleContent.h>
-#include <piejam/gui/model/FxScope.h>
-#include <piejam/gui/model/FxSpectrum.h>
+#include <piejam/gui/model/FxModuleRegistry.h>
 #include <piejam/gui/model/Info.h>
 #include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/Log.h>
@@ -44,14 +42,9 @@
 #include <piejam/gui/model/StereoLevelParameter.h>
 #include <piejam/gui/model/StringList.h>
 #include <piejam/gui/model/Types.h>
+#include <piejam/gui/model/WaveformDataObject.h>
 
 #include <mutex>
-
-static void
-initResources()
-{
-    Q_INIT_RESOURCE(piejam_gui_resources);
-}
 
 namespace piejam::gui
 {
@@ -59,41 +52,39 @@ namespace piejam::gui
 static void
 runRegistration()
 {
-    initResources();
+    qRegisterMetaType<piejam::gui::model::FxModuleType>();
+    qRegisterMetaType<piejam::gui::model::FxModuleRegistryItem>();
 
-    qRegisterMetaType<piejam::gui::model::EnumListModel*>();
-    qRegisterMetaType<piejam::gui::model::StringList*>();
     qRegisterMetaType<piejam::gui::model::AudioDeviceSettings*>();
     qRegisterMetaType<piejam::gui::model::AudioInputOutputSettings*>();
+    qRegisterMetaType<piejam::gui::model::AudioStreamListener*>();
+    qRegisterMetaType<piejam::gui::model::AudioStreamProvider*>();
+    qRegisterMetaType<piejam::gui::model::BoolParameter*>();
+    qRegisterMetaType<piejam::gui::model::DbScaleData*>();
+    qRegisterMetaType<piejam::gui::model::EnumListModel*>();
+    qRegisterMetaType<piejam::gui::model::EnumParameter*>();
+    qRegisterMetaType<piejam::gui::model::FloatParameter*>();
+    qRegisterMetaType<piejam::gui::model::FxBrowser*>();
+    qRegisterMetaType<piejam::gui::model::FxChainModule*>();
+    qRegisterMetaType<piejam::gui::model::FxModule*>();
+    qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
+    qRegisterMetaType<piejam::gui::model::Info*>();
+    qRegisterMetaType<piejam::gui::model::IntParameter*>();
+    qRegisterMetaType<piejam::gui::model::Log*>();
+    qRegisterMetaType<piejam::gui::model::MidiAssignable*>();
+    qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
     qRegisterMetaType<piejam::gui::model::Mixer*>();
     qRegisterMetaType<piejam::gui::model::MixerChannel*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelEdit*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelFx*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();
-    qRegisterMetaType<piejam::gui::model::DbScaleData*>();
-    qRegisterMetaType<piejam::gui::model::Info*>();
-    qRegisterMetaType<piejam::gui::model::Log*>();
     qRegisterMetaType<piejam::gui::model::Parameter*>();
-    qRegisterMetaType<piejam::gui::model::BoolParameter*>();
-    qRegisterMetaType<piejam::gui::model::EnumParameter*>();
-    qRegisterMetaType<piejam::gui::model::IntParameter*>();
-    qRegisterMetaType<piejam::gui::model::FloatParameter*>();
-    qRegisterMetaType<piejam::gui::model::StereoLevelParameter*>();
-    qRegisterMetaType<piejam::gui::model::FxChainModule*>();
-    qRegisterMetaType<piejam::gui::model::FxBrowser*>();
-    qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
-    qRegisterMetaType<piejam::gui::model::MidiAssignable*>();
-    qRegisterMetaType<piejam::gui::model::AudioStreamProvider*>();
-    qRegisterMetaType<piejam::gui::model::AudioStreamListener*>();
-    qRegisterMetaType<piejam::gui::model::FxModule*>();
-    qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
-    qRegisterMetaType<piejam::gui::model::FxScope*>();
-    qRegisterMetaType<piejam::gui::model::WaveformDataObject*>();
-    qRegisterMetaType<piejam::gui::model::ScopeData*>();
-    qRegisterMetaType<piejam::gui::model::FxSpectrum*>();
-    qRegisterMetaType<piejam::gui::model::SpectrumData*>();
-    qRegisterMetaType<piejam::gui::model::FxFilter*>();
     qRegisterMetaType<piejam::gui::model::RootView*>();
+    qRegisterMetaType<piejam::gui::model::ScopeData*>();
+    qRegisterMetaType<piejam::gui::model::SpectrumData*>();
+    qRegisterMetaType<piejam::gui::model::StereoLevelParameter*>();
+    qRegisterMetaType<piejam::gui::model::StringList*>();
+    qRegisterMetaType<piejam::gui::model::WaveformDataObject*>();
 
     qRegisterMetaType<piejam::gui::item::SpectrumScaleLabel>();
 
@@ -116,13 +107,6 @@ runRegistration()
             1,
             0,
             "Parameter",
-            "Not createable");
-
-    qmlRegisterUncreatableType<piejam::gui::model::FxScope>(
-            "PieJam.Models",
-            1,
-            0,
-            "FxScope",
             "Not createable");
 
     qmlRegisterUncreatableType<piejam::gui::model::RootView>(
@@ -163,6 +147,13 @@ runRegistration()
             0,
             "MixerDbScales",
             &model::g_mixerDbScales);
+
+    qmlRegisterSingletonInstance<piejam::gui::model::FxModuleRegistry>(
+            "PieJam.Models",
+            1,
+            0,
+            "FxModuleRegistry",
+            &model::fxModuleRegistrySingleton());
 }
 
 ModelManager::ModelManager(

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/runtime/fx/internal.h>
+#include <piejam/runtime/fx/fwd.h>
 
 #include <piejam/audio/types.h>
 #include <piejam/boxed_vector.h>
@@ -17,28 +17,28 @@ namespace piejam::runtime::fx
 
 struct registry
 {
-    using item = std::variant<internal, ladspa::plugin_descriptor>;
-
-    boxed_vector<item> entries;
+    using item = std::variant<internal_id, ladspa::plugin_descriptor>;
 
     auto operator==(registry const&) const noexcept -> bool = default;
+
+    static auto register_internal_module() -> internal_id
+    {
+        auto id = internal_id::generate();
+        internal_modules().update([id](std::vector<item>& internal_modules) {
+            internal_modules.emplace_back(id);
+        });
+        return id;
+    }
+
+    boxed_vector<item> entries{internal_modules()};
+
+private:
+    static auto internal_modules() -> boxed_vector<item>&
+    {
+        static boxed_vector<item> s_modules;
+        return s_modules;
+    }
 };
-
-[[nodiscard]] inline auto
-make_internal_fx_registry_entries()
-{
-    return std::vector<registry::item>{
-            {internal::tool},
-            {internal::filter},
-            {internal::scope},
-            {internal::spectrum}};
-}
-
-[[nodiscard]] inline auto
-make_default_registry() -> registry
-{
-    return {.entries = make_internal_fx_registry_entries()};
-}
 
 [[nodiscard]] inline auto
 find_ladspa_plugin_descriptor(
@@ -62,7 +62,7 @@ struct is_available_for_bus_type
 {
     audio::bus_type bus_type;
 
-    [[nodiscard]] auto operator()(internal) const -> bool
+    [[nodiscard]] auto operator()(internal_id) const -> bool
     {
         return true;
     }

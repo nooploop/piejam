@@ -17,6 +17,7 @@
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
+#include <boost/assert.hpp>
 #include <boost/core/ignore_unused.hpp>
 
 #include <functional>
@@ -37,7 +38,7 @@ struct make_add_fx_module_action
         auto action = std::make_unique<actions::insert_internal_fx_module>();
         action->fx_chain_id = fx_chain_id;
         action->position = npos;
-        action->type = fx.type;
+        action->type = fx.id;
         action->initial_values = fx.preset;
         action->midi_assignments = fx.midi;
         return action;
@@ -54,6 +55,12 @@ struct make_add_fx_module_action
         action->initial_values = ladspa_plug.preset;
         action->midi_assignments = ladspa_plug.midi;
         return action;
+    }
+
+    auto operator()(std::monostate const&) -> std::unique_ptr<action>
+    {
+        BOOST_ASSERT(false);
+        return nullptr;
     }
 };
 

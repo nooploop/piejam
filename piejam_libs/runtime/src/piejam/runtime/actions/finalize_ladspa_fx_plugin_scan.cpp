@@ -31,12 +31,14 @@ sort_fx_plugins(std::vector<ladspa::plugin_descriptor>& plugins)
 void
 finalize_ladspa_fx_plugin_scan::reduce(state& st) const
 {
-    auto fxs = fx::make_internal_fx_registry_entries();
+    fx::registry new_registry;
     auto ladspa_plugins = plugins;
     filter_fx_plugins(ladspa_plugins);
     sort_fx_plugins(ladspa_plugins);
-    boost::push_back(fxs, std::move(ladspa_plugins));
-    st.fx_registry.entries = std::move(fxs);
+    new_registry.entries.update([&](std::vector<fx::registry::item>& fxs) {
+        boost::push_back(fxs, std::move(ladspa_plugins));
+    });
+    st.fx_registry = std::move(new_registry);
 }
 
 } // namespace piejam::runtime::actions

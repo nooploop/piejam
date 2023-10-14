@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include <piejam/gui/model/FxModuleType.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
 
 namespace piejam::gui::model
 {
@@ -15,19 +17,9 @@ class FxModuleContent : public SubscribableModel
     Q_OBJECT
 
 public:
-    enum class Type : int
-    {
-        Generic = 0,
-        Filter,
-        Scope,
-        Spectrum
-    };
+    Q_PROPERTY(piejam::gui::model::FxModuleType type READ type CONSTANT FINAL)
 
-    Q_ENUM(Type)
-
-    Q_PROPERTY(Type type READ type CONSTANT FINAL)
-
-    virtual auto type() const noexcept -> Type = 0;
+    virtual auto type() const noexcept -> FxModuleType = 0;
 };
 
 } // namespace piejam::gui::model

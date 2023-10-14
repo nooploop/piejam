@@ -22,7 +22,7 @@ ViewPane {
 
         readonly property bool bypassed: root.model && root.model.bypassed
         readonly property var content: root.model ? root.model.content : null
-        readonly property int contentType: private_.content ? private_.content.type : -1
+        readonly property var contentType: private_.content ? private_.content.type : null
     }
 
     RowLayout {
@@ -46,44 +46,30 @@ ViewPane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                currentIndex: private_.contentType
+                currentIndex: private_.contentType ? FxModuleRegistry.indexOf(private_.contentType) : -1
 
-                BusyLoader {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                Repeater {
+                    model: FxModuleRegistry.items
 
-                    sourceComponent: ParametersListView {
-                        model: private_.contentType === FxModuleContent.Type.Generic ? private_.content : null
-                    }
-                }
+                    delegate: BusyLoader {
+                        id: fxModuleViewLoader
 
-                BusyLoader {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
 
-                    sourceComponent: FilterView {
-                        model: private_.contentType === FxModuleContent.Type.Filter ? private_.content : null
-                        bypassed: private_.bypassed
-                    }
-                }
+                        source: modelData.viewSource
 
-                BusyLoader {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                        Binding {
+                            target: fxModuleViewLoader.item
+                            property: "model"
+                            value: private_.contentType === modelData.fxType ? private_.content : null
+                        }
 
-                    sourceComponent: ScopeView {
-                        model: private_.contentType === FxModuleContent.Type.Scope ? private_.content : null
-                        bypassed: private_.bypassed
-                    }
-                }
-
-                BusyLoader {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    sourceComponent: SpectrumView {
-                        model: private_.contentType === FxModuleContent.Type.Spectrum ? private_.content : null
-                        bypassed: private_.bypassed
+                        Binding {
+                            target: fxModuleViewLoader.item
+                            property: "bypassed"
+                            value: private_.bypassed
+                        }
                     }
                 }
             }

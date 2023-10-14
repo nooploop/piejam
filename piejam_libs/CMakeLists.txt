@@ -17,5 +17,6 @@ add_subdirectory(reselect)
 add_subdirectory(thread)
 add_subdirectory(runtime)
 add_subdirectory(gui)
+add_subdirectory(fx_modules)
 
 set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)

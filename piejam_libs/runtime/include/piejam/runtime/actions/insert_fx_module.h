@@ -28,7 +28,7 @@ struct insert_internal_fx_module final
 {
     mixer::channel_id fx_chain_id;
     std::size_t position{};
-    fx::internal type{};
+    fx::internal_id type{};
     std::vector<fx::parameter_value_assignment> initial_values;
     std::vector<fx::parameter_midi_assignment> midi_assignments;
     bool show_fx_module{};

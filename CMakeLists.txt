@@ -12,7 +12,6 @@ set(CMAKE_CXX_STANDARD 20)
 option(PIEJAM_BENCHMARKS "Build benchmarks" OFF)
 option(PIEJAM_COVERAGE "Enable test coverage" OFF)
 option(PIEJAM_TESTS "Build tests" OFF)
-option(PIEJAM_TOOLS "Build tools" OFF)
 
 if(PIEJAM_TESTS)
     enable_testing()
@@ -78,7 +77,3 @@ add_subdirectory(piejam_libs)
 add_subdirectory(piejam_app)
 
 set(QML_IMPORT_PATH ${PIEJAM_QML_IMPORT_PATHS} CACHE STRING "Path used to locate CMake modules by Qt Creator" FORCE)
-
-if(PIEJAM_TOOLS)
-    add_subdirectory(piejam_tools)
-endif()

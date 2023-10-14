@@ -10,13 +10,13 @@ find_package(Qt5QuickControls2 REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5VirtualKeyboard REQUIRED)
 
-set(RESOUCE_FILES "resources/piejam_gui_resources.qrc")
+set(RESOURCE_FILES "resources/piejam_gui_resources.qrc")
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
     find_package(Qt5QuickCompiler)
-    qtquick_compiler_add_resources(RESOURCES ${RESOUCE_FILES})
+    qtquick_compiler_add_resources(RESOURCES ${RESOURCE_FILES})
 else()
-    qt5_add_resources(RESOURCES ${RESOUCE_FILES})
+    qt5_add_resources(RESOURCES ${RESOURCE_FILES})
 endif()
 
 list(APPEND PIEJAM_QML_IMPORT_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/resources)
@@ -26,6 +26,7 @@ add_library(piejam_gui STATIC
     ${RESOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/ModelManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/generic_list_model_edit_script_executor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/init.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/DbScale.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/Scope.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/item/Spectrum.h
@@ -47,14 +48,15 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryInternal.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryInternalData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntryLADSPA.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxChainModule.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxFilter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxGenericModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleContent.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxScope.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxSpectrum.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleContentFactory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleRegistry.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxModuleType.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxStream.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/GenericListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Info.h
@@ -90,6 +92,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/qt_log.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/ModelManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/init.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/DbScale.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/item/Spectrum.cpp
@@ -107,11 +110,9 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryInternal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryLADSPA.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxChainModule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxGenericModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxModule.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxScope.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxSpectrum.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxModuleRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxStream.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/Info.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/IntParameter.cpp
@@ -133,6 +134,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/WaveformDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
 )
+
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_gui
     Qt5::Quick
@@ -150,3 +152,6 @@ target_link_libraries(piejam_gui
 target_compile_options(piejam_gui PRIVATE -Wall -Wextra -Werror -pedantic-errors)
 
 add_subdirectory(tests)
+
+unset(RESOURCE_FILES)
+unset(RESOURCES)

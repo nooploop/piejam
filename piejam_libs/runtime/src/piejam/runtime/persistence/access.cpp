@@ -139,12 +139,13 @@ static auto
 export_fx_plugin(
         state const& st,
         fx::module const& fx_mod,
-        fx::internal const fx_type) -> session::fx_plugin
+        fx::internal_id const fx_internal_id) -> session::fx_plugin
 {
-    BOOST_ASSERT(std::get<fx::internal>(fx_mod.fx_instance_id) == fx_type);
+    BOOST_ASSERT(
+            std::get<fx::internal_id>(fx_mod.fx_instance_id) == fx_internal_id);
 
     session::internal_fx fx;
-    fx.type = fx_type;
+    fx.id = fx_internal_id;
     fx.preset = export_parameter_values(fx_mod, st.params);
     fx.midi = export_fx_midi_assignments(fx_mod, st.midi_assignments);
     return fx;

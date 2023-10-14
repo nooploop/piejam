@@ -75,40 +75,4 @@ TEST_F(state_with_one_mixer_input,
     EXPECT_TRUE(sut.params.get_map<stereo_level_parameter>().empty());
 }
 
-struct state_with_one_fx : testing::Test
-{
-    state_with_one_fx()
-        : bus_id(add_mixer_channel(sut, "foo", audio::bus_type::stereo))
-        , fx_mod_id(insert_internal_fx_module(
-                  sut,
-                  bus_id,
-                  0,
-                  fx::internal::tool,
-                  {},
-                  {}))
-    {
-    }
-
-    state sut;
-    mixer::channel_id bus_id;
-    fx::module_id fx_mod_id;
-};
-
-TEST_F(state_with_one_fx, after_insert_fx)
-{
-    EXPECT_EQ(1u, sut.fx_modules.size());
-    EXPECT_TRUE(sut.fx_modules.contains(fx_mod_id));
-}
-
-TEST_F(state_with_one_fx, remove_fx)
-{
-    EXPECT_EQ(1u, sut.fx_modules.size());
-    ASSERT_TRUE(sut.fx_modules.contains(fx_mod_id));
-
-    remove_fx_module(sut, bus_id, fx_mod_id);
-
-    EXPECT_TRUE(sut.fx_modules.empty());
-    EXPECT_FALSE(sut.fx_modules.contains(fx_mod_id));
-}
-
 } // namespace piejam::runtime::test

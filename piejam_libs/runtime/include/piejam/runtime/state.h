@@ -66,7 +66,7 @@ struct state
     ui_parameter_descriptors_map ui_params;
     audio_streams_cache streams;
 
-    fx::registry fx_registry{fx::make_default_registry()};
+    fx::registry fx_registry;
 
     fx::modules_t fx_modules;
     box<fx::ladspa_instances> fx_ladspa_instances;
@@ -131,7 +131,7 @@ auto insert_internal_fx_module(
         state&,
         mixer::channel_id,
         std::size_t position,
-        fx::internal,
+        fx::internal_id,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> fx::module_id;

@@ -25,7 +25,7 @@ namespace
 makeBrowserEntry(
         runtime::store_dispatch dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::fx::internal fx_type) -> std::unique_ptr<FxBrowserEntry>
+        runtime::fx::internal_id fx_type) -> std::unique_ptr<FxBrowserEntry>
 {
     return std::make_unique<FxBrowserEntryInternal>(
             std::move(dispatch),

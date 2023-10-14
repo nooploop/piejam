@@ -32,7 +32,7 @@ struct session
 
     struct internal_fx
     {
-        fx::internal type;
+        fx::internal_id id{};
         fx_preset preset;
         fx_midi_assignments midi;
     };
@@ -45,10 +45,12 @@ struct session
         fx_midi_assignments midi;
     };
 
-    struct fx_plugin : std::variant<internal_fx, ladspa_plugin>
+    struct fx_plugin : std::variant<std::monostate, internal_fx, ladspa_plugin>
     {
-        using base_t = std::variant<internal_fx, ladspa_plugin>;
-        using base_t::variant;
+        using base_t = std::variant<std::monostate, internal_fx, ladspa_plugin>;
+        using base_t::base_t;
+        using base_t::operator=;
+
         [[nodiscard]] auto as_variant() const noexcept -> base_t const&
         {
             return *this;

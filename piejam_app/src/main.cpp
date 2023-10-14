@@ -4,7 +4,9 @@
 
 #include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/fx_modules/init.h>
 #include <piejam/gui/ModelManager.h>
+#include <piejam/gui/init.h>
 #include <piejam/gui/model/Info.h>
 #include <piejam/gui/qt_log.h>
 #include <piejam/ladspa/instance_manager_processor_factory.h>
@@ -111,6 +113,9 @@ main(int argc, char* argv[]) -> int
 
     // run app on the second cpu, first one is for the system
     this_thread::set_affinity(1);
+
+    piejam::gui::init();
+    piejam::fx_modules::init();
 
     gui::qt_log::install_handler();
     spdlog::set_level(spdlog::level::level_enum::debug);

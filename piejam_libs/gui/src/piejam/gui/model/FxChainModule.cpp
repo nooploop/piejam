@@ -7,7 +7,6 @@
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/fx_chain_actions.h>
 #include <piejam/runtime/actions/root_view_actions.h>
-#include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/selectors.h>
 

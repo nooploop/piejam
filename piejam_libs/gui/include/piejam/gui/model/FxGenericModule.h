@@ -14,7 +14,7 @@
 namespace piejam::gui::model
 {
 
-class FxGenericModule final : public Subscribable<FxModuleContent>
+class FxGenericModule : public Subscribable<FxModuleContent>
 {
     Q_OBJECT
 
@@ -27,9 +27,9 @@ public:
             runtime::fx::module_id);
     ~FxGenericModule();
 
-    auto type() const noexcept -> Type override
+    auto type() const noexcept -> FxModuleType override
     {
-        return Type::Generic;
+        return {};
     }
 
     auto parameters() noexcept -> FxParametersList*;

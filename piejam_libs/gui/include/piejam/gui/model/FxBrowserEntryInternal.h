@@ -7,7 +7,6 @@
 #include <piejam/entity_id.h>
 #include <piejam/gui/model/FxBrowserEntry.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/mixer_fwd.h>
 
 namespace piejam::gui::model
 {
@@ -18,14 +17,14 @@ public:
     FxBrowserEntryInternal(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::fx::internal);
+            runtime::fx::internal_id);
 
     void appendModule() override;
 
 private:
     void onSubscribe() override;
 
-    runtime::fx::internal m_fx_type;
+    runtime::fx::internal_id m_fx_type;
 };
 
 } // namespace piejam::gui::model

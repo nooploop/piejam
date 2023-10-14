@@ -6,6 +6,8 @@
 
 #include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/fx/parameter_assignment.h>
+#include <piejam/runtime/midi_assignment.h>
 
 #include <vector>
 

@@ -4,8 +4,8 @@
 
 #include <piejam/runtime/persistence/session.h>
 
-#include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
+#include <piejam/runtime/persistence/fx_internal_id.h>
 #include <piejam/runtime/persistence/midi_assignment.h>
 
 #include <nlohmann/json.hpp>
@@ -24,22 +24,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
 
 } // namespace piejam::audio
 
-namespace piejam::runtime
-{
-
-namespace fx
-{
-
-NLOHMANN_JSON_SERIALIZE_ENUM(
-        internal,
-        {{internal::tool, "tool"},
-         {internal::filter, "filter"},
-         {internal::scope, "scope"},
-         {internal::spectrum, "spectrum"}})
-
-} // namespace fx
-
-namespace persistence
+namespace piejam::runtime::persistence
 {
 
 static auto const s_key_version = "version";
@@ -56,13 +41,13 @@ static auto const s_key_ladspa = "ladspa";
 void
 to_json(nlohmann::json& j, session::internal_fx const& fx)
 {
-    j = {{"type", fx.type}, {"preset", fx.preset}, {"midi", fx.midi}};
+    j = {{"type", fx.id}, {"preset", fx.preset}, {"midi", fx.midi}};
 }
 
 void
 from_json(nlohmann::json const& j, session::internal_fx& fx)
 {
-    j.at("type").get_to(fx.type);
+    j.at("type").get_to(fx.id);
     j.at("preset").get_to(fx.preset);
     j.at("midi").get_to(fx.midi);
 }
@@ -95,7 +80,8 @@ to_json(nlohmann::json& j, session::fx_plugin const& fx_plug)
                     },
                     [&j](session::ladspa_plugin const& ladspa_plug) {
                         j = {{s_key_ladspa, ladspa_plug}};
-                    }),
+                    },
+                    [](std::monostate) { BOOST_ASSERT(false); }),
             fx_plug.as_variant());
 }
 
@@ -311,6 +297,4 @@ save_session(std::ostream& out, session const& ses)
 
 session::~session() = default;
 
-} // namespace persistence
-
-} // namespace piejam::runtime
+} // namespace piejam::runtime::persistence

@@ -6,91 +6,87 @@ SPDX-License-Identifier: CC0-1.0
 
 <RCC>
     <qresource prefix="/">
-        <file>qtquickcontrols2.conf</file>
-        <file>PieJam/MixerControls/VolumeFader.qml</file>
-        <file>PieJam/MixerControls/LevelIndicator.qml</file>
-        <file>PieJam/MixerControls/StereoLevelMeter.qml</file>
-        <file>PieJam/MixerControls/LevelMeterVolumeFader.qml</file>
-        <file>PieJam/Views/Mixer.qml</file>
-        <file>PieJam/Views/Power.qml</file>
-        <file>PieJam/Views/ViewPane.qml</file>
-        <file>PieJam/Views/MainWindow.qml</file>
-        <file>PieJam/Views/qmldir</file>
-        <file>PieJam/Util/MathExt.js</file>
-        <file>PieJam/MixerControls/ChannelPerformStrip.qml</file>
-        <file>PieJam/Controls/SymmetricBipolarSlider.qml</file>
-        <file>PieJam/SettingsControls/BusConfig.qml</file>
-        <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
-        <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
-        <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
-        <file>PieJam/MixerControls/ChannelControls.qml</file>
-        <file>PieJam/FxChainControls/ParameterControl.qml</file>
-        <file>PieJam/Util/DbConvert.js</file>
-        <file>PieJam/Controls/HeaderLabel.qml</file>
-        <file>PieJam/Views/Settings.qml</file>
-        <file>PieJam/SettingsControls/AudioSettings.qml</file>
-        <file>PieJam/SettingsControls/MidiSettings.qml</file>
-        <file>PieJam/SettingsControls/MidiDeviceConfig.qml</file>
-        <file>PieJam/Views/StatusBar.qml</file>
-        <file>PieJam/Info.qml</file>
-        <file>PieJam/qmldir</file>
-        <file>PieJam/MidiLearn.qml</file>
-        <file>PieJam/Controls/MidiAssignArea.qml</file>
-        <file>PieJam/MidiAssignable.qml</file>
-        <file>PieJam/Controls/CpuLoadMeter.qml</file>
-        <file>PieJam/MixerControls/ChannelsListView.qml</file>
-        <file>PieJam/MixerControls/ChannelEditStrip.qml</file>
-        <file>PieJam/MixerControls/ChannelAddStrip.qml</file>
-        <file>PieJam/MixerControls/ChannelStrip.qml</file>
-        <file>PieJam/MixerControls/MixerViewSettings.qml</file>
-        <file>PieJam/MixerControls/qmldir</file>
-        <file>PieJam/Views/RootView.qml</file>
-        <file>images/icons/cog.svg</file>
-        <file>images/icons/power.svg</file>
-        <file>images/icons/tune-vertical.svg</file>
-        <file>images/icons/autorenew.svg</file>
-        <file>images/icons/midi-port.svg</file>
-        <file>images/icons/pencil.svg</file>
-        <file>PieJam/FxChainControls/EnumButtonGroup.qml</file>
-        <file>PieJam/FxChainControls/ParametersListView.qml</file>
-        <file>PieJam/FxChainControls/ScopeView.qml</file>
-        <file>PieJam/FxChainControls/SpectrumView.qml</file>
-        <file>PieJam/FxChainControls/StereoChannelSelector.qml</file>
-        <file>images/icons/micro-sd.svg</file>
-        <file>PieJam/Controls/DiskSpaceIndicator.qml</file>
-        <file>PieJam/Controls/InfoReadout.qml</file>
         <file>Main.qml</file>
-        <file>PieJam/FxChainControls/FilterView.qml</file>
-        <file>PieJam/Controls/XYPad.qml</file>
-        <file>PieJam/Controls/StackList.qml</file>
-        <file>PieJam/Util/ColorExt.js</file>
-        <file>PieJam/ModelSubscription.qml</file>
         <file>PieJam/Controls/BusyLoader.qml</file>
-        <file>PieJam/FxChainControls/ParameterTouchstrip.qml</file>
-        <file>PieJam/Controls/Touchstrip.qml</file>
-        <file>PieJam/FxChainControls/IntSlider.qml</file>
-        <file>images/icons/chevron-down.svg</file>
-        <file>images/icons/chevron-up.svg</file>
-        <file>images/icons/arrow-expand-vertical.svg</file>
         <file>PieJam/Controls/Circle.qml</file>
-        <file>PieJam/Views/Log.qml</file>
-        <file>images/icons/info.svg</file>
+        <file>PieJam/Controls/CpuLoadMeter.qml</file>
+        <file>PieJam/Controls/DiskSpaceIndicator.qml</file>
+        <file>PieJam/Controls/HeaderLabel.qml</file>
+        <file>PieJam/Controls/InfoReadout.qml</file>
         <file>PieJam/Controls/InfoToolButton.qml</file>
+        <file>PieJam/Controls/MidiAssignArea.qml</file>
+        <file>PieJam/Controls/ParameterSymmetricBipolarSlider.qml</file>
+        <file>PieJam/Controls/ParameterToggleButton.qml</file>
         <file>PieJam/Controls/QuickSpinBox.qml</file>
-        <file>images/icons/falling_edge.svg</file>
-        <file>images/icons/rising_edge.svg</file>
-        <file>images/icons/snow.svg</file>
-        <file>PieJam/MixerControls/ChannelFxStrip.qml</file>
-        <file>PieJam/Views/FxBrowser.qml</file>
-        <file>PieJam/Views/FxModule.qml</file>
+        <file>PieJam/Controls/StackList.qml</file>
+        <file>PieJam/Controls/SymmetricBipolarSlider.qml</file>
+        <file>PieJam/Controls/Touchstrip.qml</file>
+        <file>PieJam/Controls/XYPad.qml</file>
+        <file>PieJam/FxChainControls/EnumButtonGroup.qml</file>
         <file>PieJam/FxChainControls/EnumComboBox.qml</file>
+        <file>PieJam/FxChainControls/IntSlider.qml</file>
+        <file>PieJam/FxChainControls/ParameterControl.qml</file>
         <file>PieJam/FxChainControls/ParameterQuickSpinBox.qml</file>
         <file>PieJam/FxChainControls/ParameterSwitch.qml</file>
+        <file>PieJam/FxChainControls/ParameterTouchstrip.qml</file>
+        <file>PieJam/FxChainControls/ParameterXYPad.qml</file>
+        <file>PieJam/FxChainControls/ParametersListView.qml</file>
+        <file>PieJam/FxChainControls/StereoChannelSelector.qml</file>
         <file>PieJam/FxChainControls/StreamSourceSettings.qml</file>
+        <file>PieJam/FxChainControls/qmldir</file>
+        <file>PieJam/Info.qml</file>
+        <file>PieJam/MidiAssignable.qml</file>
+        <file>PieJam/MidiLearn.qml</file>
+        <file>PieJam/MixerControls/ChannelAddStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelControls.qml</file>
+        <file>PieJam/MixerControls/ChannelEditStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelFxStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelPerformStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelsListView.qml</file>
+        <file>PieJam/MixerControls/LevelIndicator.qml</file>
+        <file>PieJam/MixerControls/LevelMeterVolumeFader.qml</file>
+        <file>PieJam/MixerControls/MixerViewSettings.qml</file>
+        <file>PieJam/MixerControls/StereoLevelMeter.qml</file>
+        <file>PieJam/MixerControls/VolumeFader.qml</file>
+        <file>PieJam/MixerControls/qmldir</file>
+        <file>PieJam/ModelSubscription.qml</file>
+        <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
+        <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
+        <file>PieJam/SettingsControls/AudioSettings.qml</file>
+        <file>PieJam/SettingsControls/BusConfig.qml</file>
+        <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
+        <file>PieJam/SettingsControls/MidiDeviceConfig.qml</file>
+        <file>PieJam/SettingsControls/MidiSettings.qml</file>
+        <file>PieJam/SubscribableItem.qml</file>
+        <file>PieJam/Util/ColorExt.js</file>
+        <file>PieJam/Util/DbConvert.js</file>
+        <file>PieJam/Util/MathExt.js</file>
+        <file>PieJam/Views/FxBrowser.qml</file>
+        <file>PieJam/Views/FxModule.qml</file>
+        <file>PieJam/Views/Log.qml</file>
+        <file>PieJam/Views/MainWindow.qml</file>
+        <file>PieJam/Views/Mixer.qml</file>
+        <file>PieJam/Views/Power.qml</file>
+        <file>PieJam/Views/RootView.qml</file>
+        <file>PieJam/Views/Settings.qml</file>
+        <file>PieJam/Views/StatusBar.qml</file>
+        <file>PieJam/Views/ViewPane.qml</file>
         <file>PieJam/Views/ViewToolBar.qml</file>
         <file>PieJam/Views/ViewToolBarButton.qml</file>
-        <file>PieJam/SubscribableItem.qml</file>
-        <file>PieJam/Controls/ParameterToggleButton.qml</file>
-        <file>PieJam/Controls/ParameterSymmetricBipolarSlider.qml</file>
+        <file>PieJam/Views/qmldir</file>
+        <file>PieJam/qmldir</file>
+        <file>images/icons/arrow-expand-vertical.svg</file>
+        <file>images/icons/autorenew.svg</file>
+        <file>images/icons/chevron-down.svg</file>
+        <file>images/icons/chevron-up.svg</file>
+        <file>images/icons/cog.svg</file>
+        <file>images/icons/info.svg</file>
+        <file>images/icons/micro-sd.svg</file>
+        <file>images/icons/midi-port.svg</file>
+        <file>images/icons/pencil.svg</file>
+        <file>images/icons/power.svg</file>
+        <file>images/icons/tune-vertical.svg</file>
+        <file>qtquickcontrols2.conf</file>
     </qresource>
 </RCC>

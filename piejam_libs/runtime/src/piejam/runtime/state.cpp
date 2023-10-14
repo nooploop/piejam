@@ -8,11 +8,8 @@
 #include <piejam/audio/types.h>
 #include <piejam/indexed_access.h>
 #include <piejam/ladspa/port_descriptor.h>
-#include <piejam/runtime/modules/filter/filter_module.h>
+#include <piejam/runtime/modules/factory.h>
 #include <piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h>
-#include <piejam/runtime/modules/scope/scope_module.h>
-#include <piejam/runtime/modules/spectrum/spectrum_module.h>
-#include <piejam/runtime/modules/tool/tool_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_factory.h>
 #include <piejam/runtime/parameter_value_to_string.h>
@@ -251,7 +248,7 @@ insert_internal_fx_module(
         state& st,
         mixer::channel_id const mixer_channel_id,
         std::size_t const position,
-        fx::internal const fx_type,
+        fx::internal_id fx_internal_id,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> fx::module_id
@@ -264,48 +261,15 @@ insert_internal_fx_module(
     fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
-    fx::module_id fx_mod_id;
-    switch (fx_type)
-    {
-        case fx::internal::tool:
-            fx_mod_id = make_internal_fx_module(
-                    st.fx_modules,
-                    modules::tool::make_module(
-                            bus_type,
-                            st.params,
-                            st.ui_params));
-            break;
-
-        case fx::internal::filter:
-            fx_mod_id = make_internal_fx_module(
-                    st.fx_modules,
-                    modules::filter::make_module(
-                            bus_type,
-                            st.params,
-                            st.ui_params,
-                            st.streams));
-            break;
-
-        case fx::internal::scope:
-            fx_mod_id = make_internal_fx_module(
-                    st.fx_modules,
-                    modules::scope::make_module(
-                            bus_type,
-                            st.params,
-                            st.ui_params,
-                            st.streams));
-            break;
-
-        case fx::internal::spectrum:
-            fx_mod_id = make_internal_fx_module(
-                    st.fx_modules,
-                    modules::spectrum::make_module(
-                            bus_type,
-                            st.params,
-                            st.ui_params,
-                            st.streams));
-            break;
-    }
+    fx::module_id fx_mod_id = make_internal_fx_module(
+            st.fx_modules,
+            modules::internal_fx_module_factories::lookup(fx_internal_id)({
+                    .bus_type = bus_type,
+                    .sample_rate = st.sample_rate,
+                    .params = st.params,
+                    .ui_params = st.ui_params,
+                    .streams = st.streams,
+            }));
 
     fx_chain.emplace(std::next(fx_chain.begin(), insert_pos), fx_mod_id);
 

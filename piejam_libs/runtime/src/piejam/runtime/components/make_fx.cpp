@@ -10,15 +10,11 @@
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/internal.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/modules/filter/filter_component.h>
 #include <piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h>
-#include <piejam/runtime/modules/scope/scope_component.h>
-#include <piejam/runtime/modules/spectrum/spectrum_component.h>
-#include <piejam/runtime/modules/tool/tool_component.h>
 
 #include <boost/assert.hpp>
+#include <boost/container/flat_map.hpp>
 #include <boost/hof/match.hpp>
 
 namespace piejam::runtime::components
@@ -29,42 +25,21 @@ namespace
 
 auto
 make_internal_fx(
-        fx::internal fx_type,
+        fx::internal_id id,
         fx::module const& fx_mod,
+        audio::sample_rate const sample_rate,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
-        audio::sample_rate const sample_rate,
         std::string_view const name)
         -> std::unique_ptr<audio::engine::component>
 {
-    switch (fx_type)
-    {
-        case fx::internal::tool:
-            return modules::tool::make_component(fx_mod, param_procs, name);
-
-        case fx::internal::filter:
-            return modules::filter::make_component(
-                    fx_mod,
-                    sample_rate,
-                    param_procs,
-                    stream_procs,
-                    name);
-
-        case fx::internal::scope:
-            return modules::scope::make_component(
-                    fx_mod,
-                    sample_rate,
-                    stream_procs);
-
-        case fx::internal::spectrum:
-            return modules::spectrum::make_component(
-                    fx_mod,
-                    sample_rate,
-                    stream_procs);
-    }
-
-    BOOST_ASSERT_MSG(false, "Unknown internal fx");
-    return nullptr;
+    return internal_fx_component_factories::lookup(id)({
+            .fx_mod = fx_mod,
+            .sample_rate = sample_rate,
+            .param_procs = param_procs,
+            .stream_procs = stream_procs,
+            .name = name,
+    });
 }
 
 } // namespace
@@ -81,14 +56,14 @@ make_fx(fx::module const& fx_mod,
 {
     return std::visit(
             boost::hof::match(
-                    [&](fx::internal fx_type)
+                    [&](fx::internal_id id)
                             -> std::unique_ptr<audio::engine::component> {
                         return make_internal_fx(
-                                fx_type,
+                                id,
                                 fx_mod,
+                                sample_rate,
                                 param_procs,
                                 stream_procs,
-                                sample_rate,
                                 name);
                     },
                     [&](ladspa::instance_id id)
