@@ -11,6 +11,7 @@ Item {
 
     property alias active: loader.active
     property alias item: loader.item
+    property alias source: loader.source
     property alias sourceComponent: loader.sourceComponent
 
     implicitWidth: loader.item ? loader.item.implicitWidth : 200
