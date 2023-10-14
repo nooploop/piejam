@@ -55,6 +55,15 @@ add_library(piejam_fx_modules STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/spectrum/spectrum_internal_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/spectrum/spectrum_module.cpp
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/dual_pan/gui/FxDualPan.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/dual_pan/dual_pan_component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/dual_pan/dual_pan_internal_id.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/dual_pan/dual_pan_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/dual_pan/gui/FxDualPan.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/dual_pan/dual_pan_component.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/dual_pan/dual_pan_internal_id.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/dual_pan/dual_pan_module.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/tool/gui/FxTool.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/tool/tool_component.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/tool/tool_internal_id.h
