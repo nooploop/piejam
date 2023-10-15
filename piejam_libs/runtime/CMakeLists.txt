@@ -84,8 +84,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi_input_controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx/ladspa_fx_component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx/ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_normalize.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/fwd.h
@@ -177,8 +177,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_control_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_input_controller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa_fx/ladspa_fx_component.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/modules/ladspa_fx/ladspa_fx_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx/ladspa_fx_component.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx/ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/parameter_value_to_string.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp

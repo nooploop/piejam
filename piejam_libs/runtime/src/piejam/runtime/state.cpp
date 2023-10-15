@@ -9,7 +9,7 @@
 #include <piejam/indexed_access.h>
 #include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/internal_fx_module_factory.h>
-#include <piejam/runtime/modules/ladspa_fx/ladspa_fx_module.h>
+#include <piejam/runtime/ladspa_fx/ladspa_fx_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_factory.h>
 #include <piejam/runtime/parameter_value_to_string.h>
@@ -307,7 +307,7 @@ insert_ladspa_fx_module(
     fx::chain_t fx_chain = mixer_channel.fx_chain;
     auto const insert_pos = std::min(position, fx_chain.size());
 
-    auto fx_mod_id = st.fx_modules.add(modules::ladspa_fx::make_module(
+    auto fx_mod_id = st.fx_modules.add(ladspa_fx::make_module(
             instance_id,
             plugin_desc.name,
             bus_type,

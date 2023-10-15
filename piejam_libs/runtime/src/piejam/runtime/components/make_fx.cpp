@@ -12,7 +12,7 @@
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/internal_fx_component_factory.h>
-#include <piejam/runtime/modules/ladspa_fx/ladspa_fx_component.h>
+#include <piejam/runtime/ladspa_fx/ladspa_fx_component.h>
 
 #include <boost/assert.hpp>
 #include <boost/container/flat_map.hpp>
@@ -69,7 +69,7 @@ make_fx(fx::module const& fx_mod,
                     },
                     [&](ladspa::instance_id id)
                             -> std::unique_ptr<audio::engine::component> {
-                        return modules::ladspa_fx::make_component(
+                        return ladspa_fx::make_component(
                                 fx_mod,
                                 get_fx_param_name,
                                 [&, id]() {

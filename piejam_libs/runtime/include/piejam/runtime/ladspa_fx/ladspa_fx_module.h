@@ -13,7 +13,7 @@
 #include <span>
 #include <string>
 
-namespace piejam::runtime::modules::ladspa_fx
+namespace piejam::runtime::ladspa_fx
 {
 
 auto make_module(
@@ -24,4 +24,4 @@ auto make_module(
         parameters_map&,
         ui_parameter_descriptors_map&) -> fx::module;
 
-} // namespace piejam::runtime::modules::ladspa_fx
+} // namespace piejam::runtime::ladspa_fx
