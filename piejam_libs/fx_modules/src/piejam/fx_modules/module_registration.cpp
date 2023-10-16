@@ -20,6 +20,9 @@ register_module(module_registration mod_reg) -> runtime::fx::internal_id
 
     auto id = runtime::fx::registry::register_internal_module();
 
+    runtime::fx::is_available_for_bus_type::internal_fx_mono_availability()
+            .add_entry(id, mod_reg.available_for_mono);
+
     runtime::persistence::register_internal_fx(
             id,
             std::move(mod_reg.persistence_name));

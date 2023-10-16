@@ -21,6 +21,8 @@ namespace piejam::fx_modules
 
 struct module_registration
 {
+    bool available_for_mono;
+
     std::string persistence_name;
 
     runtime::internal_fx_module_factory fx_module_factory;

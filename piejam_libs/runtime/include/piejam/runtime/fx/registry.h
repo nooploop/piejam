@@ -9,6 +9,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/boxed_vector.h>
 #include <piejam/ladspa/plugin_descriptor.h>
+#include <piejam/registry_map.h>
 
 #include <variant>
 
@@ -62,9 +63,16 @@ struct is_available_for_bus_type
 {
     audio::bus_type bus_type;
 
-    [[nodiscard]] auto operator()(internal_id) const -> bool
+    [[nodiscard]] auto operator()(internal_id const id) const -> bool
     {
-        return true;
+        switch (bus_type)
+        {
+            case audio::bus_type::mono:
+                return internal_fx_mono_availability().lookup(id);
+
+            default:
+                return true;
+        }
     }
 
     [[nodiscard]] auto operator()(ladspa::plugin_descriptor const& pd) const
@@ -87,6 +95,13 @@ struct is_available_for_bus_type
     [[nodiscard]] auto operator()(registry::item const& item) const -> bool
     {
         return std::visit(*this, item);
+    }
+
+    static auto internal_fx_mono_availability()
+            -> registry_map<internal_id, bool>&
+    {
+        static registry_map<internal_id, bool> s_mapping;
+        return s_mapping;
     }
 };
 
