@@ -19,9 +19,7 @@ struct FxBrowserEntryInternalData
     QString description;
 };
 
-using FxBrowserEntryInternalDataMap = registry_map<
-        struct FxBrowserEntryInternalDataTag,
-        runtime::fx::internal_id,
-        FxBrowserEntryInternalData>;
+using FxBrowserEntryInternalDataMap =
+        registry_map<runtime::fx::internal_id, FxBrowserEntryInternalData>;
 
 } // namespace piejam::gui::model

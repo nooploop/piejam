@@ -25,9 +25,7 @@ struct internal_fx_module_factory_args
 using internal_fx_module_factory =
         std::function<fx::module(internal_fx_module_factory_args const&)>;
 
-using internal_fx_module_factories = registry_map<
-        struct internal_fx_module_factory_tag,
-        fx::internal_id,
-        internal_fx_module_factory>;
+using internal_fx_module_factories =
+        registry_map<fx::internal_id, internal_fx_module_factory>;
 
 } // namespace piejam::runtime

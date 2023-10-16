@@ -30,9 +30,7 @@ using internal_fx_component_factory =
         std::function<std::unique_ptr<audio::engine::component>(
                 internal_fx_component_factory_args const&)>;
 
-using internal_fx_component_factories = registry_map<
-        struct internal_fx_component_factories_tag,
-        fx::internal_id,
-        internal_fx_component_factory>;
+using internal_fx_component_factories =
+        registry_map<fx::internal_id, internal_fx_component_factory>;
 
 } // namespace piejam::runtime

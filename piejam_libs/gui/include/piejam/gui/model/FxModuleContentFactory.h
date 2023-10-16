@@ -23,10 +23,8 @@ using FxModuleContentFactory = std::function<std::unique_ptr<FxModuleContent>(
         runtime::subscriber&,
         runtime::fx::module_id)>;
 
-using FxModuleContentFactories = registry_map<
-        FxModuleContentFactory,
-        runtime::fx::internal_id,
-        FxModuleContentFactory>;
+using FxModuleContentFactories =
+        registry_map<runtime::fx::internal_id, FxModuleContentFactory>;
 
 template <class T>
 auto

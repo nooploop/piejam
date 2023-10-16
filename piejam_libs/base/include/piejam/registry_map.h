@@ -10,7 +10,7 @@
 namespace piejam
 {
 
-template <class Tag, class Key, class Value>
+template <class Key, class Value>
 class registry_map
 {
 public:
