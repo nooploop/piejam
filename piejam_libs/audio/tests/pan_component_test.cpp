@@ -11,17 +11,39 @@
 namespace piejam::audio::components::test
 {
 
-TEST(pan_component, stereo_in_out)
+TEST(pan_component, pan_io)
 {
     auto sut = make_pan();
-    EXPECT_EQ(2u, sut->inputs().size());
+    EXPECT_EQ(1u, sut->inputs().size());
     EXPECT_EQ(2u, sut->outputs().size());
+    EXPECT_EQ(1u, sut->event_inputs().size());
+    EXPECT_EQ(0u, sut->event_outputs().size());
 }
 
-TEST(pan_component, event_io)
+TEST(pan_component, volume_pan_io)
 {
-    auto sut = make_pan();
+    auto sut = make_volume_pan();
+    EXPECT_EQ(1u, sut->inputs().size());
+    EXPECT_EQ(2u, sut->outputs().size());
+    EXPECT_EQ(2u, sut->event_inputs().size());
+    EXPECT_EQ(0u, sut->event_outputs().size());
+}
+
+TEST(pan_component, balance_io)
+{
+    auto sut = make_stereo_balance();
+    EXPECT_EQ(2u, sut->inputs().size());
+    EXPECT_EQ(2u, sut->outputs().size());
     EXPECT_EQ(1u, sut->event_inputs().size());
+    EXPECT_EQ(0u, sut->event_outputs().size());
+}
+
+TEST(pan_component, volume_balance_io)
+{
+    auto sut = make_volume_stereo_balance();
+    EXPECT_EQ(2u, sut->inputs().size());
+    EXPECT_EQ(2u, sut->outputs().size());
+    EXPECT_EQ(2u, sut->event_inputs().size());
     EXPECT_EQ(0u, sut->event_outputs().size());
 }
 

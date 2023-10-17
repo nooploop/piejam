@@ -4,7 +4,6 @@
 
 #include <piejam/fx_modules/scope/scope_component.h>
 
-#include <piejam/audio/components/remap_channels.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/endpoint_ports.h>
 #include <piejam/audio/sample_rate.h>

@@ -6,29 +6,25 @@
 
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph_endpoint.h>
+#include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/graph_node.h>
+#include <piejam/audio/engine/identity_processor.h>
 
 #include <boost/assert.hpp>
 
 #include <array>
 #include <memory>
+#include <span>
 #include <utility>
 
 namespace piejam::audio::components
 {
 
-template <engine::graph_node Node, class Ins, class Outs>
-class remap_channels;
-
-template <engine::graph_node Node, std::size_t... I, std::size_t... O>
-class remap_channels<Node, std::index_sequence<I...>, std::index_sequence<O...>>
-        final : public engine::component
+template <engine::graph_node Node, class... ChannelMappings>
+class remap_input_channels final : public engine::component
 {
 public:
-    remap_channels(
-            std::unique_ptr<Node> node,
-            std::index_sequence<I...>,
-            std::index_sequence<O...>)
+    remap_input_channels(std::unique_ptr<Node> node, ChannelMappings...)
         : m_node{std::move(node)}
     {
         BOOST_ASSERT(m_node);
@@ -41,7 +37,7 @@ public:
 
     [[nodiscard]] auto outputs() const -> endpoints override
     {
-        return m_outputs;
+        return m_node->outputs();
     }
 
     [[nodiscard]] auto event_inputs() const -> endpoints override
@@ -57,28 +53,70 @@ public:
     void connect(engine::graph& g) const override
     {
         m_node->connect(g);
+
+        connect_inputs(g, std::make_index_sequence<num_inputs>{});
     }
 
 private:
+    template <std::size_t I, std::size_t... Is>
+    void connect_input(engine::graph& g, std::index_sequence<Is...>) const
+    {
+        (engine::connect(
+                 g,
+                 *m_input_procs[I],
+                 engine::endpoint_ports::from<0>{},
+                 *m_node,
+                 engine::endpoint_ports::to<Is>{}),
+         ...);
+    }
+
+    template <std::size_t... I>
+    void connect_inputs(engine::graph& g, std::index_sequence<I...>) const
+    {
+        (connect_input<I>(g, ChannelMappings{}), ...);
+    }
+
     std::unique_ptr<Node> m_node;
 
-    std::array<engine::graph_endpoint, sizeof...(I)> m_inputs{
-            engine::dst_endpoint(*m_node, I)...};
-    std::array<engine::graph_endpoint, sizeof...(O)> m_outputs{
-            engine::src_endpoint(*m_node, O)...};
+    constexpr static inline std::size_t const num_inputs{
+            sizeof...(ChannelMappings)};
+
+    using input_procs_t =
+            std::array<std::unique_ptr<engine::processor>, num_inputs>;
+
+    template <std::size_t... I>
+    static auto make_input_procs(std::index_sequence<I...>) -> input_procs_t
+    {
+        return input_procs_t{((void)I, engine::make_identity_processor())...};
+    }
+
+    input_procs_t m_input_procs{
+            make_input_procs(std::make_index_sequence<num_inputs>{})};
+
+    using inputs_t = std::array<engine::graph_endpoint, num_inputs>;
+
+    template <std::size_t... I>
+    static auto make_inputs(
+            std::span<std::unique_ptr<engine::processor> const> const
+                    input_procs,
+            std::index_sequence<I...>) -> inputs_t
+    {
+        return inputs_t{engine::dst_endpoint(*input_procs[I], 0)...};
+    }
+
+    inputs_t m_inputs{
+            make_inputs(m_input_procs, std::make_index_sequence<num_inputs>{})};
 };
 
-template <engine::graph_node Node, std::size_t... I, std::size_t... O>
+template <engine::graph_node Node, class... ChannelMappings>
 auto
-make_remap_channels(
+make_remap_input_channels(
         std::unique_ptr<Node> node,
-        std::index_sequence<I...> ins,
-        std::index_sequence<O...> outs) -> std::unique_ptr<engine::component>
+        ChannelMappings... mappings) -> std::unique_ptr<engine::component>
 {
-    return std::make_unique<remap_channels<
-            Node,
-            std::index_sequence<I...>,
-            std::index_sequence<O...>>>(std::move(node), ins, outs);
+    return std::make_unique<remap_input_channels<Node, ChannelMappings...>>(
+            std::move(node),
+            std::move(mappings)...);
 }
 
 } // namespace piejam::audio::components

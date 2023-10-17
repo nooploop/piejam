@@ -77,28 +77,28 @@ dst_event_endpoint(processor& src, std::size_t port) noexcept
 
 template <graph_node N>
 inline constexpr auto
-in_endpoit(N&& node, std::size_t port) noexcept
+in_endpoint(N&& node, std::size_t port) noexcept
 {
     return dst_endpoint(std::forward<N>(node), port);
 }
 
 template <graph_node N>
 inline constexpr auto
-out_endpoit(N&& node, std::size_t port) noexcept
+out_endpoint(N&& node, std::size_t port) noexcept
 {
     return src_endpoint(std::forward<N>(node), port);
 }
 
 template <graph_node N>
 inline constexpr auto
-in_event_endpoit(N&& node, std::size_t port) noexcept
+in_event_endpoint(N&& node, std::size_t port) noexcept
 {
     return dst_event_endpoint(std::forward<N>(node), port);
 }
 
 template <graph_node N>
 inline constexpr auto
-out_event_endpoit(N&& node, std::size_t port) noexcept
+out_event_endpoint(N&& node, std::size_t port) noexcept
 {
     return src_event_endpoint(std::forward<N>(node), port);
 }

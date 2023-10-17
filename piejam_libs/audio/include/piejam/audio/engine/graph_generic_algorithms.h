@@ -8,6 +8,9 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_node.h>
 
+#include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/range/indices.h>
+
 #include <boost/assert.hpp>
 
 #include <memory>
@@ -62,6 +65,24 @@ connect_event(
              src_event_endpoint(std::forward<Src>(src), M),
              dst_event_endpoint(std::forward<Dst>(dst), N)),
      ...);
+}
+
+template <graph_node Node>
+auto
+in_event_endpoints(Node&& node)
+{
+    return algorithm::transform_to_vector(
+            range::indices(node.event_inputs()),
+            [&](std::size_t i) { return dst_event_endpoint(node, i); });
+}
+
+template <graph_node Node>
+auto
+out_event_endpoints(Node&& node)
+{
+    return algorithm::transform_to_vector(
+            range::indices(node.event_outputs()),
+            [&](std::size_t i) { return src_event_endpoint(node, i); });
 }
 
 } // namespace piejam::audio::engine

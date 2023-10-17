@@ -12,14 +12,26 @@
 namespace piejam::audio::components
 {
 
+// audio in: 1
+// audio out: 2
+// event in: pan
 auto make_pan(std::string_view name = {}) -> std::unique_ptr<engine::component>;
 
+// audio in: 1
+// audio out: 2
+// event in: volume, pan
 auto make_volume_pan(std::string_view name = {})
         -> std::unique_ptr<engine::component>;
 
+// audio in: 2
+// audio out: 2
+// event in: balance
 auto make_stereo_balance(std::string_view name = {})
         -> std::unique_ptr<engine::component>;
 
+// audio in: 2
+// audio out: 2
+// event in: volume, balance
 auto make_volume_stereo_balance(std::string_view name = {})
         -> std::unique_ptr<engine::component>;
 

@@ -89,12 +89,6 @@ public:
 
         engine::connect(
                 g,
-                *m_left_input_proc,
-                engine::endpoint_ports::from<0, 0>{},
-                *m_left_pan,
-                engine::endpoint_ports::to<0, 1>{});
-        engine::connect(
-                g,
                 *m_left_pan,
                 engine::endpoint_ports::from<0>{},
                 *m_left_mix_proc,
@@ -106,12 +100,6 @@ public:
                 *m_left_mix_proc,
                 engine::endpoint_ports::to<1>{});
 
-        engine::connect(
-                g,
-                *m_right_input_proc,
-                engine::endpoint_ports::from<0, 0>{},
-                *m_right_pan,
-                engine::endpoint_ports::to<0, 1>{});
         engine::connect(
                 g,
                 *m_left_pan,
@@ -137,21 +125,13 @@ private:
                     .proc = *m_right_param_proc,
                     .port = 0},
     };
-    std::unique_ptr<audio::engine::processor> m_left_input_proc{
-            audio::engine::make_identity_processor()};
-    std::unique_ptr<audio::engine::processor> m_right_input_proc{
-            audio::engine::make_identity_processor()};
-    std::array<audio::engine::graph_endpoint, 2> m_inputs{
-            audio::engine::graph_endpoint{
-                    .proc = *m_left_input_proc,
-                    .port = 0},
-            audio::engine::graph_endpoint{
-                    .proc = *m_right_input_proc,
-                    .port = 0}};
     std::unique_ptr<audio::engine::component> m_left_pan{
             audio::components::make_pan("left_pan")};
     std::unique_ptr<audio::engine::component> m_right_pan{
             audio::components::make_pan("right_pan")};
+    std::array<audio::engine::graph_endpoint, 2> const m_inputs{
+            audio::engine::in_endpoint(*m_left_pan, 0),
+            audio::engine::in_endpoint(*m_right_pan, 0)};
     std::unique_ptr<audio::engine::processor> m_left_mix_proc{
             audio::engine::make_mix_processor(2, "left_pan")};
     std::unique_ptr<audio::engine::processor> m_right_mix_proc{
