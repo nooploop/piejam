@@ -68,7 +68,7 @@ TEST_P(pan_balance_processor_test, pan)
 
 TEST_P(pan_balance_processor_test, balance)
 {
-    auto sut = make_stereo_balance_processor();
+    auto sut = make_balance_processor();
 
     ev_in_buf.insert(3, GetParam());
 

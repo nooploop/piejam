@@ -12,6 +12,7 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_algorithms.h>
 #include <piejam/audio/engine/graph_generic_algorithms.h>
+#include <piejam/audio/engine/pan_balance_processor.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/components/mute_solo.h>
@@ -39,8 +40,13 @@ class mixer_channel_output final : public audio::engine::component
             std::string_view name) -> std::unique_ptr<audio::engine::component>
     {
         return bus_type == audio::bus_type::mono
-                       ? audio::components::make_volume_pan(name)
-                       : audio::components::make_volume_stereo_balance(name);
+                       ? audio::components::make_pan(
+                                 audio::engine::make_volume_pan_processor(name),
+                                 name)
+                       : audio::components::make_balance(
+                                 audio::engine::make_volume_balance_processor(
+                                         name),
+                                 name);
     }
 
 public:

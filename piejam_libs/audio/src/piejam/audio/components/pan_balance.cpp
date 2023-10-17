@@ -81,42 +81,25 @@ private:
 } // namespace
 
 auto
-make_pan(std::string_view name) -> std::unique_ptr<engine::component>
+make_pan(
+        std::unique_ptr<engine::processor> pan_converter,
+        std::string_view name) -> std::unique_ptr<engine::component>
 {
     return std::make_unique<pan_balance>(
-            engine::make_pan_processor(name),
+            std::move(pan_converter),
             make_remap_input_channels(
                     make_stereo_split_amplifier(fmt::format("pan {}", name)),
                     std::index_sequence<0, 1>{}));
 }
 
 auto
-make_volume_pan(std::string_view name) -> std::unique_ptr<engine::component>
+make_balance(
+        std::unique_ptr<engine::processor> balance_converter,
+        std::string_view name) -> std::unique_ptr<engine::component>
 {
     return std::make_unique<pan_balance>(
-            engine::make_volume_pan_processor(name),
-            make_remap_input_channels(
-                    make_stereo_split_amplifier(
-                            fmt::format("volume_pan {}", name)),
-                    std::index_sequence<0, 1>{}));
-}
-
-auto
-make_stereo_balance(std::string_view name) -> std::unique_ptr<engine::component>
-{
-    return std::make_unique<pan_balance>(
-            engine::make_stereo_balance_processor(name),
+            std::move(balance_converter),
             make_stereo_split_amplifier(fmt::format("balance {}", name)));
-}
-
-auto
-make_volume_stereo_balance(std::string_view name)
-        -> std::unique_ptr<engine::component>
-{
-    return std::make_unique<pan_balance>(
-            engine::make_volume_stereo_balance_processor(name),
-            make_stereo_split_amplifier(
-                    fmt::format("volume_balance {}", name)));
 }
 
 } // namespace piejam::audio::components

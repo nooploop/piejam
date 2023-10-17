@@ -49,7 +49,7 @@ make_volume_pan_processor(std::string_view const name)
 }
 
 auto
-make_stereo_balance_processor(std::string_view const name)
+make_balance_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     using namespace std::string_view_literals;
@@ -66,7 +66,7 @@ make_stereo_balance_processor(std::string_view const name)
 }
 
 auto
-make_volume_stereo_balance_processor(std::string_view const name)
+make_volume_balance_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     using namespace std::string_view_literals;

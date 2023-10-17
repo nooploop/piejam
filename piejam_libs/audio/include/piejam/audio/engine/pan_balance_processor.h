@@ -24,12 +24,12 @@ auto make_volume_pan_processor(std::string_view name = {})
 
 // event in: balance
 // event out: gain L, gain R
-auto make_stereo_balance_processor(std::string_view name = {})
+auto make_balance_processor(std::string_view name = {})
         -> std::unique_ptr<processor>;
 
 // event in: volume, balance
 // event out: gain L, gain R
-auto make_volume_stereo_balance_processor(std::string_view name = {})
+auto make_volume_balance_processor(std::string_view name = {})
         -> std::unique_ptr<processor>;
 
 } // namespace piejam::audio::engine

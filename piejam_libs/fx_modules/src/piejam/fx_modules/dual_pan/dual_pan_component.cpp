@@ -10,6 +10,7 @@
 #include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
+#include <piejam/audio/engine/pan_balance_processor.h>
 #include <piejam/fx_modules/dual_pan/dual_pan_module.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/internal_fx_component_factory.h>
@@ -126,9 +127,13 @@ private:
                     .port = 0},
     };
     std::unique_ptr<audio::engine::component> m_left_pan{
-            audio::components::make_pan("left_pan")};
+            audio::components::make_pan(
+                    audio::engine::make_pan_processor("left_pan"),
+                    "left_pan")};
     std::unique_ptr<audio::engine::component> m_right_pan{
-            audio::components::make_pan("right_pan")};
+            audio::components::make_pan(
+                    audio::engine::make_pan_processor("right_pan"),
+                    "right_pan")};
     std::array<audio::engine::graph_endpoint, 2> const m_inputs{
             audio::engine::in_endpoint(*m_left_pan, 0),
             audio::engine::in_endpoint(*m_right_pan, 0)};
