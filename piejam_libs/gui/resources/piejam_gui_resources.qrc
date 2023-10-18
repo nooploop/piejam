@@ -28,6 +28,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/FxChainControls/ParameterControl.qml</file>
         <file>PieJam/FxChainControls/ParameterQuickSpinBox.qml</file>
         <file>PieJam/FxChainControls/ParameterSwitch.qml</file>
+        <file>PieJam/FxChainControls/ParameterToggleButton.qml</file>
         <file>PieJam/FxChainControls/ParameterTouchstrip.qml</file>
         <file>PieJam/FxChainControls/ParameterXYPad.qml</file>
         <file>PieJam/FxChainControls/ParametersListView.qml</file>
