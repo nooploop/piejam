@@ -65,9 +65,9 @@ public:
         engine::connect_event(
                 g,
                 *m_param_proc,
-                from<0, 1>{},
+                from<0, 1>,
                 *m_amp_comp,
-                to<0, 1>{});
+                to<0, 1>);
     }
 
 private:
@@ -85,11 +85,12 @@ make_pan(
         std::unique_ptr<engine::processor> pan_converter,
         std::string_view name) -> std::unique_ptr<engine::component>
 {
+    using namespace engine::endpoint_ports;
     return std::make_unique<pan_balance>(
             std::move(pan_converter),
             make_remap_input_channels(
                     make_stereo_split_amplifier(fmt::format("pan {}", name)),
-                    std::index_sequence<0, 1>{}));
+                    to<0, 1>));
 }
 
 auto

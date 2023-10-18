@@ -24,9 +24,9 @@ template <graph_node Src, std::size_t... M, graph_node Dst, std::size_t... N>
 void
 connect(graph& g,
         Src&& src,
-        endpoint_ports::from<M...>,
+        endpoint_ports::from_t<M...>,
         Dst&& dst,
-        endpoint_ports::to<N...>)
+        endpoint_ports::to_t<N...>)
 {
     static_assert(sizeof...(M) == sizeof...(N));
 
@@ -55,9 +55,9 @@ void
 connect_event(
         graph& g,
         Src&& src,
-        endpoint_ports::from<M...>,
+        endpoint_ports::from_t<M...>,
         Dst&& dst,
-        endpoint_ports::to<N...>)
+        endpoint_ports::to_t<N...>)
 {
     static_assert(sizeof...(M) == sizeof...(N));
 

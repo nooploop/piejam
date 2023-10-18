@@ -75,44 +75,25 @@ public:
         m_right_pan->connect(g);
 
         using namespace audio;
+        using namespace audio::engine::endpoint_ports;
         engine::connect_event(
                 g,
                 *m_left_param_proc,
-                engine::endpoint_ports::from<0>{},
+                from<0>,
                 *m_left_pan,
-                engine::endpoint_ports::to<0>{});
+                to<0>);
         engine::connect_event(
                 g,
                 *m_right_param_proc,
-                engine::endpoint_ports::from<0>{},
+                from<0>,
                 *m_right_pan,
-                engine::endpoint_ports::to<0>{});
+                to<0>);
 
-        engine::connect(
-                g,
-                *m_left_pan,
-                engine::endpoint_ports::from<0>{},
-                *m_left_mix_proc,
-                engine::endpoint_ports::to<0>{});
-        engine::connect(
-                g,
-                *m_right_pan,
-                engine::endpoint_ports::from<0>{},
-                *m_left_mix_proc,
-                engine::endpoint_ports::to<1>{});
+        engine::connect(g, *m_left_pan, from<0>, *m_left_mix_proc, to<0>);
+        engine::connect(g, *m_right_pan, from<0>, *m_left_mix_proc, to<1>);
 
-        engine::connect(
-                g,
-                *m_left_pan,
-                engine::endpoint_ports::from<1>{},
-                *m_right_mix_proc,
-                engine::endpoint_ports::to<0>{});
-        engine::connect(
-                g,
-                *m_right_pan,
-                engine::endpoint_ports::from<1>{},
-                *m_right_mix_proc,
-                engine::endpoint_ports::to<1>{});
+        engine::connect(g, *m_left_pan, from<1>, *m_right_mix_proc, to<0>);
+        engine::connect(g, *m_right_pan, from<1>, *m_right_mix_proc, to<1>);
     }
 
 private:

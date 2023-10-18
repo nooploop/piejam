@@ -110,23 +110,23 @@ public:
         audio::engine::connect_event(
                 g,
                 *m_volume_input_proc,
-                from<0>{},
+                from<0>,
                 *m_volume_pan_balance,
-                to<0>{});
+                to<0>);
 
         audio::engine::connect_event(
                 g,
                 *m_pan_balance_input_proc,
-                from<0>{},
+                from<0>,
                 *m_volume_pan_balance,
-                to<1>{});
+                to<1>);
 
         audio::engine::connect_event(
                 g,
                 *m_mute_input_proc,
-                from<0>{},
+                from<0>,
                 *m_mute_solo,
-                to<0>{});
+                to<0>);
 
         audio::engine::connect(g, *m_volume_pan_balance, *m_mute_solo);
         audio::engine::connect(g, *m_volume_pan_balance, *m_level_meter);
@@ -134,16 +134,16 @@ public:
         audio::engine::connect_event(
                 g,
                 *m_level_meter,
-                from<0>{},
+                from<0>,
                 *m_peak_level_proc,
-                to<0>{});
+                to<0>);
 
         audio::engine::connect_event(
                 g,
                 *m_level_meter,
-                from<1>{},
+                from<1>,
                 *m_rms_level_proc,
-                to<0>{});
+                to<0>);
     }
 
 private:

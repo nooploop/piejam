@@ -61,13 +61,8 @@ private:
     template <std::size_t I, std::size_t... Is>
     void connect_input(engine::graph& g, std::index_sequence<Is...>) const
     {
-        (engine::connect(
-                 g,
-                 *m_input_procs[I],
-                 engine::endpoint_ports::from<0>{},
-                 *m_node,
-                 engine::endpoint_ports::to<Is>{}),
-         ...);
+        using namespace engine::endpoint_ports;
+        (engine::connect(g, *m_input_procs[I], from<0>, *m_node, to<Is>), ...);
     }
 
     template <std::size_t... I>

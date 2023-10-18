@@ -391,54 +391,54 @@ public:
         audio::engine::connect_event(
                 g,
                 *m_type_input_proc,
-                from<0>{},
+                from<0>,
                 *m_coeffs_proc,
-                to<0>{});
+                to<0>);
 
         audio::engine::connect_event(
                 g,
                 *m_cutoff_input_proc,
-                from<0>{},
+                from<0>,
                 *m_coeffs_proc,
-                to<1>{});
+                to<1>);
 
         audio::engine::connect_event(
                 g,
                 *m_resonance_input_proc,
-                from<0>{},
+                from<0>,
                 *m_coeffs_proc,
-                to<2>{});
+                to<2>);
 
         (audio::engine::connect_event(
                  g,
                  *m_coeffs_proc,
-                 from<0>{},
+                 from<0>,
                  *m_filter_procs[Channel],
-                 to<0>{}),
+                 to<0>),
          ...);
 
         (audio::engine::connect(
                  g,
                  *m_input_procs[Channel],
-                 from<0>{},
+                 from<0>,
                  *m_filter_procs[Channel],
-                 to<0>{}),
+                 to<0>),
          ...);
 
         (audio::engine::connect(
                  g,
                  *m_input_procs[Channel],
-                 from<0>{},
+                 from<0>,
                  *m_in_out_stream,
-                 to<Channel>{}),
+                 to<Channel>),
          ...);
 
         (audio::engine::connect(
                  g,
                  *m_filter_procs[Channel],
-                 from<0>{},
+                 from<0>,
                  *m_in_out_stream,
-                 to<Channel + num_channels>{}),
+                 to<Channel + num_channels>),
          ...);
     }
 
