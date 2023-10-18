@@ -32,6 +32,8 @@ public:
             piejam::gui::model::ParameterId const&);
     ~Parameter();
 
+    auto paramId() const -> ParameterId;
+
     enum class Type
     {
         Float,
@@ -82,8 +84,6 @@ signals:
 
 protected:
     void onSubscribe() override;
-
-    auto paramKeyId() const -> ParameterId;
 
 private:
     struct Impl;

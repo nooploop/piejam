@@ -97,7 +97,7 @@ Parameter::resetToDefault()
 }
 
 auto
-Parameter::paramKeyId() const -> ParameterId
+Parameter::paramId() const -> ParameterId
 {
     return m_impl->param;
 }
