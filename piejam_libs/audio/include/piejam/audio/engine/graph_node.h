@@ -34,17 +34,17 @@ src_endpoint(processor& src, std::size_t port) noexcept
 }
 
 inline constexpr auto
-dst_endpoint(component const& src, std::size_t port) noexcept
+dst_endpoint(component const& dst, std::size_t port) noexcept
 {
-    BOOST_ASSERT(port < src.num_inputs());
-    return src.inputs()[port];
+    BOOST_ASSERT(port < dst.num_inputs());
+    return dst.inputs()[port];
 }
 
 inline constexpr auto
-dst_endpoint(processor& src, std::size_t port) noexcept
+dst_endpoint(processor& dst, std::size_t port) noexcept
 {
-    BOOST_ASSERT(port < src.num_inputs());
-    return graph_endpoint{.proc = src, .port = port};
+    BOOST_ASSERT(port < dst.num_inputs());
+    return graph_endpoint{.proc = dst, .port = port};
 }
 
 inline constexpr auto
@@ -62,17 +62,17 @@ src_event_endpoint(processor& src, std::size_t port) noexcept
 }
 
 inline constexpr auto
-dst_event_endpoint(component const& src, std::size_t port) noexcept
+dst_event_endpoint(component const& dst, std::size_t port) noexcept
 {
-    BOOST_ASSERT(port < src.event_inputs().size());
-    return src.event_inputs()[port];
+    BOOST_ASSERT(port < dst.event_inputs().size());
+    return dst.event_inputs()[port];
 }
 
 inline constexpr auto
-dst_event_endpoint(processor& src, std::size_t port) noexcept
+dst_event_endpoint(processor& dst, std::size_t port) noexcept
 {
-    BOOST_ASSERT(port < src.event_inputs().size());
-    return graph_endpoint{.proc = src, .port = port};
+    BOOST_ASSERT(port < dst.event_inputs().size());
+    return graph_endpoint{.proc = dst, .port = port};
 }
 
 template <graph_node N>
