@@ -32,7 +32,6 @@ struct SubStreamProcessor
     virtual ~SubStreamProcessor() = default;
 
     virtual auto process(AudioStream const&) -> Result = 0;
-    virtual void drop(std::size_t frames) = 0;
     virtual void clear() = 0;
 };
 

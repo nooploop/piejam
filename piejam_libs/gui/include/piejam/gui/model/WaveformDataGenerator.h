@@ -18,7 +18,7 @@ class WaveformDataGenerator final : public AudioStreamListener
     Q_OBJECT
 
 public:
-    WaveformDataGenerator(std::span<BusType const> substreamConfigs);
+    explicit WaveformDataGenerator(std::span<BusType const> substreamConfigs);
     ~WaveformDataGenerator() override;
 
     void setSamplesPerPixel(int x);

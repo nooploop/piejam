@@ -20,7 +20,7 @@ class SpectrumDataGenerator final : public AudioStreamListener
 {
     Q_OBJECT
 public:
-    SpectrumDataGenerator(std::span<BusType const> substreamConfigs);
+    explicit SpectrumDataGenerator(std::span<BusType const> substreamConfigs);
     ~SpectrumDataGenerator() override;
 
     void setSampleRate(audio::sample_rate);

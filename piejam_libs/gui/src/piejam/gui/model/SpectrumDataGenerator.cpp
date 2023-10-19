@@ -59,16 +59,12 @@ dftForResolution(DFTResolution const resolution) -> numeric::dft&
 
 struct InactiveGenerator final : SubStreamProcessor<SpectrumDataPoints>
 {
-    auto process(AudioStream const&) -> SpectrumDataPoints
+    auto process(AudioStream const&) -> SpectrumDataPoints override
     {
-        return SpectrumDataPoints();
+        return {};
     }
 
-    void drop(std::size_t)
-    {
-    }
-
-    void clear()
+    void clear() override
     {
     }
 };
@@ -83,7 +79,7 @@ template <StereoChannel SC>
 class Generator final : public SubStreamProcessor<SpectrumDataPoints>
 {
 public:
-    Generator(Args const& args)
+    explicit Generator(Args const& args)
         : m_dft{dftForResolution(args.resolution)}
     {
         float const binSize = args.sampleRate.as_float() / m_dft.size();
@@ -140,10 +136,6 @@ public:
         }
 
         return m_dataPoints;
-    }
-
-    void drop(std::size_t) override
-    {
     }
 
     void clear() override
@@ -209,8 +201,8 @@ struct Factory
 
 struct SpectrumDataGenerator::Impl
 {
-    Impl(std::span<BusType const> substreamConfigs)
-        : streamProcessor{std::move(substreamConfigs)}
+    explicit Impl(std::span<BusType const> substreamConfigs)
+        : streamProcessor{substreamConfigs}
     {
     }
 
@@ -220,7 +212,7 @@ struct SpectrumDataGenerator::Impl
 
 SpectrumDataGenerator::SpectrumDataGenerator(
         std::span<BusType const> substreamConfigs)
-    : m_impl(std::make_unique<Impl>(std::move(substreamConfigs)))
+    : m_impl{std::make_unique<Impl>(substreamConfigs)}
 {
 }
 
@@ -278,7 +270,7 @@ SpectrumDataGenerator::update(AudioStream const& stream)
     }
 
     m_impl->streamProcessor.process(stream);
-    generated(m_impl->streamProcessor.results);
+    emit generated(m_impl->streamProcessor.results);
 }
 
 } // namespace piejam::gui::model

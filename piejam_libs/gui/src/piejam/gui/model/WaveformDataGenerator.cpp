@@ -24,16 +24,12 @@ namespace
 
 struct InactiveGenerator final : SubStreamProcessor<WaveformData>
 {
-    auto process(AudioStream const&) -> WaveformData
+    auto process(AudioStream const&) -> WaveformData override
     {
         return WaveformData{};
     }
 
-    void drop(std::size_t)
-    {
-    }
-
-    void clear()
+    void clear() override
     {
     }
 };
@@ -48,7 +44,7 @@ template <StereoChannel SC>
 class Generator final : public SubStreamProcessor<WaveformData>
 {
 public:
-    Generator(int const samplesPerPixel)
+    explicit Generator(int const samplesPerPixel)
         : m_samplesPerPixel{samplesPerPixel}
     {
     }
@@ -96,10 +92,6 @@ public:
         }
 
         return result;
-    }
-
-    void drop(std::size_t /*frames*/) override
-    {
     }
 
     void clear() override
@@ -175,8 +167,8 @@ struct Factory
 
 struct WaveformDataGenerator::Impl
 {
-    Impl(std::span<BusType const> substreamConfigs)
-        : streamProcessor{std::move(substreamConfigs)}
+    explicit Impl(std::span<BusType const> substreamConfigs)
+        : streamProcessor{substreamConfigs}
     {
     }
 
@@ -186,7 +178,7 @@ struct WaveformDataGenerator::Impl
 
 WaveformDataGenerator::WaveformDataGenerator(
         std::span<BusType const> substreamConfigs)
-    : m_impl(std::make_unique<Impl>(std::move(substreamConfigs)))
+    : m_impl(std::make_unique<Impl>(substreamConfigs))
 {
 }
 
@@ -247,7 +239,8 @@ WaveformDataGenerator::update(AudioStream const& stream)
     }
 
     m_impl->streamProcessor.process(stream);
-    generated(m_impl->streamProcessor.results);
+
+    emit generated(m_impl->streamProcessor.results);
 }
 
 } // namespace piejam::gui::model

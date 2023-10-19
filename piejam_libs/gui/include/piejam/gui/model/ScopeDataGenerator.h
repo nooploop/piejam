@@ -20,7 +20,7 @@ class ScopeDataGenerator final : public AudioStreamListener
 {
     Q_OBJECT
 public:
-    ScopeDataGenerator(std::span<BusType const> substreamConfigs);
+    explicit ScopeDataGenerator(std::span<BusType const> substreamConfigs);
     ~ScopeDataGenerator() override;
 
     void setSampleRate(audio::sample_rate);

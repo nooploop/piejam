@@ -6,6 +6,7 @@
 
 #include <piejam/gui/model/StreamProcessor.h>
 
+#include <piejam/algorithm/shift_push_back.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/functional/edge_detect.h>
 #include <piejam/math.h>
@@ -29,43 +30,36 @@ using ScopeSamples = std::span<float const>;
 struct Args
 {
     std::size_t resolution{1};
+    std::size_t windowSize{64};
 };
 
 struct InactiveGenerator final : SubStreamProcessor<ScopeData::Samples>
 {
-    InactiveGenerator(Args const&)
+    explicit InactiveGenerator(Args const& args)
+        : m_args{args}
     {
     }
 
-    auto process(AudioStream const& stream) -> ScopeData::Samples
+    auto process(AudioStream const&) -> ScopeData::Samples override
     {
-        m_captured.resize(m_captured.size() + stream.num_frames());
-        return m_captured;
+        return {};
     }
 
-    void drop(std::size_t const frames)
+    void clear() override
     {
-        BOOST_ASSERT(frames < m_captured.size());
-        m_captured.erase(
-                m_captured.begin(),
-                std::next(m_captured.begin() + frames));
-    }
-
-    void clear()
-    {
-        m_captured.clear();
     }
 
 private:
-    std::vector<float> m_captured{};
+    Args m_args;
 };
 
 template <StereoChannel SC>
 class Generator final : public SubStreamProcessor<ScopeData::Samples>
 {
 public:
-    Generator(Args args)
-        : m_args{std::move(args)}
+    explicit Generator(Args args)
+        : m_args{args}
+        , m_captured(args.windowSize * 2)
     {
     }
 
@@ -92,7 +86,7 @@ public:
                                           : m_args.resolution - m_restFrames),
                 streamFrames.end());
 
-        boost::push_back(
+        algorithm::shift_push_back(
                 m_captured,
                 streamFramesSubRange |
                         boost::adaptors::strided(m_args.resolution) |
@@ -108,23 +102,15 @@ public:
         return m_captured;
     }
 
-    void drop(std::size_t const frames) override
-    {
-        BOOST_ASSERT(frames < m_captured.size());
-        m_captured.erase(
-                m_captured.begin(),
-                std::next(m_captured.begin() + frames));
-    }
-
     void clear() override
     {
-        m_captured.clear();
+        std::ranges::fill(m_captured, 0.f);
     }
 
 private:
     Args m_args;
-    std::size_t m_restFrames{0};
     std::vector<float> m_captured{};
+    std::size_t m_restFrames{0};
 };
 
 struct Factory
@@ -175,17 +161,17 @@ struct Factory
 auto
 findTrigger(
         ScopeData::Samples const& samples,
-        std::size_t windowSize,
-        TriggerSlope trigger,
+        std::size_t const windowSize,
+        TriggerSlope const trigger,
         float triggerLevel) -> ScopeData::Samples::iterator
 {
-    if (samples.size() < windowSize)
-    {
-        return samples.end();
-    }
+    BOOST_ASSERT(samples.size() >= windowSize);
 
     auto itFirst = samples.begin();
-    auto itLast = std::next(samples.begin(), samples.size() - windowSize);
+    auto itLast = std::next(
+            samples.begin(),
+            static_cast<std::ranges::range_difference_t<ScopeData::Samples>>(
+                    samples.size() - windowSize));
 
     auto itFound =
             trigger == TriggerSlope::RisingEdge
@@ -216,26 +202,26 @@ enum class ScopeDataGeneratorState
 
 struct ScopeDataGenerator::Impl
 {
-    Impl(std::span<BusType const> substreamConfigs)
-        : streamProcessor{std::move(substreamConfigs)}
+    explicit Impl(std::span<BusType const> substreamConfigs)
+        : streamProcessor{substreamConfigs}
     {
     }
 
     audio::sample_rate sampleRate;
-    std::size_t windowSize{64};
     std::chrono::milliseconds holdTime{16};
     std::size_t triggerStream{};
     TriggerSlope triggerSlope{TriggerSlope::RisingEdge};
     float triggerLevel{};
     bool freeze{};
     ScopeDataGeneratorState state{ScopeDataGeneratorState::WaitingForTrigger};
+    std::size_t holdCapturedSize{};
 
     StreamProcessor<Args, ScopeData::Samples, Factory> streamProcessor;
 };
 
 ScopeDataGenerator::ScopeDataGenerator(
         std::span<BusType const> substreamConfigs)
-    : m_impl(std::make_unique<Impl>(std::move(substreamConfigs)))
+    : m_impl(std::make_unique<Impl>(substreamConfigs))
 {
 }
 
@@ -259,7 +245,9 @@ ScopeDataGenerator::setResolution(std::size_t const resolution)
 void
 ScopeDataGenerator::setWindowSize(std::size_t const windowSize)
 {
-    m_impl->windowSize = windowSize;
+    m_impl->streamProcessor.updateProperty(
+            m_impl->streamProcessor.args.windowSize,
+            windowSize);
 }
 
 void
@@ -326,8 +314,8 @@ ScopeDataGenerator::update(AudioStream const& stream)
 
     auto const triggerStreamSamples =
             m_impl->streamProcessor.results[m_impl->triggerStream];
-    auto const capturedSize = triggerStreamSamples.size();
-    auto const windowSize = m_impl->windowSize;
+    auto const capturedSize = stream.num_frames();
+    auto const windowSize = m_impl->streamProcessor.args.windowSize;
 
     switch (m_impl->state)
     {
@@ -344,30 +332,28 @@ ScopeDataGenerator::update(AudioStream const& stream)
                 auto result = algorithm::transform_to_vector(
                         m_impl->streamProcessor.results,
                         [=](ScopeData::Samples const& stream) {
-                            return ScopeData::Samples{
-                                    stream.data() + offset,
-                                    windowSize};
+                            return stream.empty()
+                                           ? stream
+                                           : ScopeData::Samples{
+                                                     stream.data() + offset,
+                                                     windowSize};
                         });
 
                 emit generated(result);
 
-                m_impl->streamProcessor.clear();
                 m_impl->state = ScopeDataGeneratorState::Hold;
-            }
-            else if (capturedSize > windowSize * 2)
-            {
-                m_impl->streamProcessor.drop(capturedSize - windowSize);
+                m_impl->holdCapturedSize = 0;
             }
             break;
         }
 
         case ScopeDataGeneratorState::Hold:
         {
+            m_impl->holdCapturedSize += capturedSize;
             auto const holdTimeSize =
                     m_impl->sampleRate.to_samples(m_impl->holdTime);
-            if (capturedSize >= holdTimeSize)
+            if (m_impl->holdCapturedSize >= holdTimeSize)
             {
-                m_impl->streamProcessor.clear();
                 m_impl->state = ScopeDataGeneratorState::WaitingForTrigger;
             }
             break;
