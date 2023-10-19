@@ -11,7 +11,7 @@
 namespace piejam::algorithm
 {
 
-template <std::ranges::forward_range Target, std::ranges::forward_range Source>
+template <std::ranges::range Target, std::ranges::range Source>
 constexpr auto
 shift_push_back(Target&& target, Source&& source)
 {
