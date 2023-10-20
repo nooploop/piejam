@@ -25,7 +25,7 @@ public:
 
         constexpr iterator() noexcept = default;
 
-        constexpr iterator(smoother<T>& smoother)
+        constexpr explicit iterator(smoother<T>& smoother)
             : m_smoother(std::addressof(smoother))
         {
         }
@@ -66,41 +66,41 @@ public:
 
     constexpr smoother() noexcept = default;
 
-    constexpr smoother(T const current) noexcept
+    constexpr explicit smoother(T const current) noexcept
         : m_current(current)
         , m_target(current)
     {
     }
 
-    constexpr void set(T target, std::size_t frames_to_smooth) noexcept
+    constexpr void set(T target, std::size_t steps_to_smooth) noexcept
     {
-        if (target != m_target)
+        if (m_target == target)
         {
-            m_target = target;
-            m_frames_to_smooth = frames_to_smooth;
+            return;
+        }
 
-            if (!m_frames_to_smooth)
-            {
-                m_current = m_target;
-                m_inc = T{};
-                m_advance = &smoother<T>::advance_still;
-            }
-            else
-            {
-                m_inc = (m_target - m_current) / m_frames_to_smooth;
-                m_advance = &smoother<T>::advance_running;
-            }
+        m_target = target;
+        m_steps_to_smooth = steps_to_smooth;
+
+        if (m_steps_to_smooth == 0u)
+        {
+            m_current = m_target;
+            m_inc = T{};
+        }
+        else
+        {
+            m_inc = (m_target - m_current) / m_steps_to_smooth;
         }
     }
 
     [[nodiscard]] constexpr auto generator() noexcept -> iterator
     {
-        return {*this};
+        return iterator{*this};
     }
 
     [[nodiscard]] constexpr auto is_running() const noexcept -> bool
     {
-        return m_frames_to_smooth != 0;
+        return m_steps_to_smooth != 0;
     }
 
     [[nodiscard]] constexpr auto current() const noexcept -> T
@@ -111,35 +111,23 @@ public:
 private:
     constexpr void advance() noexcept
     {
-        (this->*m_advance)();
-    }
-
-    constexpr void advance_running() noexcept
-    {
-        BOOST_ASSERT(is_running());
-
-        m_current += m_inc;
-
-        --m_frames_to_smooth;
-
-        if (!is_running())
+        if (is_running())
         {
-            m_current = m_target;
-            m_advance = &smoother<T>::advance_still;
+            m_current += m_inc;
+
+            --m_steps_to_smooth;
+
+            if (!is_running())
+            {
+                m_current = m_target;
+            }
         }
     }
 
-    constexpr void advance_still() noexcept
-    {
-        BOOST_ASSERT(!is_running());
-    }
-
-    std::size_t m_frames_to_smooth{};
+    std::size_t m_steps_to_smooth{};
     T m_inc{};
     T m_current{};
     T m_target{};
-    using advance_t = void (smoother<T>::*)();
-    advance_t m_advance{&smoother<T>::advance_still};
 };
 
 } // namespace piejam::audio

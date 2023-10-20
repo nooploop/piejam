@@ -62,7 +62,7 @@ class amplifier final : public engine::component
 {
 public:
     amplifier(std::size_t num_channels, std::string_view name)
-        : m_gain_proc{engine::make_smoother_processor(
+        : m_gain_proc{engine::make_event_to_audio_smoother_processor(
                   engine::default_smooth_length,
                   fmt::format("{} gain", name))}
         , m_amp_procs{algorithm::transform_to_vector(
@@ -124,7 +124,7 @@ public:
         : m_gain_procs{algorithm::transform_to_vector(
                   range::iota(num_channels),
                   [=](auto ch) {
-                      return engine::make_smoother_processor(
+                      return engine::make_event_to_audio_smoother_processor(
                               engine::default_smooth_length,
                               format_name(name, "gain", ch, num_channels));
                   })}

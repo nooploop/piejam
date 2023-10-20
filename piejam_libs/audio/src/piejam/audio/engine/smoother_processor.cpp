@@ -20,12 +20,14 @@ namespace piejam::audio::engine
 namespace
 {
 
-class smoother_processor final
+class event_to_audio_smoother_processor final
     : public named_processor
-    , public single_event_input_processor<smoother_processor, float>
+    , public single_event_input_processor<
+              event_to_audio_smoother_processor,
+              float>
 {
 public:
-    smoother_processor(
+    event_to_audio_smoother_processor(
             std::size_t const smooth_length,
             std::string_view const name)
         : named_processor(name)
@@ -35,7 +37,7 @@ public:
 
     auto type_name() const noexcept -> std::string_view override
     {
-        return "smooth";
+        return "e_to_a_smooth";
     }
 
     auto num_inputs() const noexcept -> std::size_t override
@@ -113,11 +115,13 @@ private:
 } // namespace
 
 auto
-make_smoother_processor(
+make_event_to_audio_smoother_processor(
         std::size_t const smooth_length,
         std::string_view const name) -> std::unique_ptr<processor>
 {
-    return std::make_unique<smoother_processor>(smooth_length, name);
+    return std::make_unique<event_to_audio_smoother_processor>(
+            smooth_length,
+            name);
 }
 
 } // namespace piejam::audio::engine
