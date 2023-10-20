@@ -12,6 +12,8 @@
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/smoother.h>
 
+#include <boost/assert.hpp>
+
 #include <type_traits>
 
 namespace piejam::audio::engine
@@ -30,8 +32,8 @@ public:
     event_to_audio_smoother_processor(
             std::size_t const smooth_length,
             std::string_view const name)
-        : named_processor(name)
-        , m_smooth_length(smooth_length)
+        : named_processor{name}
+        , m_smooth_length{smooth_length}
     {
     }
 
@@ -112,6 +114,106 @@ private:
     smoother<float> m_smoother;
 };
 
+class event_smoother_processor final
+    : public named_processor
+    , public single_event_input_processor<event_smoother_processor, float>
+{
+public:
+    event_smoother_processor(
+            std::size_t const smooth_length,
+            std::size_t const smooth_steps,
+            std::string_view const name)
+        : named_processor{name}
+        , m_smooth_steps{smooth_steps}
+        , m_step_length{smooth_length / smooth_steps}
+    {
+        BOOST_ASSERT_MSG(
+                smooth_length % smooth_steps == 0,
+                "smooth_length should be dividable by smooth_steps");
+    }
+
+    auto type_name() const noexcept -> std::string_view override
+    {
+        return "smooth";
+    }
+
+    auto num_inputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    auto num_outputs() const noexcept -> std::size_t override
+    {
+        return 0;
+    }
+
+    auto event_inputs() const noexcept -> event_ports override
+    {
+        static std::array s_ports{event_port(std::in_place_type<float>, "ev")};
+        return s_ports;
+    }
+
+    auto event_outputs() const noexcept -> event_ports override
+    {
+        static std::array s_ports{
+                event_port(std::in_place_type<float>, "sm_ev")};
+        return s_ports;
+    }
+
+    void process(engine::process_context const& ctx) override
+    {
+        verify_process_context(*this, ctx);
+
+        process_sliced(ctx);
+    }
+
+    void process_buffer(process_context const& ctx)
+    {
+        process_slice(ctx, 0, ctx.buffer_size);
+    }
+
+    void process_slice(
+            process_context const& ctx,
+            std::size_t const offset,
+            std::size_t const count)
+    {
+        std::size_t samples_left = count;
+        while (samples_left && m_smoother.is_running())
+        {
+            if (m_counter == 0u)
+            {
+                ctx.event_outputs.get<float>(0).insert(
+                        offset + count - samples_left,
+                        *(m_smoother.generator())++);
+
+                if (m_smoother.is_running())
+                {
+                    m_counter = m_step_length;
+                }
+            }
+            else
+            {
+                std::size_t const rem = std::min(samples_left, m_counter);
+
+                samples_left -= rem;
+                m_counter -= rem;
+            }
+        }
+    }
+
+    void process_event(process_context const&, event<float> const& ev)
+    {
+        m_smoother.set(ev.value(), m_smooth_steps);
+        m_counter = m_step_length;
+    }
+
+private:
+    std::size_t const m_smooth_steps;
+    std::size_t const m_step_length;
+    std::size_t m_counter{};
+    smoother<float> m_smoother;
+};
+
 } // namespace
 
 auto
@@ -121,6 +223,18 @@ make_event_to_audio_smoother_processor(
 {
     return std::make_unique<event_to_audio_smoother_processor>(
             smooth_length,
+            name);
+}
+
+auto
+make_event_smoother_processor(
+        std::size_t const smooth_length,
+        std::size_t const smooth_steps,
+        std::string_view const name) -> std::unique_ptr<processor>
+{
+    return std::make_unique<event_smoother_processor>(
+            smooth_length,
+            smooth_steps,
             name);
 }
 
