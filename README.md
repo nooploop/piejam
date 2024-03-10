@@ -23,6 +23,7 @@ More [documentation](https://piejam.readthedocs.io/en/stable/)
 * Flexible routing between mixer channels
 * Fx chain per mixer channel
 * Fx modules:
+    * Dual Pan
     * Filter
     * Oscilloscope
     * Spectrum Analyzer
