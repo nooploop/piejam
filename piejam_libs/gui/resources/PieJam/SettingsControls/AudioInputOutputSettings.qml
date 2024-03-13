@@ -14,79 +14,78 @@ SubscribableItem {
     property bool showAddMono: true
     property bool showAddStereo: true
 
-    ListView {
-        id: busConfigsList
-
-        model: root.model.busConfigs
-
-        anchors.right: parent.right
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: addButtons.top
+    ColumnLayout {
+        anchors.fill: parent
         anchors.margins: 8
 
         spacing: 8
 
-        clip: true
+        ListView {
+            id: busConfigsList
 
-        delegate: BusConfig {
-            height: 64
-            name: model.item.name
-            mono: model.item.mono
-            channels: root.model.channels
-            monoChannelIndex: model.item.monoChannel
-            stereoLeftChannelIndex: model.item.stereoLeftChannel
-            stereoRightChannelIndex: model.item.stereoRightChannel
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            anchors.left: parent ? parent.left : undefined
-            anchors.right: parent ? parent.right : undefined
+            model: root.model.busConfigs
 
-            onMonoChannelSelected: model.item.changeMonoChannel(ch)
-            onStereoLeftChannelSelected: model.item.changeStereoLeftChannel(ch)
-            onStereoRightChannelSelected: model.item.changeStereoRightChannel(ch)
-            onDeleteConfigClicked: model.item.deleteBus()
-            onNameEdited: model.item.changeName(name)
+            spacing: 8
 
-            ModelSubscription {
-                target: model.item
-                subscribed: visible
+            clip: true
+
+            delegate: BusConfig {
+                height: 64
+                name: model.item.name
+                mono: model.item.mono
+                channels: root.model.channels
+                monoChannelIndex: model.item.monoChannel
+                stereoLeftChannelIndex: model.item.stereoLeftChannel
+                stereoRightChannelIndex: model.item.stereoRightChannel
+
+                anchors.left: parent ? parent.left : undefined
+                anchors.right: parent ? parent.right : undefined
+
+                onMonoChannelSelected: model.item.changeMonoChannel(ch)
+                onStereoLeftChannelSelected: model.item.changeStereoLeftChannel(ch)
+                onStereoRightChannelSelected: model.item.changeStereoRightChannel(ch)
+                onDeleteConfigClicked: model.item.deleteBus()
+                onNameEdited: model.item.changeName(name)
+
+                ModelSubscription {
+                    target: model.item
+                    subscribed: visible
+                }
             }
         }
-    }
 
-    RowLayout {
-        id: addButtons
+        RowLayout {
+            id: addButtons
 
-        spacing: 8
-        anchors.rightMargin: 8
-        anchors.leftMargin: 8
-        anchors.bottomMargin: 8
-
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.left: parent.left
-
-        Button {
-            id: addMono
-
-            text: "+Mono"
             Layout.fillWidth: true
-            Layout.minimumWidth: addButtons.width / 2
-            visible: root.showAddMono
+            Layout.preferredHeight: 40
 
-            onClicked: root.model.addMonoBus()
+            spacing: 8
+
+            Button {
+                id: addMono
+
+                Layout.fillWidth: true
+
+                text: "+Mono"
+                visible: root.showAddMono
+
+                onClicked: root.model.addMonoBus()
+            }
+
+            Button {
+                id: addStereo
+
+                Layout.fillWidth: true
+
+                text: "+Stereo"
+                visible: root.showAddStereo
+
+                onClicked: root.model.addStereoBus()
+            }
         }
-
-        Button {
-            id: addStereo
-
-            text: "+Stereo"
-            Layout.fillWidth: true
-            Layout.minimumWidth: addButtons.width / 2
-            visible: root.showAddStereo
-
-            onClicked: root.model.addStereoBus()
-        }
-
     }
 }
