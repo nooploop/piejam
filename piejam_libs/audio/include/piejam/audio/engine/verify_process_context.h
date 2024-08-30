@@ -14,7 +14,6 @@
 #include <piejam/audio/simd.h>
 
 #include <boost/assert.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <algorithm>
 
@@ -22,7 +21,9 @@ namespace piejam::audio::engine
 {
 
 inline void
-verify_process_context(processor const& proc, process_context const& ctx)
+verify_process_context(
+        [[maybe_unused]] processor const& proc,
+        [[maybe_unused]] process_context const& ctx)
 {
     BOOST_ASSERT(proc.num_inputs() == ctx.inputs.size());
     BOOST_ASSERT(proc.num_outputs() == ctx.outputs.size());
@@ -50,8 +51,6 @@ verify_process_context(processor const& proc, process_context const& ctx)
             [](event_port const& p, auto const& b) {
                 return p.type() == b->type();
             }));
-
-    boost::ignore_unused(proc, ctx);
 }
 
 } // namespace piejam::audio::engine

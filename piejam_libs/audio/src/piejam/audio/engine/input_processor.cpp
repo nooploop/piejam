@@ -7,11 +7,6 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
 
-#include <boost/assert.hpp>
-#include <boost/core/ignore_unused.hpp>
-
-#include <algorithm>
-
 namespace piejam::audio::engine
 {
 

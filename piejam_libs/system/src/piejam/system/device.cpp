@@ -67,11 +67,10 @@ auto
 device::ioctl(
         unsigned long const request,
         void* const p,
-        std::size_t const size) noexcept -> std::error_code
+        [[maybe_unused]] std::size_t const size) noexcept -> std::error_code
 {
     BOOST_ASSERT(m_fd != invalid);
     BOOST_ASSERT(_IOC_SIZE(request) == size);
-    boost::ignore_unused(size);
 
     if (-1 == ::ioctl(m_fd, request, p))
     {

@@ -7,7 +7,6 @@
 #include <piejam/range/strided_span.h>
 
 #include <boost/assert.hpp>
-#include <boost/core/ignore_unused.hpp>
 
 #include <algorithm>
 #include <span>
@@ -67,7 +66,7 @@ public:
                 U* const data,
                 difference_type const step,
                 std::size_t const minor_size,
-                difference_type const minor_step) noexcept
+                [[maybe_unused]] difference_type const minor_step) noexcept
             requires(MinorStep != dynamic_stride)
             : m_minor_span{data, minor_size}
             , m_step{step}
@@ -79,7 +78,6 @@ public:
                     MinorSize == std::dynamic_extent ||
                     MinorSize == minor_size);
             BOOST_ASSERT(MinorStep == minor_step);
-            boost::ignore_unused(minor_step);
         }
 
         [[nodiscard]] constexpr auto operator*() const noexcept -> reference

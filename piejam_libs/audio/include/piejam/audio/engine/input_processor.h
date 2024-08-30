@@ -7,9 +7,6 @@
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/pcm_buffer_converter.h>
 
-#include <span>
-#include <vector>
-
 namespace piejam::audio::engine
 {
 

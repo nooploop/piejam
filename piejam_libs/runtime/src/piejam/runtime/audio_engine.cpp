@@ -364,14 +364,13 @@ connect_mixer_channel_with_fx_chain(
 void
 connect_mixer_input(
         audio::engine::graph& g,
-        mixer::channels_t const& channels,
+        [[maybe_unused]] mixer::channels_t const& channels,
         device_io::buses_t const& device_buses,
         component_map const& comps,
         std::span<audio::engine::input_processor> const input_procs,
         mixer::channel const& mixer_channel,
         audio::engine::component& mixer_channel_in)
 {
-    boost::ignore_unused(channels);
     std::visit(
             boost::hof::match(
                     [](default_t) {},
