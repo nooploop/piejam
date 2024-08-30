@@ -73,14 +73,6 @@ struct StreamProcessor
         }
     }
 
-    void drop(std::size_t const frames)
-    {
-        for (auto&& processor : processors)
-        {
-            processor->drop(frames);
-        }
-    }
-
     void clear()
     {
         for (auto&& processor : processors)

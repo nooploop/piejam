@@ -25,8 +25,6 @@ namespace piejam::gui::model
 namespace
 {
 
-using ScopeSamples = std::span<float const>;
-
 struct Args
 {
     std::size_t resolution{1};
@@ -165,6 +163,11 @@ findTrigger(
         TriggerSlope const trigger,
         float triggerLevel) -> ScopeData::Samples::iterator
 {
+    if (samples.empty())
+    {
+        return samples.end();
+    }
+
     BOOST_ASSERT(samples.size() >= windowSize);
 
     auto itFirst = samples.begin();
