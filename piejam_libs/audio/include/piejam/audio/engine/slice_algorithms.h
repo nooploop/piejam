@@ -31,14 +31,16 @@ struct slice_add
     {
     }
 
-    constexpr auto operator()(T const l_c, T const r_c) const -> slice<T>
+    constexpr auto operator()(
+            typename slice<T>::constant_t const l_c,
+            typename slice<T>::constant_t const r_c) const -> slice<T>
     {
         return l_c + r_c;
     }
 
-    constexpr auto
-    operator()(typename slice<T>::span_t const& l_buf, T const r_c) const
-            -> slice<T>
+    constexpr auto operator()(
+            typename slice<T>::span_t const l_buf,
+            typename slice<T>::constant_t const r_c) const -> slice<T>
     {
         if (r_c != T{})
         {
@@ -56,16 +58,16 @@ struct slice_add
         }
     }
 
-    constexpr auto
-    operator()(T const l_c, typename slice<T>::span_t const& r_buf) const
-            -> slice<T>
+    constexpr auto operator()(
+            typename slice<T>::constant_t const l_c,
+            typename slice<T>::span_t const r_buf) const -> slice<T>
     {
         return (*this)(r_buf, l_c);
     }
 
     constexpr auto operator()(
-            typename slice<T>::span_t const& l_buf,
-            typename slice<T>::span_t const& r_buf) const -> slice<T>
+            typename slice<T>::span_t const l_buf,
+            typename slice<T>::span_t const r_buf) const -> slice<T>
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
@@ -85,14 +87,16 @@ struct slice_multiply
     {
     }
 
-    constexpr auto operator()(T const l_c, T const r_c) const -> slice<T>
+    constexpr auto operator()(
+            typename slice<T>::constant_t const l_c,
+            typename slice<T>::constant_t const r_c) const -> slice<T>
     {
         return l_c * r_c;
     }
 
-    constexpr auto
-    operator()(typename slice<T>::span_t const& l_buf, T const r_c) const
-            -> slice<T>
+    constexpr auto operator()(
+            typename slice<T>::span_t const l_buf,
+            typename slice<T>::constant_t const r_c) const -> slice<T>
     {
         switch (switch_cast(r_c))
         {
@@ -121,16 +125,16 @@ struct slice_multiply
         }
     }
 
-    constexpr auto
-    operator()(T const l_c, typename slice<T>::span_t const& r_buf) const
-            -> slice<T>
+    constexpr auto operator()(
+            typename slice<T>::constant_t const l_c,
+            typename slice<T>::span_t const r_buf) const -> slice<T>
     {
         return (*this)(r_buf, l_c);
     }
 
     constexpr auto operator()(
-            typename slice<T>::span_t const& l_buf,
-            typename slice<T>::span_t const& r_buf) const -> slice<T>
+            typename slice<T>::span_t const l_buf,
+            typename slice<T>::span_t const r_buf) const -> slice<T>
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
@@ -157,12 +161,13 @@ struct slice_clamp
         BOOST_ASSERT(simd::is_aligned(out.data()));
     }
 
-    constexpr auto operator()(T const c) const -> slice<T>
+    constexpr auto operator()(typename slice<T>::constant_t const c) const
+            -> slice<T>
     {
         return math::clamp(c, m_min, m_max);
     }
 
-    constexpr auto operator()(typename slice<T>::span_t const& buf) const
+    constexpr auto operator()(typename slice<T>::span_t const buf) const
             -> slice<T>
     {
         BOOST_ASSERT(simd::is_aligned(buf.data()));
@@ -190,12 +195,14 @@ struct slice_copy
     {
     }
 
-    constexpr void operator()(T const c) const noexcept
+    constexpr void
+    operator()(typename slice<T>::constant_t const c) const noexcept
     {
         std::ranges::fill(m_out, c);
     }
 
-    constexpr void operator()(std::span<T const> const buf) const noexcept
+    constexpr void
+    operator()(typename slice<T>::span_t const buf) const noexcept
     {
         if (buf.data() != m_out.data())
         {
@@ -217,13 +224,14 @@ struct subslice
     {
     }
 
-    constexpr auto operator()(T const c) const noexcept -> slice<T>
+    constexpr auto
+    operator()(typename slice<T>::constant_t const c) const noexcept -> slice<T>
     {
         return c;
     }
 
-    constexpr auto operator()(std::span<T const> const buf) const noexcept
-            -> slice<T>
+    constexpr auto
+    operator()(typename slice<T>::span_t const buf) const noexcept -> slice<T>
     {
         BOOST_ASSERT(m_offset < buf.size());
         BOOST_ASSERT(m_offset + m_size <= buf.size());
@@ -245,13 +253,14 @@ struct slice_transform
     {
     }
 
-    constexpr auto operator()(T const c) const noexcept -> slice<T>
+    constexpr auto
+    operator()(typename slice<T>::constant_t const c) const noexcept -> slice<T>
     {
         return m_f(c);
     }
 
-    constexpr auto operator()(std::span<T const> const buf) const noexcept
-            -> slice<T>
+    constexpr auto
+    operator()(typename slice<T>::span_t const buf) const noexcept -> slice<T>
     {
         BOOST_ASSERT(buf.size() == m_out.size());
         simd::transform(buf, m_out.data(), m_f);

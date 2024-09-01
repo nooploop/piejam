@@ -541,7 +541,7 @@ public:
 
                     m_instance.connect_port(
                             m_input_port_indices[i],
-                            const_cast<LADSPA_Data*>(sub.buffer().data()));
+                            const_cast<LADSPA_Data*>(sub.span().data()));
                 }
 
                 for (std::size_t i : range::indices(ctx.outputs))

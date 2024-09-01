@@ -47,8 +47,8 @@ TEST(graph_to_dag, audio_is_transferred_to_connected_proc)
 
     auto input_has_sample = [](process_context const& ctx) {
         return ctx.inputs.size() == 1 &&
-               ctx.inputs[0].get().buffer().size() == 1 &&
-               ctx.inputs[0].get().buffer()[0] == 23.f;
+               ctx.inputs[0].get().span().size() == 1 &&
+               ctx.inputs[0].get().span()[0] == 23.f;
     };
 
     EXPECT_CALL(out_proc, process(Truly(input_has_sample))).Times(1);
@@ -84,10 +84,10 @@ TEST(graph_to_dag, audio_can_spread_to_multiple_ins)
 
     auto input_has_sample = [](process_context const& ctx) {
         return ctx.inputs.size() == 2 &&
-               ctx.inputs[0].get().buffer().size() == 1 &&
-               ctx.inputs[0].get().buffer()[0] == 23.f &&
-               ctx.inputs[1].get().buffer().size() == 1 &&
-               ctx.inputs[1].get().buffer()[0] == 23.f;
+               ctx.inputs[0].get().span().size() == 1 &&
+               ctx.inputs[0].get().span()[0] == 23.f &&
+               ctx.inputs[1].get().span().size() == 1 &&
+               ctx.inputs[1].get().span()[0] == 23.f;
     };
 
     EXPECT_CALL(out_proc, process(Truly(input_has_sample))).Times(1);
@@ -143,7 +143,7 @@ TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
 
     auto valid_ins = [](process_context const& ctx) {
         return ctx.inputs.size() == 2 &&
-               ctx.inputs[0].get().buffer().size() == 1 &&
+               ctx.inputs[0].get().span().size() == 1 &&
                is_silence(ctx.inputs[1]);
     };
 

@@ -58,16 +58,16 @@ TEST_F(mix_processor_2_inputs,
 
     sut->process(ctx);
 
-    ASSERT_TRUE(results[0].is_buffer());
-    ASSERT_EQ(buffer_size, results[0].buffer().size());
-    EXPECT_FLOAT_EQ(.23f + .77f, results[0].buffer()[0]);
-    EXPECT_FLOAT_EQ(.58f + .77f, results[0].buffer()[1]);
-    EXPECT_FLOAT_EQ(.77f + .77f, results[0].buffer()[2]);
-    EXPECT_FLOAT_EQ(.99f + .77f, results[0].buffer()[3]);
-    EXPECT_FLOAT_EQ(.23f + .77f, results[0].buffer()[4]);
-    EXPECT_FLOAT_EQ(.58f + .77f, results[0].buffer()[5]);
-    EXPECT_FLOAT_EQ(.77f + .77f, results[0].buffer()[6]);
-    EXPECT_FLOAT_EQ(.99f + .77f, results[0].buffer()[7]);
+    ASSERT_TRUE(results[0].is_span());
+    ASSERT_EQ(buffer_size, results[0].span().size());
+    EXPECT_FLOAT_EQ(.23f + .77f, results[0].span()[0]);
+    EXPECT_FLOAT_EQ(.58f + .77f, results[0].span()[1]);
+    EXPECT_FLOAT_EQ(.77f + .77f, results[0].span()[2]);
+    EXPECT_FLOAT_EQ(.99f + .77f, results[0].span()[3]);
+    EXPECT_FLOAT_EQ(.23f + .77f, results[0].span()[4]);
+    EXPECT_FLOAT_EQ(.58f + .77f, results[0].span()[5]);
+    EXPECT_FLOAT_EQ(.77f + .77f, results[0].span()[6]);
+    EXPECT_FLOAT_EQ(.99f + .77f, results[0].span()[7]);
 }
 
 TEST_F(mix_processor_2_inputs,
@@ -79,9 +79,9 @@ TEST_F(mix_processor_2_inputs,
 
     sut->process(ctx);
 
-    ASSERT_TRUE(results[0].is_buffer());
-    EXPECT_EQ(in1_buf.data(), results[0].buffer().data());
-    EXPECT_EQ(in1_buf.size(), results[0].buffer().size());
+    ASSERT_TRUE(results[0].is_span());
+    EXPECT_EQ(in1_buf.data(), results[0].span().data());
+    EXPECT_EQ(in1_buf.size(), results[0].span().size());
 }
 
 TEST_F(mix_processor_2_inputs, mix_two_buffers_result_will_be_in_the_output)
@@ -95,16 +95,16 @@ TEST_F(mix_processor_2_inputs, mix_two_buffers_result_will_be_in_the_output)
 
     sut->process(ctx);
 
-    ASSERT_TRUE(results[0].is_buffer());
-    ASSERT_EQ(buffer_size, results[0].buffer().size());
-    EXPECT_FLOAT_EQ(.23f + .99f, results[0].buffer()[0]);
-    EXPECT_FLOAT_EQ(.58f + .77f, results[0].buffer()[1]);
-    EXPECT_FLOAT_EQ(.77f + .58f, results[0].buffer()[2]);
-    EXPECT_FLOAT_EQ(.99f + .23f, results[0].buffer()[3]);
-    EXPECT_FLOAT_EQ(.23f + .99f, results[0].buffer()[4]);
-    EXPECT_FLOAT_EQ(.58f + .77f, results[0].buffer()[5]);
-    EXPECT_FLOAT_EQ(.77f + .58f, results[0].buffer()[6]);
-    EXPECT_FLOAT_EQ(.99f + .23f, results[0].buffer()[7]);
+    ASSERT_TRUE(results[0].is_span());
+    ASSERT_EQ(buffer_size, results[0].span().size());
+    EXPECT_FLOAT_EQ(.23f + .99f, results[0].span()[0]);
+    EXPECT_FLOAT_EQ(.58f + .77f, results[0].span()[1]);
+    EXPECT_FLOAT_EQ(.77f + .58f, results[0].span()[2]);
+    EXPECT_FLOAT_EQ(.99f + .23f, results[0].span()[3]);
+    EXPECT_FLOAT_EQ(.23f + .99f, results[0].span()[4]);
+    EXPECT_FLOAT_EQ(.58f + .77f, results[0].span()[5]);
+    EXPECT_FLOAT_EQ(.77f + .58f, results[0].span()[6]);
+    EXPECT_FLOAT_EQ(.99f + .23f, results[0].span()[7]);
 }
 
 TEST(mix_processor, mix_two_silence_channels)
@@ -140,12 +140,12 @@ TEST(mix_processor, mix_one_silence_one_non_silence_channel)
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
     sut->process({in, out, result, {}, {}, 1});
 
-    ASSERT_EQ(1u, result[0].buffer().size());
-    EXPECT_FLOAT_EQ(0.23f, result[0].buffer()[0]);
+    ASSERT_EQ(1u, result[0].span().size());
+    EXPECT_FLOAT_EQ(0.23f, result[0].span()[0]);
 }
 
 TEST(mix_processor, mix_two_non_silence_channels)
@@ -167,13 +167,13 @@ TEST(mix_processor, mix_two_non_silence_channels)
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
     sut->process({in, out, result, {}, {}, out_buf.size()});
 
-    ASSERT_TRUE(result[0].is_buffer());
-    ASSERT_EQ(buffer_size, result[0].buffer().size());
-    for (auto const v : result[0].buffer())
+    ASSERT_TRUE(result[0].is_span());
+    ASSERT_EQ(buffer_size, result[0].span().size());
+    for (auto const v : result[0].span())
     {
         EXPECT_FLOAT_EQ(0.81f, v);
     }
@@ -194,13 +194,13 @@ TEST(mix_processor, mix_two_silence_one_non_silence_channel)
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
     sut->process({in, out, result, {}, {}, 1});
 
-    ASSERT_TRUE(result[0].is_buffer());
-    ASSERT_EQ(1u, result[0].buffer().size());
-    EXPECT_FLOAT_EQ(0.23f, result[0].buffer()[0]);
+    ASSERT_TRUE(result[0].is_span());
+    ASSERT_EQ(1u, result[0].span().size());
+    EXPECT_FLOAT_EQ(0.23f, result[0].span()[0]);
 }
 
 TEST(mix_processor, mix_one_silence_two_non_silence_channels)
@@ -224,12 +224,12 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
     sut->process({in, out, result, {}, {}, buffer_size});
 
-    ASSERT_EQ(buffer_size, result[0].buffer().size());
-    for (auto const v : result[0].buffer())
+    ASSERT_EQ(buffer_size, result[0].span().size());
+    for (auto const v : result[0].span())
     {
         EXPECT_FLOAT_EQ(0.81f, v);
     }
@@ -260,13 +260,13 @@ TEST(mix_processor, mix_one_silence_and_eight_buffers)
     std::vector<std::span<float>> out{out_buf};
     std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FLOAT_EQ(0.f, result[0].buffer()[0]);
+    ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
     sut->process({in, out, result, {}, {}, buffer_size});
 
-    ASSERT_TRUE(result[0].is_buffer());
-    ASSERT_EQ(buffer_size, result[0].buffer().size());
-    for (auto const v : result[0].buffer())
+    ASSERT_TRUE(result[0].is_span());
+    ASSERT_EQ(buffer_size, result[0].span().size());
+    for (auto const v : result[0].span())
     {
         EXPECT_FLOAT_EQ(8.f, v);
     }

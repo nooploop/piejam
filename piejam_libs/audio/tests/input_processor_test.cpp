@@ -31,9 +31,9 @@ TEST(input_processor, input_is_propagated_to_outputs)
     sut.set_input(converter);
     sut.process({{}, outputs, results, {}, {}, 4});
 
-    ASSERT_TRUE(results[0].is_buffer());
-    EXPECT_EQ(results[0].buffer().data(), out_buf.data());
-    EXPECT_EQ(results[0].buffer().size(), out_buf.size());
+    ASSERT_TRUE(results[0].is_span());
+    EXPECT_EQ(results[0].span().data(), out_buf.data());
+    EXPECT_EQ(results[0].span().size(), out_buf.size());
 }
 
 } // namespace piejam::audio::engine::test

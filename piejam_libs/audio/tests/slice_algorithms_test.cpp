@@ -31,8 +31,8 @@ TEST(slice_algorithms_add, adding_zero_to_buffer_will_result_in_the_buffer)
 
     auto res = add(x, y, {});
 
-    ASSERT_TRUE(res.is_buffer());
-    auto res_buffer = res.buffer();
+    ASSERT_TRUE(res.is_span());
+    auto res_buffer = res.span();
     EXPECT_EQ(buf.data(), res_buffer.data());
     EXPECT_EQ(buf.size(), res_buffer.size());
 }
@@ -48,8 +48,8 @@ TEST(slice_algorithms_add, adding_non_zero_to_buffer_will_write_to_out)
 
     auto res = add(x, y, {out});
 
-    ASSERT_TRUE(res.is_buffer());
-    auto res_buffer = res.buffer();
+    ASSERT_TRUE(res.is_span());
+    auto res_buffer = res.span();
     EXPECT_EQ(out.data(), res_buffer.data());
     EXPECT_EQ(out.size(), res_buffer.size());
     EXPECT_TRUE(std::ranges::equal(res_buffer, expected));
@@ -68,8 +68,8 @@ TEST(slice_algorithms_add, adding_buffers_will_write_to_out)
 
     auto res = add(x, y, {out});
 
-    ASSERT_TRUE(res.is_buffer());
-    auto res_buffer = res.buffer();
+    ASSERT_TRUE(res.is_span());
+    auto res_buffer = res.span();
     EXPECT_EQ(out.data(), res_buffer.data());
     EXPECT_EQ(out.size(), res_buffer.size());
     EXPECT_TRUE(std::ranges::equal(res_buffer, expected));
@@ -96,8 +96,8 @@ TEST(slice_algorithms_multiply, multiply_buffer_by_one_will_result_in_buffer)
 
     auto res = multiply(x, y, {});
 
-    ASSERT_TRUE(res.is_buffer());
-    auto res_buffer = res.buffer();
+    ASSERT_TRUE(res.is_span());
+    auto res_buffer = res.span();
     EXPECT_EQ(buf.data(), res_buffer.data());
     EXPECT_EQ(buf.size(), res_buffer.size());
 
@@ -128,9 +128,9 @@ TEST(slice_algorithms_multiply, multiply_buffer_by_non_zero_one_constant)
             slice<float>(3.f),
             std::span<float>(out));
 
-    ASSERT_TRUE(res.is_buffer());
-    EXPECT_EQ(out.data(), res.buffer().data());
-    EXPECT_EQ(out.size(), res.buffer().size());
+    ASSERT_TRUE(res.is_span());
+    EXPECT_EQ(out.data(), res.span().data());
+    EXPECT_EQ(out.size(), res.span().size());
 
     using testing::ElementsAre;
     using testing::Matches;
@@ -147,9 +147,9 @@ TEST(slice_algorithms_multiply, multiply_buffer_by_minus_one_inverts_sign)
             slice<float>(-1.f),
             std::span<float>(out));
 
-    ASSERT_TRUE(res.is_buffer());
-    EXPECT_EQ(out.data(), res.buffer().data());
-    EXPECT_EQ(out.size(), res.buffer().size());
+    ASSERT_TRUE(res.is_span());
+    EXPECT_EQ(out.data(), res.span().data());
+    EXPECT_EQ(out.size(), res.span().size());
 
     EXPECT_FLOAT_EQ(-2.f, out[0]);
     EXPECT_FLOAT_EQ(3.f, out[1]);
@@ -167,9 +167,9 @@ TEST(slice_algorithms_multiply, multiply_non_zero_one_constant_by_buffer)
             slice<float>(buf),
             std::span<float>(out));
 
-    ASSERT_TRUE(res.is_buffer());
-    EXPECT_EQ(out.data(), res.buffer().data());
-    EXPECT_EQ(out.size(), res.buffer().size());
+    ASSERT_TRUE(res.is_span());
+    EXPECT_EQ(out.data(), res.span().data());
+    EXPECT_EQ(out.size(), res.span().size());
 
     using testing::ElementsAre;
     using testing::Matches;
@@ -189,9 +189,9 @@ TEST(slice_algorithms_multiply, mulitply_two_buffers)
             slice<float>(buf2),
             std::span<float>(out));
 
-    ASSERT_TRUE(res.is_buffer());
-    EXPECT_EQ(out.data(), res.buffer().data());
-    EXPECT_EQ(out.size(), res.buffer().size());
+    ASSERT_TRUE(res.is_span());
+    EXPECT_EQ(out.data(), res.span().data());
+    EXPECT_EQ(out.size(), res.span().size());
 
     using testing::ElementsAre;
     using testing::Matches;
@@ -213,9 +213,9 @@ TEST(slice_algorithms_subslice, sublice_buffer)
 
     auto res = subslice(slice<float>(buf), 3, 3);
 
-    ASSERT_TRUE(res.is_buffer());
-    EXPECT_EQ(buf.data() + 3, res.buffer().data());
-    EXPECT_EQ(3u, res.buffer().size());
+    ASSERT_TRUE(res.is_span());
+    EXPECT_EQ(buf.data() + 3, res.span().data());
+    EXPECT_EQ(3u, res.span().size());
 }
 
 TEST(slice_interleave_2_slices, both_constant)
@@ -406,9 +406,9 @@ TEST(slice_clamp, buffer)
             std::array buf{-1.5f, 1.5f, 0.5f, 23.f, -17.f, 0.23f, 0.f, -0.25f};
     slice<float> s(buf);
     auto res = engine::clamp(s, -1.f, 1.f, {buf});
-    ASSERT_TRUE(res.is_buffer());
-    EXPECT_EQ(buf.size(), res.buffer().size());
-    EXPECT_EQ(buf.data(), res.buffer().data());
+    ASSERT_TRUE(res.is_span());
+    EXPECT_EQ(buf.size(), res.span().size());
+    EXPECT_EQ(buf.data(), res.span().data());
 
     using testing::ElementsAre;
     using testing::Matches;

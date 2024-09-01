@@ -18,12 +18,13 @@ class slice
 {
 public:
     using value_type = T;
+    using constant_t = T;
     using span_t = std::span<T const>;
     using variant_t = std::variant<T, span_t>;
 
     constexpr slice() noexcept = default;
 
-    constexpr slice(T v) noexcept
+    constexpr slice(constant_t v) noexcept
         : m_value(v)
     {
     }
@@ -39,20 +40,20 @@ public:
         return std::holds_alternative<T>(m_value);
     }
 
-    [[nodiscard]] constexpr auto constant() const noexcept -> T
+    [[nodiscard]] constexpr auto constant() const noexcept -> constant_t
     {
         BOOST_ASSERT(is_constant());
         return *std::get_if<0>(&m_value);
     }
 
-    [[nodiscard]] constexpr auto is_buffer() const noexcept -> bool
+    [[nodiscard]] constexpr auto is_span() const noexcept -> bool
     {
         return std::holds_alternative<span_t>(m_value);
     }
 
-    [[nodiscard]] constexpr auto buffer() const noexcept -> span_t const&
+    [[nodiscard]] constexpr auto span() const noexcept -> span_t const&
     {
-        BOOST_ASSERT(is_buffer());
+        BOOST_ASSERT(is_span());
         return *std::get_if<1>(&m_value);
     }
 

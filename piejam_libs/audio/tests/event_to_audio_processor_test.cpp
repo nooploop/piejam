@@ -74,8 +74,8 @@ TEST_F(event_to_audio_smoother_processor_test, event_at_begin_of_buffer)
 
     sut->process(ctx);
 
-    ASSERT_TRUE(ctx.results[0].is_buffer());
-    EXPECT_EQ(out0.data(), ctx.results[0].buffer().data());
+    ASSERT_TRUE(ctx.results[0].is_span());
+    EXPECT_EQ(out0.data(), ctx.results[0].span().data());
 
     ev_in_buf.clear();
 
@@ -96,8 +96,8 @@ TEST_F(event_to_audio_smoother_processor_test, rampup_inside_buffer)
 
     sut->process(ctx);
 
-    ASSERT_TRUE(ctx.results[0].is_buffer());
-    EXPECT_EQ(out0.data(), ctx.results[0].buffer().data());
+    ASSERT_TRUE(ctx.results[0].is_span());
+    EXPECT_EQ(out0.data(), ctx.results[0].span().data());
 
     EXPECT_TRUE(std::ranges::all_of(
             out0.begin(),
@@ -124,7 +124,7 @@ TEST_F(event_to_audio_smoother_processor_test, noramp_if_same_target)
 
     sut->process(ctx);
 
-    ASSERT_TRUE(ctx.results[0].is_buffer());
+    ASSERT_TRUE(ctx.results[0].is_span());
     EXPECT_TRUE(std::ranges::all_of(out0, equal_to<>(0.f)));
 }
 
@@ -137,8 +137,8 @@ TEST_F(event_to_audio_smoother_processor_test, ramp_over_process_boundary)
 
     sut->process(ctx);
 
-    ASSERT_TRUE(ctx.results[0].is_buffer());
-    EXPECT_EQ(out0.data(), ctx.results[0].buffer().data());
+    ASSERT_TRUE(ctx.results[0].is_span());
+    EXPECT_EQ(out0.data(), ctx.results[0].span().data());
 
     EXPECT_TRUE(std::ranges::all_of(
             out0.begin(),

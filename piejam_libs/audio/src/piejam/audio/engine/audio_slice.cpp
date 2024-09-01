@@ -14,7 +14,8 @@ is_silence(audio_slice const& sl) noexcept -> bool
 {
     struct is_silence_visitor
     {
-        constexpr auto operator()(float const x) const noexcept -> bool
+        constexpr auto
+        operator()(audio_slice::constant_t const x) const noexcept -> bool
         {
             return x == 0.f;
         }

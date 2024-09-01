@@ -31,8 +31,8 @@ verify_process_context(
     BOOST_ASSERT(proc.event_inputs().size() == ctx.event_inputs.size());
     BOOST_ASSERT(proc.event_outputs().size() == ctx.event_outputs.size());
     BOOST_ASSERT(std::ranges::all_of(ctx.inputs, [&](audio_slice const& b) {
-        return b.is_constant() || (b.buffer().size() == ctx.buffer_size &&
-                                   simd::is_aligned(b.buffer().data()));
+        return b.is_constant() || (b.span().size() == ctx.buffer_size &&
+                                   simd::is_aligned(b.span().data()));
     }));
     BOOST_ASSERT(
             std::ranges::all_of(ctx.outputs, [&](std::span<float> const b) {
