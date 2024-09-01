@@ -118,11 +118,10 @@ TEST(mix_processor, mix_two_silence_channels)
     std::vector<std::span<float>> out = {out_buf};
     std::vector<audio_slice> result{out[0]};
 
-    ASSERT_FALSE(is_silence(result[0]));
-
     sut->process({in, out, result, {}, {}, 1});
 
-    EXPECT_TRUE(is_silence(result[0]));
+    ASSERT_TRUE(result[0].is_constant());
+    EXPECT_TRUE(result[0].constant() == 0.f);
 }
 
 TEST(mix_processor, mix_one_silence_one_non_silence_channel)

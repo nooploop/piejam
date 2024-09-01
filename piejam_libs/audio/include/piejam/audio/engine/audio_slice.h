@@ -12,6 +12,4 @@ class slice;
 
 using audio_slice = slice<float>;
 
-auto is_silence(audio_slice const& l) noexcept -> bool;
-
 } // namespace piejam::audio::engine

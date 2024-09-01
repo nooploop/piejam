@@ -144,7 +144,8 @@ TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
     auto valid_ins = [](process_context const& ctx) {
         return ctx.inputs.size() == 2 &&
                ctx.inputs[0].get().span().size() == 1 &&
-               is_silence(ctx.inputs[1]);
+               ctx.inputs[1].get().is_constant() &&
+               ctx.inputs[1].get().constant() == 0.f;
     };
 
     EXPECT_CALL(out_proc, process(Truly(valid_ins))).Times(1);
