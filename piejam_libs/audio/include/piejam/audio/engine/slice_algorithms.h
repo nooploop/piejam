@@ -8,6 +8,7 @@
 
 #include <piejam/audio/simd.h>
 #include <piejam/math.h>
+#include <piejam/switch_cast.h>
 
 #include <boost/assert.hpp>
 #include <boost/hof/capture.hpp>
@@ -93,32 +94,30 @@ struct slice_multiply
     operator()(typename slice<T>::span_t const& l_buf, T const r_c) const
             -> slice<T>
     {
-        if (r_c == T{})
+        switch (switch_cast(r_c))
         {
-            return T{};
-        }
-        else if (r_c == T{-1})
-        {
-            BOOST_ASSERT(l_buf.size() == m_out.size());
-            simd::transform(
-                    l_buf,
-                    m_out.data(),
-                    bhof::capture(mipp::Reg<T>(T{}))(std::minus<>{}));
-            return m_out;
-        }
-        else if (r_c == T{1})
-        {
-            return l_buf;
-        }
-        else
-        {
-            BOOST_ASSERT(l_buf.size() == m_out.size());
-            simd::transform(
-                    l_buf,
-                    m_out.data(),
-                    bhof::capture(mipp::Reg<T>(r_c))(std::multiplies<>{}));
+            case switch_cast(T{0}):
+                return r_c;
 
-            return m_out;
+            case switch_cast(T{1}):
+                return l_buf;
+
+            case switch_cast(T{-1}):
+                BOOST_ASSERT(l_buf.size() == m_out.size());
+                simd::transform(
+                        l_buf,
+                        m_out.data(),
+                        bhof::capture(mipp::Reg<T>(T{}))(std::minus<>{}));
+                return m_out;
+
+            default:
+                BOOST_ASSERT(l_buf.size() == m_out.size());
+                simd::transform(
+                        l_buf,
+                        m_out.data(),
+                        bhof::capture(mipp::Reg<T>(r_c))(std::multiplies<>{}));
+
+                return m_out;
         }
     }
 

@@ -21,6 +21,7 @@ target_sources(piejam_base INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/npos.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/registry_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/scope_guard.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/switch_cast.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/to_underlying.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/tuple.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/tuple_element_compare.h
