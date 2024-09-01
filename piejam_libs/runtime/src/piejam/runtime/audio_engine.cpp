@@ -806,11 +806,6 @@ audio_engine::rebuild(
     auto const solo_groups = runtime::solo_groups(st.mixer_state.channels);
     make_solo_group_components(comps, solo_groups, m_impl->param_procs);
 
-    m_impl->param_procs.initialize([&st](auto const id) {
-        auto const* const desc = st.params.find(id);
-        return desc ? std::optional{desc->value.get()} : std::nullopt;
-    });
-
     processor_map procs;
 
     bool const midi_learn = static_cast<bool>(st.midi_learning);
@@ -857,6 +852,11 @@ audio_engine::rebuild(
     connect_solo_groups(new_graph, comps, solo_groups);
 
     auto [final_graph, mixers] = audio::engine::finalize_graph(new_graph);
+
+    m_impl->param_procs.initialize([&st](auto const id) {
+        auto const* const desc = st.params.find(id);
+        return desc ? std::optional{desc->value.get()} : std::nullopt;
+    });
 
     if (!m_impl->process.swap_executor(
                 audio::engine::graph_to_dag(final_graph)
