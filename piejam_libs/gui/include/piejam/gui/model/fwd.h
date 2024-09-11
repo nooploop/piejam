@@ -31,6 +31,7 @@ class MixerChannelPerform;
 class MixerChannelEdit;
 class MixerChannelFx;
 class DbScaleData;
+class AudioRouting;
 
 class BusConfig;
 using BusConfigsList = GenericListModel<BusConfig>;

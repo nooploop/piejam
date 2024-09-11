@@ -13,12 +13,9 @@
 #include <piejam/audio/types.h>
 #include <piejam/boxed_string.h>
 #include <piejam/entity_map.h>
-#include <piejam/io_direction.h>
 
 #include <boost/assert.hpp>
 
-#include <functional>
-#include <string>
 #include <vector>
 
 namespace piejam::runtime::mixer
@@ -44,6 +41,22 @@ struct channel
     box<fx::chain_t> fx_chain{};
 
     auto operator==(channel const&) const noexcept -> bool = default;
+
+    auto get_io_addr(io_socket const s) const noexcept -> io_address_t const&
+    {
+        switch (s)
+        {
+            case io_socket::in:
+                return in;
+
+            case io_socket::out:
+                return out;
+        }
+
+        BOOST_ASSERT(false);
+        static io_address_t const s_default;
+        return s_default;
+    }
 };
 
 struct state
@@ -56,10 +69,7 @@ struct state
 
 auto is_default_source_valid(channels_t const&, channel_id) -> bool;
 
-auto valid_source_channels(channels_t const&, channel_id)
-        -> std::vector<channel_id>;
-
-auto valid_target_channels(channels_t const&, channel_id)
+auto valid_channels(io_socket, channels_t const&, channel_id)
         -> std::vector<channel_id>;
 
 } // namespace piejam::runtime::mixer

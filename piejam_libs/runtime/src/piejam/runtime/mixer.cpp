@@ -17,7 +17,38 @@ namespace piejam::runtime::mixer
 namespace
 {
 
-using channel_io_t = io_pair<io_address_t>;
+struct channel_io_t
+{
+    io_address_t in;
+    io_address_t out;
+
+    template <io_socket S>
+    constexpr auto get() -> io_address_t&
+    {
+        switch (S)
+        {
+            case io_socket::in:
+                return in;
+
+            case io_socket::out:
+                return out;
+        }
+    }
+
+    template <io_socket S>
+    constexpr auto get() const -> io_address_t const&
+    {
+        switch (S)
+        {
+            case io_socket::in:
+                return in;
+
+            case io_socket::out:
+                return out;
+        }
+    }
+};
+
 using channels_io_t = boost::container::flat_map<channel_id, channel_io_t>;
 
 auto
@@ -114,7 +145,7 @@ has_cycle(io_graph g)
     });
 }
 
-template <io_direction D>
+template <io_socket D>
 auto
 valid_io_channels(channels_t const& channels, channel_id const ch_id)
         -> std::vector<mixer::channel_id>
@@ -127,7 +158,7 @@ valid_io_channels(channels_t const& channels, channel_id const ch_id)
         if (mixer_channel_id == ch_id)
         {
             // mono mixer channels can't have input channels
-            if (D == io_direction::input &&
+            if (D == io_socket::in &&
                 mixer_channel.bus_type == audio::bus_type::mono)
             {
                 return {};
@@ -137,22 +168,22 @@ valid_io_channels(channels_t const& channels, channel_id const ch_id)
             continue;
         }
 
-        if (D == io_direction::output &&
+        if (D == io_socket::out &&
             mixer_channel.bus_type == audio::bus_type::mono)
         {
             // mono mixer channels can't be targets
             continue;
         }
 
-        auto prev_id = channels_io[ch_id].get(D);
-        channels_io[ch_id].get(D) = mixer_channel_id;
+        auto prev_id =
+                std::exchange(channels_io[ch_id].get<D>(), mixer_channel_id);
 
         if (!has_cycle(make_channels_io_graph(channels_io)))
         {
             valid_ids.push_back(mixer_channel_id);
         }
 
-        channels_io[ch_id].get(D) = prev_id;
+        channels_io[ch_id].get<D>() = prev_id;
     }
 
     return valid_ids;
@@ -172,14 +203,23 @@ auto
 valid_source_channels(channels_t const& channels, channel_id const ch_id)
         -> std::vector<channel_id>
 {
-    return valid_io_channels<io_direction::input>(channels, ch_id);
+    return valid_io_channels<io_socket::in>(channels, ch_id);
 }
 
 auto
-valid_target_channels(channels_t const& channels, channel_id const ch_id)
+valid_channels(io_socket const s, channels_t const& channels, channel_id const ch_id)
         -> std::vector<channel_id>
 {
-    return valid_io_channels<io_direction::output>(channels, ch_id);
+    switch (s)
+    {
+        case io_socket::in:
+            return valid_io_channels<io_socket::in>(channels, ch_id);
+
+        case io_socket::out:
+            return valid_io_channels<io_socket::out>(channels, ch_id);
+    }
+
+    return {};
 }
 
 } // namespace piejam::runtime::mixer

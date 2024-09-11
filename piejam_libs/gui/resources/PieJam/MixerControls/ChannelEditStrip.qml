@@ -75,62 +75,10 @@ SubscribableItem {
                 text: qsTr("Audio In")
             }
 
-            ComboBox {
+            AudioRoutingComboBox {
                 Layout.fillWidth: true
 
-                displayText: root.model ? root.model.selectedInput : ""
-
-                Material.foreground: root.model
-                                            ? (PJModels.MixerChannelEdit.SelectedInputState.Invalid === root.model.selectedInputState
-                                                ? Material.Red
-                                                : Material.primaryTextColor)
-                                            : Material.primaryTextColor
-
-                popup: Menu {
-                    MenuItem {
-                        enabled: root.model ? root.model.defaultInputIsValid : true
-
-                        text: root.model && (root.model.busType === PJModels.Types.BusType.Mono) ? qsTr("None") : qsTr("Mix")
-
-                        onClicked: root.model.changeInputToDefault()
-                    }
-
-                    Menu {
-                        title: qsTr("Devices")
-
-                        enabled: inDevicesRep.count > 0
-
-                        Repeater {
-                            id: inDevicesRep
-
-                            model: root.model ? root.model.inputDevices : []
-
-                            delegate: MenuItem {
-                                text: modelData
-
-                                onClicked: root.model.changeInputToDevice(index)
-                            }
-                        }
-                    }
-
-                    Menu {
-                        title: qsTr("Channels")
-
-                        enabled: inChannelsRep.count > 0
-
-                        Repeater {
-                            id: inChannelsRep
-
-                            model: root.model ? root.model.inputChannels : []
-
-                            delegate: MenuItem {
-                                text: modelData
-
-                                onClicked: root.model.changeInputToChannel(index)
-                            }
-                        }
-                    }
-                }
+                model: root.model ? root.model.in : null
             }
 
             Label {
@@ -140,70 +88,10 @@ SubscribableItem {
                 text: qsTr("Audio Out")
             }
 
-            ComboBox {
+            AudioRoutingComboBox {
                 Layout.fillWidth: true
 
-                displayText: root.model ? root.model.selectedOutput : ""
-
-                function selectedOutputStateToColor(s) {
-                    switch (s) {
-                        case PJModels.MixerChannelEdit.SelectedOutputState.Invalid:
-                            return Material.Red
-
-                        case PJModels.MixerChannelEdit.SelectedOutputState.NotMixed:
-                            return Material.Yellow
-
-                        default:
-                            return Material.primaryTextColor
-                    }
-                }
-
-                Material.foreground: selectedOutputStateToColor(root.model ? root.model.selectedOutputState : null)
-
-                popup: Menu {
-
-                    MenuItem {
-                        text: qsTr("None")
-
-                        onClicked: root.model.changeOutputToNone()
-                    }
-
-                    Menu {
-                        title: qsTr("Devices")
-
-                        enabled: outDevicesRep.count > 0
-
-                        Repeater {
-                            id: outDevicesRep
-
-                            model: root.model ? root.model.outputDevices : []
-
-                            delegate: MenuItem {
-                                text: modelData
-
-                                onClicked: root.model.changeOutputToDevice(index)
-                            }
-                        }
-                    }
-
-                    Menu {
-                        title: qsTr("Channels")
-
-                        enabled: outChannelsRep.count > 0
-
-                        Repeater {
-                            id: outChannelsRep
-
-                            model: root.model ? root.model.outputChannels : []
-
-                            delegate: MenuItem {
-                                text: modelData
-
-                                onClicked: root.model.changeOutputToChannel(index)
-                            }
-                        }
-                    }
-                }
+                model: root.model ? root.model.out : null
             }
 
             Item {

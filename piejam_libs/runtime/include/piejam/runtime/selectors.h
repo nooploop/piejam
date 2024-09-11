@@ -87,13 +87,6 @@ struct mixer_device_route
     auto operator==(mixer_device_route const&) const noexcept -> bool = default;
 };
 
-extern selector<boxed_vector<mixer_device_route>> const
-        select_mixer_mono_input_devices;
-extern selector<boxed_vector<mixer_device_route>> const
-        select_mixer_stereo_input_devices;
-extern selector<boxed_vector<mixer_device_route>> const
-        select_mixer_output_devices;
-
 struct mixer_channel_route
 {
     mixer::channel_id channel_id;
@@ -102,15 +95,6 @@ struct mixer_channel_route
     auto operator==(mixer_channel_route const&) const noexcept
             -> bool = default;
 };
-
-auto make_default_mixer_channel_input_is_valid_selector(mixer::channel_id)
-        -> selector<bool>;
-
-auto make_mixer_input_channels_selector(mixer::channel_id)
-        -> selector<boxed_vector<mixer_channel_route>>;
-
-auto make_mixer_output_channels_selector(mixer::channel_id)
-        -> selector<boxed_vector<mixer_channel_route>>;
 
 struct selected_route
 {
@@ -122,15 +106,27 @@ struct selected_route
     };
 
     state_t state{};
-    std::string name;
+    boxed_string name;
 
     auto operator==(selected_route const&) const noexcept -> bool = default;
 };
 
-auto make_mixer_channel_input_selector(mixer::channel_id)
+auto make_mixer_channel_default_route_name_selector(
+        audio::bus_type,
+        mixer::io_socket) -> selector<boxed_string>;
+
+auto make_mixer_channel_default_route_is_valid_selector(
+        mixer::channel_id,
+        mixer::io_socket) -> selector<bool>;
+
+auto make_mixer_channel_selected_route_selector(mixer::channel_id, mixer::io_socket)
         -> selector<box<selected_route>>;
-auto make_mixer_channel_output_selector(mixer::channel_id)
-        -> selector<box<selected_route>>;
+
+auto make_mixer_devices_selector(audio::bus_type, mixer::io_socket)
+        -> selector<boxed_vector<mixer_device_route>>;
+
+auto make_mixer_channels_selector(mixer::channel_id, mixer::io_socket)
+        -> selector<boxed_vector<mixer_channel_route>>;
 
 auto make_device_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
 

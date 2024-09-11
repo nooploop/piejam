@@ -13,9 +13,18 @@ namespace piejam::gui::model
 
 struct MixerChannel::Impl
 {
-    std::unique_ptr<MixerChannelPerform> m_perform;
-    std::unique_ptr<MixerChannelEdit> m_edit;
-    std::unique_ptr<MixerChannelFx> m_fx;
+    Impl(runtime::store_dispatch store_dispatch,
+         runtime::subscriber& state_change_subscriber,
+         runtime::mixer::channel_id const id)
+        : m_perform{store_dispatch, state_change_subscriber, id}
+        , m_edit{store_dispatch, state_change_subscriber, id}
+        , m_fx{store_dispatch, state_change_subscriber, id}
+    {
+    }
+
+    MixerChannelPerform m_perform;
+    MixerChannelEdit m_edit;
+    MixerChannelFx m_fx;
 };
 
 MixerChannel::MixerChannel(
@@ -24,18 +33,9 @@ MixerChannel::MixerChannel(
         runtime::mixer::channel_id const id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
-              std::make_unique<MixerChannelPerform>(
                       store_dispatch,
                       state_change_subscriber,
-                      id),
-              std::make_unique<MixerChannelEdit>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      id),
-              std::make_unique<MixerChannelFx>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      id)))
+                      id))
 {
 }
 
@@ -49,19 +49,19 @@ MixerChannel::onSubscribe()
 auto
 MixerChannel::perform() const -> MixerChannelPerform*
 {
-    return m_impl->m_perform.get();
+    return &m_impl->m_perform;
 }
 
 auto
 MixerChannel::edit() const -> MixerChannelEdit*
 {
-    return m_impl->m_edit.get();
+    return &m_impl->m_edit;
 }
 
 auto
 MixerChannel::fx() const -> MixerChannelFx*
 {
-    return m_impl->m_fx.get();
+    return &m_impl->m_fx;
 }
 
 } // namespace piejam::gui::model

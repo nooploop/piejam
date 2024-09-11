@@ -221,15 +221,17 @@ apply_mixer_io(
     };
 
     {
-        auto action = std::make_unique<set_mixer_channel_input>();
+        auto action = std::make_unique<set_mixer_channel_route>();
         action->channel_id = channel_id;
+        action->io_socket = mixer::io_socket::in;
         action->route = get_io_addr(in);
         batch.push_back(std::move(action));
     }
 
     {
-        auto action = std::make_unique<set_mixer_channel_output>();
+        auto action = std::make_unique<set_mixer_channel_route>();
         action->channel_id = channel_id;
+        action->io_socket = mixer::io_socket::out;
         action->route = get_io_addr(out);
         batch.push_back(std::move(action));
     }

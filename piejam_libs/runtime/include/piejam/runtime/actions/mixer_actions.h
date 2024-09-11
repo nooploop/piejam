@@ -54,12 +54,12 @@ struct set_mixer_channel_name final
     void reduce(state&) const override;
 };
 
-template <io_direction D>
 struct set_mixer_channel_route final
-    : ui::cloneable_action<set_mixer_channel_route<D>, reducible_action>
-    , visitable_engine_action<set_mixer_channel_route<D>>
+    : ui::cloneable_action<set_mixer_channel_route, reducible_action>
+    , visitable_engine_action<set_mixer_channel_route>
 {
     mixer::channel_id channel_id;
+    mixer::io_socket io_socket;
     mixer::io_address_t route;
 
     void reduce(state&) const override;

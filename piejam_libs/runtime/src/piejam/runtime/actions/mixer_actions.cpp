@@ -102,22 +102,24 @@ set_mixer_channel_name::reduce(state& st) const
             });
 }
 
-template <io_direction D>
 void
-set_mixer_channel_route<D>::reduce(state& st) const
+set_mixer_channel_route::reduce(state& st) const
 {
     st.mixer_state.channels.update(
             channel_id,
             [this](mixer::channel& mixer_channel) {
-                (D == io_direction::input ? mixer_channel.in
-                                          : mixer_channel.out) = route;
+                switch (io_socket)
+                {
+                    case mixer::io_socket::in:
+                        mixer_channel.in = route;
+                        break;
+
+                    case mixer::io_socket::out:
+                        mixer_channel.out = route;
+                        break;
+                }
             });
 }
-
-template void
-set_mixer_channel_route<io_direction::input>::reduce(state&) const;
-template void
-set_mixer_channel_route<io_direction::output>::reduce(state&) const;
 
 void
 move_mixer_channel_left::reduce(state& st) const

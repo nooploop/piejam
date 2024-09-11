@@ -39,16 +39,16 @@ TEST(mixer_valid_io, test1)
             .rms_level = {},
     });
 
-    auto vs1 = valid_source_channels(channels, bus1);
+    auto vs1 = valid_channels(io_socket::in, channels, bus1);
     EXPECT_TRUE(Matches(ElementsAre(bus2))(vs1));
 
-    auto vs2 = valid_source_channels(channels, bus2);
+    auto vs2 = valid_channels(io_socket::in, channels, bus2);
     EXPECT_TRUE(Matches(ElementsAre(bus1))(vs2));
 
-    auto vt1 = valid_target_channels(channels, bus1);
+    auto vt1 = valid_channels(io_socket::out, channels, bus1);
     EXPECT_TRUE(Matches(ElementsAre(bus2))(vt1));
 
-    auto vt2 = valid_target_channels(channels, bus2);
+    auto vt2 = valid_channels(io_socket::out, channels, bus2);
     EXPECT_TRUE(Matches(ElementsAre(bus1))(vt2));
 }
 
@@ -72,16 +72,16 @@ TEST(mixer_valid_io, test2)
             .rms_level = {},
     });
 
-    auto vs1 = valid_source_channels(channels, bus1);
+    auto vs1 = valid_channels(io_socket::in, channels, bus1);
     EXPECT_TRUE(vs1.empty());
 
-    auto vs2 = valid_source_channels(channels, bus2);
+    auto vs2 = valid_channels(io_socket::in, channels, bus2);
     EXPECT_TRUE(Matches(ElementsAre(bus1))(vs2));
 
-    auto vt1 = valid_target_channels(channels, bus1);
+    auto vt1 = valid_channels(io_socket::out, channels, bus1);
     EXPECT_TRUE(Matches(ElementsAre(bus2))(vt1));
 
-    auto vt2 = valid_target_channels(channels, bus2);
+    auto vt2 = valid_channels(io_socket::out, channels, bus2);
     EXPECT_TRUE(vt2.empty());
 }
 

@@ -27,6 +27,12 @@ using io_address_t = std::variant<
         device_io::bus_id,
         channel_id>;
 
+enum class io_socket
+{
+    in,
+    out,
+};
+
 using channel_ids_t = std::vector<channel_id>;
 
 struct state;

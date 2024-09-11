@@ -39,10 +39,7 @@ struct delete_bus;
 
 struct add_mixer_channel;
 struct delete_mixer_channel;
-template <io_direction>
 struct set_mixer_channel_route;
-using set_mixer_channel_input = set_mixer_channel_route<io_direction::input>;
-using set_mixer_channel_output = set_mixer_channel_route<io_direction::output>;
 struct move_mixer_channel_left;
 struct move_mixer_channel_right;
 struct show_fx_browser;
