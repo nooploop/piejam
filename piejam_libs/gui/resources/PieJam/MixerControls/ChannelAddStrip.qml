@@ -5,6 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 Item {
     id: root
@@ -21,42 +22,46 @@ Item {
 
         anchors.fill: parent
 
-        TextField {
-            id: nameText
+        ColumnLayout {
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
+            anchors.fill: parent
 
-            placeholderText: qsTr("Name")
-        }
+            TextField {
+                id: nameText
 
-        Button {
-            id: addMonoButton
+                Layout.fillWidth: true
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: addStereoButton.top
+                placeholderText: qsTr("Name")
+            }
 
-            text: qsTr("Add Mono")
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
 
-            Material.background: Material.color(Material.Green, Material.Shade400)
+            Button {
+                id: addMonoButton
 
-            onClicked: root.addMonoClicked()
-        }
+                Layout.fillWidth: true
 
-        Button {
-            id: addStereoButton
+                text: qsTr("+ Mono")
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+                Material.background: Material.color(Material.Green, Material.Shade400)
 
-            text: qsTr("Add Stereo")
+                onClicked: root.addMonoClicked()
+            }
 
-            Material.background: Material.color(Material.Green, Material.Shade400)
+            Button {
+                id: addStereoButton
 
-            onClicked: root.addStereoClicked()
+                Layout.fillWidth: true
+
+                text: qsTr("+ Stereo")
+
+                Material.background: Material.color(Material.Green, Material.Shade400)
+
+                onClicked: root.addStereoClicked()
+            }
         }
     }
 }

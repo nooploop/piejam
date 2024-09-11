@@ -5,6 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 
 import PieJam.Models 1.0 as PJModels
 
@@ -18,223 +19,209 @@ SubscribableItem {
     implicitWidth: 132
 
     Frame {
-        id: frame
-
         anchors.fill: parent
 
-        Button {
-            id: deleteButton
+        ColumnLayout {
+            anchors.fill: parent
 
-            visible: root.deletable
-            enabled: root.deletable
+            TextField {
+                id: nameText
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+                Layout.fillWidth: true
 
-            text: qsTr("Delete")
+                text: root.model ? root.model.name : ""
 
-            Material.background: Material.color(Material.Red, Material.Shade400)
+                placeholderText: qsTr("Name")
 
-            onClicked: root.model.deleteChannel()
-        }
+                onTextEdited: root.model.changeName(nameText.text)
+            }
 
-        TextField {
-            id: nameText
+            RowLayout {
+                id: moveButtonsRow
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
+                Layout.fillWidth: true
+                Layout.preferredHeight: 48
+                Layout.maximumHeight: 48
 
-            text: root.model ? root.model.name : ""
+                spacing: 8
 
-            placeholderText: qsTr("Name")
+                Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-            onTextEdited: root.model.changeName(nameText.text)
-        }
+                    enabled: root.model && root.model.canMoveLeft
 
-        Label {
-            id: audioInLabel
+                    text: qsTr("<")
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: moveButtonsRow.bottom
-            textFormat: Text.PlainText
-            anchors.topMargin: 8
-
-            text: qsTr("Audio In")
-        }
-
-        ComboBox {
-            id: audioInSelect
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: audioInLabel.bottom
-
-            displayText: root.model ? root.model.selectedInput : ""
-
-            Material.foreground: root.model ? (PJModels.MixerChannelEdit.SelectedInputState.Invalid === root.model.selectedInputState
-                                        ? Material.Red
-                                        : Material.primaryTextColor) : Material.primaryTextColor
-
-            popup: Menu {
-                id: audioInMenu
-
-                MenuItem {
-                    enabled: root.model ? root.model.defaultInputIsValid : true
-
-                    text: root.model && (root.model.busType == PJModels.Types.BusType.Mono) ? qsTr("None") : qsTr("Mix")
-
-                    onClicked: root.model.changeInputToDefault()
+                    onClicked: root.model.moveLeft()
                 }
 
-                Menu {
-                    title: qsTr("Devices")
+                Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-                    enabled: inDevicesRep.count > 0
+                    enabled: root.model && root.model.canMoveRight
 
-                    Repeater {
-                        id: inDevicesRep
+                    text: qsTr(">")
 
-                        model: root.model ? root.model.inputDevices : []
+                    onClicked: root.model.moveRight()
+                }
+            }
 
-                        delegate: MenuItem {
-                            text: modelData
+            Label {
+                Layout.fillWidth: true
 
-                            onClicked: root.model.changeInputToDevice(index)
+                textFormat: Text.PlainText
+                text: qsTr("Audio In")
+            }
+
+            ComboBox {
+                Layout.fillWidth: true
+
+                displayText: root.model ? root.model.selectedInput : ""
+
+                Material.foreground: root.model
+                                            ? (PJModels.MixerChannelEdit.SelectedInputState.Invalid === root.model.selectedInputState
+                                                ? Material.Red
+                                                : Material.primaryTextColor)
+                                            : Material.primaryTextColor
+
+                popup: Menu {
+                    MenuItem {
+                        enabled: root.model ? root.model.defaultInputIsValid : true
+
+                        text: root.model && (root.model.busType === PJModels.Types.BusType.Mono) ? qsTr("None") : qsTr("Mix")
+
+                        onClicked: root.model.changeInputToDefault()
+                    }
+
+                    Menu {
+                        title: qsTr("Devices")
+
+                        enabled: inDevicesRep.count > 0
+
+                        Repeater {
+                            id: inDevicesRep
+
+                            model: root.model ? root.model.inputDevices : []
+
+                            delegate: MenuItem {
+                                text: modelData
+
+                                onClicked: root.model.changeInputToDevice(index)
+                            }
                         }
                     }
-                }
 
-                Menu {
-                    title: qsTr("Channels")
+                    Menu {
+                        title: qsTr("Channels")
 
-                    enabled: inChannelsRep.count > 0
+                        enabled: inChannelsRep.count > 0
 
-                    Repeater {
-                        id: inChannelsRep
+                        Repeater {
+                            id: inChannelsRep
 
-                        model: root.model ? root.model.inputChannels : []
+                            model: root.model ? root.model.inputChannels : []
 
-                        delegate: MenuItem {
-                            text: modelData
+                            delegate: MenuItem {
+                                text: modelData
 
-                            onClicked: root.model.changeInputToChannel(index)
+                                onClicked: root.model.changeInputToChannel(index)
+                            }
                         }
                     }
                 }
             }
-        }
 
-        Label {
-            id: audioOutLabel
+            Label {
+                Layout.fillWidth: true
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: audioInSelect.bottom
-            anchors.topMargin: 8
+                textFormat: Text.PlainText
+                text: qsTr("Audio Out")
+            }
 
-            textFormat: Text.PlainText
-            text: qsTr("Audio Out")
-        }
+            ComboBox {
+                Layout.fillWidth: true
 
-        ComboBox {
-            id: audioOutSelect
+                displayText: root.model ? root.model.selectedOutput : ""
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: audioOutLabel.bottom
+                function selectedOutputStateToColor(s) {
+                    switch (s) {
+                        case PJModels.MixerChannelEdit.SelectedOutputState.Invalid:
+                            return Material.Red
 
-            displayText: root.model ? root.model.selectedOutput : ""
+                        case PJModels.MixerChannelEdit.SelectedOutputState.NotMixed:
+                            return Material.Yellow
 
-            Material.foreground: root.model ? (root.model.selectedOutputState === PJModels.MixerChannelEdit.SelectedOutputState.Invalid
-                                        ? Material.Red
-                                        : root.model.selectedOutputState === PJModels.MixerChannelEdit.SelectedOutputState.NotMixed
-                                                ? Material.Yellow
-                                                : Material.primaryTextColor) : Material.primaryTextColor;
-
-            popup: Menu {
-                id: audioOutMenu
-
-                MenuItem {
-                    text: qsTr("None")
-
-                    onClicked: root.model.changeOutputToNone()
-                }
-
-                Menu {
-                    title: qsTr("Devices")
-
-                    enabled: outDevicesRep.count > 0
-
-                    Repeater {
-                        id: outDevicesRep
-
-                        model: root.model ? root.model.outputDevices : []
-
-                        delegate: MenuItem {
-                            text: modelData
-
-                            onClicked: root.model.changeOutputToDevice(index)
-                        }
+                        default:
+                            return Material.primaryTextColor
                     }
                 }
 
-                Menu {
-                    title: qsTr("Channels")
+                Material.foreground: selectedOutputStateToColor(root.model ? root.model.selectedOutputState : null)
 
-                    enabled: outChannelsRep.count > 0
+                popup: Menu {
 
-                    Repeater {
-                        id: outChannelsRep
+                    MenuItem {
+                        text: qsTr("None")
 
-                        model: root.model ? root.model.outputChannels : []
+                        onClicked: root.model.changeOutputToNone()
+                    }
 
-                        delegate: MenuItem {
-                            text: modelData
+                    Menu {
+                        title: qsTr("Devices")
 
-                            onClicked: root.model.changeOutputToChannel(index)
+                        enabled: outDevicesRep.count > 0
+
+                        Repeater {
+                            id: outDevicesRep
+
+                            model: root.model ? root.model.outputDevices : []
+
+                            delegate: MenuItem {
+                                text: modelData
+
+                                onClicked: root.model.changeOutputToDevice(index)
+                            }
+                        }
+                    }
+
+                    Menu {
+                        title: qsTr("Channels")
+
+                        enabled: outChannelsRep.count > 0
+
+                        Repeater {
+                            id: outChannelsRep
+
+                            model: root.model ? root.model.outputChannels : []
+
+                            delegate: MenuItem {
+                                text: modelData
+
+                                onClicked: root.model.changeOutputToChannel(index)
+                            }
                         }
                     }
                 }
             }
-        }
 
-        Row {
-            id: moveButtonsRow
-
-            height: 48
-
-            anchors.top: nameText.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            spacing: 8
-
-            Button {
-                id: moveLeftButton
-
-                width: 48
-                height: 48
-
-                enabled: root.model && root.model.canMoveLeft
-
-                text: qsTr("<")
-
-                onClicked: root.model.moveLeft()
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
             }
 
             Button {
-                id: moveRightButton
+                visible: root.deletable
+                enabled: root.deletable
 
-                width: 48
-                height: 48
+                Layout.fillWidth: true
 
-                enabled: root.model && root.model.canMoveRight
+                text: qsTr("Delete")
 
-                text: qsTr(">")
+                Material.background: Material.color(Material.Red, Material.Shade400)
 
-                onClicked: root.model.moveRight()
+                onClicked: root.model.deleteChannel()
             }
         }
     }
