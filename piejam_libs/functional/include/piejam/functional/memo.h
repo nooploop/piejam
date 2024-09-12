@@ -22,7 +22,7 @@ template <class F>
 class memo
 {
 public:
-    memo(F f) noexcept(std::is_nothrow_move_constructible_v<F>)
+    explicit memo(F f) noexcept(std::is_nothrow_move_constructible_v<F>)
         : m_f(std::move(f))
     {
     }

@@ -11,6 +11,9 @@
 #include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/pcm_hw_params.h>
 
+#include <piejam/box.h>
+#include <piejam/io_pair.h>
+
 namespace piejam::audio
 {
 

@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <piejam/box.h>
+#include <piejam/io_pair.h>
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -20,12 +23,6 @@ struct pcm_descriptor
             -> bool = default;
 };
 
-struct pcm_io_descriptors
-{
-    std::vector<pcm_descriptor> inputs;
-    std::vector<pcm_descriptor> outputs;
-
-    auto operator==(pcm_io_descriptors const&) const noexcept -> bool = default;
-};
+using pcm_io_descriptors = io_pair<unique_box<std::vector<pcm_descriptor>>>;
 
 } // namespace piejam::audio

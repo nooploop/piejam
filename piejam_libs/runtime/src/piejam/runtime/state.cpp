@@ -129,8 +129,9 @@ set_intersection(Vector const& in, Vector const& out)
 
 auto
 sample_rates(
-        box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params) -> audio::sample_rates_t
+        unique_box<audio::pcm_hw_params> const& input_hw_params,
+        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        -> audio::sample_rates_t
 {
     return set_intersection(
             input_hw_params->sample_rates,
@@ -145,8 +146,9 @@ sample_rates_from_state(state const& state) -> audio::sample_rates_t
 
 auto
 period_sizes(
-        box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params) -> audio::period_sizes_t
+        unique_box<audio::pcm_hw_params> const& input_hw_params,
+        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        -> audio::period_sizes_t
 {
     return set_intersection(
             input_hw_params->period_sizes,
@@ -161,8 +163,9 @@ period_sizes_from_state(state const& state) -> audio::period_sizes_t
 
 auto
 period_counts(
-        box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params) -> audio::period_counts_t
+        unique_box<audio::pcm_hw_params> const& input_hw_params,
+        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        -> audio::period_counts_t
 {
     return set_intersection(
             input_hw_params->period_counts,

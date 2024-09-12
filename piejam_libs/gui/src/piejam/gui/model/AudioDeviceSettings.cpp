@@ -16,46 +16,37 @@
 #include <piejam/runtime/actions/select_sample_rate.h>
 #include <piejam/runtime/selectors.h>
 
-#include <boost/hof/compose.hpp>
+#include <boost/hof/lift.hpp>
+#include <boost/range/adaptor/ref_unwrapped.hpp>
 
 #include <algorithm>
 
 namespace piejam::gui::model
 {
 
-static auto
-deviceNames(std::vector<piejam::audio::pcm_descriptor> const& devices)
-        -> QStringList
+namespace
+{
+
+template <class Range, class F>
+auto
+to_QStringList(Range const& l, F&& f) -> QStringList
 {
     QStringList result;
-    std::ranges::transform(
-            devices,
-            std::back_inserter(result),
-            boost::hof::compose(
-                    &QString::fromStdString,
-                    &piejam::audio::pcm_descriptor::name));
+    std::ranges::transform(l, std::back_inserter(result), std::forward<F>(f));
     return result;
 }
 
-template <class Vector>
-static auto
-toQStringList(Vector const& l) -> QStringList
-{
-    QStringList result;
-    std::ranges::transform(
-            l,
-            std::back_inserter(result),
-            [](auto const& x) -> QString { return QString::number(x.get()); });
-    return result;
-}
+auto const QString_from_number = BOOST_HOF_LIFT(QString::number);
+
+} // namespace
 
 struct AudioDeviceSettings::Impl
 {
-    StringList inputDevices;
-    StringList outputDevices;
-    StringList sampleRates;
-    StringList periodSizes;
-    StringList periodCounts;
+    StringList input_sound_cards;
+    StringList output_sound_cards;
+    StringList sample_rates;
+    StringList period_sizes;
+    StringList period_counts;
 };
 
 AudioDeviceSettings::AudioDeviceSettings(
@@ -69,33 +60,33 @@ AudioDeviceSettings::AudioDeviceSettings(
 AudioDeviceSettings::~AudioDeviceSettings() = default;
 
 auto
-AudioDeviceSettings::inputDevices() -> StringList*
+AudioDeviceSettings::inputSoundCards() -> StringList*
 {
-    return &m_impl->inputDevices;
+    return &m_impl->input_sound_cards;
 }
 
 auto
-AudioDeviceSettings::outputDevices() -> StringList*
+AudioDeviceSettings::outputSoundCards() -> StringList*
 {
-    return &m_impl->outputDevices;
+    return &m_impl->output_sound_cards;
 }
 
 auto
 AudioDeviceSettings::sampleRates() -> StringList*
 {
-    return &m_impl->sampleRates;
+    return &m_impl->sample_rates;
 }
 
 auto
 AudioDeviceSettings::periodSizes() -> StringList*
 {
-    return &m_impl->periodSizes;
+    return &m_impl->period_sizes;
 }
 
 auto
 AudioDeviceSettings::periodCounts() -> StringList*
 {
-    return &m_impl->periodCounts;
+    return &m_impl->period_counts;
 }
 
 void
@@ -103,49 +94,56 @@ AudioDeviceSettings::onSubscribe()
 {
     namespace selectors = runtime::selectors;
 
-    observe(selectors::select_input_devices,
-            [this](selectors::input_devices const& input_devices) {
-                inputDevices()->setElements(
-                        deviceNames(input_devices.first->inputs));
-                inputDevices()->setFocused(
-                        static_cast<int>(input_devices.second));
+    observe(selectors::select_input_sound_card,
+            [this](selectors::sound_card_choice const& choice) {
+                inputSoundCards()->setElements(to_QStringList(
+                        choice.available,
+                        &QString::fromStdString));
+                inputSoundCards()->setFocused(static_cast<int>(choice.current));
             });
 
-    observe(selectors::select_output_devices,
-            [this](selectors::output_devices const& output_devices) {
-                outputDevices()->setElements(
-                        deviceNames(output_devices.first->outputs));
-                outputDevices()->setFocused(
-                        static_cast<int>(output_devices.second));
+    observe(selectors::select_output_sound_card,
+            [this](selectors::sound_card_choice const& choice) {
+                outputSoundCards()->setElements(to_QStringList(
+                        choice.available,
+                        &QString::fromStdString));
+                outputSoundCards()->setFocused(
+                        static_cast<int>(choice.current));
             });
 
     observe(selectors::select_sample_rate,
-            [this](selectors::sample_rate const& sample_rate) {
+            [this](selectors::sample_rate_choice const& sample_rate) {
                 auto const index = algorithm::index_of(
-                        *sample_rate.first,
-                        sample_rate.second);
+                        sample_rate.available,
+                        sample_rate.current);
 
-                sampleRates()->setElements(toQStringList(*sample_rate.first));
+                sampleRates()->setElements(to_QStringList(
+                        sample_rate.available | boost::adaptors::ref_unwrapped,
+                        QString_from_number));
                 sampleRates()->setFocused(static_cast<int>(index));
             });
 
     observe(selectors::select_period_size,
-            [this](selectors::period_size const& period_size) {
+            [this](selectors::period_size_choice const& period_size) {
                 auto const index = algorithm::index_of(
-                        *period_size.first,
-                        period_size.second);
+                        period_size.available,
+                        period_size.current);
 
-                periodSizes()->setElements(toQStringList(*period_size.first));
+                periodSizes()->setElements(to_QStringList(
+                        period_size.available | boost::adaptors::ref_unwrapped,
+                        QString_from_number));
                 periodSizes()->setFocused(static_cast<int>(index));
             });
 
     observe(selectors::select_period_count,
-            [this](selectors::period_count const& period_count) {
+            [this](selectors::period_count_choice const& period_count) {
                 auto const index = algorithm::index_of(
-                        *period_count.first,
-                        period_count.second);
+                        period_count.available,
+                        period_count.current);
 
-                periodCounts()->setElements(toQStringList(*period_count.first));
+                periodCounts()->setElements(to_QStringList(
+                        period_count.available | boost::adaptors::ref_unwrapped,
+                        QString_from_number));
                 periodCounts()->setFocused(static_cast<int>(index));
             });
 
@@ -154,31 +152,31 @@ AudioDeviceSettings::onSubscribe()
 }
 
 void
-AudioDeviceSettings::refreshDeviceLists()
+AudioDeviceSettings::refreshSoundCardLists()
 {
     dispatch(runtime::actions::refresh_devices{});
 }
 
 void
-AudioDeviceSettings::selectInputDevice(unsigned const index)
+AudioDeviceSettings::selectInputSoundCard(unsigned const index)
 {
     runtime::actions::initiate_device_selection action;
-    action.input = true;
+    action.io_dir = io_direction::input;
     action.index = index;
     dispatch(action);
 }
 
 void
-AudioDeviceSettings::selectOutputDevice(unsigned const index)
+AudioDeviceSettings::selectOutputSoundCard(unsigned const index)
 {
     runtime::actions::initiate_device_selection action;
-    action.input = false;
+    action.io_dir = io_direction::output;
     action.index = index;
     dispatch(action);
 }
 
 void
-AudioDeviceSettings::selectSamplerate(unsigned const index)
+AudioDeviceSettings::selectSampleRate(unsigned const index)
 {
     runtime::actions::select_sample_rate action;
     action.index = index;

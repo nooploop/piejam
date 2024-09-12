@@ -16,7 +16,7 @@ struct initiate_device_selection final
     : ui::cloneable_action<initiate_device_selection, action>
     , visitable_device_action<initiate_device_selection>
 {
-    bool input{};
+    io_direction io_dir{};
     std::size_t index{};
 };
 

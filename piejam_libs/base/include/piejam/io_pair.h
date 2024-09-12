@@ -26,17 +26,11 @@ struct io_pair
     {
     }
 
-    constexpr io_pair(T const& i, T const& o) noexcept(
-            std::is_nothrow_copy_constructible_v<T>)
-        : in(i)
-        , out(o)
-    {
-    }
-
-    constexpr io_pair(T&& i, T&& o) noexcept(
-            std::is_nothrow_move_constructible_v<T>)
-        : in(std::move(i))
-        , out(std::move(o))
+    template <std::convertible_to<T> I, std::convertible_to<T> O>
+    constexpr io_pair(I&& i, O&& o) noexcept(noexcept(T{
+            std::forward<I>(i)}) && noexcept(T{std::forward<O>(o)}))
+        : in{std::forward<I>(i)}
+        , out{std::forward<O>(o)}
     {
     }
 
@@ -46,7 +40,7 @@ struct io_pair
     constexpr auto operator=(io_pair const&) -> io_pair& = default;
     constexpr auto operator=(io_pair&&) noexcept -> io_pair& = default;
 
-    constexpr auto operator==(io_pair const&) const noexcept -> bool = default;
+    auto operator==(io_pair const&) const noexcept -> bool = default;
 
     constexpr auto get(io_direction const io_dir) const noexcept -> T const&
     {

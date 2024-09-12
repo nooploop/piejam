@@ -5,7 +5,6 @@
 #pragma once
 
 #include <cstddef>
-#include <span>
 
 namespace piejam::audio
 {
@@ -19,7 +18,6 @@ class process_thread;
 struct pcm_descriptor;
 struct pcm_device_config;
 struct pcm_hw_params;
-struct pcm_io_descriptors;
 struct pcm_process_config;
 struct pcm_io_config;
 

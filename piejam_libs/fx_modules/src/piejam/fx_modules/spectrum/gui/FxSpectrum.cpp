@@ -278,7 +278,7 @@ void
 FxSpectrum::onSubscribe()
 {
     m_impl->spectrumGenerator.setSampleRate(
-            observe_once(runtime::selectors::select_sample_rate).second);
+            observe_once(runtime::selectors::select_sample_rate)->current);
 }
 
 void

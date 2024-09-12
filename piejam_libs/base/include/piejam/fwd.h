@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/box_fwd.h>
+
 namespace piejam
 {
 

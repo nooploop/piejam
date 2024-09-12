@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/box_fwd.h>
 #include <piejam/scope_guard.h>
 
 #include <boost/callable_traits/args.hpp>
@@ -11,10 +12,7 @@
 #include <memory>
 #include <utility>
 
-namespace piejam
-{
-
-namespace detail
+namespace piejam::detail
 {
 
 struct box_equal
@@ -38,9 +36,6 @@ struct box_eq
         return l.get() == r.get();
     }
 };
-
-template <class T, class Eq>
-class box;
 
 template <class>
 struct is_box : std::false_type
@@ -151,12 +146,4 @@ private:
     std::shared_ptr<T const> m_value;
 };
 
-} // namespace detail
-
-template <class T>
-using box = detail::box<T, detail::box_equal>;
-
-template <class T>
-using unique_box = detail::box<T, detail::box_eq>;
-
-} // namespace piejam
+} // namespace piejam::detail

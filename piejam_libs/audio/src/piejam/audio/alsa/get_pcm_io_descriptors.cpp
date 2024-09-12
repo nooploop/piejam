@@ -4,6 +4,8 @@
 
 #include "get_pcm_io_descriptors.h"
 
+#include <piejam/box.h>
+#include <piejam/io_pair.h>
 #include <piejam/system/device.h>
 
 #include <fmt/format.h>
@@ -17,7 +19,6 @@
 
 #include <algorithm>
 #include <filesystem>
-#include <string_view>
 
 namespace piejam::audio::alsa
 {
@@ -166,21 +167,24 @@ struct to_pcm_descriptor
 auto
 get_pcm_io_descriptors() -> pcm_io_descriptors
 {
-    pcm_io_descriptors result;
+    io_pair<std::vector<pcm_descriptor>> result;
 
     for (soundcard const& sc : soundcards())
     {
         std::ranges::transform(
                 input_devices(sc),
-                std::back_inserter(result.inputs),
+                std::back_inserter(result.in),
                 to_pcm_descriptor{sc, 'c'});
         std::ranges::transform(
                 output_devices(sc),
-                std::back_inserter(result.outputs),
+                std::back_inserter(result.out),
                 to_pcm_descriptor{sc, 'p'});
     }
 
-    return result;
+    return pcm_io_descriptors{
+            std::move(result.in),
+            std::move(result.out),
+    };
 }
 
 } // namespace piejam::audio::alsa

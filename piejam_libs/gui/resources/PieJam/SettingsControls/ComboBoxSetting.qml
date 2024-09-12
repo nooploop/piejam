@@ -4,7 +4,7 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-
+import QtQuick.Layouts 1.15
 
 Item {
 
@@ -19,7 +19,7 @@ Item {
 
     signal optionSelected(int index)
 
-    implicitWidth: 800
+    implicitWidth: 300
     implicitHeight: 56
 
     Frame {
@@ -27,33 +27,38 @@ Item {
 
         anchors.fill: parent
 
-        Label {
-            id: nameLabel
+        spacing: 0
 
-            width: 128
+        topPadding: 2
+        bottomPadding: 2
 
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
+        RowLayout {
+            anchors.fill: parent
 
-            verticalAlignment: Text.AlignVCenter
-            textFormat: Text.PlainText
-            font.pixelSize: 18
-        }
+            Label {
+                id: nameLabel
 
-        ComboBox {
-            id: comboBox
+                Layout.preferredWidth: 128
+                Layout.fillHeight: true
 
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: 8
-            anchors.right: parent.right
-            anchors.left: nameLabel.right
+                verticalAlignment: Text.AlignVCenter
+                textFormat: Text.PlainText
+                font.pixelSize: 18
+            }
 
-            displayText: comboBox.count == 0
-                         ? emptyText
-                         : (comboBox.currentIndex == -1 ? unselectedText : comboBox.currentText)
-            enabled: comboBox.count != 0
+            ComboBox {
+                id: comboBox
 
-            onActivated: optionSelected(index)
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                displayText: comboBox.count == 0
+                             ? emptyText
+                             : (comboBox.currentIndex == -1 ? unselectedText : comboBox.currentText)
+                enabled: comboBox.count != 0
+
+                onActivated: root.optionSelected(index)
+            }
         }
     }
 

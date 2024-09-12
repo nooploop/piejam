@@ -17,10 +17,10 @@ class AudioDeviceSettings final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::StringList* inputDevices READ inputDevices
-                       NOTIFY inputDevicesChanged FINAL)
-    Q_PROPERTY(piejam::gui::model::StringList* outputDevices READ outputDevices
-                       NOTIFY outputDevicesChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::StringList* inputSoundCards READ
+                       inputSoundCards NOTIFY inputSoundCardsChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::StringList* outputSoundCards READ
+                       outputSoundCards NOTIFY outputSoundCardsChanged FINAL)
     Q_PROPERTY(piejam::gui::model::StringList* sampleRates READ sampleRates
                        NOTIFY sampleRatesChanged FINAL)
     Q_PROPERTY(piejam::gui::model::StringList* periodSizes READ periodSizes
@@ -32,10 +32,10 @@ class AudioDeviceSettings final : public Subscribable<SubscribableModel>
 
 public:
     AudioDeviceSettings(runtime::store_dispatch, runtime::subscriber&);
-    ~AudioDeviceSettings();
+    ~AudioDeviceSettings() override;
 
-    auto inputDevices() -> StringList*;
-    auto outputDevices() -> StringList*;
+    auto inputSoundCards() -> StringList*;
+    auto outputSoundCards() -> StringList*;
     auto sampleRates() -> StringList*;
     auto periodSizes() -> StringList*;
     auto periodCounts() -> StringList*;
@@ -54,16 +54,16 @@ public:
         }
     }
 
-    Q_INVOKABLE void refreshDeviceLists();
-    Q_INVOKABLE void selectInputDevice(unsigned index);
-    Q_INVOKABLE void selectOutputDevice(unsigned index);
-    Q_INVOKABLE void selectSamplerate(unsigned index);
+    Q_INVOKABLE void refreshSoundCardLists();
+    Q_INVOKABLE void selectInputSoundCard(unsigned index);
+    Q_INVOKABLE void selectOutputSoundCard(unsigned index);
+    Q_INVOKABLE void selectSampleRate(unsigned index);
     Q_INVOKABLE void selectPeriodSize(unsigned index);
     Q_INVOKABLE void selectPeriodCount(unsigned index);
 
 signals:
-    void inputDevicesChanged();
-    void outputDevicesChanged();
+    void inputSoundCardsChanged();
+    void outputSoundCardsChanged();
     void sampleRatesChanged();
     void periodSizesChanged();
     void periodCountsChanged();

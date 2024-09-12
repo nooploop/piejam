@@ -21,25 +21,55 @@
 namespace piejam::runtime::selectors
 {
 
-selector<sample_rate> const select_sample_rate(
-        [get_sample_rates = memo(boxify_result(&runtime::sample_rates))](
-                state const& st) -> sample_rate {
-            return {get_sample_rates(st.input.hw_params, st.output.hw_params),
-                    st.sample_rate};
+static auto get_sample_rate =
+        memo([](unique_box<audio::pcm_hw_params> const& input_hw_params,
+                unique_box<audio::pcm_hw_params> const& output_hw_params,
+                audio::sample_rate const current) -> box<sample_rate_choice> {
+            return {std::in_place,
+                    runtime::sample_rates(input_hw_params, output_hw_params),
+                    current};
         });
 
-selector<period_size> const select_period_size(
-        [get_period_sizes = memo(boxify_result(&runtime::period_sizes))](
-                state const& st) -> period_size {
-            return {get_period_sizes(st.input.hw_params, st.output.hw_params),
-                    st.period_size};
+selector<box<sample_rate_choice>> const select_sample_rate([](state const& st) {
+    return get_sample_rate(
+            st.input.hw_params,
+            st.output.hw_params,
+            st.sample_rate);
+});
+
+static auto get_period_size =
+        memo([](unique_box<audio::pcm_hw_params> const& input_hw_params,
+                unique_box<audio::pcm_hw_params> const& output_hw_params,
+                audio::period_size const current) {
+            return box<period_size_choice>{
+                    std::in_place,
+                    runtime::period_sizes(input_hw_params, output_hw_params),
+                    current};
         });
 
-selector<period_count> const select_period_count(
-        [get = memo(boxify_result(&runtime::period_counts))](state const& st)
-                -> period_count {
-            return {get(st.input.hw_params, st.output.hw_params),
-                    st.period_count};
+selector<box<period_size_choice>> const select_period_size([](state const& st) {
+    return get_period_size(
+            st.input.hw_params,
+            st.output.hw_params,
+            st.period_size);
+});
+
+static auto get_period_count =
+        memo([](unique_box<audio::pcm_hw_params> const& input_hw_params,
+                unique_box<audio::pcm_hw_params> const& output_hw_params,
+                audio::period_count const current) {
+            return box<period_count_choice>{
+                    std::in_place,
+                    runtime::period_counts(input_hw_params, output_hw_params),
+                    current};
+        });
+
+selector<box<period_count_choice>> const
+        select_period_count([](state const& st) {
+            return get_period_count(
+                    st.input.hw_params,
+                    st.output.hw_params,
+                    st.period_count);
         });
 
 selector<float> const select_buffer_latency([](state const& st) {
@@ -49,14 +79,25 @@ selector<float> const select_buffer_latency([](state const& st) {
                    : 0.f;
 });
 
-selector<input_devices> const
-        select_input_devices([](state const& st) -> input_devices {
-            return {st.pcm_devices, st.input.index};
+static auto get_sound_card =
+        memo([](unique_box<std::vector<audio::pcm_descriptor>> const& descs,
+                std::size_t const index) {
+            return box<sound_card_choice>{
+                    std::in_place,
+                    algorithm::transform_to_vector(
+                            descs.get(),
+                            &audio::pcm_descriptor::name),
+                    index};
         });
 
-selector<output_devices> const
-        select_output_devices([](state const& st) -> output_devices {
-            return {st.pcm_devices, st.output.index};
+selector<box<sound_card_choice>> const
+        select_input_sound_card([](state const& st) {
+            return get_sound_card(st.pcm_devices.in, st.input.index);
+        });
+
+selector<box<sound_card_choice>> const
+        select_output_sound_card([](state const& st) {
+            return get_sound_card(st.pcm_devices.out, st.output.index);
         });
 
 auto
@@ -264,7 +305,8 @@ get_default_route_name(
                    : s_none;
 }
 
-auto make_mixer_channel_default_route_name_selector(
+auto
+make_mixer_channel_default_route_name_selector(
         audio::bus_type const bus_type,
         mixer::io_socket const io_socket) -> selector<boxed_string>
 {
@@ -405,7 +447,8 @@ make_mixer_devices_selector(
             };
 
         default:
-            return [get = memo(make_mixer_device_routes(audio::bus_type::stereo))](
+            return [get = memo(
+                            make_mixer_device_routes(audio::bus_type::stereo))](
                            state const& st) mutable {
                 return get(
                         st.device_io_state.buses,

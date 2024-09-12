@@ -456,7 +456,7 @@ void
 FxScope::onSubscribe()
 {
     m_impl->scopeDataGenerator.setSampleRate(
-            observe_once(runtime::selectors::select_sample_rate).second);
+            observe_once(runtime::selectors::select_sample_rate)->current);
 }
 
 void

@@ -17,54 +17,54 @@ Item {
 
     id: root
 
-    TabBar {
-        id: tabs
+    ColumnLayout {
+        anchors.fill: parent
 
-        anchors.right: parent.right
-        anchors.left: parent.left
-        anchors.top: parent.top
+        TabBar {
+            id: tabs
 
-        currentIndex: 0
+            Layout.fillWidth: true
 
-        TabButton {
-            text: "Device"
+            currentIndex: 0
+
+            TabButton {
+                text: "Device"
+            }
+
+            TabButton {
+                text: "Input"
+            }
+
+            TabButton {
+                text: "Output"
+            }
         }
 
-        TabButton {
-            text: "Input"
-        }
+        StackLayout {
+            id: stackView
 
-        TabButton {
-            text: "Output"
-        }
-    }
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-    StackLayout {
-        id: stackView
+            currentIndex: tabs.currentIndex
 
-        anchors.top: tabs.bottom
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
+            AudioDeviceSettings {
+                id: deviceSettings
+            }
 
-        currentIndex: tabs.currentIndex
+            AudioInputOutputSettings {
+                id: audioInputSettings
 
-        AudioDeviceSettings {
-            id: deviceSettings
-        }
+                showAddMono: true
+                showAddStereo: true
+            }
 
-        AudioInputOutputSettings {
-            id: audioInputSettings
+            AudioInputOutputSettings {
+                id: audioOutputSettings
 
-            showAddMono: true
-            showAddStereo: true
-        }
-
-        AudioInputOutputSettings {
-            id: audioOutputSettings
-
-            showAddMono: false
-            showAddStereo: true
+                showAddMono: false
+                showAddStereo: true
+            }
         }
     }
 }

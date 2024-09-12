@@ -106,7 +106,7 @@ void
 FxFilter::onSubscribe()
 {
     m_impl->dataGenerator.setSampleRate(
-            observe_once(runtime::selectors::select_sample_rate).second);
+            observe_once(runtime::selectors::select_sample_rate)->current);
 }
 
 auto

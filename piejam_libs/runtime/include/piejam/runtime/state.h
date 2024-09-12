@@ -38,7 +38,6 @@
 #include <piejam/runtime/selected_device.h>
 #include <piejam/runtime/ui_parameter_descriptors_map.h>
 
-#include <functional>
 #include <optional>
 #include <span>
 #include <vector>
@@ -48,7 +47,7 @@ namespace piejam::runtime
 
 struct state
 {
-    box<audio::pcm_io_descriptors> pcm_devices;
+    audio::pcm_io_descriptors pcm_devices;
 
     selected_device input;
     selected_device output;
@@ -99,18 +98,21 @@ struct state
 auto make_initial_state() -> state;
 
 auto sample_rates(
-        box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params) -> audio::sample_rates_t;
+        unique_box<audio::pcm_hw_params> const& input_hw_params,
+        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        -> audio::sample_rates_t;
 auto sample_rates_from_state(state const&) -> audio::sample_rates_t;
 
 auto period_sizes(
-        box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params) -> audio::period_sizes_t;
+        unique_box<audio::pcm_hw_params> const& input_hw_params,
+        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        -> audio::period_sizes_t;
 auto period_sizes_from_state(state const&) -> audio::period_sizes_t;
 
 auto period_counts(
-        box<audio::pcm_hw_params> input_hw_params,
-        box<audio::pcm_hw_params> output_hw_params) -> audio::period_counts_t;
+        unique_box<audio::pcm_hw_params> const& input_hw_params,
+        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        -> audio::period_counts_t;
 auto period_counts_from_state(state const&) -> audio::period_counts_t;
 
 auto add_device_bus(
@@ -141,7 +143,7 @@ auto insert_ladspa_fx_module(
         std::size_t position,
         ladspa::instance_id,
         ladspa::plugin_descriptor const&,
-        std::span<const ladspa::port_descriptor> control_inputs,
+        std::span<ladspa::port_descriptor const> control_inputs,
         std::vector<fx::parameter_value_assignment> const& initial_values,
         std::vector<fx::parameter_midi_assignment> const& midi_assigns)
         -> fx::module_id;

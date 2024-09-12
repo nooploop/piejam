@@ -44,11 +44,11 @@ save_app_config(
 
         conf.input_device_name =
                 state.input.index != npos
-                        ? state.pcm_devices->inputs[state.input.index].name
+                        ? state.pcm_devices.in.get()[state.input.index].name
                         : std::string();
         conf.output_device_name =
                 state.output.index != npos
-                        ? state.pcm_devices->outputs[state.output.index].name
+                        ? state.pcm_devices.out.get()[state.output.index].name
                         : std::string();
         conf.sample_rate = state.sample_rate;
         conf.period_size = state.period_size;

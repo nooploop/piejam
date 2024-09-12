@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/fwd.h>
+#include <piejam/audio/pcm_descriptor.h>
 
 #include <memory>
 

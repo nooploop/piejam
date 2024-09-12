@@ -4,6 +4,7 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 
 import ".."
 import "../SettingsControls"
@@ -14,172 +15,135 @@ SubscribableItem {
     implicitWidth: 752
     implicitHeight: 432
 
-    ComboBoxSetting {
-        id: inputSetting
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 4
 
-        anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.right: reloadButtonFrame.left
-        anchors.rightMargin: 8
-        anchors.top: parent.top
-        anchors.topMargin: 8
+        RowLayout {
+            Layout.fillWidth: true
 
-        model: root.model.inputDevices.elements
-        currentIndex: root.model.inputDevices.focused
+            ColumnLayout {
+                Layout.fillWidth: true
 
-        nameLabelText: qsTr("Input:")
-        unselectedText: qsTr("Select input device...")
+                ComboBoxSetting {
+                    Layout.fillWidth: true
 
-        onOptionSelected: root.model.selectInputDevice(index)
-    }
+                    model: root.model.inputSoundCards.elements
+                    currentIndex: root.model.inputSoundCards.focused
 
-    ComboBoxSetting {
-        id: outputSetting
+                    nameLabelText: qsTr("input:")
+                    unselectedText: qsTr("Select input...")
 
-        anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.right: reloadButtonFrame.left
-        anchors.rightMargin: 8
-        anchors.top: inputSetting.bottom
-        anchors.topMargin: 6
+                    onOptionSelected: root.model.selectInputSoundCard(index)
+                }
 
-        model: root.model.outputDevices.elements
-        currentIndex: root.model.outputDevices.focused
+                ComboBoxSetting {
+                    Layout.fillWidth: true
 
-        nameLabelText: qsTr("Output:")
-        unselectedText: qsTr("Select output device...")
+                    model: root.model.outputSoundCards.elements
+                    currentIndex: root.model.outputSoundCards.focused
 
-        onOptionSelected: root.model.selectOutputDevice(index)
-    }
+                    nameLabelText: qsTr("output:")
+                    unselectedText: qsTr("Select output...")
 
-    ComboBoxSetting {
-        id: sampleRateSetting
+                    onOptionSelected: root.model.selectOutputSoundCard(index)
+                }
+            }
 
-        anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        anchors.top: outputSetting.bottom
-        anchors.topMargin: 6
+            Frame {
+                Layout.preferredWidth: 117
+                Layout.preferredHeight: 117
 
-        model: root.model.sampleRates.elements
-        currentIndex: root.model.sampleRates.focused
+                RoundButton {
+                    id: reloadBtn
 
-        nameLabelText: qsTr("Sample rate:")
-        unselectedText: qsTr("Select sample rate...")
+                    width: 72
+                    height: 72
 
-        onOptionSelected: root.model.selectSamplerate(index)
-    }
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
 
-    ComboBoxSetting {
-        id: periodSizeSetting
+                    icon.width: 24
+                    icon.height: 24
+                    icon.source: "qrc:///images/icons/autorenew.svg"
+                    display: AbstractButton.IconOnly
 
-        anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        anchors.top: sampleRateSetting.bottom
-        anchors.topMargin: 6
-
-        model: root.model.periodSizes.elements
-        currentIndex: root.model.periodSizes.focused
-
-        nameLabelText: qsTr("Period size:")
-        unselectedText: qsTr("Select period size...")
-
-        onOptionSelected: root.model.selectPeriodSize(index)
-    }
-
-    ComboBoxSetting {
-        id: periodCountSetting
-
-        anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        anchors.top: periodSizeSetting.bottom
-        anchors.topMargin: 6
-
-        model: root.model.periodCounts.elements
-        currentIndex: root.model.periodCounts.focused
-
-        nameLabelText: qsTr("Period count:")
-        unselectedText: qsTr("Select period count...")
-
-        onOptionSelected: root.model.selectPeriodCount(index)
-    }
-
-    Frame {
-        id: reloadButtonFrame
-
-        width: reloadButtonFrame.height
-
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        anchors.top: parent.top
-        anchors.bottom: outputSetting.bottom
-        anchors.topMargin: 8
-
-        RoundButton {
-            id: reloadBtn
-
-            width: 72
-            height: 72
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            icon.width: 24
-            icon.height: 24
-            icon.source: "qrc:///images/icons/autorenew.svg"
-            display: AbstractButton.IconOnly
-
-            onClicked: root.model.refreshDeviceLists()
-        }
-    }
-
-    Frame {
-        id: bufferLatencyFrame
-
-        anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        anchors.top: periodCountSetting.bottom
-        anchors.topMargin: 6
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 8
-
-        Label {
-            id: bufferLatencyLabel
-
-            width: 128
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-
-            verticalAlignment: Text.AlignVCenter
-            textFormat: Text.PlainText
-            font.pixelSize: 18
-
-            text: qsTr("Buffer latency:")
+                    onClicked: root.model.refreshSoundCardLists()
+                }
+            }
         }
 
-        Label {
-            id: bufferLatencyValueLabel
+        ComboBoxSetting {
+            Layout.fillWidth: true
 
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: bufferLatencyLabel.right
-            anchors.leftMargin: 8
-            anchors.right: parent.right
-            anchors.rightMargin: 8
+            model: root.model.sampleRates.elements
+            currentIndex: root.model.sampleRates.focused
 
-            verticalAlignment: Text.AlignVCenter
-            font.italic: true
-            textFormat: Text.PlainText
-            font.pixelSize: 18
+            nameLabelText: qsTr("sample rate:")
+            unselectedText: qsTr("Select sample rate...")
 
-            text: root.model.bufferLatency.toFixed(2) + qsTr(" ms")
+            onOptionSelected: root.model.selectSampleRate(index)
+        }
+
+        ComboBoxSetting {
+            Layout.fillWidth: true
+
+            model: root.model.periodSizes.elements
+            currentIndex: root.model.periodSizes.focused
+
+            nameLabelText: qsTr("period size:")
+            unselectedText: qsTr("Select period size...")
+
+            onOptionSelected: root.model.selectPeriodSize(index)
+        }
+
+        ComboBoxSetting {
+            Layout.fillWidth: true
+
+            model: root.model.periodCounts.elements
+            currentIndex: root.model.periodCounts.focused
+
+            nameLabelText: qsTr("period count:")
+            unselectedText: qsTr("Select period count...")
+
+            onOptionSelected: root.model.selectPeriodCount(index)
+        }
+
+        Frame {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 64
+
+            RowLayout {
+                anchors.fill: parent
+
+                Label {
+                    Layout.preferredWidth: 128
+                    Layout.fillHeight: true
+
+                    verticalAlignment: Text.AlignVCenter
+                    textFormat: Text.PlainText
+                    font.pixelSize: 18
+
+                    text: qsTr("buffer latency:")
+                }
+
+                Label {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    verticalAlignment: Text.AlignVCenter
+                    font.italic: true
+                    textFormat: Text.PlainText
+                    font.pixelSize: 18
+
+                    text: root.model.bufferLatency.toFixed(2) + qsTr(" ms")
+                }
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
     }
 }

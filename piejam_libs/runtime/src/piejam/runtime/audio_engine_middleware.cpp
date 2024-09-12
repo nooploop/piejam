@@ -77,7 +77,7 @@ update_channel(std::size_t& ch, std::size_t const num_chs)
 struct update_devices final
     : ui::cloneable_action<update_devices, reducible_action>
 {
-    box<piejam::audio::pcm_io_descriptors> pcm_devices;
+    unique_box<piejam::audio::pcm_io_descriptors> pcm_devices;
 
     selected_device input;
     selected_device output;
@@ -160,8 +160,8 @@ audio_engine_middleware::process_device_action(
 static auto
 make_update_devices_action(
         audio::device_manager& device_manager,
-        box<audio::pcm_io_descriptors> new_devices,
-        box<audio::pcm_io_descriptors> current_devices,
+        audio::pcm_io_descriptors const& new_devices,
+        audio::pcm_io_descriptors const& current_devices,
         std::size_t const input_index,
         std::size_t const output_index,
         audio::sample_rate const sample_rate,
@@ -190,26 +190,27 @@ make_update_devices_action(
     };
 
     next_action.input = next_device(
-            new_devices->inputs,
-            current_devices->inputs,
+            new_devices.in.get(),
+            current_devices.in.get(),
             input_index);
 
     next_action.output = next_device(
-            new_devices->outputs,
-            current_devices->outputs,
+            new_devices.out.get(),
+            current_devices.out.get(),
             output_index);
 
-    auto next_value = [](box<audio::pcm_hw_params> input_hw_params,
-                         box<audio::pcm_hw_params> output_hw_params,
-                         auto&& sel,
-                         auto current) {
-        auto const values = std::invoke(
-                std::forward<decltype(sel)>(sel),
-                input_hw_params,
-                output_hw_params);
-        auto const it = algorithm::find_or_get_first(values, current);
-        return it != values.end() ? *it : decltype(*it){};
-    };
+    auto next_value =
+            [](unique_box<audio::pcm_hw_params> const& input_hw_params,
+               unique_box<audio::pcm_hw_params> const& output_hw_params,
+               auto&& sel,
+               auto current) {
+                auto const values = std::invoke(
+                        std::forward<decltype(sel)>(sel),
+                        input_hw_params,
+                        output_hw_params);
+                auto const it = algorithm::find_or_get_first(values, current);
+                return it != values.end() ? *it : decltype(*it){};
+            };
 
     next_action.sample_rate = next_value(
             next_action.input.hw_params,
@@ -220,11 +221,11 @@ make_update_devices_action(
     if (next_action.sample_rate.valid())
     {
         next_action.input.hw_params = device_manager.hw_params(
-                new_devices->inputs[next_action.input.index],
+                new_devices.in.get()[next_action.input.index],
                 &next_action.sample_rate,
                 nullptr);
         next_action.output.hw_params = device_manager.hw_params(
-                new_devices->outputs[next_action.output.index],
+                new_devices.out.get()[next_action.output.index],
                 &next_action.sample_rate,
                 nullptr);
     }
@@ -238,11 +239,11 @@ make_update_devices_action(
     if (next_action.period_size.valid())
     {
         next_action.input.hw_params = device_manager.hw_params(
-                new_devices->inputs[next_action.input.index],
+                new_devices.in.get()[next_action.input.index],
                 &next_action.sample_rate,
                 &next_action.period_size);
         next_action.output.hw_params = device_manager.hw_params(
-                new_devices->outputs[next_action.output.index],
+                new_devices.out.get()[next_action.output.index],
                 &next_action.sample_rate,
                 &next_action.period_size);
     }
@@ -269,11 +270,11 @@ audio_engine_middleware::process_device_action(
             current_state.pcm_devices,
             current_state.pcm_devices,
             algorithm::index_of(
-                    current_state.pcm_devices->inputs,
+                    current_state.pcm_devices.in.get(),
                     a.conf.input_device_name,
                     &audio::pcm_descriptor::name),
             algorithm::index_of(
-                    current_state.pcm_devices->outputs,
+                    current_state.pcm_devices.out.get(),
                     a.conf.output_device_name,
                     &audio::pcm_descriptor::name),
             a.conf.sample_rate,
@@ -314,8 +315,10 @@ audio_engine_middleware::process_device_action(
             m_device_manager,
             current_state.pcm_devices,
             current_state.pcm_devices,
-            action.input ? action.index : current_state.input.index,
-            action.input ? current_state.output.index : action.index,
+            action.io_dir == io_direction::input ? action.index
+                                                 : current_state.input.index,
+            action.io_dir == io_direction::output ? action.index
+                                                  : current_state.output.index,
             current_state.sample_rate,
             current_state.period_size,
             current_state.period_count));
@@ -586,8 +589,8 @@ audio_engine_middleware::open_device(middleware_functors const& mw_fs)
     try
     {
         auto device = m_device_manager.make_device(
-                st.pcm_devices->inputs[st.input.index],
-                st.pcm_devices->outputs[st.output.index],
+                st.pcm_devices.in.get()[st.input.index],
+                st.pcm_devices.out.get()[st.output.index],
                 audio::pcm_io_config{
                         audio::pcm_device_config{
                                 st.input.hw_params->interleaved,

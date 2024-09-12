@@ -33,25 +33,32 @@ namespace piejam::runtime::selectors
 template <class Value>
 using selector = reselect::selector<Value, state>;
 
-using sample_rate = std::pair<box<audio::sample_rates_t>, audio::sample_rate>;
-extern selector<sample_rate> const select_sample_rate;
+template <class Available, class Current>
+struct choice_model
+{
+    Available available;
+    Current current;
 
-using period_size = std::pair<box<audio::period_sizes_t>, audio::period_size>;
-extern selector<period_size> const select_period_size;
+    auto operator==(choice_model const&) const -> bool = default;
+};
 
-using period_count =
-        std::pair<box<audio::period_counts_t>, audio::period_count>;
-extern selector<period_count> const select_period_count;
+using sample_rate_choice =
+        choice_model<audio::sample_rates_t, audio::sample_rate>;
+extern selector<box<sample_rate_choice>> const select_sample_rate;
+
+using period_size_choice =
+        choice_model<audio::period_sizes_t, audio::period_size>;
+extern selector<box<period_size_choice>> const select_period_size;
+
+using period_count_choice =
+        choice_model<audio::period_counts_t, audio::period_count>;
+extern selector<box<period_count_choice>> const select_period_count;
 
 extern selector<float> const select_buffer_latency;
 
-//! \todo input_devices/output_devices could get a reduced value, not the whole
-//! pcm_io_descriptors
-using input_devices = std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
-extern selector<input_devices> const select_input_devices;
-
-using output_devices = std::pair<box<audio::pcm_io_descriptors>, std::size_t>;
-extern selector<output_devices> const select_output_devices;
+using sound_card_choice = choice_model<std::vector<std::string>, std::size_t>;
+extern selector<box<sound_card_choice>> const select_input_sound_card;
+extern selector<box<sound_card_choice>> const select_output_sound_card;
 
 auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 
@@ -119,8 +126,9 @@ auto make_mixer_channel_default_route_is_valid_selector(
         mixer::channel_id,
         mixer::io_socket) -> selector<bool>;
 
-auto make_mixer_channel_selected_route_selector(mixer::channel_id, mixer::io_socket)
-        -> selector<box<selected_route>>;
+auto make_mixer_channel_selected_route_selector(
+        mixer::channel_id,
+        mixer::io_socket) -> selector<box<selected_route>>;
 
 auto make_mixer_devices_selector(audio::bus_type, mixer::io_socket)
         -> selector<boxed_vector<mixer_device_route>>;

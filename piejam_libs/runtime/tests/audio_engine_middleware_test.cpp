@@ -81,8 +81,9 @@ TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
 
     state st;
     st.pcm_devices = audio::pcm_io_descriptors{
-            .inputs = {audio::pcm_descriptor{.name = "foo", .path = {}}},
-            .outputs = {audio::pcm_descriptor{.name = "foo", .path = {}}}};
+            std::vector{audio::pcm_descriptor{.name = "foo", .path = {}}},
+            std::vector{audio::pcm_descriptor{.name = "foo", .path = {}}},
+    };
     st.input.index = 0;
     st.input.hw_params = default_hw_params;
     st.output.index = 0;
@@ -115,8 +116,9 @@ TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
 
     state st;
     st.pcm_devices = audio::pcm_io_descriptors{
-            .inputs = {audio::pcm_descriptor{.name = "foo", .path = {}}},
-            .outputs = {audio::pcm_descriptor{.name = "foo", .path = {}}}};
+            std::vector{audio::pcm_descriptor{.name = "foo", .path = {}}},
+            std::vector{audio::pcm_descriptor{.name = "foo", .path = {}}},
+    };
     st.input.index = 0;
     st.input.hw_params = default_hw_params;
     st.output.index = 0;
@@ -153,10 +155,11 @@ TEST_F(audio_engine_middleware_test,
     st.output.index = 0;
     st.output.hw_params = hw_params;
     st.pcm_devices = audio::pcm_io_descriptors{
-            .inputs =
-                    {audio::pcm_descriptor{.name = "foo", .path = {}},
-                     audio::pcm_descriptor{.name = "bar", .path = {}}},
-            .outputs = {audio::pcm_descriptor{.name = "foo", .path = {}}}};
+            std::vector{
+                    audio::pcm_descriptor{.name = "foo", .path = {}},
+                    audio::pcm_descriptor{.name = "bar", .path = {}}},
+            std::vector{audio::pcm_descriptor{.name = "foo", .path = {}}},
+    };
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillRepeatedly([&st](auto const& a) {
@@ -168,7 +171,7 @@ TEST_F(audio_engine_middleware_test,
             .WillRepeatedly(Return(ByMove(audio::make_dummy_device())));
 
     actions::initiate_device_selection in_action;
-    in_action.input = true;
+    in_action.io_dir = io_direction::input;
     in_action.index = 1; // select another device
 
     sut(make_middleware_functors(mf_mock), in_action);
