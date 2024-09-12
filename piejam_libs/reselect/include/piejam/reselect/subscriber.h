@@ -56,8 +56,9 @@ public:
                     if (*last != current)
                     {
                         handler(current);
-                        *last = current;
                     }
+
+                    *last = current;
                 }),
                 token);
     }
