@@ -5,12 +5,11 @@
 #include <piejam/runtime/audio_engine_middleware.h>
 
 #include <piejam/runtime/actions/activate_midi_device.h>
-#include <piejam/runtime/actions/add_bus.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/control_midi_assignment.h>
 #include <piejam/runtime/actions/deactivate_midi_device.h>
-#include <piejam/runtime/actions/delete_bus.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
+#include <piejam/runtime/actions/external_audio_device_actions.h>
 #include <piejam/runtime/actions/fx_chain_actions.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
@@ -19,7 +18,6 @@
 #include <piejam/runtime/actions/recording.h>
 #include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/request_streams_update.h>
-#include <piejam/runtime/actions/select_bus_channel.h>
 #include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_sample_rate.h>
@@ -95,22 +93,22 @@ struct update_devices final
         st.period_size = period_size;
         st.period_count = period_count;
 
-        st.device_io_state.buses.update(
+        st.device_io_state.devices.update(
                 *st.device_io_state.inputs,
                 [num_in_channels = input.hw_params->num_channels](
-                        external_audio::bus_id,
-                        external_audio::bus& bus) {
-                    update_channel(bus.channels.left, num_in_channels);
-                    update_channel(bus.channels.right, num_in_channels);
+                        external_audio::device_id,
+                        external_audio::device& device) {
+                    update_channel(device.channels.left, num_in_channels);
+                    update_channel(device.channels.right, num_in_channels);
                 });
 
-        st.device_io_state.buses.update(
+        st.device_io_state.devices.update(
                 *st.device_io_state.outputs,
                 [num_out_channels = output.hw_params->num_channels](
-                        external_audio::bus_id,
-                        external_audio::bus& bus) {
-                    update_channel(bus.channels.left, num_out_channels);
-                    update_channel(bus.channels.right, num_out_channels);
+                        external_audio::device_id,
+                        external_audio::device& device) {
+                    update_channel(device.channels.left, num_out_channels);
+                    update_channel(device.channels.right, num_out_channels);
                 });
     }
 };

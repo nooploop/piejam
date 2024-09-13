@@ -21,7 +21,7 @@ namespace piejam::gui::model
 
 struct MixerChannelPerform::Impl
 {
-    runtime::mixer::channel_id busId;
+    runtime::mixer::channel_id channel_id;
 
     std::unique_ptr<StereoLevelParameter> peakLevel;
     std::unique_ptr<StereoLevelParameter> rmsLevel;
@@ -134,12 +134,13 @@ MixerChannelPerform::mute() const noexcept -> BoolParameter*
 void
 MixerChannelPerform::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_channel_name_selector(m_impl->busId),
+    observe(runtime::selectors::make_mixer_channel_name_selector(
+                    m_impl->channel_id),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });
 
-    observe(runtime::selectors::make_muted_by_solo_selector(m_impl->busId),
+    observe(runtime::selectors::make_muted_by_solo_selector(m_impl->channel_id),
             [this](bool x) { setMutedBySolo(x); });
 }
 

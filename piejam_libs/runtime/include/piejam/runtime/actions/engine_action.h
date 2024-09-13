@@ -12,9 +12,9 @@ namespace piejam::runtime::actions
 
 struct engine_action_visitor
     : ui::action_visitor_interface<
-              select_bus_channel,
-              add_bus,
-              delete_bus,
+              set_external_audio_device_bus_channel,
+              add_external_audio_device,
+              remove_external_audio_device,
               add_mixer_channel,
               delete_mixer_channel,
               set_mixer_channel_route,

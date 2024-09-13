@@ -33,9 +33,9 @@ struct select_period_count;
 struct activate_midi_device;
 struct deactivate_midi_device;
 
-struct select_bus_channel;
-struct add_bus;
-struct delete_bus;
+struct set_external_audio_device_bus_channel;
+struct add_external_audio_device;
+struct remove_external_audio_device;
 
 struct add_mixer_channel;
 struct delete_mixer_channel;
@@ -50,7 +50,7 @@ struct request_streams_update;
 
 struct update_streams;
 
-struct set_device_bus_name;
+struct set_external_audio_device_name;
 
 template <class>
 struct set_parameter_value;

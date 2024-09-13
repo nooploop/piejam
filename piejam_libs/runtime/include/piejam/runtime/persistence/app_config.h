@@ -21,7 +21,7 @@ namespace piejam::runtime::persistence
 
 inline constexpr unsigned current_app_config_version = 0;
 
-struct bus_config
+struct external_audio_device_config
 {
     std::string name;
     audio::bus_type bus_type;
@@ -36,8 +36,8 @@ struct app_config
     audio::period_size period_size{};
     audio::period_count period_count{};
 
-    std::vector<bus_config> input_bus_config;
-    std::vector<bus_config> output_bus_config;
+    std::vector<external_audio_device_config> input_devices;
+    std::vector<external_audio_device_config> output_devices;
 
     std::vector<std::string> enabled_midi_input_devices;
 

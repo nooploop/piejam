@@ -22,7 +22,8 @@ class AudioInputOutputSettings : public Subscribable<SubscribableModel>
     Q_OBJECT
 
     Q_PROPERTY(QStringList channels READ channels NOTIFY channelsChanged FINAL)
-    Q_PROPERTY(QAbstractListModel* busConfigs READ busConfigs CONSTANT FINAL)
+    Q_PROPERTY(
+            QAbstractListModel* deviceConfigs READ deviceConfigs CONSTANT FINAL)
 
 protected:
     AudioInputOutputSettings(
@@ -47,10 +48,10 @@ public:
         }
     }
 
-    auto busConfigs() -> BusConfigsList*;
+    auto deviceConfigs() -> ExternalAudioDeviceConfigList*;
 
-    Q_INVOKABLE void addMonoBus();
-    Q_INVOKABLE void addStereoBus();
+    Q_INVOKABLE void addMonoDevice();
+    Q_INVOKABLE void addStereoDevice();
 
 signals:
     void channelsChanged();

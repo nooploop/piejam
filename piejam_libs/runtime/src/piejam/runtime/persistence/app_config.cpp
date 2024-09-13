@@ -36,11 +36,9 @@ from_json(nlohmann::json const& j, pair<T>& p)
 namespace piejam::runtime::persistence
 {
 
-using namespace std::string_literals;
-
 static auto const s_key_version = "version";
 static auto const s_key_audio_settings = "audio_settings";
-static auto const s_key_input_device_name = "input_device_name"s;
+static auto const s_key_input_device_name = "input_device_name";
 static auto const s_key_output_device_name = "output_device_name";
 static auto const s_key_sample_rate = "sample_rate";
 static auto const s_key_period_size = "period_size";
@@ -58,7 +56,7 @@ get_version(nlohmann::json const& conf) -> unsigned
 }
 
 void
-to_json(nlohmann::json& j, bus_config const& conf)
+to_json(nlohmann::json& j, external_audio_device_config const& conf)
 {
     j = nlohmann::json{
             {"name", conf.name},
@@ -67,7 +65,7 @@ to_json(nlohmann::json& j, bus_config const& conf)
 }
 
 void
-from_json(nlohmann::json const& j, bus_config& conf)
+from_json(nlohmann::json const& j, external_audio_device_config& conf)
 {
     j.at("name").get_to(conf.name);
     j.at("bus_type").get_to(conf.bus_type);
@@ -84,8 +82,8 @@ to_json(nlohmann::json& j, app_config const& conf)
            {s_key_sample_rate, conf.sample_rate.get()},
            {s_key_period_size, conf.period_size.get()},
            {s_key_period_count, conf.period_count.get()},
-           {s_key_input_configs, conf.input_bus_config},
-           {s_key_output_configs, conf.output_bus_config},
+           {s_key_input_configs, conf.input_devices},
+           {s_key_output_configs, conf.output_devices},
            {s_key_enabled_midi_input_devices, conf.enabled_midi_input_devices},
            {s_key_rec_session, conf.rec_session}}}};
 }
@@ -102,8 +100,8 @@ from_json(nlohmann::json const& j, app_config& conf)
             audio_settings.at(s_key_period_size).get<unsigned>());
     conf.period_count = audio::period_count(
             audio_settings.at(s_key_period_count).get<unsigned>());
-    audio_settings.at(s_key_input_configs).get_to(conf.input_bus_config);
-    audio_settings.at(s_key_output_configs).get_to(conf.output_bus_config);
+    audio_settings.at(s_key_input_configs).get_to(conf.input_devices);
+    audio_settings.at(s_key_output_configs).get_to(conf.output_devices);
     audio_settings.at(s_key_enabled_midi_input_devices)
             .get_to(conf.enabled_midi_input_devices);
     audio_settings.at(s_key_rec_session).get_to(conf.rec_session);

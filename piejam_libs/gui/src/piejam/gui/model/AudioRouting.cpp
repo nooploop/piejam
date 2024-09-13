@@ -124,7 +124,7 @@ AudioRouting::changeToDevice(unsigned index)
     runtime::actions::set_mixer_channel_route action;
     action.channel_id = m_impl->mixer_channel_id;
     action.io_socket = m_impl->io_socket;
-    action.route = (*m_impl->devices)[index].bus_id;
+    action.route = (*m_impl->devices)[index].device_id;
     dispatch(action);
 }
 

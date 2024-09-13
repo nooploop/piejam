@@ -21,52 +21,58 @@ namespace piejam::gui::model
 
 struct Mixer::Impl
 {
-    boxed_vector<runtime::mixer::channel_id> inputs;
-    runtime::mixer::channel_id mainChannelId;
-    runtime::mixer::channel_ids_t allChannelIds;
-    std::unique_ptr<MixerChannel> mainChannel;
-    MixerChannelsList inputChannels;
+    Impl(runtime::store_dispatch store_dispatch,
+         runtime::subscriber& state_change_subscriber,
+         runtime::mixer::channel_id main_channel)
+        : main_channel_id{main_channel}
+        , mainChannel{store_dispatch, state_change_subscriber, main_channel}
+    {
+    }
+
+    runtime::mixer::channel_id main_channel_id;
+    box<runtime::mixer::channel_ids_t> user_channel_ids;
+    runtime::mixer::channel_ids_t all_channel_ids;
+
+    MixerChannel mainChannel;
+    MixerChannelsList userChannels;
 };
 
 Mixer::Mixer(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
-    : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(
-              boxed_vector<runtime::mixer::channel_id>{},
-              observe_once(runtime::selectors::select_mixer_main_channel),
-              runtime::mixer::channel_ids_t{},
-              std::make_unique<MixerChannel>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      observe_once(
-                              runtime::selectors::select_mixer_main_channel))))
+    : Subscribable{store_dispatch, state_change_subscriber}
+    , m_impl{std::make_unique<Impl>(
+              store_dispatch,
+              state_change_subscriber,
+              observe_once(runtime::selectors::select_mixer_main_channel))}
 {
 }
 
 Mixer::~Mixer() = default;
 
 auto
-Mixer::inputChannels() -> MixerChannelsList*
+Mixer::userChannels() -> MixerChannelsList*
 {
-    return &m_impl->inputChannels;
+    return &m_impl->userChannels;
 }
 
 auto
 Mixer::mainChannel() const -> MixerChannel*
 {
-    return m_impl->mainChannel.get();
+    return &m_impl->mainChannel;
 }
 
 void
 Mixer::onSubscribe()
 {
-    observe(runtime::selectors::select_mixer_input_channels,
-            [this](boxed_vector<runtime::mixer::channel_id> const& bus_infos) {
+    observe(runtime::selectors::select_mixer_user_channels,
+            [this](box<runtime::mixer::channel_ids_t> const& user_channel_ids) {
                 algorithm::apply_edit_script(
-                        algorithm::edit_script(*m_impl->inputs, *bus_infos),
+                        algorithm::edit_script(
+                                *m_impl->user_channel_ids,
+                                *user_channel_ids),
                         piejam::gui::generic_list_model_edit_script_executor{
-                                *inputChannels(),
+                                *userChannels(),
                                 [this](auto const& channel_id) {
                                     return std::make_unique<MixerChannel>(
                                             dispatch(),
@@ -74,14 +80,16 @@ Mixer::onSubscribe()
                                             channel_id);
                                 }});
 
-                m_impl->inputs = bus_infos;
+                m_impl->user_channel_ids = user_channel_ids;
 
-                m_impl->allChannelIds.clear();
+                m_impl->all_channel_ids.clear();
 
                 // main channel must be added first, for correct order in
                 // fxchains list
-                m_impl->allChannelIds.emplace_back(m_impl->mainChannelId);
-                boost::range::push_back(m_impl->allChannelIds, *m_impl->inputs);
+                m_impl->all_channel_ids.emplace_back(m_impl->main_channel_id);
+                boost::range::push_back(
+                        m_impl->all_channel_ids,
+                        *m_impl->user_channel_ids);
             });
 }
 
@@ -109,7 +117,7 @@ void
 Mixer::requestLevelsUpdate()
 {
     dispatch(runtime::actions::request_mixer_levels_update(
-            m_impl->allChannelIds));
+            m_impl->all_channel_ids));
 }
 
 } // namespace piejam::gui::model

@@ -124,8 +124,8 @@ make_num_device_channels_selector(io_direction const bd)
 }
 
 auto
-make_device_bus_list_selector(io_direction const bd)
-        -> selector<box<external_audio::bus_list_t>>
+make_external_audio_device_ids_selector(io_direction const bd)
+        -> selector<box<external_audio::device_ids_t>>
 {
     switch (bd)
     {
@@ -137,7 +137,7 @@ make_device_bus_list_selector(io_direction const bd)
     }
 }
 
-selector<boxed_vector<mixer::channel_id>> const select_mixer_input_channels(
+selector<boxed_vector<mixer::channel_id>> const select_mixer_user_channels(
         [](state const& st) { return st.mixer_state.inputs; });
 
 selector<mixer::channel_id> const select_mixer_main_channel(
@@ -237,20 +237,19 @@ static struct
 {
     auto operator()(
             audio::bus_type const bus_type,
-            external_audio::buses_t const& devices,
-            box<external_audio::bus_list_t> const& from_device_list) const
+            external_audio::devices_t const& devices,
+            box<external_audio::device_ids_t> const& device_ids) const
             -> boxed_vector<mixer_device_route>
     {
         std::vector<mixer_device_route> result;
-        for (auto device_bus_id : *from_device_list)
+        for (auto device_id : *device_ids)
         {
-            if (external_audio::bus const* const device_bus =
-                        devices.find(device_bus_id);
-                device_bus && device_bus->bus_type == bus_type)
+            if (auto const* const device = devices.find(device_id);
+                device && device->bus_type == bus_type)
             {
                 result.emplace_back(mixer_device_route{
-                        .bus_id = device_bus_id,
-                        .name = *device_bus->name});
+                        .device_id = device_id,
+                        .name = *device->name});
             }
         }
         return box_(std::move(result));
@@ -259,10 +258,9 @@ static struct
     auto operator()(audio::bus_type const bus_type) const
     {
         return [this, bus_type](
-                       external_audio::buses_t const& devices,
-                       box<external_audio::bus_list_t> const&
-                               from_device_list) {
-            return (*this)(bus_type, devices, from_device_list);
+                       external_audio::devices_t const& devices,
+                       box<external_audio::device_ids_t> const& device_ids) {
+            return (*this)(bus_type, devices, device_ids);
         };
     }
 } const make_mixer_device_routes;
@@ -325,7 +323,7 @@ struct
             mixer::channel_id const channel_id,
             mixer::io_socket const io_socket,
             mixer::channels_t const& channels,
-            external_audio::buses_t const& device_buses) const
+            external_audio::devices_t const& devices) const
             -> box<selected_route>
     {
         mixer::channel const* const mixer_channel = channels.find(channel_id);
@@ -373,14 +371,14 @@ struct
                                         .name = default_name};
                             }
                         },
-                        [&](external_audio::bus_id const dev_bus_id) {
-                            if (external_audio::bus const* const dev_bus =
-                                        device_buses.find(dev_bus_id);
-                                dev_bus)
+                        [&](external_audio::device_id const device_id) {
+                            if (auto const* const device =
+                                        devices.find(device_id);
+                                device)
                             {
                                 return selected_route{
                                         .state = selected_route::state_t::valid,
-                                        .name = dev_bus->name};
+                                        .name = device->name};
                             }
                             else
                             {
@@ -404,8 +402,8 @@ struct
     {
         return [=,
                 this](mixer::channels_t const& channels,
-                      external_audio::buses_t const& device_buses) {
-            return (*this)(channel_id, io_socket, channels, device_buses);
+                      external_audio::devices_t const& devices) {
+            return (*this)(channel_id, io_socket, channels, devices);
         };
     }
 } const get_mixer_channel_selected_route;
@@ -436,7 +434,7 @@ make_mixer_channel_selected_route_selector(
     return [get = memo(
                     get_mixer_channel_selected_route(channel_id, io_socket))](
                    state const& st) {
-        return get(st.mixer_state.channels, st.device_io_state.buses);
+        return get(st.mixer_state.channels, st.device_io_state.devices);
     };
 }
 
@@ -451,7 +449,9 @@ make_mixer_devices_selector(
         case mixer::io_socket::in:
             return [get = memo(make_mixer_device_routes(bus_type))](
                            state const& st) mutable {
-                return get(st.device_io_state.buses, st.device_io_state.inputs);
+                return get(
+                        st.device_io_state.devices,
+                        st.device_io_state.inputs);
             };
 
         default:
@@ -459,7 +459,7 @@ make_mixer_devices_selector(
                             make_mixer_device_routes(audio::bus_type::stereo))](
                            state const& st) mutable {
                 return get(
-                        st.device_io_state.buses,
+                        st.device_io_state.devices,
                         st.device_io_state.outputs);
             };
     }
@@ -476,18 +476,18 @@ make_mixer_channels_selector(
 }
 
 auto
-make_device_bus_name_selector(external_audio::bus_id const bus_id)
-        -> selector<boxed_string>
+make_external_audio_device_name_selector(
+        external_audio::device_id const device_id) -> selector<boxed_string>
 {
-    auto get_device_bus_name = [](external_audio::buses_t const& device_buses,
-                                  external_audio::bus_id const bus_id) {
-        external_audio::bus const* const bus = device_buses.find(bus_id);
-        return bus ? bus->name : boxed_string();
+    auto get_device_name = [](external_audio::devices_t const& devices,
+                              external_audio::device_id const device_id) {
+        external_audio::device const* const device = devices.find(device_id);
+        return device ? device->name : boxed_string();
     };
 
-    return [bus_id,
-            get = memo(get_device_bus_name)](state const& st) -> boxed_string {
-        return get(st.device_io_state.buses, bus_id);
+    return [device_id,
+            get = memo(get_device_name)](state const& st) -> boxed_string {
+        return get(st.device_io_state.devices, device_id);
     };
 }
 
@@ -530,40 +530,41 @@ make_mixer_channel_can_move_right_selector(mixer::channel_id const channel_id)
 }
 
 auto
-make_bus_type_selector(external_audio::bus_id const bus_id)
-        -> selector<audio::bus_type>
+make_external_audio_device_bus_type_selector(
+        external_audio::device_id const device_id) -> selector<audio::bus_type>
 {
-    return [bus_id](state const& st) -> audio::bus_type {
-        external_audio::bus const* bus = st.device_io_state.buses.find(bus_id);
-        return bus ? bus->bus_type : audio::bus_type::mono;
+    return [device_id](state const& st) -> audio::bus_type {
+        external_audio::device const* device =
+                st.device_io_state.devices.find(device_id);
+        return device ? device->bus_type : audio::bus_type::mono;
     };
 }
 
 auto
-make_bus_channel_selector(
-        external_audio::bus_id const bus_id,
+make_external_audio_device_bus_channel_selector(
+        external_audio::device_id const device_id,
         audio::bus_channel const bc) -> selector<std::size_t>
 {
     switch (bc)
     {
         case audio::bus_channel::mono:
         case audio::bus_channel::left:
-            return [bus_id](state const& st) -> std::size_t {
-                external_audio::bus const* const bus =
-                        st.device_io_state.buses.find(bus_id);
-                return bus ? bus->channels.left : piejam::npos;
+            return [device_id](state const& st) -> std::size_t {
+                external_audio::device const* const device =
+                        st.device_io_state.devices.find(device_id);
+                return device ? device->channels.left : piejam::npos;
             };
 
         case audio::bus_channel::right:
-            return [bus_id](state const& st) -> std::size_t {
-                external_audio::bus const* const bus =
-                        st.device_io_state.buses.find(bus_id);
-                return bus ? bus->channels.right : piejam::npos;
+            return [device_id](state const& st) -> std::size_t {
+                external_audio::device const* const device =
+                        st.device_io_state.devices.find(device_id);
+                return device ? device->channels.right : piejam::npos;
             };
     }
 
     BOOST_ASSERT(false);
-    __builtin_unreachable();
+    return boost::hof::always(piejam::npos);
 }
 
 selector<boxed_vector<midi::device_id_t>> const select_midi_input_devices(

@@ -11,7 +11,7 @@
 namespace piejam::gui::model
 {
 
-class BusConfig final : public Subscribable<SubscribableModel>
+class ExternalAudioDeviceConfig final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -24,10 +24,10 @@ class BusConfig final : public Subscribable<SubscribableModel>
                        stereoRightChannelChanged FINAL)
 
 public:
-    BusConfig(
+    ExternalAudioDeviceConfig(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::external_audio::bus_id);
+            runtime::external_audio::device_id);
 
     auto name() const noexcept -> QString const&
     {
@@ -107,7 +107,7 @@ public:
 
     Q_INVOKABLE void changeStereoRightChannel(unsigned);
 
-    Q_INVOKABLE void deleteBus();
+    Q_INVOKABLE void remove();
 
 signals:
 
@@ -120,7 +120,7 @@ signals:
 private:
     void onSubscribe() override;
 
-    runtime::external_audio::bus_id m_bus_id;
+    runtime::external_audio::device_id m_device_id;
 
     QString m_name;
     bool m_mono{true};

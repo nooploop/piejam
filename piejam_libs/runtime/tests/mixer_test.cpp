@@ -18,7 +18,7 @@ TEST(mixer_valid_io, test1)
     using namespace std::string_literals;
 
     channels_t channels;
-    auto bus1 = channels.add(channel{
+    auto channel1 = channels.add(channel{
             .name = box_("foo"s),
             .bus_type = audio::bus_type::stereo,
             .volume = {},
@@ -29,7 +29,7 @@ TEST(mixer_valid_io, test1)
             .peak_level = {},
             .rms_level = {},
     });
-    auto bus2 = channels.add(channel{
+    auto channel2 = channels.add(channel{
             .name = box_("bar"s),
             .bus_type = audio::bus_type::stereo,
             .volume = {},
@@ -41,17 +41,17 @@ TEST(mixer_valid_io, test1)
             .rms_level = {},
     });
 
-    auto vs1 = valid_channels(io_socket::in, channels, bus1);
-    EXPECT_TRUE(Matches(ElementsAre(bus2))(vs1));
+    auto vs1 = valid_channels(io_socket::in, channels, channel1);
+    EXPECT_TRUE(Matches(ElementsAre(channel2))(vs1));
 
-    auto vs2 = valid_channels(io_socket::in, channels, bus2);
-    EXPECT_TRUE(Matches(ElementsAre(bus1))(vs2));
+    auto vs2 = valid_channels(io_socket::in, channels, channel2);
+    EXPECT_TRUE(Matches(ElementsAre(channel1))(vs2));
 
-    auto vt1 = valid_channels(io_socket::out, channels, bus1);
-    EXPECT_TRUE(Matches(ElementsAre(bus2))(vt1));
+    auto vt1 = valid_channels(io_socket::out, channels, channel1);
+    EXPECT_TRUE(Matches(ElementsAre(channel2))(vt1));
 
-    auto vt2 = valid_channels(io_socket::out, channels, bus2);
-    EXPECT_TRUE(Matches(ElementsAre(bus1))(vt2));
+    auto vt2 = valid_channels(io_socket::out, channels, channel2);
+    EXPECT_TRUE(Matches(ElementsAre(channel1))(vt2));
 }
 
 TEST(mixer_valid_io, test2)
@@ -62,11 +62,11 @@ TEST(mixer_valid_io, test2)
     using namespace std::string_literals;
 
     channels_t channels;
-    auto bus1 = channels.add(channel{});
-    auto bus2 = channels.add(channel{
+    auto channel1 = channels.add(channel{});
+    auto channel2 = channels.add(channel{
             .name = box_("foo"s),
             .bus_type = audio::bus_type::stereo,
-            .in = bus1,
+            .in = channel1,
             .volume = {},
             .pan_balance = {},
             .record = {},
@@ -76,16 +76,16 @@ TEST(mixer_valid_io, test2)
             .rms_level = {},
     });
 
-    auto vs1 = valid_channels(io_socket::in, channels, bus1);
+    auto vs1 = valid_channels(io_socket::in, channels, channel1);
     EXPECT_TRUE(vs1.empty());
 
-    auto vs2 = valid_channels(io_socket::in, channels, bus2);
-    EXPECT_TRUE(Matches(ElementsAre(bus1))(vs2));
+    auto vs2 = valid_channels(io_socket::in, channels, channel2);
+    EXPECT_TRUE(Matches(ElementsAre(channel1))(vs2));
 
-    auto vt1 = valid_channels(io_socket::out, channels, bus1);
-    EXPECT_TRUE(Matches(ElementsAre(bus2))(vt1));
+    auto vt1 = valid_channels(io_socket::out, channels, channel1);
+    EXPECT_TRUE(Matches(ElementsAre(channel2))(vt1));
 
-    auto vt2 = valid_channels(io_socket::out, channels, bus2);
+    auto vt2 = valid_channels(io_socket::out, channels, channel2);
     EXPECT_TRUE(vt2.empty());
 }
 

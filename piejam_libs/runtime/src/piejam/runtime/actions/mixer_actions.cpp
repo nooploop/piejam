@@ -24,27 +24,28 @@ add_mixer_channel::reduce(state& st) const
 
     if (auto_assign_input)
     {
-        for (auto bus_id : *st.device_io_state.inputs)
+        for (auto device_id : *st.device_io_state.inputs)
         {
             auto it = std::ranges::find_if(
                     st.mixer_state.channels,
-                    boost::hof::unpack([bus_id](
-                                               mixer::channel_id,
-                                               mixer::channel const&
-                                                       mixer_channel) {
-                        return std::holds_alternative<external_audio::bus_id>(
-                                       mixer_channel.in) &&
-                               std::get<external_audio::bus_id>(
-                                       mixer_channel.in) == bus_id;
-                    }));
+                    boost::hof::unpack(
+                            [device_id](
+                                    mixer::channel_id,
+                                    mixer::channel const& mixer_channel) {
+                                return std::holds_alternative<
+                                               external_audio::device_id>(
+                                               mixer_channel.in) &&
+                                       std::get<external_audio::device_id>(
+                                               mixer_channel.in) == device_id;
+                            }));
 
             if (it == st.mixer_state.channels.end() &&
-                st.device_io_state.buses[bus_id].bus_type == bus_type)
+                st.device_io_state.devices[device_id].bus_type == bus_type)
             {
                 st.mixer_state.channels.update(
                         added_mixer_channel_id,
-                        [bus_id](mixer::channel& mixer_channel) {
-                            mixer_channel.in = bus_id;
+                        [device_id](mixer::channel& mixer_channel) {
+                            mixer_channel.in = device_id;
                         });
                 break;
             }

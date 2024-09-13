@@ -40,11 +40,11 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamListener.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/AudioStreamProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BoolParameter.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/BusConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/DbScaleTick.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/EnumListModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/EnumParameter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/ExternalAudioDeviceConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FloatParameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowser.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/FxBrowserEntry.h
@@ -104,9 +104,9 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioStreamAmplifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/AudioStreamChannelDuplicator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/BoolParameter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/BusConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/DbScaleData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/EnumParameter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/ExternalAudioDeviceConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FloatParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/FxBrowserEntryInternal.cpp

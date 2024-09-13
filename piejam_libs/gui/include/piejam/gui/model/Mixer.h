@@ -18,15 +18,15 @@ class Mixer final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractListModel* inputChannels READ inputChannels CONSTANT)
+    Q_PROPERTY(QAbstractListModel* userChannels READ userChannels CONSTANT)
     Q_PROPERTY(piejam::gui::model::MixerChannel* mainChannel READ mainChannel
                        NOTIFY mainChannelChanged FINAL)
 
 public:
     Mixer(runtime::store_dispatch, runtime::subscriber&);
-    ~Mixer();
+    ~Mixer() override;
 
-    auto inputChannels() -> MixerChannelsList*;
+    auto userChannels() -> MixerChannelsList*;
 
     auto mainChannel() const -> MixerChannel*;
 

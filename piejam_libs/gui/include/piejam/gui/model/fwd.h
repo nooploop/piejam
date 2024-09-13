@@ -33,11 +33,9 @@ class MixerChannelFx;
 class DbScaleData;
 class AudioRouting;
 
-class BusConfig;
-using BusConfigsList = GenericListModel<BusConfig>;
-
-class BusName;
-using BusNamesList = GenericListModel<BusName>;
+class ExternalAudioDeviceConfig;
+using ExternalAudioDeviceConfigList =
+        GenericListModel<ExternalAudioDeviceConfig>;
 
 class Parameter;
 using FxParametersList = GenericListModel<Parameter>;

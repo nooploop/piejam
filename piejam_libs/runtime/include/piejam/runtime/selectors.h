@@ -62,11 +62,11 @@ extern selector<box<sound_card_choice>> const select_output_sound_card;
 
 auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 
-auto make_device_bus_list_selector(io_direction)
-        -> selector<box<external_audio::bus_list_t>>;
+auto make_external_audio_device_ids_selector(io_direction)
+        -> selector<box<external_audio::device_ids_t>>;
 
 extern selector<boxed_vector<mixer::channel_id>> const
-        select_mixer_input_channels;
+        select_mixer_user_channels;
 extern selector<mixer::channel_id> const select_mixer_main_channel;
 
 auto make_mixer_channel_bus_type_selector(mixer::channel_id)
@@ -88,7 +88,7 @@ auto make_mixer_channel_rms_level_parameter_selector(mixer::channel_id)
 
 struct mixer_device_route
 {
-    external_audio::bus_id bus_id;
+    external_audio::device_id device_id;
     std::string name;
 
     auto operator==(mixer_device_route const&) const noexcept -> bool = default;
@@ -136,7 +136,7 @@ auto make_mixer_devices_selector(audio::bus_type, mixer::io_socket)
 auto make_mixer_channels_selector(mixer::channel_id, mixer::io_socket)
         -> selector<boxed_vector<mixer_channel_route>>;
 
-auto make_device_bus_name_selector(external_audio::bus_id)
+auto make_external_audio_device_name_selector(external_audio::device_id)
         -> selector<boxed_string>;
 
 auto make_mixer_channel_name_selector(mixer::channel_id)
@@ -147,11 +147,12 @@ auto make_mixer_channel_can_move_left_selector(mixer::channel_id)
 auto make_mixer_channel_can_move_right_selector(mixer::channel_id)
         -> selector<bool>;
 
-auto make_bus_type_selector(external_audio::bus_id)
+auto make_external_audio_device_bus_type_selector(external_audio::device_id)
         -> selector<audio::bus_type>;
 
-auto make_bus_channel_selector(external_audio::bus_id, audio::bus_channel)
-        -> selector<std::size_t>;
+auto make_external_audio_device_bus_channel_selector(
+        external_audio::device_id,
+        audio::bus_channel) -> selector<std::size_t>;
 
 extern selector<boxed_vector<midi::device_id_t>> const
         select_midi_input_devices;

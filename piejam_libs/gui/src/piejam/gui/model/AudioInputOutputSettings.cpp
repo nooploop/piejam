@@ -7,21 +7,20 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/audio/types.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
-#include <piejam/gui/model/BusConfig.h>
+#include <piejam/gui/model/ExternalAudioDeviceConfig.h>
 #include <piejam/gui/model/GenericListModel.h>
-#include <piejam/runtime/actions/add_bus.h>
+#include <piejam/runtime/actions/external_audio_device_actions.h>
 #include <piejam/runtime/selectors.h>
-
-#include <string>
 
 namespace piejam::gui::model
 {
 
 struct AudioInputOutputSettings::Impl
 {
-    io_direction ioDir;
-    runtime::external_audio::bus_list_t busIds;
-    BusConfigsList busConfigs;
+    io_direction io_dir;
+    box<runtime::external_audio::device_ids_t> device_ids;
+
+    ExternalAudioDeviceConfigList deviceConfigs;
 };
 
 AudioInputOutputSettings::AudioInputOutputSettings(
@@ -36,9 +35,9 @@ AudioInputOutputSettings::AudioInputOutputSettings(
 AudioInputOutputSettings::~AudioInputOutputSettings() = default;
 
 auto
-AudioInputOutputSettings::busConfigs() -> BusConfigsList*
+AudioInputOutputSettings::deviceConfigs() -> ExternalAudioDeviceConfigList*
 {
-    return &m_impl->busConfigs;
+    return &m_impl->deviceConfigs;
 }
 
 void
@@ -46,7 +45,7 @@ AudioInputOutputSettings::onSubscribe()
 {
     namespace selectors = runtime::selectors;
 
-    observe(selectors::make_num_device_channels_selector(m_impl->ioDir),
+    observe(selectors::make_num_device_channels_selector(m_impl->io_dir),
             [this](std::size_t const num_input_channels) {
                 QStringList channels;
                 channels.push_back("-");
@@ -58,44 +57,50 @@ AudioInputOutputSettings::onSubscribe()
                 setChannels(channels);
             });
 
-    observe(selectors::make_device_bus_list_selector(m_impl->ioDir),
-            [this](box<runtime::external_audio::bus_list_t> const& bus_ids) {
+    observe(selectors::make_external_audio_device_ids_selector(m_impl->io_dir),
+            [this](box<runtime::external_audio::device_ids_t> const&
+                           device_ids) {
                 algorithm::apply_edit_script(
-                        algorithm::edit_script(m_impl->busIds, *bus_ids),
+                        algorithm::edit_script(
+                                *m_impl->device_ids,
+                                *device_ids),
                         piejam::gui::generic_list_model_edit_script_executor{
-                                m_impl->busConfigs,
-                                [this](runtime::external_audio::bus_id bus_id) {
-                                    return std::make_unique<BusConfig>(
+                                m_impl->deviceConfigs,
+                                [this](runtime::external_audio::device_id
+                                               device_id) {
+                                    return std::make_unique<
+                                            ExternalAudioDeviceConfig>(
                                             dispatch(),
                                             state_change_subscriber(),
-                                            bus_id);
+                                            device_id);
                                 }});
 
-                m_impl->busIds = bus_ids;
+                m_impl->device_ids = device_ids;
             });
 }
 
 static void
-addBus(runtime::store_dispatch dispatch,
-       io_direction direction,
-       audio::bus_type bus_type)
+addDevice(
+        runtime::store_dispatch dispatch,
+        io_direction direction,
+        audio::bus_type bus_type)
 {
-    runtime::actions::add_bus action;
+    runtime::actions::add_external_audio_device action;
     action.direction = direction;
     action.type = bus_type;
     dispatch(action);
 }
 
 void
-AudioInputOutputSettings::addMonoBus()
+AudioInputOutputSettings::addMonoDevice()
 {
-    addBus(dispatch(), m_impl->ioDir, audio::bus_type::mono);
+    addDevice(dispatch(), m_impl->io_dir, audio::bus_type::mono);
 }
 
 void
-AudioInputOutputSettings::addStereoBus()
+AudioInputOutputSettings::addStereoDevice()
 {
-    addBus(dispatch(), m_impl->ioDir, audio::bus_type::stereo);
+    addDevice(dispatch(), m_impl->io_dir, audio::bus_type::stereo);
 }
 
 } // namespace piejam::gui::model

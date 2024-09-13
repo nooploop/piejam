@@ -51,7 +51,7 @@ ViewPane {
         anchors.margins: 8
         anchors.leftMargin: 0
 
-        model: root.model.inputChannels
+        model: root.model.userChannels
 
         header: Item {
             width: 8

@@ -22,7 +22,7 @@ template <io_direction D>
 static auto
 apply_bus_configs(
         state& st,
-        std::vector<persistence::bus_config> const& configs,
+        std::vector<persistence::external_audio_device_config> const& configs,
         std::size_t const num_ch)
 {
     BOOST_ASSERT_MSG(
@@ -38,7 +38,7 @@ apply_bus_configs(
         auto const type = D == io_direction::output ? audio::bus_type::stereo
                                                     : bus_conf.bus_type;
 
-        add_device_bus(st, bus_conf.name, D, type, chs);
+        runtime::add_external_audio_device(st, bus_conf.name, D, type, chs);
     }
 }
 
@@ -47,12 +47,12 @@ apply_app_config::reduce(state& st) const
 {
     apply_bus_configs<io_direction::input>(
             st,
-            conf.input_bus_config,
+            conf.input_devices,
             st.selected_io_sound_card.in.hw_params->num_channels);
 
     apply_bus_configs<io_direction::output>(
             st,
-            conf.output_bus_config,
+            conf.output_devices,
             st.selected_io_sound_card.out.hw_params->num_channels);
 
     st.rec_session = conf.rec_session;

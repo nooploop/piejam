@@ -24,7 +24,7 @@ using missing_device_address = boxed_string;
 using io_address_t = std::variant<
         default_t,
         missing_device_address,
-        external_audio::bus_id,
+        external_audio::device_id,
         channel_id>;
 
 enum class io_socket

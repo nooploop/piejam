@@ -55,7 +55,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
         <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
         <file>PieJam/SettingsControls/AudioSettings.qml</file>
-        <file>PieJam/SettingsControls/BusConfig.qml</file>
+        <file>PieJam/SettingsControls/ExternalAudioDeviceConfig.qml</file>
         <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
         <file>PieJam/SettingsControls/MidiDeviceConfig.qml</file>
         <file>PieJam/SettingsControls/MidiSettings.qml</file>

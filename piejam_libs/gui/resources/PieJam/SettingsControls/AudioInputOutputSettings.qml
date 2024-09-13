@@ -21,18 +21,16 @@ SubscribableItem {
         spacing: 8
 
         ListView {
-            id: busConfigsList
-
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            model: root.model.busConfigs
+            model: root.model.deviceConfigs
 
             spacing: 8
 
             clip: true
 
-            delegate: BusConfig {
+            delegate: ExternalAudioDeviceConfig {
                 height: 64
                 name: model.item.name
                 mono: model.item.mono
@@ -47,7 +45,7 @@ SubscribableItem {
                 onMonoChannelSelected: model.item.changeMonoChannel(ch)
                 onStereoLeftChannelSelected: model.item.changeStereoLeftChannel(ch)
                 onStereoRightChannelSelected: model.item.changeStereoRightChannel(ch)
-                onDeleteConfigClicked: model.item.deleteBus()
+                onDeleteConfigClicked: model.item.remove()
                 onNameEdited: model.item.changeName(name)
 
                 ModelSubscription {
@@ -58,33 +56,27 @@ SubscribableItem {
         }
 
         RowLayout {
-            id: addButtons
-
             Layout.fillWidth: true
             Layout.preferredHeight: 40
 
             spacing: 8
 
             Button {
-                id: addMono
-
                 Layout.fillWidth: true
 
                 text: "+Mono"
                 visible: root.showAddMono
 
-                onClicked: root.model.addMonoBus()
+                onClicked: root.model.addMonoDevice()
             }
 
             Button {
-                id: addStereo
-
                 Layout.fillWidth: true
 
                 text: "+Stereo"
                 visible: root.showAddStereo
 
-                onClicked: root.model.addStereoBus()
+                onClicked: root.model.addStereoDevice()
             }
         }
     }

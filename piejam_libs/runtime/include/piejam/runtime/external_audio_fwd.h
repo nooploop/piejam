@@ -11,11 +11,11 @@
 namespace piejam::runtime::external_audio
 {
 
-struct bus;
-using bus_id = entity_id<bus>;
-using buses_t = entity_map<bus>;
+struct device;
+using device_id = entity_id<device>;
+using devices_t = entity_map<device>;
 
-using bus_list_t = std::vector<bus_id>;
+using device_ids_t = std::vector<device_id>;
 
 struct state;
 

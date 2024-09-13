@@ -58,28 +58,30 @@ save_app_config(
         conf.period_size = state.period_size;
         conf.period_count = state.period_count;
 
-        auto const buses_to_bus_configs =
-                [](auto const& buses, auto const& bus_ids, auto& configs) {
-                    configs.reserve(bus_ids.size());
-                    std::ranges::transform(
-                            bus_ids,
-                            std::back_inserter(configs),
-                            [&buses](external_audio::bus_id const& ch_id)
-                                    -> persistence::bus_config {
-                                external_audio::bus const& bus = buses[ch_id];
-                                return {bus.name, bus.bus_type, bus.channels};
-                            });
-                };
+        auto const buses_to_bus_configs = [](auto const& devices,
+                                             auto const& device_ids,
+                                             auto& configs) {
+            configs.reserve(device_ids.size());
+            std::ranges::transform(
+                    device_ids,
+                    std::back_inserter(configs),
+                    [&devices](external_audio::device_id const& device_id)
+                            -> persistence::external_audio_device_config {
+                        external_audio::device const& device =
+                                devices[device_id];
+                        return {device.name, device.bus_type, device.channels};
+                    });
+        };
 
         buses_to_bus_configs(
-                state.device_io_state.buses,
+                state.device_io_state.devices,
                 state.device_io_state.inputs.get(),
-                conf.input_bus_config);
+                conf.input_devices);
 
         buses_to_bus_configs(
-                state.device_io_state.buses,
+                state.device_io_state.devices,
                 state.device_io_state.outputs.get(),
-                conf.output_bus_config);
+                conf.output_devices);
 
         conf.enabled_midi_input_devices = enabled_midi_input_devices;
 
@@ -263,12 +265,12 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 .type = session::mixer_io_type::channel,
                                 .name = mixer_channel.name};
                     },
-                    [&st](external_audio::bus_id const& bus_id) {
-                        external_audio::bus const& bus =
-                                st.device_io_state.buses[bus_id];
+                    [&st](external_audio::device_id const& device_id) {
+                        external_audio::device const& device =
+                                st.device_io_state.devices[device_id];
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,
-                                .name = bus.name};
+                                .name = device.name};
                     },
                     [](mixer::missing_device_address const& name) {
                         return session::mixer_io{

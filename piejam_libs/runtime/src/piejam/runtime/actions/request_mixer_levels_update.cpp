@@ -21,10 +21,12 @@ request_mixer_levels_update(mixer::channel_ids_t channel_ids) -> thunk_action
         state const& st = get_state();
         request_parameters_update next_action;
 
-        for (mixer::channel_id const bus_id : channel_ids)
+        for (mixer::channel_id const channel_id : channel_ids)
         {
-            next_action.push_back(st.mixer_state.channels[bus_id].peak_level);
-            next_action.push_back(st.mixer_state.channels[bus_id].rms_level);
+            next_action.push_back(
+                    st.mixer_state.channels[channel_id].peak_level);
+            next_action.push_back(
+                    st.mixer_state.channels[channel_id].rms_level);
         }
 
         dispatch(next_action);

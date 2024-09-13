@@ -14,10 +14,10 @@
 #include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/BoolParameter.h>
-#include <piejam/gui/model/BusConfig.h>
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/EnumListModel.h>
 #include <piejam/gui/model/EnumParameter.h>
+#include <piejam/gui/model/ExternalAudioDeviceConfig.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>

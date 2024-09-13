@@ -14,7 +14,7 @@
 namespace piejam::runtime::external_audio
 {
 
-struct bus
+struct device
 {
     boxed_string name;
 
@@ -23,15 +23,15 @@ struct bus
     //! mono channels hold same device channel in the pair
     channel_index_pair channels{npos};
 
-    auto operator==(bus const&) const noexcept -> bool = default;
+    auto operator==(device const&) const noexcept -> bool = default;
 };
 
 struct state
 {
-    buses_t buses;
+    devices_t devices;
 
-    box<bus_list_t> inputs;
-    box<bus_list_t> outputs;
+    box<device_ids_t> inputs;
+    box<device_ids_t> outputs;
 };
 
 } // namespace piejam::runtime::external_audio

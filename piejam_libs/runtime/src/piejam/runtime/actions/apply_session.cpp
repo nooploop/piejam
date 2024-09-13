@@ -170,7 +170,7 @@ find_mixer_channel_by_name(
 
 auto
 find_device_bus_by_name(
-        external_audio::buses_t const& device_buses,
+        external_audio::devices_t const& device_buses,
         std::string const& name)
 {
     return std::ranges::find_if(device_buses, [&name](auto const& p) {
@@ -181,7 +181,7 @@ find_device_bus_by_name(
 void
 apply_mixer_io(
         batch_action& batch,
-        external_audio::buses_t const& device_buses,
+        external_audio::devices_t const& device_buses,
         mixer::channels_t const& channels,
         mixer::channel_id const& channel_id,
         persistence::session::mixer_io const& in,
@@ -241,7 +241,7 @@ apply_mixer_io(
 void
 apply_mixer_io(
         batch_action& batch,
-        external_audio::buses_t const& device_buses,
+        external_audio::devices_t const& device_buses,
         mixer::channels_t const& channels,
         mixer::channel_ids_t const& channel_ids,
         std::vector<persistence::session::mixer_channel> const& mb_data)
@@ -323,13 +323,13 @@ configure_mixer_channels(
     // io
     apply_mixer_io(
             action,
-            st.device_io_state.buses,
+            st.device_io_state.devices,
             st.mixer_state.channels,
             st.mixer_state.inputs,
             session.mixer_channels);
     apply_mixer_io(
             action,
-            st.device_io_state.buses,
+            st.device_io_state.devices,
             st.mixer_state.channels,
             st.mixer_state.main,
             session.main_mixer_channel.in,

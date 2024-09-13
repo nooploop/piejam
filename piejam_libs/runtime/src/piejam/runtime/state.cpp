@@ -347,26 +347,28 @@ insert_ladspa_fx_module(
 void
 insert_missing_ladspa_fx_module(
         state& st,
-        mixer::channel_id const bus_id,
+        mixer::channel_id const channel_id,
         std::size_t const position,
         fx::unavailable_ladspa const& unavail,
         std::string_view const name)
 {
-    BOOST_ASSERT(bus_id != mixer::channel_id{});
+    BOOST_ASSERT(channel_id != mixer::channel_id{});
 
-    st.mixer_state.channels.update(bus_id, [&](mixer::channel& mixer_channel) {
-        mixer_channel.fx_chain.update([&](fx::chain_t& fx_chain) {
-            auto id = st.fx_unavailable_ladspa_plugins.add(unavail);
-            auto const insert_pos = std::min(position, fx_chain.size());
-            fx_chain.emplace(
-                    std::next(fx_chain.begin(), insert_pos),
-                    st.fx_modules.add(fx::module{
-                            .fx_instance_id = id,
-                            .name = box_(std::string(name)),
-                            .parameters = {},
-                            .streams = {}}));
-        });
-    });
+    st.mixer_state.channels.update(
+            channel_id,
+            [&](mixer::channel& mixer_channel) {
+                mixer_channel.fx_chain.update([&](fx::chain_t& fx_chain) {
+                    auto id = st.fx_unavailable_ladspa_plugins.add(unavail);
+                    auto const insert_pos = std::min(position, fx_chain.size());
+                    fx_chain.emplace(
+                            std::next(fx_chain.begin(), insert_pos),
+                            st.fx_modules.add(fx::module{
+                                    .fx_instance_id = id,
+                                    .name = box_(std::string(name)),
+                                    .parameters = {},
+                                    .streams = {}}));
+                });
+            });
 }
 
 template <class P>
@@ -431,23 +433,24 @@ remove_fx_module(
 }
 
 auto
-add_device_bus(
+add_external_audio_device(
         state& st,
         std::string const& name,
         io_direction const io_dir,
         audio::bus_type const bus_type,
-        channel_index_pair const& channels) -> external_audio::bus_id
+        channel_index_pair const& channels) -> external_audio::device_id
 {
-    auto id = st.device_io_state.buses.add(external_audio::bus{
+    auto id = st.device_io_state.devices.add(external_audio::device{
             .name = box_(name),
             .bus_type = io_dir == io_direction::input ? bus_type
                                                       : audio::bus_type::stereo,
             .channels = channels});
 
-    auto& bus_list = io_dir == io_direction::input ? st.device_io_state.inputs
-                                                   : st.device_io_state.outputs;
+    auto& devices_ids = io_dir == io_direction::input
+                                ? st.device_io_state.inputs
+                                : st.device_io_state.outputs;
 
-    emplace_back(bus_list, id);
+    emplace_back(devices_ids, id);
 
     st.mixer_state.channels.update(
             [id,
@@ -480,7 +483,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
     using namespace std::string_literals;
 
     parameter_factory ui_params_factory{st.params, st.ui_params};
-    auto bus_id = st.mixer_state.channels.add(mixer::channel{
+    auto channel_id = st.mixer_state.channels.add(mixer::channel{
             .name = box_(std::move(name)),
             .bus_type = bus_type,
             .in = {},
@@ -521,8 +524,8 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
             .rms_level = parameter_factory{st.params}.make_parameter(
                     parameter::stereo_level{}),
             .fx_chain = {}});
-    emplace_back(st.mixer_state.inputs, bus_id);
-    return bus_id;
+    emplace_back(st.mixer_state.inputs, channel_id);
+    return channel_id;
 }
 
 void
@@ -566,33 +569,35 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
 }
 
 void
-remove_device_bus(state& st, external_audio::bus_id const device_bus_id)
+remove_external_audio_device(
+        state& st,
+        external_audio::device_id const device_id)
 {
-    auto const name = st.device_io_state.buses[device_bus_id].name;
+    auto const name = st.device_io_state.devices[device_id].name;
 
     st.mixer_state.channels.update(
-            [device_bus_id,
+            [device_id,
              &name](mixer::channel_id, mixer::channel& mixer_channel) {
-                if (mixer_channel.in == mixer::io_address_t(device_bus_id))
+                if (mixer_channel.in == mixer::io_address_t(device_id))
                 {
                     mixer_channel.in = mixer::missing_device_address(name);
                 }
 
-                if (mixer_channel.out == mixer::io_address_t(device_bus_id))
+                if (mixer_channel.out == mixer::io_address_t(device_id))
                 {
                     mixer_channel.out = mixer::missing_device_address(name);
                 }
             });
 
-    st.device_io_state.buses.remove(device_bus_id);
+    st.device_io_state.devices.remove(device_id);
 
-    if (algorithm::contains(*st.device_io_state.inputs, device_bus_id))
+    if (algorithm::contains(*st.device_io_state.inputs, device_id))
     {
-        remove_erase(st.device_io_state.inputs, device_bus_id);
+        remove_erase(st.device_io_state.inputs, device_id);
     }
     else
     {
-        remove_erase(st.device_io_state.outputs, device_bus_id);
+        remove_erase(st.device_io_state.outputs, device_id);
     }
 }
 

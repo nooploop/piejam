@@ -4,12 +4,11 @@
 
 add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/activate_midi_device.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/add_bus.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/external_audio_device_actions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/control_midi_assignment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/deactivate_midi_device.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_bus.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/device_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/engine_action.h
@@ -40,11 +39,9 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/save_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/save_session.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/scan_ladspa_fx_plugins.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_bus_channel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_period_count.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_period_size.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/select_sample_rate.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_device_bus_name.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_float_parameter_normalized.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/set_parameter_value.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/update_parameter_values.h
@@ -139,12 +136,11 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui_parameter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ui_parameter_descriptors_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/activate_midi_device.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/add_bus.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/external_audio_device_actions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/apply_session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/control_midi_assignment.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/deactivate_midi_device.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_bus.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/delete_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/fx_chain_actions.cpp
@@ -159,8 +155,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/reset_fx_parameter_to_default_value.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/root_view_actions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/scan_ladspa_fx_plugins.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/select_bus_channel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_device_bus_name.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_float_parameter_normalized.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/set_parameter_value.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/actions/update_parameter_values.cpp

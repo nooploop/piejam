@@ -113,19 +113,19 @@ auto period_counts(
         -> audio::period_counts_t;
 auto period_counts_from_state(state const&) -> audio::period_counts_t;
 
-auto add_device_bus(
+auto add_external_audio_device(
         state&,
         std::string const& name,
         io_direction,
         audio::bus_type,
-        channel_index_pair const&) -> external_audio::bus_id;
+        channel_index_pair const&) -> external_audio::device_id;
 
 auto add_mixer_channel(state&, std::string name, audio::bus_type)
         -> mixer::channel_id;
 
 void remove_mixer_channel(state&, mixer::channel_id);
 
-void remove_device_bus(state&, external_audio::bus_id);
+void remove_external_audio_device(state&, external_audio::device_id);
 
 auto insert_internal_fx_module(
         state&,
