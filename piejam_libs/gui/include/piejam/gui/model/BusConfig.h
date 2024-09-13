@@ -6,7 +6,7 @@
 
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
-#include <piejam/runtime/device_io_fwd.h>
+#include <piejam/runtime/external_audio_fwd.h>
 
 namespace piejam::gui::model
 {
@@ -27,7 +27,7 @@ public:
     BusConfig(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::device_io::bus_id);
+            runtime::external_audio::bus_id);
 
     auto name() const noexcept -> QString const&
     {
@@ -120,7 +120,7 @@ signals:
 private:
     void onSubscribe() override;
 
-    runtime::device_io::bus_id m_bus_id;
+    runtime::external_audio::bus_id m_bus_id;
 
     QString m_name;
     bool m_mono{true};

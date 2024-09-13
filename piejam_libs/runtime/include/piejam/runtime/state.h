@@ -18,7 +18,7 @@
 #include <piejam/npos.h>
 #include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/channel_index_pair.h>
-#include <piejam/runtime/device_io.h>
+#include <piejam/runtime/external_audio.h>
 #include <piejam/runtime/fx/ladspa_instances.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
@@ -54,7 +54,7 @@ struct state
     audio::period_size period_size{};
     audio::period_count period_count{};
 
-    device_io::state device_io_state;
+    external_audio::state device_io_state;
 
     boxed_vector<midi::device_id_t> midi_inputs;
     box<midi_devices_t> midi_devices;
@@ -118,14 +118,14 @@ auto add_device_bus(
         std::string const& name,
         io_direction,
         audio::bus_type,
-        channel_index_pair const&) -> device_io::bus_id;
+        channel_index_pair const&) -> external_audio::bus_id;
 
 auto add_mixer_channel(state&, std::string name, audio::bus_type)
         -> mixer::channel_id;
 
 void remove_mixer_channel(state&, mixer::channel_id);
 
-void remove_device_bus(state&, device_io::bus_id);
+void remove_device_bus(state&, external_audio::bus_id);
 
 auto insert_internal_fx_module(
         state&,

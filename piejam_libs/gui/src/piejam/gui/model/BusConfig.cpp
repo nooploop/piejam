@@ -15,7 +15,7 @@ namespace piejam::gui::model
 BusConfig::BusConfig(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::device_io::bus_id bus_id)
+        runtime::external_audio::bus_id bus_id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_bus_id(bus_id)
 {
@@ -62,7 +62,7 @@ BusConfig::changeName(QString const& name)
 static void
 changeChannel(
         runtime::store_dispatch dispatch,
-        runtime::device_io::bus_id bus_id,
+        runtime::external_audio::bus_id bus_id,
         audio::bus_channel const bus_channel,
         unsigned const channel_index)
 {

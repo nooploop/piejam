@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/runtime/device_io_fwd.h>
+#include <piejam/runtime/external_audio_fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>

@@ -7,7 +7,7 @@
 #include <piejam/boxed_string.h>
 #include <piejam/default.h>
 #include <piejam/fwd.h>
-#include <piejam/runtime/device_io_fwd.h>
+#include <piejam/runtime/external_audio_fwd.h>
 
 #include <variant>
 #include <vector>
@@ -24,7 +24,7 @@ using missing_device_address = boxed_string;
 using io_address_t = std::variant<
         default_t,
         missing_device_address,
-        device_io::bus_id,
+        external_audio::bus_id,
         channel_id>;
 
 enum class io_socket

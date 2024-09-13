@@ -10,7 +10,7 @@
 #include <piejam/gui/model/fwd.h>
 
 #include <piejam/audio/types.h>
-#include <piejam/runtime/device_io_fwd.h>
+#include <piejam/runtime/external_audio_fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 

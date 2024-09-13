@@ -50,9 +50,10 @@ default_channels(state const& st, io_direction io_dir, audio::bus_type bus_type)
                                    ? *st.device_io_state.inputs
                                    : *st.device_io_state.outputs;
 
-    for (device_io::bus_id const bus_id : bus_list)
+    for (external_audio::bus_id const bus_id : bus_list)
     {
-        device_io::bus const* const bus = st.device_io_state.buses.find(bus_id);
+        external_audio::bus const* const bus =
+                st.device_io_state.buses.find(bus_id);
         BOOST_ASSERT(bus);
         if (auto ch = bus->channels.left; ch != npos)
         {

@@ -436,9 +436,9 @@ add_device_bus(
         std::string const& name,
         io_direction const io_dir,
         audio::bus_type const bus_type,
-        channel_index_pair const& channels) -> device_io::bus_id
+        channel_index_pair const& channels) -> external_audio::bus_id
 {
-    auto id = st.device_io_state.buses.add(device_io::bus{
+    auto id = st.device_io_state.buses.add(external_audio::bus{
             .name = box_(name),
             .bus_type = io_dir == io_direction::input ? bus_type
                                                       : audio::bus_type::stereo,
@@ -566,7 +566,7 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
 }
 
 void
-remove_device_bus(state& st, device_io::bus_id const device_bus_id)
+remove_device_bus(state& st, external_audio::bus_id const device_bus_id)
 {
     auto const name = st.device_io_state.buses[device_bus_id].name;
 

@@ -58,9 +58,9 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/mute_solo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/solo_switch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/components/stream.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/device_io_fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/dynamic_key_shared_object_map.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/external_audio.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/external_audio_fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/fx/get_parameter_name.h
@@ -73,6 +73,8 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/generic_action_visitor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/internal_fx_component_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/internal_fx_module_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx/ladspa_fx_component.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx/ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/locations.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/middleware_functors.h
@@ -84,8 +86,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/midi_input_controller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/mixer_fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx/ladspa_fx_component.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/ladspa_fx/ladspa_fx_module.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/float_normalize.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/parameter/fwd.h
@@ -172,13 +172,13 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/mute_solo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/solo_switch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/components/stream.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx/ladspa_fx_component.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx/ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_assignment_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_control_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/midi_input_controller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/mixer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx/ladspa_fx_component.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/ladspa_fx/ladspa_fx_module.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/parameter_value_to_string.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp

@@ -9,9 +9,9 @@
 #include <piejam/entity_map.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
-#include <piejam/runtime/device_io_fwd.h>
+#include <piejam/runtime/external_audio_fwd.h>
 
-namespace piejam::runtime::device_io
+namespace piejam::runtime::external_audio
 {
 
 struct bus
@@ -34,4 +34,4 @@ struct state
     box<bus_list_t> outputs;
 };
 
-} // namespace piejam::runtime::device_io
+} // namespace piejam::runtime::external_audio

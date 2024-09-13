@@ -30,8 +30,8 @@
 #include <piejam/runtime/components/mixer_channel.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/components/solo_switch.h>
-#include <piejam/runtime/device_io.h>
 #include <piejam/runtime/dynamic_key_shared_object_map.h>
+#include <piejam/runtime/external_audio.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter_processor_factory.h>
@@ -365,7 +365,7 @@ void
 connect_mixer_input(
         audio::engine::graph& g,
         [[maybe_unused]] mixer::channels_t const& channels,
-        device_io::buses_t const& device_buses,
+        external_audio::buses_t const& device_buses,
         component_map const& comps,
         std::span<audio::engine::input_processor> const input_procs,
         mixer::channel const& mixer_channel,
@@ -375,8 +375,8 @@ connect_mixer_input(
             boost::hof::match(
                     [](default_t) {},
                     [](mixer::missing_device_address const&) {},
-                    [&](device_io::bus_id const device_bus_id) {
-                        device_io::bus const& device_bus =
+                    [&](external_audio::bus_id const device_bus_id) {
+                        external_audio::bus const& device_bus =
                                 device_buses[device_bus_id];
 
                         if (device_bus.channels.left != npos)
@@ -420,7 +420,7 @@ void
 connect_mixer_output(
         audio::engine::graph& g,
         mixer::channels_t const& channels,
-        device_io::buses_t const& device_buses,
+        external_audio::buses_t const& device_buses,
         component_map const& comps,
         std::span<audio::engine::output_processor> const output_procs,
         std::span<processor_ptr> const output_clip_procs,
@@ -430,8 +430,8 @@ connect_mixer_output(
     std::visit(
             boost::hof::match(
                     [](default_t) {},
-                    [&](device_io::bus_id const device_bus_id) {
-                        device_io::bus const& device_bus =
+                    [&](external_audio::bus_id const device_bus_id) {
+                        external_audio::bus const& device_bus =
                                 device_buses[device_bus_id];
 
                         auto get_clip_proc = [&](std::size_t const ch)
@@ -495,7 +495,7 @@ auto
 make_graph(
         component_map const& comps,
         mixer::channels_t const& channels,
-        device_io::buses_t const& device_buses,
+        external_audio::buses_t const& device_buses,
         std::span<audio::engine::input_processor> const input_procs,
         std::span<audio::engine::output_processor> const output_procs,
         std::span<processor_ptr> const output_clip_procs,

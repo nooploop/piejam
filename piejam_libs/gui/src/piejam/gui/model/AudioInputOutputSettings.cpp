@@ -20,7 +20,7 @@ namespace piejam::gui::model
 struct AudioInputOutputSettings::Impl
 {
     io_direction ioDir;
-    runtime::device_io::bus_list_t busIds;
+    runtime::external_audio::bus_list_t busIds;
     BusConfigsList busConfigs;
 };
 
@@ -59,12 +59,12 @@ AudioInputOutputSettings::onSubscribe()
             });
 
     observe(selectors::make_device_bus_list_selector(m_impl->ioDir),
-            [this](box<runtime::device_io::bus_list_t> const& bus_ids) {
+            [this](box<runtime::external_audio::bus_list_t> const& bus_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(m_impl->busIds, *bus_ids),
                         piejam::gui::generic_list_model_edit_script_executor{
                                 m_impl->busConfigs,
-                                [this](runtime::device_io::bus_id bus_id) {
+                                [this](runtime::external_audio::bus_id bus_id) {
                                     return std::make_unique<BusConfig>(
                                             dispatch(),
                                             state_change_subscriber(),

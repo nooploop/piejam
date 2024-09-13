@@ -32,10 +32,10 @@ add_mixer_channel::reduce(state& st) const
                                                mixer::channel_id,
                                                mixer::channel const&
                                                        mixer_channel) {
-                        return std::holds_alternative<device_io::bus_id>(
+                        return std::holds_alternative<external_audio::bus_id>(
                                        mixer_channel.in) &&
-                               std::get<device_io::bus_id>(mixer_channel.in) ==
-                                       bus_id;
+                               std::get<external_audio::bus_id>(
+                                       mixer_channel.in) == bus_id;
                     }));
 
             if (it == st.mixer_state.channels.end() &&

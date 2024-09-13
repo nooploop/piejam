@@ -98,8 +98,8 @@ struct update_devices final
         st.device_io_state.buses.update(
                 *st.device_io_state.inputs,
                 [num_in_channels = input.hw_params->num_channels](
-                        device_io::bus_id,
-                        device_io::bus& bus) {
+                        external_audio::bus_id,
+                        external_audio::bus& bus) {
                     update_channel(bus.channels.left, num_in_channels);
                     update_channel(bus.channels.right, num_in_channels);
                 });
@@ -107,8 +107,8 @@ struct update_devices final
         st.device_io_state.buses.update(
                 *st.device_io_state.outputs,
                 [num_out_channels = output.hw_params->num_channels](
-                        device_io::bus_id,
-                        device_io::bus& bus) {
+                        external_audio::bus_id,
+                        external_audio::bus& bus) {
                     update_channel(bus.channels.left, num_out_channels);
                     update_channel(bus.channels.right, num_out_channels);
                 });

@@ -13,7 +13,7 @@ namespace piejam::runtime::actions
 void
 set_device_bus_name::reduce(state& st) const
 {
-    st.device_io_state.buses.update(bus_id, [this](device_io::bus& bus) {
+    st.device_io_state.buses.update(bus_id, [this](external_audio::bus& bus) {
         bus.name = name;
     });
 

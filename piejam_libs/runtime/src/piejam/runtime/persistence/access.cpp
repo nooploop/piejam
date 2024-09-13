@@ -64,9 +64,9 @@ save_app_config(
                     std::ranges::transform(
                             bus_ids,
                             std::back_inserter(configs),
-                            [&buses](device_io::bus_id const& ch_id)
+                            [&buses](external_audio::bus_id const& ch_id)
                                     -> persistence::bus_config {
-                                device_io::bus const& bus = buses[ch_id];
+                                external_audio::bus const& bus = buses[ch_id];
                                 return {bus.name, bus.bus_type, bus.channels};
                             });
                 };
@@ -263,8 +263,8 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 .type = session::mixer_io_type::channel,
                                 .name = mixer_channel.name};
                     },
-                    [&st](device_io::bus_id const& bus_id) {
-                        device_io::bus const& bus =
+                    [&st](external_audio::bus_id const& bus_id) {
+                        external_audio::bus const& bus =
                                 st.device_io_state.buses[bus_id];
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,

@@ -16,7 +16,7 @@
 #include <piejam/io_direction.h>
 #include <piejam/midi/device_id.h>
 #include <piejam/reselect/fwd.h>
-#include <piejam/runtime/device_io_fwd.h>
+#include <piejam/runtime/external_audio_fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/midi_assignment_id.h>
@@ -63,7 +63,7 @@ extern selector<box<sound_card_choice>> const select_output_sound_card;
 auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 
 auto make_device_bus_list_selector(io_direction)
-        -> selector<box<device_io::bus_list_t>>;
+        -> selector<box<external_audio::bus_list_t>>;
 
 extern selector<boxed_vector<mixer::channel_id>> const
         select_mixer_input_channels;
@@ -88,7 +88,7 @@ auto make_mixer_channel_rms_level_parameter_selector(mixer::channel_id)
 
 struct mixer_device_route
 {
-    device_io::bus_id bus_id;
+    external_audio::bus_id bus_id;
     std::string name;
 
     auto operator==(mixer_device_route const&) const noexcept -> bool = default;
@@ -136,7 +136,8 @@ auto make_mixer_devices_selector(audio::bus_type, mixer::io_socket)
 auto make_mixer_channels_selector(mixer::channel_id, mixer::io_socket)
         -> selector<boxed_vector<mixer_channel_route>>;
 
-auto make_device_bus_name_selector(device_io::bus_id) -> selector<boxed_string>;
+auto make_device_bus_name_selector(external_audio::bus_id)
+        -> selector<boxed_string>;
 
 auto make_mixer_channel_name_selector(mixer::channel_id)
         -> selector<boxed_string>;
@@ -146,9 +147,10 @@ auto make_mixer_channel_can_move_left_selector(mixer::channel_id)
 auto make_mixer_channel_can_move_right_selector(mixer::channel_id)
         -> selector<bool>;
 
-auto make_bus_type_selector(device_io::bus_id) -> selector<audio::bus_type>;
+auto make_bus_type_selector(external_audio::bus_id)
+        -> selector<audio::bus_type>;
 
-auto make_bus_channel_selector(device_io::bus_id, audio::bus_channel)
+auto make_bus_channel_selector(external_audio::bus_id, audio::bus_channel)
         -> selector<std::size_t>;
 
 extern selector<boxed_vector<midi::device_id_t>> const
