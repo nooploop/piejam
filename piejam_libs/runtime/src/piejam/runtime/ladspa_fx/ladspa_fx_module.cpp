@@ -77,8 +77,11 @@ private:
                                                           from_normalized_log
                                                 : &parameter::
                                                           from_normalized_linear},
-                        {.name = port_desc.name,
-                         .value_to_string = &float_parameter_value_to_string}));
+                        {
+                                .name = box_(port_desc.name),
+                                .value_to_string =
+                                        &float_parameter_value_to_string,
+                        }));
     }
 
     void operator()(
@@ -97,8 +100,11 @@ private:
                                 .default_value = p.default_value,
                                 .min = p.min,
                                 .max = p.max},
-                        {.name = port_desc.name,
-                         .value_to_string = &int_parameter_value_to_string}));
+                        {
+                                .name = box_(port_desc.name),
+                                .value_to_string =
+                                        &int_parameter_value_to_string,
+                        }));
     }
 
     void operator()(
@@ -112,8 +118,11 @@ private:
                 port_desc.index,
                 ui_params_factory.make_parameter(
                         bool_parameter{.default_value = p.default_value},
-                        {.name = port_desc.name,
-                         .value_to_string = &bool_parameter_value_to_string}));
+                        {
+                                .name = box_(port_desc.name),
+                                .value_to_string =
+                                        &bool_parameter_value_to_string,
+                        }));
     }
 
     parameters_map& m_params;
@@ -127,16 +136,16 @@ make_module(
         ladspa::instance_id instance_id,
         std::string const& name,
         audio::bus_type const bus_type,
-        std::span<const ladspa::port_descriptor> const control_inputs,
+        std::span<ladspa::port_descriptor const> const control_inputs,
         parameters_map& params,
         ui_parameter_descriptors_map& ui_params) -> fx::module
 {
     return fx::module{
             .fx_instance_id = instance_id,
-            .name = name,
+            .name = box_(name),
             .bus_type = bus_type,
-            .parameters =
-                    make_module_parameters{params, ui_params}(control_inputs),
+            .parameters = box_(
+                    make_module_parameters{params, ui_params}(control_inputs)),
             .streams = {}};
 }
 

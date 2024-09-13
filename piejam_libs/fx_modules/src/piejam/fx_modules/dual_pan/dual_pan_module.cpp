@@ -30,53 +30,44 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
-            .name = "Dual Pan"s,
+            .name = box_("Dual Pan"s),
             .bus_type = args.bus_type,
-            .parameters =
-                    runtime::fx::module_parameters{
-                            {
-                                    to_underlying(parameter_key::left_pan),
-                                    ui_params_factory.make_parameter(
-                                            runtime::float_parameter{
-                                                    .default_value = -1.f,
-                                                    .min = -1.f,
-                                                    .max = 1.f,
-                                                    .to_normalized =
-                                                            &runtime::parameter::
-                                                                    to_normalized_linear,
-                                                    .from_normalized =
-                                                            &runtime::parameter::
-                                                                    from_normalized_linear,
-                                            },
-                                            {
-                                                    .name = "Left Pan"s,
-                                                    .value_to_string =
-                                                            &runtime::
-                                                                    float_parameter_value_to_string,
-                                            }),
-                            },
-                            {
-                                    to_underlying(parameter_key::right_pan),
-                                    ui_params_factory.make_parameter(
-                                            runtime::float_parameter{
-                                                    .default_value = 1.f,
-                                                    .min = -1.f,
-                                                    .max = 1.f,
-                                                    .to_normalized =
-                                                            &runtime::parameter::
-                                                                    to_normalized_linear,
-                                                    .from_normalized =
-                                                            &runtime::parameter::
-                                                                    from_normalized_linear,
-                                            },
-                                            {
-                                                    .name = "Right Pan"s,
-                                                    .value_to_string =
-                                                            &runtime::
-                                                                    float_parameter_value_to_string,
-                                            }),
-                            },
-                    },
+            .parameters = box_(runtime::fx::module_parameters{
+                    {to_underlying(parameter_key::left_pan),
+                     ui_params_factory.make_parameter(
+                             runtime::float_parameter{
+                                     .default_value = -1.f,
+                                     .min = -1.f,
+                                     .max = 1.f,
+                                     .to_normalized =
+                                             &runtime::parameter::
+                                                     to_normalized_linear,
+                                     .from_normalized =
+                                             &runtime::parameter::
+                                                     from_normalized_linear,
+                             },
+                             {.name = box_("Left Pan"s),
+                              .value_to_string =
+                                      &runtime::
+                                              float_parameter_value_to_string})},
+                    {to_underlying(parameter_key::right_pan),
+                     ui_params_factory.make_parameter(
+                             runtime::float_parameter{
+                                     .default_value = 1.f,
+                                     .min = -1.f,
+                                     .max = 1.f,
+                                     .to_normalized =
+                                             &runtime::parameter::
+                                                     to_normalized_linear,
+                                     .from_normalized =
+                                             &runtime::parameter::
+                                                     from_normalized_linear,
+                             },
+                             {.name = box_("Right Pan"s),
+                              .value_to_string =
+                                      &runtime::
+                                              float_parameter_value_to_string})},
+            }),
             .streams = {}};
 }
 

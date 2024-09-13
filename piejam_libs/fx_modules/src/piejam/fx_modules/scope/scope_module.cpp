@@ -180,176 +180,150 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
-            .name = "Scope"s,
+            .name = box_("Scope"s),
             .bus_type = args.bus_type,
-            .parameters =
-                    runtime::fx::module_parameters{
-                            {to_underlying(parameter_key::mode),
-                             ui_params_factory.make_parameter(
-                                     runtime::int_parameter{
-                                             .default_value = bus_type_to(
-                                                     args.bus_type,
-                                                     to_underlying(
-                                                             mode::trigger),
-                                                     to_underlying(
-                                                             mode::trigger_a)),
-                                             .min = to_underlying(mode::_min),
-                                             .max = bus_type_to(
-                                                     args.bus_type,
-                                                     to_underlying(
-                                                             mode::trigger),
-                                                     to_underlying(
-                                                             mode::trigger_b))},
-                                     {.name = "Mode"s,
-                                      .value_to_string =
-                                              to_mode_string(args.bus_type)})},
-                            {to_underlying(parameter_key::trigger_slope),
-                             ui_params_factory.make_parameter(
-                                     runtime::int_parameter{
-                                             .default_value = to_underlying(
-                                                     trigger_slope::
-                                                             rising_edge),
-                                             .min = to_underlying(
-                                                     trigger_slope::_min),
-                                             .max = to_underlying(
-                                                     trigger_slope::_max)},
-                                     {.name = "Slope"s,
-                                      .value_to_string =
-                                              &to_trigger_slope_string})},
-                            {to_underlying(parameter_key::trigger_level),
-                             ui_params_factory.make_parameter(
-                                     runtime::float_parameter{
-                                             .default_value = 0.f,
-                                             .min = -1.f,
-                                             .max = 1.f,
-                                             .to_normalized =
-                                                     &runtime::parameter::
-                                                             to_normalized_linear,
-                                             .from_normalized =
-                                                     &runtime::parameter::
-                                                             from_normalized_linear},
-                                     {.name = "Trigger Level"s,
-                                      .value_to_string =
-                                              &runtime::
-                                                      float_parameter_value_to_string})},
-                            {to_underlying(parameter_key::hold_time),
-                             ui_params_factory.make_parameter(
-                                     runtime::float_parameter{
-                                             .default_value = 80.f,
-                                             .min = 16.f,
-                                             .max = 1600.f,
-                                             .to_normalized =
-                                                     &runtime::parameter::
-                                                             to_normalized_linear,
-                                             .from_normalized =
-                                                     &runtime::parameter::
-                                                             from_normalized_linear},
-                                     {.name = "Hold Time"s,
-                                      .value_to_string =
-                                              &to_hold_time_string})},
-                            {to_underlying(parameter_key::waveform_window_size),
-                             ui_params_factory.make_parameter(
-                                     runtime::int_parameter{
-                                             .default_value = to_underlying(
-                                                     window_size::large),
-                                             .min = to_underlying(
-                                                     window_size::_min),
-                                             .max = to_underlying(
-                                                     window_size::_max)},
-                                     {.name = "Window Size"s,
-                                      .value_to_string =
-                                              &to_window_size_string})},
-                            {to_underlying(parameter_key::scope_window_size),
-                             ui_params_factory.make_parameter(
-                                     runtime::int_parameter{
-                                             .default_value = to_underlying(
-                                                     window_size::very_small),
-                                             .min = to_underlying(
-                                                     window_size::_min),
-                                             .max = to_underlying(
-                                                     window_size::_max)},
-                                     {.name = "Window Size"s,
-                                      .value_to_string =
-                                              &to_window_size_string})},
-                            {to_underlying(parameter_key::stream_a_active),
-                             ui_params_factory.make_parameter(
-                                     runtime::bool_parameter{
-                                             .default_value = true},
-                                     {.name = "Stream A Active"s,
-                                      .value_to_string =
-                                              &runtime::
-                                                      bool_parameter_value_to_string})},
-                            {to_underlying(parameter_key::stream_b_active),
-                             ui_params_factory.make_parameter(
-                                     runtime::bool_parameter{
-                                             .default_value = false},
-                                     {.name = "Stream B Active"s,
-                                      .value_to_string =
-                                              &runtime::
-                                                      bool_parameter_value_to_string})},
-                            {to_underlying(parameter_key::channel_a),
-                             ui_params_factory.make_parameter(
-                                     runtime::int_parameter{
-                                             .default_value = to_underlying(
-                                                     stereo_channel::left),
-                                             .min = to_underlying(
-                                                     stereo_channel::_min),
-                                             .max = to_underlying(
-                                                     stereo_channel::_max)},
-                                     {.name = "Channel A"s,
-                                      .value_to_string =
-                                              &to_stereo_channel_string})},
-                            {to_underlying(parameter_key::channel_b),
-                             ui_params_factory.make_parameter(
-                                     runtime::int_parameter{
-                                             .default_value = to_underlying(
-                                                     stereo_channel::right),
-                                             .min = to_underlying(
-                                                     stereo_channel::_min),
-                                             .max = to_underlying(
-                                                     stereo_channel::_max)},
-                                     {.name = "Channel B"s,
-                                      .value_to_string =
-                                              &to_stereo_channel_string})},
-                            {to_underlying(parameter_key::gain_a),
-                             ui_params_factory.make_parameter(
-                                     runtime::float_parameter{
-                                             .default_value = 1.f,
-                                             .min = dB_ival::min_gain,
-                                             .max = dB_ival::max_gain,
-                                             .to_normalized =
-                                                     dB_ival::to_normalized,
-                                             .from_normalized =
-                                                     dB_ival::from_normalized},
-                                     {.name = "Gain A"s,
-                                      .value_to_string = &to_dB_string})},
-                            {to_underlying(parameter_key::gain_b),
-                             ui_params_factory.make_parameter(
-                                     runtime::float_parameter{
-                                             .default_value = 1.f,
-                                             .min = dB_ival::min_gain,
-                                             .max = dB_ival::max_gain,
-                                             .to_normalized =
-                                                     dB_ival::to_normalized,
-                                             .from_normalized =
-                                                     dB_ival::from_normalized},
-                                     {.name = "Gain B"s,
-                                      .value_to_string = &to_dB_string})},
-                            {to_underlying(parameter_key::freeze),
-                             ui_params_factory
-                                     .make_parameter(
-                                             runtime::bool_parameter{
-                                                     .default_value = false},
-                                             {.name = "Freeze"s,
-                                              .value_to_string =
-                                                      &runtime::
-                                                              bool_parameter_value_to_string})},
-                    },
-            .streams = runtime::fx::module_streams{
+            .parameters = box_(runtime::fx::module_parameters{
+                    {to_underlying(parameter_key::mode),
+                     ui_params_factory.make_parameter(
+                             runtime::int_parameter{
+                                     .default_value = bus_type_to(
+                                             args.bus_type,
+                                             to_underlying(mode::trigger),
+                                             to_underlying(mode::trigger_a)),
+                                     .min = to_underlying(mode::_min),
+                                     .max = bus_type_to(
+                                             args.bus_type,
+                                             to_underlying(mode::trigger),
+                                             to_underlying(mode::trigger_b))},
+                             {.name = box_("Mode"s),
+                              .value_to_string =
+                                      to_mode_string(args.bus_type)})},
+                    {to_underlying(parameter_key::trigger_slope),
+                     ui_params_factory.make_parameter(
+                             runtime::int_parameter{
+                                     .default_value = to_underlying(
+                                             trigger_slope::rising_edge),
+                                     .min = to_underlying(trigger_slope::_min),
+                                     .max = to_underlying(trigger_slope::_max)},
+                             {.name = box_("Slope"s),
+                              .value_to_string = &to_trigger_slope_string})},
+                    {to_underlying(parameter_key::trigger_level),
+                     ui_params_factory.make_parameter(
+                             runtime::float_parameter{
+                                     .default_value = 0.f,
+                                     .min = -1.f,
+                                     .max = 1.f,
+                                     .to_normalized =
+                                             &runtime::parameter::
+                                                     to_normalized_linear,
+                                     .from_normalized =
+                                             &runtime::parameter::
+                                                     from_normalized_linear},
+                             {.name = box_("Trigger Level"s),
+                              .value_to_string =
+                                      &runtime::
+                                              float_parameter_value_to_string})},
+                    {to_underlying(parameter_key::hold_time),
+                     ui_params_factory.make_parameter(
+                             runtime::float_parameter{
+                                     .default_value = 80.f,
+                                     .min = 16.f,
+                                     .max = 1600.f,
+                                     .to_normalized =
+                                             &runtime::parameter::
+                                                     to_normalized_linear,
+                                     .from_normalized =
+                                             &runtime::parameter::
+                                                     from_normalized_linear},
+                             {.name = box_("Hold Time"s),
+                              .value_to_string = &to_hold_time_string})},
+                    {to_underlying(parameter_key::waveform_window_size),
+                     ui_params_factory.make_parameter(
+                             runtime::int_parameter{
+                                     .default_value =
+                                             to_underlying(window_size::large),
+                                     .min = to_underlying(window_size::_min),
+                                     .max = to_underlying(window_size::_max)},
+                             {.name = box_("Window Size"s),
+                              .value_to_string = &to_window_size_string})},
+                    {to_underlying(parameter_key::scope_window_size),
+                     ui_params_factory.make_parameter(
+                             runtime::int_parameter{
+                                     .default_value = to_underlying(
+                                             window_size::very_small),
+                                     .min = to_underlying(window_size::_min),
+                                     .max = to_underlying(window_size::_max)},
+                             {.name = box_("Window Size"s),
+                              .value_to_string = &to_window_size_string})},
+                    {to_underlying(parameter_key::stream_a_active),
+                     ui_params_factory.make_parameter(
+                             runtime::bool_parameter{.default_value = true},
+                             {.name = box_("Stream A Active"s),
+                              .value_to_string =
+                                      &runtime::
+                                              bool_parameter_value_to_string})},
+                    {to_underlying(parameter_key::stream_b_active),
+                     ui_params_factory.make_parameter(
+                             runtime::bool_parameter{.default_value = false},
+                             {.name = box_("Stream B Active"s),
+                              .value_to_string =
+                                      &runtime::
+                                              bool_parameter_value_to_string})},
+                    {to_underlying(parameter_key::channel_a),
+                     ui_params_factory.make_parameter(
+                             runtime::int_parameter{
+                                     .default_value = to_underlying(
+                                             stereo_channel::left),
+                                     .min = to_underlying(stereo_channel::_min),
+                                     .max = to_underlying(
+                                             stereo_channel::_max)},
+                             {.name = box_("Channel A"s),
+                              .value_to_string = &to_stereo_channel_string})},
+                    {to_underlying(parameter_key::channel_b),
+                     ui_params_factory.make_parameter(
+                             runtime::int_parameter{
+                                     .default_value = to_underlying(
+                                             stereo_channel::right),
+                                     .min = to_underlying(stereo_channel::_min),
+                                     .max = to_underlying(
+                                             stereo_channel::_max)},
+                             {.name = box_("Channel B"s),
+                              .value_to_string = &to_stereo_channel_string})},
+                    {to_underlying(parameter_key::gain_a),
+                     ui_params_factory.make_parameter(
+                             runtime::float_parameter{
+                                     .default_value = 1.f,
+                                     .min = dB_ival::min_gain,
+                                     .max = dB_ival::max_gain,
+                                     .to_normalized = dB_ival::to_normalized,
+                                     .from_normalized =
+                                             dB_ival::from_normalized},
+                             {.name = box_("Gain A"s),
+                              .value_to_string = &to_dB_string})},
+                    {to_underlying(parameter_key::gain_b),
+                     ui_params_factory.make_parameter(
+                             runtime::float_parameter{
+                                     .default_value = 1.f,
+                                     .min = dB_ival::min_gain,
+                                     .max = dB_ival::max_gain,
+                                     .to_normalized = dB_ival::to_normalized,
+                                     .from_normalized =
+                                             dB_ival::from_normalized},
+                             {.name = box_("Gain B"s),
+                              .value_to_string = &to_dB_string})},
+                    {to_underlying(parameter_key::freeze),
+                     ui_params_factory.make_parameter(
+                             runtime::bool_parameter{.default_value = false},
+                             {.name = box_("Freeze"s),
+                              .value_to_string =
+                                      &runtime::
+                                              bool_parameter_value_to_string})},
+            }),
+            .streams = box_(runtime::fx::module_streams{
                     {to_underlying(stream_key::input),
                      args.streams.add(runtime::audio_stream_buffer(
                              std::in_place,
-                             num_channels(args.bus_type)))}}};
+                             num_channels(args.bus_type)))}})};
 }
 
 } // namespace piejam::fx_modules::scope

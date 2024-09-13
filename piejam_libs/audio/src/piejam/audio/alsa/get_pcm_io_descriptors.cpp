@@ -182,8 +182,8 @@ get_pcm_io_descriptors() -> pcm_io_descriptors
     }
 
     return pcm_io_descriptors{
-            std::move(result.in),
-            std::move(result.out),
+            unique_box_(std::move(result.in)),
+            unique_box_(std::move(result.out)),
     };
 }
 

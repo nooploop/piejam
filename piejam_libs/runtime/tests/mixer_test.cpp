@@ -15,9 +15,11 @@ TEST(mixer_valid_io, test1)
     using testing::ElementsAre;
     using testing::Matches;
 
+    using namespace std::string_literals;
+
     channels_t channels;
     auto bus1 = channels.add(channel{
-            .name = "foo",
+            .name = box_("foo"s),
             .bus_type = audio::bus_type::stereo,
             .volume = {},
             .pan_balance = {},
@@ -28,7 +30,7 @@ TEST(mixer_valid_io, test1)
             .rms_level = {},
     });
     auto bus2 = channels.add(channel{
-            .name = "bar",
+            .name = box_("bar"s),
             .bus_type = audio::bus_type::stereo,
             .volume = {},
             .pan_balance = {},
@@ -57,10 +59,12 @@ TEST(mixer_valid_io, test2)
     using testing::ElementsAre;
     using testing::Matches;
 
+    using namespace std::string_literals;
+
     channels_t channels;
     auto bus1 = channels.add(channel{});
     auto bus2 = channels.add(channel{
-            .name = "foo",
+            .name = box_("foo"s),
             .bus_type = audio::bus_type::stereo,
             .in = bus1,
             .volume = {},

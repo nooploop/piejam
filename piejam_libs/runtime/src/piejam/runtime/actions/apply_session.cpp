@@ -200,7 +200,8 @@ apply_mixer_io(
                 }
                 else
                 {
-                    return mixer::io_address_t(mixer_io.name);
+                    return mixer::io_address_t(
+                            mixer::missing_device_address(mixer_io.name));
                 }
 
             case persistence::session::mixer_io_type::channel:

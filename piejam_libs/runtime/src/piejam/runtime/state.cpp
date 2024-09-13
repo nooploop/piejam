@@ -356,7 +356,7 @@ insert_missing_ladspa_fx_module(
                     std::next(fx_chain.begin(), insert_pos),
                     st.fx_modules.add(fx::module{
                             .fx_instance_id = id,
-                            .name = std::string(name),
+                            .name = box_(std::string(name)),
                             .parameters = {},
                             .streams = {}}));
         });
@@ -433,7 +433,7 @@ add_device_bus(
         channel_index_pair const& channels) -> device_io::bus_id
 {
     auto id = st.device_io_state.buses.add(device_io::bus{
-            .name = name,
+            .name = box_(name),
             .bus_type = io_dir == io_direction::input ? bus_type
                                                       : audio::bus_type::stereo,
             .channels = channels});
@@ -472,9 +472,10 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
         -> mixer::channel_id
 {
     using namespace std::string_literals;
+
     parameter_factory ui_params_factory{st.params, st.ui_params};
     auto bus_id = st.mixer_state.channels.add(mixer::channel{
-            .name = std::move(name),
+            .name = box_(std::move(name)),
             .bus_type = bus_type,
             .in = {},
             .out = st.mixer_state.main,
@@ -485,7 +486,8 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                             .max = 4.f,
                             .to_normalized = &to_normalized_volume,
                             .from_normalized = &from_normalized_volume},
-                    {.name = "Volume", .value_to_string = &volume_to_string}),
+                    {.name = box_("Volume"s),
+                     .value_to_string = &volume_to_string}),
             .pan_balance = ui_params_factory.make_parameter(
                     parameter::float_{
                             .default_value = 0.f,
@@ -494,19 +496,19 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                             .to_normalized = &parameter::to_normalized_linear,
                             .from_normalized =
                                     &parameter::from_normalized_linear},
-                    {.name = bus_type_to(bus_type, "Pan"s, "Balance"s),
+                    {.name = box_(bus_type_to(bus_type, "Pan"s, "Balance"s)),
                      .value_to_string = &float_parameter_value_to_string}),
             .record = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
-                    {.name = "Record",
+                    {.name = box_("Record"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .mute = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
-                    {.name = "Mute",
+                    {.name = box_("Mute"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .solo = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
-                    {.name = "Solo",
+                    {.name = box_("Solo"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .peak_level = parameter_factory{st.params}.make_parameter(
                     parameter::stereo_level{}),

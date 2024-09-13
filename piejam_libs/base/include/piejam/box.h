@@ -12,7 +12,10 @@
 #include <memory>
 #include <utility>
 
-namespace piejam::detail
+namespace piejam
+{
+
+namespace detail
 {
 
 struct box_equal
@@ -66,7 +69,7 @@ public:
     }
 
     template <convertible_to_box_value<T const> U>
-    box(U&& v)
+    explicit box(U&& v)
         : box(std::in_place, std::forward<U>(v))
     {
     }
@@ -77,16 +80,16 @@ public:
     {
     }
 
-    box(box<T, Eq> const&) = default;
+    box(box const&) = default;
 
-    box(box<T, Eq>&& other) noexcept
+    box(box&& other) noexcept
         : m_value{other.m_value}
     {
     }
 
-    auto operator=(box<T, Eq> const&) -> box<T, Eq>& = default;
+    auto operator=(box const&) -> box& = default;
 
-    auto operator=(box<T, Eq>&& other) noexcept -> box<T, Eq>&
+    auto operator=(box&& other) noexcept -> box&
     {
         m_value = other.m_value;
         return *this;
@@ -146,4 +149,34 @@ private:
     std::shared_ptr<T const> m_value;
 };
 
-} // namespace piejam::detail
+template <class T, class Eq>
+auto
+operator==(box<T, Eq> const& lhs, T const& rhs) -> bool
+{
+    return lhs.get() == rhs;
+}
+
+template <class T, class Eq>
+auto
+operator==(T const& lhs, box<T, Eq> const& rhs) -> bool
+{
+    return lhs == rhs.get();
+}
+
+} // namespace detail
+
+template <class T>
+auto
+box_(T&& t)
+{
+    return box<std::decay_t<T>>{std::forward<T>(t)};
+};
+
+template <class T>
+auto
+unique_box_(T&& t)
+{
+    return unique_box<std::decay_t<T>>{std::forward<T>(t)};
+}
+
+} // namespace piejam

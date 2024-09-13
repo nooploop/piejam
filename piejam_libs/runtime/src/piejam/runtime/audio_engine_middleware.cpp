@@ -181,12 +181,13 @@ make_update_devices_action(
                                       : npos;
         return selected_device{
                 .index = found_index,
-                .hw_params = found_index != npos
-                                     ? device_manager.hw_params(
-                                               new_devices[found_index],
-                                               nullptr,
-                                               nullptr)
-                                     : audio::pcm_hw_params{}};
+                .hw_params = unique_box_(
+                        found_index != npos ? device_manager.hw_params(
+                                                      new_devices[found_index],
+                                                      nullptr,
+                                                      nullptr)
+                                            : audio::pcm_hw_params{}),
+        };
     };
 
     next_action.input = next_device(

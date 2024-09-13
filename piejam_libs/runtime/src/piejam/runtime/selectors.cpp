@@ -248,7 +248,7 @@ static struct
                         .name = *device_bus->name});
             }
         }
-        return {std::move(result)};
+        return box_(std::move(result));
     }
 
     auto operator()(audio::bus_type const bus_type) const
@@ -271,13 +271,13 @@ static struct
     {
         auto valid_sources =
                 mixer::valid_channels(io_socket, channels, channel_id);
-        return algorithm::transform_to_vector(
+        return box_(algorithm::transform_to_vector(
                 valid_sources,
                 [&](auto const& id) {
                     return mixer_channel_route{
                             .channel_id = id,
                             .name = channels[id].name};
-                });
+                }));
     }
 
     auto operator()(
@@ -325,13 +325,14 @@ struct
         if (!mixer_channel)
         {
             static boxed_string const s_empty{"-"};
-            return selected_route{selected_route::state_t::invalid, s_empty};
+            return box_(
+                    selected_route{selected_route::state_t::invalid, s_empty});
         }
 
         auto const default_name =
                 get_default_route_name(mixer_channel->bus_type, io_socket);
 
-        return std::visit(
+        return box_(std::visit(
                 boost::hof::match(
                         [&](default_t) {
                             return selected_route{
@@ -387,7 +388,7 @@ struct
                                     .state = selected_route::state_t::invalid,
                                     .name = name};
                         }),
-                mixer_channel->get_io_addr(io_socket));
+                mixer_channel->get_io_addr(io_socket)));
     }
 
     auto operator()(
