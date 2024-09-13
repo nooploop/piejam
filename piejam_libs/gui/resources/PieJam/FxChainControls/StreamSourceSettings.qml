@@ -14,7 +14,7 @@ import "../Controls"
 Item {
     id: root
 
-    property var model: null
+    property var model: null // TODO: currently subscribed by parent, possibly needs to be decoupled
 
     QtObject {
         id: private_

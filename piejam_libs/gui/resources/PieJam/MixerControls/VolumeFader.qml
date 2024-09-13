@@ -15,11 +15,10 @@ import "../Controls"
 import "../Util/ColorExt.js" as ColorExt
 import "../Util/DbConvert.js" as DbConvert
 
-Item {
+SubscribableItem {
     id: root
 
-    property var model: null
-    property var scaleData
+    property var scaleData: null
 
     implicitWidth: 50
     implicitHeight: 300
@@ -31,7 +30,7 @@ Item {
 
         padding: 6
 
-        value: root.model ? root.scaleData.dBToPosition(DbConvert.to_dB(root.model.value)) : 0
+        value: root.model && root.scaleData ? root.scaleData.dBToPosition(DbConvert.to_dB(root.model.value)) : 0
 
         orientation: Qt.Vertical
 
@@ -48,7 +47,7 @@ Item {
                     Layout.fillHeight: true
 
                     Repeater {
-                        model: scaleData.ticks
+                        model: root.scaleData ? root.scaleData.ticks : null
 
                         delegate: Label {
                             anchors.left: parent ? parent.left : undefined
@@ -91,7 +90,7 @@ Item {
         }
 
         onMoved: {
-            if (root.model) {
+            if (root.model && root.scaleData) {
                 var newVolume = root.scaleData.dBAt(slider.value)
                 root.model.changeValue(DbConvert.from_dB(newVolume))
                 Info.showParameterValue(root.model)

@@ -45,6 +45,19 @@ toBusType(BusType bt) -> audio::bus_type
     }
 }
 
+template <class T>
+[[nodiscard]] constexpr auto
+busTypeTo(BusType const b, T&& mono_value, T&& stereo_value) -> decltype(auto)
+{
+    switch (b)
+    {
+        case BusType::Mono:
+            return std::forward<T>(mono_value);
+        case BusType::Stereo:
+            return std::forward<T>(stereo_value);
+    }
+}
+
 enum class DFTResolution
 {
     Low,

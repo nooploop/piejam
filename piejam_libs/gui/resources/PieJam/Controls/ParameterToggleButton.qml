@@ -10,10 +10,8 @@ import PieJam.Models 1.0
 
 import ".."
 
-Item {
+SubscribableItem {
     id: root
-
-    property var model: null
 
     property bool flat: false
     property alias text: button.text

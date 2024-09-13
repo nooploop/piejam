@@ -9,6 +9,7 @@ import QtQuick.Layouts 1.15
 
 import PieJam.Items 1.0 as PJItems
 
+import ".."
 import "../Util/DbConvert.js" as DbConvert
 
 Item {
@@ -17,7 +18,7 @@ Item {
     property var peakLevel: null
     property var rmsLevel: null
     property bool muted: false
-    property var scaleData
+    property var scaleData: null
 
     implicitWidth: 56
     implicitHeight: 300
@@ -62,7 +63,7 @@ Item {
             Layout.fillHeight: true
 
             Repeater {
-                model: scaleData.ticks
+                model: root.scaleData ? root.scaleData.ticks : null
 
                 delegate: Label {
                     anchors.left: parent ? parent.left : undefined
@@ -99,8 +100,8 @@ Item {
             Layout.topMargin: 6
             Layout.bottomMargin: 6
 
-            peakLevel: scaleData ? scaleData.dBToPosition(DbConvert.to_dB(private_.peakLevelLeft)) : 0
-            rmsLevel: scaleData ? scaleData.dBToPosition(DbConvert.to_dB(private_.rmsLevelLeft)) : 0
+            peakLevel: root.scaleData ? root.scaleData.dBToPosition(DbConvert.to_dB(private_.peakLevelLeft)) : 0
+            rmsLevel: root.scaleData ? root.scaleData.dBToPosition(DbConvert.to_dB(private_.rmsLevelLeft)) : 0
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
@@ -115,8 +116,8 @@ Item {
             Layout.topMargin: 6
             Layout.bottomMargin: 6
 
-            peakLevel: scaleData ? scaleData.dBToPosition(DbConvert.to_dB(private_.peakLevelRight)) : 0
-            rmsLevel: scaleData ? scaleData.dBToPosition(DbConvert.to_dB(private_.rmsLevelRight)) : 0
+            peakLevel: root.scaleData ? root.scaleData.dBToPosition(DbConvert.to_dB(private_.peakLevelRight)) : 0
+            rmsLevel: root.scaleData ? root.scaleData.dBToPosition(DbConvert.to_dB(private_.rmsLevelRight)) : 0
 
             gradient: root.muted ? mutedLevelGradient : levelGradient
 
@@ -133,5 +134,15 @@ Item {
             color: Material.primaryTextColor
             tickOffset: 6
         }
+    }
+
+    ModelSubscription {
+        target: root.peakLevel
+        subscribed: root.visible
+    }
+
+    ModelSubscription {
+        target: root.rmsLevel
+        subscribed: root.visible
     }
 }

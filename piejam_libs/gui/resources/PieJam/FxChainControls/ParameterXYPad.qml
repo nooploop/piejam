@@ -9,6 +9,7 @@ import QtQuick.Layouts 1.15
 
 import PieJam.Models 1.0
 
+import ".."
 import "../Controls"
 
 Item {
@@ -43,5 +44,15 @@ Item {
             if (private_.paramModelY)
                 private_.paramModelY.changeNormalizedValue(1 - y)
         }
+    }
+
+    ModelSubscription {
+        target: root.modelX
+        subscribed: root.visible
+    }
+
+    ModelSubscription {
+        target: root.modelY
+        subscribed: root.visible
     }
 }

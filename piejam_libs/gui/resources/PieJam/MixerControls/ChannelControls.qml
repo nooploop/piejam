@@ -12,9 +12,9 @@ import "../Controls"
 Item {
     id: root
 
-    property var record: null
-    property var solo: null
-    property var mute: null
+    property alias record: recordButton.model
+    property alias solo: soloButton.model
+    property alias mute: muteButton.model
 
     RowLayout {
         anchors.fill: parent
@@ -22,7 +22,7 @@ Item {
         spacing: 6
 
         ParameterToggleButton {
-            model: root.record
+            id: recordButton
 
             Layout.fillWidth: true
             Layout.preferredHeight: 40
@@ -32,7 +32,7 @@ Item {
         }
 
         ParameterToggleButton {
-            model: root.solo
+            id: soloButton
 
             Layout.fillWidth: true
             Layout.preferredHeight: 40
@@ -42,7 +42,7 @@ Item {
         }
 
         ParameterToggleButton {
-            model: root.mute
+            id: muteButton
 
             Layout.fillWidth: true
             Layout.preferredHeight: 40

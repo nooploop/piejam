@@ -12,10 +12,9 @@ import PieJam.Models 1.0
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
 
-    property var model: null
     property real stepScale: 1
 
     implicitWidth: 96

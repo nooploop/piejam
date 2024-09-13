@@ -15,9 +15,9 @@ Item {
     id: root
 
     property string name: "X"
-    property var activeParam: null
-    property var channelParam: null
-    property var gainParam: null
+    property alias activeParam: activeParamButton.model
+    property alias channelParam: channelParamButton.model
+    property alias gainParam: gainParamButton.model
 
     implicitWidth: 256
     implicitHeight: 40
@@ -29,7 +29,7 @@ Item {
         spacing: 8
 
         ParameterToggleButton {
-            model: root.activeParam
+            id: activeParamButton
 
             Layout.preferredWidth: 32
             Layout.fillHeight: true
@@ -39,14 +39,14 @@ Item {
         }
 
         EnumButtonGroup {
-            model: root.channelParam
+            id: channelParamButton
 
             Layout.preferredWidth: 128
             Layout.fillHeight: true
         }
 
         ParameterQuickSpinBox {
-            model: root.gainParam
+            id: gainParamButton
             stepScale: 1.04167
 
             Layout.preferredWidth: 128

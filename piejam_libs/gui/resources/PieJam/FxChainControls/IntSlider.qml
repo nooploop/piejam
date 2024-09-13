@@ -12,10 +12,9 @@ import PieJam.Models 1.0
 import ".."
 import "../Controls"
 
-Item {
+SubscribableItem {
     id: root
 
-    property var model: null
     property int orientation: Qt.Vertical
     property bool stepButtonsVisible: true
 
