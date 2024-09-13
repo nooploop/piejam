@@ -207,8 +207,10 @@ valid_source_channels(channels_t const& channels, channel_id const ch_id)
 }
 
 auto
-valid_channels(io_socket const s, channels_t const& channels, channel_id const ch_id)
-        -> std::vector<channel_id>
+valid_channels(
+        io_socket const s,
+        channels_t const& channels,
+        channel_id const ch_id) -> std::vector<channel_id>
 {
     switch (s)
     {

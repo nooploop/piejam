@@ -20,7 +20,6 @@ struct ui_parameter_descriptor
     value_to_string_fn value_to_string{};
 };
 
-using ui_parameter_descriptors_map =
-        parameter::map<ui_parameter_descriptor>;
+using ui_parameter_descriptors_map = parameter::map<ui_parameter_descriptor>;
 
 } // namespace piejam::runtime

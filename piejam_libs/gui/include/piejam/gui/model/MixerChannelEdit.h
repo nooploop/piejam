@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <piejam/runtime/mixer_fwd.h>
@@ -32,11 +32,9 @@ class MixerChannelEdit final : public Subscribable<SubscribableModel>
     Q_PROPERTY(bool canMoveRight READ canMoveRight NOTIFY canMoveRightChanged
                        FINAL)
 
-    Q_PROPERTY(piejam::gui::model::AudioRouting* in READ in
-                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::AudioRouting* in READ in CONSTANT FINAL)
 
-    Q_PROPERTY(piejam::gui::model::AudioRouting* out READ out
-                       CONSTANT FINAL)
+    Q_PROPERTY(piejam::gui::model::AudioRouting* out READ out CONSTANT FINAL)
 
 public:
     MixerChannelEdit(

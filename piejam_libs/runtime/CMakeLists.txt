@@ -117,7 +117,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/recorder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/recorder_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/root_view_mode.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_device.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selected_sound_card.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/selectors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/solo_group.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/state.h

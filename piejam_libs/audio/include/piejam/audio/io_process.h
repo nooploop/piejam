@@ -12,10 +12,10 @@
 namespace piejam::audio
 {
 
-class device
+class io_process
 {
 public:
-    virtual ~device() = default;
+    virtual ~io_process() = default;
 
     [[nodiscard]] virtual auto is_open() const noexcept -> bool = 0;
 
@@ -34,6 +34,6 @@ public:
     [[nodiscard]] virtual auto xruns() const noexcept -> std::size_t = 0;
 };
 
-auto make_dummy_device() -> std::unique_ptr<device>;
+auto make_dummy_io_process() -> std::unique_ptr<io_process>;
 
 } // namespace piejam::audio

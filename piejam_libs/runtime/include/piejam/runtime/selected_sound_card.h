@@ -4,19 +4,20 @@
 
 #pragma once
 
-#include <piejam/audio/pcm_hw_params.h>
+#include <piejam/audio/sound_card_hw_params.h>
 #include <piejam/box.h>
 #include <piejam/npos.h>
 
 namespace piejam::runtime
 {
 
-struct selected_device
+struct selected_sound_card
 {
     std::size_t index{npos};
-    unique_box<audio::pcm_hw_params> hw_params;
+    unique_box<audio::sound_card_hw_params> hw_params;
 
-    auto operator==(selected_device const&) const noexcept -> bool = default;
+    auto operator==(selected_sound_card const&) const noexcept
+            -> bool = default;
 };
 
 } // namespace piejam::runtime

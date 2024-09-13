@@ -48,12 +48,12 @@ apply_app_config::reduce(state& st) const
     apply_bus_configs<io_direction::input>(
             st,
             conf.input_bus_config,
-            st.input.hw_params->num_channels);
+            st.selected_io_sound_card.in.hw_params->num_channels);
 
     apply_bus_configs<io_direction::output>(
             st,
             conf.output_bus_config,
-            st.output.hw_params->num_channels);
+            st.selected_io_sound_card.out.hw_params->num_channels);
 
     st.rec_session = conf.rec_session;
 }

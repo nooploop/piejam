@@ -21,7 +21,8 @@ class AudioRouting final : public Subscribable<SubscribableModel>
     Q_OBJECT
 
     Q_PROPERTY(QString defaultName READ defaultName CONSTANT FINAL)
-    Q_PROPERTY(bool defaultIsValid READ defaultIsValid NOTIFY defaultIsValidChanged FINAL)
+    Q_PROPERTY(bool defaultIsValid READ defaultIsValid NOTIFY
+                       defaultIsValidChanged FINAL)
     Q_PROPERTY(SelectedState selectedState READ selectedState NOTIFY
                        selectedStateChanged FINAL)
     Q_PROPERTY(QString selected READ selected NOTIFY selectedChanged FINAL)

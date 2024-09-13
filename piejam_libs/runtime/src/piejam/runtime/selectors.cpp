@@ -22,24 +22,25 @@ namespace piejam::runtime::selectors
 {
 
 static auto get_sample_rate =
-        memo([](unique_box<audio::pcm_hw_params> const& input_hw_params,
-                unique_box<audio::pcm_hw_params> const& output_hw_params,
-                audio::sample_rate const current) -> box<sample_rate_choice> {
-            return {std::in_place,
+        memo([](unique_box<audio::sound_card_hw_params> const& input_hw_params,
+                unique_box<audio::sound_card_hw_params> const& output_hw_params,
+                audio::sample_rate const current) {
+            return box<sample_rate_choice>{
+                    std::in_place,
                     runtime::sample_rates(input_hw_params, output_hw_params),
                     current};
         });
 
 selector<box<sample_rate_choice>> const select_sample_rate([](state const& st) {
     return get_sample_rate(
-            st.input.hw_params,
-            st.output.hw_params,
+            st.selected_io_sound_card.in.hw_params,
+            st.selected_io_sound_card.out.hw_params,
             st.sample_rate);
 });
 
 static auto get_period_size =
-        memo([](unique_box<audio::pcm_hw_params> const& input_hw_params,
-                unique_box<audio::pcm_hw_params> const& output_hw_params,
+        memo([](unique_box<audio::sound_card_hw_params> const& input_hw_params,
+                unique_box<audio::sound_card_hw_params> const& output_hw_params,
                 audio::period_size const current) {
             return box<period_size_choice>{
                     std::in_place,
@@ -49,14 +50,14 @@ static auto get_period_size =
 
 selector<box<period_size_choice>> const select_period_size([](state const& st) {
     return get_period_size(
-            st.input.hw_params,
-            st.output.hw_params,
+            st.selected_io_sound_card.in.hw_params,
+            st.selected_io_sound_card.out.hw_params,
             st.period_size);
 });
 
 static auto get_period_count =
-        memo([](unique_box<audio::pcm_hw_params> const& input_hw_params,
-                unique_box<audio::pcm_hw_params> const& output_hw_params,
+        memo([](unique_box<audio::sound_card_hw_params> const& input_hw_params,
+                unique_box<audio::sound_card_hw_params> const& output_hw_params,
                 audio::period_count const current) {
             return box<period_count_choice>{
                     std::in_place,
@@ -67,8 +68,8 @@ static auto get_period_count =
 selector<box<period_count_choice>> const
         select_period_count([](state const& st) {
             return get_period_count(
-                    st.input.hw_params,
-                    st.output.hw_params,
+                    st.selected_io_sound_card.in.hw_params,
+                    st.selected_io_sound_card.out.hw_params,
                     st.period_count);
         });
 
@@ -79,25 +80,29 @@ selector<float> const select_buffer_latency([](state const& st) {
                    : 0.f;
 });
 
-static auto get_sound_card =
-        memo([](unique_box<std::vector<audio::pcm_descriptor>> const& descs,
-                std::size_t const index) {
+static auto get_sound_card = memo(
+        [](unique_box<std::vector<audio::sound_card_descriptor>> const& descs,
+           std::size_t const index) {
             return box<sound_card_choice>{
                     std::in_place,
                     algorithm::transform_to_vector(
                             descs.get(),
-                            &audio::pcm_descriptor::name),
+                            &audio::sound_card_descriptor::name),
                     index};
         });
 
 selector<box<sound_card_choice>> const
         select_input_sound_card([](state const& st) {
-            return get_sound_card(st.pcm_devices.in, st.input.index);
+            return get_sound_card(
+                    st.io_sound_cards.in,
+                    st.selected_io_sound_card.in.index);
         });
 
 selector<box<sound_card_choice>> const
         select_output_sound_card([](state const& st) {
-            return get_sound_card(st.pcm_devices.out, st.output.index);
+            return get_sound_card(
+                    st.io_sound_cards.out,
+                    st.selected_io_sound_card.out.index);
         });
 
 auto
@@ -108,12 +113,12 @@ make_num_device_channels_selector(io_direction const bd)
     {
         case io_direction::input:
             return selector<std::size_t>([](state const& st) -> std::size_t {
-                return st.input.hw_params->num_channels;
+                return st.selected_io_sound_card.in.hw_params->num_channels;
             });
 
         case io_direction::output:
             return selector<std::size_t>([](state const& st) -> std::size_t {
-                return st.output.hw_params->num_channels;
+                return st.selected_io_sound_card.out.hw_params->num_channels;
             });
     }
 }

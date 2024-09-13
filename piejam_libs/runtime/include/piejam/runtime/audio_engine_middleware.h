@@ -25,8 +25,8 @@ class audio_engine_middleware final
 public:
     audio_engine_middleware(
             thread::configuration const& audio_thread_config,
-            std::span<const thread::configuration> wt_configs,
-            audio::device_manager&,
+            std::span<thread::configuration const> wt_configs,
+            audio::sound_card_manager&,
             ladspa::processor_factory&,
             std::unique_ptr<midi_input_controller>);
     audio_engine_middleware(audio_engine_middleware&&) noexcept = default;
@@ -55,12 +55,12 @@ private:
     thread::configuration m_audio_thread_config;
     std::vector<thread::worker> m_workers;
 
-    audio::device_manager& m_device_manager;
+    audio::sound_card_manager& m_device_manager;
     ladspa::processor_factory& m_ladspa_processor_factory;
     std::unique_ptr<midi_input_controller> m_midi_controller;
 
     std::unique_ptr<audio_engine> m_engine;
-    std::unique_ptr<audio::device> m_device;
+    std::unique_ptr<audio::io_process> m_device;
 };
 
 } // namespace piejam::runtime

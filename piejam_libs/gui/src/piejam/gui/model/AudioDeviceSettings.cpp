@@ -5,7 +5,7 @@
 #include <piejam/gui/model/AudioDeviceSettings.h>
 
 #include <piejam/algorithm/index_of.h>
-#include <piejam/audio/pcm_descriptor.h>
+#include <piejam/audio/sound_card_descriptor.h>
 #include <piejam/gui/model/StringList.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>

@@ -10,9 +10,10 @@
 namespace piejam::audio::alsa
 {
 
-auto
-get_hw_params(pcm_descriptor const&, sample_rate const*, period_size const*)
-        -> pcm_hw_params;
+auto get_hw_params(
+        sound_card_descriptor const&,
+        sample_rate const*,
+        period_size const*) -> sound_card_hw_params;
 
 void set_hw_params(
         system::device&,

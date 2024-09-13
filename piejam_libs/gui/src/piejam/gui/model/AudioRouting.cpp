@@ -35,9 +35,10 @@ AudioRouting::AudioRouting(
                       runtime::selectors::make_mixer_channel_bus_type_selector(
                               id)))}
     , m_defaultName{QString::fromStdString(observe_once(
-              runtime::selectors::make_mixer_channel_default_route_name_selector(
-                      m_impl->bus_type,
-                      io_socket)))}
+              runtime::selectors::
+                      make_mixer_channel_default_route_name_selector(
+                              m_impl->bus_type,
+                              io_socket)))}
 {
 }
 

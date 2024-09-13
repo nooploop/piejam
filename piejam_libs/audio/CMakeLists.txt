@@ -9,8 +9,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/pan_balance.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/components/remap_channels.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/cpu_load_meter.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/device_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/dsp/biquad.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/dsp/biquad_filter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/dsp/envelope_follower.h
@@ -57,6 +55,8 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/value_io_processor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/engine/verify_process_context.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/fwd.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/io_process.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/io_process_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/level_meter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/multichannel_buffer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/multichannel_layout.h
@@ -65,10 +65,7 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_buffer_converter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_convert.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_descriptor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_format.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_hw_params.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_io_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/pcm_sample_type.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/period_count.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/period_size.h
@@ -78,9 +75,12 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/sample_rate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/simd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/smoother.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/sound_card_descriptor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/sound_card_hw_params.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/sound_card_manager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/audio/types.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_pcm_io_descriptors.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_pcm_io_descriptors.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_io_sound_cards.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_io_sound_cards.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_set_hw_params.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/get_set_hw_params.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/alsa/pcm_io.cpp
@@ -94,8 +94,6 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/level_meter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/components/pan_balance.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/cpu_load_meter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/device.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/device_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/clip_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/dag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/export_graph_as_dot.cpp
@@ -113,6 +111,8 @@ add_library(piejam_audio STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/processor_job.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/smoother_processor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/engine/stream_processor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/io_process.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/audio/sound_card_manager.cpp
 )
 
 target_compile_options(piejam_audio PRIVATE -Wall -Wextra -Werror -pedantic-errors)

@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/sound_card_manager.h>
 #include <piejam/fx_modules/init.h>
 #include <piejam/gui/ModelManager.h>
 #include <piejam/gui/init.h>
@@ -61,8 +61,6 @@
 #include <boost/core/demangle.hpp>
 
 #include <filesystem>
-#include <fstream>
-#include <iostream>
 
 namespace
 {
@@ -143,7 +141,7 @@ main(int argc, char* argv[]) -> int
 
     QQuickStyle::setStyle("Material");
 
-    auto audio_device_manager = audio::make_device_manager();
+    auto audio_device_manager = audio::make_sound_card_manager();
     auto midi_device_manager = midi::make_device_manager();
     ladspa::instance_manager_processor_factory ladspa_manager;
 

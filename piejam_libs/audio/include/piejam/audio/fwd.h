@@ -11,15 +11,15 @@ namespace piejam::audio
 
 enum class pcm_format : unsigned;
 
-class device;
-class device_manager;
+class io_process;
+class sound_card_manager;
 class process_thread;
 
-struct pcm_descriptor;
+struct sound_card_descriptor;
 struct pcm_device_config;
-struct pcm_hw_params;
+struct sound_card_hw_params;
 struct pcm_process_config;
-struct pcm_io_config;
+struct io_process_config;
 
 template <class T>
 struct pair;

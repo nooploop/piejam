@@ -37,13 +37,13 @@
 #include <piejam/algorithm/for_each_visit.h>
 #include <piejam/algorithm/index_of.h>
 #include <piejam/algorithm/transform_to_vector.h>
-#include <piejam/audio/device.h>
-#include <piejam/audio/device_manager.h>
 #include <piejam/audio/engine/processor.h>
+#include <piejam/audio/io_process.h>
+#include <piejam/audio/io_process_config.h>
 #include <piejam/audio/multichannel_buffer.h>
-#include <piejam/audio/pcm_descriptor.h>
-#include <piejam/audio/pcm_hw_params.h>
-#include <piejam/audio/pcm_io_config.h>
+#include <piejam/audio/sound_card_descriptor.h>
+#include <piejam/audio/sound_card_hw_params.h>
+#include <piejam/audio/sound_card_manager.h>
 #include <piejam/ladspa/plugin.h>
 #include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/ladspa/port_descriptor.h>
@@ -77,10 +77,10 @@ update_channel(std::size_t& ch, std::size_t const num_chs)
 struct update_devices final
     : ui::cloneable_action<update_devices, reducible_action>
 {
-    unique_box<piejam::audio::pcm_io_descriptors> pcm_devices;
+    piejam::audio::io_sound_cards io_sound_cards;
 
-    selected_device input;
-    selected_device output;
+    selected_sound_card input;
+    selected_sound_card output;
 
     audio::sample_rate sample_rate{};
     audio::period_size period_size{};
@@ -88,9 +88,9 @@ struct update_devices final
 
     void reduce(state& st) const override
     {
-        st.pcm_devices = pcm_devices;
-        st.input = input;
-        st.output = output;
+        st.io_sound_cards = io_sound_cards;
+        st.selected_io_sound_card.in = input;
+        st.selected_io_sound_card.out = output;
         st.sample_rate = sample_rate;
         st.period_size = period_size;
         st.period_count = period_count;
@@ -132,7 +132,7 @@ struct update_info final : ui::cloneable_action<update_info, reducible_action>
 audio_engine_middleware::audio_engine_middleware(
         thread::configuration const& audio_thread_config,
         std::span<thread::configuration const> const wt_configs,
-        audio::device_manager& device_manager,
+        audio::sound_card_manager& device_manager,
         ladspa::processor_factory& ladspa_processor_factory,
         std::unique_ptr<midi_input_controller> midi_controller)
     : m_audio_thread_config(audio_thread_config)
@@ -142,7 +142,7 @@ audio_engine_middleware::audio_engine_middleware(
     , m_midi_controller(
               midi_controller ? std::move(midi_controller)
                               : make_dummy_midi_input_controller())
-    , m_device(audio::make_dummy_device())
+    , m_device(audio::make_dummy_io_process())
 {
 }
 
@@ -159,9 +159,9 @@ audio_engine_middleware::process_device_action(
 
 static auto
 make_update_devices_action(
-        audio::device_manager& device_manager,
-        audio::pcm_io_descriptors const& new_devices,
-        audio::pcm_io_descriptors const& current_devices,
+        audio::sound_card_manager& device_manager,
+        audio::io_sound_cards const& new_devices,
+        audio::io_sound_cards const& current_devices,
         std::size_t const input_index,
         std::size_t const output_index,
         audio::sample_rate const sample_rate,
@@ -169,7 +169,7 @@ make_update_devices_action(
         audio::period_count const period_count) -> update_devices
 {
     update_devices next_action;
-    next_action.pcm_devices = new_devices;
+    next_action.io_sound_cards = new_devices;
 
     auto next_device = [&](auto const& new_devices,
                            auto const& current_devices,
@@ -179,14 +179,14 @@ make_update_devices_action(
                                                 new_devices,
                                                 current_devices[current_index])
                                       : npos;
-        return selected_device{
+        return selected_sound_card{
                 .index = found_index,
                 .hw_params = unique_box_(
                         found_index != npos ? device_manager.hw_params(
                                                       new_devices[found_index],
                                                       nullptr,
                                                       nullptr)
-                                            : audio::pcm_hw_params{}),
+                                            : audio::sound_card_hw_params{}),
         };
     };
 
@@ -201,8 +201,8 @@ make_update_devices_action(
             output_index);
 
     auto next_value =
-            [](unique_box<audio::pcm_hw_params> const& input_hw_params,
-               unique_box<audio::pcm_hw_params> const& output_hw_params,
+            [](unique_box<audio::sound_card_hw_params> const& input_hw_params,
+               unique_box<audio::sound_card_hw_params> const& output_hw_params,
                auto&& sel,
                auto current) {
                 auto const values = std::invoke(
@@ -268,16 +268,16 @@ audio_engine_middleware::process_device_action(
 
     mw_fs.next(make_update_devices_action(
             m_device_manager,
-            current_state.pcm_devices,
-            current_state.pcm_devices,
+            current_state.io_sound_cards,
+            current_state.io_sound_cards,
             algorithm::index_of(
-                    current_state.pcm_devices.in.get(),
+                    current_state.io_sound_cards.in.get(),
                     a.conf.input_device_name,
-                    &audio::pcm_descriptor::name),
+                    &audio::sound_card_descriptor::name),
             algorithm::index_of(
-                    current_state.pcm_devices.out.get(),
+                    current_state.io_sound_cards.out.get(),
                     a.conf.output_device_name,
-                    &audio::pcm_descriptor::name),
+                    &audio::sound_card_descriptor::name),
             a.conf.sample_rate,
             a.conf.period_size,
             a.conf.period_count));
@@ -296,9 +296,9 @@ audio_engine_middleware::process_device_action(
     mw_fs.next(make_update_devices_action(
             m_device_manager,
             m_device_manager.io_descriptors(),
-            current_state.pcm_devices,
-            current_state.input.index,
-            current_state.output.index,
+            current_state.io_sound_cards,
+            current_state.selected_io_sound_card.in.index,
+            current_state.selected_io_sound_card.out.index,
             current_state.sample_rate,
             current_state.period_size,
             current_state.period_count));
@@ -314,12 +314,14 @@ audio_engine_middleware::process_device_action(
 
     mw_fs.next(make_update_devices_action(
             m_device_manager,
-            current_state.pcm_devices,
-            current_state.pcm_devices,
-            action.io_dir == io_direction::input ? action.index
-                                                 : current_state.input.index,
-            action.io_dir == io_direction::output ? action.index
-                                                  : current_state.output.index,
+            current_state.io_sound_cards,
+            current_state.io_sound_cards,
+            action.io_dir == io_direction::input
+                    ? action.index
+                    : current_state.selected_io_sound_card.in.index,
+            action.io_dir == io_direction::output
+                    ? action.index
+                    : current_state.selected_io_sound_card.out.index,
             current_state.sample_rate,
             current_state.period_size,
             current_state.period_count));
@@ -338,10 +340,10 @@ audio_engine_middleware::process_device_action(
     {
         mw_fs.next(make_update_devices_action(
                 m_device_manager,
-                current_state.pcm_devices,
-                current_state.pcm_devices,
-                current_state.input.index,
-                current_state.output.index,
+                current_state.io_sound_cards,
+                current_state.io_sound_cards,
+                current_state.selected_io_sound_card.in.index,
+                current_state.selected_io_sound_card.out.index,
                 srs[action.index],
                 current_state.period_size,
                 current_state.period_count));
@@ -361,10 +363,10 @@ audio_engine_middleware::process_device_action(
     {
         mw_fs.next(make_update_devices_action(
                 m_device_manager,
-                current_state.pcm_devices,
-                current_state.pcm_devices,
-                current_state.input.index,
-                current_state.output.index,
+                current_state.io_sound_cards,
+                current_state.io_sound_cards,
+                current_state.selected_io_sound_card.in.index,
+                current_state.selected_io_sound_card.out.index,
                 current_state.sample_rate,
                 pss[action.index],
                 current_state.period_count));
@@ -384,10 +386,10 @@ audio_engine_middleware::process_device_action(
     {
         mw_fs.next(make_update_devices_action(
                 m_device_manager,
-                current_state.pcm_devices,
-                current_state.pcm_devices,
-                current_state.input.index,
-                current_state.output.index,
+                current_state.io_sound_cards,
+                current_state.io_sound_cards,
+                current_state.selected_io_sound_card.in.index,
+                current_state.selected_io_sound_card.out.index,
                 current_state.sample_rate,
                 current_state.period_size,
                 pcs[action.index]));
@@ -568,7 +570,7 @@ audio_engine_middleware::process_engine_action(
 void
 audio_engine_middleware::close_device()
 {
-    m_device = audio::make_dummy_device();
+    m_device = audio::make_dummy_io_process();
 
     // The engine is executed by a device, we can safely destroy it after device
     // was closed.
@@ -580,7 +582,8 @@ audio_engine_middleware::open_device(middleware_functors const& mw_fs)
 {
     auto const& st = mw_fs.get_state();
 
-    if (st.input.index == npos || st.output.index == npos ||
+    if (st.selected_io_sound_card.in.index == npos ||
+        st.selected_io_sound_card.out.index == npos ||
         st.sample_rate.invalid() || st.period_size.invalid() ||
         st.period_count.invalid())
     {
@@ -589,18 +592,23 @@ audio_engine_middleware::open_device(middleware_functors const& mw_fs)
 
     try
     {
-        auto device = m_device_manager.make_device(
-                st.pcm_devices.in.get()[st.input.index],
-                st.pcm_devices.out.get()[st.output.index],
-                audio::pcm_io_config{
+        auto device = m_device_manager.make_io_process(
+                st.io_sound_cards.in.get()[st.selected_io_sound_card.in.index],
+                st.io_sound_cards.out
+                        .get()[st.selected_io_sound_card.out.index],
+                audio::io_process_config{
                         audio::pcm_device_config{
-                                st.input.hw_params->interleaved,
-                                st.input.hw_params->format,
-                                st.input.hw_params->num_channels},
+                                st.selected_io_sound_card.in.hw_params
+                                        ->interleaved,
+                                st.selected_io_sound_card.in.hw_params->format,
+                                st.selected_io_sound_card.in.hw_params
+                                        ->num_channels},
                         audio::pcm_device_config{
-                                st.output.hw_params->interleaved,
-                                st.output.hw_params->format,
-                                st.output.hw_params->num_channels},
+                                st.selected_io_sound_card.out.hw_params
+                                        ->interleaved,
+                                st.selected_io_sound_card.out.hw_params->format,
+                                st.selected_io_sound_card.out.hw_params
+                                        ->num_channels},
                         audio::pcm_process_config{
                                 st.sample_rate,
                                 st.period_size,
@@ -626,8 +634,8 @@ audio_engine_middleware::start_engine(middleware_functors const& mw_fs)
         m_engine = std::make_unique<audio_engine>(
                 m_workers,
                 state.sample_rate,
-                state.input.hw_params->num_channels,
-                state.output.hw_params->num_channels);
+                state.selected_io_sound_card.in.hw_params->num_channels,
+                state.selected_io_sound_card.out.hw_params->num_channels);
 
         m_device->start(
                 m_audio_thread_config,

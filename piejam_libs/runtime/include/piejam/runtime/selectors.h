@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <piejam/audio/pcm_descriptor.h>
 #include <piejam/audio/period_count.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/audio/sound_card_descriptor.h>
 #include <piejam/audio/types.h>
 #include <piejam/box.h>
 #include <piejam/boxed_string.h>

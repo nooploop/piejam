@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2023  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/device.h>
+#include <piejam/audio/io_process.h>
 
 namespace piejam::audio
 {
@@ -10,7 +10,7 @@ namespace piejam::audio
 namespace
 {
 
-class dummy_device final : public device
+class dummy_device final : public io_process
 {
 public:
     [[nodiscard]] auto is_open() const noexcept -> bool override
@@ -52,7 +52,7 @@ public:
 } // namespace
 
 auto
-make_dummy_device() -> std::unique_ptr<device>
+make_dummy_io_process() -> std::unique_ptr<io_process>
 {
     return std::make_unique<dummy_device>();
 }

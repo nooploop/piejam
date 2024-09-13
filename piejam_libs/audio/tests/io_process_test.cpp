@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/device.h>
+#include <piejam/audio/io_process.h>
 
 #include <piejam/thread/configuration.h>
 
@@ -11,18 +11,18 @@
 namespace piejam::audio::test
 {
 
-TEST(dummy_device, is_open_always_false)
+TEST(dummy_io_process, is_open_always_false)
 {
-    auto sut = make_dummy_device();
+    auto sut = make_dummy_io_process();
     EXPECT_FALSE(sut->is_open());
 
     sut->close();
     EXPECT_FALSE(sut->is_open());
 }
 
-TEST(dummy_device, cant_run)
+TEST(dummy_io_process, cant_run)
 {
-    auto sut = make_dummy_device();
+    auto sut = make_dummy_io_process();
 
     EXPECT_FALSE(sut->is_running());
     sut->start({}, {}, {});
@@ -36,9 +36,9 @@ TEST(dummy_device, cant_run)
     EXPECT_FALSE(sut->is_running());
 }
 
-TEST(dummy_device, stats_always_zero)
+TEST(dummy_io_process, stats_always_zero)
 {
-    auto sut = make_dummy_device();
+    auto sut = make_dummy_io_process();
 
     EXPECT_EQ(0u, sut->xruns());
     EXPECT_FLOAT_EQ(0.f, sut->cpu_load());

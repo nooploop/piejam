@@ -33,9 +33,9 @@ MixerChannel::MixerChannel(
         runtime::mixer::channel_id const id)
     : Subscribable(store_dispatch, state_change_subscriber)
     , m_impl(std::make_unique<Impl>(
-                      store_dispatch,
-                      state_change_subscriber,
-                      id))
+              store_dispatch,
+              state_change_subscriber,
+              id))
 {
 }
 

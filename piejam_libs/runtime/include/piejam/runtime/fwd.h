@@ -17,7 +17,7 @@ namespace piejam::runtime
 
 class audio_engine;
 struct state;
-struct selected_device;
+struct selected_sound_card;
 struct store_dispatch;
 
 using action = ui::action;

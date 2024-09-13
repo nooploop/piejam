@@ -129,8 +129,8 @@ set_intersection(Vector const& in, Vector const& out)
 
 auto
 sample_rates(
-        unique_box<audio::pcm_hw_params> const& input_hw_params,
-        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        unique_box<audio::sound_card_hw_params> const& input_hw_params,
+        unique_box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::sample_rates_t
 {
     return set_intersection(
@@ -141,13 +141,15 @@ sample_rates(
 auto
 sample_rates_from_state(state const& state) -> audio::sample_rates_t
 {
-    return sample_rates(state.input.hw_params, state.output.hw_params);
+    return sample_rates(
+            state.selected_io_sound_card.in.hw_params,
+            state.selected_io_sound_card.out.hw_params);
 }
 
 auto
 period_sizes(
-        unique_box<audio::pcm_hw_params> const& input_hw_params,
-        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        unique_box<audio::sound_card_hw_params> const& input_hw_params,
+        unique_box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::period_sizes_t
 {
     return set_intersection(
@@ -158,13 +160,15 @@ period_sizes(
 auto
 period_sizes_from_state(state const& state) -> audio::period_sizes_t
 {
-    return period_sizes(state.input.hw_params, state.output.hw_params);
+    return period_sizes(
+            state.selected_io_sound_card.in.hw_params,
+            state.selected_io_sound_card.out.hw_params);
 }
 
 auto
 period_counts(
-        unique_box<audio::pcm_hw_params> const& input_hw_params,
-        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        unique_box<audio::sound_card_hw_params> const& input_hw_params,
+        unique_box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::period_counts_t
 {
     return set_intersection(
@@ -175,7 +179,9 @@ period_counts(
 auto
 period_counts_from_state(state const& state) -> audio::period_counts_t
 {
-    return period_counts(state.input.hw_params, state.output.hw_params);
+    return period_counts(
+            state.selected_io_sound_card.in.hw_params,
+            state.selected_io_sound_card.out.hw_params);
 }
 
 static auto

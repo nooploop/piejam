@@ -14,15 +14,15 @@
 namespace piejam::audio
 {
 
-struct pcm_descriptor
+struct sound_card_descriptor
 {
     std::string name;
     std::filesystem::path path;
 
-    auto operator==(pcm_descriptor const& other) const noexcept
+    auto operator==(sound_card_descriptor const& other) const noexcept
             -> bool = default;
 };
 
-using pcm_io_descriptors = io_pair<unique_box<std::vector<pcm_descriptor>>>;
+using io_sound_cards = io_pair<unique_box<std::vector<sound_card_descriptor>>>;
 
 } // namespace piejam::audio

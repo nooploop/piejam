@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2021  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <piejam/audio/sample_rate.h>
 #include <piejam/ladspa/processor_factory.h>
 
 #include <gmock/gmock.h>

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <piejam/audio/device.h>
 #include <piejam/audio/fwd.h>
-#include <piejam/audio/pcm_io_config.h>
+#include <piejam/audio/io_process.h>
+#include <piejam/audio/io_process_config.h>
 #include <piejam/system/device.h>
 
 #include <atomic>
@@ -15,13 +15,13 @@
 namespace piejam::audio::alsa
 {
 
-class pcm_io final : public piejam::audio::device
+class pcm_io final : public piejam::audio::io_process
 {
 public:
     pcm_io() noexcept;
-    pcm_io(pcm_descriptor const& in,
-           pcm_descriptor const& out,
-           pcm_io_config const& io_config);
+    pcm_io(sound_card_descriptor const& in,
+           sound_card_descriptor const& out,
+           io_process_config const& io_config);
     ~pcm_io() override;
 
     [[nodiscard]] auto is_open() const noexcept -> bool override;
@@ -49,7 +49,7 @@ public:
 private:
     system::device m_input_fd;
     system::device m_output_fd;
-    pcm_io_config m_io_config;
+    io_process_config m_io_config;
 
     std::atomic<float> m_cpu_load{};
     std::atomic_size_t m_xruns{};

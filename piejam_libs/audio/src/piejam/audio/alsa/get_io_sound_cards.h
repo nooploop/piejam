@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <piejam/audio/pcm_descriptor.h>
+#include <piejam/audio/sound_card_descriptor.h>
 
 namespace piejam::audio::alsa
 {
 
-auto get_pcm_io_descriptors() -> pcm_io_descriptors;
+auto get_io_sound_cards() -> io_sound_cards;
 
 } // namespace piejam::audio::alsa

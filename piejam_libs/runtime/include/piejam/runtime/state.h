@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <piejam/audio/pcm_descriptor.h>
-#include <piejam/audio/pcm_hw_params.h>
 #include <piejam/audio/period_count.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/audio/sound_card_descriptor.h>
+#include <piejam/audio/sound_card_hw_params.h>
 #include <piejam/audio/types.h>
 #include <piejam/box.h>
 #include <piejam/boxed_vector.h>
@@ -35,7 +35,7 @@
 #include <piejam/runtime/parameters_map.h>
 #include <piejam/runtime/recorder.h>
 #include <piejam/runtime/root_view_mode.h>
-#include <piejam/runtime/selected_device.h>
+#include <piejam/runtime/selected_sound_card.h>
 #include <piejam/runtime/ui_parameter_descriptors_map.h>
 
 #include <optional>
@@ -47,10 +47,8 @@ namespace piejam::runtime
 
 struct state
 {
-    audio::pcm_io_descriptors pcm_devices;
-
-    selected_device input;
-    selected_device output;
+    audio::io_sound_cards io_sound_cards;
+    io_pair<selected_sound_card> selected_io_sound_card;
 
     audio::sample_rate sample_rate{};
     audio::period_size period_size{};
@@ -98,20 +96,20 @@ struct state
 auto make_initial_state() -> state;
 
 auto sample_rates(
-        unique_box<audio::pcm_hw_params> const& input_hw_params,
-        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        unique_box<audio::sound_card_hw_params> const& input_hw_params,
+        unique_box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::sample_rates_t;
 auto sample_rates_from_state(state const&) -> audio::sample_rates_t;
 
 auto period_sizes(
-        unique_box<audio::pcm_hw_params> const& input_hw_params,
-        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        unique_box<audio::sound_card_hw_params> const& input_hw_params,
+        unique_box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::period_sizes_t;
 auto period_sizes_from_state(state const&) -> audio::period_sizes_t;
 
 auto period_counts(
-        unique_box<audio::pcm_hw_params> const& input_hw_params,
-        unique_box<audio::pcm_hw_params> const& output_hw_params)
+        unique_box<audio::sound_card_hw_params> const& input_hw_params,
+        unique_box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::period_counts_t;
 auto period_counts_from_state(state const&) -> audio::period_counts_t;
 

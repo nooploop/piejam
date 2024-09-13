@@ -5,12 +5,12 @@
 #include "get_set_hw_params.h"
 
 #include <piejam/algorithm/contains.h>
-#include <piejam/audio/pcm_descriptor.h>
+#include <piejam/audio/io_process_config.h>
 #include <piejam/audio/pcm_format.h>
-#include <piejam/audio/pcm_hw_params.h>
-#include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/audio/sound_card_descriptor.h>
+#include <piejam/audio/sound_card_hw_params.h>
 #include <piejam/system/device.h>
 
 #include <spdlog/spdlog.h>
@@ -229,11 +229,11 @@ pcm_to_alsa_format(pcm_format pf) -> unsigned
 
 auto
 get_hw_params(
-        pcm_descriptor const& pcm,
+        sound_card_descriptor const& pcm,
         sample_rate const* const sample_rate,
-        period_size const* const period_size) -> pcm_hw_params
+        period_size const* const period_size) -> sound_card_hw_params
 {
-    pcm_hw_params result;
+    sound_card_hw_params result;
 
     auto hw_params = make_snd_pcm_hw_params_for_refine_any();
 

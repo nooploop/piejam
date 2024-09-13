@@ -55,13 +55,13 @@ inline constexpr auto greater_equal =
         detail::compare<std::greater_equal<>, Proj>{};
 
 inline constexpr auto indirection_op =
-        []<class V>(V && v) BOOST_HOF_RETURNS(*std::forward<V>(v));
+        []<class V>(V&& v) BOOST_HOF_RETURNS(*std::forward<V>(v));
 
 inline constexpr auto addressof_op =
-        []<class V>(V && v) BOOST_HOF_RETURNS(&std::forward<V>(v));
+        []<class V>(V&& v) BOOST_HOF_RETURNS(&std::forward<V>(v));
 
 template <class IndexType, IndexType N>
 inline constexpr auto index_op =
-        []<class V>(V && v) BOOST_HOF_RETURNS(std::forward<V>(v)[N]);
+        []<class V>(V&& v) BOOST_HOF_RETURNS(std::forward<V>(v)[N]);
 
 } // namespace piejam

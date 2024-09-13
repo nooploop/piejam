@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "get_pcm_io_descriptors.h"
+#include "get_io_sound_cards.h"
 
 #include <piejam/box.h>
 #include <piejam/io_pair.h>
@@ -144,9 +144,9 @@ struct to_pcm_descriptor
         BOOST_ASSERT(stream_type == 'c' || stream_type == 'p');
     }
 
-    auto operator()(snd_pcm_info const& pcm_info) const -> pcm_descriptor
+    auto operator()(snd_pcm_info const& pcm_info) const -> sound_card_descriptor
     {
-        return pcm_descriptor{
+        return sound_card_descriptor{
                 .name = fmt::format(
                         "{} - {}",
                         reinterpret_cast<char const*>(sc.info.name),
@@ -165,9 +165,9 @@ struct to_pcm_descriptor
 } // namespace
 
 auto
-get_pcm_io_descriptors() -> pcm_io_descriptors
+get_io_sound_cards() -> io_sound_cards
 {
-    io_pair<std::vector<pcm_descriptor>> result;
+    io_pair<std::vector<sound_card_descriptor>> result;
 
     for (soundcard const& sc : soundcards())
     {
@@ -181,7 +181,7 @@ get_pcm_io_descriptors() -> pcm_io_descriptors
                 to_pcm_descriptor{sc, 'p'});
     }
 
-    return pcm_io_descriptors{
+    return io_sound_cards{
             unique_box_(std::move(result.in)),
             unique_box_(std::move(result.out)),
     };

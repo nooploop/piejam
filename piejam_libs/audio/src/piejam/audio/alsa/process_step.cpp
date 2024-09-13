@@ -9,9 +9,9 @@
 
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/cpu_load_meter.h>
+#include <piejam/audio/io_process_config.h>
 #include <piejam/audio/pcm_convert.h>
 #include <piejam/audio/pcm_format.h>
-#include <piejam/audio/pcm_io_config.h>
 #include <piejam/audio/pcm_sample_type.h>
 #include <piejam/audio/types.h>
 #include <piejam/numeric/rolling_mean.h>
@@ -391,7 +391,7 @@ make_writer(
 process_step::process_step(
         system::device& input_fd,
         system::device& output_fd,
-        pcm_io_config const& io_config,
+        io_process_config const& io_config,
         std::atomic<float>& cpu_load,
         std::atomic_size_t& xruns,
         init_process_function const& init_process_function,
