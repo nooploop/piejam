@@ -38,7 +38,7 @@ struct make_add_fx_module_action
         auto action = std::make_unique<actions::insert_internal_fx_module>();
         action->fx_chain_id = fx_chain_id;
         action->position = npos;
-        action->type = fx.id;
+        action->type = fx.type;
         action->initial_values = fx.preset;
         action->midi_assignments = fx.midi;
         return action;

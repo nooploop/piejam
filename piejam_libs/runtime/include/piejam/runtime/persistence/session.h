@@ -32,7 +32,7 @@ struct session
 
     struct internal_fx
     {
-        fx::internal_id id{};
+        fx::internal_id type{};
         fx_preset preset;
         fx_midi_assignments midi;
     };

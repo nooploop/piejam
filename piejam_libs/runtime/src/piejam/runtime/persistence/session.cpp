@@ -6,14 +6,11 @@
 
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/persistence/fx_internal_id.h>
-#include <piejam/runtime/persistence/midi_assignment.h>
 
 #include <nlohmann/json.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/hof/match.hpp>
-
-#include <fstream>
 
 namespace piejam::audio
 {
@@ -23,6 +20,28 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
         {{bus_type::mono, "mono"}, {bus_type::stereo, "stereo"}})
 
 } // namespace piejam::audio
+
+namespace piejam::runtime
+{
+
+NLOHMANN_JSON_SERIALIZE_ENUM(
+        midi_assignment::type,
+        {{midi_assignment::type::cc, "cc"}})
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        midi_assignment,
+        channel,
+        control_type,
+        control_id);
+
+} // namespace piejam::runtime
+
+namespace piejam::runtime::fx
+{
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(parameter_midi_assignment, key, value);
+
+} // namespace piejam::runtime::fx
 
 namespace piejam::runtime::persistence
 {
@@ -38,37 +57,14 @@ get_version(nlohmann::json const& json_ses) -> unsigned
 static auto const s_key_internal = "internal";
 static auto const s_key_ladspa = "ladspa";
 
-void
-to_json(nlohmann::json& j, session::internal_fx const& fx)
-{
-    j = {{"type", fx.id}, {"preset", fx.preset}, {"midi", fx.midi}};
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::internal_fx, type, preset, midi);
 
-void
-from_json(nlohmann::json const& j, session::internal_fx& fx)
-{
-    j.at("type").get_to(fx.id);
-    j.at("preset").get_to(fx.preset);
-    j.at("midi").get_to(fx.midi);
-}
-
-void
-to_json(nlohmann::json& j, session::ladspa_plugin const& plug)
-{
-    j = {{"id", plug.id},
-         {"name", plug.name},
-         {"preset", plug.preset},
-         {"midi", plug.midi}};
-}
-
-void
-from_json(nlohmann::json const& j, session::ladspa_plugin& plug)
-{
-    j.at("id").get_to(plug.id);
-    j.at("name").get_to(plug.name);
-    j.at("preset").get_to(plug.preset);
-    j.at("midi").get_to(plug.midi);
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        session::ladspa_plugin,
+        id,
+        name,
+        preset,
+        midi);
 
 void
 to_json(nlohmann::json& j, session::fx_plugin const& fx_plug)
@@ -106,21 +102,11 @@ from_json(nlohmann::json const& j, session::fx_plugin& fx_plug)
     }
 }
 
-void
-to_json(nlohmann::json& j, session::mixer_parameters const& mixer_params)
-{
-    j = {{"volume", mixer_params.volume},
-         {"pan", mixer_params.pan},
-         {"mute", mixer_params.mute}};
-}
-
-void
-from_json(nlohmann::json const& j, session::mixer_parameters& mixer_params)
-{
-    j.at("volume").get_to(mixer_params.volume);
-    j.at("pan").get_to(mixer_params.pan);
-    j.at("mute").get_to(mixer_params.mute);
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        session::mixer_parameters,
+        volume,
+        pan,
+        mute);
 
 void
 to_json(nlohmann::json& j, session::mixer_midi const& midi)
@@ -166,42 +152,17 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
          {session::mixer_io_type::device, "device"},
          {session::mixer_io_type::channel, "channel"}})
 
-void
-to_json(nlohmann::json& j, session::mixer_io const& mixer_io)
-{
-    j = {{"type", mixer_io.type}, {"name", mixer_io.name}};
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::mixer_io, type, name);
 
-void
-from_json(nlohmann::json const& j, session::mixer_io& mixer_io)
-{
-    j.at("type").get_to(mixer_io.type);
-    j.at("name").get_to(mixer_io.name);
-}
-
-void
-to_json(nlohmann::json& j, session::mixer_channel const& mb)
-{
-    j = {{"name", mb.name},
-         {"bus_type", mb.bus_type},
-         {"parameter", mb.parameter},
-         {"midi", mb.midi},
-         {"fx_chain", mb.fx_chain},
-         {"in", mb.in},
-         {"out", mb.out}};
-}
-
-void
-from_json(nlohmann::json const& j, session::mixer_channel& mb)
-{
-    j.at("name").get_to(mb.name);
-    j.at("bus_type").get_to(mb.bus_type);
-    j.at("parameter").get_to(mb.parameter);
-    j.at("midi").get_to(mb.midi);
-    j.at("fx_chain").get_to(mb.fx_chain);
-    j.at("in").get_to(mb.in);
-    j.at("out").get_to(mb.out);
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        session::mixer_channel,
+        name,
+        bus_type,
+        parameter,
+        midi,
+        fx_chain,
+        in,
+        out);
 
 static auto const s_key_mixer_channels = "mixer_channels";
 static auto const s_key_main_mixer_channel = "main_mixer_channel";

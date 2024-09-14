@@ -55,22 +55,11 @@ get_version(nlohmann::json const& conf) -> unsigned
     return conf.at(s_key_version).get<unsigned>();
 }
 
-void
-to_json(nlohmann::json& j, external_audio_device_config const& conf)
-{
-    j = nlohmann::json{
-            {"name", conf.name},
-            {"bus_type", conf.bus_type},
-            {"channels", conf.channels}};
-}
-
-void
-from_json(nlohmann::json const& j, external_audio_device_config& conf)
-{
-    j.at("name").get_to(conf.name);
-    j.at("bus_type").get_to(conf.bus_type);
-    j.at("channels").get_to(conf.channels);
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        external_audio_device_config,
+        name,
+        bus_type,
+        channels);
 
 void
 to_json(nlohmann::json& j, app_config const& conf)

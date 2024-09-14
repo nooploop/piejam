@@ -151,7 +151,7 @@ export_fx_plugin(
             std::get<fx::internal_id>(fx_mod.fx_instance_id) == fx_internal_id);
 
     session::internal_fx fx;
-    fx.id = fx_internal_id;
+    fx.type = fx_internal_id;
     fx.preset = export_parameter_values(fx_mod, st.params);
     fx.midi = export_fx_midi_assignments(fx_mod, st.midi_assignments);
     return fx;
