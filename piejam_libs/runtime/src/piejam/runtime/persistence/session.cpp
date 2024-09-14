@@ -6,6 +6,7 @@
 
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/persistence/fx_internal_id.h>
+#include <piejam/runtime/persistence/optional.h>
 
 #include <nlohmann/json.hpp>
 
@@ -108,42 +109,24 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         pan,
         mute);
 
+static optional_serializer<midi_assignment> const s_midi_volume{"volume"};
+static optional_serializer<midi_assignment> const s_midi_pan{"pan"};
+static optional_serializer<midi_assignment> const s_midi_mute{"mute"};
+
 void
 to_json(nlohmann::json& j, session::mixer_midi const& midi)
 {
-    if (midi.volume)
-    {
-        j["volume"] = *midi.volume;
-    }
-
-    if (midi.pan)
-    {
-        j["pan"] = *midi.pan;
-    }
-
-    if (midi.mute)
-    {
-        j["mute"] = *midi.mute;
-    }
+    s_midi_volume.to_json(j, midi.volume);
+    s_midi_pan.to_json(j, midi.pan);
+    s_midi_mute.to_json(j, midi.mute);
 }
 
 void
 from_json(nlohmann::json const& j, session::mixer_midi& midi)
 {
-    if (j.contains("volume"))
-    {
-        midi.volume = j.at("volume").get<midi_assignment>();
-    }
-
-    if (j.contains("pan"))
-    {
-        midi.pan = j.at("pan").get<midi_assignment>();
-    }
-
-    if (j.contains("mute"))
-    {
-        midi.mute = j.at("mute").get<midi_assignment>();
-    }
+    s_midi_volume.from_json(j, midi.volume);
+    s_midi_pan.from_json(j, midi.pan);
+    s_midi_mute.from_json(j, midi.mute);
 }
 
 NLOHMANN_JSON_SERIALIZE_ENUM(
