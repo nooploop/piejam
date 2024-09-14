@@ -7,6 +7,8 @@
 #include <piejam/runtime/state.h>
 
 #include <piejam/algorithm/contains.h>
+#include <piejam/functional/operators.h>
+#include <piejam/set_if.h>
 
 #include <fmt/format.h>
 
@@ -161,16 +163,17 @@ set_external_audio_device_name::reduce(state& st) const
                     : io_direction::output;
 
     st.mixer_state.channels.update(
-            [this,
-             io_dir,
-             route_name = mixer::io_address_t(mixer::missing_device_address(
-                     name))](mixer::channel_id, mixer::channel& channel) {
-                auto& io_addr = io_dir == io_direction::input ? channel.in
-                                                              : channel.out;
-
-                if (io_addr == route_name)
+            [io_dir,
+             equal_to_device_name = equal_to<>(
+                     mixer::io_address_t(mixer::missing_device_address(name))),
+             this](mixer::channel_id, mixer::channel& mixer_channel) {
+                if (io_dir == io_direction::input)
                 {
-                    io_addr = device_id;
+                    set_if(mixer_channel.in, equal_to_device_name, device_id);
+                }
+                else
+                {
+                    set_if(mixer_channel.out, equal_to_device_name, device_id);
                 }
             });
 }

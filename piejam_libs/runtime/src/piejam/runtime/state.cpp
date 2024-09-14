@@ -6,6 +6,7 @@
 
 #include <piejam/algorithm/contains.h>
 #include <piejam/audio/types.h>
+#include <piejam/functional/operators.h>
 #include <piejam/indexed_access.h>
 #include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/internal_fx_module_factory.h>
@@ -13,6 +14,7 @@
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_factory.h>
 #include <piejam/runtime/parameter_value_to_string.h>
+#include <piejam/set_if.h>
 #include <piejam/tuple_element_compare.h>
 
 #include <fmt/format.h>
@@ -453,23 +455,17 @@ add_external_audio_device(
     emplace_back(devices_ids, id);
 
     st.mixer_state.channels.update(
-            [id,
-             io_dir,
-             route_name = mixer::io_address_t(mixer::missing_device_address(
-                     name))](mixer::channel_id, mixer::channel& mixer_channel) {
+            [io_dir,
+             equal_to_device_name = equal_to<>(
+                     mixer::io_address_t(mixer::missing_device_address(name))),
+             id](mixer::channel_id, mixer::channel& mixer_channel) {
                 if (io_dir == io_direction::input)
                 {
-                    if (mixer_channel.in == route_name)
-                    {
-                        mixer_channel.in = mixer::io_address_t(id);
-                    }
+                    set_if(mixer_channel.in, equal_to_device_name, id);
                 }
                 else
                 {
-                    if (mixer_channel.out == route_name)
-                    {
-                        mixer_channel.out = mixer::io_address_t(id);
-                    }
+                    set_if(mixer_channel.out, equal_to_device_name, id);
                 }
             });
 
@@ -553,19 +549,15 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
 
     st.mixer_state.channels.remove(mixer_channel_id);
 
-    st.mixer_state.channels.update([mixer_channel_id](
-                                           mixer::channel_id,
-                                           mixer::channel& mixer_channel) {
-        if (mixer_channel.in == mixer::io_address_t(mixer_channel_id))
-        {
-            mixer_channel.in = {};
-        }
-
-        if (mixer_channel.out == mixer::io_address_t(mixer_channel_id))
-        {
-            mixer_channel.out = {};
-        }
-    });
+    st.mixer_state.channels.update(
+            [equal_to_mixer_channel =
+                     equal_to<>(mixer::io_address_t(mixer_channel_id)),
+             empty_addr = mixer::io_address_t{}](
+                    mixer::channel_id,
+                    mixer::channel& mixer_channel) {
+                set_if(mixer_channel.in, equal_to_mixer_channel, empty_addr);
+                set_if(mixer_channel.out, equal_to_mixer_channel, empty_addr);
+            });
 }
 
 void
@@ -576,17 +568,11 @@ remove_external_audio_device(
     auto const name = st.device_io_state.devices[device_id].name;
 
     st.mixer_state.channels.update(
-            [device_id,
-             &name](mixer::channel_id, mixer::channel& mixer_channel) {
-                if (mixer_channel.in == mixer::io_address_t(device_id))
-                {
-                    mixer_channel.in = mixer::missing_device_address(name);
-                }
-
-                if (mixer_channel.out == mixer::io_address_t(device_id))
-                {
-                    mixer_channel.out = mixer::missing_device_address(name);
-                }
+            [equal_to_device = equal_to<>(mixer::io_address_t(device_id)),
+             missing_device_name = mixer::missing_device_address(
+                     name)](mixer::channel_id, mixer::channel& mixer_channel) {
+                set_if(mixer_channel.in, equal_to_device, missing_device_name);
+                set_if(mixer_channel.out, equal_to_device, missing_device_name);
             });
 
     st.device_io_state.devices.remove(device_id);
