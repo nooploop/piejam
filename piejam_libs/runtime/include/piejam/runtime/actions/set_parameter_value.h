@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/entity_id.h>
-#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/parameter/map.h>
 #include <piejam/runtime/parameters.h>
@@ -18,7 +18,7 @@ namespace piejam::runtime::actions
 template <class Parameter>
 struct set_parameter_value final
     : ui::cloneable_action<set_parameter_value<Parameter>, reducible_action>
-    , visitable_engine_action<set_parameter_value<Parameter>>
+    , visitable_audio_engine_action<set_parameter_value<Parameter>>
 {
     template <class V>
     set_parameter_value(parameter::id_t<Parameter> id, V&& value)

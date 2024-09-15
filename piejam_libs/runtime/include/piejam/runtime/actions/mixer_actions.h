@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/action.h>
@@ -18,7 +18,7 @@ namespace piejam::runtime::actions
 
 struct add_mixer_channel final
     : ui::cloneable_action<add_mixer_channel, reducible_action>
-    , visitable_engine_action<add_mixer_channel>
+    , visitable_audio_engine_action<add_mixer_channel>
 {
     add_mixer_channel() = default;
     add_mixer_channel(std::string name, audio::bus_type bus_type)
@@ -36,7 +36,7 @@ struct add_mixer_channel final
 
 struct delete_mixer_channel final
     : ui::cloneable_action<delete_mixer_channel, reducible_action>
-    , visitable_engine_action<delete_mixer_channel>
+    , visitable_audio_engine_action<delete_mixer_channel>
 {
     mixer::channel_id mixer_channel_id{};
 
@@ -56,7 +56,7 @@ struct set_mixer_channel_name final
 
 struct set_mixer_channel_route final
     : ui::cloneable_action<set_mixer_channel_route, reducible_action>
-    , visitable_engine_action<set_mixer_channel_route>
+    , visitable_audio_engine_action<set_mixer_channel_route>
 {
     mixer::channel_id channel_id;
     mixer::io_socket io_socket;
@@ -67,7 +67,7 @@ struct set_mixer_channel_route final
 
 struct move_mixer_channel_left final
     : ui::cloneable_action<move_mixer_channel_left, reducible_action>
-    , visitable_engine_action<move_mixer_channel_left>
+    , visitable_audio_engine_action<move_mixer_channel_left>
 {
     mixer::channel_id channel_id;
 
@@ -76,7 +76,7 @@ struct move_mixer_channel_left final
 
 struct move_mixer_channel_right final
     : ui::cloneable_action<move_mixer_channel_right, reducible_action>
-    , visitable_engine_action<move_mixer_channel_right>
+    , visitable_audio_engine_action<move_mixer_channel_right>
 {
     mixer::channel_id channel_id;
 

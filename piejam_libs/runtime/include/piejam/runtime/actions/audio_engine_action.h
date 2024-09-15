@@ -10,7 +10,7 @@
 namespace piejam::runtime::actions
 {
 
-struct engine_action_visitor
+struct audio_engine_action_visitor
     : ui::action_visitor_interface<
               set_external_audio_device_bus_channel,
               add_external_audio_device,
@@ -41,11 +41,13 @@ struct engine_action_visitor
 {
 };
 
-struct engine_action : ui::visitable_action_interface<engine_action_visitor>
+struct audio_engine_action
+    : ui::visitable_action_interface<audio_engine_action_visitor>
 {
 };
 
 template <class Action>
-using visitable_engine_action = ui::visitable_action<Action, engine_action>;
+using visitable_audio_engine_action =
+        ui::visitable_action<Action, audio_engine_action>;
 
 } // namespace piejam::runtime::actions

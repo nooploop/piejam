@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/device_action.h>
+#include <piejam/runtime/actions/audio_io_process_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -14,7 +14,7 @@ namespace piejam::runtime::actions
 
 struct refresh_devices final
     : ui::cloneable_action<refresh_devices, action>
-    , visitable_device_action<refresh_devices>
+    , visitable_audio_io_process_action<refresh_devices>
 {
 };
 

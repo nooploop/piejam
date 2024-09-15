@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/ui/action.h>
@@ -20,7 +20,7 @@ namespace piejam::runtime::actions
 
 struct request_parameters_update final
     : ui::cloneable_action<request_parameters_update, action>
-    , visitable_engine_action<request_parameters_update>
+    , visitable_audio_engine_action<request_parameters_update>
 {
     template <class Parameter>
     using parameter_ids_set_t =

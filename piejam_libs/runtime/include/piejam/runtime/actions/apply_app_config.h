@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/device_action.h>
+#include <piejam/runtime/actions/audio_io_process_action.h>
 #include <piejam/runtime/actions/midi_control_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/persistence/app_config.h>
@@ -16,7 +16,7 @@ namespace piejam::runtime::actions
 
 struct apply_app_config final
     : ui::cloneable_action<apply_app_config, reducible_action>
-    , visitable_device_action<apply_app_config>
+    , visitable_audio_io_process_action<apply_app_config>
     , visitable_midi_control_action<apply_app_config>
 {
     persistence::app_config conf;

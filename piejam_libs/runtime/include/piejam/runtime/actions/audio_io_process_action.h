@@ -10,7 +10,7 @@
 namespace piejam::runtime::actions
 {
 
-struct device_action_visitor
+struct audio_io_process_action_visitor
     : ui::action_visitor_interface<
               apply_app_config,
               refresh_devices,
@@ -23,11 +23,13 @@ struct device_action_visitor
 {
 };
 
-struct device_action : ui::visitable_action_interface<device_action_visitor>
+struct audio_io_process_action
+    : ui::visitable_action_interface<audio_io_process_action_visitor>
 {
 };
 
 template <class Action>
-using visitable_device_action = ui::visitable_action<Action, device_action>;
+using visitable_audio_io_process_action =
+        ui::visitable_action<Action, audio_io_process_action>;
 
 } // namespace piejam::runtime::actions

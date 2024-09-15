@@ -6,7 +6,7 @@
 
 #include <piejam/entity_id.h>
 #include <piejam/midi/device_id.h>
-#include <piejam/runtime/actions/device_action.h>
+#include <piejam/runtime/actions/audio_io_process_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -16,7 +16,7 @@ namespace piejam::runtime::actions
 
 struct activate_midi_device final
     : ui::cloneable_action<activate_midi_device, reducible_action>
-    , visitable_device_action<activate_midi_device>
+    , visitable_audio_io_process_action<activate_midi_device>
 {
     midi::device_id_t device_id;
 

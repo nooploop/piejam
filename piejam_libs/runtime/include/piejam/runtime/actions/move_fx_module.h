@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/entity_id.h>
-#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
@@ -17,14 +17,14 @@ namespace piejam::runtime::actions
 
 struct move_fx_module_up final
     : ui::cloneable_action<move_fx_module_up, reducible_action>
-    , visitable_engine_action<move_fx_module_up>
+    , visitable_audio_engine_action<move_fx_module_up>
 {
     void reduce(state&) const override;
 };
 
 struct move_fx_module_down final
     : ui::cloneable_action<move_fx_module_down, reducible_action>
-    , visitable_engine_action<move_fx_module_down>
+    , visitable_audio_engine_action<move_fx_module_down>
 {
     void reduce(state&) const override;
 };

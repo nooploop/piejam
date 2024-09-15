@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/actions/midi_control_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
@@ -15,7 +15,7 @@ namespace piejam::runtime::actions
 
 struct request_info_update final
     : ui::cloneable_action<request_info_update, action>
-    , visitable_engine_action<request_info_update>
+    , visitable_audio_engine_action<request_info_update>
     , visitable_midi_control_action<request_info_update>
 {
 };

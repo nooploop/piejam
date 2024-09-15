@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/entity_id.h>
-#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/actions/ladspa_fx_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -18,7 +18,7 @@ namespace piejam::runtime::actions
 
 struct delete_fx_module final
     : ui::cloneable_action<delete_fx_module, reducible_action>
-    , visitable_engine_action<delete_fx_module>
+    , visitable_audio_engine_action<delete_fx_module>
     , visitable_ladspa_fx_action<delete_fx_module>
 {
     mixer::channel_id fx_chain_id;

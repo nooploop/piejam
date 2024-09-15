@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/entity_id.h>
-#include <piejam/runtime/actions/engine_action.h>
+#include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
@@ -17,7 +17,7 @@ namespace piejam::runtime::actions
 
 struct toggle_fx_module_bypass final
     : ui::cloneable_action<toggle_fx_module_bypass, reducible_action>
-    , visitable_engine_action<toggle_fx_module_bypass>
+    , visitable_audio_engine_action<toggle_fx_module_bypass>
 {
     fx::module_id fx_mod_id;
 
@@ -26,7 +26,7 @@ struct toggle_fx_module_bypass final
 
 struct toggle_focused_fx_module_bypass final
     : ui::cloneable_action<toggle_focused_fx_module_bypass, reducible_action>
-    , visitable_engine_action<toggle_focused_fx_module_bypass>
+    , visitable_audio_engine_action<toggle_focused_fx_module_bypass>
 {
     void reduce(state&) const override;
 };

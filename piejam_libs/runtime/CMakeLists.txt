@@ -6,11 +6,11 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/activate_midi_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_app_config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/apply_session.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/audio_engine_action.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/audio_io_process_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/control_midi_assignment.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/deactivate_midi_device.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/delete_fx_module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/device_action.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/engine_action.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/external_audio_device_actions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/actions/fwd.h

@@ -12,8 +12,8 @@ namespace piejam::runtime::actions
 
 // actions
 
-struct device_action;
-struct engine_action;
+struct audio_io_process_action;
+struct audio_engine_action;
 struct midi_control_action;
 struct persistence_action;
 struct recorder_action;
@@ -83,8 +83,8 @@ struct stop_recording;
 
 // visitors
 
-struct device_action_visitor;
-struct engine_action_visitor;
+struct audio_io_process_action_visitor;
+struct audio_engine_action_visitor;
 struct midi_control_action_visitor;
 struct persistence_action_visitor;
 struct recorder_action_visitor;

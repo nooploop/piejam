@@ -673,7 +673,7 @@ audio_engine_middleware::operator()(
         middleware_functors const& mw_fs,
         action const& action)
 {
-    if (auto a = dynamic_cast<actions::device_action const*>(&action))
+    if (auto a = dynamic_cast<actions::audio_io_process_action const*>(&action))
     {
         if (mw_fs.get_state().recording)
         {
@@ -682,7 +682,8 @@ audio_engine_middleware::operator()(
 
         close_device();
 
-        auto v = ui::make_action_visitor<actions::device_action_visitor>(
+        auto v = ui::make_action_visitor<
+                actions::audio_io_process_action_visitor>(
                 [&](auto&& a) { process_device_action(mw_fs, a); });
 
         a->visit(v);
@@ -690,9 +691,10 @@ audio_engine_middleware::operator()(
         open_device(mw_fs);
         start_engine(mw_fs);
     }
-    else if (auto a = dynamic_cast<actions::engine_action const*>(&action))
+    else if (
+            auto a = dynamic_cast<actions::audio_engine_action const*>(&action))
     {
-        auto v = ui::make_action_visitor<actions::engine_action_visitor>(
+        auto v = ui::make_action_visitor<actions::audio_engine_action_visitor>(
                 [&](auto&& a) { process_engine_action(mw_fs, a); });
 
         a->visit(v);
