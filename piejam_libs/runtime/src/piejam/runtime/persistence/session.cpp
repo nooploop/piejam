@@ -7,6 +7,7 @@
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/persistence/fx_internal_id.h>
 #include <piejam/runtime/persistence/optional.h>
+#include <piejam/runtime/persistence/variant.h>
 
 #include <nlohmann/json.hpp>
 
@@ -41,6 +42,29 @@ namespace piejam::runtime::fx
 {
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(parameter_midi_assignment, key, value);
+
+auto const parameter_value_assignment_serializer =
+        persistence::variant_serializer{
+                persistence::variant_option<float>{"float"},
+                persistence::variant_option<int>{"int"},
+                persistence::variant_option<bool>{"bool"},
+        };
+
+void
+to_json(nlohmann::json& j, parameter_value_assignment const& p)
+{
+    j = {{"key", p.key},
+         {"value", parameter_value_assignment_serializer.to_json(p.value)}};
+}
+
+void
+from_json(nlohmann::json const& j, parameter_value_assignment& p)
+{
+    j.at("key").get_to(p.key);
+
+    auto const& v = j.at("value");
+    parameter_value_assignment_serializer.from_json(v, p.value);
+}
 
 } // namespace piejam::runtime::fx
 

@@ -102,6 +102,7 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/fx_preset.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/optional.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/session.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence/variant.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/persistence_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/fwd.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/runtime/processors/midi_assignment_processor.h
@@ -177,7 +178,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/access.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/app_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_internal_id.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/fx_preset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence/session.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/persistence_middleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/processors/midi_assignment_processor.cpp
@@ -192,7 +192,6 @@ add_library(piejam_runtime STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/state.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/store_dispatch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/runtime/thunk_action.cpp
-    include/piejam/runtime/persistence/optional.h
 )
 
 find_package(nlohmann_json REQUIRED)

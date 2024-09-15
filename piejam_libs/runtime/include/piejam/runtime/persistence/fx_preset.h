@@ -6,17 +6,7 @@
 
 #include <piejam/runtime/fx/fwd.h>
 
-#include <nlohmann/json_fwd.hpp>
-
 #include <vector>
-
-namespace piejam::runtime::fx
-{
-
-void to_json(nlohmann::json&, parameter_value_assignment const&);
-void from_json(nlohmann::json const&, parameter_value_assignment&);
-
-} // namespace piejam::runtime::fx
 
 namespace piejam::runtime::persistence
 {
