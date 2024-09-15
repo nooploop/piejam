@@ -93,8 +93,8 @@ struct update_devices final
         st.period_size = period_size;
         st.period_count = period_count;
 
-        st.device_io_state.devices.update(
-                *st.device_io_state.inputs,
+        st.external_audio_state.devices.update(
+                *st.external_audio_state.inputs,
                 [num_in_channels = input.hw_params->num_channels](
                         external_audio::device_id,
                         external_audio::device& device) {
@@ -102,8 +102,8 @@ struct update_devices final
                     update_channel(device.channels.right, num_in_channels);
                 });
 
-        st.device_io_state.devices.update(
-                *st.device_io_state.outputs,
+        st.external_audio_state.devices.update(
+                *st.external_audio_state.outputs,
                 [num_out_channels = output.hw_params->num_channels](
                         external_audio::device_id,
                         external_audio::device& device) {

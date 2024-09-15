@@ -36,7 +36,7 @@ struct FxGenericModule::Impl
 {
     runtime::fx::module_id fx_mod_id;
 
-    box<runtime::fx::module_parameters> param_ids;
+    unique_box<runtime::fx::module_parameters> param_ids;
     FxParametersList parameters;
 };
 
@@ -68,7 +68,7 @@ FxGenericModule::onSubscribe()
 {
     observe(runtime::selectors::make_fx_module_parameters_selector(
                     m_impl->fx_mod_id),
-            [this](box<runtime::fx::module_parameters> const& paramIds) {
+            [this](auto const& paramIds) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
                                 fxParameterIds(*m_impl->param_ids),

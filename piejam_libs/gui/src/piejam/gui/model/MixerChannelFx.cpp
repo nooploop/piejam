@@ -21,7 +21,7 @@ struct MixerChannelFx::Impl
 {
     runtime::mixer::channel_id mixer_channel_id;
 
-    box<runtime::fx::chain_t> fx_chain;
+    unique_box<runtime::fx::chain_t> fx_chain;
 
     FxChainModulesList modules;
 };
@@ -91,7 +91,7 @@ MixerChannelFx::onSubscribe()
 
     observe(runtime::selectors::make_fx_chain_selector(
                     m_impl->mixer_channel_id),
-            [this](box<runtime::fx::chain_t> const& fx_chain) {
+            [this](auto const& fx_chain) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->fx_chain, *fx_chain),
                         piejam::gui::generic_list_model_edit_script_executor{

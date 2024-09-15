@@ -832,7 +832,7 @@ audio_engine::rebuild(
     auto new_graph = make_graph(
             comps,
             st.mixer_state.channels,
-            st.device_io_state.devices,
+            st.external_audio_state.devices,
             m_impl->input_procs,
             m_impl->output_procs,
             output_clip_procs,

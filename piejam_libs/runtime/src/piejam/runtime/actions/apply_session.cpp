@@ -323,13 +323,13 @@ configure_mixer_channels(
     // io
     apply_mixer_io(
             action,
-            st.device_io_state.devices,
+            st.external_audio_state.devices,
             st.mixer_state.channels,
             st.mixer_state.inputs,
             session.mixer_channels);
     apply_mixer_io(
             action,
-            st.device_io_state.devices,
+            st.external_audio_state.devices,
             st.mixer_state.channels,
             st.mixer_state.main,
             session.main_mixer_channel.in,

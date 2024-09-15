@@ -21,57 +21,63 @@
 namespace piejam::runtime::selectors
 {
 
-static auto get_sample_rate =
-        memo([](unique_box<audio::sound_card_hw_params> const& input_hw_params,
-                unique_box<audio::sound_card_hw_params> const& output_hw_params,
-                audio::sample_rate const current) {
-            return box<sample_rate_choice>{
-                    std::in_place,
-                    runtime::sample_rates(input_hw_params, output_hw_params),
-                    current};
-        });
-
 selector<box<sample_rate_choice>> const select_sample_rate([](state const& st) {
+    static auto const get_sample_rate = memo(
+            [](unique_box<audio::sound_card_hw_params> const& input_hw_params,
+               unique_box<audio::sound_card_hw_params> const& output_hw_params,
+               audio::sample_rate const current) {
+                return box<sample_rate_choice>{
+                        std::in_place,
+                        runtime::sample_rates(
+                                input_hw_params,
+                                output_hw_params),
+                        current};
+            });
+
     return get_sample_rate(
             st.selected_io_sound_card.in.hw_params,
             st.selected_io_sound_card.out.hw_params,
             st.sample_rate);
 });
 
-static auto get_period_size =
-        memo([](unique_box<audio::sound_card_hw_params> const& input_hw_params,
-                unique_box<audio::sound_card_hw_params> const& output_hw_params,
-                audio::period_size const current) {
-            return box<period_size_choice>{
-                    std::in_place,
-                    runtime::period_sizes(input_hw_params, output_hw_params),
-                    current};
-        });
-
 selector<box<period_size_choice>> const select_period_size([](state const& st) {
+    static auto const get_period_size = memo(
+            [](unique_box<audio::sound_card_hw_params> const& input_hw_params,
+               unique_box<audio::sound_card_hw_params> const& output_hw_params,
+               audio::period_size const current) {
+                return box<period_size_choice>{
+                        std::in_place,
+                        runtime::period_sizes(
+                                input_hw_params,
+                                output_hw_params),
+                        current};
+            });
+
     return get_period_size(
             st.selected_io_sound_card.in.hw_params,
             st.selected_io_sound_card.out.hw_params,
             st.period_size);
 });
 
-static auto get_period_count =
-        memo([](unique_box<audio::sound_card_hw_params> const& input_hw_params,
-                unique_box<audio::sound_card_hw_params> const& output_hw_params,
-                audio::period_count const current) {
-            return box<period_count_choice>{
-                    std::in_place,
-                    runtime::period_counts(input_hw_params, output_hw_params),
-                    current};
-        });
+selector<box<period_count_choice>> const select_period_count([](state const&
+                                                                        st) {
+    static auto get_period_count = memo(
+            [](unique_box<audio::sound_card_hw_params> const& input_hw_params,
+               unique_box<audio::sound_card_hw_params> const& output_hw_params,
+               audio::period_count const current) {
+                return box<period_count_choice>{
+                        std::in_place,
+                        runtime::period_counts(
+                                input_hw_params,
+                                output_hw_params),
+                        current};
+            });
 
-selector<box<period_count_choice>> const
-        select_period_count([](state const& st) {
-            return get_period_count(
-                    st.selected_io_sound_card.in.hw_params,
-                    st.selected_io_sound_card.out.hw_params,
-                    st.period_count);
-        });
+    return get_period_count(
+            st.selected_io_sound_card.in.hw_params,
+            st.selected_io_sound_card.out.hw_params,
+            st.period_count);
+});
 
 selector<float> const select_buffer_latency([](state const& st) {
     return st.sample_rate.get() != 0
@@ -106,10 +112,10 @@ selector<box<sound_card_choice>> const
         });
 
 auto
-make_num_device_channels_selector(io_direction const bd)
+make_num_device_channels_selector(io_direction const io_dir)
         -> selector<std::size_t>
 {
-    switch (bd)
+    switch (io_dir)
     {
         case io_direction::input:
             return selector<std::size_t>([](state const& st) -> std::size_t {
@@ -124,89 +130,158 @@ make_num_device_channels_selector(io_direction const bd)
 }
 
 auto
-make_external_audio_device_ids_selector(io_direction const bd)
-        -> selector<box<external_audio::device_ids_t>>
+make_external_audio_device_ids_selector(io_direction const io_dir)
+        -> selector<unique_box<external_audio::device_ids_t>>
 {
-    switch (bd)
+    switch (io_dir)
     {
         case io_direction::input:
-            return [](state const& st) { return st.device_io_state.inputs; };
+            return [](state const& st) {
+                return st.external_audio_state.inputs;
+            };
 
         case io_direction::output:
-            return [](state const& st) { return st.device_io_state.outputs; };
+            return [](state const& st) {
+                return st.external_audio_state.outputs;
+            };
     }
 }
 
-selector<boxed_vector<mixer::channel_id>> const select_mixer_user_channels(
+template <auto GetMember>
+static auto
+make_external_audio_member_selector(
+        external_audio::device_id const device_id,
+        decltype(std::invoke(
+                GetMember,
+                std::declval<external_audio::device const&>())) default_value =
+                {})
+{
+    auto get = memo([device_id, default_value = std::move(default_value)](
+                            external_audio::devices_t const& devices) {
+        external_audio::device const* const device = devices.find(device_id);
+        return device ? std::invoke(GetMember, *device) : default_value;
+    });
+
+    return [get = std::move(get)](state const& st) {
+        return get(st.external_audio_state.devices);
+    };
+}
+
+auto
+make_external_audio_device_name_selector(
+        external_audio::device_id const device_id) -> selector<boxed_string>
+{
+    return make_external_audio_member_selector<&external_audio::device::name>(
+            device_id);
+}
+
+auto
+make_external_audio_device_bus_type_selector(
+        external_audio::device_id const device_id) -> selector<audio::bus_type>
+{
+    return make_external_audio_member_selector<
+            &external_audio::device::bus_type>(device_id);
+}
+
+template <audio::bus_channel BusChannel>
+static auto
+get_external_audio_device_bus_channel(external_audio::device const& device)
+{
+    return BusChannel == audio::bus_channel::right ? device.channels.right
+                                                   : device.channels.left;
+}
+
+auto
+make_external_audio_device_bus_channel_selector(
+        external_audio::device_id const device_id,
+        audio::bus_channel const bus_channel) -> selector<std::size_t>
+{
+    switch (bus_channel)
+    {
+        case audio::bus_channel::right:
+            return make_external_audio_member_selector<
+                    &get_external_audio_device_bus_channel<
+                            audio::bus_channel::right>>(
+                    device_id,
+                    piejam::npos);
+
+        default:
+            return make_external_audio_member_selector<
+                    &get_external_audio_device_bus_channel<
+                            audio::bus_channel::left>>(device_id, piejam::npos);
+    }
+}
+
+selector<unique_box<mixer::channel_ids_t>> const select_mixer_user_channels(
         [](state const& st) { return st.mixer_state.inputs; });
 
 selector<mixer::channel_id> const select_mixer_main_channel(
         [](state const& st) { return st.mixer_state.main; });
 
+template <auto GetMember>
+static auto
+make_mixer_channel_member_selector(
+        mixer::channel_id const channel_id,
+        decltype(std::invoke(GetMember, std::declval<mixer::channel const&>()))
+                default_value = {})
+{
+    auto get = memo([channel_id, default_value = std::move(default_value)](
+                            mixer::channels_t const& channels) {
+        mixer::channel const* const channel = channels.find(channel_id);
+        return channel ? std::invoke(GetMember, channel) : default_value;
+    });
+
+    return [get = std::move(get)](state const& st) {
+        return get(st.mixer_state.channels);
+    };
+}
+
 auto
 make_mixer_channel_bus_type_selector(mixer::channel_id const channel_id)
         -> selector<audio::bus_type>
 {
-    return [channel_id](state const& st) {
-        mixer::channel const* const channel =
-                st.mixer_state.channels.find(channel_id);
-        return channel ? channel->bus_type : audio::bus_type::mono;
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::bus_type>(
+            channel_id);
 }
 
 auto
 make_mixer_channel_volume_parameter_selector(mixer::channel_id const channel_id)
         -> selector<float_parameter_id>
 {
-    return [channel_id](state const& st) {
-        mixer::channel const* const channel =
-                st.mixer_state.channels.find(channel_id);
-        return channel ? channel->volume : float_parameter_id{};
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::volume>(
+            channel_id);
 }
 
 auto
 make_mixer_channel_pan_balance_parameter_selector(
         mixer::channel_id const channel_id) -> selector<float_parameter_id>
 {
-    return [channel_id](state const& st) {
-        mixer::channel const* const channel =
-                st.mixer_state.channels.find(channel_id);
-        return channel ? channel->pan_balance : float_parameter_id{};
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::pan_balance>(
+            channel_id);
 }
 
 auto
 make_mixer_channel_record_parameter_selector(mixer::channel_id const channel_id)
         -> selector<bool_parameter_id>
 {
-    return [channel_id](state const& st) {
-        mixer::channel const* const channel =
-                st.mixer_state.channels.find(channel_id);
-        return channel ? channel->record : bool_parameter_id{};
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::record>(
+            channel_id);
 }
 
 auto
 make_mixer_channel_mute_parameter_selector(mixer::channel_id const channel_id)
         -> selector<bool_parameter_id>
 {
-    return [channel_id](state const& st) {
-        mixer::channel const* const channel =
-                st.mixer_state.channels.find(channel_id);
-        return channel ? channel->mute : bool_parameter_id{};
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::mute>(
+            channel_id);
 }
 
 auto
 make_mixer_channel_solo_parameter_selector(mixer::channel_id const channel_id)
         -> selector<bool_parameter_id>
 {
-    return [channel_id](state const& st) {
-        mixer::channel const* const channel =
-                st.mixer_state.channels.find(channel_id);
-        return channel ? channel->solo : bool_parameter_id{};
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::solo>(
+            channel_id);
 }
 
 auto
@@ -214,11 +289,8 @@ make_mixer_channel_peak_level_parameter_selector(
         mixer::channel_id const channel_id)
         -> selector<stereo_level_parameter_id>
 {
-    return [channel_id](state const& st) {
-        mixer::channel const* const channel =
-                st.mixer_state.channels.find(channel_id);
-        return channel ? channel->peak_level : stereo_level_parameter_id{};
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::peak_level>(
+            channel_id);
 }
 
 auto
@@ -226,74 +298,9 @@ make_mixer_channel_rms_level_parameter_selector(
         mixer::channel_id const channel_id)
         -> selector<stereo_level_parameter_id>
 {
-    return [channel_id](state const& st) {
-        mixer::channel const* const channel =
-                st.mixer_state.channels.find(channel_id);
-        return channel ? channel->rms_level : stereo_level_parameter_id{};
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::rms_level>(
+            channel_id);
 }
-
-static struct
-{
-    auto operator()(
-            audio::bus_type const bus_type,
-            external_audio::devices_t const& devices,
-            box<external_audio::device_ids_t> const& device_ids) const
-            -> boxed_vector<mixer_device_route>
-    {
-        std::vector<mixer_device_route> result;
-        for (auto device_id : *device_ids)
-        {
-            if (auto const* const device = devices.find(device_id);
-                device && device->bus_type == bus_type)
-            {
-                result.emplace_back(mixer_device_route{
-                        .device_id = device_id,
-                        .name = *device->name});
-            }
-        }
-        return box_(std::move(result));
-    }
-
-    auto operator()(audio::bus_type const bus_type) const
-    {
-        return [this, bus_type](
-                       external_audio::devices_t const& devices,
-                       box<external_audio::device_ids_t> const& device_ids) {
-            return (*this)(bus_type, devices, device_ids);
-        };
-    }
-} const make_mixer_device_routes;
-
-static struct
-{
-    auto operator()(
-            mixer::channel_id const channel_id,
-            mixer::io_socket const io_socket,
-            mixer::channels_t const& channels) const
-            -> boxed_vector<mixer_channel_route>
-    {
-        auto valid_sources =
-                mixer::valid_channels(io_socket, channels, channel_id);
-        return box_(algorithm::transform_to_vector(
-                valid_sources,
-                [&](auto const& id) {
-                    return mixer_channel_route{
-                            .channel_id = id,
-                            .name = channels[id].name};
-                }));
-    }
-
-    auto operator()(
-            mixer::channel_id const channel_id,
-            mixer::io_socket const io_socket) const
-    {
-        return [=, this](mixer::channels_t const& channels) {
-            return (*this)(channel_id, io_socket, channels);
-        };
-    }
-
-} const make_mixer_channel_routes;
 
 static auto
 get_default_route_name(
@@ -317,7 +324,25 @@ make_mixer_channel_default_route_name_selector(
     return boost::hof::always(get_default_route_name(bus_type, io_socket));
 }
 
-struct
+auto
+make_mixer_channel_default_route_is_valid_selector(
+        mixer::channel_id const channel_id,
+        mixer::io_socket const io_socket) -> selector<bool>
+{
+    switch (io_socket)
+    {
+        case mixer::io_socket::in:
+            return [channel_id, get = memo(&mixer::is_default_source_valid)](
+                           state const& st) {
+                return get(st.mixer_state.channels, channel_id);
+            };
+
+        default:
+            return boost::hof::always(true);
+    }
+}
+
+static struct
 {
     auto operator()(
             mixer::channel_id const channel_id,
@@ -409,24 +434,6 @@ struct
 } const get_mixer_channel_selected_route;
 
 auto
-make_mixer_channel_default_route_is_valid_selector(
-        mixer::channel_id const channel_id,
-        mixer::io_socket const io_socket) -> selector<bool>
-{
-    switch (io_socket)
-    {
-        case mixer::io_socket::in:
-            return [channel_id, get = memo(&mixer::is_default_source_valid)](
-                           state const& st) {
-                return get(st.mixer_state.channels, channel_id);
-            };
-
-        default:
-            return boost::hof::always(true);
-    }
-}
-
-auto
 make_mixer_channel_selected_route_selector(
         mixer::channel_id const channel_id,
         mixer::io_socket const io_socket) -> selector<box<selected_route>>
@@ -434,60 +441,80 @@ make_mixer_channel_selected_route_selector(
     return [get = memo(
                     get_mixer_channel_selected_route(channel_id, io_socket))](
                    state const& st) {
-        return get(st.mixer_state.channels, st.device_io_state.devices);
+        return get(st.mixer_state.channels, st.external_audio_state.devices);
     };
 }
 
 auto
-make_mixer_devices_selector(
+make_mixer_device_routes_selector(
         audio::bus_type const bus_type,
         mixer::io_socket const io_socket)
         -> selector<boxed_vector<mixer_device_route>>
 {
+    auto get_mixer_device_routes = memo(
+            [bus_type](
+                    external_audio::devices_t const& devices,
+                    unique_box<external_audio::device_ids_t> const& device_ids)
+                    -> boxed_vector<mixer_device_route> {
+                std::vector<mixer_device_route> result;
+                for (auto device_id : *device_ids)
+                {
+                    if (auto const* const device = devices.find(device_id);
+                        device && device->bus_type == bus_type)
+                    {
+                        result.emplace_back(mixer_device_route{
+                                .device_id = device_id,
+                                .name = *device->name});
+                    }
+                }
+                return box_(std::move(result));
+            });
+
     switch (io_socket)
     {
         case mixer::io_socket::in:
-            return [get = memo(make_mixer_device_routes(bus_type))](
+            return [get = std::move(get_mixer_device_routes)](
                            state const& st) mutable {
                 return get(
-                        st.device_io_state.devices,
-                        st.device_io_state.inputs);
+                        st.external_audio_state.devices,
+                        st.external_audio_state.inputs);
             };
 
-        default:
-            return [get = memo(
-                            make_mixer_device_routes(audio::bus_type::stereo))](
+        case mixer::io_socket::out:
+            BOOST_ASSERT(bus_type == audio::bus_type::stereo);
+            return [get = std::move(get_mixer_device_routes)](
                            state const& st) mutable {
                 return get(
-                        st.device_io_state.devices,
-                        st.device_io_state.outputs);
+                        st.external_audio_state.devices,
+                        st.external_audio_state.outputs);
             };
     }
+
+    BOOST_ASSERT(false);
+    return boost::hof::always(boxed_vector<mixer_device_route>{});
 }
 
 auto
-make_mixer_channels_selector(
+make_mixer_channel_routes_selector(
         mixer::channel_id const channel_id,
         mixer::io_socket const io_socket)
         -> selector<boxed_vector<mixer_channel_route>>
 {
-    return [get = memo(make_mixer_channel_routes(channel_id, io_socket))](
-                   state const& st) { return get(st.mixer_state.channels); };
-}
+    auto get_mixer_channel_routes =
+            memo([channel_id, io_socket](mixer::channels_t const& channels) {
+                auto valid_sources =
+                        mixer::valid_channels(io_socket, channels, channel_id);
+                return box_(algorithm::transform_to_vector(
+                        valid_sources,
+                        [&](auto const& id) {
+                            return mixer_channel_route{
+                                    .channel_id = id,
+                                    .name = channels[id].name};
+                        }));
+            });
 
-auto
-make_external_audio_device_name_selector(
-        external_audio::device_id const device_id) -> selector<boxed_string>
-{
-    auto get_device_name = [](external_audio::devices_t const& devices,
-                              external_audio::device_id const device_id) {
-        external_audio::device const* const device = devices.find(device_id);
-        return device ? device->name : boxed_string();
-    };
-
-    return [device_id,
-            get = memo(get_device_name)](state const& st) -> boxed_string {
-        return get(st.device_io_state.devices, device_id);
+    return [get = std::move(get_mixer_channel_routes)](state const& st) {
+        return get(st.mixer_state.channels);
     };
 }
 
@@ -495,16 +522,8 @@ auto
 make_mixer_channel_name_selector(mixer::channel_id const channel_id)
         -> selector<boxed_string>
 {
-    auto get_mixer_channel_name = [](mixer::channels_t const& channels,
-                                     mixer::channel_id const channel_id) {
-        mixer::channel const* const mixer_channel = channels.find(channel_id);
-        return mixer_channel ? mixer_channel->name : boxed_string();
-    };
-
-    return [channel_id, get = memo(get_mixer_channel_name)](
-                   state const& st) -> boxed_string {
-        return get(st.mixer_state.channels, channel_id);
-    };
+    return make_mixer_channel_member_selector<&mixer::channel::name>(
+            channel_id);
 }
 
 auto
@@ -529,84 +548,37 @@ make_mixer_channel_can_move_right_selector(mixer::channel_id const channel_id)
     };
 }
 
-auto
-make_external_audio_device_bus_type_selector(
-        external_audio::device_id const device_id) -> selector<audio::bus_type>
-{
-    return [device_id](state const& st) -> audio::bus_type {
-        external_audio::device const* device =
-                st.device_io_state.devices.find(device_id);
-        return device ? device->bus_type : audio::bus_type::mono;
-    };
-}
-
-auto
-make_external_audio_device_bus_channel_selector(
-        external_audio::device_id const device_id,
-        audio::bus_channel const bc) -> selector<std::size_t>
-{
-    switch (bc)
-    {
-        case audio::bus_channel::mono:
-        case audio::bus_channel::left:
-            return [device_id](state const& st) -> std::size_t {
-                external_audio::device const* const device =
-                        st.device_io_state.devices.find(device_id);
-                return device ? device->channels.left : piejam::npos;
-            };
-
-        case audio::bus_channel::right:
-            return [device_id](state const& st) -> std::size_t {
-                external_audio::device const* const device =
-                        st.device_io_state.devices.find(device_id);
-                return device ? device->channels.right : piejam::npos;
-            };
-    }
-
-    BOOST_ASSERT(false);
-    return boost::hof::always(piejam::npos);
-}
-
-selector<boxed_vector<midi::device_id_t>> const select_midi_input_devices(
-        [](state const& st) -> boxed_vector<midi::device_id_t> {
-            return st.midi_inputs;
-        });
-
-static auto
-midi_device_name(
-        box<std::unordered_map<midi::device_id_t, midi_device_config>> const&
-                midi_devices,
-        midi::device_id_t const device_id) -> boxed_string
-{
-    auto it = midi_devices->find(device_id);
-    return it != midi_devices->end() ? it->second.name : boxed_string();
-}
+selector<unique_box<midi::device_ids_t>> const select_midi_input_devices(
+        [](state const& st) { return st.midi_inputs; });
 
 auto
 make_midi_device_name_selector(midi::device_id_t const device_id)
         -> selector<boxed_string>
 {
-    return [device_id](state const& st) {
-        return midi_device_name(st.midi_devices, device_id);
-    };
-}
+    auto get_midi_device_name =
+            memo([device_id](unique_box<midi_devices_t> const& midi_devices) {
+                auto it = midi_devices->find(device_id);
+                return it != midi_devices->end() ? it->second.name
+                                                 : boxed_string();
+            });
 
-static bool
-is_midi_device_enabled(
-        box<std::unordered_map<midi::device_id_t, midi_device_config>> const&
-                midi_devices,
-        midi::device_id_t const device_id)
-{
-    auto it = midi_devices->find(device_id);
-    return it != midi_devices->end() && it->second.enabled;
+    return [get = std::move(get_midi_device_name)](state const& st) {
+        return get(st.midi_devices);
+    };
 }
 
 auto
 make_midi_device_enabled_selector(midi::device_id_t const device_id)
         -> selector<bool>
 {
-    return [device_id](state const& st) {
-        return is_midi_device_enabled(st.midi_devices, device_id);
+    auto is_midi_device_enabled =
+            memo([device_id](unique_box<midi_devices_t> const& midi_devices) {
+                auto it = midi_devices->find(device_id);
+                return it != midi_devices->end() && it->second.enabled;
+            });
+
+    return [get = std::move(is_midi_device_enabled)](state const& st) {
+        return get(st.midi_devices);
     };
 }
 
@@ -647,7 +619,7 @@ make_muted_by_solo_state(mixer::channels_t const& channels)
     return result;
 }
 
-selector<box<muted_by_solo_state_t>> select_muted_by_solo_state(
+static selector<box<muted_by_solo_state_t>> const select_muted_by_solo_state(
         [get = memo(boxify_result(&make_muted_by_solo_state))](
                 state const& st) { return get(st.mixer_state.channels); });
 
@@ -663,14 +635,28 @@ make_muted_by_solo_selector(mixer::channel_id const mixer_channel_id)
 }
 
 auto
-make_fx_chain_selector(mixer::channel_id mixer_channel_id)
-        -> selector<box<fx::chain_t>>
+make_fx_chain_selector(mixer::channel_id const channel_id)
+        -> selector<unique_box<fx::chain_t>>
 {
-    return [mixer_channel_id](state const& st) -> box<fx::chain_t> {
-        static box<fx::chain_t> s_empty_fx_chain;
-        mixer::channel const* const mixer_channel =
-                st.mixer_state.channels.find(mixer_channel_id);
-        return mixer_channel ? mixer_channel->fx_chain : s_empty_fx_chain;
+    return make_mixer_channel_member_selector<&mixer::channel::fx_chain>(
+            channel_id);
+}
+
+template <auto GetMember>
+auto
+make_fx_module_member_selector(fx::module_id const fx_mod_id)
+{
+    static decltype(std::invoke(
+            GetMember,
+            std::declval<fx::module const*>())) s_default{};
+
+    auto get = memo([fx_mod_id](fx::modules_t const& fx_modules) {
+        fx::module const* const fx_mod = fx_modules.find(fx_mod_id);
+        return fx_mod ? std::invoke(GetMember, fx_mod) : s_default;
+    });
+
+    return [get = std::move(get)](state const& st) {
+        return get(st.fx_modules);
     };
 }
 
@@ -678,50 +664,61 @@ auto
 make_fx_module_instance_id_selector(fx::module_id const fx_mod_id)
         -> selector<fx::instance_id>
 {
-    return [fx_mod_id](state const& st) -> fx::instance_id {
-        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
-        return fx_mod ? fx_mod->fx_instance_id : fx::instance_id();
-    };
+    return make_fx_module_member_selector<&fx::module::fx_instance_id>(
+            fx_mod_id);
 }
 
 auto
 make_fx_module_name_selector(fx::module_id const fx_mod_id)
         -> selector<boxed_string>
 {
-    return [fx_mod_id](state const& st) -> boxed_string {
-        static boxed_string s_empty_name;
-        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
-        return fx_mod ? fx_mod->name : s_empty_name;
-    };
+    return make_fx_module_member_selector<&fx::module::name>(fx_mod_id);
 }
 
 auto
 make_fx_module_bus_type_selector(fx::module_id const fx_mod_id)
         -> selector<audio::bus_type>
 {
-    return [fx_mod_id](state const& st) -> audio::bus_type {
-        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
-        return fx_mod ? fx_mod->bus_type : audio::bus_type::mono;
-    };
+    return make_fx_module_member_selector<&fx::module::bus_type>(fx_mod_id);
 }
 
 auto
 make_fx_module_bypass_selector(fx::module_id const fx_mod_id) -> selector<bool>
 {
-    return [fx_mod_id](state const& st) -> bool {
-        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
-        return fx_mod && fx_mod->bypassed;
-    };
+    return make_fx_module_member_selector<&fx::module::bypassed>(fx_mod_id);
 }
 
 auto
 make_fx_module_parameters_selector(fx::module_id const fx_mod_id)
-        -> selector<box<fx::module_parameters>>
+        -> selector<unique_box<fx::module_parameters>>
 {
-    return [fx_mod_id](state const& st) -> box<fx::module_parameters> {
-        static box<fx::module_parameters> s_empty;
-        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
-        return fx_mod ? fx_mod->parameters : s_empty;
+    return make_fx_module_member_selector<&fx::module::parameters>(fx_mod_id);
+}
+
+static auto
+make_fx_module_can_move_selector(mixer::channel_id const fx_chain_id, bool up)
+        -> selector<bool>
+{
+    auto get = memo([fx_chain_id,
+                     up](mixer::channels_t const& channels,
+                         mixer::channel_id focused_fx_chain_id,
+                         fx::module_id focused_fx_mod_id) {
+        if (fx_chain_id != focused_fx_chain_id)
+        {
+            return false;
+        }
+
+        mixer::channel const* const mixer_channel = channels.find(fx_chain_id);
+        return mixer_channel && !mixer_channel->fx_chain->empty() &&
+               (up ? mixer_channel->fx_chain->front()
+                   : mixer_channel->fx_chain->back()) != focused_fx_mod_id;
+    });
+
+    return [get = std::move(get)](state const& st) -> bool {
+        return get(
+                st.mixer_state.channels,
+                st.gui_state.focused_fx_chain_id,
+                st.gui_state.focused_fx_mod_id);
     };
 }
 
@@ -729,83 +726,93 @@ auto
 make_fx_module_can_move_up_selector(mixer::channel_id const fx_chain_id)
         -> selector<bool>
 {
-    return [=](state const& st) -> bool {
-        if (fx_chain_id != st.gui_state.focused_fx_chain_id)
-        {
-            return false;
-        }
-
-        mixer::channel const* const mixer_channel =
-                st.mixer_state.channels.find(fx_chain_id);
-        return mixer_channel && !mixer_channel->fx_chain->empty() &&
-               mixer_channel->fx_chain->front() !=
-                       st.gui_state.focused_fx_mod_id;
-    };
+    return make_fx_module_can_move_selector(fx_chain_id, true);
 }
 
 auto
 make_fx_module_can_move_down_selector(mixer::channel_id const fx_chain_id)
         -> selector<bool>
 {
-    return [=](state const& st) -> bool {
-        if (fx_chain_id != st.gui_state.focused_fx_chain_id)
-        {
-            return false;
-        }
-
-        mixer::channel const* const mixer_channel =
-                st.mixer_state.channels.find(fx_chain_id);
-        return mixer_channel && !mixer_channel->fx_chain->empty() &&
-               mixer_channel->fx_chain->back() !=
-                       st.gui_state.focused_fx_mod_id;
-    };
+    return make_fx_module_can_move_selector(fx_chain_id, false);
 }
 
 auto
 make_fx_parameter_name_selector(fx::parameter_id const fx_param_id)
         -> selector<boxed_string>
 {
-    return [fx_param_id](state const& st) -> boxed_string {
-        static boxed_string s_empty;
-        return std::visit(
-                [&](auto param_id) {
+    static boxed_string const s_empty;
+    return std::visit(
+            [](auto param_id) -> selector<boxed_string> {
+                return [param_id](state const& st) {
                     if (auto const* const desc = st.ui_params.find(param_id);
                         desc)
                     {
                         return desc->name;
                     }
                     return s_empty;
-                },
-                fx_param_id);
-    };
+                };
+            },
+            fx_param_id);
 }
 
 auto
 make_fx_parameter_value_string_selector(fx::parameter_id const fx_param_id)
         -> selector<std::string>
 {
-    return [fx_param_id](state const& st) -> std::string {
-        return std::visit(
-                [&](auto param_id) {
+    return std::visit(
+            [](auto param_id) -> selector<std::string> {
+                using parameter_t = typename decltype(param_id)::tag;
+                using cached_value_type = typename parameter_descriptor<
+                        parameter_t>::value_slot::cached_type;
+                using value_to_string_fn = typename ui_parameter_descriptor<
+                        parameter_t>::value_to_string_fn;
+                using memoed_value_to_string_fn =
+                        decltype(memo(std::declval<value_to_string_fn>()));
+
+                return [param_id,
+                        cached_value = cached_value_type{},
+                        value_to_string =
+                                std::shared_ptr<memoed_value_to_string_fn>{}](
+                               state const& st) mutable {
+                    if (cached_value && value_to_string) [[likely]]
+                    {
+                        return (*value_to_string)(*cached_value);
+                    }
+
                     auto const* const desc = st.params.find(param_id);
                     auto const* const ui_desc =
                             desc ? st.ui_params.find(param_id) : nullptr;
-                    return desc && ui_desc
-                                   ? ui_desc->value_to_string(desc->value.get())
-                                   : std::string{};
-                },
-                fx_param_id);
-    };
+
+                    if (desc && ui_desc)
+                    {
+                        cached_value = desc->value.cached();
+                        value_to_string =
+                                std::make_shared<memoed_value_to_string_fn>(
+                                        memo(ui_desc->value_to_string));
+
+                        return ui_desc->value_to_string(desc->value.get());
+                    }
+
+                    return std::string{};
+                };
+            },
+            fx_param_id);
 }
 
 auto
 make_fx_module_streams_selector(fx::module_id fx_mod_id)
-        -> selector<box<fx::module_streams>>
+        -> selector<unique_box<fx::module_streams>>
 {
-    return [fx_mod_id](state const& st) -> box<fx::module_streams> {
-        static box<fx::module_streams> s_empty;
-        fx::module const* const fx_mod = st.fx_modules.find(fx_mod_id);
-        return fx_mod ? fx_mod->streams : s_empty;
+    static unique_box<fx::module_streams> const s_empty;
+
+    auto get_fx_module_streams =
+            memo([fx_mod_id](fx::modules_t const& fx_modules) {
+                fx::module const* const fx_mod = fx_modules.find(fx_mod_id);
+                return fx_mod ? fx_mod->streams : s_empty;
+            });
+
+    return [get = std::move(get_fx_module_streams)](state const& st) {
+        return get(st.fx_modules);
     };
 }
 
@@ -813,10 +820,17 @@ auto
 make_audio_stream_selector(audio_stream_id stream_id)
         -> selector<audio_stream_buffer>
 {
-    return [stream_id](state const& st) -> audio_stream_buffer {
-        static audio_stream_buffer s_empty(std::in_place, 1);
-        auto* stream = st.streams.find(stream_id);
-        return stream ? *stream : s_empty;
+    static audio_stream_buffer s_empty(std::in_place, 1);
+
+    auto get_audio_stream =
+            memo([stream_id](audio_streams_cache const& streams) {
+                auto* stream = streams.find(stream_id);
+                return stream ? *stream : s_empty;
+            });
+
+    return [get = std::move(get_audio_stream)](
+                   state const& st) -> audio_stream_buffer {
+        return get(st.streams);
     };
 }
 
@@ -975,19 +989,34 @@ selector<fx::module_id> const select_focused_fx_module([](state const& st) {
     return st.gui_state.focused_fx_mod_id;
 });
 
-selector<boxed_string> const select_focused_fx_module_name([](state const& st) {
+static auto
+get_focused_fx_module_name(
+        fx::modules_t const& fx_modules,
+        fx::module_id const focused_fx_mod_id)
+{
     static boxed_string s_empty_name;
 
-    fx::module const* const fx_mod =
-            st.fx_modules.find(st.gui_state.focused_fx_mod_id);
+    fx::module const* const fx_mod = fx_modules.find(focused_fx_mod_id);
     return fx_mod ? fx_mod->name : s_empty_name;
-});
+}
 
-selector<bool> const
-select_focused_fx_module_bypassed([](state const& st) -> bool {
-    fx::module const* const fx_mod =
-            st.fx_modules.find(st.gui_state.focused_fx_mod_id);
+selector<boxed_string> const select_focused_fx_module_name(
+        [get = memo(&get_focused_fx_module_name)](state const& st) {
+            return get(st.fx_modules, st.gui_state.focused_fx_mod_id);
+        });
+
+static auto
+get_focused_fx_module_bypassed(
+        fx::modules_t const& fx_modules,
+        fx::module_id const focused_fx_mod_id)
+{
+    fx::module const* const fx_mod = fx_modules.find(focused_fx_mod_id);
     return fx_mod && fx_mod->bypassed;
-});
+}
+
+selector<bool> const select_focused_fx_module_bypassed(
+        [get = memo(&get_focused_fx_module_bypassed)](state const& st) -> bool {
+            return get(st.fx_modules, st.gui_state.focused_fx_mod_id);
+        });
 
 } // namespace piejam::runtime::selectors

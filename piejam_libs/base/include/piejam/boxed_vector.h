@@ -16,17 +16,17 @@ namespace piejam
 template <class T>
 using boxed_vector = box<std::vector<T>>;
 
-template <class T>
+template <class T, class Eq>
 auto
-remove_erase(boxed_vector<T>& vec, T const& value)
+remove_erase(detail::box<std::vector<T>, Eq>& vec, T const& value)
 {
     vec.update(
             [&value](std::vector<T>& vec) { boost::remove_erase(vec, value); });
 }
 
-template <class T, class... Args>
+template <class T, class Eq, class... Args>
 void
-emplace_back(boxed_vector<T>& vec, Args&&... args)
+emplace_back(detail::box<std::vector<T>, Eq>& vec, Args&&... args)
 {
     vec.update([&](std::vector<T>& vec) {
         vec.emplace_back(std::forward<decltype(args)>(args)...);

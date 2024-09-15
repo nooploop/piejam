@@ -15,7 +15,7 @@ namespace piejam::gui::model
 
 struct MidiInputSettings::Impl
 {
-    boxed_vector<midi::device_id_t> device_ids;
+    unique_box<midi::device_ids_t> device_ids;
     MidiDeviceList devices;
 };
 
@@ -39,7 +39,7 @@ void
 MidiInputSettings::onSubscribe()
 {
     observe(runtime::selectors::select_midi_input_devices,
-            [this](boxed_vector<midi::device_id_t> const& devs) {
+            [this](auto const& devs) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->device_ids, *devs),
                         piejam::gui::generic_list_model_edit_script_executor{

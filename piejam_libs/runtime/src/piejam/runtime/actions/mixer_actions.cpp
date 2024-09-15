@@ -24,7 +24,7 @@ add_mixer_channel::reduce(state& st) const
 
     if (auto_assign_input)
     {
-        for (auto device_id : *st.device_io_state.inputs)
+        for (auto device_id : *st.external_audio_state.inputs)
         {
             auto it = std::ranges::find_if(
                     st.mixer_state.channels,
@@ -40,7 +40,7 @@ add_mixer_channel::reduce(state& st) const
                             }));
 
             if (it == st.mixer_state.channels.end() &&
-                st.device_io_state.devices[device_id].bus_type == bus_type)
+                st.external_audio_state.devices[device_id].bus_type == bus_type)
             {
                 st.mixer_state.channels.update(
                         added_mixer_channel_id,

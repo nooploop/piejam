@@ -74,7 +74,7 @@ AudioRouting::onSubscribe()
                 }
             });
 
-    observe(runtime::selectors::make_mixer_devices_selector(
+    observe(runtime::selectors::make_mixer_device_routes_selector(
                     m_impl->bus_type,
                     m_impl->io_socket),
             [this](boxed_vector<runtime::selectors::mixer_device_route> const&
@@ -90,7 +90,7 @@ AudioRouting::onSubscribe()
                 setDevices(std::move(deviceNames));
             });
 
-    observe(runtime::selectors::make_mixer_channels_selector(
+    observe(runtime::selectors::make_mixer_channel_routes_selector(
                     m_impl->mixer_channel_id,
                     m_impl->io_socket),
             [this](boxed_vector<runtime::selectors::mixer_channel_route> const&

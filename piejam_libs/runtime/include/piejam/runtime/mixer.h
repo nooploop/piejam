@@ -38,7 +38,7 @@ struct channel
     stereo_level_parameter_id peak_level;
     stereo_level_parameter_id rms_level;
 
-    box<fx::chain_t> fx_chain{};
+    unique_box<fx::chain_t> fx_chain{};
 
     auto operator==(channel const&) const noexcept -> bool = default;
 
@@ -63,7 +63,7 @@ struct state
 {
     channels_t channels;
 
-    box<channel_ids_t> inputs;
+    unique_box<channel_ids_t> inputs;
     channel_id main;
 };
 

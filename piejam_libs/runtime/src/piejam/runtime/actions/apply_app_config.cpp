@@ -26,8 +26,8 @@ apply_bus_configs(
         std::size_t const num_ch)
 {
     BOOST_ASSERT_MSG(
-            D == io_direction::input ? st.device_io_state.inputs->empty()
-                                     : st.device_io_state.outputs->empty(),
+            D == io_direction::input ? st.external_audio_state.inputs->empty()
+                                     : st.external_audio_state.outputs->empty(),
             "configs should be cleared before applying");
     for (auto const& bus_conf : configs)
     {

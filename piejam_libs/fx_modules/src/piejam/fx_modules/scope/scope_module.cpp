@@ -182,7 +182,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
             .fx_instance_id = internal_id(),
             .name = box_("Scope"s),
             .bus_type = args.bus_type,
-            .parameters = box_(runtime::fx::module_parameters{
+            .parameters = unique_box_(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::mode),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
@@ -319,7 +319,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                       &runtime::
                                               bool_parameter_value_to_string})},
             }),
-            .streams = box_(runtime::fx::module_streams{
+            .streams = unique_box_(runtime::fx::module_streams{
                     {to_underlying(stream_key::input),
                      args.streams.add(runtime::audio_stream_buffer(
                              std::in_place,

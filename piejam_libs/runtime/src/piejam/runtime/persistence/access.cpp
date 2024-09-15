@@ -74,13 +74,13 @@ save_app_config(
         };
 
         buses_to_bus_configs(
-                state.device_io_state.devices,
-                state.device_io_state.inputs.get(),
+                state.external_audio_state.devices,
+                state.external_audio_state.inputs.get(),
                 conf.input_devices);
 
         buses_to_bus_configs(
-                state.device_io_state.devices,
-                state.device_io_state.outputs.get(),
+                state.external_audio_state.devices,
+                state.external_audio_state.outputs.get(),
                 conf.output_devices);
 
         conf.enabled_midi_input_devices = enabled_midi_input_devices;
@@ -267,7 +267,7 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                     },
                     [&st](external_audio::device_id const& device_id) {
                         external_audio::device const& device =
-                                st.device_io_state.devices[device_id];
+                                st.external_audio_state.devices[device_id];
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,
                                 .name = device.name};

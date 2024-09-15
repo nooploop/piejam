@@ -144,7 +144,7 @@ make_module(
             .fx_instance_id = instance_id,
             .name = box_(name),
             .bus_type = bus_type,
-            .parameters = box_(
+            .parameters = unique_box_(
                     make_module_parameters{params, ui_params}(control_inputs)),
             .streams = {}};
 }

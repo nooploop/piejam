@@ -30,13 +30,13 @@ default_bus_name(state const& st, io_direction io_dir, audio::bus_type bus_type)
         case io_direction::input:
             return fmt::format(
                     "In {} {}",
-                    st.device_io_state.inputs->size() + 1,
+                    st.external_audio_state.inputs->size() + 1,
                     bus_type == audio::bus_type::mono ? "M" : "S");
 
         case io_direction::output:
             return fmt::format(
                     "Speaker {}",
-                    st.device_io_state.outputs->size() + 1);
+                    st.external_audio_state.outputs->size() + 1);
     }
 }
 
@@ -51,13 +51,13 @@ default_channels(state const& st, io_direction io_dir, audio::bus_type bus_type)
     std::vector<bool> assigned_channels(num_channels);
 
     auto const& device_ids = io_dir == io_direction::input
-                                     ? *st.device_io_state.inputs
-                                     : *st.device_io_state.outputs;
+                                     ? *st.external_audio_state.inputs
+                                     : *st.external_audio_state.outputs;
 
     for (external_audio::device_id const device_id : device_ids)
     {
         external_audio::device const* const device =
-                st.device_io_state.devices.find(device_id);
+                st.external_audio_state.devices.find(device_id);
         BOOST_ASSERT(device);
         if (auto ch = device->channels.left; ch != npos)
         {
@@ -130,7 +130,7 @@ remove_external_audio_device::reduce(state& st) const
 void
 set_external_audio_device_bus_channel::reduce(state& st) const
 {
-    st.device_io_state.devices.update(
+    st.external_audio_state.devices.update(
             device_id,
             [this](external_audio::device& device) {
                 switch (channel_selector)
@@ -153,12 +153,12 @@ set_external_audio_device_bus_channel::reduce(state& st) const
 void
 set_external_audio_device_name::reduce(state& st) const
 {
-    st.device_io_state.devices.update(
+    st.external_audio_state.devices.update(
             device_id,
             [this](external_audio::device& device) { device.name = name; });
 
     auto const io_dir =
-            algorithm::contains(*st.device_io_state.inputs, device_id)
+            algorithm::contains(*st.external_audio_state.inputs, device_id)
                     ? io_direction::input
                     : io_direction::output;
 

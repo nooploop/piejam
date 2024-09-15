@@ -54,10 +54,10 @@ struct state
     audio::period_size period_size{};
     audio::period_count period_count{};
 
-    external_audio::state device_io_state;
+    external_audio::state external_audio_state;
 
-    boxed_vector<midi::device_id_t> midi_inputs;
-    box<midi_devices_t> midi_devices;
+    unique_box<midi::device_ids_t> midi_inputs;
+    unique_box<midi_devices_t> midi_devices;
 
     parameters_map params;
     ui_parameter_descriptors_map ui_params;

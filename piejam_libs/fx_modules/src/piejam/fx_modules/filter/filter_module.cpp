@@ -81,7 +81,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
             .fx_instance_id = internal_id(),
             .name = box_("Filter"s),
             .bus_type = args.bus_type,
-            .parameters = box_(runtime::fx::module_parameters{
+            .parameters = unique_box_(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::type),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
@@ -117,7 +117,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                                      from_normalized_linear},
                              {.name = box_("Resonance"s),
                               .value_to_string = &to_resonance_string})}}),
-            .streams = box_(runtime::fx::module_streams{
+            .streams = unique_box_(runtime::fx::module_streams{
                     {to_underlying(stream_key::in_out),
                      args.streams.add(runtime::audio_stream_buffer(
                              std::in_place,

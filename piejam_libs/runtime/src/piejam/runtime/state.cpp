@@ -442,15 +442,15 @@ add_external_audio_device(
         audio::bus_type const bus_type,
         channel_index_pair const& channels) -> external_audio::device_id
 {
-    auto id = st.device_io_state.devices.add(external_audio::device{
+    auto id = st.external_audio_state.devices.add(external_audio::device{
             .name = box_(name),
             .bus_type = io_dir == io_direction::input ? bus_type
                                                       : audio::bus_type::stereo,
             .channels = channels});
 
     auto& devices_ids = io_dir == io_direction::input
-                                ? st.device_io_state.inputs
-                                : st.device_io_state.outputs;
+                                ? st.external_audio_state.inputs
+                                : st.external_audio_state.outputs;
 
     emplace_back(devices_ids, id);
 
@@ -565,7 +565,7 @@ remove_external_audio_device(
         state& st,
         external_audio::device_id const device_id)
 {
-    auto const name = st.device_io_state.devices[device_id].name;
+    auto const name = st.external_audio_state.devices[device_id].name;
 
     st.mixer_state.channels.update(
             [equal_to_device = equal_to<>(mixer::io_address_t(device_id)),
@@ -575,15 +575,15 @@ remove_external_audio_device(
                 set_if(mixer_channel.out, equal_to_device, missing_device_name);
             });
 
-    st.device_io_state.devices.remove(device_id);
+    st.external_audio_state.devices.remove(device_id);
 
-    if (algorithm::contains(*st.device_io_state.inputs, device_id))
+    if (algorithm::contains(*st.external_audio_state.inputs, device_id))
     {
-        remove_erase(st.device_io_state.inputs, device_id);
+        remove_erase(st.external_audio_state.inputs, device_id);
     }
     else
     {
-        remove_erase(st.device_io_state.outputs, device_id);
+        remove_erase(st.external_audio_state.outputs, device_id);
     }
 }
 

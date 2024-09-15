@@ -130,7 +130,7 @@ public:
     auto operator==(entity_map const&) const noexcept -> bool = default;
 
 private:
-    box<map_t> m_map;
+    unique_box<map_t> m_map;
 };
 
 } // namespace piejam
