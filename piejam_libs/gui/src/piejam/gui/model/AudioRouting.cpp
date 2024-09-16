@@ -4,6 +4,8 @@
 
 #include <piejam/gui/model/AudioRouting.h>
 
+#include <piejam/gui/model/AudioRoutingSelection.h>
+
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/selectors.h>
@@ -17,6 +19,8 @@ struct AudioRouting::Impl
     runtime::mixer::channel_id mixer_channel_id;
     runtime::mixer::io_socket io_socket;
     audio::bus_type bus_type;
+
+    std::unique_ptr<AudioRoutingSelection> selected;
 
     boxed_vector<runtime::selectors::mixer_device_route> devices;
     boxed_vector<runtime::selectors::mixer_channel_route> channels;
@@ -33,16 +37,28 @@ AudioRouting::AudioRouting(
               io_socket,
               observe_once(
                       runtime::selectors::make_mixer_channel_bus_type_selector(
-                              id)))}
+                              id)),
+              std::make_unique<AudioRoutingSelection>(
+                      store_dispatch,
+                      state_change_subscriber,
+                      id,
+                      io_socket))}
     , m_defaultName{QString::fromStdString(observe_once(
               runtime::selectors::
                       make_mixer_channel_default_route_name_selector(
                               m_impl->bus_type,
                               io_socket)))}
 {
+    connectSubscribableChild(*m_impl->selected);
 }
 
 AudioRouting::~AudioRouting() = default;
+
+auto
+AudioRouting::selected() const noexcept -> AudioRoutingSelection*
+{
+    return m_impl->selected.get();
+}
 
 void
 AudioRouting::onSubscribe()
@@ -52,27 +68,6 @@ AudioRouting::onSubscribe()
                             m_impl->mixer_channel_id,
                             m_impl->io_socket),
             [this](bool const x) { setDefaultIsValid(x); });
-
-    observe(runtime::selectors::make_mixer_channel_selected_route_selector(
-                    m_impl->mixer_channel_id,
-                    m_impl->io_socket),
-            [this](box<runtime::selectors::selected_route> const& sel_route) {
-                setSelected(QString::fromStdString(sel_route->name));
-                switch (sel_route->state)
-                {
-                    case runtime::selectors::selected_route::state_t::valid:
-                        setSelectedState(SelectedState::Valid);
-                        break;
-
-                    case runtime::selectors::selected_route::state_t::not_mixed:
-                        setSelectedState(SelectedState::NotMixed);
-                        break;
-
-                    default:
-                        setSelectedState(SelectedState::Invalid);
-                        break;
-                }
-            });
 
     observe(runtime::selectors::make_mixer_device_routes_selector(
                     m_impl->bus_type,

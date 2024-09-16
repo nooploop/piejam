@@ -32,6 +32,7 @@ class MixerChannelEdit;
 class MixerChannelFx;
 class DbScaleData;
 class AudioRouting;
+class AudioRoutingSelection;
 
 class ExternalAudioDeviceConfig;
 using ExternalAudioDeviceConfigList =

@@ -23,9 +23,8 @@ class AudioRouting final : public Subscribable<SubscribableModel>
     Q_PROPERTY(QString defaultName READ defaultName CONSTANT FINAL)
     Q_PROPERTY(bool defaultIsValid READ defaultIsValid NOTIFY
                        defaultIsValidChanged FINAL)
-    Q_PROPERTY(SelectedState selectedState READ selectedState NOTIFY
-                       selectedStateChanged FINAL)
-    Q_PROPERTY(QString selected READ selected NOTIFY selectedChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::AudioRoutingSelection* selected READ selected
+                       CONSTANT FINAL)
     Q_PROPERTY(QStringList devices READ devices NOTIFY devicesChanged FINAL)
     Q_PROPERTY(QStringList channels READ channels NOTIFY channelsChanged FINAL)
 
@@ -56,42 +55,7 @@ public:
         }
     }
 
-    enum class SelectedState
-    {
-        Invalid,
-        Valid,
-        NotMixed
-    };
-
-    Q_ENUM(SelectedState)
-
-    auto selectedState() const noexcept -> SelectedState
-    {
-        return m_selectedState;
-    }
-
-    void setSelectedState(SelectedState x)
-    {
-        if (m_selectedState != x)
-        {
-            m_selectedState = x;
-            emit selectedStateChanged();
-        }
-    }
-
-    auto selected() const noexcept -> QString const&
-    {
-        return m_selected;
-    }
-
-    void setSelected(QString const& x)
-    {
-        if (m_selected != x)
-        {
-            m_selected = x;
-            emit selectedChanged();
-        }
-    }
+    auto selected() const noexcept -> AudioRoutingSelection*;
 
     auto devices() const -> QStringList const&
     {
@@ -127,8 +91,6 @@ public:
 
 signals:
     void defaultIsValidChanged();
-    void selectedStateChanged();
-    void selectedChanged();
     void devicesChanged();
     void channelsChanged();
 
@@ -140,8 +102,6 @@ private:
 
     QString m_defaultName;
     bool m_defaultIsValid{};
-    SelectedState m_selectedState{};
-    QString m_selected;
     QStringList m_devices;
     QStringList m_channels;
 };

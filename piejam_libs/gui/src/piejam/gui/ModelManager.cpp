@@ -11,6 +11,7 @@
 #include <piejam/gui/model/AudioDeviceSettings.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
 #include <piejam/gui/model/AudioRouting.h>
+#include <piejam/gui/model/AudioRoutingSelection.h>
 #include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/BoolParameter.h>
@@ -59,6 +60,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::AudioDeviceSettings*>();
     qRegisterMetaType<piejam::gui::model::AudioInputOutputSettings*>();
     qRegisterMetaType<piejam::gui::model::AudioRouting*>();
+    qRegisterMetaType<piejam::gui::model::AudioRoutingSelection*>();
     qRegisterMetaType<piejam::gui::model::AudioStreamListener*>();
     qRegisterMetaType<piejam::gui::model::AudioStreamProvider*>();
     qRegisterMetaType<piejam::gui::model::BoolParameter*>();
@@ -90,11 +92,11 @@ runRegistration()
 
     qRegisterMetaType<piejam::gui::item::SpectrumScaleLabel>();
 
-    qmlRegisterUncreatableType<piejam::gui::model::AudioRouting>(
+    qmlRegisterUncreatableType<piejam::gui::model::AudioRoutingSelection>(
             "PieJam.Models",
             1,
             0,
-            "AudioRouting",
+            "AudioRoutingSelection",
             "Not creatable");
 
     qmlRegisterUncreatableType<piejam::gui::model::FxModuleContent>(

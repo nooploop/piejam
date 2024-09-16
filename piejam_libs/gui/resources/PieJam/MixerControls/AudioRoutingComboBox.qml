@@ -21,14 +21,14 @@ SubscribableItem {
 
         anchors.fill: parent
 
-        displayText: root.model ? root.model.selected : "-"
+        displayText: root.model ? root.model.selected.label : "-"
 
         function selectedStateToColor(s) {
             switch (s) {
-                case PJModels.AudioRouting.SelectedState.Invalid:
+                case PJModels.AudioRoutingSelection.State.Invalid:
                     return Material.Red
 
-                case PJModels.AudioRouting.SelectedState.NotMixed:
+                case PJModels.AudioRoutingSelection.State.NotMixed:
                     return Material.Yellow
 
                 default:
@@ -36,7 +36,7 @@ SubscribableItem {
             }
         }
 
-        Material.foreground: selectedStateToColor(root.model ? root.model.selectedState : null)
+        Material.foreground: selectedStateToColor(root.model ? root.model.selected.state : null)
 
         popup: Menu {
             MenuItem {
