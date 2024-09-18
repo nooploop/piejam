@@ -10,7 +10,6 @@
 
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/multichannel_buffer.h>
-#include <piejam/boxify_result.h>
 #include <piejam/functional/memo.h>
 #include <piejam/npos.h>
 #include <piejam/range/indices.h>
