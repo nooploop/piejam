@@ -34,14 +34,14 @@ using stereo_level = audio::pair<float>;
 struct locations;
 
 template <class Parameter>
-struct parameter_descriptor;
+struct parameter_map_slot;
 
-using parameters_map = parameter::map<parameter_descriptor>;
+using parameters_map = parameter::map<parameter_map_slot>;
 
 template <class Parameter>
-struct ui_parameter_descriptor;
+struct ui_parameter_map_slot;
 
-using ui_parameter_descriptors_map = parameter::map<ui_parameter_descriptor>;
+using ui_parameters_map = parameter::map<ui_parameter_map_slot>;
 
 using parameter_processor_factory = boost::mp11::
         mp_rename<parameters_t, processors::parameter_processor_factory>;

@@ -24,6 +24,7 @@ ListView {
         perform: model.item.perform
         edit: model.item.edit
         fx: model.item.fx
+        auxSend: model.item.auxSend
     }
 }
 

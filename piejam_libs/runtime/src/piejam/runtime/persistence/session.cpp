@@ -162,6 +162,12 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::mixer_io, type, name);
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        session::mixer_aux_send,
+        route,
+        enabled,
+        volume);
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         session::mixer_channel,
         name,
         bus_type,
@@ -169,7 +175,8 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         midi,
         fx_chain,
         in,
-        out);
+        out,
+        aux_sends);
 
 static auto const s_key_mixer_channels = "mixer_channels";
 static auto const s_key_main_mixer_channel = "main_mixer_channel";

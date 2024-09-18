@@ -18,6 +18,7 @@ struct audio_engine_action_visitor
               add_mixer_channel,
               delete_mixer_channel,
               set_mixer_channel_route,
+              enable_mixer_channel_aux_route,
               move_mixer_channel_left,
               move_mixer_channel_right,
               delete_fx_module,

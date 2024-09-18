@@ -123,6 +123,7 @@ ViewPane {
         perform: root.model.mainChannel.perform
         edit: root.model.mainChannel.edit
         fx: root.model.mainChannel.fx
+        auxSend: root.model.mainChannel.auxSend
 
         deletable: false
     }
@@ -146,6 +147,13 @@ ViewPane {
             checked: MixerViewSettings.mode === MixerViewSettings.fx
 
             onClicked: MixerViewSettings.switchMode(MixerViewSettings.fx)
+        }
+
+        ViewToolBarButton {
+            iconSource: "qrc:///images/icons/aux.svg"
+            checked: MixerViewSettings.mode === MixerViewSettings.auxSend
+
+            onClicked: MixerViewSettings.switchMode(MixerViewSettings.auxSend)
         }
 
         Item {

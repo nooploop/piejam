@@ -70,7 +70,9 @@ AudioRouting::onSubscribe()
             [this](bool const x) { setDefaultIsValid(x); });
 
     observe(runtime::selectors::make_mixer_device_routes_selector(
-                    m_impl->bus_type,
+                    m_impl->io_socket != runtime::mixer::io_socket::in
+                            ? audio::bus_type::stereo
+                            : m_impl->bus_type,
                     m_impl->io_socket),
             [this](boxed_vector<runtime::selectors::mixer_device_route> const&
                            devices) {

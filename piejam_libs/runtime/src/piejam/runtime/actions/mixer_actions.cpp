@@ -118,7 +118,48 @@ set_mixer_channel_route::reduce(state& st) const
                     case mixer::io_socket::out:
                         mixer_channel.out = route;
                         break;
+
+                    case mixer::io_socket::aux:
+                        BOOST_ASSERT_MSG(
+                                false,
+                                "use select_mixer_channel_aux_route");
+                        break;
                 }
+            });
+}
+
+void
+select_mixer_channel_aux_route::reduce(state& st) const
+{
+    st.mixer_state.channels.update(
+            channel_id,
+            [this](mixer::channel& mixer_channel) {
+                mixer_channel.aux = route;
+            });
+}
+
+void
+enable_mixer_channel_aux_route::reduce(state& st) const
+{
+    st.mixer_state.channels.update(
+            channel_id,
+            [this](mixer::channel& mixer_channel) {
+                mixer_channel.aux_sends.update(
+                        [this,
+                         route = std::holds_alternative<default_t>(route)
+                                         ? mixer_channel.aux
+                                         : route](
+                                mixer::aux_sends_t& aux_sends) {
+                            if (auto it = aux_sends.find(route);
+                                it != aux_sends.end())
+                            {
+                                it->second.enabled = enabled;
+                            }
+                            else
+                            {
+                                BOOST_ASSERT(false);
+                            }
+                        });
             });
 }
 

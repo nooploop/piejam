@@ -26,7 +26,7 @@ struct make_module_parameters
 {
     make_module_parameters(
             parameters_map& params,
-            ui_parameter_descriptors_map& ui_params)
+            ui_parameters_map& ui_params)
         : m_params{params}
         , m_ui_params{ui_params}
     {
@@ -126,7 +126,7 @@ private:
     }
 
     parameters_map& m_params;
-    ui_parameter_descriptors_map& m_ui_params;
+    ui_parameters_map& m_ui_params;
 };
 
 } // namespace
@@ -138,7 +138,7 @@ make_module(
         audio::bus_type const bus_type,
         std::span<ladspa::port_descriptor const> const control_inputs,
         parameters_map& params,
-        ui_parameter_descriptors_map& ui_params) -> fx::module
+        ui_parameters_map& ui_params) -> fx::module
 {
     return fx::module{
             .fx_instance_id = instance_id,

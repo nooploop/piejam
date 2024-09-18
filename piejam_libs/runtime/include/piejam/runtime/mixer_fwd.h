@@ -19,7 +19,17 @@ struct channel;
 using channel_id = entity_id<channel>;
 using channels_t = entity_map<channel>;
 
-using missing_device_address = boxed_string;
+struct missing_device_address
+{
+    boxed_string name;
+
+    auto operator==(missing_device_address const&) const -> bool = default;
+
+    auto operator<(missing_device_address const& other) const -> bool
+    {
+        return name.get() < other.name.get();
+    }
+};
 
 using io_address_t = std::variant<
         default_t,
@@ -31,6 +41,7 @@ enum class io_socket
 {
     in,
     out,
+    aux,
 };
 
 using channel_ids_t = std::vector<channel_id>;

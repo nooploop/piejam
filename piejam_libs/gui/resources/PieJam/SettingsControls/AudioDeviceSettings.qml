@@ -65,7 +65,7 @@ SubscribableItem {
 
                     icon.width: 24
                     icon.height: 24
-                    icon.source: "qrc:///images/icons/autorenew.svg"
+                    icon.source: "qrc:///images/icons/cycle_arrows.svg"
                     display: AbstractButton.IconOnly
 
                     onClicked: root.model.refreshSoundCardLists()

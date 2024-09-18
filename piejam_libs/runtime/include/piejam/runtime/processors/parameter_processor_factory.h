@@ -37,6 +37,7 @@ public:
     auto make_processor(parameter::id_t<P> id, std::string_view const name = {})
             -> std::shared_ptr<parameter_processor<P>>
     {
+        BOOST_ASSERT(id.valid());
         auto proc = std::make_shared<parameter_processor<P>>(name);
         std::get<processor_map<P>>(m_procs).insert_or_assign(id, proc);
         return proc;

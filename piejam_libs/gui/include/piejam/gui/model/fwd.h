@@ -30,6 +30,7 @@ using MixerChannelsList = GenericListModel<MixerChannel>;
 class MixerChannelPerform;
 class MixerChannelEdit;
 class MixerChannelFx;
+class MixerChannelAuxSend;
 class DbScaleData;
 class AudioRouting;
 class AudioRoutingSelection;

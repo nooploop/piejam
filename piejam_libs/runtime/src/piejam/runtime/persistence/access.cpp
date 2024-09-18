@@ -272,12 +272,29 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 .type = session::mixer_io_type::device,
                                 .name = device.name};
                     },
-                    [](mixer::missing_device_address const& name) {
+                    [](mixer::missing_device_address const& missing) {
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,
-                                .name = name};
+                                .name = missing.name};
                     }),
             addr);
+}
+
+static auto
+export_mixer_aux_sends(state const& st, mixer::aux_sends_t const& aux_sends)
+{
+    std::vector<session::mixer_aux_send> result;
+
+    for (auto const& [aux, aux_send] : aux_sends)
+    {
+        result.emplace_back(session::mixer_aux_send{
+                .route = export_mixer_io(st, aux),
+                .enabled = aux_send.enabled,
+                .volume = st.params[aux_send.volume].value.get(),
+        });
+    }
+
+    return result;
 }
 
 static auto
@@ -291,6 +308,7 @@ export_mixer_channel(state const& st, mixer::channel const& mixer_channel)
     result.parameter = export_mixer_parameters(st, mixer_channel);
     result.in = export_mixer_io(st, mixer_channel.in);
     result.out = export_mixer_io(st, mixer_channel.out);
+    result.aux_sends = export_mixer_aux_sends(st, mixer_channel.aux_sends);
     return result;
 }
 

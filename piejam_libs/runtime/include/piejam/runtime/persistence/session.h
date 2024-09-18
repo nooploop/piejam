@@ -86,6 +86,13 @@ struct session
         std::string name;
     };
 
+    struct mixer_aux_send
+    {
+        mixer_io route;
+        bool enabled;
+        float volume;
+    };
+
     struct mixer_channel
     {
         std::string name;
@@ -95,6 +102,7 @@ struct session
         fx_chain_t fx_chain;
         mixer_io in;
         mixer_io out;
+        std::vector<mixer_aux_send> aux_sends;
     };
 
     std::vector<mixer_channel> mixer_channels;

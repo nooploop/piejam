@@ -63,10 +63,7 @@ class box
 public:
     using value_type = T;
 
-    box()
-        : box(std::in_place, T{})
-    {
-    }
+    box() = default;
 
     template <convertible_to_box_value<T const> U>
     explicit box(U&& v)
@@ -146,7 +143,14 @@ public:
     }
 
 private:
-    std::shared_ptr<T const> m_value;
+    static auto get_default() -> std::shared_ptr<T const>
+    {
+        static std::shared_ptr<T const> const s_default{
+                std::make_shared<T>(T{})};
+        return s_default;
+    }
+
+    std::shared_ptr<T const> m_value{get_default()};
 };
 
 template <class T, class Eq>

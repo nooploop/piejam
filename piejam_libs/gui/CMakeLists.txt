@@ -69,6 +69,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MidiInputSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/Mixer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelAuxSend.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelEdit.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelFx.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/gui/model/MixerChannelPerform.h
@@ -137,6 +138,7 @@ add_library(piejam_gui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/StereoLevelParameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/model/WaveformDataGenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/gui/qt_log.cpp
+    src/piejam/gui/model/MixerChannelAuxSend.cpp
 )
 
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

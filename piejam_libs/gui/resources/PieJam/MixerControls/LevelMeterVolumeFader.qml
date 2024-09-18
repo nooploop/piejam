@@ -13,7 +13,7 @@ Item {
     property alias peakLevel: meter.peakLevel
     property alias rmsLevel: meter.rmsLevel
     property alias volume: fader.model
-    property alias muted: meter.muted
+    property bool muted: false
 
     property alias levelMeterScale: meter.scaleData
     property alias volumeFaderScale: fader.scaleData
@@ -26,6 +26,8 @@ Item {
             id: meter
 
             Layout.fillHeight: true
+
+            muted: root.muted
         }
 
         VolumeFader {
@@ -33,6 +35,8 @@ Item {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            muted: root.muted
         }
     }
 }

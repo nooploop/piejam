@@ -33,6 +33,7 @@
 #include <piejam/gui/model/MidiInputSettings.h>
 #include <piejam/gui/model/Mixer.h>
 #include <piejam/gui/model/MixerChannel.h>
+#include <piejam/gui/model/MixerChannelAuxSend.h>
 #include <piejam/gui/model/MixerChannelEdit.h>
 #include <piejam/gui/model/MixerChannelFx.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
@@ -79,6 +80,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::MidiInputSettings*>();
     qRegisterMetaType<piejam::gui::model::Mixer*>();
     qRegisterMetaType<piejam::gui::model::MixerChannel*>();
+    qRegisterMetaType<piejam::gui::model::MixerChannelAuxSend*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelEdit*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelFx*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();

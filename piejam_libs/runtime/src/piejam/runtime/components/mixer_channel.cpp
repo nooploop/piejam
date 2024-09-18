@@ -164,6 +164,59 @@ private:
             {m_mute_solo->event_inputs()[1]}};
 };
 
+class mixer_channel_aux_send final : public audio::engine::component
+{
+public:
+    mixer_channel_aux_send(
+            mixer::channel const& mixer_channel,
+            float_parameter_id aux_volume,
+            parameter_processor_factory& param_procs)
+        : m_volume_param(param_procs.make_processor(
+                  aux_volume,
+                  format_name(*mixer_channel.name, "aux_volume")))
+        , m_volume_amp{audio::components::make_stereo_amplifier(
+                  format_name(*mixer_channel.name, "aux_amp"))}
+    {
+    }
+    auto inputs() const -> endpoints override
+    {
+        return m_volume_amp->inputs();
+    }
+
+    auto outputs() const -> endpoints override
+    {
+        return m_volume_amp->outputs();
+    }
+
+    auto event_inputs() const -> endpoints override
+    {
+        return {};
+    }
+
+    auto event_outputs() const -> endpoints override
+    {
+        return {};
+    }
+
+    void connect(audio::engine::graph& g) const override
+    {
+        m_volume_amp->connect(g);
+
+        using namespace audio::engine::endpoint_ports;
+
+        audio::engine::connect_event(
+                g,
+                *m_volume_param,
+                from<0>,
+                *m_volume_amp,
+                to<0>);
+    }
+
+private:
+    std::shared_ptr<audio::engine::value_io_processor<float>> m_volume_param;
+    std::unique_ptr<audio::engine::component> m_volume_amp;
+};
+
 } // namespace
 
 auto
@@ -185,6 +238,19 @@ make_mixer_channel_output(
             mixer_channel,
             param_procs,
             sample_rate);
+}
+
+auto
+make_mixer_channel_aux_send(
+        mixer::channel const& mixer_channel,
+        float_parameter_id aux_volume,
+        parameter_processor_factory& param_procs)
+        -> std::unique_ptr<audio::engine::component>
+{
+    return std::make_unique<mixer_channel_aux_send>(
+            mixer_channel,
+            aux_volume,
+            param_procs);
 }
 
 } // namespace piejam::runtime::components

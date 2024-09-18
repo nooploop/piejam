@@ -8,9 +8,10 @@ import QtQuick.Layouts 1.15
 Item {
     id: root
 
-    property var perform: null
-    property var edit: null
-    property var fx: null
+    property alias perform: performStrip.model
+    property alias edit: editStrip.model
+    property alias fx: fxStrip.model
+    property alias auxSend: auxSendStrip.model
 
     property bool deletable: true
 
@@ -23,17 +24,21 @@ Item {
         currentIndex: MixerViewSettings.mode
 
         ChannelPerformStrip {
-            model: root.perform
+            id: performStrip
         }
 
         ChannelEditStrip {
-            model: root.edit
+            id: editStrip
 
             deletable: root.deletable
         }
 
         ChannelFxStrip {
-            model: root.fx
+            id: fxStrip
+        }
+
+        ChannelAuxSend {
+            id: auxSendStrip
         }
     }
 }

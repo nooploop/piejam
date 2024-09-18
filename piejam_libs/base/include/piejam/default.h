@@ -4,13 +4,15 @@
 
 #pragma once
 
+#include <compare>
+
 namespace piejam
 {
 
 struct default_t
 {
-    [[nodiscard]] constexpr bool
-    operator==(default_t const&) const noexcept = default;
+    [[nodiscard]] constexpr auto
+    operator<=>(default_t const&) const noexcept = default;
 };
 
 } // namespace piejam

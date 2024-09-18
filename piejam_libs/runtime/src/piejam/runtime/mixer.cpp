@@ -4,9 +4,13 @@
 
 #include <piejam/runtime/mixer.h>
 
+#include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/functional/get.h>
 #include <piejam/io_pair.h>
 
+#include <boost/hof/compose.hpp>
 #include <boost/hof/unpack.hpp>
+#include <boost/range/adaptor/filtered.hpp>
 
 #include <algorithm>
 #include <ranges>
@@ -21,6 +25,7 @@ struct channel_io_t
 {
     io_address_t in;
     io_address_t out;
+    std::vector<io_address_t> aux_sends;
 
     template <io_socket S>
     constexpr auto get() -> io_address_t&
@@ -54,10 +59,24 @@ using channels_io_t = boost::container::flat_map<channel_id, channel_io_t>;
 auto
 extract_channels_io(channels_t const& channels) -> channels_io_t
 {
+    using boost::adaptors::filtered;
+    namespace bhof = boost::hof;
+
     auto transformed = std::views::transform(
             channels,
-            boost::hof::unpack([](auto const id, auto const& channel) {
-                return std::pair(id, channel_io_t(channel.in, channel.out));
+            bhof::unpack([](auto const id, auto const& channel) {
+                auto aux_sends = algorithm::transform_to_vector(
+                        *channel.aux_sends | filtered(bhof::compose(
+                                                     &mixer::aux_send::enabled,
+                                                     get_by_index<1>)),
+                        get_by_index<0>);
+
+                return std::pair(
+                        id,
+                        channel_io_t{
+                                .in = channel.in,
+                                .out = channel.out,
+                                .aux_sends = std::move(aux_sends)});
             }));
 
     return channels_io_t(
@@ -91,14 +110,23 @@ make_channels_io_graph(channels_io_t const& channels_io) -> io_graph
             result[*in_channel_id].children.push_back(id);
         }
 
-        if (channel_id const* const out_channel_id =
-                    std::get_if<channel_id>(&ch_io.out))
-        {
-            if (std::holds_alternative<default_t>(
-                        channels_io.at(*out_channel_id).in))
+        auto add_out_child = [&](auto const& addr) {
+            if (channel_id const* const out_channel_id =
+                        std::get_if<channel_id>(&addr))
             {
-                result[id].children.push_back(*out_channel_id);
+                if (std::holds_alternative<default_t>(
+                            channels_io.at(*out_channel_id).in))
+                {
+                    result[id].children.push_back(*out_channel_id);
+                }
             }
+        };
+
+        add_out_child(ch_io.out);
+
+        for (auto aux : ch_io.aux_sends)
+        {
+            add_out_child(aux);
         }
     }
 
@@ -191,8 +219,9 @@ valid_io_channels(channels_t const& channels, channel_id const ch_id)
 
 } // namespace
 
-bool
+auto
 is_default_source_valid(channels_t const& channels, channel_id const ch_id)
+        -> bool
 {
     auto channels_io = extract_channels_io(channels);
     channels_io[ch_id].in = default_t{};
@@ -200,10 +229,41 @@ is_default_source_valid(channels_t const& channels, channel_id const ch_id)
 }
 
 auto
-valid_source_channels(channels_t const& channels, channel_id const ch_id)
-        -> std::vector<channel_id>
+can_toggle_aux(channels_t const& channels, channel_id const ch_id) -> bool
 {
-    return valid_io_channels<io_socket::in>(channels, ch_id);
+    mixer::channel const* const channel = channels.find(ch_id);
+    if (!channel)
+    {
+        return false;
+    }
+
+    auto it_aux_send = channel->aux_sends->find(channel->aux);
+    if (it_aux_send == channel->aux_sends->end())
+    {
+        return false;
+    }
+
+    if (it_aux_send->second.enabled)
+    {
+        return true; // we can always disable an enabled aux
+    }
+
+    auto const* const target =
+            std::get_if<mixer::channel_id>(&it_aux_send->first);
+    if (!target)
+    {
+        return true; // anything but a channel can be enabled without check
+    }
+
+    auto channels_io = extract_channels_io(channels);
+
+    if (!std::holds_alternative<default_t>(channels_io[*target].in))
+    {
+        return true; // if target in is not set to "Mix"
+    }
+
+    channels_io[ch_id].aux_sends.emplace_back(channel->aux);
+    return !has_cycle(make_channels_io_graph(channels_io));
 }
 
 auto
@@ -219,6 +279,10 @@ valid_channels(
 
         case io_socket::out:
             return valid_io_channels<io_socket::out>(channels, ch_id);
+
+        case io_socket::aux:
+            BOOST_ASSERT(false);
+            return {};
     }
 
     return {};

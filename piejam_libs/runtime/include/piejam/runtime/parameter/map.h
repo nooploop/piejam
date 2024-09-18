@@ -14,21 +14,21 @@
 namespace piejam::runtime::parameter
 {
 
-template <template <class Parameter> class Value>
+template <template <class Parameter> class Slot>
 class map
 {
 public:
     template <class P>
-    using value_map = boost::container::flat_map<id_t<P>, Value<P>>;
+    using map_t = boost::container::flat_map<id_t<P>, Slot<P>>;
 
     template <class P>
-    auto get_map() const -> value_map<P> const&
+    auto get_map() const -> map_t<P> const&
     {
-        return *static_cast<value_map<P> const*>(m_maps.at(typeid(P)).get());
+        return *static_cast<map_t<P> const*>(m_maps.at(typeid(P)).get());
     }
 
     template <class P>
-    auto get_map() -> value_map<P>&
+    auto get_map() -> map_t<P>&
     {
         auto it = m_maps.find(typeid(P));
 
@@ -36,11 +36,11 @@ public:
         {
             it = m_maps.emplace(
                                std::type_index{typeid(P)},
-                               std::make_shared<value_map<P>>())
+                               std::make_shared<map_t<P>>())
                          .first;
         }
 
-        return *static_cast<value_map<P>*>(it->second.get());
+        return *static_cast<map_t<P>*>(it->second.get());
     }
 
     template <class P, class... Args>
@@ -69,7 +69,7 @@ public:
     }
 
     template <class P>
-    auto find(id_t<P> const id) const noexcept -> Value<P> const*
+    auto find(id_t<P> const id) const noexcept -> Slot<P> const*
     {
         auto const& m = get_map<P>();
         auto it = m.find(id);
@@ -77,7 +77,7 @@ public:
     }
 
     template <class P>
-    auto find(id_t<P> const id) noexcept -> Value<P>*
+    auto find(id_t<P> const id) noexcept -> Slot<P>*
     {
         auto& m = get_map<P>();
         auto it = m.find(id);
@@ -85,7 +85,7 @@ public:
     }
 
     template <class P>
-    auto operator[](id_t<P> const id) const noexcept -> Value<P> const&
+    auto operator[](id_t<P> const id) const noexcept -> Slot<P> const&
     {
         auto const& m = get_map<P>();
         auto it = m.find(id);
@@ -94,7 +94,7 @@ public:
     }
 
     template <class P>
-    auto operator[](id_t<P> const id) noexcept -> Value<P>&
+    auto operator[](id_t<P> const id) noexcept -> Slot<P>&
     {
         auto& m = get_map<P>();
         auto it = m.find(id);

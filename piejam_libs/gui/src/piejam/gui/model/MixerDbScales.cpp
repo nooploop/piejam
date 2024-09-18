@@ -43,6 +43,22 @@ makeVolumeFaderScaleTick12to12(float const dB) noexcept -> DbScaleTick
             .dB = dB};
 }
 
+static constexpr auto
+makeSendFaderScaleTick60To24(float const dB) noexcept -> DbScaleTick
+{
+    return DbScaleTick{
+            .position = math::linear_map(dB, -60.f, -24.f, 0.05f, 0.4f),
+            .dB = dB};
+}
+
+static constexpr auto
+makeVolumeFaderScaleTick24to0(float const dB) noexcept -> DbScaleTick
+{
+    return DbScaleTick{
+            .position = math::linear_map(dB, -24.f, 0.f, 0.4f, 1.f),
+            .dB = dB};
+}
+
 MixerDbScales::MixerDbScales()
     : m_levelMeterScale(std::make_unique<DbScaleData>(QVector<DbScaleTick>(
               {DbScaleTick{
@@ -78,6 +94,23 @@ MixerDbScales::MixerDbScales()
                makeVolumeFaderScaleTick12to12(6.f),
                makeVolumeFaderScaleTick12to12(9.f),
                DbScaleTick{.position = 1.f, .dB = 12.f}})))
+    , m_sendFaderScale(std::make_unique<DbScaleData>(QVector<DbScaleTick>(
+              {DbScaleTick{
+                       .position = 0.f,
+                       .dB = -std::numeric_limits<float>::infinity()},
+               DbScaleTick{.position = 0.05f, .dB = -60.f},
+               makeSendFaderScaleTick60To24(-50.f),
+               makeSendFaderScaleTick60To24(-40.f),
+               makeSendFaderScaleTick60To24(-30.f),
+               DbScaleTick{.position = 0.4f, .dB = -24.f},
+               makeVolumeFaderScaleTick24to0(-21.f),
+               makeVolumeFaderScaleTick24to0(-18.f),
+               makeVolumeFaderScaleTick24to0(-15.f),
+               makeVolumeFaderScaleTick24to0(-12.f),
+               makeVolumeFaderScaleTick24to0(-9.f),
+               makeVolumeFaderScaleTick24to0(-6.f),
+               makeVolumeFaderScaleTick24to0(-3.f),
+               DbScaleTick{.position = 1.f, .dB = 0.f}})))
 {
 }
 

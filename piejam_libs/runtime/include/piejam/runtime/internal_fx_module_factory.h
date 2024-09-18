@@ -18,7 +18,7 @@ struct internal_fx_module_factory_args
     audio::bus_type bus_type;
     audio::sample_rate sample_rate;
     parameters_map& params;
-    ui_parameter_descriptors_map& ui_params;
+    ui_parameters_map& ui_params;
     audio_streams_cache& streams;
 };
 

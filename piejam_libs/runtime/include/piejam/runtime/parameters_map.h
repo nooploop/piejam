@@ -12,7 +12,7 @@ namespace piejam::runtime
 {
 
 template <class Parameter>
-struct parameter_descriptor
+struct parameter_map_slot
 {
     Parameter param;
 
@@ -43,12 +43,24 @@ struct parameter_descriptor
             return m_value;
         }
 
+        auto operator==(value_slot const& other) const -> bool
+        {
+            return get() == other.get();
+        }
+
+        auto operator!=(value_slot const& other) const -> bool
+        {
+            return get() != other.get();
+        }
+
     private:
         std::shared_ptr<value_type> m_value{
                 std::make_shared<value_type>(value_type{})};
     } value{param.default_value};
+
+    auto operator==(parameter_map_slot const&) const -> bool = default;
 };
 
-using parameters_map = parameter::map<parameter_descriptor>;
+using parameters_map = parameter::map<parameter_map_slot>;
 
 } // namespace piejam::runtime

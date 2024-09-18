@@ -74,6 +74,8 @@ Item {
                     font.pixelSize: 10
                     font.bold: true
 
+                    color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
+
                     text: modelData.dB
                     horizontalAlignment: Text.AlignRight
                 }
@@ -87,7 +89,7 @@ Item {
             Layout.fillHeight: true
 
             scaleData: root.scaleData
-            color: Material.primaryTextColor
+            color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
             tickOffset: 6
             edge: PJItems.DbScale.Edge.Right
         }
@@ -131,7 +133,7 @@ Item {
             Layout.fillHeight: true
 
             scaleData: root.scaleData
-            color: Material.primaryTextColor
+            color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
             tickOffset: 6
         }
     }

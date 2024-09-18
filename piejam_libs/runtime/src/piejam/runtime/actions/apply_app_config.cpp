@@ -20,7 +20,7 @@ update_channel(std::size_t& cur_ch, std::size_t const num_chs)
 
 template <io_direction D>
 static auto
-apply_bus_configs(
+apply_external_audio_device_configs(
         state& st,
         std::vector<persistence::external_audio_device_config> const& configs,
         std::size_t const num_ch)
@@ -45,12 +45,12 @@ apply_bus_configs(
 void
 apply_app_config::reduce(state& st) const
 {
-    apply_bus_configs<io_direction::input>(
+    apply_external_audio_device_configs<io_direction::input>(
             st,
             conf.input_devices,
             st.selected_io_sound_card.in.hw_params->num_channels);
 
-    apply_bus_configs<io_direction::output>(
+    apply_external_audio_device_configs<io_direction::output>(
             st,
             conf.output_devices,
             st.selected_io_sound_card.out.hw_params->num_channels);

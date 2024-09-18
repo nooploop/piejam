@@ -12,6 +12,7 @@ Item {
     readonly property int perform: 0
     readonly property int edit: 1
     readonly property int fx: 2
+    readonly property int auxSend: 3
 
     property int mode: root.perform
 

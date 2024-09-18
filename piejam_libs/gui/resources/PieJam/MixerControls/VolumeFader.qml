@@ -19,6 +19,9 @@ SubscribableItem {
     id: root
 
     property var scaleData: null
+    property bool muted: false
+
+    signal moved()
 
     implicitWidth: 50
     implicitHeight: 300
@@ -58,6 +61,8 @@ SubscribableItem {
                             font.pixelSize: 10
                             font.bold: true
 
+                            color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
+
                             text: modelData.dB
                             horizontalAlignment: Text.AlignRight
                         }
@@ -71,7 +76,7 @@ SubscribableItem {
                     Layout.fillHeight: true
 
                     scaleData: root.scaleData
-                    color: Material.primaryTextColor
+                    color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
                     tickOffset: 6
                     edge: PJItems.DbScale.Edge.Right
                 }
@@ -94,6 +99,7 @@ SubscribableItem {
                 var newVolume = root.scaleData.dBAt(slider.value)
                 root.model.changeValue(DbConvert.from_dB(newVolume))
                 Info.showParameterValue(root.model)
+                root.moved()
             }
         }
     }

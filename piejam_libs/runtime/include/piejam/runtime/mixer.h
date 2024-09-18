@@ -21,6 +21,14 @@
 namespace piejam::runtime::mixer
 {
 
+struct aux_send
+{
+    bool enabled{};
+    float_parameter_id volume{};
+};
+
+using aux_sends_t = std::map<io_address_t, aux_send>;
+
 struct channel
 {
     boxed_string name{};
@@ -29,14 +37,17 @@ struct channel
 
     io_address_t in{};
     io_address_t out{};
+    io_address_t aux{}; // currently selected aux route
 
-    float_parameter_id volume;
-    float_parameter_id pan_balance;
-    bool_parameter_id record;
-    bool_parameter_id mute;
-    bool_parameter_id solo;
-    stereo_level_parameter_id peak_level;
-    stereo_level_parameter_id rms_level;
+    unique_box<aux_sends_t> aux_sends{};
+
+    float_parameter_id volume{};
+    float_parameter_id pan_balance{};
+    bool_parameter_id record{};
+    bool_parameter_id mute{};
+    bool_parameter_id solo{};
+    stereo_level_parameter_id peak_level{};
+    stereo_level_parameter_id rms_level{};
 
     unique_box<fx::chain_t> fx_chain{};
 
@@ -51,6 +62,9 @@ struct channel
 
             case io_socket::out:
                 return out;
+
+            case io_socket::aux:
+                return aux;
         }
 
         BOOST_ASSERT(false);
@@ -68,6 +82,8 @@ struct state
 };
 
 auto is_default_source_valid(channels_t const&, channel_id) -> bool;
+
+auto can_toggle_aux(channels_t const&, channel_id) -> bool;
 
 auto valid_channels(io_socket, channels_t const&, channel_id)
         -> std::vector<channel_id>;

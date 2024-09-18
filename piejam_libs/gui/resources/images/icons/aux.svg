@@ -1,0 +1,22 @@
+<!--
+SPDX-FileCopyrightText: Google - Material Design Icons https://materialdesignicons.com/
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg
+   height="24px"
+   viewBox="0 -960 960 960"
+   width="24px"
+   fill="#5f6368"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <path
+     d="m 360,-840 v 567 l -64,-63 -56,56 160,160 160,-160 -56,-57 -64,64 v -261 q 35,31 79,44.5 44,13.5 88,13.5 11,0 21,-1 10,-1 19,-3 l -63,64 56,56 160,-160 -160,-160 -56,56 63,64 q -11,2 -22,3.5 -11,1.5 -22,1.5 -54,0 -99.5,-30.5 Q 458,-616 440,-680 v -160 z"
+     id="path1" />
+</svg>

@@ -11,7 +11,7 @@ namespace piejam::runtime
 {
 
 template <class Parameter>
-struct ui_parameter_descriptor
+struct ui_parameter_map_slot
 {
     using value_to_string_fn =
             std::string (*)(parameter::value_type_t<Parameter>);
@@ -20,6 +20,6 @@ struct ui_parameter_descriptor
     value_to_string_fn value_to_string{};
 };
 
-using ui_parameter_descriptors_map = parameter::map<ui_parameter_descriptor>;
+using ui_parameters_map = parameter::map<ui_parameter_map_slot>;
 
 } // namespace piejam::runtime

@@ -20,6 +20,8 @@ class MixerDbScales : public QObject
                        levelMeterScale CONSTANT)
     Q_PROPERTY(piejam::gui::model::DbScaleData* volumeFaderScale READ
                        volumeFaderScale CONSTANT)
+    Q_PROPERTY(piejam::gui::model::DbScaleData* sendFaderScale READ
+                       sendFaderScale CONSTANT)
 public:
     MixerDbScales();
     ~MixerDbScales();
@@ -34,9 +36,15 @@ public:
         return m_volumeFaderScale.get();
     }
 
+    auto sendFaderScale() const noexcept -> DbScaleData*
+    {
+        return m_sendFaderScale.get();
+    }
+
 private:
     std::unique_ptr<DbScaleData> m_levelMeterScale;
     std::unique_ptr<DbScaleData> m_volumeFaderScale;
+    std::unique_ptr<DbScaleData> m_sendFaderScale;
 };
 
 extern MixerDbScales g_mixerDbScales;

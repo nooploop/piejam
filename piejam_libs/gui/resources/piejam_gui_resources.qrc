@@ -78,7 +78,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/qmldir</file>
         <file>images/icons/arrow-expand-vertical.svg</file>
-        <file>images/icons/autorenew.svg</file>
+        <file>images/icons/cycle_arrows.svg</file>
         <file>images/icons/chevron-down.svg</file>
         <file>images/icons/chevron-up.svg</file>
         <file>images/icons/cog.svg</file>
@@ -90,5 +90,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/tune-vertical.svg</file>
         <file>qtquickcontrols2.conf</file>
         <file>PieJam/MixerControls/AudioRoutingComboBox.qml</file>
+        <file>PieJam/MixerControls/ChannelAuxSend.qml</file>
+        <file>images/icons/aux.svg</file>
     </qresource>
 </RCC>

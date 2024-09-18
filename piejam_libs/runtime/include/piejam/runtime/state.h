@@ -47,6 +47,8 @@ namespace piejam::runtime
 
 struct state
 {
+    std::size_t reduce_count{};
+
     audio::io_sound_cards io_sound_cards;
     io_pair<selected_sound_card> selected_io_sound_card;
 
@@ -60,7 +62,7 @@ struct state
     unique_box<midi_devices_t> midi_devices;
 
     parameters_map params;
-    ui_parameter_descriptors_map ui_params;
+    ui_parameters_map ui_params;
     audio_streams_cache streams;
 
     fx::registry fx_registry;

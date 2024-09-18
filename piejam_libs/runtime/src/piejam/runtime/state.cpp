@@ -85,6 +85,59 @@ from_normalized_volume(float_parameter const& p, float const norm_value)
     }
 }
 
+struct send_low_dB_interval
+{
+    static constexpr float min = -60.f;
+    static constexpr float max = -24.f;
+};
+
+struct send_high_dB_interval
+{
+    static constexpr float min = -24.f;
+    static constexpr float max = 0.f;
+};
+
+constexpr auto
+to_normalized_send(float_parameter const& p, float const value)
+{
+    if (value == 0.f)
+    {
+        return 0.f;
+    }
+    else if (0.f < value && value < 0.0625f)
+    {
+        return parameter::to_normalized_dB<send_low_dB_interval>(p, value) /
+               4.f;
+    }
+    else
+    {
+        return (parameter::to_normalized_dB<send_high_dB_interval>(p, value) *
+                0.75f) +
+               0.25f;
+    }
+}
+
+constexpr auto
+from_normalized_send(float_parameter const& p, float const norm_value) -> float
+{
+    if (norm_value == 0.f)
+    {
+        return 0.f;
+    }
+    else if (0.f < norm_value && norm_value < 0.25f)
+    {
+        return parameter::from_normalized_dB<send_low_dB_interval>(
+                p,
+                4.f * norm_value);
+    }
+    else
+    {
+        return parameter::from_normalized_dB<send_high_dB_interval>(
+                p,
+                (norm_value - 0.25f) / 0.75f);
+    }
+}
+
 auto
 volume_to_string(float volume) -> std::string
 {
@@ -434,6 +487,74 @@ remove_fx_module(
     }
 }
 
+template <class ParameterFactory>
+static auto
+make_aux_send_parameter(ParameterFactory& ui_params_factory)
+{
+    using namespace std::string_literals;
+
+    return ui_params_factory.make_parameter(
+            parameter::float_{
+                    .default_value = 0.f,
+                    .min = 0.f,
+                    .max = 1.f,
+                    .to_normalized = &to_normalized_send,
+                    .from_normalized = &from_normalized_send},
+            {.name = box_("Send"s), .value_to_string = &volume_to_string});
+}
+
+template <class ParameterFactory>
+static auto
+make_aux_send(
+        mixer::aux_sends_t& aux_sends,
+        mixer::io_address_t const& route,
+        ParameterFactory& ui_params_factory)
+{
+    aux_sends.emplace(
+            route,
+            mixer::aux_send{
+                    .enabled = false,
+                    .volume = make_aux_send_parameter(ui_params_factory)});
+}
+
+template <class ParameterFactory>
+static auto
+make_aux_sends(
+        mixer::channels_t const& channels,
+        external_audio::device_ids_t const& output_devices,
+        ParameterFactory& ui_params_factory)
+{
+    mixer::aux_sends_t result;
+    for (auto const& [channel_id, channel] : channels)
+    {
+        if (channel.bus_type == audio::bus_type::stereo)
+        {
+            make_aux_send(result, channel_id, ui_params_factory);
+        }
+    }
+
+    // output device must be stereo
+    for (auto const device_id : output_devices)
+    {
+        make_aux_send(result, device_id, ui_params_factory);
+    }
+
+    return result;
+}
+
+static auto
+remove_aux_send(
+        state& st,
+        mixer::aux_sends_t& aux_sends,
+        mixer::io_address_t const& route)
+{
+    if (auto it = aux_sends.find(route); it != aux_sends.end())
+    {
+        remove_parameter(st, it->second.volume);
+        aux_sends.erase(it);
+    }
+}
+
 auto
 add_external_audio_device(
         state& st,
@@ -442,8 +563,10 @@ add_external_audio_device(
         audio::bus_type const bus_type,
         channel_index_pair const& channels) -> external_audio::device_id
 {
+    auto boxed_name = box_(name);
+
     auto id = st.external_audio_state.devices.add(external_audio::device{
-            .name = box_(name),
+            .name = boxed_name,
             .bus_type = io_dir == io_direction::input ? bus_type
                                                       : audio::bus_type::stereo,
             .channels = channels});
@@ -454,10 +577,13 @@ add_external_audio_device(
 
     emplace_back(devices_ids, id);
 
+    parameter_factory ui_params_factory{st.params, st.ui_params};
+
     st.mixer_state.channels.update(
-            [io_dir,
-             equal_to_device_name = equal_to<>(
-                     mixer::io_address_t(mixer::missing_device_address(name))),
+            [&,
+             io_dir,
+             equal_to_device_name = equal_to<>(mixer::io_address_t(
+                     mixer::missing_device_address{boxed_name})),
              id](mixer::channel_id, mixer::channel& mixer_channel) {
                 if (io_dir == io_direction::input)
                 {
@@ -466,6 +592,18 @@ add_external_audio_device(
                 else
                 {
                     set_if(mixer_channel.out, equal_to_device_name, id);
+                }
+
+                if (io_dir == io_direction::output)
+                {
+                    mixer_channel.aux_sends.update(
+                            [&, route = mixer::io_address_t{id}](
+                                    mixer::aux_sends_t& aux_sends) {
+                                make_aux_send(
+                                        aux_sends,
+                                        route,
+                                        ui_params_factory);
+                            });
                 }
             });
 
@@ -484,6 +622,10 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
             .bus_type = bus_type,
             .in = {},
             .out = st.mixer_state.main,
+            .aux_sends = unique_box_(make_aux_sends(
+                    st.mixer_state.channels,
+                    st.external_audio_state.outputs,
+                    ui_params_factory)),
             .volume = ui_params_factory.make_parameter(
                     parameter::float_{
                             .default_value = 1.f,
@@ -521,6 +663,20 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                     parameter::stereo_level{}),
             .fx_chain = {}});
     emplace_back(st.mixer_state.inputs, channel_id);
+
+    // add as aux_send to each channel
+    st.mixer_state.channels.update(
+            [&](mixer::channel_id id, mixer::channel& channel) {
+                if (id != channel_id)
+                {
+                    channel.aux_sends.update(
+                            [&, route = mixer::io_address_t{channel_id}](
+                                    mixer::aux_sends_t& m) {
+                                make_aux_send(m, route, ui_params_factory);
+                            });
+                }
+            });
+
     return channel_id;
 }
 
@@ -540,6 +696,22 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
     remove_parameter(st, mixer_channel.peak_level);
     remove_parameter(st, mixer_channel.rms_level);
 
+    // remove own aux_sends
+    for (auto& aux_send : mixer_channel.aux_sends.get())
+    {
+        remove_parameter(st, aux_send.second.volume);
+    }
+
+    // remove itself as aux_send from other channels
+    st.mixer_state.channels.update(
+            [&, addr = mixer::io_address_t{mixer_channel_id}](
+                    mixer::channel_id,
+                    mixer::channel& channel) {
+                channel.aux_sends.update([&](mixer::aux_sends_t& m) {
+                    remove_aux_send(st, m, addr);
+                });
+            });
+
     BOOST_ASSERT_MSG(
             mixer_channel.fx_chain->empty(),
             "fx_chain should be emptied before");
@@ -557,6 +729,7 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
                     mixer::channel& mixer_channel) {
                 set_if(mixer_channel.in, equal_to_mixer_channel, empty_addr);
                 set_if(mixer_channel.out, equal_to_mixer_channel, empty_addr);
+                set_if(mixer_channel.aux, equal_to_mixer_channel, empty_addr);
             });
 }
 
@@ -573,6 +746,7 @@ remove_external_audio_device(
                      name)](mixer::channel_id, mixer::channel& mixer_channel) {
                 set_if(mixer_channel.in, equal_to_device, missing_device_name);
                 set_if(mixer_channel.out, equal_to_device, missing_device_name);
+                set_if(mixer_channel.aux, equal_to_device, missing_device_name);
             });
 
     st.external_audio_state.devices.remove(device_id);
@@ -583,7 +757,20 @@ remove_external_audio_device(
     }
     else
     {
+        BOOST_ASSERT(algorithm::contains(
+                *st.external_audio_state.outputs,
+                device_id));
         remove_erase(st.external_audio_state.outputs, device_id);
+
+        st.mixer_state.channels.update(
+                [&,
+                 device_id](mixer::channel_id, mixer::channel& mixer_channel) {
+                    mixer_channel.aux_sends.update(
+                            [&, route = mixer::io_address_t{device_id}](
+                                    mixer::aux_sends_t& m) {
+                                remove_aux_send(st, m, route);
+                            });
+                });
     }
 }
 

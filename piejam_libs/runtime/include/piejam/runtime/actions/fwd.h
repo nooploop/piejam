@@ -40,6 +40,7 @@ struct remove_external_audio_device;
 struct add_mixer_channel;
 struct delete_mixer_channel;
 struct set_mixer_channel_route;
+struct enable_mixer_channel_aux_route;
 struct move_mixer_channel_left;
 struct move_mixer_channel_right;
 struct show_fx_browser;

@@ -159,62 +159,59 @@ apply_mixer_parameters(
 }
 
 auto
-find_mixer_channel_by_name(
+find_mixer_channel_route(
         mixer::channels_t const& channels,
         std::string const& name)
 {
-    return std::ranges::find_if(channels, [&name](auto const& p) {
-        return p.second.name == name;
-    });
+    if (auto it = std::ranges::find_if(
+                channels,
+                [&name](auto const& p) { return p.second.name == name; });
+        it != channels.end())
+    {
+        return mixer::io_address_t(it->first);
+    }
+    else
+    {
+        return mixer::io_address_t{};
+    }
 }
 
 auto
-find_device_bus_by_name(
-        external_audio::devices_t const& device_buses,
+find_external_audio_device_route(
+        external_audio::devices_t const& devices,
         std::string const& name)
 {
-    return std::ranges::find_if(device_buses, [&name](auto const& p) {
-        return p.second.name == name;
-    });
+    if (auto it = std::ranges::find_if(
+                devices,
+                [&name](auto const& p) { return p.second.name == name; });
+        it != devices.end())
+    {
+        return mixer::io_address_t(it->first);
+    }
+    else
+    {
+        return mixer::io_address_t(mixer::missing_device_address{box_(name)});
+    }
 }
 
 void
 apply_mixer_io(
         batch_action& batch,
-        external_audio::devices_t const& device_buses,
+        external_audio::devices_t const& devices,
         mixer::channels_t const& channels,
         mixer::channel_id const& channel_id,
         persistence::session::mixer_io const& in,
-        persistence::session::mixer_io const& out)
+        persistence::session::mixer_io const& out,
+        std::vector<persistence::session::mixer_aux_send> const& aux_sends)
 {
-    auto get_io_addr = [&](auto const& mixer_io) {
+    auto find_route = [&](auto const& mixer_io) {
         switch (mixer_io.type)
         {
             case persistence::session::mixer_io_type::device:
-                if (auto it = find_device_bus_by_name(
-                            device_buses,
-                            mixer_io.name);
-                    it != device_buses.end())
-                {
-                    return mixer::io_address_t(it->first);
-                }
-                else
-                {
-                    return mixer::io_address_t(
-                            mixer::missing_device_address(mixer_io.name));
-                }
+                return find_external_audio_device_route(devices, mixer_io.name);
 
             case persistence::session::mixer_io_type::channel:
-                if (auto it =
-                            find_mixer_channel_by_name(channels, mixer_io.name);
-                    it != channels.end())
-                {
-                    return mixer::io_address_t(it->first);
-                }
-                else
-                {
-                    return mixer::io_address_t();
-                }
+                return find_mixer_channel_route(channels, mixer_io.name);
 
             default:
                 return mixer::io_address_t();
@@ -225,7 +222,7 @@ apply_mixer_io(
         auto action = std::make_unique<set_mixer_channel_route>();
         action->channel_id = channel_id;
         action->io_socket = mixer::io_socket::in;
-        action->route = get_io_addr(in);
+        action->route = find_route(in);
         batch.push_back(std::move(action));
     }
 
@@ -233,8 +230,34 @@ apply_mixer_io(
         auto action = std::make_unique<set_mixer_channel_route>();
         action->channel_id = channel_id;
         action->io_socket = mixer::io_socket::out;
-        action->route = get_io_addr(out);
+        action->route = find_route(out);
         batch.push_back(std::move(action));
+    }
+
+    if (auto const* const channel = channels.find(channel_id); channel)
+    {
+        for (auto const& aux_send_data : aux_sends)
+        {
+            if (auto route = find_route(aux_send_data.route);
+                !std::holds_alternative<default_t>(route))
+            {
+                auto const aux_send_it = channel->aux_sends->find(route);
+
+                batch.emplace_back<actions::set_float_parameter>(
+                        aux_send_it->second.volume,
+                        aux_send_data.volume);
+
+                if (aux_send_data.enabled)
+                {
+                    auto action = std::make_unique<
+                            actions::enable_mixer_channel_aux_route>();
+                    action->channel_id = channel_id;
+                    action->route = route;
+                    action->enabled = true;
+                    batch.push_back(std::move(action));
+                }
+            }
+        }
     }
 }
 
@@ -255,7 +278,8 @@ apply_mixer_io(
                 channels,
                 channel_ids[i],
                 mb_data[i].in,
-                mb_data[i].out);
+                mb_data[i].out,
+                mb_data[i].aux_sends);
     }
 }
 
@@ -333,7 +357,8 @@ configure_mixer_channels(
             st.mixer_state.channels,
             st.mixer_state.main,
             session.main_mixer_channel.in,
-            session.main_mixer_channel.out);
+            session.main_mixer_channel.out,
+            session.main_mixer_channel.aux_sends);
 
     return action;
 }
