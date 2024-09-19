@@ -574,7 +574,7 @@ private:
     std::vector<unsigned long> m_output_port_indices{};
     std::vector<audio::engine::event_port> m_event_inputs;
     std::vector<audio::engine::event_port> m_event_outputs;
-    std::vector<std::array<float, audio::max_period_size.get()>>
+    std::vector<std::array<float, audio::max_period_size.value()>>
             m_constant_audio_inputs;
     std::vector<control_input> m_control_inputs;
     std::vector<float> m_control_outputs;
@@ -660,7 +660,7 @@ public:
     {
         if (LADSPA_Handle handle = m_ladspa_desc->instantiate(
                     m_ladspa_desc,
-                    sample_rate.get()))
+                    sample_rate.value()))
         {
             return std::make_unique<processor>(
                     plugin_instance(*m_ladspa_desc, handle),

@@ -289,14 +289,14 @@ get_hw_params(
             preferred_sample_rates,
             std::back_inserter(result.sample_rates),
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_RATE),
-            &audio::sample_rate::get);
+            &audio::sample_rate::value);
 
     if (sample_rate && algorithm::contains(result.sample_rates, *sample_rate))
     {
         set_interval_value(
                 hw_params,
                 SNDRV_PCM_HW_PARAM_RATE,
-                sample_rate->get());
+                sample_rate->value());
     }
 
     BOOST_ASSERT(result.period_sizes.empty());
@@ -304,14 +304,14 @@ get_hw_params(
             preferred_period_sizes,
             std::back_inserter(result.period_sizes),
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIOD_SIZE),
-            &audio::period_size::get);
+            &audio::period_size::value);
 
     if (period_size && algorithm::contains(result.period_sizes, *period_size))
     {
         set_interval_value(
                 hw_params,
                 SNDRV_PCM_HW_PARAM_PERIOD_SIZE,
-                period_size->get());
+                period_size->value());
     }
 
     BOOST_ASSERT(result.period_counts.empty());
@@ -319,7 +319,7 @@ get_hw_params(
             preferred_period_counts,
             std::back_inserter(result.period_counts),
             test_interval_value(fd, hw_params, SNDRV_PCM_HW_PARAM_PERIODS),
-            &audio::period_count::get);
+            &audio::period_count::value);
 
     return result;
 }
@@ -354,15 +354,15 @@ set_hw_params(
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_RATE,
-            process_config.sample_rate.get());
+            process_config.sample_rate.value());
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_PERIOD_SIZE,
-            process_config.period_size.get());
+            process_config.period_size.value());
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_PERIODS,
-            process_config.period_count.get());
+            process_config.period_count.value());
 
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_PARAMS, hw_params))
     {

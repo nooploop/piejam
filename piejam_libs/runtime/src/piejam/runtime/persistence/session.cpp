@@ -21,6 +21,21 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
         bus_type,
         {{bus_type::mono, "mono"}, {bus_type::stereo, "stereo"}})
 
+template <class T>
+void
+to_json(nlohmann::json& j, pair<T> const& p)
+{
+    j = nlohmann::json{{"left", p.left}, {"right", p.right}};
+}
+
+template <class T>
+void
+from_json(nlohmann::json const& j, pair<T>& p)
+{
+    j.at("left").get_to(p.left);
+    j.at("right").get_to(p.right);
+}
+
 } // namespace piejam::audio
 
 namespace piejam::runtime
@@ -72,12 +87,19 @@ namespace piejam::runtime::persistence
 {
 
 static auto const s_key_version = "version";
+static auto const s_key_session = "session";
 
 static auto
 get_version(nlohmann::json const& json_ses) -> unsigned
 {
     return json_ses.at(s_key_version).get<unsigned>();
 }
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        session::external_audio_device_config,
+        name,
+        bus_type,
+        channels);
 
 static auto const s_key_internal = "internal";
 static auto const s_key_ladspa = "ladspa";
@@ -159,7 +181,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
          {session::mixer_io_type::device, "device"},
          {session::mixer_io_type::channel, "channel"}})
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::mixer_io, type, name);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::mixer_io, type, index, name);
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         session::mixer_aux_send,
@@ -178,24 +200,12 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         out,
         aux_sends);
 
-static auto const s_key_mixer_channels = "mixer_channels";
-static auto const s_key_main_mixer_channel = "main_mixer_channel";
-
-void
-to_json(nlohmann::json& json_ses, session const& ses)
-{
-    json_ses = {
-            {s_key_version, current_session_version},
-            {s_key_mixer_channels, ses.mixer_channels},
-            {s_key_main_mixer_channel, ses.main_mixer_channel}};
-}
-
-void
-from_json(nlohmann::json const& json_ses, session& ses)
-{
-    json_ses.at(s_key_mixer_channels).get_to(ses.mixer_channels);
-    json_ses.at(s_key_main_mixer_channel).get_to(ses.main_mixer_channel);
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        session,
+        external_audio_input_devices,
+        external_audio_output_devices,
+        main_mixer_channel,
+        mixer_channels);
 
 using upgrade_function = void (*)(nlohmann::json&);
 using upgrade_functions_array =
@@ -260,16 +270,17 @@ load_session(std::istream& in) -> session
     BOOST_ASSERT(current_session_version == get_version(json_ses));
 
     session ses;
-    json_ses.get_to(ses);
+    json_ses.at(s_key_session).get_to(ses);
     return ses;
 }
 
 void
 save_session(std::ostream& out, session const& ses)
 {
-    out << nlohmann::json(ses).dump(4) << std::endl;
+    nlohmann::json json_ses = {
+            {s_key_version, current_session_version},
+            {s_key_session, ses}};
+    out << json_ses.dump(4) << std::endl;
 }
-
-session::~session() = default;
 
 } // namespace piejam::runtime::persistence

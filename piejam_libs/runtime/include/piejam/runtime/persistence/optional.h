@@ -12,6 +12,9 @@
 namespace piejam::runtime::persistence
 {
 
+namespace detail
+{
+
 template <class T>
 void
 optional_to_json(
@@ -38,6 +41,8 @@ optional_from_json(
     }
 }
 
+} // namespace detail
+
 template <class T>
 struct optional_serializer
 {
@@ -45,12 +50,12 @@ struct optional_serializer
 
     void to_json(nlohmann::json& j, std::optional<T> const& value) const
     {
-        optional_to_json(j, value, name);
+        detail::optional_to_json(j, value, name);
     }
 
     void from_json(nlohmann::json const& j, std::optional<T>& value) const
     {
-        optional_from_json(j, value, name);
+        detail::optional_from_json(j, value, name);
     }
 };
 

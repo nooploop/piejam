@@ -6,6 +6,7 @@
 
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/apply_app_config.h>
+#include <piejam/runtime/actions/apply_session.h>
 #include <piejam/runtime/actions/control_midi_assignment.h>
 #include <piejam/runtime/actions/deactivate_midi_device.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
@@ -270,11 +271,11 @@ audio_engine_middleware::process_device_action(
             current_state.io_sound_cards,
             algorithm::index_of(
                     current_state.io_sound_cards.in.get(),
-                    a.conf.input_device_name,
+                    a.conf.input_sound_card,
                     &audio::sound_card_descriptor::name),
             algorithm::index_of(
                     current_state.io_sound_cards.out.get(),
-                    a.conf.output_device_name,
+                    a.conf.output_sound_card,
                     &audio::sound_card_descriptor::name),
             a.conf.sample_rate,
             a.conf.period_size,

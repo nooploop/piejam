@@ -17,9 +17,9 @@
 #include <piejam/runtime/selectors.h>
 
 #include <boost/hof/lift.hpp>
-#include <boost/range/adaptor/ref_unwrapped.hpp>
 
 #include <algorithm>
+#include <ranges>
 
 namespace piejam::gui::model
 {
@@ -118,7 +118,9 @@ AudioDeviceSettings::onSubscribe()
                         sample_rate.current);
 
                 sampleRates()->setElements(to_QStringList(
-                        sample_rate.available | boost::adaptors::ref_unwrapped,
+                        sample_rate.available |
+                                std::views::transform(
+                                        &audio::sample_rate::value),
                         QString_from_number));
                 sampleRates()->setFocused(static_cast<int>(index));
             });
@@ -130,7 +132,9 @@ AudioDeviceSettings::onSubscribe()
                         period_size.current);
 
                 periodSizes()->setElements(to_QStringList(
-                        period_size.available | boost::adaptors::ref_unwrapped,
+                        period_size.available |
+                                std::views::transform(
+                                        &audio::period_size::value),
                         QString_from_number));
                 periodSizes()->setFocused(static_cast<int>(index));
             });
@@ -142,7 +146,9 @@ AudioDeviceSettings::onSubscribe()
                         period_count.current);
 
                 periodCounts()->setElements(to_QStringList(
-                        period_count.available | boost::adaptors::ref_unwrapped,
+                        period_count.available |
+                                std::views::transform(
+                                        &audio::period_count::value),
                         QString_from_number));
                 periodCounts()->setFocused(static_cast<int>(index));
             });

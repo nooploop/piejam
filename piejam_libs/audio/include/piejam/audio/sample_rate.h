@@ -30,7 +30,7 @@ public:
         return m_value == 0;
     }
 
-    [[nodiscard]] constexpr auto get() const noexcept -> unsigned
+    [[nodiscard]] constexpr auto value() const noexcept -> unsigned
     {
         return m_value;
     }

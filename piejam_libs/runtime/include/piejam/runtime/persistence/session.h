@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/persistence/fx_midi_assignments.h>
@@ -28,7 +30,12 @@ inline constexpr unsigned current_session_version = 0;
 
 struct session
 {
-    ~session();
+    struct external_audio_device_config
+    {
+        std::string name;
+        audio::bus_type bus_type;
+        channel_index_pair channels;
+    };
 
     struct internal_fx
     {
@@ -83,6 +90,7 @@ struct session
     struct mixer_io
     {
         mixer_io_type type;
+        std::size_t index;
         std::string name;
     };
 
@@ -105,8 +113,10 @@ struct session
         std::vector<mixer_aux_send> aux_sends;
     };
 
-    std::vector<mixer_channel> mixer_channels;
+    std::vector<external_audio_device_config> external_audio_input_devices;
+    std::vector<external_audio_device_config> external_audio_output_devices;
     mixer_channel main_mixer_channel;
+    std::vector<mixer_channel> mixer_channels;
 };
 
 void to_json(nlohmann::json&, session const&);

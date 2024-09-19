@@ -120,7 +120,7 @@ struct interleaved_reader final : pcm_reader
         : m_fd(fd)
         , m_num_channels(num_channels)
         , m_period_size(period_size)
-        , m_read_buffer(num_channels * period_size.get())
+        , m_read_buffer(num_channels * period_size.value())
         , m_converter(algorithm::transform_to_vector(
                   range::iota(num_channels),
                   [this](std::size_t const channel) {
@@ -137,7 +137,7 @@ struct interleaved_reader final : pcm_reader
     convert(std::size_t const channel, std::span<float> const buffer) noexcept
     {
         BOOST_ASSERT(channel < m_num_channels);
-        BOOST_ASSERT(m_period_size.get() == buffer.size());
+        BOOST_ASSERT(m_period_size.value() == buffer.size());
 
         range::strided_span<pcm_sample_t<F>> interleaved{
                 m_read_buffer.data() + channel,
@@ -160,7 +160,7 @@ struct interleaved_reader final : pcm_reader
         if (auto err =
                     readi(m_fd,
                           m_read_buffer.data(),
-                          m_period_size.get(),
+                          m_period_size.value(),
                           m_num_channels))
         {
             return err;
@@ -259,7 +259,7 @@ struct interleaved_writer final : pcm_writer
         : m_fd(fd)
         , m_num_channels(num_channels)
         , m_period_size(period_size)
-        , m_write_buffer(num_channels * period_size.get())
+        , m_write_buffer(num_channels * period_size.value())
         , m_converter(algorithm::transform_to_vector(
                   range::iota(num_channels),
                   [this](std::size_t const channel) {
@@ -283,11 +283,11 @@ struct interleaved_writer final : pcm_writer
     void convert(std::size_t const channel, std::span<float const> const buffer)
     {
         BOOST_ASSERT(channel < m_num_channels);
-        BOOST_ASSERT(m_period_size.get() == buffer.size());
+        BOOST_ASSERT(m_period_size.value() == buffer.size());
 
         range::strided_span<pcm_sample_t<F>> interleaved{
                 m_write_buffer.data() + channel,
-                m_period_size.get(),
+                m_period_size.value(),
                 static_cast<std::ptrdiff_t>(m_num_channels)};
 
         std::ranges::transform(
@@ -302,7 +302,7 @@ struct interleaved_writer final : pcm_writer
 
         range::strided_span<pcm_sample_t<F>> interleaved{
                 m_write_buffer.data() + channel,
-                m_period_size.get(),
+                m_period_size.value(),
                 static_cast<std::ptrdiff_t>(m_num_channels)};
 
         std::ranges::fill(interleaved, pcm_convert::to<F>(constant));
@@ -318,7 +318,7 @@ struct interleaved_writer final : pcm_writer
         return writei(
                 m_fd,
                 m_write_buffer.data(),
-                m_period_size.get(),
+                m_period_size.value(),
                 m_num_channels);
     }
 
@@ -413,7 +413,7 @@ process_step::process_step(
     , m_cpu_load_mean_acc(
               io_config.process_config.sample_rate.to_samples(
                       std::chrono::seconds{1}) /
-              io_config.process_config.period_size.get()) // 1sec window
+              io_config.process_config.period_size.value()) // 1sec window
 {
     m_xruns.store(0, std::memory_order_relaxed);
 
@@ -441,7 +441,7 @@ process_step::operator()() -> std::error_condition
             m_writer->clear();
 
             for (unsigned i = 0;
-                 i < m_io_config.process_config.period_count.get();
+                 i < m_io_config.process_config.period_count.value();
                  ++i)
             {
                 if (auto err = m_writer->transfer())
@@ -468,10 +468,10 @@ process_step::operator()() -> std::error_condition
     if (!err)
     {
         cpu_load_meter cpu_load_meter(
-                m_io_config.process_config.period_size.get(),
+                m_io_config.process_config.period_size.value(),
                 m_io_config.process_config.sample_rate);
 
-        m_process_function(m_io_config.process_config.period_size.get());
+        m_process_function(m_io_config.process_config.period_size.value());
 
         m_cpu_load.store(
                 m_cpu_load_mean_acc(cpu_load_meter.stop()),

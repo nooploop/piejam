@@ -78,6 +78,7 @@ struct load_app_config;
 struct save_app_config;
 struct load_session;
 struct save_session;
+struct apply_session;
 
 struct start_recording;
 struct stop_recording;

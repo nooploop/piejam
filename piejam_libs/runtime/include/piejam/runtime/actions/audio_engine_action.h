@@ -38,7 +38,8 @@ struct audio_engine_action_visitor
               stop_midi_learning,
               update_midi_assignments,
               start_recording,
-              stop_recording>
+              stop_recording,
+              apply_session>
 {
 };
 

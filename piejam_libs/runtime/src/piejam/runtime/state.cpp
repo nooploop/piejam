@@ -171,7 +171,7 @@ static auto
 set_intersection(Vector const& in, Vector const& out)
 {
     Vector result;
-    auto proj = [](auto const& x) { return x.get(); };
+    auto proj = [](auto const& x) { return x.value(); };
     std::ranges::set_intersection(
             in,
             out,

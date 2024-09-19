@@ -4,12 +4,22 @@
 
 #pragma once
 
+#include <piejam/box.h>
+#include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/persistence/fwd.h>
+#include <piejam/runtime/persistence/session.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
 
-auto apply_session(persistence::session) -> thunk_action;
+struct apply_session final
+    : ui::cloneable_action<apply_session, reducible_action>
+    , visitable_audio_engine_action<apply_session>
+{
+    unique_box<persistence::session> session;
+
+    void reduce(state&) const override;
+};
 
 } // namespace piejam::runtime::actions

@@ -4,6 +4,8 @@
 
 #include <piejam/runtime/persistence/app_config.h>
 
+#include <piejam/runtime/persistence/strong_type.h>
+
 #include <nlohmann/json.hpp>
 
 #include <istream>
@@ -12,24 +14,20 @@
 namespace piejam::audio
 {
 
-NLOHMANN_JSON_SERIALIZE_ENUM(
-        bus_type,
-        {{bus_type::mono, "mono"}, {bus_type::stereo, "stereo"}})
+M_PIEJAM_PERSISTENCE_DEFINE_STRONG_TYPE_SERIALIER(
+        sample_rate,
+        unsigned,
+        "sample_rate");
 
-template <class T>
-void
-to_json(nlohmann::json& j, pair<T> const& p)
-{
-    j = nlohmann::json{{"left", p.left}, {"right", p.right}};
-}
+M_PIEJAM_PERSISTENCE_DEFINE_STRONG_TYPE_SERIALIER(
+        period_size,
+        unsigned,
+        "period_size");
 
-template <class T>
-void
-from_json(nlohmann::json const& j, pair<T>& p)
-{
-    j.at("left").get_to(p.left);
-    j.at("right").get_to(p.right);
-}
+M_PIEJAM_PERSISTENCE_DEFINE_STRONG_TYPE_SERIALIER(
+        period_count,
+        unsigned,
+        "period_count");
 
 } // namespace piejam::audio
 
@@ -37,17 +35,7 @@ namespace piejam::runtime::persistence
 {
 
 static auto const s_key_version = "version";
-static auto const s_key_audio_settings = "audio_settings";
-static auto const s_key_input_device_name = "input_device_name";
-static auto const s_key_output_device_name = "output_device_name";
-static auto const s_key_sample_rate = "sample_rate";
-static auto const s_key_period_size = "period_size";
-static auto const s_key_period_count = "period_count";
-static auto const s_key_input_configs = "input_configs";
-static auto const s_key_output_configs = "output_configs";
-static auto const s_key_enabled_midi_input_devices =
-        "enabled_midi_input_devices";
-static auto const s_key_rec_session = "rec_session";
+static auto const s_key_app_config = "app_config";
 
 static auto
 get_version(nlohmann::json const& conf) -> unsigned
@@ -56,45 +44,14 @@ get_version(nlohmann::json const& conf) -> unsigned
 }
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        external_audio_device_config,
-        name,
-        bus_type,
-        channels);
-
-void
-to_json(nlohmann::json& j, app_config const& conf)
-{
-    j = {{s_key_version, current_app_config_version},
-         {s_key_audio_settings,
-          {{s_key_input_device_name, conf.input_device_name},
-           {s_key_output_device_name, conf.output_device_name},
-           {s_key_sample_rate, conf.sample_rate.get()},
-           {s_key_period_size, conf.period_size.get()},
-           {s_key_period_count, conf.period_count.get()},
-           {s_key_input_configs, conf.input_devices},
-           {s_key_output_configs, conf.output_devices},
-           {s_key_enabled_midi_input_devices, conf.enabled_midi_input_devices},
-           {s_key_rec_session, conf.rec_session}}}};
-}
-
-void
-from_json(nlohmann::json const& j, app_config& conf)
-{
-    auto const& audio_settings = j.at(s_key_audio_settings);
-    audio_settings.at(s_key_input_device_name).get_to(conf.input_device_name);
-    audio_settings.at(s_key_output_device_name).get_to(conf.output_device_name);
-    conf.sample_rate = audio::sample_rate(
-            audio_settings.at(s_key_sample_rate).get<unsigned>());
-    conf.period_size = audio::period_size(
-            audio_settings.at(s_key_period_size).get<unsigned>());
-    conf.period_count = audio::period_count(
-            audio_settings.at(s_key_period_count).get<unsigned>());
-    audio_settings.at(s_key_input_configs).get_to(conf.input_devices);
-    audio_settings.at(s_key_output_configs).get_to(conf.output_devices);
-    audio_settings.at(s_key_enabled_midi_input_devices)
-            .get_to(conf.enabled_midi_input_devices);
-    audio_settings.at(s_key_rec_session).get_to(conf.rec_session);
-}
+        app_config,
+        input_sound_card,
+        output_sound_card,
+        sample_rate,
+        period_size,
+        period_count,
+        enabled_midi_input_devices,
+        rec_session);
 
 using upgrade_function = void (*)(nlohmann::json&);
 using upgrade_functions_array =
@@ -159,14 +116,17 @@ load_app_config(std::istream& in) -> app_config
     assert(current_app_config_version == get_version(json_conf));
 
     app_config conf;
-    json_conf.get_to(conf);
+    json_conf.at(s_key_app_config).get_to(conf);
     return conf;
 }
 
 void
 save_app_config(std::ostream& out, app_config const& conf)
 {
-    out << nlohmann::json(conf).dump(4) << std::endl;
+    nlohmann::json const json_conf = {
+            {s_key_version, current_app_config_version},
+            {s_key_app_config, conf}};
+    out << json_conf.dump(4) << '\n';
 }
 
 } // namespace piejam::runtime::persistence

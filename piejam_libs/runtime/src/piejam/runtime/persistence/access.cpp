@@ -4,22 +4,18 @@
 
 #include <piejam/runtime/persistence/access.h>
 
+#include <piejam/algorithm/index_of.h>
 #include <piejam/algorithm/transform_to_vector.h>
-#include <piejam/entity_id_hash.h>
-#include <piejam/runtime/actions/apply_app_config.h>
-#include <piejam/runtime/actions/apply_session.h>
 #include <piejam/runtime/fx/unavailable_ladspa.h>
 #include <piejam/runtime/persistence/app_config.h>
 #include <piejam/runtime/persistence/session.h>
 #include <piejam/runtime/state.h>
-#include <piejam/runtime/ui/thunk_action.h>
 
 #include <spdlog/spdlog.h>
 
 #include <boost/assert.hpp>
 #include <boost/hof/match.hpp>
 
-#include <algorithm>
 #include <filesystem>
 #include <fstream>
 
@@ -42,13 +38,13 @@ save_app_config(
 
         persistence::app_config conf;
 
-        conf.input_device_name =
+        conf.input_sound_card =
                 state.selected_io_sound_card.in.index != npos
                         ? state.io_sound_cards.in
                                   .get()[state.selected_io_sound_card.in.index]
                                   .name
                         : std::string();
-        conf.output_device_name =
+        conf.output_sound_card =
                 state.selected_io_sound_card.out.index != npos
                         ? state.io_sound_cards.out
                                   .get()[state.selected_io_sound_card.out.index]
@@ -57,31 +53,6 @@ save_app_config(
         conf.sample_rate = state.sample_rate;
         conf.period_size = state.period_size;
         conf.period_count = state.period_count;
-
-        auto const buses_to_bus_configs = [](auto const& devices,
-                                             auto const& device_ids,
-                                             auto& configs) {
-            configs.reserve(device_ids.size());
-            std::ranges::transform(
-                    device_ids,
-                    std::back_inserter(configs),
-                    [&devices](external_audio::device_id const& device_id)
-                            -> persistence::external_audio_device_config {
-                        external_audio::device const& device =
-                                devices[device_id];
-                        return {device.name, device.bus_type, device.channels};
-                    });
-        };
-
-        buses_to_bus_configs(
-                state.external_audio_state.devices,
-                state.external_audio_state.inputs.get(),
-                conf.input_devices);
-
-        buses_to_bus_configs(
-                state.external_audio_state.devices,
-                state.external_audio_state.outputs.get(),
-                conf.output_devices);
 
         conf.enabled_midi_input_devices = enabled_midi_input_devices;
 
@@ -94,6 +65,22 @@ save_app_config(
         auto const* const message = err.what();
         spdlog::error("could not save config file: {}", message);
     }
+}
+
+static auto
+export_external_audio_device_configs(
+        external_audio::devices_t const& devices,
+        external_audio::device_ids_t const& device_ids)
+{
+    return algorithm::transform_to_vector(
+            device_ids,
+            [&devices](external_audio::device_id const& device_id)
+                    -> persistence::session::external_audio_device_config {
+                external_audio::device const& device = devices[device_id];
+                return {.name = device.name,
+                        .bus_type = device.bus_type,
+                        .channels = device.channels};
+            });
 }
 
 static auto
@@ -249,6 +236,24 @@ export_mixer_parameters(state const& st, mixer::channel const& mixer_channel)
 }
 
 static auto
+channel_index(mixer::state const& st, mixer::channel_id const channel_id)
+{
+    return channel_id == st.main
+                   ? 0
+                   : algorithm::index_of(*st.inputs, channel_id) + 1;
+}
+
+static auto
+device_index(
+        external_audio::state const& st,
+        external_audio::device_id const device_id)
+{
+    auto const in_index = algorithm::index_of(*st.inputs, device_id);
+    return in_index != npos ? in_index
+                            : algorithm::index_of(*st.outputs, device_id);
+}
+
+static auto
 export_mixer_io(state const& st, mixer::io_address_t const& addr)
 {
     return std::visit(
@@ -256,6 +261,7 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                     [](default_t) {
                         return session::mixer_io{
                                 .type = session::mixer_io_type::default_,
+                                .index = npos,
                                 .name = {}};
                     },
                     [&st](mixer::channel_id const& channel_id) {
@@ -263,6 +269,9 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 st.mixer_state.channels[channel_id];
                         return session::mixer_io{
                                 .type = session::mixer_io_type::channel,
+                                .index = channel_index(
+                                        st.mixer_state,
+                                        channel_id),
                                 .name = mixer_channel.name};
                     },
                     [&st](external_audio::device_id const& device_id) {
@@ -270,11 +279,15 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 st.external_audio_state.devices[device_id];
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,
+                                .index = device_index(
+                                        st.external_audio_state,
+                                        device_id),
                                 .name = device.name};
                     },
                     [](mixer::missing_device_address const& missing) {
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,
+                                .index = npos,
                                 .name = missing.name};
                     }),
             addr);
@@ -336,6 +349,15 @@ save_session(std::filesystem::path const& file, state const& st)
         }
 
         session ses;
+
+        ses.external_audio_input_devices = export_external_audio_device_configs(
+                st.external_audio_state.devices,
+                st.external_audio_state.inputs.get());
+
+        ses.external_audio_output_devices =
+                export_external_audio_device_configs(
+                        st.external_audio_state.devices,
+                        st.external_audio_state.outputs.get());
 
         ses.mixer_channels = export_mixer_channels(st, *st.mixer_state.inputs);
         ses.main_mixer_channel = export_mixer_channel(

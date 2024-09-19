@@ -7,8 +7,6 @@
 #include <piejam/audio/period_count.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
-#include <piejam/audio/types.h>
-#include <piejam/runtime/channel_index_pair.h>
 
 #include <nlohmann/json_fwd.hpp>
 
@@ -21,23 +19,13 @@ namespace piejam::runtime::persistence
 
 inline constexpr unsigned current_app_config_version = 0;
 
-struct external_audio_device_config
-{
-    std::string name;
-    audio::bus_type bus_type;
-    channel_index_pair channels;
-};
-
 struct app_config
 {
-    std::string input_device_name;
-    std::string output_device_name;
+    std::string input_sound_card;
+    std::string output_sound_card;
     audio::sample_rate sample_rate{};
     audio::period_size period_size{};
     audio::period_count period_count{};
-
-    std::vector<external_audio_device_config> input_devices;
-    std::vector<external_audio_device_config> output_devices;
 
     std::vector<std::string> enabled_midi_input_devices;
 

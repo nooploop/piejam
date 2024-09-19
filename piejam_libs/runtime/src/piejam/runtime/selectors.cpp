@@ -80,8 +80,8 @@ selector<box<period_count_choice>> const select_period_count([](state const&
 });
 
 selector<float> const select_buffer_latency([](state const& st) {
-    return st.sample_rate.get() != 0
-                   ? (st.period_size.get() * st.period_count.get() * 1000.f) /
+    return st.sample_rate.value() != 0
+                   ? (st.period_size.value() * st.period_count.value() * 1000.f) /
                              st.sample_rate.as_float()
                    : 0.f;
 });

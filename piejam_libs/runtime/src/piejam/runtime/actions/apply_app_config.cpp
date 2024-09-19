@@ -9,52 +9,9 @@
 namespace piejam::runtime::actions
 {
 
-static void
-update_channel(std::size_t& cur_ch, std::size_t const num_chs)
-{
-    if (cur_ch >= num_chs)
-    {
-        cur_ch = npos;
-    }
-}
-
-template <io_direction D>
-static auto
-apply_external_audio_device_configs(
-        state& st,
-        std::vector<persistence::external_audio_device_config> const& configs,
-        std::size_t const num_ch)
-{
-    BOOST_ASSERT_MSG(
-            D == io_direction::input ? st.external_audio_state.inputs->empty()
-                                     : st.external_audio_state.outputs->empty(),
-            "configs should be cleared before applying");
-    for (auto const& bus_conf : configs)
-    {
-        auto chs = bus_conf.channels;
-        update_channel(chs.left, num_ch);
-        update_channel(chs.right, num_ch);
-
-        auto const type = D == io_direction::output ? audio::bus_type::stereo
-                                                    : bus_conf.bus_type;
-
-        runtime::add_external_audio_device(st, bus_conf.name, D, type, chs);
-    }
-}
-
 void
 apply_app_config::reduce(state& st) const
 {
-    apply_external_audio_device_configs<io_direction::input>(
-            st,
-            conf.input_devices,
-            st.selected_io_sound_card.in.hw_params->num_channels);
-
-    apply_external_audio_device_configs<io_direction::output>(
-            st,
-            conf.output_devices,
-            st.selected_io_sound_card.out.hw_params->num_channels);
-
     st.rec_session = conf.rec_session;
 }
 

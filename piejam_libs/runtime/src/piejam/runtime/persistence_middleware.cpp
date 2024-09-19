@@ -83,7 +83,9 @@ struct persistence_action_visitor : private generic_action_visitor<void>
                 throw std::runtime_error("could not open session file");
             }
 
-            dispatch(actions::apply_session(persistence::load_session(in)));
+            actions::apply_session action;
+            action.session = persistence::load_session(in);
+            dispatch(action);
         }
         catch (std::exception const& err)
         {

@@ -26,7 +26,7 @@ class thread_context;
 class processor_job final
 {
 public:
-    using output_buffer_t = std::array<float, max_period_size.get()>;
+    using output_buffer_t = std::array<float, max_period_size.value()>;
 
     processor_job(processor& proc);
 
