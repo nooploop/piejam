@@ -20,17 +20,17 @@ template <class T, class Eq>
 auto
 remove_erase(detail::box<std::vector<T>, Eq>& vec, T const& value)
 {
-    vec.update(
-            [&value](std::vector<T>& vec) { boost::remove_erase(vec, value); });
+    auto vec_ = vec.lock();
+    boost::remove_erase(*vec_, value);
 }
 
 template <class T, class Eq, class... Args>
 void
 emplace_back(detail::box<std::vector<T>, Eq>& vec, Args&&... args)
 {
-    vec.update([&](std::vector<T>& vec) {
-        vec.emplace_back(std::forward<decltype(args)>(args)...);
-    });
+    auto vec_ = vec.lock();
+
+    vec_->template emplace_back(std::forward<decltype(args)>(args)...);
 }
 
 } // namespace piejam

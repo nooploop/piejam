@@ -181,26 +181,24 @@ apply_mixer_io(
         channel.in = find_route(in, io_direction::input);
         channel.out = find_route(out, io_direction::output);
 
-        channel.aux_sends.update([&](mixer::aux_sends_t& aux_sends) {
-            for (auto const& aux_send_data : aux_sends_data)
-            {
-                // TODO: check maybe not needed if devices are stored in session
-                if (auto route = find_route(
-                            aux_send_data.route,
-                            io_direction::output);
-                    !std::holds_alternative<default_t>(route))
-                {
-                    if (auto aux_send_it = aux_sends.find(route);
-                        aux_send_it != aux_sends.end())
-                    {
-                        params[aux_send_it->second.volume].value.set(
-                                aux_send_data.volume);
+        auto aux_sends = channel.aux_sends.lock();
 
-                        aux_send_it->second.enabled = aux_send_data.enabled;
-                    }
+        for (auto const& aux_send_data : aux_sends_data)
+        {
+            if (auto route =
+                        find_route(aux_send_data.route, io_direction::output);
+                !std::holds_alternative<default_t>(route))
+            {
+                if (auto aux_send_it = aux_sends->find(route);
+                    aux_send_it != aux_sends->end())
+                {
+                    params[aux_send_it->second.volume].value.set(
+                            aux_send_data.volume);
+
+                    aux_send_it->second.enabled = aux_send_data.enabled;
                 }
             }
-        });
+        }
     });
 }
 

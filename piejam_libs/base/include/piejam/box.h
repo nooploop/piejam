@@ -63,6 +63,40 @@ class box
 public:
     using value_type = T;
 
+    class write_lock
+    {
+    public:
+        explicit write_lock(std::shared_ptr<T const>& boxed_value)
+            : m_boxed_value{boxed_value}
+        {
+        }
+
+        ~write_lock()
+        {
+            m_boxed_value = m_value;
+        }
+
+        write_lock(write_lock const&) = delete;
+        write_lock(write_lock&&) = delete;
+
+        auto operator=(write_lock const&) = delete;
+        auto operator=(write_lock&&) = delete;
+
+        auto operator*() const noexcept -> T&
+        {
+            return *m_value;
+        }
+
+        auto operator->() const noexcept -> T*
+        {
+            return m_value.get();
+        }
+
+    private:
+        std::shared_ptr<T const>& m_boxed_value;
+        std::shared_ptr<T> m_value{std::make_shared<T>(*m_boxed_value)};
+    };
+
     box() = default;
 
     template <convertible_to_box_value<T const> U>
@@ -119,17 +153,9 @@ public:
         return *this;
     }
 
-    template <std::invocable<T&> U>
-    auto update(U&& u)
+    auto lock() -> write_lock
     {
-        static_assert(std::is_same_v<
-                      std::tuple_element_t<
-                              0,
-                              boost::callable_traits::args_t<U>>,
-                      T&>);
-        auto value = std::make_shared<T>(*m_value);
-        on_scope_exit on_exit([this, value]() { m_value = std::move(value); });
-        return u(*value);
+        return write_lock{m_value};
     }
 
     auto operator==(box const& other) const noexcept -> bool

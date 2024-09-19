@@ -276,16 +276,16 @@ update_midi_assignments(
         box<midi_assignments_map>& midi_assigns,
         midi_assignments_map const& new_assignments)
 {
-    midi_assigns.update([&](midi_assignments_map& midi_assigns) {
-        for (auto&& [id, ass] : new_assignments)
-        {
-            std::erase_if(
-                    midi_assigns,
-                    tuple::element<1>.equal_to(std::cref(ass)));
+    auto midi_assigns_ = midi_assigns.lock();
 
-            midi_assigns.insert_or_assign(id, ass);
-        }
-    });
+    for (auto&& [id, ass] : new_assignments)
+    {
+        std::erase_if(
+                *midi_assigns_,
+                tuple::element<1>.equal_to(std::cref(ass)));
+
+        midi_assigns_->insert_or_assign(id, ass);
+    }
 }
 
 static void
@@ -391,10 +391,7 @@ insert_ladspa_fx_module(
                 mixer_channel.fx_chain = std::move(fx_chain);
             });
 
-    st.fx_ladspa_instances.update(
-            [&](fx::ladspa_instances& fx_ladspa_instances) {
-                fx_ladspa_instances.emplace(instance_id, plugin_desc);
-            });
+    st.fx_ladspa_instances.lock()->emplace(instance_id, plugin_desc);
 
     return fx_mod_id;
 }
@@ -412,17 +409,17 @@ insert_missing_ladspa_fx_module(
     st.mixer_state.channels.update(
             channel_id,
             [&](mixer::channel& mixer_channel) {
-                mixer_channel.fx_chain.update([&](fx::chain_t& fx_chain) {
-                    auto id = st.fx_unavailable_ladspa_plugins.add(unavail);
-                    auto const insert_pos = std::min(position, fx_chain.size());
-                    fx_chain.emplace(
-                            std::next(fx_chain.begin(), insert_pos),
-                            st.fx_modules.add(fx::module{
-                                    .fx_instance_id = id,
-                                    .name = box_(std::string(name)),
-                                    .parameters = {},
-                                    .streams = {}}));
-                });
+                auto fx_chain = mixer_channel.fx_chain.lock();
+
+                auto id = st.fx_unavailable_ladspa_plugins.add(unavail);
+                auto const insert_pos = std::min(position, fx_chain->size());
+                fx_chain->emplace(
+                        std::next(fx_chain->begin(), insert_pos),
+                        st.fx_modules.add(fx::module{
+                                .fx_instance_id = id,
+                                .name = box_(std::string(name)),
+                                .parameters = {},
+                                .streams = {}}));
             });
 }
 
@@ -430,8 +427,7 @@ template <class P>
 static auto
 remove_midi_assignement_for_parameter(state& st, parameter::id_t<P> id)
 {
-    st.midi_assignments.update(
-            [id](midi_assignments_map& m) { m.erase(midi_assignment_id{id}); });
+    st.midi_assignments.lock()->erase(midi_assignment_id{id});
 }
 
 template <class P>
@@ -475,9 +471,7 @@ remove_fx_module(
 
     if (auto id = std::get_if<ladspa::instance_id>(&fx_mod.fx_instance_id))
     {
-        st.fx_ladspa_instances.update([id](fx::ladspa_instances& instances) {
-            instances.erase(*id);
-        });
+        st.fx_ladspa_instances.lock()->erase(*id);
     }
     else if (
             auto id = std::get_if<fx::unavailable_ladspa_id>(
@@ -596,14 +590,12 @@ add_external_audio_device(
 
                 if (io_dir == io_direction::output)
                 {
-                    mixer_channel.aux_sends.update(
-                            [&, route = mixer::io_address_t{id}](
-                                    mixer::aux_sends_t& aux_sends) {
-                                make_aux_send(
-                                        aux_sends,
-                                        route,
-                                        ui_params_factory);
-                            });
+                    auto aux_sends = mixer_channel.aux_sends.lock();
+
+                    make_aux_send(
+                            *mixer_channel.aux_sends.lock(),
+                            id,
+                            ui_params_factory);
                 }
             });
 
@@ -669,11 +661,10 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
             [&](mixer::channel_id id, mixer::channel& channel) {
                 if (id != channel_id)
                 {
-                    channel.aux_sends.update(
-                            [&, route = mixer::io_address_t{channel_id}](
-                                    mixer::aux_sends_t& m) {
-                                make_aux_send(m, route, ui_params_factory);
-                            });
+                    make_aux_send(
+                            *channel.aux_sends.lock(),
+                            channel_id,
+                            ui_params_factory);
                 }
             });
 
@@ -707,9 +698,7 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
             [&, addr = mixer::io_address_t{mixer_channel_id}](
                     mixer::channel_id,
                     mixer::channel& channel) {
-                channel.aux_sends.update([&](mixer::aux_sends_t& m) {
-                    remove_aux_send(st, m, addr);
-                });
+                remove_aux_send(st, *channel.aux_sends.lock(), addr);
             });
 
     BOOST_ASSERT_MSG(
@@ -763,13 +752,10 @@ remove_external_audio_device(
         remove_erase(st.external_audio_state.outputs, device_id);
 
         st.mixer_state.channels.update(
-                [&,
-                 device_id](mixer::channel_id, mixer::channel& mixer_channel) {
-                    mixer_channel.aux_sends.update(
-                            [&, route = mixer::io_address_t{device_id}](
-                                    mixer::aux_sends_t& m) {
-                                remove_aux_send(st, m, route);
-                            });
+                [&, route = mixer::io_address_t{device_id}](
+                        mixer::channel_id,
+                        mixer::channel& mixer_channel) {
+                    remove_aux_send(st, *mixer_channel.aux_sends.lock(), route);
                 });
     }
 }

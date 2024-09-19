@@ -144,45 +144,39 @@ enable_mixer_channel_aux_route::reduce(state& st) const
     st.mixer_state.channels.update(
             channel_id,
             [this](mixer::channel& mixer_channel) {
-                mixer_channel.aux_sends.update(
-                        [this,
-                         route = std::holds_alternative<default_t>(route)
-                                         ? mixer_channel.aux
-                                         : route](
-                                mixer::aux_sends_t& aux_sends) {
-                            if (auto it = aux_sends.find(route);
-                                it != aux_sends.end())
-                            {
-                                it->second.enabled = enabled;
-                            }
-                            else
-                            {
-                                BOOST_ASSERT(false);
-                            }
-                        });
+                auto aux_sends = mixer_channel.aux_sends.lock();
+                if (auto it = aux_sends->find(mixer_channel.aux);
+                    it != aux_sends->end())
+                {
+                    it->second.enabled = enabled;
+                }
+                else
+                {
+                    BOOST_ASSERT(false);
+                }
             });
 }
 
 void
 move_mixer_channel_left::reduce(state& st) const
 {
-    st.mixer_state.inputs.update([this](mixer::channel_ids_t& channel_ids) {
-        auto it = std::ranges::find(channel_ids, channel_id);
-        BOOST_ASSERT(it != channel_ids.end());
-        BOOST_ASSERT(it != channel_ids.begin());
-        std::iter_swap(it, std::prev(it));
-    });
+    auto channel_ids = st.mixer_state.inputs.lock();
+
+    auto it = std::ranges::find(*channel_ids, channel_id);
+    BOOST_ASSERT(it != channel_ids->end());
+    BOOST_ASSERT(it != channel_ids->begin());
+    std::iter_swap(it, std::prev(it));
 }
 
 void
 move_mixer_channel_right::reduce(state& st) const
 {
-    st.mixer_state.inputs.update([this](mixer::channel_ids_t& channel_ids) {
-        auto it = std::ranges::find(channel_ids, channel_id);
-        BOOST_ASSERT(it != channel_ids.end());
-        BOOST_ASSERT(std::next(it) != channel_ids.begin());
-        std::iter_swap(it, std::next(it));
-    });
+    auto channel_ids = st.mixer_state.inputs.lock();
+
+    auto it = std::ranges::find(*channel_ids, channel_id);
+    BOOST_ASSERT(it != channel_ids->end());
+    BOOST_ASSERT(std::next(it) != channel_ids->begin());
+    std::iter_swap(it, std::next(it));
 }
 
 } // namespace piejam::runtime::actions

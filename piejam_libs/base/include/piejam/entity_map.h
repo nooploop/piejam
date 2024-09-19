@@ -66,65 +66,64 @@ public:
     [[nodiscard]] auto add(Args&&... args) -> id_t
     {
         auto id = id_t::generate();
-        m_map.update([&, id](map_t& m) {
-            m.emplace_hint(
-                    m.end(),
-                    std::piecewise_construct,
-                    std::forward_as_tuple(id),
-                    std::forward_as_tuple(std::forward<Args>(args)...));
-        });
+
+        auto m = m_map.lock();
+        m->emplace_hint(
+                m->end(),
+                std::piecewise_construct,
+                std::forward_as_tuple(id),
+                std::forward_as_tuple(std::forward<Args>(args)...));
         return id;
     }
 
     template <std::invocable<Entity&> U>
     auto update(id_t const id, U&& u)
     {
-        return m_map.update([id, &u](map_t& m) {
-            auto it = m.find(id);
-            BOOST_ASSERT(it != m.end());
-            return u(it->second);
-        });
+        auto m = m_map.lock();
+
+        auto it = m->find(id);
+        BOOST_ASSERT(it != m->end());
+        return u(it->second);
     }
 
     template <std::invocable<id_t, Entity&> U>
     auto update(std::span<id_t const> const ids, U&& u)
     {
-        m_map.update([ids, &u](map_t& m) {
-            for (auto const id : ids)
-            {
-                if (auto it = m.find(id); it != m.end())
-                {
-                    u(id, it->second);
-                }
-            }
-        });
+        auto m = m_map.lock();
+
+        for (auto const id : ids)
+        {
+            auto it = m->find(id);
+            BOOST_ASSERT(it != m->end());
+            u(id, it->second);
+        }
     }
 
     template <std::invocable<id_t, Entity&> U>
     auto update(U&& u)
     {
-        m_map.update([&u](map_t& m) {
-            for (auto&& [id, value] : m)
-            {
-                u(id, value);
-            }
-        });
+        auto m = m_map.lock();
+
+        for (auto&& [id, value] : *m)
+        {
+            u(id, value);
+        }
     }
 
     auto remove(id_t const id) -> typename map_t::size_type
     {
-        return m_map.update([id](map_t& m) { return m.erase(id); });
+        return m_map.lock()->erase(id);
     }
 
     template <std::ranges::range RangeOfIds>
     void remove(RangeOfIds const& ids)
     {
-        m_map.update([&](map_t& m) {
-            for (id_t const id : ids)
-            {
-                m.erase(id);
-            }
-        });
+        auto m = m_map.lock();
+
+        for (id_t const id : ids)
+        {
+            m->erase(id);
+        }
     }
 
     auto operator==(entity_map const&) const noexcept -> bool = default;

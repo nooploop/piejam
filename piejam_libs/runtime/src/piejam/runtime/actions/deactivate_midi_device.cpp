@@ -13,9 +13,7 @@ namespace piejam::runtime::actions
 void
 deactivate_midi_device::reduce(state& st) const
 {
-    st.midi_devices.update([this](midi_devices_t& devices) {
-        devices[device_id].enabled = false;
-    });
+    (*st.midi_devices.lock())[device_id].enabled = false;
 }
 
 } // namespace piejam::runtime::actions

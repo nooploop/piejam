@@ -79,7 +79,6 @@ struct enable_mixer_channel_aux_route final
     , visitable_audio_engine_action<enable_mixer_channel_aux_route>
 {
     mixer::channel_id channel_id;
-    mixer::io_address_t route;
     bool enabled;
 
     void reduce(state&) const override;

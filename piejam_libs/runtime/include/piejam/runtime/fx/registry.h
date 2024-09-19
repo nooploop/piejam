@@ -25,9 +25,7 @@ struct registry
     static auto register_internal_module() -> internal_id
     {
         auto id = internal_id::generate();
-        internal_modules().update([id](std::vector<item>& internal_modules) {
-            internal_modules.emplace_back(id);
-        });
+        emplace_back(internal_modules(), id);
         return id;
     }
 

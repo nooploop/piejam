@@ -31,13 +31,16 @@ sort_fx_plugins(std::vector<ladspa::plugin_descriptor>& plugins)
 void
 finalize_ladspa_fx_plugin_scan::reduce(state& st) const
 {
-    fx::registry new_registry;
     auto ladspa_plugins = plugins;
     filter_fx_plugins(ladspa_plugins);
     sort_fx_plugins(ladspa_plugins);
-    new_registry.entries.update([&](std::vector<fx::registry::item>& fxs) {
-        boost::push_back(fxs, std::move(ladspa_plugins));
-    });
+
+    fx::registry new_registry;
+    {
+        auto fxs = new_registry.entries.lock();
+        boost::push_back(*fxs, std::move(ladspa_plugins));
+    }
+
     st.fx_registry = std::move(new_registry);
 }
 
