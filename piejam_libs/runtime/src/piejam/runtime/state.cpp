@@ -273,18 +273,14 @@ apply_parameter_values(
 
 static void
 update_midi_assignments(
-        box<midi_assignments_map>& midi_assigns,
+        midi_assignments_map& midi_assigns,
         midi_assignments_map const& new_assignments)
 {
-    auto midi_assigns_ = midi_assigns.lock();
-
     for (auto&& [id, ass] : new_assignments)
     {
-        std::erase_if(
-                *midi_assigns_,
-                tuple::element<1>.equal_to(std::cref(ass)));
+        std::erase_if(midi_assigns, tuple::element<1>.equal_to(std::cref(ass)));
 
-        midi_assigns_->insert_or_assign(id, ass);
+        midi_assigns.insert_or_assign(id, ass);
     }
 }
 
@@ -292,7 +288,7 @@ static void
 apply_fx_midi_assignments(
         std::vector<fx::parameter_midi_assignment> const& fx_midi_assigns,
         fx::module const& fx_mod,
-        box<midi_assignments_map>& midi_assigns)
+        midi_assignments_map& midi_assigns)
 {
     midi_assignments_map new_assignments;
     for (auto&& [key, value] : fx_midi_assigns)
@@ -340,7 +336,10 @@ insert_internal_fx_module(
     auto const& fx_mod = st.fx_modules[fx_chain[insert_pos]];
 
     apply_parameter_values(initial_values, fx_mod, st.params);
-    apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
+    apply_fx_midi_assignments(
+            midi_assigns,
+            fx_mod,
+            *st.midi_assignments.lock());
 
     st.mixer_state.channels.update(
             mixer_channel_id,
@@ -383,7 +382,10 @@ insert_ladspa_fx_module(
 
     auto const& fx_mod = st.fx_modules[fx_chain[insert_pos]];
     apply_parameter_values(initial_values, fx_mod, st.params);
-    apply_fx_midi_assignments(midi_assigns, fx_mod, st.midi_assignments);
+    apply_fx_midi_assignments(
+            midi_assigns,
+            fx_mod,
+            *st.midi_assignments.lock());
 
     st.mixer_state.channels.update(
             mixer_channel_id,
@@ -763,7 +765,7 @@ remove_external_audio_device(
 void
 update_midi_assignments(state& st, midi_assignments_map const& assignments)
 {
-    update_midi_assignments(st.midi_assignments, assignments);
+    update_midi_assignments(*st.midi_assignments.lock(), assignments);
 }
 
 } // namespace piejam::runtime

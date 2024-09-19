@@ -73,7 +73,7 @@ struct state
 
     mixer::state mixer_state{};
 
-    box<midi_assignments_map> midi_assignments;
+    unique_box<midi_assignments_map> midi_assignments;
     std::optional<midi_assignment_id> midi_learning{};
 
     bool recording{};

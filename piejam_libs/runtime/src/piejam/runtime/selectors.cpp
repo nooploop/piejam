@@ -80,10 +80,10 @@ selector<box<period_count_choice>> const select_period_count([](state const&
 });
 
 selector<float> const select_buffer_latency([](state const& st) {
-    return st.sample_rate.value() != 0
-                   ? (st.period_size.value() * st.period_count.value() * 1000.f) /
-                             st.sample_rate.as_float()
-                   : 0.f;
+    return st.sample_rate.value() != 0 ? (st.period_size.value() *
+                                          st.period_count.value() * 1000.f) /
+                                                 st.sample_rate.as_float()
+                                       : 0.f;
 });
 
 static auto get_sound_card = memo(
@@ -1050,11 +1050,14 @@ auto
 make_midi_assignment_selector(midi_assignment_id const id)
         -> selector<std::optional<midi_assignment>>
 {
-    return [id](state const& st) -> std::optional<midi_assignment> {
-        auto it = st.midi_assignments->find(id);
-        return it != st.midi_assignments->end()
-                       ? it->second
-                       : std::optional<midi_assignment>{};
+    auto get = memo([id](midi_assignments_map const& midi_assigns) {
+        auto it = midi_assigns.find(id);
+        return it != midi_assigns.end() ? it->second
+                                        : std::optional<midi_assignment>{};
+    });
+
+    return [get = std::move(get)](state const& st) {
+        return get(*st.midi_assignments);
     };
 }
 
