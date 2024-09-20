@@ -4,47 +4,43 @@
 
 #pragma once
 
+#include <functional>
+
 namespace piejam
 {
 
-struct
+namespace detail
 {
-    template <class T>
-    constexpr auto
-    operator()(T const& v, T const& lo, T const& hi) const noexcept -> bool
-    {
-        return lo <= v && v <= hi;
-    }
-} const in_closed;
 
-struct
+template <class LeftCompare, class RightCompare>
+struct interval_check
 {
     template <class T>
-    constexpr auto
-    operator()(T const& v, T const& lo, T const& hi) const noexcept -> bool
+    constexpr auto operator()(T const v, T const lo, T const hi) const noexcept
+            -> bool
     {
-        return lo < v && v < hi;
+        return LeftCompare{}(lo, v) && RightCompare{}(v, hi);
     }
-} const in_open;
 
-struct
-{
     template <class T>
-    constexpr auto
-    operator()(T const& v, T const& lo, T const& hi) const noexcept -> bool
+    constexpr auto operator()(T const v) const noexcept
     {
-        return lo < v && v <= hi;
+        return [this, v](T const lo, T const hi) { return (*this)(v, lo, hi); };
     }
-} const in_left_open;
+};
 
-struct
-{
-    template <class T>
-    constexpr auto
-    operator()(T const& v, T const& lo, T const& hi) const noexcept -> bool
-    {
-        return lo <= v && v < hi;
-    }
-} const in_right_open;
+} // namespace detail
+
+inline constexpr auto const in_closed =
+        detail::interval_check<std::less_equal<>, std::less_equal<>>{};
+
+inline constexpr auto const in_open =
+        detail::interval_check<std::less<>, std::less<>>{};
+
+inline constexpr auto const in_left_open =
+        detail::interval_check<std::less<>, std::less_equal<>>{};
+
+inline constexpr auto const in_right_open =
+        detail::interval_check<std::less_equal<>, std::less<>>{};
 
 } // namespace piejam
