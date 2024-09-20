@@ -393,7 +393,7 @@ insert_ladspa_fx_module(
                 mixer_channel.fx_chain = std::move(fx_chain);
             });
 
-    st.fx_ladspa_instances.lock()->emplace(instance_id, plugin_desc);
+    st.fx_ladspa_instances.emplace(instance_id, plugin_desc);
 
     return fx_mod_id;
 }
@@ -473,7 +473,7 @@ remove_fx_module(
 
     if (auto id = std::get_if<ladspa::instance_id>(&fx_mod.fx_instance_id))
     {
-        st.fx_ladspa_instances.lock()->erase(*id);
+        st.fx_ladspa_instances.erase(*id);
     }
     else if (
             auto id = std::get_if<fx::unavailable_ladspa_id>(

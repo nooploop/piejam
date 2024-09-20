@@ -68,7 +68,7 @@ struct state
     fx::registry fx_registry;
 
     fx::modules_t fx_modules;
-    box<fx::ladspa_instances> fx_ladspa_instances;
+    fx::ladspa_instances fx_ladspa_instances;
     fx::unavailable_ladspa_plugins fx_unavailable_ladspa_plugins;
 
     mixer::state mixer_state{};

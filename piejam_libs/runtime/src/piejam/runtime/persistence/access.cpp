@@ -153,7 +153,7 @@ export_fx_plugin(
     BOOST_ASSERT(std::get<ladspa::instance_id>(fx_mod.fx_instance_id) == id);
 
     session::ladspa_plugin plug;
-    auto const& pd = st.fx_ladspa_instances->at(id);
+    auto const& pd = st.fx_ladspa_instances.at(id);
     plug.id = pd.id;
     plug.name = pd.name;
     plug.preset = export_parameter_values(fx_mod, st.params);
