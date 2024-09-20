@@ -119,9 +119,9 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                               .value_to_string = &to_resonance_string})}}),
             .streams = box(runtime::fx::module_streams{
                     {to_underlying(stream_key::in_out),
-                     args.streams.add(runtime::audio_stream_buffer(
+                     args.streams.emplace(
                              std::in_place,
-                             num_channels(args.bus_type) * 2))}})};
+                             num_channels(args.bus_type) * 2)}})};
 }
 
 } // namespace piejam::fx_modules::filter

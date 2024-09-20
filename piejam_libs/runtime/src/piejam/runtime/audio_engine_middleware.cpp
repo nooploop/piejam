@@ -43,12 +43,14 @@
 #include <piejam/audio/sound_card_descriptor.h>
 #include <piejam/audio/sound_card_hw_params.h>
 #include <piejam/audio/sound_card_manager.h>
+#include <piejam/functional/operators.h>
 #include <piejam/ladspa/plugin.h>
 #include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/ladspa/port_descriptor.h>
 #include <piejam/ladspa/processor_factory.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/input_event_handler.h>
+#include <piejam/set_if.h>
 #include <piejam/thread/worker.h>
 #include <piejam/tuple_element_compare.h>
 
@@ -63,15 +65,6 @@ namespace piejam::runtime
 
 namespace
 {
-
-constexpr void
-update_channel(std::size_t& ch, std::size_t const num_chs)
-{
-    if (ch >= num_chs)
-    {
-        ch = npos;
-    }
-}
 
 struct update_devices final
     : ui::cloneable_action<update_devices, reducible_action>
@@ -94,23 +87,25 @@ struct update_devices final
         st.period_size = period_size;
         st.period_count = period_count;
 
-        st.external_audio_state.devices.update(
-                *st.external_audio_state.inputs,
-                [num_in_channels = input.hw_params->num_channels](
-                        external_audio::device_id,
-                        external_audio::device& device) {
-                    update_channel(device.channels.left, num_in_channels);
-                    update_channel(device.channels.right, num_in_channels);
-                });
+        auto devices = st.external_audio_state.devices.lock();
 
-        st.external_audio_state.devices.update(
-                *st.external_audio_state.outputs,
-                [num_out_channels = output.hw_params->num_channels](
-                        external_audio::device_id,
-                        external_audio::device& device) {
-                    update_channel(device.channels.left, num_out_channels);
-                    update_channel(device.channels.right, num_out_channels);
-                });
+        auto update_channels = [&](auto num_channels, auto const& ids) {
+            auto const ge_num_channels = greater_equal<>(num_channels);
+            for (auto id : ids)
+            {
+                auto& device = devices[id];
+                set_if(device.channels.left, ge_num_channels, npos);
+                set_if(device.channels.right, ge_num_channels, npos);
+            }
+        };
+
+        update_channels(
+                input.hw_params->num_channels,
+                *st.external_audio_state.inputs);
+
+        update_channels(
+                output.hw_params->num_channels,
+                *st.external_audio_state.outputs);
     }
 };
 

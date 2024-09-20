@@ -177,7 +177,7 @@ apply_mixer_io(
         }
     };
 
-    mixer_state.channels.update(channel_id, [&](mixer::channel& channel) {
+    [&](mixer::channel& channel) {
         channel.in = find_route(in, io_direction::input);
         channel.out = find_route(out, io_direction::output);
 
@@ -199,7 +199,7 @@ apply_mixer_io(
                 }
             }
         }
-    });
+    }(mixer_state.channels.lock()[channel_id]);
 }
 
 } // namespace
@@ -240,23 +240,21 @@ apply_session::reduce(state& st) const
         apply_mixer_fx_chain(st, added_channel_id, channel_data.fx_chain);
     }
 
-    st.mixer_state.channels.update(
-            st.mixer_state.main,
-            [&](mixer::channel& main_mixer_channel) {
-                main_mixer_channel.name = session->main_mixer_channel.name;
-                apply_mixer_midi(
-                        mixer_midi_assignments,
-                        main_mixer_channel,
-                        session->main_mixer_channel.midi);
-                apply_mixer_parameters(
-                        st.params,
-                        main_mixer_channel,
-                        session->main_mixer_channel.parameter);
-                apply_mixer_fx_chain(
-                        st,
-                        st.mixer_state.main,
-                        session->main_mixer_channel.fx_chain);
-            });
+    [&](mixer::channel& main_mixer_channel) {
+        main_mixer_channel.name = session->main_mixer_channel.name;
+        apply_mixer_midi(
+                mixer_midi_assignments,
+                main_mixer_channel,
+                session->main_mixer_channel.midi);
+        apply_mixer_parameters(
+                st.params,
+                main_mixer_channel,
+                session->main_mixer_channel.parameter);
+        apply_mixer_fx_chain(
+                st,
+                st.mixer_state.main,
+                session->main_mixer_channel.fx_chain);
+    }(st.mixer_state.channels.lock()[st.mixer_state.main]);
 
     runtime::update_midi_assignments(st, mixer_midi_assignments);
 

@@ -18,7 +18,7 @@ TEST(mixer_valid_io, test1)
     using namespace std::string_literals;
 
     channels_t channels;
-    auto channel1 = channels.add(channel{
+    auto channel1 = channels.insert({
             .name = box("foo"s),
             .bus_type = audio::bus_type::stereo,
             .volume = {},
@@ -29,7 +29,7 @@ TEST(mixer_valid_io, test1)
             .peak_level = {},
             .rms_level = {},
     });
-    auto channel2 = channels.add(channel{
+    auto channel2 = channels.insert({
             .name = box("bar"s),
             .bus_type = audio::bus_type::stereo,
             .volume = {},
@@ -62,8 +62,8 @@ TEST(mixer_valid_io, test2)
     using namespace std::string_literals;
 
     channels_t channels;
-    auto channel1 = channels.add(channel{});
-    auto channel2 = channels.add(channel{
+    auto channel1 = channels.insert({});
+    auto channel2 = channels.insert({
             .name = box("foo"s),
             .bus_type = audio::bus_type::stereo,
             .in = channel1,

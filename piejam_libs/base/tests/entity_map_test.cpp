@@ -22,7 +22,7 @@ TEST(entity_map, default_ctor)
 TEST(entity_map, add)
 {
     entity_map<int> sut;
-    auto id = sut.add(5);
+    auto id = sut.lock().emplace(5);
     EXPECT_NE(entity_map<int>::id_t{}, id);
     EXPECT_FALSE(sut.empty());
     EXPECT_EQ(1, sut.size());
@@ -32,31 +32,31 @@ TEST(entity_map, add)
 TEST(entity_map, remove)
 {
     entity_map<int> sut;
-    auto id = sut.add(5);
+    auto id = sut.lock().emplace(5);
     ASSERT_FALSE(sut.empty());
 
-    sut.remove(id);
+    sut.lock().erase(id);
     EXPECT_TRUE(sut.empty());
 }
 
 TEST(entity_map, remove_remove)
 {
     entity_map<int> sut;
-    auto id = sut.add(5);
+    auto id = sut.lock().emplace(5);
     ASSERT_FALSE(sut.empty());
 
-    EXPECT_EQ(1u, sut.remove(id));
+    EXPECT_EQ(1u, sut.lock().erase(id));
     EXPECT_TRUE(sut.empty());
 
-    EXPECT_EQ(0, sut.remove(id));
+    EXPECT_EQ(0, sut.lock().erase(id));
 }
 
 TEST(entity_map, add_add_add)
 {
     entity_map<int> sut;
-    auto id1 = sut.add(2);
-    auto id2 = sut.add(3);
-    auto id3 = sut.add(5);
+    auto id1 = sut.lock().emplace(2);
+    auto id2 = sut.lock().emplace(3);
+    auto id3 = sut.lock().emplace(5);
     EXPECT_THAT(
             sut,
             testing::ElementsAre(

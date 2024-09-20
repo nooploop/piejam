@@ -10,9 +10,6 @@
 #include <boost/assert.hpp>
 #include <boost/container/flat_map.hpp>
 
-#include <concepts>
-#include <span>
-
 namespace piejam
 {
 
@@ -62,68 +59,93 @@ public:
         return it->second;
     }
 
+    class locked
+    {
+    public:
+        explicit locked(entity_map& m)
+            : m_{m.m_map.lock()}
+        {
+        }
+
+        [[nodiscard]] auto begin() noexcept
+        {
+            return m_->begin();
+        }
+
+        [[nodiscard]] auto end() noexcept
+        {
+            return m_->end();
+        }
+
+        [[nodiscard]] auto operator[](id_t const id) -> Entity&
+        {
+            auto it = m_->find(id);
+            BOOST_ASSERT(it != m_->end());
+            return it->second;
+        }
+
+        [[nodiscard]] auto insert(Entity value) -> id_t
+        {
+            auto id = id_t::generate();
+            m_->emplace_hint(m_->end(), id, std::move(value));
+            return id;
+        }
+
+        template <class... Args>
+        [[nodiscard]] auto emplace(Args&&... args) -> id_t
+        {
+            auto id = id_t::generate();
+            m_->emplace_hint(
+                    m_->end(),
+                    std::piecewise_construct,
+                    std::forward_as_tuple(id),
+                    std::forward_as_tuple(std::forward<Args>(args)...));
+            return id;
+        }
+
+        auto erase(id_t const id) -> typename map_t::size_type
+        {
+            return m_->erase(id);
+        }
+
+        template <std::ranges::range RangeOfIds>
+        void erase(RangeOfIds&& ids)
+        {
+            for (auto id : ids)
+            {
+                m_->erase(id);
+            }
+        }
+
+    private:
+        box<map_t>::write_lock m_;
+    };
+
+    auto lock() -> locked
+    {
+        return locked{*this};
+    }
+
+    [[nodiscard]] auto insert(Entity value) -> id_t
+    {
+        return lock().insert(std::move(value));
+    }
+
     template <class... Args>
-    [[nodiscard]] auto add(Args&&... args) -> id_t
+    [[nodiscard]] auto emplace(Args&&... args) -> id_t
     {
-        auto id = id_t::generate();
-
-        auto m = m_map.lock();
-        m->emplace_hint(
-                m->end(),
-                std::piecewise_construct,
-                std::forward_as_tuple(id),
-                std::forward_as_tuple(std::forward<Args>(args)...));
-        return id;
+        return lock().emplace(std::forward<Args>(args)...);
     }
 
-    template <std::invocable<Entity&> U>
-    auto update(id_t const id, U&& u)
+    auto erase(id_t const id) -> typename map_t::size_type
     {
-        auto m = m_map.lock();
-
-        auto it = m->find(id);
-        BOOST_ASSERT(it != m->end());
-        return u(it->second);
-    }
-
-    template <std::invocable<id_t, Entity&> U>
-    auto update(std::span<id_t const> const ids, U&& u)
-    {
-        auto m = m_map.lock();
-
-        for (auto const id : ids)
-        {
-            auto it = m->find(id);
-            BOOST_ASSERT(it != m->end());
-            u(id, it->second);
-        }
-    }
-
-    template <std::invocable<id_t, Entity&> U>
-    auto update(U&& u)
-    {
-        auto m = m_map.lock();
-
-        for (auto&& [id, value] : *m)
-        {
-            u(id, value);
-        }
-    }
-
-    auto remove(id_t const id) -> typename map_t::size_type
-    {
-        return m_map.lock()->erase(id);
+        return lock().erase(id);
     }
 
     template <std::ranges::range RangeOfIds>
-    void remove(RangeOfIds const& ids)
+    void erase(RangeOfIds&& ids)
     {
-        auto m = m_map.lock();
-
-        for (id_t const id : ids)
-        {
-            m->erase(id);
-        }
+        lock().erase(std::forward<RangeOfIds>(ids));
     }
 
     auto operator==(entity_map const&) const noexcept -> bool = default;

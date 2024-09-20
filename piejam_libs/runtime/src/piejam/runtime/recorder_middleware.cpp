@@ -105,7 +105,8 @@ struct recorder_action_visitor
 
                 if (sndfile)
                 {
-                    auto stream_id = streams.add(std::in_place, num_channels);
+                    auto stream_id =
+                            streams.emplace(std::in_place, num_channels);
                     recorder_streams.emplace(mixer_channel_id, stream_id);
                     open_streams.emplace(stream_id, std::move(sndfile));
                 }
@@ -151,8 +152,7 @@ struct recorder_action_visitor
             new_st.recording = false;
             ++new_st.rec_take;
 
-            new_st.streams.remove(
-                    *new_st.recorder_streams | std::views::values);
+            new_st.streams.erase(*new_st.recorder_streams | std::views::values);
 
             new_st.recorder_streams = {};
         }});

@@ -4,25 +4,16 @@
 
 #include <piejam/runtime/actions/fx_chain_actions.h>
 
+#include <piejam/bool.h>
 #include <piejam/runtime/state.h>
 
 namespace piejam::runtime::actions
 {
 
 void
-toggle_fx_module_bypass::reduce(state& st) const
-{
-    st.fx_modules.update(fx_mod_id, [](fx::module& fx_mod) {
-        fx_mod.bypassed = !fx_mod.bypassed;
-    });
-}
-
-void
 toggle_focused_fx_module_bypass::reduce(state& st) const
 {
-    st.fx_modules.update(
-            st.gui_state.focused_fx_mod_id,
-            [](fx::module& fx_mod) { fx_mod.bypassed = !fx_mod.bypassed; });
+    toggle_bool(st.fx_modules.lock()[st.gui_state.focused_fx_mod_id].bypassed);
 }
 
 void

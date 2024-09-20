@@ -110,14 +110,12 @@ add_external_audio_device::reduce(state& st) const
 
     if (direction == io_direction::output)
     {
-        st.mixer_state.channels.update(
-                st.mixer_state.main,
-                [added_device_id](mixer::channel& mixer_channel) {
-                    if (std::holds_alternative<default_t>(mixer_channel.out))
-                    {
-                        mixer_channel.out = added_device_id;
-                    }
-                });
+        [added_device_id](mixer::channel& mixer_channel) {
+            if (std::holds_alternative<default_t>(mixer_channel.out))
+            {
+                mixer_channel.out = added_device_id;
+            }
+        }(st.mixer_state.channels.lock()[st.mixer_state.main]);
     }
 }
 
@@ -130,52 +128,43 @@ remove_external_audio_device::reduce(state& st) const
 void
 set_external_audio_device_bus_channel::reduce(state& st) const
 {
-    st.external_audio_state.devices.update(
-            device_id,
-            [this](external_audio::device& device) {
-                switch (channel_selector)
-                {
-                    case audio::bus_channel::mono:
-                        device.channels = channel_index_pair{channel_index};
-                        break;
+    [this](external_audio::device& device) {
+        switch (channel_selector)
+        {
+            case audio::bus_channel::mono:
+                device.channels = channel_index_pair{channel_index};
+                break;
 
-                    case audio::bus_channel::left:
-                        device.channels.left = channel_index;
-                        break;
+            case audio::bus_channel::left:
+                device.channels.left = channel_index;
+                break;
 
-                    case audio::bus_channel::right:
-                        device.channels.right = channel_index;
-                        break;
-                }
-            });
+            case audio::bus_channel::right:
+                device.channels.right = channel_index;
+                break;
+        }
+    }(st.external_audio_state.devices.lock()[device_id]);
 }
 
 void
 set_external_audio_device_name::reduce(state& st) const
 {
-    st.external_audio_state.devices.update(
-            device_id,
-            [this](external_audio::device& device) { device.name = name; });
+    st.external_audio_state.devices.lock()[device_id].name = name;
 
     auto const io_dir =
             algorithm::contains(*st.external_audio_state.inputs, device_id)
                     ? io_direction::input
                     : io_direction::output;
 
-    st.mixer_state.channels.update(
-            [io_dir,
-             equal_to_device_name = equal_to<>(
-                     mixer::io_address_t(mixer::missing_device_address(name))),
-             this](mixer::channel_id, mixer::channel& mixer_channel) {
-                if (io_dir == io_direction::input)
-                {
-                    set_if(mixer_channel.in, equal_to_device_name, device_id);
-                }
-                else
-                {
-                    set_if(mixer_channel.out, equal_to_device_name, device_id);
-                }
-            });
+    auto equal_to_device_name = equal_to<>(
+            mixer::io_address_t(mixer::missing_device_address(name)));
+    auto const get_io_addr = io_dir == io_direction::input
+                                     ? &mixer::channel::in
+                                     : &mixer::channel::out;
+    for (auto& [_, mixer_channel] : st.mixer_state.channels.lock())
+    {
+        set_if(mixer_channel.*get_io_addr, equal_to_device_name, device_id);
+    }
 }
 
 } // namespace piejam::runtime::actions

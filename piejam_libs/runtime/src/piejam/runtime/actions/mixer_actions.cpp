@@ -4,12 +4,13 @@
 
 #include <piejam/runtime/actions/mixer_actions.h>
 
+#include <piejam/functional/get.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
-#include <boost/hof/unpack.hpp>
+#include <boost/hof/compose.hpp>
 
 #include <iterator>
 
@@ -26,27 +27,16 @@ add_mixer_channel::reduce(state& st) const
     {
         for (auto device_id : *st.external_audio_state.inputs)
         {
-            auto it = std::ranges::find_if(
+            auto it = std::ranges::find(
                     st.mixer_state.channels,
-                    boost::hof::unpack(
-                            [device_id](
-                                    mixer::channel_id,
-                                    mixer::channel const& mixer_channel) {
-                                return std::holds_alternative<
-                                               external_audio::device_id>(
-                                               mixer_channel.in) &&
-                                       std::get<external_audio::device_id>(
-                                               mixer_channel.in) == device_id;
-                            }));
+                    mixer::io_address_t{device_id},
+                    boost::hof::compose(&mixer::channel::in, get_by_index<1>));
 
             if (it == st.mixer_state.channels.end() &&
                 st.external_audio_state.devices[device_id].bus_type == bus_type)
             {
-                st.mixer_state.channels.update(
-                        added_mixer_channel_id,
-                        [device_id](mixer::channel& mixer_channel) {
-                            mixer_channel.in = device_id;
-                        });
+                st.mixer_state.channels.lock()[added_mixer_channel_id].in =
+                        device_id;
                 break;
             }
         }
@@ -96,65 +86,51 @@ initiate_mixer_channel_deletion(mixer::channel_id mixer_channel_id)
 void
 set_mixer_channel_name::reduce(state& st) const
 {
-    st.mixer_state.channels.update(
-            channel_id,
-            [this](mixer::channel& mixer_channel) {
-                mixer_channel.name = name;
-            });
+    st.mixer_state.channels.lock()[channel_id].name = name;
 }
 
 void
 set_mixer_channel_route::reduce(state& st) const
 {
-    st.mixer_state.channels.update(
-            channel_id,
-            [this](mixer::channel& mixer_channel) {
-                switch (io_socket)
-                {
-                    case mixer::io_socket::in:
-                        mixer_channel.in = route;
-                        break;
+    [this](mixer::channel& mixer_channel) {
+        switch (io_socket)
+        {
+            case mixer::io_socket::in:
+                mixer_channel.in = route;
+                break;
 
-                    case mixer::io_socket::out:
-                        mixer_channel.out = route;
-                        break;
+            case mixer::io_socket::out:
+                mixer_channel.out = route;
+                break;
 
-                    case mixer::io_socket::aux:
-                        BOOST_ASSERT_MSG(
-                                false,
-                                "use select_mixer_channel_aux_route");
-                        break;
-                }
-            });
+            case mixer::io_socket::aux:
+                BOOST_ASSERT_MSG(false, "use select_mixer_channel_aux_route");
+                break;
+        }
+    }(st.mixer_state.channels.lock()[channel_id]);
 }
 
 void
 select_mixer_channel_aux_route::reduce(state& st) const
 {
-    st.mixer_state.channels.update(
-            channel_id,
-            [this](mixer::channel& mixer_channel) {
-                mixer_channel.aux = route;
-            });
+    st.mixer_state.channels.lock()[channel_id].aux = route;
 }
 
 void
 enable_mixer_channel_aux_route::reduce(state& st) const
 {
-    st.mixer_state.channels.update(
-            channel_id,
-            [this](mixer::channel& mixer_channel) {
-                auto aux_sends = mixer_channel.aux_sends.lock();
-                if (auto it = aux_sends->find(mixer_channel.aux);
-                    it != aux_sends->end())
-                {
-                    it->second.enabled = enabled;
-                }
-                else
-                {
-                    BOOST_ASSERT(false);
-                }
-            });
+    [this](mixer::channel& mixer_channel) {
+        auto aux_sends = mixer_channel.aux_sends.lock();
+        if (auto it = aux_sends->find(mixer_channel.aux);
+            it != aux_sends->end())
+        {
+            it->second.enabled = enabled;
+        }
+        else
+        {
+            BOOST_ASSERT(false);
+        }
+    }(st.mixer_state.channels.lock()[channel_id]);
 }
 
 void
