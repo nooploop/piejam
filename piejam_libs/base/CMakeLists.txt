@@ -5,6 +5,7 @@
 add_library(piejam_base INTERFACE)
 
 target_sources(piejam_base INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/bool.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/box.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/boxed_string.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/boxed_vector.h
