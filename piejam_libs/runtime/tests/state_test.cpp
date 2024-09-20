@@ -4,6 +4,7 @@
 
 #include <piejam/runtime/state.h>
 
+#include <piejam/math.h>
 #include <piejam/runtime/parameter/map.h>
 
 #include <gtest/gtest.h>
@@ -34,7 +35,7 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_channel)
     auto const& volume_param = sut.params[channel.volume].param;
     EXPECT_EQ(1.f, volume_param.default_value);
     EXPECT_EQ(0.f, volume_param.min);
-    EXPECT_EQ(4.f, volume_param.max);
+    EXPECT_EQ(math::from_dB(6.f), volume_param.max);
     auto volume_value = sut.params[channel.volume].value.get();
     EXPECT_EQ(1.f, volume_value);
 

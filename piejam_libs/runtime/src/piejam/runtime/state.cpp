@@ -611,7 +611,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                     parameter::float_{
                             .default_value = 1.f,
                             .min = 0.f,
-                            .max = 4.f,
+                            .max = math::from_dB(6.f),
                             .to_normalized = &to_normalized_volume,
                             .from_normalized = &from_normalized_volume},
                     {.name = box("Volume"s),
