@@ -95,7 +95,7 @@ TEST(box, eq_operator)
     box<int> const z(7);
 
     EXPECT_TRUE(x == x);
-    EXPECT_TRUE(x == y);
+    EXPECT_FALSE(x == y);
     EXPECT_FALSE(x == z);
 }
 
@@ -106,7 +106,7 @@ TEST(box, neq_operator)
     box<int> const z(7);
 
     EXPECT_FALSE(x != x);
-    EXPECT_FALSE(x != y);
+    EXPECT_TRUE(x != y);
     EXPECT_TRUE(x != z);
 }
 

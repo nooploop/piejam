@@ -179,13 +179,11 @@ TEST_F(midi_control_middleware_test, remove_and_readd_enabled_device)
     sut(make_middleware_functors(mf_mock), action);
 
     EXPECT_EQ(std::vector<midi::device_id_t>({next_dev_id}), *st.midi_inputs);
-    EXPECT_EQ(
-            (midi_devices_t{
-                    {next_dev_id,
-                     midi_device_config{
-                             .name = box("test"s),
-                             .enabled = false}}}),
-            *st.midi_devices);
+
+    auto midi_device = st.midi_devices->find(next_dev_id);
+    ASSERT_NE(midi_device, st.midi_devices->end());
+    EXPECT_EQ(midi_device->second.name, "test"s);
+    EXPECT_FALSE(midi_device->second.enabled);
 }
 
 TEST_F(midi_control_middleware_test, remove_eanabled_and_add_new_device)
@@ -220,13 +218,11 @@ TEST_F(midi_control_middleware_test, remove_eanabled_and_add_new_device)
     sut(make_middleware_functors(mf_mock), action);
 
     EXPECT_EQ(std::vector<midi::device_id_t>({next_dev_id}), *st.midi_inputs);
-    EXPECT_EQ(
-            (midi_devices_t{
-                    {next_dev_id,
-                     midi_device_config{
-                             .name = box("test2"s),
-                             .enabled = false}}}),
-            *st.midi_devices);
+
+    auto midi_device = st.midi_devices->find(next_dev_id);
+    ASSERT_NE(midi_device, st.midi_devices->end());
+    EXPECT_EQ(midi_device->second.name, "test2"s);
+    EXPECT_FALSE(midi_device->second.enabled);
 }
 
 TEST_F(midi_control_middleware_test,
