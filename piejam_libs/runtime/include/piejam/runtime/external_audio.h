@@ -30,8 +30,8 @@ struct state
 {
     devices_t devices;
 
-    unique_box<device_ids_t> inputs;
-    unique_box<device_ids_t> outputs;
+    box<device_ids_t> inputs;
+    box<device_ids_t> outputs;
 };
 
 } // namespace piejam::runtime::external_audio

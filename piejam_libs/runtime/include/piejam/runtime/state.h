@@ -58,8 +58,8 @@ struct state
 
     external_audio::state external_audio_state;
 
-    unique_box<midi::device_ids_t> midi_inputs;
-    unique_box<midi_devices_t> midi_devices;
+    box<midi::device_ids_t> midi_inputs;
+    box<midi_devices_t> midi_devices;
 
     parameters_map params;
     ui_parameters_map ui_params;
@@ -73,11 +73,11 @@ struct state
 
     mixer::state mixer_state{};
 
-    unique_box<midi_assignments_map> midi_assignments;
+    box<midi_assignments_map> midi_assignments;
     std::optional<midi_assignment_id> midi_learning{};
 
     bool recording{};
-    unique_box<recorder_streams_t> recorder_streams;
+    box<recorder_streams_t> recorder_streams;
     std::size_t rec_session{};
     std::size_t rec_take{};
 
@@ -98,20 +98,20 @@ struct state
 auto make_initial_state() -> state;
 
 auto sample_rates(
-        unique_box<audio::sound_card_hw_params> const& input_hw_params,
-        unique_box<audio::sound_card_hw_params> const& output_hw_params)
+        box<audio::sound_card_hw_params> const& input_hw_params,
+        box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::sample_rates_t;
 auto sample_rates_from_state(state const&) -> audio::sample_rates_t;
 
 auto period_sizes(
-        unique_box<audio::sound_card_hw_params> const& input_hw_params,
-        unique_box<audio::sound_card_hw_params> const& output_hw_params)
+        box<audio::sound_card_hw_params> const& input_hw_params,
+        box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::period_sizes_t;
 auto period_sizes_from_state(state const&) -> audio::period_sizes_t;
 
 auto period_counts(
-        unique_box<audio::sound_card_hw_params> const& input_hw_params,
-        unique_box<audio::sound_card_hw_params> const& output_hw_params)
+        box<audio::sound_card_hw_params> const& input_hw_params,
+        box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::period_counts_t;
 auto period_counts_from_state(state const&) -> audio::period_counts_t;
 

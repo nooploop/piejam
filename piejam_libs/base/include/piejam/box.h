@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/box_fwd.h>
 #include <piejam/scope_guard.h>
 
 #include <boost/callable_traits/args.hpp>
@@ -15,38 +14,19 @@
 namespace piejam
 {
 
+template <class T>
+class box;
+
 namespace detail
 {
-
-struct box_equal
-{
-    template <class T>
-    constexpr auto operator()(
-            std::shared_ptr<T const> const& l,
-            std::shared_ptr<T const> const& r) const noexcept -> bool
-    {
-        return l.get() == r.get() || *l == *r;
-    }
-};
-
-struct box_eq
-{
-    template <class T>
-    constexpr auto operator()(
-            std::shared_ptr<T const> const& l,
-            std::shared_ptr<T const> const& r) const noexcept -> bool
-    {
-        return l.get() == r.get();
-    }
-};
 
 template <class>
 struct is_box : std::false_type
 {
 };
 
-template <class T, class Eq>
-struct is_box<box<T, Eq>> : std::true_type
+template <class T>
+struct is_box<box<T>> : std::true_type
 {
 };
 
@@ -57,7 +37,9 @@ template <class From, class To>
 concept convertible_to_box_value =
         std::is_convertible_v<From, To> && !is_box_v<std::remove_cvref_t<From>>;
 
-template <class T, class Eq>
+} // namespace detail
+
+template <class T>
 class box
 {
 public:
@@ -99,7 +81,7 @@ public:
 
     box() = default;
 
-    template <convertible_to_box_value<T const> U>
+    template <detail::convertible_to_box_value<T const> U>
     explicit box(U&& v)
         : box(std::in_place, std::forward<U>(v))
     {
@@ -146,7 +128,7 @@ public:
         return m_value.get();
     }
 
-    template <convertible_to_box_value<T const> U>
+    template <detail::convertible_to_box_value<T const> U>
     auto operator=(U&& value) -> box&
     {
         m_value = std::make_shared<T const>(std::forward<U>(value));
@@ -160,7 +142,7 @@ public:
 
     auto operator==(box const& other) const noexcept -> bool
     {
-        return Eq{}(m_value, other.m_value);
+        return m_value.get() == other.m_value.get();
     }
 
     auto operator!=(box const& other) const noexcept -> bool
@@ -179,34 +161,21 @@ private:
     std::shared_ptr<T const> m_value{get_default()};
 };
 
-template <class T, class Eq>
+template <class T>
 auto
-operator==(box<T, Eq> const& lhs, T const& rhs) -> bool
+operator==(box<T> const& lhs, T const& rhs) -> bool
 {
     return lhs.get() == rhs;
 }
 
-template <class T, class Eq>
+template <class T>
 auto
-operator==(T const& lhs, box<T, Eq> const& rhs) -> bool
+operator==(T const& lhs, box<T> const& rhs) -> bool
 {
     return lhs == rhs.get();
 }
 
-} // namespace detail
-
-template <class T>
-auto
-box_(T&& t)
-{
-    return box<std::decay_t<T>>{std::forward<T>(t)};
-};
-
-template <class T>
-auto
-unique_box_(T&& t)
-{
-    return unique_box<std::decay_t<T>>{std::forward<T>(t)};
-}
+template <class T, class = std::enable_if_t<!detail::is_box_v<T>>>
+box(T&& t) -> box<std::remove_cvref_t<T>>;
 
 } // namespace piejam

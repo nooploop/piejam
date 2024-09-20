@@ -19,7 +19,7 @@ TEST(mixer_valid_io, test1)
 
     channels_t channels;
     auto channel1 = channels.add(channel{
-            .name = box_("foo"s),
+            .name = box("foo"s),
             .bus_type = audio::bus_type::stereo,
             .volume = {},
             .pan_balance = {},
@@ -30,7 +30,7 @@ TEST(mixer_valid_io, test1)
             .rms_level = {},
     });
     auto channel2 = channels.add(channel{
-            .name = box_("bar"s),
+            .name = box("bar"s),
             .bus_type = audio::bus_type::stereo,
             .volume = {},
             .pan_balance = {},
@@ -64,7 +64,7 @@ TEST(mixer_valid_io, test2)
     channels_t channels;
     auto channel1 = channels.add(channel{});
     auto channel2 = channels.add(channel{
-            .name = box_("foo"s),
+            .name = box("foo"s),
             .bus_type = audio::bus_type::stereo,
             .in = channel1,
             .volume = {},

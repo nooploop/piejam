@@ -164,7 +164,7 @@ TEST_F(midi_control_middleware_test, remove_and_readd_enabled_device)
     st.midi_inputs = std::vector<midi::device_id_t>({prev_dev_id});
     st.midi_devices = midi_devices_t{
             {prev_dev_id,
-             midi_device_config{.name = box_("test"s), .enabled = true}}};
+             midi_device_config{.name = box("test"s), .enabled = true}}};
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(
@@ -183,7 +183,7 @@ TEST_F(midi_control_middleware_test, remove_and_readd_enabled_device)
             (midi_devices_t{
                     {next_dev_id,
                      midi_device_config{
-                             .name = box_("test"s),
+                             .name = box("test"s),
                              .enabled = false}}}),
             *st.midi_devices);
 }
@@ -209,7 +209,7 @@ TEST_F(midi_control_middleware_test, remove_eanabled_and_add_new_device)
     st.midi_inputs = std::vector<midi::device_id_t>({prev_dev_id});
     st.midi_devices = midi_devices_t{
             {prev_dev_id,
-             midi_device_config{.name = box_("test"s), .enabled = true}}};
+             midi_device_config{.name = box("test"s), .enabled = true}}};
 
     EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
     EXPECT_CALL(mf_mock, next(_)).WillOnce([&st](auto const& a) {
@@ -224,7 +224,7 @@ TEST_F(midi_control_middleware_test, remove_eanabled_and_add_new_device)
             (midi_devices_t{
                     {next_dev_id,
                      midi_device_config{
-                             .name = box_("test2"s),
+                             .name = box("test2"s),
                              .enabled = false}}}),
             *st.midi_devices);
 }
@@ -247,7 +247,7 @@ TEST_F(midi_control_middleware_test,
 
     st.midi_devices = midi_devices_t{
             {midi::device_id_t::generate(),
-             midi_device_config{.name = box_("test"s), .enabled = true}}};
+             midi_device_config{.name = box("test"s), .enabled = true}}};
 
     actions::save_app_config action("save_file");
     ASSERT_TRUE(action.enabled_midi_devices.empty());

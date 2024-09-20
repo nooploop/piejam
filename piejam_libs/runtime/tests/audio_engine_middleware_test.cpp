@@ -81,9 +81,9 @@ TEST_F(audio_engine_middleware_test, select_sample_rate_will_change_sample_rate)
 
     state st;
     st.io_sound_cards = audio::io_sound_cards{
-            unique_box_(std::vector{
+            box(std::vector{
                     audio::sound_card_descriptor{.name = "foo", .path = {}}}),
-            unique_box_(std::vector{
+            box(std::vector{
                     audio::sound_card_descriptor{.name = "foo", .path = {}}}),
     };
     st.selected_io_sound_card.in.index = 0;
@@ -118,9 +118,9 @@ TEST_F(audio_engine_middleware_test, select_period_size_will_change_period_size)
 
     state st;
     st.io_sound_cards = audio::io_sound_cards{
-            unique_box_(std::vector{
+            box(std::vector{
                     audio::sound_card_descriptor{.name = "foo", .path = {}}}),
-            unique_box_(std::vector{
+            box(std::vector{
                     audio::sound_card_descriptor{.name = "foo", .path = {}}}),
     };
     st.selected_io_sound_card.in.index = 0;
@@ -159,10 +159,10 @@ TEST_F(audio_engine_middleware_test,
     st.selected_io_sound_card.out.index = 0;
     st.selected_io_sound_card.out.hw_params = hw_params;
     st.io_sound_cards = audio::io_sound_cards{
-            unique_box_(std::vector{
+            box(std::vector{
                     audio::sound_card_descriptor{.name = "foo", .path = {}},
                     audio::sound_card_descriptor{.name = "bar", .path = {}}}),
-            unique_box_(std::vector{
+            box(std::vector{
                     audio::sound_card_descriptor{.name = "foo", .path = {}}}),
     };
 

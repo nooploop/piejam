@@ -30,7 +30,7 @@ struct Mixer::Impl
     }
 
     runtime::mixer::channel_id main_channel_id;
-    unique_box<runtime::mixer::channel_ids_t> user_channel_ids;
+    box<runtime::mixer::channel_ids_t> user_channel_ids;
     runtime::mixer::channel_ids_t all_channel_ids;
 
     MixerChannel mainChannel;
@@ -66,7 +66,7 @@ void
 Mixer::onSubscribe()
 {
     observe(runtime::selectors::select_mixer_user_channels,
-            [this](unique_box<runtime::mixer::channel_ids_t> const&
+            [this](box<runtime::mixer::channel_ids_t> const&
                            user_channel_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(

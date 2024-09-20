@@ -182,8 +182,8 @@ get_io_sound_cards() -> io_sound_cards
     }
 
     return io_sound_cards{
-            unique_box_(std::move(result.in)),
-            unique_box_(std::move(result.out)),
+            box(std::move(result.in)),
+            box(std::move(result.out)),
     };
 }
 

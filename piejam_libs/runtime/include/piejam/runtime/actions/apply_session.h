@@ -17,7 +17,7 @@ struct apply_session final
     : ui::cloneable_action<apply_session, reducible_action>
     , visitable_audio_engine_action<apply_session>
 {
-    unique_box<persistence::session> session;
+    box<persistence::session> session;
 
     void reduce(state&) const override;
 };

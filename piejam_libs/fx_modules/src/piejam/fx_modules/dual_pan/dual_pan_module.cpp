@@ -30,9 +30,9 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
-            .name = box_("Dual Pan"s),
+            .name = box("Dual Pan"s),
             .bus_type = args.bus_type,
-            .parameters = unique_box_(runtime::fx::module_parameters{
+            .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::left_pan),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
@@ -46,7 +46,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                              &runtime::parameter::
                                                      from_normalized_linear,
                              },
-                             {.name = box_("Left Pan"s),
+                             {.name = box("Left Pan"s),
                               .value_to_string =
                                       &runtime::
                                               float_parameter_value_to_string})},
@@ -63,7 +63,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                              &runtime::parameter::
                                                      from_normalized_linear,
                              },
-                             {.name = box_("Right Pan"s),
+                             {.name = box("Right Pan"s),
                               .value_to_string =
                                       &runtime::
                                               float_parameter_value_to_string})},

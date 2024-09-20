@@ -36,7 +36,7 @@ struct FxGenericModule::Impl
 {
     runtime::fx::module_id fx_mod_id;
 
-    unique_box<runtime::fx::module_parameters> param_ids;
+    box<runtime::fx::module_parameters> param_ids;
     FxParametersList parameters;
 };
 

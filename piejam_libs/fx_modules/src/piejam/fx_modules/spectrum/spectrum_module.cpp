@@ -83,20 +83,20 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
-            .name = box_("Spectrum"s),
+            .name = box("Spectrum"s),
             .bus_type = args.bus_type,
-            .parameters = unique_box_(runtime::fx::module_parameters{
+            .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::stream_a_active),
                      ui_params_factory.make_parameter(
                              runtime::bool_parameter{.default_value = true},
-                             {.name = box_("Stream A Active"s),
+                             {.name = box("Stream A Active"s),
                               .value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
                     {to_underlying(parameter_key::stream_b_active),
                      ui_params_factory.make_parameter(
                              runtime::bool_parameter{.default_value = false},
-                             {.name = box_("Stream B Active"s),
+                             {.name = box("Stream B Active"s),
                               .value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
@@ -108,7 +108,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .min = to_underlying(stereo_channel::_min),
                                      .max = to_underlying(
                                              stereo_channel::_max)},
-                             {.name = box_("Channel A"s),
+                             {.name = box("Channel A"s),
                               .value_to_string = &to_stereo_channel_string})},
                     {to_underlying(parameter_key::channel_b),
                      ui_params_factory.make_parameter(
@@ -118,7 +118,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .min = to_underlying(stereo_channel::_min),
                                      .max = to_underlying(
                                              stereo_channel::_max)},
-                             {.name = box_("Channel B"s),
+                             {.name = box("Channel B"s),
                               .value_to_string = &to_stereo_channel_string})},
                     {to_underlying(parameter_key::gain_a),
                      ui_params_factory.make_parameter(
@@ -129,7 +129,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
-                             {.name = box_("Gain A"s),
+                             {.name = box("Gain A"s),
                               .value_to_string = &to_dB_string})},
                     {to_underlying(parameter_key::gain_b),
                      ui_params_factory.make_parameter(
@@ -140,17 +140,17 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
-                             {.name = box_("Gain B"s),
+                             {.name = box("Gain B"s),
                               .value_to_string = &to_dB_string})},
                     {to_underlying(parameter_key::freeze),
                      ui_params_factory.make_parameter(
                              runtime::bool_parameter{.default_value = false},
-                             {.name = box_("Freeze"s),
+                             {.name = box("Freeze"s),
                               .value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
             }),
-            .streams = unique_box_(runtime::fx::module_streams{
+            .streams = box(runtime::fx::module_streams{
                     {to_underlying(stream_key::input),
                      args.streams.add(runtime::audio_stream_buffer(
                              std::in_place,

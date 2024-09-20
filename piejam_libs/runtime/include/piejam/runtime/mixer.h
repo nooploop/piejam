@@ -39,7 +39,7 @@ struct channel
     io_address_t out{};
     io_address_t aux{}; // currently selected aux route
 
-    unique_box<aux_sends_t> aux_sends{};
+    box<aux_sends_t> aux_sends{};
 
     float_parameter_id volume{};
     float_parameter_id pan_balance{};
@@ -49,7 +49,7 @@ struct channel
     stereo_level_parameter_id peak_level{};
     stereo_level_parameter_id rms_level{};
 
-    unique_box<fx::chain_t> fx_chain{};
+    box<fx::chain_t> fx_chain{};
 
     auto operator==(channel const&) const noexcept -> bool = default;
 
@@ -77,7 +77,7 @@ struct state
 {
     channels_t channels;
 
-    unique_box<channel_ids_t> inputs;
+    box<channel_ids_t> inputs;
     channel_id main;
 };
 

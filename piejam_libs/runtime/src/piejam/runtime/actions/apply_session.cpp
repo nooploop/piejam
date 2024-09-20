@@ -145,7 +145,7 @@ find_external_audio_device_route(
     return index < devices.size()
                    ? mixer::io_address_t{devices[index]}
                    : mixer::io_address_t{
-                             mixer::missing_device_address{box_(name)}};
+                             mixer::missing_device_address{box(name)}};
 }
 
 void

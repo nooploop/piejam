@@ -23,6 +23,6 @@ struct sound_card_descriptor
             -> bool = default;
 };
 
-using io_sound_cards = io_pair<unique_box<std::vector<sound_card_descriptor>>>;
+using io_sound_cards = io_pair<box<std::vector<sound_card_descriptor>>>;
 
 } // namespace piejam::audio

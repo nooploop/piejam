@@ -184,8 +184,8 @@ set_intersection(Vector const& in, Vector const& out)
 
 auto
 sample_rates(
-        unique_box<audio::sound_card_hw_params> const& input_hw_params,
-        unique_box<audio::sound_card_hw_params> const& output_hw_params)
+        box<audio::sound_card_hw_params> const& input_hw_params,
+        box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::sample_rates_t
 {
     return set_intersection(
@@ -203,8 +203,8 @@ sample_rates_from_state(state const& state) -> audio::sample_rates_t
 
 auto
 period_sizes(
-        unique_box<audio::sound_card_hw_params> const& input_hw_params,
-        unique_box<audio::sound_card_hw_params> const& output_hw_params)
+        box<audio::sound_card_hw_params> const& input_hw_params,
+        box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::period_sizes_t
 {
     return set_intersection(
@@ -222,8 +222,8 @@ period_sizes_from_state(state const& state) -> audio::period_sizes_t
 
 auto
 period_counts(
-        unique_box<audio::sound_card_hw_params> const& input_hw_params,
-        unique_box<audio::sound_card_hw_params> const& output_hw_params)
+        box<audio::sound_card_hw_params> const& input_hw_params,
+        box<audio::sound_card_hw_params> const& output_hw_params)
         -> audio::period_counts_t
 {
     return set_intersection(
@@ -419,7 +419,7 @@ insert_missing_ladspa_fx_module(
                         std::next(fx_chain->begin(), insert_pos),
                         st.fx_modules.add(fx::module{
                                 .fx_instance_id = id,
-                                .name = box_(std::string(name)),
+                                .name = box(std::string(name)),
                                 .parameters = {},
                                 .streams = {}}));
             });
@@ -496,7 +496,7 @@ make_aux_send_parameter(ParameterFactory& ui_params_factory)
                     .max = 1.f,
                     .to_normalized = &to_normalized_send,
                     .from_normalized = &from_normalized_send},
-            {.name = box_("Send"s), .value_to_string = &volume_to_string});
+            {.name = box("Send"s), .value_to_string = &volume_to_string});
 }
 
 template <class ParameterFactory>
@@ -559,7 +559,7 @@ add_external_audio_device(
         audio::bus_type const bus_type,
         channel_index_pair const& channels) -> external_audio::device_id
 {
-    auto boxed_name = box_(name);
+    auto boxed_name = box(name);
 
     auto id = st.external_audio_state.devices.add(external_audio::device{
             .name = boxed_name,
@@ -612,11 +612,11 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
 
     parameter_factory ui_params_factory{st.params, st.ui_params};
     auto channel_id = st.mixer_state.channels.add(mixer::channel{
-            .name = box_(std::move(name)),
+            .name = box(std::move(name)),
             .bus_type = bus_type,
             .in = {},
             .out = st.mixer_state.main,
-            .aux_sends = unique_box_(make_aux_sends(
+            .aux_sends = box(make_aux_sends(
                     st.mixer_state.channels,
                     st.external_audio_state.outputs,
                     ui_params_factory)),
@@ -627,7 +627,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                             .max = 4.f,
                             .to_normalized = &to_normalized_volume,
                             .from_normalized = &from_normalized_volume},
-                    {.name = box_("Volume"s),
+                    {.name = box("Volume"s),
                      .value_to_string = &volume_to_string}),
             .pan_balance = ui_params_factory.make_parameter(
                     parameter::float_{
@@ -637,19 +637,19 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                             .to_normalized = &parameter::to_normalized_linear,
                             .from_normalized =
                                     &parameter::from_normalized_linear},
-                    {.name = box_(bus_type_to(bus_type, "Pan"s, "Balance"s)),
+                    {.name = box(bus_type_to(bus_type, "Pan"s, "Balance"s)),
                      .value_to_string = &float_parameter_value_to_string}),
             .record = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
-                    {.name = box_("Record"s),
+                    {.name = box("Record"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .mute = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
-                    {.name = box_("Mute"s),
+                    {.name = box("Mute"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .solo = ui_params_factory.make_parameter(
                     parameter::bool_{.default_value = false},
-                    {.name = box_("Solo"s),
+                    {.name = box("Solo"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .peak_level = parameter_factory{st.params}.make_parameter(
                     parameter::stereo_level{}),

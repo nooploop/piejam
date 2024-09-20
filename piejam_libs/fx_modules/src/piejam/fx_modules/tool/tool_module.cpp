@@ -54,9 +54,9 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
-            .name = box_("Tool"s),
+            .name = box("Tool"s),
             .bus_type = args.bus_type,
-            .parameters = unique_box_(runtime::fx::module_parameters{
+            .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::gain),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
@@ -66,7 +66,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
-                             {.name = box_("Gain"s),
+                             {.name = box("Gain"s),
                               .value_to_string = &to_dB_string})}}),
             .streams = {}};
 }

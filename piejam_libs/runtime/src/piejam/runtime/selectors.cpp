@@ -21,63 +21,71 @@
 namespace piejam::runtime::selectors
 {
 
-selector<box<sample_rate_choice>> const select_sample_rate([](state const& st) {
-    static auto const get_sample_rate = memo(
-            [](unique_box<audio::sound_card_hw_params> const& input_hw_params,
-               unique_box<audio::sound_card_hw_params> const& output_hw_params,
-               audio::sample_rate const current) {
-                return box<sample_rate_choice>{
-                        std::in_place,
-                        runtime::sample_rates(
-                                input_hw_params,
-                                output_hw_params),
-                        current};
-            });
+selector<box<sample_rate_choice>> const
+        select_sample_rate([](state const& st) {
+            static auto const get_sample_rate =
+                    memo([](box<audio::sound_card_hw_params> const&
+                                    input_hw_params,
+                            box<audio::sound_card_hw_params> const&
+                                    output_hw_params,
+                            audio::sample_rate const current) {
+                        return box<sample_rate_choice>{
+                                std::in_place,
+                                runtime::sample_rates(
+                                        input_hw_params,
+                                        output_hw_params),
+                                current};
+                    });
 
-    return get_sample_rate(
-            st.selected_io_sound_card.in.hw_params,
-            st.selected_io_sound_card.out.hw_params,
-            st.sample_rate);
-});
+            return get_sample_rate(
+                    st.selected_io_sound_card.in.hw_params,
+                    st.selected_io_sound_card.out.hw_params,
+                    st.sample_rate);
+        });
 
-selector<box<period_size_choice>> const select_period_size([](state const& st) {
-    static auto const get_period_size = memo(
-            [](unique_box<audio::sound_card_hw_params> const& input_hw_params,
-               unique_box<audio::sound_card_hw_params> const& output_hw_params,
-               audio::period_size const current) {
-                return box<period_size_choice>{
-                        std::in_place,
-                        runtime::period_sizes(
-                                input_hw_params,
-                                output_hw_params),
-                        current};
-            });
+selector<box<period_size_choice>> const
+        select_period_size([](state const& st) {
+            static auto const get_period_size =
+                    memo([](box<audio::sound_card_hw_params> const&
+                                    input_hw_params,
+                            box<audio::sound_card_hw_params> const&
+                                    output_hw_params,
+                            audio::period_size const current) {
+                        return box<period_size_choice>{
+                                std::in_place,
+                                runtime::period_sizes(
+                                        input_hw_params,
+                                        output_hw_params),
+                                current};
+                    });
 
-    return get_period_size(
-            st.selected_io_sound_card.in.hw_params,
-            st.selected_io_sound_card.out.hw_params,
-            st.period_size);
-});
+            return get_period_size(
+                    st.selected_io_sound_card.in.hw_params,
+                    st.selected_io_sound_card.out.hw_params,
+                    st.period_size);
+        });
 
-selector<box<period_count_choice>> const select_period_count([](state const&
-                                                                        st) {
-    static auto get_period_count = memo(
-            [](unique_box<audio::sound_card_hw_params> const& input_hw_params,
-               unique_box<audio::sound_card_hw_params> const& output_hw_params,
-               audio::period_count const current) {
-                return box<period_count_choice>{
-                        std::in_place,
-                        runtime::period_counts(
-                                input_hw_params,
-                                output_hw_params),
-                        current};
-            });
+selector<box<period_count_choice>> const
+        select_period_count([](state const& st) {
+            static auto get_period_count =
+                    memo([](box<audio::sound_card_hw_params> const&
+                                    input_hw_params,
+                            box<audio::sound_card_hw_params> const&
+                                    output_hw_params,
+                            audio::period_count const current) {
+                        return box<period_count_choice>{
+                                std::in_place,
+                                runtime::period_counts(
+                                        input_hw_params,
+                                        output_hw_params),
+                                current};
+                    });
 
-    return get_period_count(
-            st.selected_io_sound_card.in.hw_params,
-            st.selected_io_sound_card.out.hw_params,
-            st.period_count);
-});
+            return get_period_count(
+                    st.selected_io_sound_card.in.hw_params,
+                    st.selected_io_sound_card.out.hw_params,
+                    st.period_count);
+        });
 
 selector<float> const select_buffer_latency([](state const& st) {
     return st.sample_rate.value() != 0 ? (st.period_size.value() *
@@ -87,7 +95,7 @@ selector<float> const select_buffer_latency([](state const& st) {
 });
 
 static auto get_sound_card = memo(
-        [](unique_box<std::vector<audio::sound_card_descriptor>> const& descs,
+        [](box<std::vector<audio::sound_card_descriptor>> const& descs,
            std::size_t const index) {
             return box<sound_card_choice>{
                     std::in_place,
@@ -131,7 +139,7 @@ make_num_device_channels_selector(io_direction const io_dir)
 
 auto
 make_external_audio_device_ids_selector(io_direction const io_dir)
-        -> selector<unique_box<external_audio::device_ids_t>>
+        -> selector<box<external_audio::device_ids_t>>
 {
     switch (io_dir)
     {
@@ -212,7 +220,7 @@ make_external_audio_device_bus_channel_selector(
     }
 }
 
-selector<unique_box<mixer::channel_ids_t>> const select_mixer_user_channels(
+selector<box<mixer::channel_ids_t>> const select_mixer_user_channels(
         [](state const& st) { return st.mixer_state.inputs; });
 
 selector<mixer::channel_id> const select_mixer_main_channel(
@@ -411,14 +419,14 @@ static struct
         if (!mixer_channel)
         {
             static boxed_string const s_empty{"-"};
-            return box_(
+            return box(
                     selected_route{selected_route::state_t::invalid, s_empty});
         }
 
         auto const default_name =
                 get_default_route_name(mixer_channel->bus_type, io_socket);
 
-        return box_(std::visit(
+        return box(std::visit(
                 boost::hof::match(
                         [&](default_t) {
                             return selected_route{
@@ -492,7 +500,8 @@ static struct
 auto
 make_mixer_channel_selected_route_selector(
         mixer::channel_id const channel_id,
-        mixer::io_socket const io_socket) -> selector<box<selected_route>>
+        mixer::io_socket const io_socket)
+        -> selector<box<selected_route>>
 {
     return [get = memo(
                     get_mixer_channel_selected_route(channel_id, io_socket))](
@@ -510,7 +519,7 @@ make_mixer_device_routes_selector(
     auto get_mixer_device_routes = memo(
             [bus_type](
                     external_audio::devices_t const& devices,
-                    unique_box<external_audio::device_ids_t> const& device_ids)
+                    box<external_audio::device_ids_t> const& device_ids)
                     -> boxed_vector<mixer_device_route> {
                 std::vector<mixer_device_route> result;
                 for (auto device_id : *device_ids)
@@ -523,7 +532,7 @@ make_mixer_device_routes_selector(
                                 .name = *device->name});
                     }
                 }
-                return box_(std::move(result));
+                return box(std::move(result));
             });
 
     switch (io_socket)
@@ -573,7 +582,7 @@ make_mixer_channel_routes_selector(
                         result.emplace_back(id, channel.name);
                     }
 
-                    return box_(std::move(result));
+                    return box(std::move(result));
                 });
 
         return [get = std::move(get_mixer_channel_routes)](state const& st) {
@@ -588,7 +597,7 @@ make_mixer_channel_routes_selector(
                             io_socket,
                             channels,
                             channel_id);
-                    return box_(algorithm::transform_to_vector(
+                    return box(algorithm::transform_to_vector(
                             valid_sources,
                             [&](auto const& id) {
                                 return mixer_channel_route{
@@ -633,7 +642,7 @@ make_mixer_channel_can_move_right_selector(mixer::channel_id const channel_id)
     };
 }
 
-selector<unique_box<midi::device_ids_t>> const select_midi_input_devices(
+selector<box<midi::device_ids_t>> const select_midi_input_devices(
         [](state const& st) { return st.midi_inputs; });
 
 auto
@@ -641,7 +650,7 @@ make_midi_device_name_selector(midi::device_id_t const device_id)
         -> selector<boxed_string>
 {
     auto get_midi_device_name =
-            memo([device_id](unique_box<midi_devices_t> const& midi_devices) {
+            memo([device_id](box<midi_devices_t> const& midi_devices) {
                 auto it = midi_devices->find(device_id);
                 return it != midi_devices->end() ? it->second.name
                                                  : boxed_string();
@@ -657,7 +666,7 @@ make_midi_device_enabled_selector(midi::device_id_t const device_id)
         -> selector<bool>
 {
     auto is_midi_device_enabled =
-            memo([device_id](unique_box<midi_devices_t> const& midi_devices) {
+            memo([device_id](box<midi_devices_t> const& midi_devices) {
                 auto it = midi_devices->find(device_id);
                 return it != midi_devices->end() && it->second.enabled;
             });
@@ -716,12 +725,12 @@ struct muted_by_solo_state
 auto
 make_muted_by_solo_state(
         mixer::channels_t const& channels,
-        parameters_map const* const params) -> unique_box<muted_by_solo_state>
+        parameters_map const* const params) -> box<muted_by_solo_state>
 {
-    return unique_box_(muted_by_solo_state{channels, params});
+    return box(muted_by_solo_state{channels, params});
 }
 
-selector<unique_box<muted_by_solo_state>> const select_muted_by_solo_state(
+selector<box<muted_by_solo_state>> const select_muted_by_solo_state(
         [get = memo(&make_muted_by_solo_state)](state const& st) {
             return get(st.mixer_state.channels, &st.params);
         });
@@ -740,7 +749,7 @@ make_muted_by_solo_selector(mixer::channel_id const mixer_channel_id)
 
 auto
 make_fx_chain_selector(mixer::channel_id const channel_id)
-        -> selector<unique_box<fx::chain_t>>
+        -> selector<box<fx::chain_t>>
 {
     return make_mixer_channel_member_selector<&mixer::channel::fx_chain>(
             channel_id);
@@ -794,7 +803,7 @@ make_fx_module_bypass_selector(fx::module_id const fx_mod_id) -> selector<bool>
 
 auto
 make_fx_module_parameters_selector(fx::module_id const fx_mod_id)
-        -> selector<unique_box<fx::module_parameters>>
+        -> selector<box<fx::module_parameters>>
 {
     return make_fx_module_member_selector<&fx::module::parameters>(fx_mod_id);
 }
@@ -905,9 +914,9 @@ make_fx_parameter_value_string_selector(fx::parameter_id const fx_param_id)
 
 auto
 make_fx_module_streams_selector(fx::module_id fx_mod_id)
-        -> selector<unique_box<fx::module_streams>>
+        -> selector<box<fx::module_streams>>
 {
-    static unique_box<fx::module_streams> const s_empty;
+    static box<fx::module_streams> const s_empty;
 
     auto get_fx_module_streams =
             memo([fx_mod_id](fx::modules_t const& fx_modules) {

@@ -18,7 +18,7 @@ namespace piejam::gui::model
 struct AudioInputOutputSettings::Impl
 {
     io_direction io_dir;
-    unique_box<runtime::external_audio::device_ids_t> device_ids;
+    box<runtime::external_audio::device_ids_t> device_ids;
 
     ExternalAudioDeviceConfigList deviceConfigs;
 };
@@ -58,7 +58,7 @@ AudioInputOutputSettings::onSubscribe()
             });
 
     observe(selectors::make_external_audio_device_ids_selector(m_impl->io_dir),
-            [this](unique_box<runtime::external_audio::device_ids_t> const&
+            [this](box<runtime::external_audio::device_ids_t> const&
                            device_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(

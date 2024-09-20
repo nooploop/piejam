@@ -21,7 +21,7 @@ struct MixerChannelFx::Impl
 {
     runtime::mixer::channel_id mixer_channel_id;
 
-    unique_box<runtime::fx::chain_t> fx_chain;
+    box<runtime::fx::chain_t> fx_chain;
 
     FxChainModulesList modules;
 };

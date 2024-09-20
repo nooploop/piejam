@@ -23,11 +23,19 @@ struct missing_device_address
 {
     boxed_string name;
 
-    auto operator==(missing_device_address const&) const -> bool = default;
-
-    auto operator<(missing_device_address const& other) const -> bool
+    auto operator<=>(missing_device_address const& other) const
     {
-        return name.get() < other.name.get();
+        return name.get() <=> other.name.get();
+    }
+
+    auto operator==(missing_device_address const& other) const
+    {
+        return name.get() == other.name.get();
+    }
+
+    auto operator!=(missing_device_address const& other) const
+    {
+        return name.get() == other.name.get();
     }
 };
 

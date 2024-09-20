@@ -180,7 +180,7 @@ make_update_devices_action(
                                       : npos;
         return selected_sound_card{
                 .index = found_index,
-                .hw_params = unique_box_(
+                .hw_params = box(
                         found_index != npos ? device_manager.hw_params(
                                                       new_devices[found_index],
                                                       nullptr,
@@ -200,8 +200,8 @@ make_update_devices_action(
             output_index);
 
     auto next_value =
-            [](unique_box<audio::sound_card_hw_params> const& input_hw_params,
-               unique_box<audio::sound_card_hw_params> const& output_hw_params,
+            [](box<audio::sound_card_hw_params> const& input_hw_params,
+               box<audio::sound_card_hw_params> const& output_hw_params,
                auto&& sel,
                auto current) {
                 auto const values = std::invoke(

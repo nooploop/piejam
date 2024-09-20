@@ -78,7 +78,7 @@ private:
                                                 : &parameter::
                                                           from_normalized_linear},
                         {
-                                .name = box_(port_desc.name),
+                                .name = box(port_desc.name),
                                 .value_to_string =
                                         &float_parameter_value_to_string,
                         }));
@@ -101,7 +101,7 @@ private:
                                 .min = p.min,
                                 .max = p.max},
                         {
-                                .name = box_(port_desc.name),
+                                .name = box(port_desc.name),
                                 .value_to_string =
                                         &int_parameter_value_to_string,
                         }));
@@ -119,7 +119,7 @@ private:
                 ui_params_factory.make_parameter(
                         bool_parameter{.default_value = p.default_value},
                         {
-                                .name = box_(port_desc.name),
+                                .name = box(port_desc.name),
                                 .value_to_string =
                                         &bool_parameter_value_to_string,
                         }));
@@ -142,9 +142,9 @@ make_module(
 {
     return fx::module{
             .fx_instance_id = instance_id,
-            .name = box_(name),
+            .name = box(name),
             .bus_type = bus_type,
-            .parameters = unique_box_(
+            .parameters = box(
                     make_module_parameters{params, ui_params}(control_inputs)),
             .streams = {}};
 }

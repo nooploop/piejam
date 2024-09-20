@@ -145,17 +145,17 @@ TEST(box, lock)
     EXPECT_EQ(7, sut.get());
 }
 
-TEST(unique_box, copy_and_eq)
+TEST(box, copy_and_eq)
 {
-    unique_box<std::vector<float>> const v(std::vector<float>{1, 2, 3});
+    box<std::vector<float>> const v(std::vector<float>{1, 2, 3});
     auto w = v;
     EXPECT_EQ(v, w);
 }
 
-TEST(unique_box, assign_and_eq)
+TEST(box, assign_and_eq)
 {
-    unique_box<std::vector<float>> const v(std::vector<float>{1, 2, 3});
-    unique_box<std::vector<float>> w;
+    box<std::vector<float>> const v(std::vector<float>{1, 2, 3});
+    box<std::vector<float>> w;
     w = v;
     EXPECT_EQ(v, w);
 }

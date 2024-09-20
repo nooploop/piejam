@@ -79,16 +79,16 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
-            .name = box_("Filter"s),
+            .name = box("Filter"s),
             .bus_type = args.bus_type,
-            .parameters = unique_box_(runtime::fx::module_parameters{
+            .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::type),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
                                      .default_value = to_underlying(type::lp2),
                                      .min = 0,
                                      .max = 7},
-                             {.name = box_("Type"s),
+                             {.name = box("Type"s),
                               .value_to_string = &to_type_string})},
                     {to_underlying(parameter_key::cutoff),
                      ui_params_factory.make_parameter(
@@ -101,7 +101,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .from_normalized =
                                              &runtime::parameter::
                                                      from_normalized_log},
-                             {.name = box_("Cutoff"s),
+                             {.name = box("Cutoff"s),
                               .value_to_string = &to_cutoff_string})},
                     {to_underlying(parameter_key::resonance),
                      ui_params_factory.make_parameter(
@@ -115,9 +115,9 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .from_normalized =
                                              &runtime::parameter::
                                                      from_normalized_linear},
-                             {.name = box_("Resonance"s),
+                             {.name = box("Resonance"s),
                               .value_to_string = &to_resonance_string})}}),
-            .streams = unique_box_(runtime::fx::module_streams{
+            .streams = box(runtime::fx::module_streams{
                     {to_underlying(stream_key::in_out),
                      args.streams.add(runtime::audio_stream_buffer(
                              std::in_place,

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <piejam/box_fwd.h>
-
 namespace piejam
 {
 
@@ -17,5 +15,8 @@ class entity_map;
 
 template <class T>
 struct io_pair;
+
+template <class T>
+class box;
 
 } // namespace piejam
