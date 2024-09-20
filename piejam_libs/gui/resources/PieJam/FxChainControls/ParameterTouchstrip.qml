@@ -55,7 +55,7 @@ SubscribableItem {
             Touchstrip {
                 value: private_.value
 
-                relative: relButton.checked
+                resolution: resolutionButton.checked ? 1000 : 250
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -76,7 +76,7 @@ SubscribableItem {
         }
 
         Button {
-            id: relButton
+            id: resolutionButton
 
             checkable: true
             display: AbstractButton.IconOnly

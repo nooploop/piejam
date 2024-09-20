@@ -12,7 +12,6 @@ Item {
     id: root
 
     property real value: 0
-    property bool relative: false
     property real resolution: 1000
 
     signal changeValue(real newValue)
@@ -39,21 +38,13 @@ Item {
         preventStealing: true
 
         onPressed: {
-            if (!root.relative)
-                root.changeValue(1 - MathExt.clamp(mouse.y / touchArea.height, 0, 1))
-            else
-                lastY = mouse.y
-
+            lastY = mouse.y
             mouse.accepted = true
         }
 
         onPositionChanged: {
-            if (!root.relative) {
-                root.changeValue(1 - MathExt.clamp(mouse.y / touchArea.height, 0, 1))
-            } else {
-                root.changeValue(MathExt.clamp(root.value + (lastY - mouse.y) * inc, 0, 1))
-                lastY = mouse.y
-            }
+            root.changeValue(MathExt.clamp(root.value + (lastY - mouse.y) * inc, 0, 1))
+            lastY = mouse.y
         }
     }
 }

@@ -14,6 +14,7 @@ import ".."
 import "../Controls"
 import "../Util/ColorExt.js" as ColorExt
 import "../Util/DbConvert.js" as DbConvert
+import "../Util/MathExt.js" as MathExt
 
 SubscribableItem {
     id: root
@@ -26,82 +27,99 @@ SubscribableItem {
     implicitWidth: 50
     implicitHeight: 300
 
-    Slider {
-        id: slider
+    QtObject {
+        id: private_
+
+        readonly property real position: root.model && root.scaleData
+                ? root.scaleData.dBToPosition(DbConvert.to_dB(root.model.value))
+                : 0
+    }
+
+    RowLayout {
+        anchors.fill: parent
+
+        spacing: 2
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Repeater {
+                model: root.scaleData ? root.scaleData.ticks : null
+
+                delegate: Label {
+                    anchors.left: parent ? parent.left : undefined
+                    anchors.right: parent ? parent.right : undefined
+
+                    y: (1 - modelData.position) * (parent.height - 12)
+
+                    font.pixelSize: 10
+                    font.bold: true
+
+                    color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
+
+                    text: modelData.dB
+                    horizontalAlignment: Text.AlignRight
+                }
+            }
+        }
+
+        PJItems.DbScale {
+            id: dbScale
+
+            Layout.preferredWidth: 8
+            Layout.fillHeight: true
+
+            scaleData: root.scaleData
+            color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
+            tickOffset: 6
+            edge: PJItems.DbScale.Edge.Right
+        }
+    }
+
+    MouseArea {
+        id: touchArea
+
+        property real inc: 1 / 250
+        property real lastY: 0
 
         anchors.fill: parent
 
-        padding: 6
+        preventStealing: true
 
-        value: root.model && root.scaleData ? root.scaleData.dBToPosition(DbConvert.to_dB(root.model.value)) : 0
+        onPressed: {
+            lastY = mouse.y
 
-        orientation: Qt.Vertical
-
-        background: Item {
-            anchors.fill: parent
-
-            RowLayout {
-                anchors.fill: parent
-
-                spacing: 2
-
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    Repeater {
-                        model: root.scaleData ? root.scaleData.ticks : null
-
-                        delegate: Label {
-                            anchors.left: parent ? parent.left : undefined
-                            anchors.right: parent ? parent.right : undefined
-
-                            y: (1 - modelData.position) * (parent.height - 12)
-
-                            font.pixelSize: 10
-                            font.bold: true
-
-                            color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
-
-                            text: modelData.dB
-                            horizontalAlignment: Text.AlignRight
-                        }
-                    }
-                }
-
-                PJItems.DbScale {
-                    id: dbScale
-
-                    Layout.preferredWidth: 8
-                    Layout.fillHeight: true
-
-                    scaleData: root.scaleData
-                    color: root.muted ? Material.secondaryTextColor : Material.primaryTextColor
-                    tickOffset: 6
-                    edge: PJItems.DbScale.Edge.Right
-                }
-            }
+            mouse.accepted = true
         }
 
-        handle: Rectangle {
-            y: slider.visualPosition * slider.availableHeight + 6 - Screen.devicePixelRatio
+        onPositionChanged: {
+            var newPosition = MathExt.clamp(private_.position + (lastY - mouse.y) * inc, 0, 1)
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-
-            height: 2 + Screen.devicePixelRatio
-
-            color: ColorExt.setAlpha(Material.accentColor, 0.6)
-        }
-
-        onMoved: {
             if (root.model && root.scaleData) {
-                var newVolume = root.scaleData.dBAt(slider.value)
-                root.model.changeValue(DbConvert.from_dB(newVolume))
-                Info.showParameterValue(root.model)
-                root.moved()
+                var newVolume = root.scaleData.dBAt(newPosition)
+                var newValue = DbConvert.from_dB(newVolume)
+                if (root.model.value !== newValue) {
+                    root.model.changeValue(newValue)
+                    lastY = mouse.y
+                    Info.showParameterValue(root.model)
+                    root.moved()
+                }
             }
         }
+    }
+
+    Rectangle {
+        id: handle
+
+        y: (1 - private_.position) * (root.height - 12) + 6 - Screen.devicePixelRatio
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        height: 2 + Screen.devicePixelRatio
+
+        color: ColorExt.setAlpha(Material.accentColor, 0.6)
     }
 
     MidiAssignArea {
