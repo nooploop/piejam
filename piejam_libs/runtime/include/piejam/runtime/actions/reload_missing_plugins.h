@@ -4,11 +4,17 @@
 
 #pragma once
 
+#include <piejam/runtime/actions/ladspa_fx_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/ui/cloneable_action.h>
 
 namespace piejam::runtime::actions
 {
 
-auto reload_missing_plugins() -> thunk_action;
+struct reload_missing_plugins final
+    : ui::cloneable_action<reload_missing_plugins, action>
+    , visitable_ladspa_fx_action<reload_missing_plugins>
+{
+};
 
 } // namespace piejam::runtime::actions

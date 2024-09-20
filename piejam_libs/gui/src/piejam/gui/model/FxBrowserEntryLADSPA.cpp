@@ -6,7 +6,6 @@
 
 #include <piejam/npos.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
-#include <piejam/runtime/actions/replace_fx_module.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/selectors.h>

@@ -242,7 +242,7 @@ make_internal_fx_module(fx::modules_t& fx_modules, fx::module&& fx_mod)
     return fx_modules.emplace(std::move(fx_mod));
 }
 
-static void
+void
 apply_parameter_values(
         std::vector<fx::parameter_value_assignment> const& values,
         fx::module const& fx_mod,
@@ -281,7 +281,7 @@ update_midi_assignments(
     }
 }
 
-static void
+void
 apply_fx_midi_assignments(
         std::vector<fx::parameter_midi_assignment> const& fx_midi_assigns,
         fx::module const& fx_mod,
@@ -411,6 +411,7 @@ insert_missing_ladspa_fx_module(
             st.fx_modules.insert({
                     .fx_instance_id = id,
                     .name = box(std::string(name)),
+                    .bus_type = mixer_channel.bus_type,
                     .parameters = {},
                     .streams = {},
             }));
@@ -457,8 +458,6 @@ remove_fx_module(
         std::visit([&st](auto&& id) { remove_parameter(st, id); }, fx_param_id);
     }
 
-    st.fx_modules.erase(fx_mod_id);
-
     if (auto id = std::get_if<ladspa::instance_id>(&fx_mod.fx_instance_id))
     {
         st.fx_ladspa_instances.erase(*id);
@@ -469,6 +468,8 @@ remove_fx_module(
     {
         st.fx_unavailable_ladspa_plugins.erase(*id);
     }
+
+    st.fx_modules.erase(fx_mod_id);
 }
 
 template <class ParameterFactory>

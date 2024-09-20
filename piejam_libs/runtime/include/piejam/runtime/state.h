@@ -129,6 +129,16 @@ void remove_mixer_channel(state&, mixer::channel_id);
 
 void remove_external_audio_device(state&, external_audio::device_id);
 
+void apply_parameter_values(
+        std::vector<fx::parameter_value_assignment> const&,
+        fx::module const&,
+        parameters_map&);
+
+void apply_fx_midi_assignments(
+        std::vector<fx::parameter_midi_assignment> const&,
+        fx::module const&,
+        midi_assignments_map&);
+
 auto insert_internal_fx_module(
         state&,
         mixer::channel_id,

@@ -76,4 +76,30 @@ struct insert_missing_ladspa_fx_module final
     void reduce(state&) const override;
 };
 
+struct replace_missing_ladspa_fx_module final
+    : ui::cloneable_action<replace_missing_ladspa_fx_module, reducible_action>
+    , visitable_audio_engine_action<replace_missing_ladspa_fx_module>
+{
+    struct fx_chain_replacement
+    {
+        struct fx_mod_replacement
+        {
+            std::size_t position;
+            struct
+            {
+                ladspa::instance_id instance_id;
+                ladspa::plugin_descriptor plugin_desc;
+                std::span<ladspa::port_descriptor const> control_inputs;
+            } ladspa_fx_instance;
+        };
+
+        mixer::channel_id fx_chain_id;
+        std::vector<fx_mod_replacement> fx_mod_replacements;
+    };
+
+    std::vector<fx_chain_replacement> fx_chain_replacements;
+
+    void reduce(state&) const override;
+};
+
 } // namespace piejam::runtime::actions

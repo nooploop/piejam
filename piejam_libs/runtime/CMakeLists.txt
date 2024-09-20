@@ -29,7 +29,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/actions/refresh_devices.h
     include/piejam/runtime/actions/refresh_midi_devices.h
     include/piejam/runtime/actions/reload_missing_plugins.h
-    include/piejam/runtime/actions/replace_fx_module.h
     include/piejam/runtime/actions/request_info_update.h
     include/piejam/runtime/actions/request_mixer_levels_update.h
     include/piejam/runtime/actions/request_parameters_update.h
@@ -150,8 +149,6 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/actions/mixer_actions.cpp
     src/piejam/runtime/actions/move_fx_module.cpp
     src/piejam/runtime/actions/recording.cpp
-    src/piejam/runtime/actions/reload_missing_plugins.cpp
-    src/piejam/runtime/actions/replace_fx_module.cpp
     src/piejam/runtime/actions/request_mixer_levels_update.cpp
     src/piejam/runtime/actions/request_parameters_update.cpp
     src/piejam/runtime/actions/reset_fx_parameter_to_default_value.cpp

@@ -5,6 +5,7 @@
 #include <piejam/runtime/ladspa_fx_middleware.h>
 
 #include <piejam/ladspa/instance_manager.h>
+#include <piejam/range/indices.h>
 #include <piejam/redux/middleware_functors.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
@@ -102,6 +103,76 @@ ladspa_fx_middleware::process_ladspa_fx_action(
                 std::get_if<ladspa::instance_id>(&fx_instance_id))
     {
         m_ladspa_control.unload(*instance_id);
+    }
+}
+
+template <>
+void
+ladspa_fx_middleware::process_ladspa_fx_action(
+        middleware_functors const& mw_fs,
+        actions::reload_missing_plugins const&)
+{
+    auto const& st = mw_fs.get_state();
+
+    actions::replace_missing_ladspa_fx_module action;
+
+    bool send_action = false;
+    for (auto&& [mixer_channel_id, mixer_channel] : st.mixer_state.channels)
+    {
+        auto& [_, fx_mod_replacements] =
+                action.fx_chain_replacements.emplace_back(mixer_channel_id);
+
+        for (std::size_t fx_pos : range::indices(*mixer_channel.fx_chain))
+        {
+            auto&& fx_mod_id = (*mixer_channel.fx_chain)[fx_pos];
+            auto const& fx_mod = st.fx_modules[fx_mod_id];
+
+            if (auto unavail_id = std::get_if<fx::unavailable_ladspa_id>(
+                        &fx_mod.fx_instance_id);
+                unavail_id)
+            {
+                auto const& unavail =
+                        st.fx_unavailable_ladspa_plugins[*unavail_id];
+
+                if (auto plugin_desc = find_ladspa_plugin_descriptor(
+                            st.fx_registry,
+                            unavail.plugin_id);
+                    plugin_desc)
+                {
+                    auto const num_channels =
+                            audio::num_channels(mixer_channel.bus_type);
+                    if (num_channels != plugin_desc->num_inputs ||
+                        num_channels != plugin_desc->num_outputs)
+                    {
+                        continue;
+                    }
+
+                    if (auto instance_id = m_ladspa_control.load(*plugin_desc);
+                        instance_id.valid())
+                    {
+                        auto& [_, ladspa_instance] =
+                                fx_mod_replacements.emplace_back(fx_pos);
+                        ladspa_instance.instance_id = instance_id;
+                        ladspa_instance.plugin_desc = *plugin_desc;
+                        ladspa_instance.control_inputs =
+                                m_ladspa_control.control_inputs(instance_id);
+
+                        send_action = true;
+                    }
+                    else
+                    {
+                        spdlog::error(
+                                "Failed to load LADSPA fx plugin: {}",
+                                *fx_mod.name);
+                    }
+                }
+            }
+        }
+    }
+
+    if (send_action)
+    {
+        mw_fs.next(action);
     }
 }
 
