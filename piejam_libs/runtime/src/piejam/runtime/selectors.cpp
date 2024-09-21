@@ -21,58 +21,50 @@
 namespace piejam::runtime::selectors
 {
 
-selector<box<sample_rate_choice>> const
-        select_sample_rate([](state const& st) {
-            static auto const get_sample_rate =
-                    memo([](box<audio::sound_card_hw_params> const&
-                                    input_hw_params,
-                            box<audio::sound_card_hw_params> const&
-                                    output_hw_params,
-                            audio::sample_rate const current) {
-                        return box<sample_rate_choice>{
-                                std::in_place,
-                                runtime::sample_rates(
-                                        input_hw_params,
-                                        output_hw_params),
-                                current};
-                    });
+selector<box<sample_rate_choice>> const select_sample_rate([](state const& st) {
+    static auto const get_sample_rate =
+            memo([](box<audio::sound_card_hw_params> const& input_hw_params,
+                    box<audio::sound_card_hw_params> const& output_hw_params,
+                    audio::sample_rate const current) {
+                return box<sample_rate_choice>{
+                        std::in_place,
+                        runtime::sample_rates(
+                                input_hw_params,
+                                output_hw_params),
+                        current};
+            });
 
-            return get_sample_rate(
-                    st.selected_io_sound_card.in.hw_params,
-                    st.selected_io_sound_card.out.hw_params,
-                    st.sample_rate);
-        });
+    return get_sample_rate(
+            st.selected_io_sound_card.in.hw_params,
+            st.selected_io_sound_card.out.hw_params,
+            st.sample_rate);
+});
 
-selector<box<period_size_choice>> const
-        select_period_size([](state const& st) {
-            static auto const get_period_size =
-                    memo([](box<audio::sound_card_hw_params> const&
-                                    input_hw_params,
-                            box<audio::sound_card_hw_params> const&
-                                    output_hw_params,
-                            audio::period_size const current) {
-                        return box<period_size_choice>{
-                                std::in_place,
-                                runtime::period_sizes(
-                                        input_hw_params,
-                                        output_hw_params),
-                                current};
-                    });
+selector<box<period_size_choice>> const select_period_size([](state const& st) {
+    static auto const get_period_size =
+            memo([](box<audio::sound_card_hw_params> const& input_hw_params,
+                    box<audio::sound_card_hw_params> const& output_hw_params,
+                    audio::period_size const current) {
+                return box<period_size_choice>{
+                        std::in_place,
+                        runtime::period_sizes(
+                                input_hw_params,
+                                output_hw_params),
+                        current};
+            });
 
-            return get_period_size(
-                    st.selected_io_sound_card.in.hw_params,
-                    st.selected_io_sound_card.out.hw_params,
-                    st.period_size);
-        });
+    return get_period_size(
+            st.selected_io_sound_card.in.hw_params,
+            st.selected_io_sound_card.out.hw_params,
+            st.period_size);
+});
 
 selector<box<period_count_choice>> const
         select_period_count([](state const& st) {
-            static auto get_period_count =
-                    memo([](box<audio::sound_card_hw_params> const&
-                                    input_hw_params,
-                            box<audio::sound_card_hw_params> const&
-                                    output_hw_params,
-                            audio::period_count const current) {
+            static auto get_period_count = memo(
+                    [](box<audio::sound_card_hw_params> const& input_hw_params,
+                       box<audio::sound_card_hw_params> const& output_hw_params,
+                       audio::period_count const current) {
                         return box<period_count_choice>{
                                 std::in_place,
                                 runtime::period_counts(
@@ -94,9 +86,9 @@ selector<float> const select_buffer_latency([](state const& st) {
                                        : 0.f;
 });
 
-static auto get_sound_card = memo(
-        [](box<std::vector<audio::sound_card_descriptor>> const& descs,
-           std::size_t const index) {
+static auto get_sound_card =
+        memo([](box<std::vector<audio::sound_card_descriptor>> const& descs,
+                std::size_t const index) {
             return box<sound_card_choice>{
                     std::in_place,
                     algorithm::transform_to_vector(
@@ -500,8 +492,7 @@ static struct
 auto
 make_mixer_channel_selected_route_selector(
         mixer::channel_id const channel_id,
-        mixer::io_socket const io_socket)
-        -> selector<box<selected_route>>
+        mixer::io_socket const io_socket) -> selector<box<selected_route>>
 {
     return [get = memo(
                     get_mixer_channel_selected_route(channel_id, io_socket))](
@@ -516,11 +507,11 @@ make_mixer_device_routes_selector(
         mixer::io_socket const io_socket)
         -> selector<boxed_vector<mixer_device_route>>
 {
-    auto get_mixer_device_routes = memo(
-            [bus_type](
-                    external_audio::devices_t const& devices,
-                    box<external_audio::device_ids_t> const& device_ids)
-                    -> boxed_vector<mixer_device_route> {
+    auto get_mixer_device_routes =
+            memo([bus_type](
+                         external_audio::devices_t const& devices,
+                         box<external_audio::device_ids_t> const& device_ids)
+                         -> boxed_vector<mixer_device_route> {
                 std::vector<mixer_device_route> result;
                 for (auto device_id : *device_ids)
                 {
@@ -853,16 +844,11 @@ auto
 make_fx_parameter_name_selector(fx::parameter_id const fx_param_id)
         -> selector<boxed_string>
 {
-    static boxed_string const s_empty;
     return std::visit(
             [](auto param_id) -> selector<boxed_string> {
                 return [param_id](state const& st) {
-                    if (auto const* const desc = st.ui_params.find(param_id);
-                        desc)
-                    {
-                        return desc->name;
-                    }
-                    return s_empty;
+                    auto const* const desc = st.ui_params.find(param_id);
+                    return desc ? desc->name : boxed_string{};
                 };
             },
             fx_param_id);
@@ -907,6 +893,20 @@ make_fx_parameter_value_string_selector(fx::parameter_id const fx_param_id)
                     }
 
                     return std::string{};
+                };
+            },
+            fx_param_id);
+}
+
+auto
+make_fx_parameter_bipolar_selector(fx::parameter_id const fx_param_id)
+        -> selector<bool>
+{
+    return std::visit(
+            [](auto param_id) -> selector<bool> {
+                return [param_id](state const& st) {
+                    auto const* const desc = st.ui_params.find(param_id);
+                    return desc && desc->bipolar;
                 };
             },
             fx_param_id);

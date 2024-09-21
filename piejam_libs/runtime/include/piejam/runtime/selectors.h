@@ -65,8 +65,7 @@ auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 auto make_external_audio_device_ids_selector(io_direction)
         -> selector<box<external_audio::device_ids_t>>;
 
-extern selector<box<mixer::channel_ids_t>> const
-        select_mixer_user_channels;
+extern selector<box<mixer::channel_ids_t>> const select_mixer_user_channels;
 extern selector<mixer::channel_id> const select_mixer_main_channel;
 
 auto make_mixer_channel_bus_type_selector(mixer::channel_id)
@@ -105,8 +104,8 @@ struct mixer_channel_route
     mixer::channel_id channel_id;
     std::string name;
 
-    auto operator==(mixer_channel_route const&) const noexcept
-            -> bool = default;
+    auto
+    operator==(mixer_channel_route const&) const noexcept -> bool = default;
 };
 
 struct selected_route
@@ -169,8 +168,7 @@ auto make_midi_device_enabled_selector(midi::device_id_t) -> selector<bool>;
 
 auto make_muted_by_solo_selector(mixer::channel_id) -> selector<bool>;
 
-auto make_fx_chain_selector(mixer::channel_id)
-        -> selector<box<fx::chain_t>>;
+auto make_fx_chain_selector(mixer::channel_id) -> selector<box<fx::chain_t>>;
 
 auto make_fx_module_instance_id_selector(fx::module_id)
         -> selector<fx::instance_id>;
@@ -186,6 +184,7 @@ auto make_fx_parameter_name_selector(fx::parameter_id)
         -> selector<boxed_string>;
 auto make_fx_parameter_value_string_selector(fx::parameter_id)
         -> selector<std::string>;
+auto make_fx_parameter_bipolar_selector(fx::parameter_id) -> selector<bool>;
 auto make_fx_module_streams_selector(fx::module_id)
         -> selector<box<fx::module_streams>>;
 auto make_audio_stream_selector(audio_stream_id)

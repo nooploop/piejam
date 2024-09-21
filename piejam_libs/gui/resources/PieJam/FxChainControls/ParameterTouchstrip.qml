@@ -21,6 +21,7 @@ SubscribableItem {
 
         readonly property var paramModel: root.model && root.model.type === Parameter.Type.Float ? root.model : null
         readonly property real value: private_.paramModel ? private_.paramModel.normalizedValue : 0
+        readonly property bool bipolar: private_.paramModel ? private_.paramModel.bipolar : false
     }
 
     ColumnLayout {
@@ -46,9 +47,9 @@ SubscribableItem {
                     color: Material.accentColor
 
                     x: 0
-                    y: parent.height - height
+                    y: (private_.bipolar ? Math.min(0.5, 1 - private_.value) : (1 - private_.value)) * parent.height
                     width: parent.width
-                    height: private_.value * parent.height
+                    height: (private_.bipolar ? Math.abs(private_.value - 0.5) : private_.value) * parent.height
                 }
             }
 

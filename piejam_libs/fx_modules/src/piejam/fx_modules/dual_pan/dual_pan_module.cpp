@@ -46,10 +46,13 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                              &runtime::parameter::
                                                      from_normalized_linear,
                              },
-                             {.name = box("Left Pan"s),
-                              .value_to_string =
-                                      &runtime::
-                                              float_parameter_value_to_string})},
+                             {
+                                     .name = box("Left Pan"s),
+                                     .value_to_string =
+                                             &runtime::
+                                                     float_parameter_value_to_string,
+                                     .bipolar = true,
+                             })},
                     {to_underlying(parameter_key::right_pan),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
@@ -63,10 +66,13 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                              &runtime::parameter::
                                                      from_normalized_linear,
                              },
-                             {.name = box("Right Pan"s),
-                              .value_to_string =
-                                      &runtime::
-                                              float_parameter_value_to_string})},
+                             {
+                                     .name = box("Right Pan"s),
+                                     .value_to_string =
+                                             &runtime::
+                                                     float_parameter_value_to_string,
+                                     .bipolar = true,
+                             })},
             }),
             .streams = {}};
 }

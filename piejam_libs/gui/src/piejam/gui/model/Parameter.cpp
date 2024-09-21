@@ -54,8 +54,11 @@ Parameter::Parameter(
                       state_change_subscriber,
                       param)))
 {
-    setName(QString::fromStdString(*observe_once(
+    setName(QString::fromStdString(observe_once(
             runtime::selectors::make_fx_parameter_name_selector(param))));
+
+    setBipolar(observe_once(
+            runtime::selectors::make_fx_parameter_bipolar_selector(param)));
 }
 
 Parameter::~Parameter() = default;

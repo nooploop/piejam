@@ -24,13 +24,14 @@ class Parameter : public Subscribable<SubscribableModel>
                        FINAL)
     Q_PROPERTY(
             piejam::gui::model::MidiAssignable* midi READ midi CONSTANT FINAL)
+    Q_PROPERTY(bool bipolar READ bipolar NOTIFY bipolarChanged FINAL)
 
 public:
     Parameter(
             runtime::store_dispatch,
             runtime::subscriber&,
             piejam::gui::model::ParameterId const&);
-    ~Parameter();
+    ~Parameter() override;
 
     auto paramId() const -> ParameterId;
 
@@ -51,6 +52,29 @@ public:
         return m_name;
     }
 
+    auto valueString() const noexcept -> QString const&
+    {
+        return m_valueString;
+    }
+
+    auto bipolar() const noexcept -> bool
+    {
+        return m_bipolar;
+    }
+
+    auto midi() const -> MidiAssignable*;
+
+    Q_INVOKABLE void resetToDefault();
+
+signals:
+    void nameChanged();
+    void valueStringChanged();
+    void bipolarChanged();
+
+protected:
+    void onSubscribe() override;
+
+private:
     void setName(QString const& x)
     {
         if (m_name != x)
@@ -58,11 +82,6 @@ public:
             m_name = x;
             emit nameChanged();
         }
-    }
-
-    auto valueString() const noexcept -> QString const&
-    {
-        return m_valueString;
     }
 
     void setValueString(QString const& x)
@@ -74,23 +93,21 @@ public:
         }
     }
 
-    auto midi() const -> MidiAssignable*;
+    void setBipolar(bool x)
+    {
+        if (m_bipolar != x)
+        {
+            m_bipolar = x;
+            emit bipolarChanged();
+        }
+    }
 
-    Q_INVOKABLE void resetToDefault();
-
-signals:
-    void nameChanged();
-    void valueStringChanged();
-
-protected:
-    void onSubscribe() override;
-
-private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
     QString m_name;
     QString m_valueString;
+    bool m_bipolar{};
 };
 
 auto makeParameter(

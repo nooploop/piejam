@@ -5,6 +5,7 @@
 #include <piejam/fx_modules/tool/tool_module.h>
 
 #include <piejam/fx_modules/tool/tool_internal_id.h>
+#include <piejam/math.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/float_normalize.h>
@@ -26,9 +27,6 @@ struct dB_ival
 {
     static constexpr auto min{-24.f};
     static constexpr auto max{24.f};
-
-    static constexpr auto min_gain{std::pow(10.f, min / 20.f)};
-    static constexpr auto max_gain{std::pow(10.f, max / 20.f)};
 
     static constexpr auto to_normalized =
             &runtime::parameter::to_normalized_dB<dB_ival>;
@@ -61,13 +59,16 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
                                      .default_value = 1.f,
-                                     .min = dB_ival::min_gain,
-                                     .max = dB_ival::max_gain,
+                                     .min = math::from_dB(dB_ival::min),
+                                     .max = math::from_dB(dB_ival::max),
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
-                             {.name = box("Gain"s),
-                              .value_to_string = &to_dB_string})}}),
+                             {
+                                     .name = box("Gain"s),
+                                     .value_to_string = &to_dB_string,
+                                     .bipolar = true,
+                             })}}),
             .streams = {}};
 }
 
