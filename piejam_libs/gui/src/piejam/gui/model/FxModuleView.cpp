@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/FxModule.h>
+#include <piejam/gui/model/FxModuleView.h>
 
 #include <piejam/gui/model/FxGenericModule.h>
 #include <piejam/gui/model/FxModuleContentFactory.h>
@@ -16,7 +16,7 @@
 namespace piejam::gui::model
 {
 
-struct FxModule::Impl
+struct FxModuleView::Impl
 {
     runtime::fx::module_id fx_mod_id;
     std::unique_ptr<FxModuleContent> content;
@@ -50,7 +50,7 @@ makeModuleContent(
             fx_instance_id);
 }
 
-FxModule::FxModule(
+FxModuleView::FxModuleView(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
@@ -58,16 +58,16 @@ FxModule::FxModule(
 {
 }
 
-FxModule::~FxModule() = default;
+FxModuleView::~FxModuleView() = default;
 
 auto
-FxModule::content() noexcept -> FxModuleContent*
+FxModuleView::content() noexcept -> FxModuleContent*
 {
     return m_impl->content.get();
 }
 
 void
-FxModule::onSubscribe()
+FxModuleView::onSubscribe()
 {
     setChainName(QString::fromStdString(observe_once(
             runtime::selectors::make_mixer_channel_name_selector(observe_once(
@@ -98,7 +98,7 @@ FxModule::onSubscribe()
 }
 
 void
-FxModule::toggleBypass()
+FxModuleView::toggleBypass()
 {
     dispatch(runtime::actions::toggle_focused_fx_module_bypass{});
 }

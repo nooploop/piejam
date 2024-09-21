@@ -10,8 +10,6 @@
 
 #include <piejam/runtime/root_view_mode.h>
 
-#include <memory>
-
 namespace piejam::gui::model
 {
 

@@ -35,7 +35,8 @@ class ModelManager final : public QObject
     Q_PROPERTY(piejam::gui::model::Info* info READ info CONSTANT)
     Q_PROPERTY(piejam::gui::model::Log* log READ log CONSTANT)
     Q_PROPERTY(piejam::gui::model::FxBrowser* fxBrowser READ fxBrowser CONSTANT)
-    Q_PROPERTY(piejam::gui::model::FxModule* fxModule READ fxModule CONSTANT)
+    Q_PROPERTY(
+            piejam::gui::model::FxModuleView* fxModule READ fxModule CONSTANT)
 
     Q_PROPERTY(piejam::gui::model::RootView* rootView READ rootView CONSTANT)
 
@@ -83,7 +84,7 @@ public:
         return m_fxBrowser.get();
     }
 
-    auto fxModule() const -> model::FxModule*
+    auto fxModule() const -> model::FxModuleView*
     {
         return m_fxModule.get();
     }
@@ -105,7 +106,7 @@ private:
     std::unique_ptr<model::Info> m_info;
     std::unique_ptr<model::Log> m_log;
     std::unique_ptr<model::FxBrowser> m_fxBrowser;
-    std::unique_ptr<model::FxModule> m_fxModule;
+    std::unique_ptr<model::FxModuleView> m_fxModule;
 
     std::unique_ptr<model::RootView> m_rootView;
 };

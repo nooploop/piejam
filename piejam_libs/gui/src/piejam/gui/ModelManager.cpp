@@ -22,9 +22,9 @@
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>
-#include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxModuleContent.h>
 #include <piejam/gui/model/FxModuleRegistry.h>
+#include <piejam/gui/model/FxModuleView.h>
 #include <piejam/gui/model/Info.h>
 #include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/Log.h>
@@ -71,8 +71,8 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::FloatParameter*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::FxChainModule*>();
-    qRegisterMetaType<piejam::gui::model::FxModule*>();
     qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
+    qRegisterMetaType<piejam::gui::model::FxModuleView*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::IntParameter*>();
     qRegisterMetaType<piejam::gui::model::Log*>();
@@ -185,7 +185,7 @@ ModelManager::ModelManager(
     , m_fxBrowser(std::make_unique<model::FxBrowser>(
               dispatch,
               state_change_subscriber))
-    , m_fxModule(std::make_unique<model::FxModule>(
+    , m_fxModule(std::make_unique<model::FxModuleView>(
               dispatch,
               state_change_subscriber))
     , m_rootView(std::make_unique<model::RootView>(

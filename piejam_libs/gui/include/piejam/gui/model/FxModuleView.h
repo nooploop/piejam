@@ -15,7 +15,7 @@
 namespace piejam::gui::model
 {
 
-class FxModule : public Subscribable<SubscribableModel>
+class FxModuleView : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
@@ -27,8 +27,8 @@ class FxModule : public Subscribable<SubscribableModel>
                        contentChanged FINAL)
 
 public:
-    FxModule(runtime::store_dispatch, runtime::subscriber&);
-    ~FxModule();
+    FxModuleView(runtime::store_dispatch, runtime::subscriber&);
+    ~FxModuleView();
 
     auto chainName() const noexcept -> QString const&
     {
