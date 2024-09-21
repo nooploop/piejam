@@ -30,12 +30,13 @@ SubscribableItem {
                 text: root.model ? root.model.name : ""
             }
 
-            ComboBox {
+            ComboBoxElided {
                 id: comboBox
 
                 Layout.fillWidth: true
 
-                displayText: root.model ? root.model.selected.label : "-"
+                displayTextToElide: root.model ? root.model.selected.label : "-"
+                elideMode: Qt.ElideMiddle
 
                 function selectedStateToColor(s) {
                     switch (s) {

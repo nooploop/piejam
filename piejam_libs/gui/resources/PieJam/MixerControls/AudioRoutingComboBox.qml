@@ -10,18 +10,20 @@ import QtQuick.Layouts 1.15
 import PieJam.Models 1.0 as PJModels
 
 import ".."
+import "../Controls"
 
 SubscribableItem {
     id: root
 
     implicitHeight: comboBox.implicitHeight
 
-    ComboBox {
+    ComboBoxElided {
         id: comboBox
 
         anchors.fill: parent
 
-        displayText: root.model ? root.model.selected.label : "-"
+        displayTextToElide: root.model ? root.model.selected.label : "-"
+        elideMode: Qt.ElideMiddle
 
         function selectedStateToColor(s) {
             switch (s) {
