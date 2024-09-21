@@ -117,8 +117,9 @@ MixerChannelEdit::moveRight()
 void
 MixerChannelEdit::deleteChannel()
 {
-    dispatch(runtime::actions::initiate_mixer_channel_deletion(
-            m_impl->channel_id));
+    runtime::actions::delete_mixer_channel action;
+    action.mixer_channel_id = m_impl->channel_id;
+    dispatch(action);
 }
 
 } // namespace piejam::gui::model

@@ -10,6 +10,7 @@
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/ladspa_fx_action.h>
+#include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/action.h>
@@ -103,6 +104,35 @@ ladspa_fx_middleware::process_ladspa_fx_action(
                 std::get_if<ladspa::instance_id>(&fx_instance_id))
     {
         m_ladspa_control.unload(*instance_id);
+    }
+}
+
+template <>
+void
+ladspa_fx_middleware::process_ladspa_fx_action(
+        middleware_functors const& mw_fs,
+        actions::delete_mixer_channel const& a)
+{
+    auto const& st = mw_fs.get_state();
+
+    std::vector<fx::instance_id> fx_instance_ids;
+
+    for (auto fx_mod_id :
+         st.mixer_state.channels[a.mixer_channel_id].fx_chain.get())
+    {
+        fx::module const& fx_mod = mw_fs.get_state().fx_modules[fx_mod_id];
+        fx_instance_ids.emplace_back(fx_mod.fx_instance_id);
+    }
+
+    mw_fs.next(a);
+
+    for (auto fx_instance_id : fx_instance_ids)
+    {
+        if (ladspa::instance_id const* const instance_id =
+                    std::get_if<ladspa::instance_id>(&fx_instance_id))
+        {
+            m_ladspa_control.unload(*instance_id);
+        }
     }
 }
 

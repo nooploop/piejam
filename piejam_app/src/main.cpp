@@ -14,7 +14,6 @@
 #include <piejam/midi/device_manager.h>
 #include <piejam/midi/device_update.h>
 #include <piejam/midi/input_event_handler.h>
-#include <piejam/redux/batch_middleware.h>
 #include <piejam/redux/queueing_middleware.h>
 #include <piejam/redux/store.h>
 #include <piejam/redux/thread_delegate_middleware.h>
@@ -41,7 +40,6 @@
 #include <piejam/runtime/subscriber.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/action_tracker_middleware.h>
-#include <piejam/runtime/ui/batch_action.h>
 #include <piejam/runtime/ui/thunk_action.h>
 #include <piejam/system/avg_cpu_load_tracker.h>
 #include <piejam/system/cpu_temp.h>
@@ -210,10 +208,6 @@ main(int argc, char* argv[]) -> int
 
     store.apply_middleware(middleware_factory::make<redux::thunk_middleware>());
 
-    bool batching{};
-    store.apply_middleware(
-            middleware_factory::make<redux::batch_middleware>(batching));
-
     store.apply_middleware(middleware_factory::make<
                            redux::queueing_middleware<runtime::action>>());
 
@@ -226,11 +220,8 @@ main(int argc, char* argv[]) -> int
     runtime::subscriber state_change_subscriber(
             [&store]() -> runtime::state const& { return store.state(); });
 
-    store.subscribe([&state_change_subscriber, &batching](auto const& state) {
-        if (!batching)
-        {
-            state_change_subscriber.notify(state);
-        }
+    store.subscribe([&state_change_subscriber](auto const& state) {
+        state_change_subscriber.notify(state);
     });
 
     store.dispatch(runtime::actions::scan_ladspa_fx_plugins("/usr/lib/ladspa"));

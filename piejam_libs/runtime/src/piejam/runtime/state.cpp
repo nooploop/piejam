@@ -692,9 +692,20 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
         remove_aux_send(st, *channel.aux_sends.lock(), addr);
     }
 
-    BOOST_ASSERT_MSG(
-            mixer_channel.fx_chain->empty(),
-            "fx_chain should be emptied before");
+    for (auto fx_mod_id : std::views::reverse(*mixer_channel.fx_chain))
+    {
+        remove_fx_module(st, mixer_channel_id, fx_mod_id);
+    }
+
+    if (st.gui_state.focused_fx_chain_id == mixer_channel_id)
+    {
+        st.gui_state.focused_fx_chain_id = {};
+        st.gui_state.focused_fx_mod_id = {};
+    }
+
+    set_if(st.gui_state.fx_browser_fx_chain_id,
+           equal_to<>(mixer_channel_id),
+           mixer::channel_id{});
 
     BOOST_ASSERT(algorithm::contains(*st.mixer_state.inputs, mixer_channel_id));
     remove_erase(st.mixer_state.inputs, mixer_channel_id);

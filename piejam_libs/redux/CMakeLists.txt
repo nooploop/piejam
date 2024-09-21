@@ -5,7 +5,6 @@
 add_library(piejam_redux INTERFACE)
 
 target_sources(piejam_redux INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/batch_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/concepts.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/flag_resetter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/functors.h

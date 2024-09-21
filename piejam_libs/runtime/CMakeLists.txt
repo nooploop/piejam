@@ -126,7 +126,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/ui/action.h
     include/piejam/runtime/ui/action_tracker_middleware.h
     include/piejam/runtime/ui/action_visitor.h
-    include/piejam/runtime/ui/batch_action.h
     include/piejam/runtime/ui/cloneable_action.h
     include/piejam/runtime/ui/fwd.h
     include/piejam/runtime/ui/generic_action_visitor.h

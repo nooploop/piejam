@@ -30,7 +30,6 @@
 #include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/midi_input_controller.h>
 #include <piejam/runtime/state.h>
-#include <piejam/runtime/ui/batch_action.h>
 
 #include <piejam/algorithm/find_or_get_first.h>
 #include <piejam/algorithm/for_each_visit.h>

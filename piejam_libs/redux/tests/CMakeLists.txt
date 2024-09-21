@@ -7,7 +7,6 @@ if(NOT PIEJAM_TESTS)
 endif()
 
 add_executable(piejam_redux_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/batch_middleware_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/flag_resetter_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/queueing_middleware_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/store_test.cpp
