@@ -77,9 +77,7 @@ private:
 
         return std::unique_ptr<engine::processor>{
                 new engine::event_converter_processor(
-                        [](float l, float r) -> pair<float> {
-                            return {l, r};
-                        },
+                        [](float l, float r) -> pair<float> { return {l, r}; },
                         s_input_names,
                         s_output_names,
                         name)};

@@ -89,8 +89,8 @@ public:
         }
     }
 
-    static constexpr auto envelope(float const prev, float const in) noexcept
-            -> float
+    static constexpr auto
+    envelope(float const prev, float const in) noexcept -> float
     {
         BOOST_ASSERT(in >= 0.f);
         return in > prev ? in : in + 0.85f * (prev - in);

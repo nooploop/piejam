@@ -56,14 +56,14 @@ struct intx_t
     }
 
     template <class ShiftInt>
-    [[nodiscard]] constexpr auto operator<<(ShiftInt shift) const noexcept
-            -> intx_t
+    [[nodiscard]] constexpr auto
+    operator<<(ShiftInt shift) const noexcept -> intx_t
     {
         return value << shift;
     }
 
-    [[nodiscard]] constexpr auto operator^(intx_t other) const noexcept
-            -> intx_t
+    [[nodiscard]] constexpr auto
+    operator^(intx_t other) const noexcept -> intx_t
     {
         return value ^ other.value;
     }

@@ -26,7 +26,7 @@ internal_id() -> runtime::fx::internal_id
             .fx_browser_entry_description =
                     "Pan left and right channel separately.",
             .fx_module_content_factory =
-                    &piejam::gui::model::makeFxModuleContent<gui::FxDualPan>,
+                    &piejam::gui::model::makeFxModule<gui::FxDualPan>,
             .viewSource = "/PieJam/FxChainControls/ParametersListView.qml"});
     return id;
 }

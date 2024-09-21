@@ -55,17 +55,16 @@ public:
     }
 
     template <class Rep, class Period>
-    constexpr auto
-    to_samples(std::chrono::duration<Rep, Period> const& dur) const noexcept
-            -> std::size_t
+    constexpr auto to_samples(std::chrono::duration<Rep, Period> const& dur)
+            const noexcept -> std::size_t
     {
         return static_cast<std::size_t>(
                 m_value *
                 (dur / std::chrono::duration<double, std::ratio<1>>(1)));
     }
 
-    constexpr auto operator==(sample_rate const&) const noexcept
-            -> bool = default;
+    constexpr auto
+    operator==(sample_rate const&) const noexcept -> bool = default;
 
 private:
     unsigned m_value{};

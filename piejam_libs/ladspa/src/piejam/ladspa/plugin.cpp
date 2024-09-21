@@ -675,8 +675,8 @@ public:
     }
 
 private:
-    static auto throw_if_null(LADSPA_Descriptor const* d)
-            -> LADSPA_Descriptor const*
+    static auto
+    throw_if_null(LADSPA_Descriptor const* d) -> LADSPA_Descriptor const*
     {
         if (!d)
         {

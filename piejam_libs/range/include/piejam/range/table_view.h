@@ -96,8 +96,8 @@ public:
             return *(*this + n);
         }
 
-        constexpr auto operator+=(std::ptrdiff_t n) noexcept
-                -> major_index_iterator&
+        constexpr auto
+        operator+=(std::ptrdiff_t n) noexcept -> major_index_iterator&
         {
             if constexpr (MinorStep == dynamic_stride)
             {
@@ -121,8 +121,8 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr auto operator++(int) noexcept
-                -> major_index_iterator
+        [[nodiscard]] constexpr auto
+        operator++(int) noexcept -> major_index_iterator
         {
             major_index_iterator temp(*this);
             ++(*this);
@@ -135,36 +135,36 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr auto operator--(int) noexcept
-                -> major_index_iterator
+        [[nodiscard]] constexpr auto
+        operator--(int) noexcept -> major_index_iterator
         {
             major_index_iterator temp(*this);
             --(*this);
             return temp;
         }
 
-        [[nodiscard]] constexpr auto operator+(difference_type n) const noexcept
-                -> major_index_iterator
+        [[nodiscard]] constexpr auto
+        operator+(difference_type n) const noexcept -> major_index_iterator
         {
             major_index_iterator temp(*this);
             return temp += n;
         }
 
-        [[nodiscard]] friend constexpr auto
-        operator+(difference_type n, major_index_iterator const& it) noexcept
-                -> major_index_iterator
+        [[nodiscard]] friend constexpr auto operator+(
+                difference_type n,
+                major_index_iterator const& it) noexcept -> major_index_iterator
         {
             return it + n;
         }
 
-        constexpr auto operator-=(difference_type n) noexcept
-                -> major_index_iterator&
+        constexpr auto
+        operator-=(difference_type n) noexcept -> major_index_iterator&
         {
             return *this += -n;
         }
 
-        [[nodiscard]] constexpr auto operator-(difference_type n) const noexcept
-                -> major_index_iterator
+        [[nodiscard]] constexpr auto
+        operator-(difference_type n) const noexcept -> major_index_iterator
         {
             major_index_iterator temp(*this);
             return temp -= n;

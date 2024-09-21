@@ -5,7 +5,7 @@
 #pragma once
 
 #include <piejam/audio/engine/component.h>
-#include <piejam/gui/model/FxModuleContentFactory.h>
+#include <piejam/gui/model/FxModuleFactory.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/internal_fx_component_factory.h>
 #include <piejam/runtime/internal_fx_module_factory.h>
@@ -31,7 +31,7 @@ struct module_registration
     QString fx_browser_entry_name;
     QString fx_browser_entry_description;
 
-    gui::model::FxModuleContentFactory fx_module_content_factory;
+    gui::model::FxModuleFactory fx_module_content_factory;
 
     QString viewSource;
 };

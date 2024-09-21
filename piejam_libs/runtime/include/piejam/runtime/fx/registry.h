@@ -73,8 +73,8 @@ struct is_available_for_bus_type
         }
     }
 
-    [[nodiscard]] auto operator()(ladspa::plugin_descriptor const& pd) const
-            -> bool
+    [[nodiscard]] auto
+    operator()(ladspa::plugin_descriptor const& pd) const -> bool
     {
         switch (bus_type)
         {
@@ -95,8 +95,8 @@ struct is_available_for_bus_type
         return std::visit(*this, item);
     }
 
-    static auto internal_fx_mono_availability()
-            -> registry_map<internal_id, bool>&
+    static auto
+    internal_fx_mono_availability() -> registry_map<internal_id, bool>&
     {
         static registry_map<internal_id, bool> s_mapping;
         return s_mapping;

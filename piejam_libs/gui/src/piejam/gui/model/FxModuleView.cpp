@@ -5,7 +5,7 @@
 #include <piejam/gui/model/FxModuleView.h>
 
 #include <piejam/gui/model/FxGenericModule.h>
-#include <piejam/gui/model/FxModuleContentFactory.h>
+#include <piejam/gui/model/FxModuleFactory.h>
 #include <piejam/runtime/actions/fx_chain_actions.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/selectors.h>
@@ -19,15 +19,14 @@ namespace piejam::gui::model
 struct FxModuleView::Impl
 {
     runtime::fx::module_id fx_mod_id;
-    std::unique_ptr<FxModuleContent> content;
+    std::unique_ptr<FxModule> content;
 };
 
 auto
 makeModuleContent(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::fx::module_id const fx_mod_id)
-        -> std::unique_ptr<FxModuleContent>
+        runtime::fx::module_id const fx_mod_id) -> std::unique_ptr<FxModule>
 {
     auto const fx_instance_id = state_change_subscriber.observe_once(
             runtime::selectors::make_fx_module_instance_id_selector(fx_mod_id));
@@ -35,13 +34,13 @@ makeModuleContent(
     return std::visit(
             boost::hof::match(
                     [&](runtime::fx::internal_id fx_type)
-                            -> std::unique_ptr<FxModuleContent> {
-                        return FxModuleContentFactories::lookup(fx_type)(
+                            -> std::unique_ptr<FxModule> {
+                        return FxModuleFactories::lookup(fx_type)(
                                 store_dispatch,
                                 state_change_subscriber,
                                 fx_mod_id);
                     },
-                    [&](auto const&) -> std::unique_ptr<FxModuleContent> {
+                    [&](auto const&) -> std::unique_ptr<FxModule> {
                         return std::make_unique<FxGenericModule>(
                                 store_dispatch,
                                 state_change_subscriber,
@@ -61,7 +60,7 @@ FxModuleView::FxModuleView(
 FxModuleView::~FxModuleView() = default;
 
 auto
-FxModuleView::content() noexcept -> FxModuleContent*
+FxModuleView::content() noexcept -> FxModule*
 {
     return m_impl->content.get();
 }

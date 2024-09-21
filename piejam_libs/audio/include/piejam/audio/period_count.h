@@ -36,8 +36,8 @@ public:
         return m_value;
     }
 
-    constexpr auto operator==(period_count const&) const noexcept
-            -> bool = default;
+    constexpr auto
+    operator==(period_count const&) const noexcept -> bool = default;
 
 private:
     unsigned m_value{};

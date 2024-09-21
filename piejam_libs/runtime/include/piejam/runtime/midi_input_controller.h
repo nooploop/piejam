@@ -26,7 +26,7 @@ public:
 auto make_midi_input_controller(midi::device_manager&)
         -> std::unique_ptr<midi_input_controller>;
 
-auto make_dummy_midi_input_controller()
-        -> std::unique_ptr<midi_input_controller>;
+auto
+make_dummy_midi_input_controller() -> std::unique_ptr<midi_input_controller>;
 
 } // namespace piejam::runtime

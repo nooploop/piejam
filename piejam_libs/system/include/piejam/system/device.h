@@ -36,8 +36,8 @@ public:
     [[nodiscard]] auto ioctl(unsigned long request) noexcept -> std::error_code;
 
     template <class T>
-    [[nodiscard]] auto ioctl(unsigned long request, T& x) noexcept
-            -> std::error_code
+    [[nodiscard]] auto
+    ioctl(unsigned long request, T& x) noexcept -> std::error_code
     {
         return ioctl(request, &x, sizeof(T));
     }
@@ -49,8 +49,9 @@ public:
 
 private:
     [[nodiscard]] auto
-    ioctl(unsigned long request, void* p, std::size_t size) noexcept
-            -> std::error_code;
+    ioctl(unsigned long request,
+          void* p,
+          std::size_t size) noexcept -> std::error_code;
 
     static constexpr int invalid = -1;
 

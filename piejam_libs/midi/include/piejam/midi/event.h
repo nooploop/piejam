@@ -27,8 +27,8 @@ struct channel_event
     std::size_t channel{};
     E data{};
 
-    constexpr auto operator==(channel_event const&) const noexcept
-            -> bool = default;
+    constexpr auto
+    operator==(channel_event const&) const noexcept -> bool = default;
 };
 
 using channel_cc_event = channel_event<cc_event>;
@@ -40,8 +40,8 @@ struct external_event
     device_id_t device_id;
     event_t event{};
 
-    constexpr auto operator==(external_event const&) const noexcept
-            -> bool = default;
+    constexpr auto
+    operator==(external_event const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::midi

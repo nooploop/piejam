@@ -44,8 +44,8 @@ frequency_from_interval(T const ival, T const f0)
 
 struct pitch
 {
-    [[nodiscard]] static constexpr auto from_frequency(float frequency) noexcept
-            -> pitch
+    [[nodiscard]] static constexpr auto
+    from_frequency(float frequency) noexcept -> pitch
     {
         BOOST_ASSERT(frequency > 0.f);
 

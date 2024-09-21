@@ -66,8 +66,7 @@ void
 Mixer::onSubscribe()
 {
     observe(runtime::selectors::select_mixer_user_channels,
-            [this](box<runtime::mixer::channel_ids_t> const&
-                           user_channel_ids) {
+            [this](box<runtime::mixer::channel_ids_t> const& user_channel_ids) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(
                                 *m_impl->user_channel_ids,

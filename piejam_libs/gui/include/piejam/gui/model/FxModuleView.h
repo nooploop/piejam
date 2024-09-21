@@ -23,7 +23,7 @@ class FxModuleView : public Subscribable<SubscribableModel>
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(bool bypassed READ bypassed NOTIFY bypassedChanged FINAL)
 
-    Q_PROPERTY(piejam::gui::model::FxModuleContent* content READ content NOTIFY
+    Q_PROPERTY(piejam::gui::model::FxModule* content READ content NOTIFY
                        contentChanged FINAL)
 
 public:
@@ -45,7 +45,7 @@ public:
         return m_bypassed;
     }
 
-    auto content() noexcept -> FxModuleContent*;
+    auto content() noexcept -> FxModule*;
 
     Q_INVOKABLE void toggleBypass();
 

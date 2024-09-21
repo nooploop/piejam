@@ -79,8 +79,8 @@ public:
         return std::make_reverse_iterator(end());
     }
 
-    [[nodiscard]] constexpr auto crbegin() const noexcept
-            -> const_reverse_iterator
+    [[nodiscard]] constexpr auto
+    crbegin() const noexcept -> const_reverse_iterator
     {
         return std::make_reverse_iterator(cend());
     }
@@ -90,8 +90,8 @@ public:
         return std::make_reverse_iterator(begin());
     }
 
-    [[nodiscard]] constexpr auto crend() const noexcept
-            -> const_reverse_iterator
+    [[nodiscard]] constexpr auto
+    crend() const noexcept -> const_reverse_iterator
     {
         return std::make_reverse_iterator(cbegin());
     }
@@ -135,8 +135,8 @@ public:
     }
 
     template <difference_type ToStride>
-    [[nodiscard]] constexpr auto stride_cast() const noexcept
-            -> strided_span<T, ToStride>
+    [[nodiscard]] constexpr auto
+    stride_cast() const noexcept -> strided_span<T, ToStride>
         requires(Stride == dynamic_stride && ToStride != dynamic_stride)
     {
         BOOST_ASSERT(m_stride == ToStride);
@@ -145,8 +145,8 @@ public:
 
 private:
     template <class Iterator, class Data>
-    static constexpr auto make_iterator(Data&& d, difference_type stride)
-            -> Iterator
+    static constexpr auto
+    make_iterator(Data&& d, difference_type stride) -> Iterator
     {
         if constexpr (Stride == dynamic_stride)
         {

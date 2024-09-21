@@ -13,7 +13,7 @@ namespace piejam::ladspa
 {
 
 auto scan_file(std::filesystem::path const&) -> std::vector<plugin_descriptor>;
-auto scan_directory(std::filesystem::path const&)
-        -> std::vector<plugin_descriptor>;
+auto
+scan_directory(std::filesystem::path const&) -> std::vector<plugin_descriptor>;
 
 } // namespace piejam::ladspa

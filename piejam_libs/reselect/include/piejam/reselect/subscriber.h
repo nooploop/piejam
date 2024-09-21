@@ -35,8 +35,8 @@ public:
     }
 
     template <class Value, class Handler>
-    [[nodiscard]] auto observe(selector<Value, State> sel, Handler&& handler)
-            -> subscription
+    [[nodiscard]] auto
+    observe(selector<Value, State> sel, Handler&& handler) -> subscription
     {
         auto last = std::make_shared<Value>(sel.get(m_get_state()));
         std::invoke(std::forward<Handler>(handler), *last);

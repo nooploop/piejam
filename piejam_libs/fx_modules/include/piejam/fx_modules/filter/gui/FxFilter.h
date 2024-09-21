@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxModuleContent.h>
+#include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -15,8 +15,7 @@ namespace piejam::fx_modules::filter::gui
 {
 
 class FxFilter final
-    : public piejam::gui::model::Subscribable<
-              piejam::gui::model::FxModuleContent>
+    : public piejam::gui::model::Subscribable<piejam::gui::model::FxModule>
 {
     Q_OBJECT
 

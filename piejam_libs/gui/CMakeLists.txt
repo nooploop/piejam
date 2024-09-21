@@ -54,8 +54,8 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/FxBrowserEntryLADSPA.h
     include/piejam/gui/model/FxChainModule.h
     include/piejam/gui/model/FxGenericModule.h
-    include/piejam/gui/model/FxModuleContent.h
-    include/piejam/gui/model/FxModuleContentFactory.h
+    include/piejam/gui/model/FxModule.h
+    include/piejam/gui/model/FxModuleFactory.h
     include/piejam/gui/model/FxModuleRegistry.h
     include/piejam/gui/model/FxModuleType.h
     include/piejam/gui/model/FxModuleView.h

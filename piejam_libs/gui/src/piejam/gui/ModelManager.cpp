@@ -22,7 +22,7 @@
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxChainModule.h>
-#include <piejam/gui/model/FxModuleContent.h>
+#include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/FxModuleRegistry.h>
 #include <piejam/gui/model/FxModuleView.h>
 #include <piejam/gui/model/Info.h>
@@ -71,7 +71,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::FloatParameter*>();
     qRegisterMetaType<piejam::gui::model::FxBrowser*>();
     qRegisterMetaType<piejam::gui::model::FxChainModule*>();
-    qRegisterMetaType<piejam::gui::model::FxModuleContent*>();
+    qRegisterMetaType<piejam::gui::model::FxModule*>();
     qRegisterMetaType<piejam::gui::model::FxModuleView*>();
     qRegisterMetaType<piejam::gui::model::Info*>();
     qRegisterMetaType<piejam::gui::model::IntParameter*>();
@@ -101,11 +101,11 @@ runRegistration()
             "AudioRoutingSelection",
             "Not creatable");
 
-    qmlRegisterUncreatableType<piejam::gui::model::FxModuleContent>(
+    qmlRegisterUncreatableType<piejam::gui::model::FxModule>(
             "PieJam.Models",
             1,
             0,
-            "FxModuleContent",
+            "FxModule",
             "Not createable");
 
     qmlRegisterUncreatableType<piejam::gui::model::Parameter>(

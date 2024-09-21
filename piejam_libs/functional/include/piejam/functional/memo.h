@@ -28,8 +28,9 @@ public:
     }
 
     template <class... Args>
-    auto operator()(Args&&... args) const -> std::add_lvalue_reference_t<
-            std::add_const_t<std::invoke_result_t<F, Args&&...>>>
+    auto operator()(Args&&... args) const
+            -> std::add_lvalue_reference_t<
+                    std::add_const_t<std::invoke_result_t<F, Args&&...>>>
     {
         if (!m_last ||
             m_last->args != std::forward_as_tuple(std::forward<Args>(args)...))

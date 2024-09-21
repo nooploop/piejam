@@ -19,7 +19,7 @@ class AudioInputOutputSettings;
 class FxChainModule;
 using FxChainModulesList = GenericListModel<FxChainModule>;
 class FxModuleView;
-class FxModuleContent;
+class FxModule;
 
 class Info;
 class Log;

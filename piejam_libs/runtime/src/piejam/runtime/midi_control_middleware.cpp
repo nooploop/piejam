@@ -39,9 +39,7 @@ struct update_midi_devices final
         {
             midi_devices.emplace(
                     op.device_id,
-                    midi_device_config{
-                            .name = box(op.name),
-                            .enabled = false});
+                    midi_device_config{.name = box(op.name), .enabled = false});
             midi_inputs.emplace_back(op.device_id);
         }
 

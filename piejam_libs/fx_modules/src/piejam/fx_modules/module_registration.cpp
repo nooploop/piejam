@@ -43,7 +43,7 @@ register_module(module_registration mod_reg) -> runtime::fx::internal_id
                             std::move(mod_reg.fx_browser_entry_description),
             });
 
-    piejam::gui::model::FxModuleContentFactories::add_entry(
+    piejam::gui::model::FxModuleFactories::add_entry(
             id,
             std::move(mod_reg.fx_module_content_factory));
 

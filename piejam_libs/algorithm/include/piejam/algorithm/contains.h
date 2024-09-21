@@ -27,9 +27,9 @@ struct contains_fn
             class T,
             class Proj = std::identity>
         requires std::indirect_binary_predicate<
-                std::ranges::equal_to,
-                std::projected<I, Proj>,
-                T const*>
+                         std::ranges::equal_to,
+                         std::projected<I, Proj>,
+                         T const*>
     [[nodiscard]] constexpr auto
     operator()(I first, S last, T const& value, Proj proj = {}) const -> bool
     {
@@ -38,9 +38,9 @@ struct contains_fn
 
     template <std::ranges::input_range R, class T, class Proj = std::identity>
         requires std::indirect_binary_predicate<
-                std::ranges::equal_to,
-                std::projected<std::ranges::iterator_t<R>, Proj>,
-                T const*>
+                         std::ranges::equal_to,
+                         std::projected<std::ranges::iterator_t<R>, Proj>,
+                         T const*>
     [[nodiscard]] constexpr auto
     operator()(R&& r, T const& value, Proj proj = {}) const -> bool
     {

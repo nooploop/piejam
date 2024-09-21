@@ -12,7 +12,7 @@
 namespace piejam::gui::model
 {
 
-class FxModuleContent : public SubscribableModel
+class FxModule : public SubscribableModel
 {
     Q_OBJECT
 

@@ -102,8 +102,8 @@ public:
 
     auto update_devices() -> std::vector<device_update> override;
 
-    auto make_input_event_handler()
-            -> std::unique_ptr<input_event_handler> override;
+    auto
+    make_input_event_handler() -> std::unique_ptr<input_event_handler> override;
 
 private:
     auto is_update_relevant(alsa::midi_device_added const&) const -> bool

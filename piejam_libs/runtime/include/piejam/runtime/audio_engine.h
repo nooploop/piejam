@@ -41,8 +41,8 @@ public:
     [[nodiscard]] auto get_parameter_update(parameter::id_t<P>) const
             -> std::optional<typename P::value_type>;
 
-    [[nodiscard]] auto get_learned_midi() const
-            -> std::optional<midi::external_event>;
+    [[nodiscard]] auto
+    get_learned_midi() const -> std::optional<midi::external_event>;
 
     [[nodiscard]] auto get_stream(audio_stream_id) const -> audio_stream_buffer;
 

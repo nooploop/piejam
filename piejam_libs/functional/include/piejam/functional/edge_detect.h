@@ -12,8 +12,8 @@ namespace piejam
 struct
 {
     template <class T>
-    constexpr auto operator()(T const& v, T const& l, T const& r) const noexcept
-            -> bool
+    constexpr auto
+    operator()(T const& v, T const& l, T const& r) const noexcept -> bool
     {
         return in_right_open(v, l, r);
     }
@@ -22,8 +22,8 @@ struct
 struct
 {
     template <class T>
-    constexpr auto operator()(T const& v, T const& l, T const& r) const noexcept
-            -> bool
+    constexpr auto
+    operator()(T const& v, T const& l, T const& r) const noexcept -> bool
     {
         return in_left_open(v, r, l);
     }

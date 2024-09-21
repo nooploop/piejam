@@ -19,8 +19,8 @@ public:
 
     virtual ~pcm_reader() = default;
 
-    [[nodiscard]] virtual auto converter() const noexcept
-            -> std::span<converter_f const> = 0;
+    [[nodiscard]] virtual auto
+    converter() const noexcept -> std::span<converter_f const> = 0;
 
     [[nodiscard]] virtual auto transfer() noexcept -> std::error_code = 0;
 

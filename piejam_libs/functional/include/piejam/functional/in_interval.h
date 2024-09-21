@@ -16,8 +16,8 @@ template <class LeftCompare, class RightCompare>
 struct interval_check
 {
     template <class T>
-    constexpr auto operator()(T const v, T const lo, T const hi) const noexcept
-            -> bool
+    constexpr auto
+    operator()(T const v, T const lo, T const hi) const noexcept -> bool
     {
         return LeftCompare{}(lo, v) && RightCompare{}(v, hi);
     }

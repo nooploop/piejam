@@ -55,8 +55,8 @@ protected:
     nodes_t m_nodes;
 
 private:
-    static auto make_nodes(dag::tasks_t const& tasks, dag::graph_t const& graph)
-            -> nodes_t
+    static auto
+    make_nodes(dag::tasks_t const& tasks, dag::graph_t const& graph) -> nodes_t
     {
         nodes_t nodes;
         for (auto const& [id, task] : tasks)

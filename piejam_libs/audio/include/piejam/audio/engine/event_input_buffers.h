@@ -61,8 +61,8 @@ public:
     }
 
     template <class T>
-    [[nodiscard]] auto get(std::size_t const buffer_index) const noexcept
-            -> event_buffer<T> const&
+    [[nodiscard]] auto
+    get(std::size_t const buffer_index) const noexcept -> event_buffer<T> const&
     {
         BOOST_ASSERT(buffer_index < m_event_buffers.size());
         abstract_event_buffer const* const ev_buf =

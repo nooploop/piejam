@@ -26,7 +26,7 @@ internal_id() -> runtime::fx::internal_id
             .fx_browser_entry_description =
                     "Amplify or attenuate an audio signal.",
             .fx_module_content_factory =
-                    &piejam::gui::model::makeFxModuleContent<gui::FxTool>,
+                    &piejam::gui::model::makeFxModule<gui::FxTool>,
             .viewSource = "/PieJam/FxChainControls/ParametersListView.qml"});
     return id;
 }

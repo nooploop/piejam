@@ -22,8 +22,8 @@ struct sound_card_hw_params
     period_sizes_t period_sizes;
     period_counts_t period_counts;
 
-    auto operator==(sound_card_hw_params const&) const noexcept
-            -> bool = default;
+    auto
+    operator==(sound_card_hw_params const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::audio

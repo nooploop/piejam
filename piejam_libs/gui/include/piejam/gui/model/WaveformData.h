@@ -27,8 +27,8 @@ public:
         return m_data.size() / 2;
     }
 
-    [[nodiscard]] constexpr auto ys() const noexcept
-            -> std::vector<float> const&
+    [[nodiscard]] constexpr auto
+    ys() const noexcept -> std::vector<float> const&
     {
         return m_data;
     }
@@ -62,8 +62,8 @@ public:
         algorithm::shift_push_back(m_data, other.m_data);
     }
 
-    [[nodiscard]] auto operator==(WaveformData const&) const noexcept
-            -> bool = default;
+    [[nodiscard]] auto
+    operator==(WaveformData const&) const noexcept -> bool = default;
 
 private:
     std::vector<float> m_data;

@@ -14,8 +14,8 @@ namespace piejam::audio::engine
 
 // event in: pan
 // event out: gain L, gain R
-auto make_pan_processor(std::string_view name = {})
-        -> std::unique_ptr<processor>;
+auto
+make_pan_processor(std::string_view name = {}) -> std::unique_ptr<processor>;
 
 // event in: volume, pan
 // event out: gain L, gain R

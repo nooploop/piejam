@@ -44,8 +44,8 @@ public:
         return m_make_event_buffer(event_memory);
     }
 
-    [[nodiscard]] auto empty_event_buffer() const
-            -> abstract_event_buffer const&
+    [[nodiscard]] auto
+    empty_event_buffer() const -> abstract_event_buffer const&
     {
         return m_empty_event_buffer();
     }

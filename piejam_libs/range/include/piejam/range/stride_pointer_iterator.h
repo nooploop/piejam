@@ -60,8 +60,8 @@ public:
         return m_p;
     }
 
-    [[nodiscard]] constexpr auto operator[](difference_type n) const noexcept
-            -> reference
+    [[nodiscard]] constexpr auto
+    operator[](difference_type n) const noexcept -> reference
     {
         return *(m_p + n * stride());
     }
@@ -72,8 +72,8 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator++(int) noexcept
-            -> stride_pointer_iterator
+    [[nodiscard]] constexpr auto
+    operator++(int) noexcept -> stride_pointer_iterator
     {
         stride_pointer_iterator temp(*this);
         ++(*this);
@@ -86,23 +86,23 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator--(int) noexcept
-            -> stride_pointer_iterator
+    [[nodiscard]] constexpr auto
+    operator--(int) noexcept -> stride_pointer_iterator
     {
         stride_pointer_iterator temp(*this);
         --(*this);
         return temp;
     }
 
-    constexpr auto operator+=(difference_type n) noexcept
-            -> stride_pointer_iterator&
+    constexpr auto
+    operator+=(difference_type n) noexcept -> stride_pointer_iterator&
     {
         m_p += n * stride();
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator+(difference_type n) const noexcept
-            -> stride_pointer_iterator
+    [[nodiscard]] constexpr auto
+    operator+(difference_type n) const noexcept -> stride_pointer_iterator
     {
         stride_pointer_iterator temp(*this);
         return temp += n;
@@ -115,22 +115,21 @@ public:
         return it + n;
     }
 
-    constexpr auto operator-=(difference_type n) noexcept
-            -> stride_pointer_iterator&
+    constexpr auto
+    operator-=(difference_type n) noexcept -> stride_pointer_iterator&
     {
         return *this += -n;
     }
 
-    [[nodiscard]] constexpr auto operator-(difference_type n) const noexcept
-            -> stride_pointer_iterator
+    [[nodiscard]] constexpr auto
+    operator-(difference_type n) const noexcept -> stride_pointer_iterator
     {
         stride_pointer_iterator temp(*this);
         return temp -= n;
     }
 
-    [[nodiscard]] constexpr auto
-    operator-(stride_pointer_iterator const& rhs) const noexcept
-            -> difference_type
+    [[nodiscard]] constexpr auto operator-(stride_pointer_iterator const& rhs)
+            const noexcept -> difference_type
     {
         verify_precondition(rhs);
         return (m_p - rhs.m_p) / stride();

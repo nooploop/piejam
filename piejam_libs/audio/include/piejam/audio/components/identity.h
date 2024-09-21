@@ -11,7 +11,7 @@
 namespace piejam::audio::components
 {
 
-auto make_identity(std::size_t num_channels)
-        -> std::unique_ptr<engine::component>;
+auto
+make_identity(std::size_t num_channels) -> std::unique_ptr<engine::component>;
 
 } // namespace piejam::audio::components

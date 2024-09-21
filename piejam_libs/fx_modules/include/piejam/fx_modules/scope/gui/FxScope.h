@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxModuleContent.h>
+#include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/Types.h>
@@ -18,8 +18,7 @@ namespace piejam::fx_modules::scope::gui
 {
 
 class FxScope final
-    : public piejam::gui::model::Subscribable<
-              piejam::gui::model::FxModuleContent>
+    : public piejam::gui::model::Subscribable<piejam::gui::model::FxModule>
 {
     Q_OBJECT
 
@@ -91,8 +90,8 @@ public:
     auto triggerSlope() const noexcept -> piejam::gui::model::EnumParameter*;
     auto triggerLevel() const noexcept -> piejam::gui::model::FloatParameter*;
     auto holdTime() const noexcept -> piejam::gui::model::FloatParameter*;
-    auto waveformWindowSize() const noexcept
-            -> piejam::gui::model::IntParameter*;
+    auto
+    waveformWindowSize() const noexcept -> piejam::gui::model::IntParameter*;
     auto scopeWindowSize() const noexcept -> piejam::gui::model::IntParameter*;
     auto activeA() const noexcept -> piejam::gui::model::BoolParameter*;
     auto activeB() const noexcept -> piejam::gui::model::BoolParameter*;

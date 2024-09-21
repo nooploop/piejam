@@ -161,14 +161,14 @@ struct slice_clamp
         BOOST_ASSERT(simd::is_aligned(out.data()));
     }
 
-    constexpr auto operator()(typename slice<T>::constant_t const c) const
-            -> slice<T>
+    constexpr auto
+    operator()(typename slice<T>::constant_t const c) const -> slice<T>
     {
         return math::clamp(c, m_min, m_max);
     }
 
-    constexpr auto operator()(typename slice<T>::span_t const buf) const
-            -> slice<T>
+    constexpr auto
+    operator()(typename slice<T>::span_t const buf) const -> slice<T>
     {
         BOOST_ASSERT(simd::is_aligned(buf.data()));
         simd::transform(
@@ -305,8 +305,9 @@ private:
 
 template <class T>
 constexpr auto
-add(slice<T> const& l, slice<T> const& r, std::span<T> const out) noexcept
-        -> slice<T>
+add(slice<T> const& l,
+    slice<T> const& r,
+    std::span<T> const out) noexcept -> slice<T>
 {
     return slice<T>::visit(detail::slice_add<T>(out), l, r);
 }

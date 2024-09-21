@@ -27,8 +27,8 @@ struct io_pair
     }
 
     template <std::convertible_to<T> I, std::convertible_to<T> O>
-    constexpr io_pair(I&& i, O&& o) noexcept(noexcept(T{
-            std::forward<I>(i)}) && noexcept(T{std::forward<O>(o)}))
+    constexpr io_pair(I&& i, O&& o) noexcept(
+            noexcept(T{std::forward<I>(i)}) && noexcept(T{std::forward<O>(o)}))
         : in{std::forward<I>(i)}
         , out{std::forward<O>(o)}
     {

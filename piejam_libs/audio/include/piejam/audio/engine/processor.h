@@ -19,16 +19,16 @@ public:
 
     virtual ~processor() = default;
 
-    [[nodiscard]] virtual auto type_name() const noexcept
-            -> std::string_view = 0;
+    [[nodiscard]] virtual auto
+    type_name() const noexcept -> std::string_view = 0;
     [[nodiscard]] virtual auto name() const noexcept -> std::string_view = 0;
 
     [[nodiscard]] virtual auto num_inputs() const noexcept -> std::size_t = 0;
     [[nodiscard]] virtual auto num_outputs() const noexcept -> std::size_t = 0;
 
     [[nodiscard]] virtual auto event_inputs() const noexcept -> event_ports = 0;
-    [[nodiscard]] virtual auto event_outputs() const noexcept
-            -> event_ports = 0;
+    [[nodiscard]] virtual auto
+    event_outputs() const noexcept -> event_ports = 0;
 
     virtual void process(process_context const&) = 0;
 };

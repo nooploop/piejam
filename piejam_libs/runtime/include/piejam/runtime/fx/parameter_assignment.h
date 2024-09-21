@@ -15,8 +15,8 @@ struct parameter_assignment
     parameter_key key;
     Value value;
 
-    auto operator==(parameter_assignment const&) const noexcept
-            -> bool = default;
+    auto
+    operator==(parameter_assignment const&) const noexcept -> bool = default;
 };
 
 } // namespace piejam::runtime::fx

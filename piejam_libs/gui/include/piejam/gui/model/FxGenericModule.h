@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxModuleContent.h>
+#include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -14,7 +14,7 @@
 namespace piejam::gui::model
 {
 
-class FxGenericModule : public Subscribable<FxModuleContent>
+class FxGenericModule : public Subscribable<FxModule>
 {
     Q_OBJECT
 

@@ -24,9 +24,7 @@ namespace
 
 struct make_module_parameters
 {
-    make_module_parameters(
-            parameters_map& params,
-            ui_parameters_map& ui_params)
+    make_module_parameters(parameters_map& params, ui_parameters_map& ui_params)
         : m_params{params}
         , m_ui_params{ui_params}
     {

@@ -18,20 +18,20 @@
 namespace piejam::gui::model
 {
 
-using FxModuleContentFactory = std::function<std::unique_ptr<FxModuleContent>(
+using FxModuleFactory = std::function<std::unique_ptr<FxModule>(
         runtime::store_dispatch,
         runtime::subscriber&,
         runtime::fx::module_id)>;
 
-using FxModuleContentFactories =
-        registry_map<runtime::fx::internal_id, FxModuleContentFactory>;
+using FxModuleFactories =
+        registry_map<runtime::fx::internal_id, FxModuleFactory>;
 
 template <class T>
 auto
-makeFxModuleContent(
+makeFxModule(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& subscriber,
-        runtime::fx::module_id fx_mod_id) -> std::unique_ptr<FxModuleContent>
+        runtime::fx::module_id fx_mod_id) -> std::unique_ptr<FxModule>
 {
     return std::make_unique<T>(store_dispatch, subscriber, fx_mod_id);
 }

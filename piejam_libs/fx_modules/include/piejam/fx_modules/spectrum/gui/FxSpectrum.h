@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/FxModuleContent.h>
+#include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/Types.h>
@@ -17,8 +17,7 @@ namespace piejam::fx_modules::spectrum::gui
 {
 
 class FxSpectrum final
-    : public piejam::gui::model::Subscribable<
-              piejam::gui::model::FxModuleContent>
+    : public piejam::gui::model::Subscribable<piejam::gui::model::FxModule>
 {
     Q_OBJECT
 
