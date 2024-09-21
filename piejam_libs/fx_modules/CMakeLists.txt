@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023 Dimitrij Kotrev
+# SPDX-FileCopyrightText: 2020-2024 Dimitrij Kotrev
 #
 # SPDX-License-Identifier: CC0-1.0
 
