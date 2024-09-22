@@ -16,12 +16,10 @@
 namespace piejam::fx_modules::spectrum::gui
 {
 
-class FxSpectrum final
-    : public piejam::gui::model::Subscribable<piejam::gui::model::FxModule>
+class FxSpectrum final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
     Q_PROPERTY(
             piejam::gui::model::SpectrumData* dataA READ dataA CONSTANT FINAL)
     Q_PROPERTY(
@@ -49,8 +47,6 @@ public:
     ~FxSpectrum() override;
 
     auto type() const noexcept -> piejam::gui::model::FxModuleType override;
-
-    auto busType() const noexcept -> piejam::gui::model::BusType;
 
     auto activeA() const noexcept -> piejam::gui::model::BoolParameter*;
     auto activeB() const noexcept -> piejam::gui::model::BoolParameter*;

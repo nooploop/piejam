@@ -14,8 +14,7 @@
 namespace piejam::fx_modules::filter::gui
 {
 
-class FxFilter final
-    : public piejam::gui::model::Subscribable<piejam::gui::model::FxModule>
+class FxFilter final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
 

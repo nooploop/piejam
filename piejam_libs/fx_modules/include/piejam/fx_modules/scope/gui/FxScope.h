@@ -17,12 +17,9 @@
 namespace piejam::fx_modules::scope::gui
 {
 
-class FxScope final
-    : public piejam::gui::model::Subscribable<piejam::gui::model::FxModule>
+class FxScope final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
-
-    Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
 
     Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
                        viewSizeChanged FINAL)
@@ -67,8 +64,6 @@ public:
     ~FxScope() override;
 
     auto type() const noexcept -> piejam::gui::model::FxModuleType override;
-
-    auto busType() const noexcept -> piejam::gui::model::BusType;
 
     auto viewSize() const noexcept -> int
     {

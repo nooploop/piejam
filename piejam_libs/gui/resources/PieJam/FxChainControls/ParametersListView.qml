@@ -24,7 +24,7 @@ SubscribableItem {
         boundsBehavior: Flickable.StopAtBounds
         boundsMovement: Flickable.StopAtBounds
 
-        model: root.model ? root.model.parameters : null
+        model: root.model ? root.model.parametersList : null
 
         delegate: ParameterControl {
             paramModel: model.item

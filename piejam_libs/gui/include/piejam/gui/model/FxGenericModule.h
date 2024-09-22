@@ -6,7 +6,6 @@
 
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/GenericListModel.h>
-#include <piejam/gui/model/Subscribable.h>
 #include <piejam/runtime/fx/fwd.h>
 
 #include <memory>
@@ -14,11 +13,12 @@
 namespace piejam::gui::model
 {
 
-class FxGenericModule : public Subscribable<FxModule>
+class FxGenericModule : public FxModule
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractListModel* parameters READ parameters CONSTANT FINAL)
+    Q_PROPERTY(QAbstractListModel* parametersList READ parametersList CONSTANT
+                       FINAL)
 
 public:
     FxGenericModule(
@@ -32,8 +32,7 @@ public:
         return {};
     }
 
-    auto parameters() noexcept -> FxParametersList*;
-    auto parameters() const noexcept -> FxParametersList const*;
+    auto parametersList() noexcept -> FxParametersList*;
 
 private:
     void onSubscribe() override;

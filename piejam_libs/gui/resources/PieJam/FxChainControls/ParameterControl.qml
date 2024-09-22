@@ -91,15 +91,15 @@ Item {
                 currentIndex: root.paramModel ? root.paramModel.type : -1
 
                 ParameterTouchstrip {
-                    model: root.paramModel
+                    model: root.paramModel && root.paramModel.type === Parameter.Type.Float ? root.paramModel : null
                 }
 
                 IntSlider {
-                    model: root.paramModel
+                    model: root.paramModel && root.paramModel.type === Parameter.Type.Int ? root.paramModel : null
                 }
 
                 ParameterSwitch {
-                    model: root.paramModel
+                    model: root.paramModel && root.paramModel.type === Parameter.Type.Bool ? root.paramModel : null
                 }
             }
         }

@@ -86,70 +86,64 @@ FxScope::FxScope(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
-    : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(toBusType(
-              observe_once(runtime::selectors::make_fx_module_bus_type_selector(
-                      fx_mod_id)))))
+    : FxModule{store_dispatch, state_change_subscriber, fx_mod_id}
+    , m_impl(std::make_unique<Impl>(busType()))
 {
-    auto const parameters = observe_once(
-            runtime::selectors::make_fx_module_parameters_selector(fx_mod_id));
+    auto const& parameters = this->parameters();
 
     makeParameter(
             m_impl->mode,
-            parameters->at(to_underlying(parameter_key::mode)));
+            parameters.at(to_underlying(parameter_key::mode)));
 
     makeParameter(
             m_impl->triggerSlope,
-            parameters->at(to_underlying(parameter_key::trigger_slope)));
+            parameters.at(to_underlying(parameter_key::trigger_slope)));
 
     makeParameter(
             m_impl->triggerLevel,
-            parameters->at(to_underlying(parameter_key::trigger_level)));
+            parameters.at(to_underlying(parameter_key::trigger_level)));
 
     makeParameter(
             m_impl->holdTime,
-            parameters->at(to_underlying(parameter_key::hold_time)));
+            parameters.at(to_underlying(parameter_key::hold_time)));
 
     makeParameter(
             m_impl->waveformWindowSize,
-            parameters->at(to_underlying(parameter_key::waveform_window_size)));
+            parameters.at(to_underlying(parameter_key::waveform_window_size)));
 
     makeParameter(
             m_impl->scopeWindowSize,
-            parameters->at(to_underlying(parameter_key::scope_window_size)));
+            parameters.at(to_underlying(parameter_key::scope_window_size)));
 
     makeParameter(
             m_impl->activeA,
-            parameters->at(to_underlying(parameter_key::stream_a_active)));
+            parameters.at(to_underlying(parameter_key::stream_a_active)));
 
     makeParameter(
             m_impl->activeB,
-            parameters->at(to_underlying(parameter_key::stream_b_active)));
+            parameters.at(to_underlying(parameter_key::stream_b_active)));
 
     makeParameter(
             m_impl->channelA,
-            parameters->at(to_underlying(parameter_key::channel_a)));
+            parameters.at(to_underlying(parameter_key::channel_a)));
 
     makeParameter(
             m_impl->channelB,
-            parameters->at(to_underlying(parameter_key::channel_b)));
+            parameters.at(to_underlying(parameter_key::channel_b)));
 
     makeParameter(
             m_impl->gainA,
-            parameters->at(to_underlying(parameter_key::gain_a)));
+            parameters.at(to_underlying(parameter_key::gain_a)));
 
     makeParameter(
             m_impl->gainB,
-            parameters->at(to_underlying(parameter_key::gain_b)));
+            parameters.at(to_underlying(parameter_key::gain_b)));
 
     makeParameter(
             m_impl->freeze,
-            parameters->at(to_underlying(parameter_key::freeze)));
+            parameters.at(to_underlying(parameter_key::freeze)));
 
-    auto const streams = observe_once(
-            runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
-
-    makeStream(to_underlying(stream_key::input), m_impl->stream, *streams);
+    makeStream(to_underlying(stream_key::input), m_impl->stream, streams());
 
     m_impl->waveformGenerator.setActive(0, true);
     m_impl->waveformGenerator.setChannel(0, StereoChannel::Left);
@@ -328,12 +322,6 @@ auto
 FxScope::type() const noexcept -> FxModuleType
 {
     return {.id = internal_id()};
-}
-
-auto
-FxScope::busType() const noexcept -> BusType
-{
-    return m_impl->busType;
 }
 
 auto

@@ -46,35 +46,31 @@ FxFilter::FxFilter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
-    : Subscribable{store_dispatch, state_change_subscriber}
+    : FxModule{store_dispatch, state_change_subscriber, fx_mod_id}
 {
     auto const busType = observe_once(
             runtime::selectors::make_fx_module_bus_type_selector(fx_mod_id));
 
     m_impl = std::make_unique<Impl>(toBusType(busType));
 
-    auto const parameters = observe_once(
-            runtime::selectors::make_fx_module_parameters_selector(fx_mod_id));
+    auto const& parameters = this->parameters();
 
     makeParameter(
             m_impl->filterTypeParam,
-            parameters->at(to_underlying(parameter_key::type)));
+            parameters.at(to_underlying(parameter_key::type)));
 
     makeParameter(
             m_impl->cutoffParam,
-            parameters->at(to_underlying(parameter_key::cutoff)));
+            parameters.at(to_underlying(parameter_key::cutoff)));
 
     makeParameter(
             m_impl->resonanceParam,
-            parameters->at(to_underlying(parameter_key::resonance)));
-
-    auto const streams = observe_once(
-            runtime::selectors::make_fx_module_streams_selector(fx_mod_id));
+            parameters.at(to_underlying(parameter_key::resonance)));
 
     makeStream(
             to_underlying(stream_key::in_out),
             m_impl->inOutStream,
-            *streams);
+            streams());
 
     auto stereoChannel =
             bus_type_to(busType, StereoChannel::Left, StereoChannel::Right);

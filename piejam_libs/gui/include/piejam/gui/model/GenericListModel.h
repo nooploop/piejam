@@ -52,6 +52,11 @@ public:
         return s_roles;
     }
 
+    [[nodiscard]] auto size() const -> std::size_t
+    {
+        return m_list.size();
+    }
+
     void add(std::size_t const pos, std::unique_ptr<ListItem> item)
     {
         BOOST_ASSERT(pos <= m_list.size());
@@ -78,7 +83,8 @@ public:
 
     auto at(std::size_t pos) const -> ListItem const&
     {
-        return *m_list.at(pos);
+        BOOST_ASSERT(pos < m_list.size());
+        return *m_list[pos];
     }
 
 private:
