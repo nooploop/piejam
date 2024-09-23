@@ -4,6 +4,7 @@
 
 #include <piejam/audio/engine/pan_balance_processor.h>
 
+#include <piejam/audio/dsp/pan.h>
 #include <piejam/audio/engine/event_buffer.h>
 #include <piejam/audio/engine/event_buffer_memory.h>
 #include <piejam/audio/engine/event_input_buffers.h>
@@ -11,7 +12,6 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
-#include <piejam/audio/pan.h>
 
 #include <gtest/gtest.h>
 
@@ -55,7 +55,7 @@ TEST_P(pan_balance_processor_test, pan)
     auto const& left = ev_out_bufs.get<float>(0);
     auto const& right = ev_out_bufs.get<float>(1);
 
-    auto const expected = sinusoidal_constant_power_pan(GetParam());
+    auto const expected = dsp::sinusoidal_constant_power_pan(GetParam());
 
     ASSERT_EQ(1u, left.size());
     EXPECT_EQ(3u, left.begin()->offset());
@@ -77,7 +77,7 @@ TEST_P(pan_balance_processor_test, balance)
     auto const& left = ev_out_bufs.get<float>(0);
     auto const& right = ev_out_bufs.get<float>(1);
 
-    auto const expected = stereo_balance(GetParam());
+    auto const expected = dsp::stereo_balance(GetParam());
 
     ASSERT_EQ(1u, left.size());
     EXPECT_EQ(3u, left.begin()->offset());

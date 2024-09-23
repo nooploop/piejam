@@ -10,7 +10,7 @@
 
 #include <cmath>
 
-namespace piejam::audio
+namespace piejam::audio::dsp
 {
 
 class level_meter
@@ -63,4 +63,4 @@ private:
     double m_squared_sum{};
 };
 
-} // namespace piejam::audio
+} // namespace piejam::audio::dsp

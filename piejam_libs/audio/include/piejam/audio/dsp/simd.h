@@ -12,7 +12,7 @@
 #include <span>
 #include <type_traits>
 
-namespace piejam::audio::simd
+namespace piejam::audio::dsp::simd
 {
 
 inline constexpr auto is_aligned = [](auto&& p) {
@@ -236,4 +236,4 @@ interleave(I1&& in1, I2&& in2, I3&& in3, I4&& in4, std::span<T> out)
     }
 }
 
-} // namespace piejam::audio::simd
+} // namespace piejam::audio::dsp::simd

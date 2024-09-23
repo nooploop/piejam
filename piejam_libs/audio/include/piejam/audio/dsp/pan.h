@@ -9,12 +9,12 @@
 
 #include <numbers>
 
-namespace piejam::audio
+namespace piejam::audio::dsp
 {
 
 using stereo_gain = pair<float>;
 
-inline constexpr auto
+constexpr auto
 sinusoidal_constant_power_pan_exact(float pan_pos) -> stereo_gain
 {
     constexpr float const pi_div_4 = std::numbers::pi_v<float> / 4.f;
@@ -37,7 +37,7 @@ sinusoidal_constant_power_pan_exact(float pan_pos) -> stereo_gain
 //           (π^2 x^2)/(32 sqrt(2)) -
 //           (π^3 x^3)/(384 sqrt(2)) +
 //           (π^4 x^4)/(6144 sqrt(2))
-inline constexpr auto
+constexpr auto
 sinusoidal_constant_power_pan(float pan_pos) -> stereo_gain
 {
     constexpr float pi_f = std::numbers::pi_v<float>;
@@ -64,7 +64,7 @@ sinusoidal_constant_power_pan(float pan_pos) -> stereo_gain
     return {left, right};
 }
 
-inline constexpr auto
+constexpr auto
 stereo_balance(float balance_pos) -> stereo_gain
 {
     if (balance_pos < 0.f)
@@ -80,4 +80,4 @@ stereo_balance(float balance_pos) -> stereo_gain
     return stereo_gain{1.f};
 }
 
-} // namespace piejam::audio
+} // namespace piejam::audio::dsp

@@ -6,7 +6,7 @@
 
 #include <piejam/audio/engine/slice.h>
 
-#include <piejam/audio/simd.h>
+#include <piejam/audio/dsp/simd.h>
 #include <piejam/math.h>
 #include <piejam/switch_cast.h>
 
@@ -45,7 +45,7 @@ struct slice_add
         if (r_c != T{})
         {
             BOOST_ASSERT(l_buf.size() == m_out.size());
-            simd::transform(
+            dsp::simd::transform(
                     l_buf,
                     m_out.data(),
                     bhof::capture(mipp::Reg<T>(r_c))(std::plus<>{}));
@@ -71,7 +71,7 @@ struct slice_add
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
-        simd::transform(l_buf, r_buf.data(), m_out.data(), std::plus<>{});
+        dsp::simd::transform(l_buf, r_buf.data(), m_out.data(), std::plus<>{});
         return m_out;
     }
 
@@ -108,7 +108,7 @@ struct slice_multiply
 
             case switch_cast(T{-1}):
                 BOOST_ASSERT(l_buf.size() == m_out.size());
-                simd::transform(
+                dsp::simd::transform(
                         l_buf,
                         m_out.data(),
                         bhof::capture(mipp::Reg<T>(T{}))(std::minus<>{}));
@@ -116,7 +116,7 @@ struct slice_multiply
 
             default:
                 BOOST_ASSERT(l_buf.size() == m_out.size());
-                simd::transform(
+                dsp::simd::transform(
                         l_buf,
                         m_out.data(),
                         bhof::capture(mipp::Reg<T>(r_c))(std::multiplies<>{}));
@@ -138,7 +138,11 @@ struct slice_multiply
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
-        simd::transform(l_buf, r_buf.data(), m_out.data(), std::multiplies<>{});
+        dsp::simd::transform(
+                l_buf,
+                r_buf.data(),
+                m_out.data(),
+                std::multiplies<>{});
         return m_out;
     }
 
@@ -158,7 +162,7 @@ struct slice_clamp
         , m_out(out)
     {
         BOOST_ASSERT(min <= max);
-        BOOST_ASSERT(simd::is_aligned(out.data()));
+        BOOST_ASSERT(dsp::simd::is_aligned(out.data()));
     }
 
     constexpr auto
@@ -170,13 +174,16 @@ struct slice_clamp
     constexpr auto
     operator()(typename slice<T>::span_t const buf) const -> slice<T>
     {
-        BOOST_ASSERT(simd::is_aligned(buf.data()));
-        simd::transform(
+        BOOST_ASSERT(dsp::simd::is_aligned(buf.data()));
+        dsp::simd::transform(
                 buf,
                 m_out.data(),
                 [min = mipp::Reg<T>(m_min),
                  max = mipp::Reg<T>(m_max)](auto&& x) {
-                    return simd::clamp(std::forward<decltype(x)>(x), min, max);
+                    return dsp::simd::clamp(
+                            std::forward<decltype(x)>(x),
+                            min,
+                            max);
                 });
         return m_out;
     }
@@ -263,7 +270,7 @@ struct slice_transform
     operator()(typename slice<T>::span_t const buf) const noexcept -> slice<T>
     {
         BOOST_ASSERT(buf.size() == m_out.size());
-        simd::transform(buf, m_out.data(), m_f);
+        dsp::simd::transform(buf, m_out.data(), m_f);
         return m_out;
     }
 
@@ -283,13 +290,13 @@ struct slice_interleave
     template <class I1, class I2>
     constexpr void operator()(I1&& l, I2&& r) const noexcept
     {
-        simd::interleave(std::forward<I1>(l), std::forward<I2>(r), m_out);
+        dsp::simd::interleave(std::forward<I1>(l), std::forward<I2>(r), m_out);
     }
 
     template <class I1, class I2, class I3, class I4>
     constexpr void operator()(I1&& i1, I2&& i2, I3&& i3, I4&& i4) const noexcept
     {
-        simd::interleave(
+        dsp::simd::interleave(
                 std::forward<I1>(i1),
                 std::forward<I2>(i2),
                 std::forward<I3>(i3),

@@ -4,13 +4,13 @@
 
 #include <piejam/audio/engine/smoother_processor.h>
 
+#include <piejam/audio/dsp/smoother.h>
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/single_event_input_processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/audio/smoother.h>
 
 #include <boost/assert.hpp>
 
@@ -111,7 +111,7 @@ public:
 
 private:
     std::size_t const m_smooth_length{};
-    smoother<float> m_smoother;
+    dsp::smoother<float> m_smoother;
 };
 
 class event_smoother_processor final
@@ -211,7 +211,7 @@ private:
     std::size_t const m_smooth_steps;
     std::size_t const m_step_length;
     std::size_t m_counter{};
-    smoother<float> m_smoother;
+    dsp::smoother<float> m_smoother;
 };
 
 } // namespace

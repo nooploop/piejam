@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/audio/dsp/simd.h>
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
@@ -11,7 +12,6 @@
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
-#include <piejam/audio/simd.h>
 
 #include <boost/assert.hpp>
 
@@ -32,12 +32,12 @@ verify_process_context(
     BOOST_ASSERT(proc.event_outputs().size() == ctx.event_outputs.size());
     BOOST_ASSERT(std::ranges::all_of(ctx.inputs, [&](audio_slice const& b) {
         return b.is_constant() || (b.span().size() == ctx.buffer_size &&
-                                   simd::is_aligned(b.span().data()));
+                                   dsp::simd::is_aligned(b.span().data()));
     }));
     BOOST_ASSERT(
             std::ranges::all_of(ctx.outputs, [&](std::span<float> const b) {
                 return b.data() && (b.size() == ctx.buffer_size &&
-                                    simd::is_aligned(b.data()));
+                                    dsp::simd::is_aligned(b.data()));
             }));
     BOOST_ASSERT(std::ranges::equal(
             proc.event_inputs(),

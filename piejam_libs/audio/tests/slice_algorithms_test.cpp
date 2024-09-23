@@ -4,7 +4,7 @@
 
 #include <piejam/audio/engine/slice_algorithms.h>
 
-#include <piejam/audio/simd.h>
+#include <piejam/audio/dsp/simd.h>
 
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>

@@ -14,8 +14,8 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/update_state_action.h>
 
+#include <piejam/audio/dsp/simd.h>
 #include <piejam/audio/multichannel_buffer.h>
-#include <piejam/audio/simd.h>
 #include <piejam/system/file_utils.h>
 
 #include <sndfile.hh>
@@ -183,7 +183,7 @@ struct recorder_action_visitor
                                     .cast<audio::multichannel_layout_non_interleaved,
                                           2>();
                     interleaved.resize(stereo_view.samples().size());
-                    audio::simd::interleave(
+                    audio::dsp::simd::interleave(
                             std::span{stereo_view.channels()[0]},
                             std::span{stereo_view.channels()[1]},
                             std::span{interleaved});

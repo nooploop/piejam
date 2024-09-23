@@ -6,11 +6,10 @@
 
 #include <boost/assert.hpp>
 
-#include <algorithm>
 #include <concepts>
 #include <iterator>
 
-namespace piejam::audio
+namespace piejam::audio::dsp
 {
 
 template <std::floating_point T = float>
@@ -130,4 +129,4 @@ private:
     T m_target{};
 };
 
-} // namespace piejam::audio
+} // namespace piejam::audio::dsp

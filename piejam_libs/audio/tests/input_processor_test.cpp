@@ -4,12 +4,12 @@
 
 #include <piejam/audio/engine/input_processor.h>
 
+#include <piejam/audio/dsp/simd.h>
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/slice.h>
-#include <piejam/audio/simd.h>
 
 #include <gtest/gtest.h>
 

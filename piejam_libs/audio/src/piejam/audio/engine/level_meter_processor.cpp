@@ -4,11 +4,11 @@
 
 #include <piejam/audio/engine/level_meter_processor.h>
 
+#include <piejam/audio/dsp/level_meter.h>
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/verify_process_context.h>
-#include <piejam/audio/level_meter.h>
 #include <piejam/audio/sample_rate.h>
 
 #include <boost/hof/match.hpp>
@@ -59,7 +59,7 @@ public:
     void process(engine::process_context const&) override;
 
 private:
-    level_meter m_lm;
+    dsp::level_meter m_lm;
 };
 
 level_meter_processor::level_meter_processor(
