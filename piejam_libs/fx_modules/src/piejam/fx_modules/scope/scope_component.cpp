@@ -4,18 +4,16 @@
 
 #include <piejam/fx_modules/scope/scope_component.h>
 
-#include <piejam/audio/engine/component.h>
-#include <piejam/audio/engine/endpoint_ports.h>
-#include <piejam/audio/sample_rate.h>
 #include <piejam/fx_modules/scope/scope_module.h>
+
+#include <piejam/audio/engine/component.h>
+#include <piejam/audio/sample_rate.h>
 #include <piejam/runtime/components/stream.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/internal_fx_component_factory.h>
 #include <piejam/to_underlying.h>
 
 #include <boost/container/flat_map.hpp>
-
-#include <array>
 
 namespace piejam::fx_modules::scope
 {

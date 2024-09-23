@@ -76,6 +76,7 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/MixerDbScales.h
     include/piejam/gui/model/Parameter.h
     include/piejam/gui/model/ParameterId.h
+    include/piejam/gui/model/PitchGenerator.h
     include/piejam/gui/model/RootView.h
     include/piejam/gui/model/ScopeData.h
     include/piejam/gui/model/ScopeDataGenerator.h
@@ -116,6 +117,7 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/FxBrowserEntryLADSPA.cpp
     src/piejam/gui/model/FxChainModule.cpp
     src/piejam/gui/model/FxGenericModule.cpp
+    src/piejam/gui/model/FxModule.cpp
     src/piejam/gui/model/FxModuleRegistry.cpp
     src/piejam/gui/model/FxModuleView.cpp
     src/piejam/gui/model/FxStream.cpp
@@ -133,13 +135,13 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/MixerChannelPerform.cpp
     src/piejam/gui/model/MixerDbScales.cpp
     src/piejam/gui/model/Parameter.cpp
+    src/piejam/gui/model/PitchGenerator.cpp
     src/piejam/gui/model/RootView.cpp
     src/piejam/gui/model/ScopeDataGenerator.cpp
     src/piejam/gui/model/SpectrumDataGenerator.cpp
     src/piejam/gui/model/StereoLevelParameter.cpp
     src/piejam/gui/model/WaveformDataGenerator.cpp
     src/piejam/gui/qt_log.cpp
-    src/piejam/gui/model/FxModule.cpp
 )
 
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -155,7 +157,8 @@ target_link_libraries(piejam_gui
     piejam_algorithm
     piejam_log
     piejam_numeric
-    piejam_runtime)
+    piejam_runtime
+)
 target_compile_options(piejam_gui PRIVATE -Wall -Wextra -Werror -pedantic-errors)
 
 add_subdirectory(tests)

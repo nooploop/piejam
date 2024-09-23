@@ -14,6 +14,8 @@ add_library(piejam_audio STATIC
     include/piejam/audio/dsp/envelope_follower.h
     include/piejam/audio/dsp/level_meter.h
     include/piejam/audio/dsp/pan.h
+    include/piejam/audio/dsp/pitch_yin.h
+    include/piejam/audio/dsp/rms.h
     include/piejam/audio/dsp/simd.h
     include/piejam/audio/dsp/smoother.h
     include/piejam/audio/engine/audio_slice.h

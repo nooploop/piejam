@@ -11,10 +11,10 @@
 
 #include <memory>
 
-namespace piejam::fx_modules::spectrum
+namespace piejam::fx_modules::tuner
 {
 
 auto make_component(runtime::internal_fx_component_factory_args const&)
         -> std::unique_ptr<audio::engine::component>;
 
-} // namespace piejam::fx_modules::spectrum
+} // namespace piejam::fx_modules::tuner

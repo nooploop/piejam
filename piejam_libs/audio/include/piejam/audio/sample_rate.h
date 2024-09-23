@@ -40,6 +40,7 @@ public:
         return static_cast<int>(m_value);
     }
 
+    template <std::floating_point T = float>
     [[nodiscard]] constexpr auto as_float() const noexcept -> float
     {
         return static_cast<float>(m_value);

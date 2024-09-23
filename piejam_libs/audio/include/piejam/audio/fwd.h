@@ -28,6 +28,8 @@ class period_count;
 class period_size;
 class sample_rate;
 
+struct pitch;
+
 enum class multichannel_layout : bool;
 template <class T, class Layout, std::size_t NumChannels>
 class multichannel_view;

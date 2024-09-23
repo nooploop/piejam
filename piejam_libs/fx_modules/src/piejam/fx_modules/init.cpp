@@ -12,6 +12,8 @@
 #include <piejam/fx_modules/spectrum/spectrum_internal_id.h>
 #include <piejam/fx_modules/tool/gui/FxTool.h>
 #include <piejam/fx_modules/tool/tool_internal_id.h>
+#include <piejam/fx_modules/tuner/gui/FxTuner.h>
+#include <piejam/fx_modules/tuner/tuner_internal_id.h>
 
 #include <QDir>
 #include <QtQml>
@@ -28,6 +30,7 @@ initResources()
     qRegisterMetaType<piejam::fx_modules::scope::gui::FxScope*>();
     qRegisterMetaType<piejam::fx_modules::spectrum::gui::FxSpectrum*>();
     qRegisterMetaType<piejam::fx_modules::tool::gui::FxTool*>();
+    qRegisterMetaType<piejam::fx_modules::tuner::gui::FxTuner*>();
 
     qmlRegisterUncreatableType<piejam::fx_modules::scope::gui::FxScope>(
             "PieJam.FxModules.Models",
@@ -52,6 +55,7 @@ init()
         scope::internal_id();
         spectrum::internal_id();
         tool::internal_id();
+        tuner::internal_id();
     });
 }
 

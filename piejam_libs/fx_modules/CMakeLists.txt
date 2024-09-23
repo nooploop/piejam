@@ -23,55 +23,64 @@ set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)
 add_library(piejam_fx_modules STATIC
     ${RESOURCES}
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/init.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/module_registration.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/init.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/module_registration.cpp
+    include/piejam/fx_modules/init.h
+    include/piejam/fx_modules/module_registration.h
+    src/piejam/fx_modules/init.cpp
+    src/piejam/fx_modules/module_registration.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/filter/filter_component.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/filter/filter_internal_id.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/filter/filter_module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/filter/gui/FxFilter.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/filter/filter_component.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/filter/filter_internal_id.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/filter/filter_module.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/filter/gui/FxFilter.cpp
+    include/piejam/fx_modules/filter/filter_component.h
+    include/piejam/fx_modules/filter/filter_internal_id.h
+    include/piejam/fx_modules/filter/filter_module.h
+    include/piejam/fx_modules/filter/gui/FxFilter.h
+    src/piejam/fx_modules/filter/filter_component.cpp
+    src/piejam/fx_modules/filter/filter_internal_id.cpp
+    src/piejam/fx_modules/filter/filter_module.cpp
+    src/piejam/fx_modules/filter/gui/FxFilter.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/scope/gui/FxScope.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/scope/scope_component.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/scope/scope_internal_id.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/scope/scope_module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/scope/gui/FxScope.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/scope/scope_component.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/scope/scope_internal_id.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/scope/scope_module.cpp
+    include/piejam/fx_modules/scope/gui/FxScope.h
+    include/piejam/fx_modules/scope/scope_component.h
+    include/piejam/fx_modules/scope/scope_internal_id.h
+    include/piejam/fx_modules/scope/scope_module.h
+    src/piejam/fx_modules/scope/gui/FxScope.cpp
+    src/piejam/fx_modules/scope/scope_component.cpp
+    src/piejam/fx_modules/scope/scope_internal_id.cpp
+    src/piejam/fx_modules/scope/scope_module.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/spectrum/gui/FxSpectrum.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/spectrum/spectrum_component.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/spectrum/spectrum_internal_id.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/spectrum/spectrum_module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/spectrum/gui/FxSpectrum.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/spectrum/spectrum_component.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/spectrum/spectrum_internal_id.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/spectrum/spectrum_module.cpp
+    include/piejam/fx_modules/spectrum/gui/FxSpectrum.h
+    include/piejam/fx_modules/spectrum/spectrum_component.h
+    include/piejam/fx_modules/spectrum/spectrum_internal_id.h
+    include/piejam/fx_modules/spectrum/spectrum_module.h
+    src/piejam/fx_modules/spectrum/gui/FxSpectrum.cpp
+    src/piejam/fx_modules/spectrum/spectrum_component.cpp
+    src/piejam/fx_modules/spectrum/spectrum_internal_id.cpp
+    src/piejam/fx_modules/spectrum/spectrum_module.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/dual_pan/gui/FxDualPan.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/dual_pan/dual_pan_component.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/dual_pan/dual_pan_internal_id.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/dual_pan/dual_pan_module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/dual_pan/gui/FxDualPan.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/dual_pan/dual_pan_component.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/dual_pan/dual_pan_internal_id.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/dual_pan/dual_pan_module.cpp
+    include/piejam/fx_modules/dual_pan/gui/FxDualPan.h
+    include/piejam/fx_modules/dual_pan/dual_pan_component.h
+    include/piejam/fx_modules/dual_pan/dual_pan_internal_id.h
+    include/piejam/fx_modules/dual_pan/dual_pan_module.h
+    src/piejam/fx_modules/dual_pan/gui/FxDualPan.cpp
+    src/piejam/fx_modules/dual_pan/dual_pan_component.cpp
+    src/piejam/fx_modules/dual_pan/dual_pan_internal_id.cpp
+    src/piejam/fx_modules/dual_pan/dual_pan_module.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/tool/gui/FxTool.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/tool/tool_component.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/tool/tool_internal_id.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/fx_modules/tool/tool_module.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/tool/gui/FxTool.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/tool/tool_component.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/tool/tool_internal_id.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/fx_modules/tool/tool_module.cpp
+    include/piejam/fx_modules/tool/gui/FxTool.h
+    include/piejam/fx_modules/tool/tool_component.h
+    include/piejam/fx_modules/tool/tool_internal_id.h
+    include/piejam/fx_modules/tool/tool_module.h
+    src/piejam/fx_modules/tool/gui/FxTool.cpp
+    src/piejam/fx_modules/tool/tool_component.cpp
+    src/piejam/fx_modules/tool/tool_internal_id.cpp
+    src/piejam/fx_modules/tool/tool_module.cpp
+
+    include/piejam/fx_modules/tuner/tuner_internal_id.h
+    src/piejam/fx_modules/tuner/tuner_internal_id.cpp
+    include/piejam/fx_modules/tuner/gui/FxTuner.h
+    include/piejam/fx_modules/tuner/tuner_component.h
+    include/piejam/fx_modules/tuner/tuner_module.h
+    src/piejam/fx_modules/tuner/tuner_module.cpp
+    src/piejam/fx_modules/tuner/tuner_component.cpp
+    src/piejam/fx_modules/tuner/gui/FxTuner.cpp
 )
 
 target_include_directories(piejam_fx_modules PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -12,8 +12,6 @@
 
 #include <QString>
 
-#include <functional>
-#include <memory>
 #include <string>
 
 namespace piejam::fx_modules

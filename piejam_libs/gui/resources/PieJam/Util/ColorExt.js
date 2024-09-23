@@ -7,3 +7,11 @@
 function setAlpha(color, alpha) {
     return Qt.rgba(color.r, color.g, color.b, alpha)
 }
+
+function mapNormalized(n, from, to) {
+    return Qt.rgba(
+                from.r + n * (to.r - from.r),
+                from.g + n * (to.g - from.g),
+                from.b + n * (to.b - from.b),
+                from.a + n * (to.a - from.a))
+}

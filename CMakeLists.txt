@@ -42,7 +42,7 @@ else()
 endif()
 configure_file("CTestCustom.cmake.in" "CTestCustom.cmake")
 
-find_package(Boost COMPONENTS program_options)
+find_package(Boost CONFIG)
 find_package(spdlog REQUIRED)
 find_package(fmt REQUIRED)
 
@@ -54,7 +54,7 @@ set_target_properties(FFTW::Float
     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${FFTW3_INCLUDE_DIRS}"
     INTERFACE_LINK_LIBRARIES "${FFTW3_LINK_LIBRARIES}"
     INTERFACE_COMPILE_OPTIONS "${FFTW3_CFLAGS}"
-    )
+)
 
 pkg_search_module(SNDFILE REQUIRED sndfile)
 add_library(SndFile::sndfile INTERFACE IMPORTED)
@@ -62,7 +62,7 @@ set_target_properties(SndFile::sndfile
     PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${SNDFILE_INCLUDE_DIRS}"
     INTERFACE_LINK_LIBRARIES "${SNDFILE_LINK_LIBRARIES}"
     INTERFACE_COMPILE_OPTIONS "${SNDFILE_CFLAGS}"
-    )
+)
 
 add_library(nod INTERFACE)
 target_include_directories(nod SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/libs/nod/include)

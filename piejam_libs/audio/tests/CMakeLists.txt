@@ -10,6 +10,8 @@ add_executable(piejam_audio_test
     clip_processor_test.cpp
     component_mock.h
     dag_test.cpp
+    dsp_pitch_yin_test.cpp
+    dsp_rms_test.cpp
     event_buffer_memory_test.cpp
     event_buffer_test.cpp
     event_converter_processor_test.cpp
@@ -19,6 +21,7 @@ add_executable(piejam_audio_test
     event_test.cpp
     event_to_audio_processor_test.cpp
     fake_processor.h
+    generate_sine.h
     graph_algorithms_test.cpp
     graph_test.cpp
     graph_to_dag_test.cpp

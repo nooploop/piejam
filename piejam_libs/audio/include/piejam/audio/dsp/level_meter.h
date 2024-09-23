@@ -15,8 +15,8 @@ namespace piejam::audio::dsp
 
 class level_meter
 {
-    static inline constexpr float const peak_decay_time = 0.4f;  // in sec
-    static inline constexpr float const rms_measure_time = 0.8f; // in sec
+    static constexpr float const peak_decay_time = 0.4f;  // in sec
+    static constexpr float const rms_measure_time = 0.8f; // in sec
 
 public:
     using value_type = float;

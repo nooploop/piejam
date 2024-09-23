@@ -39,7 +39,7 @@ template <class Args, class Result, class StreamProcessorFactory>
 struct StreamProcessor
 {
     explicit StreamProcessor(std::span<BusType const> substreamConfigs)
-        : results{substreamConfigs.size()}
+        : results(substreamConfigs.size())
     {
         configs.reserve(substreamConfigs.size());
         processors.reserve(substreamConfigs.size());

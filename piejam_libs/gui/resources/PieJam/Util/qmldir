@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2020-2024 Dimitrij Kotrev
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+module PieJam.Util
+ColorExt 1.0 ColorExt.js
+DbConvert 1.0 DbConvert.js
+MathExt 1.0 MathExt.js

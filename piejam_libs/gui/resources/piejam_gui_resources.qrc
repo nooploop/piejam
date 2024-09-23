@@ -9,6 +9,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>Main.qml</file>
         <file>PieJam/Controls/BusyLoader.qml</file>
         <file>PieJam/Controls/Circle.qml</file>
+        <file>PieJam/Controls/ComboBoxElided.qml</file>
         <file>PieJam/Controls/CpuLoadMeter.qml</file>
         <file>PieJam/Controls/DiskSpaceIndicator.qml</file>
         <file>PieJam/Controls/HeaderLabel.qml</file>
@@ -38,7 +39,9 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Info.qml</file>
         <file>PieJam/MidiAssignable.qml</file>
         <file>PieJam/MidiLearn.qml</file>
+        <file>PieJam/MixerControls/AudioRoutingComboBox.qml</file>
         <file>PieJam/MixerControls/ChannelAddStrip.qml</file>
+        <file>PieJam/MixerControls/ChannelAuxSend.qml</file>
         <file>PieJam/MixerControls/ChannelControls.qml</file>
         <file>PieJam/MixerControls/ChannelEditStrip.qml</file>
         <file>PieJam/MixerControls/ChannelFxStrip.qml</file>
@@ -55,14 +58,15 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/SettingsControls/AudioDeviceSettings.qml</file>
         <file>PieJam/SettingsControls/AudioInputOutputSettings.qml</file>
         <file>PieJam/SettingsControls/AudioSettings.qml</file>
-        <file>PieJam/SettingsControls/ExternalAudioDeviceConfig.qml</file>
         <file>PieJam/SettingsControls/ComboBoxSetting.qml</file>
+        <file>PieJam/SettingsControls/ExternalAudioDeviceConfig.qml</file>
         <file>PieJam/SettingsControls/MidiDeviceConfig.qml</file>
         <file>PieJam/SettingsControls/MidiSettings.qml</file>
         <file>PieJam/SubscribableItem.qml</file>
         <file>PieJam/Util/ColorExt.js</file>
         <file>PieJam/Util/DbConvert.js</file>
         <file>PieJam/Util/MathExt.js</file>
+        <file>PieJam/Util/qmldir</file>
         <file>PieJam/Views/FxBrowser.qml</file>
         <file>PieJam/Views/FxModule.qml</file>
         <file>PieJam/Views/Log.qml</file>
@@ -78,10 +82,11 @@ SPDX-License-Identifier: CC0-1.0
         <file>PieJam/Views/qmldir</file>
         <file>PieJam/qmldir</file>
         <file>images/icons/arrow-expand-vertical.svg</file>
-        <file>images/icons/cycle_arrows.svg</file>
+        <file>images/icons/aux.svg</file>
         <file>images/icons/chevron-down.svg</file>
         <file>images/icons/chevron-up.svg</file>
         <file>images/icons/cog.svg</file>
+        <file>images/icons/cycle_arrows.svg</file>
         <file>images/icons/info.svg</file>
         <file>images/icons/micro-sd.svg</file>
         <file>images/icons/midi-port.svg</file>
@@ -89,9 +94,5 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/power.svg</file>
         <file>images/icons/tune-vertical.svg</file>
         <file>qtquickcontrols2.conf</file>
-        <file>PieJam/MixerControls/AudioRoutingComboBox.qml</file>
-        <file>PieJam/MixerControls/ChannelAuxSend.qml</file>
-        <file>images/icons/aux.svg</file>
-        <file>PieJam/Controls/ComboBoxElided.qml</file>
     </qresource>
 </RCC>
