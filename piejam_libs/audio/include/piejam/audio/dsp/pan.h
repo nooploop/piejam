@@ -5,8 +5,9 @@
 #pragma once
 
 #include <piejam/audio/pair.h>
-#include <piejam/math.h>
+#include <piejam/numeric/pow_n.h>
 
+#include <cmath>
 #include <numbers>
 
 namespace piejam::audio::dsp
@@ -69,12 +70,12 @@ stereo_balance(float balance_pos) -> stereo_gain
 {
     if (balance_pos < 0.f)
     {
-        return stereo_gain{1.f, math::pow3(1 + balance_pos)};
+        return stereo_gain{1.f, numeric::pow_n<3>(1 + balance_pos)};
     }
 
     if (balance_pos > 0.f)
     {
-        return stereo_gain{math::pow3(1 - balance_pos), 1.f};
+        return stereo_gain{numeric::pow_n<3>(1 - balance_pos), 1.f};
     }
 
     return stereo_gain{1.f};

@@ -13,13 +13,6 @@
 namespace piejam::math
 {
 
-template <class T>
-[[nodiscard]] constexpr auto
-pow3(T const x) noexcept -> T
-{
-    return x * x * x;
-}
-
 template <std::floating_point T>
 constexpr inline T negative_inf = -std::numeric_limits<T>::infinity();
 

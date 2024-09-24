@@ -3,17 +3,18 @@
 # SPDX-License-Identifier: CC0-1.0
 
 add_library(piejam_numeric STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/bitops.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/dft.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/endian.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/fwd.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/intops.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/intx.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/limits.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/rolling_mean.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/type_traits.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/numeric/window.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/piejam/numeric/dft.cpp
+    include/piejam/numeric/bitops.h
+    include/piejam/numeric/dft.h
+    include/piejam/numeric/endian.h
+    include/piejam/numeric/fwd.h
+    include/piejam/numeric/intops.h
+    include/piejam/numeric/intx.h
+    include/piejam/numeric/limits.h
+    include/piejam/numeric/pow_n.h
+    include/piejam/numeric/rolling_mean.h
+    include/piejam/numeric/type_traits.h
+    include/piejam/numeric/window.h
+    src/piejam/numeric/dft.cpp
 )
 
 target_include_directories(piejam_numeric PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
