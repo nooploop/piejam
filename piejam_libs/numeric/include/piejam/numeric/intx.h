@@ -4,36 +4,36 @@
 
 #pragma once
 
-#include <type_traits>
+#include <compare>
+#include <concepts>
 
 namespace piejam::numeric
 {
 
 #pragma pack(push, 1)
 
-template <class Integer, std::size_t Bits>
+template <std::integral Integer, std::size_t Bits>
 struct intx_t
 {
+    static_assert(sizeof(Integer) * 8 >= Bits);
+
     Integer value : Bits;
 
     constexpr intx_t() noexcept
-        : value(0)
+        : value{0}
     {
     }
 
-    template <class OtherInteger>
+    template <std::integral OtherInteger>
     constexpr intx_t(intx_t<OtherInteger, Bits> const& other) noexcept
         : value{static_cast<Integer>(other.value)}
     {
     }
 
-    template <
-            class T,
-            std::enable_if_t<
-                    std::is_floating_point_v<T> || std::is_integral_v<T>,
-                    bool> = true>
+    template <class T>
+        requires std::integral<T> || std::floating_point<T>
     constexpr intx_t(T x)
-        : value(x)
+        : value{static_cast<Integer>(x)}
     {
     }
 
@@ -43,19 +43,16 @@ struct intx_t
         return static_cast<T>(value);
     }
 
-    template <class T>
-    [[nodiscard]] constexpr auto operator/(T const x) const noexcept
-            -> std::enable_if_t<std::is_floating_point_v<T>, T>
+    template <std::floating_point T>
+    [[nodiscard]] constexpr auto operator/(T const x) const noexcept -> T
     {
         return value / x;
     }
 
-    [[nodiscard]] constexpr auto operator==(intx_t other) const noexcept -> bool
-    {
-        return value == other.value;
-    }
+    [[nodiscard]] constexpr auto
+    operator<=>(intx_t const&) const noexcept = default;
 
-    template <class ShiftInt>
+    template <std::integral ShiftInt>
     [[nodiscard]] constexpr auto
     operator<<(ShiftInt shift) const noexcept -> intx_t
     {

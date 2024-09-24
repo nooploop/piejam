@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <concepts>
 #include <type_traits>
 
 namespace piejam::numeric
 {
 
-template <class, std::size_t>
+template <std::integral, std::size_t>
 struct intx_t;
 
 template <class T>
@@ -17,7 +18,7 @@ struct make_signed : std::make_signed<T>
 {
 };
 
-template <class Integer, std::size_t Bits>
+template <std::integral Integer, std::size_t Bits>
 struct make_signed<intx_t<Integer, Bits>>
 {
     using type = intx_t<std::make_signed_t<Integer>, Bits>;
@@ -31,7 +32,7 @@ struct is_signed : std::is_signed<T>
 {
 };
 
-template <class Integer, std::size_t Bits>
+template <std::integral Integer, std::size_t Bits>
 struct is_signed<intx_t<Integer, Bits>> : std::is_signed<Integer>
 {
 };
@@ -44,7 +45,7 @@ struct is_integral : std::is_integral<T>
 {
 };
 
-template <class Integer, std::size_t Bits>
+template <std::integral Integer, std::size_t Bits>
 struct is_integral<intx_t<Integer, Bits>> : std::is_integral<Integer>
 {
 };
