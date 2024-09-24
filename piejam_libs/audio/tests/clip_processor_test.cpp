@@ -24,7 +24,7 @@ struct clip_processor_test : testing::Test
     audio::engine::event_input_buffers ev_in_bufs;
     audio::engine::event_output_buffers ev_out_bufs;
     static constexpr std::size_t const buffer_size{4};
-    std::array<float, buffer_size> out0;
+    alignas(mipp::RequiredAlignment) std::array<float, buffer_size> out0;
     std::array<std::span<float>, 1> outputs{out0};
     std::array<audio_slice, 1> results;
     audio::engine::process_context ctx{
