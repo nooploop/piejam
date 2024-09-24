@@ -58,7 +58,8 @@ struct session
         using base_t::base_t;
         using base_t::operator=;
 
-        [[nodiscard]] auto as_variant() const noexcept -> base_t const&
+        [[nodiscard]]
+        auto as_variant() const noexcept -> base_t const&
         {
             return *this;
         }

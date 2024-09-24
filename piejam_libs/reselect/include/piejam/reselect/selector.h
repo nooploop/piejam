@@ -25,7 +25,8 @@ public:
     {
     }
 
-    [[nodiscard]] auto get(State const& st) const -> Value
+    [[nodiscard]]
+    auto get(State const& st) const -> Value
     {
         return m_f(st);
     }

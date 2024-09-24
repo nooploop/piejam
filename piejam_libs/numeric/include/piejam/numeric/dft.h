@@ -17,9 +17,12 @@ public:
     explicit dft(std::size_t size);
     ~dft();
 
-    [[nodiscard]] auto size() const noexcept -> std::size_t;
-    [[nodiscard]] auto input_buffer() const noexcept -> std::span<float>;
-    [[nodiscard]] auto output_size() const noexcept -> std::size_t;
+    [[nodiscard]]
+    auto size() const noexcept -> std::size_t;
+    [[nodiscard]]
+    auto input_buffer() const noexcept -> std::span<float>;
+    [[nodiscard]]
+    auto output_size() const noexcept -> std::size_t;
 
     auto process() -> std::span<std::complex<float> const>;
 

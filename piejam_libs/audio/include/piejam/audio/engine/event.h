@@ -34,17 +34,20 @@ public:
     {
     }
 
-    [[nodiscard]] auto offset() const noexcept -> std::size_t
+    [[nodiscard]]
+    auto offset() const noexcept -> std::size_t
     {
         return m_offset;
     }
 
-    [[nodiscard]] auto value() const noexcept -> T const&
+    [[nodiscard]]
+    auto value() const noexcept -> T const&
     {
         return m_value;
     }
 
-    [[nodiscard]] auto operator==(event const&) const -> bool = default;
+    [[nodiscard]]
+    auto operator==(event const&) const -> bool = default;
 
 private:
     std::size_t m_offset{};

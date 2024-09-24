@@ -9,13 +9,15 @@
 namespace piejam::audio::engine
 {
 
-[[nodiscard]] inline auto
+[[nodiscard]]
+inline auto
 is_mono_in_out_processor(processor const& p) -> bool
 {
     return p.num_inputs() == 1 && p.num_outputs() == 1;
 }
 
-[[nodiscard]] inline auto
+[[nodiscard]]
+inline auto
 is_stereo_in_out_processor(processor const& p) -> bool
 {
     return p.num_inputs() == 2 && p.num_outputs() == 2;

@@ -17,7 +17,8 @@ template <std::floating_point T>
 constexpr inline T negative_inf = -std::numeric_limits<T>::infinity();
 
 template <std::floating_point T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 to_dB(T const log, T const min_log = T{}) -> T
 {
     static_assert(std::numeric_limits<T>::is_iec559, "IEEE 754 required");
@@ -25,14 +26,16 @@ to_dB(T const log, T const min_log = T{}) -> T
 }
 
 template <std::floating_point T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 from_dB(T const dB, T const min_dB = negative_inf<T>) -> T
 {
     return dB <= min_dB ? T{} : std::pow(T{10}, dB / T{20});
 }
 
 template <class T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 clamp(T v, T const min, T const max) -> T
     requires(std::is_arithmetic_v<T>)
 {
@@ -50,7 +53,8 @@ clamp(T v, T const min, T const max) -> T
 }
 
 template <std::floating_point T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 linear_map(
         T const v,
         T const src_lo,

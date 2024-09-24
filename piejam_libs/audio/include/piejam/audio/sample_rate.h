@@ -21,27 +21,32 @@ public:
     {
     }
 
-    [[nodiscard]] constexpr auto valid() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto valid() const noexcept -> bool
     {
         return m_value != 0;
     }
-    [[nodiscard]] constexpr auto invalid() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto invalid() const noexcept -> bool
     {
         return m_value == 0;
     }
 
-    [[nodiscard]] constexpr auto value() const noexcept -> unsigned
+    [[nodiscard]]
+    constexpr auto value() const noexcept -> unsigned
     {
         return m_value;
     }
 
-    [[nodiscard]] constexpr auto as_int() const noexcept -> int
+    [[nodiscard]]
+    constexpr auto as_int() const noexcept -> int
     {
         return static_cast<int>(m_value);
     }
 
     template <std::floating_point T = float>
-    [[nodiscard]] constexpr auto as_float() const noexcept -> float
+    [[nodiscard]]
+    constexpr auto as_float() const noexcept -> float
     {
         return static_cast<float>(m_value);
     }

@@ -19,7 +19,8 @@ public:
     virtual auto load(plugin_descriptor const&) -> instance_id = 0;
     virtual void unload(instance_id const&) = 0;
 
-    [[nodiscard]] virtual auto control_inputs(instance_id const&) const
+    [[nodiscard]]
+    virtual auto control_inputs(instance_id const&) const
             -> std::span<port_descriptor const> = 0;
 };
 

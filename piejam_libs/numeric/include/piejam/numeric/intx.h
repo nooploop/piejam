@@ -38,29 +38,31 @@ struct intx_t
     }
 
     template <class T>
-    [[nodiscard]] constexpr explicit operator T() const noexcept
+    [[nodiscard]]
+    constexpr explicit operator T() const noexcept
     {
         return static_cast<T>(value);
     }
 
     template <std::floating_point T>
-    [[nodiscard]] constexpr auto operator/(T const x) const noexcept -> T
+    [[nodiscard]]
+    constexpr auto operator/(T const x) const noexcept -> T
     {
         return value / x;
     }
 
-    [[nodiscard]] constexpr auto
-    operator<=>(intx_t const&) const noexcept = default;
+    [[nodiscard]]
+    constexpr auto operator<=>(intx_t const&) const noexcept = default;
 
     template <std::integral ShiftInt>
-    [[nodiscard]] constexpr auto
-    operator<<(ShiftInt shift) const noexcept -> intx_t
+    [[nodiscard]]
+    constexpr auto operator<<(ShiftInt shift) const noexcept -> intx_t
     {
         return value << shift;
     }
 
-    [[nodiscard]] constexpr auto
-    operator^(intx_t other) const noexcept -> intx_t
+    [[nodiscard]]
+    constexpr auto operator^(intx_t other) const noexcept -> intx_t
     {
         return value ^ other.value;
     }

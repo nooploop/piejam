@@ -82,7 +82,8 @@ public:
         BOOST_ASSERT(m_data.size() % NumChannels == 0);
     }
 
-    [[nodiscard]] constexpr auto layout() const noexcept -> multichannel_layout
+    [[nodiscard]]
+    constexpr auto layout() const noexcept -> multichannel_layout
     {
         if constexpr (std::is_same_v<
                               Layout,
@@ -96,22 +97,26 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto empty() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto empty() const noexcept -> bool
     {
         return m_data.empty();
     }
 
-    [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
+    [[nodiscard]]
+    constexpr auto num_channels() const noexcept -> std::size_t
     {
         return NumChannels == 0 ? m_num_channels : NumChannels;
     }
 
-    [[nodiscard]] constexpr auto num_frames() const noexcept -> std::size_t
+    [[nodiscard]]
+    constexpr auto num_frames() const noexcept -> std::size_t
     {
         return m_data.size() / num_channels();
     }
 
-    [[nodiscard]] constexpr auto channels() const noexcept
+    [[nodiscard]]
+    constexpr auto channels() const noexcept
     {
         if constexpr (layout_is_runtime_defined)
         {
@@ -202,7 +207,8 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto channels_subview(
+    [[nodiscard]]
+    constexpr auto channels_subview(
             std::size_t start_channel,
             std::size_t num_channels_subview) const noexcept
         requires(!std::is_same_v<Layout, multichannel_layout_interleaved>)
@@ -232,7 +238,8 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto frames() const noexcept
+    [[nodiscard]]
+    constexpr auto frames() const noexcept
     {
         if constexpr (std::is_same_v<
                               Layout,
@@ -325,7 +332,8 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto frames_subview(
+    [[nodiscard]]
+    constexpr auto frames_subview(
             std::size_t start_frame,
             std::size_t num_frames_subview) const noexcept
         requires(!std::is_same_v<Layout, multichannel_layout_non_interleaved>)
@@ -355,13 +363,15 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto samples() const noexcept -> std::span<T> const&
+    [[nodiscard]]
+    constexpr auto samples() const noexcept -> std::span<T> const&
     {
         return m_data;
     }
 
     template <class ToLayout, std::size_t ToNumChannels>
-    [[nodiscard]] constexpr auto cast() const noexcept
+    [[nodiscard]]
+    constexpr auto cast() const noexcept
     {
         if constexpr (std::is_same_v<
                               ToLayout,
@@ -401,7 +411,8 @@ public:
 
     template <std::size_t ToNumChannels>
         requires(!layout_is_runtime_defined)
-    [[nodiscard]] constexpr auto channels_cast() const noexcept
+    [[nodiscard]]
+    constexpr auto channels_cast() const noexcept
     {
         return cast<Layout, ToNumChannels>();
     }

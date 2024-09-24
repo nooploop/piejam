@@ -42,7 +42,8 @@ struct update_parameter_values final
         std::get<id_value_map_t<P>>(values).emplace(id, value);
     }
 
-    [[nodiscard]] auto empty() const noexcept -> bool;
+    [[nodiscard]]
+    auto empty() const noexcept -> bool;
 
     void reduce(state&) const override;
 };

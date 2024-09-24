@@ -52,7 +52,8 @@ public:
         return s_roles;
     }
 
-    [[nodiscard]] auto size() const -> std::size_t
+    [[nodiscard]]
+    auto size() const -> std::size_t
     {
         return m_list.size();
     }

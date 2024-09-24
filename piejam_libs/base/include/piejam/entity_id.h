@@ -26,7 +26,8 @@ struct entity_id
 
     constexpr auto operator<=>(entity_id const& other) const noexcept = default;
 
-    [[nodiscard]] constexpr auto valid() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto valid() const noexcept -> bool
     {
         return m_id != 0u;
     }

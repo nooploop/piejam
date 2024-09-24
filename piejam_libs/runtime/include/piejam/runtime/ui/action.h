@@ -13,7 +13,8 @@ struct action
 {
     virtual ~action() = default;
 
-    [[nodiscard]] virtual auto clone() const -> std::unique_ptr<action> = 0;
+    [[nodiscard]]
+    virtual auto clone() const -> std::unique_ptr<action> = 0;
 };
 
 template <class State>

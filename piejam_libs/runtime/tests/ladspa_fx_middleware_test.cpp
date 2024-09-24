@@ -27,12 +27,14 @@ TEST_F(ladspa_fx_middleware_test, unknown_action_is_passed_to_next)
 {
     struct some_action final : public action
     {
-        [[nodiscard]] auto clone() const -> std::unique_ptr<action> override
+        [[nodiscard]]
+        auto clone() const -> std::unique_ptr<action> override
         {
             return std::make_unique<some_action>();
         }
 
-        [[nodiscard]] auto reduce(state const& st) const -> state
+        [[nodiscard]]
+        auto reduce(state const& st) const -> state
         {
             return st;
         }

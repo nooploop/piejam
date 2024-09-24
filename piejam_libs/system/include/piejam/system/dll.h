@@ -62,7 +62,8 @@ public:
     }
 
 private:
-    [[nodiscard]] auto symbol(std::string_view const name) const -> void*;
+    [[nodiscard]]
+    auto symbol(std::string_view const name) const -> void*;
 
     void* m_handle{};
 };

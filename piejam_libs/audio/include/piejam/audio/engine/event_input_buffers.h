@@ -21,17 +21,20 @@ public:
 
     event_input_buffers() = default;
 
-    [[nodiscard]] auto size() const noexcept -> size_type
+    [[nodiscard]]
+    auto size() const noexcept -> size_type
     {
         return m_event_buffers.size();
     }
 
-    [[nodiscard]] auto begin() const
+    [[nodiscard]]
+    auto begin() const
     {
         return m_event_buffers.begin();
     }
 
-    [[nodiscard]] auto end() const
+    [[nodiscard]]
+    auto end() const
     {
         return m_event_buffers.end();
     }
@@ -61,7 +64,8 @@ public:
     }
 
     template <class T>
-    [[nodiscard]] auto
+    [[nodiscard]]
+    auto
     get(std::size_t const buffer_index) const noexcept -> event_buffer<T> const&
     {
         BOOST_ASSERT(buffer_index < m_event_buffers.size());

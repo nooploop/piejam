@@ -12,7 +12,8 @@ namespace piejam::numeric::bitops
 {
 
 template <class T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 set(T const v, std::size_t const bit) noexcept -> T
 {
     static_assert(is_integral_v<T>);
@@ -21,7 +22,8 @@ set(T const v, std::size_t const bit) noexcept -> T
 }
 
 template <class T, std::size_t Bit>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 set(T const v) noexcept -> T
 {
     static_assert(is_integral_v<T>);
@@ -30,7 +32,8 @@ set(T const v) noexcept -> T
 }
 
 template <class T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 reset(T const v, std::size_t const bit) noexcept -> T
 {
     static_assert(is_integral_v<T>);
@@ -39,7 +42,8 @@ reset(T const v, std::size_t const bit) noexcept -> T
 }
 
 template <class T, std::size_t Bit>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 reset(T const v) noexcept -> T
 {
     static_assert(is_integral_v<T>);
@@ -48,7 +52,8 @@ reset(T const v) noexcept -> T
 }
 
 template <class T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 toggle(T const v, std::size_t const bit) noexcept -> T
 {
     static_assert(is_integral_v<T>);
@@ -57,7 +62,8 @@ toggle(T const v, std::size_t const bit) noexcept -> T
 }
 
 template <class T, std::size_t Bit>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 toggle(T const v) noexcept -> T
 {
     static_assert(is_integral_v<T>);

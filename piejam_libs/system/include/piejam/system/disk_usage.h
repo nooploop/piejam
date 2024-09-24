@@ -9,7 +9,8 @@
 namespace piejam::system
 {
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 disk_usage(std::filesystem::path const& p)
 {
     std::error_code ec;

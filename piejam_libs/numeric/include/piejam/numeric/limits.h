@@ -14,12 +14,14 @@ namespace piejam::numeric
 template <class T>
 struct limits
 {
-    [[nodiscard]] static constexpr auto min() noexcept -> T
+    [[nodiscard]]
+    static constexpr auto min() noexcept -> T
     {
         return std::numeric_limits<T>::min();
     }
 
-    [[nodiscard]] static constexpr auto max() noexcept -> T
+    [[nodiscard]]
+    static constexpr auto max() noexcept -> T
     {
         return std::numeric_limits<T>::max();
     }
@@ -28,12 +30,14 @@ struct limits
 template <>
 struct limits<int24_t>
 {
-    [[nodiscard]] static constexpr auto min() noexcept -> int24_t
+    [[nodiscard]]
+    static constexpr auto min() noexcept -> int24_t
     {
         return -8388608;
     }
 
-    [[nodiscard]] static constexpr auto max() noexcept -> int24_t
+    [[nodiscard]]
+    static constexpr auto max() noexcept -> int24_t
     {
         return 8388607;
     }
@@ -42,12 +46,14 @@ struct limits<int24_t>
 template <>
 struct limits<uint24_t>
 {
-    [[nodiscard]] static constexpr auto min() noexcept -> uint24_t
+    [[nodiscard]]
+    static constexpr auto min() noexcept -> uint24_t
     {
         return 0;
     }
 
-    [[nodiscard]] static constexpr auto max() noexcept -> uint24_t
+    [[nodiscard]]
+    static constexpr auto max() noexcept -> uint24_t
     {
         return 16777215;
     }

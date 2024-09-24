@@ -19,7 +19,8 @@ namespace
 
 using cpu_name_t = std::string;
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 parse_cpu_line(std::string line) -> std::pair<cpu_name_t, cpu_load_data>
 {
     std::pair<std::string, cpu_load_data> result;

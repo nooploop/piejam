@@ -29,14 +29,16 @@ static inline constexpr int const semitones_per_octave = 12;
 static inline constexpr int const cents_per_octave = 1200;
 
 template <int Subdivisions, std::floating_point T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 interval_from_frequency(T const f, T const f0)
 {
     return Subdivisions * std::log2(f / f0);
 }
 
 template <int Subdivisions, std::floating_point T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 frequency_from_interval(T const ival, T const f0)
 {
     return std::pow(T{2}, ival / static_cast<T>(Subdivisions)) * f0;
@@ -44,8 +46,8 @@ frequency_from_interval(T const ival, T const f0)
 
 struct pitch
 {
-    [[nodiscard]] static constexpr auto
-    from_frequency(float frequency) noexcept -> pitch
+    [[nodiscard]]
+    static constexpr auto from_frequency(float frequency) noexcept -> pitch
     {
         BOOST_ASSERT(frequency > 0.f);
 

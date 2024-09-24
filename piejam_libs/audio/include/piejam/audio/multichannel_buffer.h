@@ -76,7 +76,8 @@ public:
         BOOST_ASSERT(m_data.size() % num_channels == 0);
     }
 
-    [[nodiscard]] auto view() noexcept
+    [[nodiscard]]
+    auto view() noexcept
     {
         if constexpr (std::is_same_v<
                               Layout,
@@ -95,7 +96,8 @@ public:
         }
     }
 
-    [[nodiscard]] auto view() const noexcept
+    [[nodiscard]]
+    auto view() const noexcept
     {
         if constexpr (std::is_same_v<
                               Layout,
@@ -114,7 +116,8 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto layout() const noexcept -> multichannel_layout
+    [[nodiscard]]
+    constexpr auto layout() const noexcept -> multichannel_layout
     {
         if constexpr (std::is_same_v<
                               Layout,
@@ -128,47 +131,56 @@ public:
         }
     }
 
-    [[nodiscard]] auto empty() const noexcept -> bool
+    [[nodiscard]]
+    auto empty() const noexcept -> bool
     {
         return m_data.empty();
     }
 
-    [[nodiscard]] constexpr auto num_channels() const noexcept -> std::size_t
+    [[nodiscard]]
+    constexpr auto num_channels() const noexcept -> std::size_t
     {
         return m_num_channels;
     }
 
-    [[nodiscard]] auto num_frames() const noexcept -> std::size_t
+    [[nodiscard]]
+    auto num_frames() const noexcept -> std::size_t
     {
         return m_data.size() / m_num_channels;
     }
 
-    [[nodiscard]] auto channels() noexcept
+    [[nodiscard]]
+    auto channels() noexcept
     {
         return view().channels();
     }
 
-    [[nodiscard]] auto channels() const noexcept
+    [[nodiscard]]
+    auto channels() const noexcept
     {
         return view().channels();
     }
 
-    [[nodiscard]] auto frames() noexcept
+    [[nodiscard]]
+    auto frames() noexcept
     {
         return view().frames();
     }
 
-    [[nodiscard]] auto frames() const noexcept
+    [[nodiscard]]
+    auto frames() const noexcept
     {
         return view().frames();
     }
 
-    [[nodiscard]] auto samples() noexcept -> std::span<T>
+    [[nodiscard]]
+    auto samples() noexcept -> std::span<T>
     {
         return m_data;
     }
 
-    [[nodiscard]] auto samples() const noexcept -> std::span<T const>
+    [[nodiscard]]
+    auto samples() const noexcept -> std::span<T const>
     {
         return m_data;
     }

@@ -14,7 +14,8 @@ namespace piejam::range
 {
 
 template <std::ranges::range... Rs>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 zip(Rs&&... rs)
 {
     return boost::make_iterator_range(

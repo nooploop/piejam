@@ -21,17 +21,20 @@ public:
     {
     }
 
-    [[nodiscard]] constexpr auto valid() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto valid() const noexcept -> bool
     {
         return m_value != 0;
     }
 
-    [[nodiscard]] constexpr auto invalid() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto invalid() const noexcept -> bool
     {
         return m_value == 0;
     }
 
-    [[nodiscard]] constexpr auto value() const noexcept -> unsigned
+    [[nodiscard]]
+    constexpr auto value() const noexcept -> unsigned
     {
         return m_value;
     }

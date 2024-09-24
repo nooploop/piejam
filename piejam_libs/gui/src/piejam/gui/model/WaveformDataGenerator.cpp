@@ -34,7 +34,8 @@ struct InactiveGenerator final : SubStreamProcessor<WaveformData>
     }
 };
 
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 clip(float const v) -> float
 {
     return math::clamp(v, -1.f, 1.f);

@@ -29,7 +29,8 @@ public:
         {
         }
 
-        [[nodiscard]] constexpr auto operator*() const noexcept -> T
+        [[nodiscard]]
+        constexpr auto operator*() const noexcept -> T
         {
             BOOST_ASSERT(m_smoother);
 
@@ -53,8 +54,8 @@ public:
             return copy;
         }
 
-        [[nodiscard]] constexpr auto
-        operator==(iterator const& other) const noexcept -> bool
+        [[nodiscard]]
+        constexpr auto operator==(iterator const& other) const noexcept -> bool
         {
             return this == &other;
         }
@@ -92,17 +93,20 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto generator() noexcept -> iterator
+    [[nodiscard]]
+    constexpr auto generator() noexcept -> iterator
     {
         return iterator{*this};
     }
 
-    [[nodiscard]] constexpr auto is_running() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto is_running() const noexcept -> bool
     {
         return m_steps_to_smooth != 0;
     }
 
-    [[nodiscard]] constexpr auto current() const noexcept -> T
+    [[nodiscard]]
+    constexpr auto current() const noexcept -> T
     {
         return m_current;
     }

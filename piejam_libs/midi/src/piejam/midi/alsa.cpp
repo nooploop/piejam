@@ -18,7 +18,8 @@ namespace piejam::midi::alsa
 namespace
 {
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 open_seq() -> system::device
 {
     system::device seq("/dev/snd/seq");
@@ -37,7 +38,8 @@ open_seq() -> system::device
     return seq;
 }
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 get_client_id(system::device& seq) -> int
 {
     int client_id{};
@@ -50,7 +52,8 @@ get_client_id(system::device& seq) -> int
     return client_id;
 }
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 make_input_port(system::device& seq, midi_client_id_t client_id) -> midi_port_t
 {
     snd_seq_port_info port_info{};
@@ -102,7 +105,8 @@ scan_devices(system::device& seq, Handler&& handler)
     }
 }
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 scan_input_devices(system::device& seq) -> std::vector<midi_device>
 {
     std::vector<midi_device> result;
@@ -219,7 +223,8 @@ midi_devices::~midi_devices()
     }
 }
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 midi_devices::connect_input(
         midi_client_id_t source_client_id,
         midi_port_t source_port) -> bool
@@ -251,7 +256,8 @@ midi_devices::disconnect_input(
     }
 }
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 midi_devices::update() -> std::vector<midi_device_event>
 {
     std::vector<midi_device_event> result = std::move(m_initial_updates);

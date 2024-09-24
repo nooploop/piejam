@@ -17,7 +17,8 @@ namespace piejam::algorithm
 template <
         std::forward_iterator It,
         std::indirect_binary_predicate<It, It> BinaryPredicate>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 all_of_adjacent(It&& first, It&& last, BinaryPredicate&& p) -> bool
 {
     return std::forward<It>(last) ==
@@ -30,7 +31,8 @@ all_of_adjacent(It&& first, It&& last, BinaryPredicate&& p) -> bool
 template <
         std::ranges::forward_range Range,
         range_binary_predicate<Range> BinaryPredicate>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 all_of_adjacent(Range&& rng, BinaryPredicate&& p) -> bool
 {
     using std::begin;

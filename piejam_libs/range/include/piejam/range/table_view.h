@@ -80,18 +80,20 @@ public:
             BOOST_ASSERT(MinorStep == minor_step);
         }
 
-        [[nodiscard]] constexpr auto operator*() const noexcept -> reference
+        [[nodiscard]]
+        constexpr auto operator*() const noexcept -> reference
         {
             return m_minor_span;
         }
 
-        [[nodiscard]] constexpr auto operator->() const noexcept -> pointer
+        [[nodiscard]]
+        constexpr auto operator->() const noexcept -> pointer
         {
             return &m_minor_span;
         }
 
-        [[nodiscard]] constexpr auto
-        operator[](difference_type n) const noexcept -> reference
+        [[nodiscard]]
+        constexpr auto operator[](difference_type n) const noexcept -> reference
         {
             return *(*this + n);
         }
@@ -121,8 +123,8 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr auto
-        operator++(int) noexcept -> major_index_iterator
+        [[nodiscard]]
+        constexpr auto operator++(int) noexcept -> major_index_iterator
         {
             major_index_iterator temp(*this);
             ++(*this);
@@ -135,24 +137,26 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr auto
-        operator--(int) noexcept -> major_index_iterator
+        [[nodiscard]]
+        constexpr auto operator--(int) noexcept -> major_index_iterator
         {
             major_index_iterator temp(*this);
             --(*this);
             return temp;
         }
 
-        [[nodiscard]] constexpr auto
+        [[nodiscard]]
+        constexpr auto
         operator+(difference_type n) const noexcept -> major_index_iterator
         {
             major_index_iterator temp(*this);
             return temp += n;
         }
 
-        [[nodiscard]] friend constexpr auto operator+(
-                difference_type n,
-                major_index_iterator const& it) noexcept -> major_index_iterator
+        [[nodiscard]]
+        friend constexpr auto
+        operator+(difference_type n, major_index_iterator const& it) noexcept
+                -> major_index_iterator
         {
             return it + n;
         }
@@ -163,54 +167,61 @@ public:
             return *this += -n;
         }
 
-        [[nodiscard]] constexpr auto
+        [[nodiscard]]
+        constexpr auto
         operator-(difference_type n) const noexcept -> major_index_iterator
         {
             major_index_iterator temp(*this);
             return temp -= n;
         }
 
-        [[nodiscard]] constexpr auto
-        operator-(major_index_iterator const& other) const noexcept
-                -> difference_type
+        [[nodiscard]]
+        constexpr auto operator-(major_index_iterator const& other)
+                const noexcept -> difference_type
         {
             verify_precondition(other);
             return (m_minor_span.data() - other.m_minor_span.data()) / step();
         }
 
-        [[nodiscard]] constexpr auto
+        [[nodiscard]]
+        constexpr auto
         operator==(major_index_iterator const& rhs) const noexcept -> bool
         {
             verify_precondition(rhs);
             return m_minor_span.data() == rhs.m_minor_span.data();
         }
 
-        [[nodiscard]] constexpr auto
+        [[nodiscard]]
+        constexpr auto
         operator!=(major_index_iterator const& rhs) const noexcept -> bool
         {
             return !(*this == rhs);
         }
 
-        [[nodiscard]] constexpr auto
+        [[nodiscard]]
+        constexpr auto
         operator<(major_index_iterator const& rhs) const noexcept -> bool
         {
             verify_precondition(rhs);
             return m_minor_span.data() < rhs.m_minor_span.data();
         }
 
-        [[nodiscard]] constexpr auto
+        [[nodiscard]]
+        constexpr auto
         operator>(major_index_iterator const& rhs) const noexcept -> bool
         {
             return rhs < *this;
         }
 
-        [[nodiscard]] constexpr auto
+        [[nodiscard]]
+        constexpr auto
         operator<=(major_index_iterator const& rhs) const noexcept -> bool
         {
             return !(rhs < *this);
         }
 
-        [[nodiscard]] constexpr auto
+        [[nodiscard]]
+        constexpr auto
         operator>=(major_index_iterator const& rhs) const noexcept -> bool
         {
             return !(*this < rhs);
@@ -234,7 +245,8 @@ public:
             (void)rhs;
         }
 
-        [[nodiscard]] constexpr auto step() const noexcept -> difference_type
+        [[nodiscard]]
+        constexpr auto step() const noexcept -> difference_type
         {
             return MajorStep == dynamic_stride ? m_step : MajorStep;
         }
@@ -275,42 +287,50 @@ public:
                 MinorStep == minor_step);
     }
 
-    [[nodiscard]] constexpr auto data() const noexcept -> T*
+    [[nodiscard]]
+    constexpr auto data() const noexcept -> T*
     {
         return m_data;
     }
 
-    [[nodiscard]] constexpr auto major_size() const noexcept -> size_type
+    [[nodiscard]]
+    constexpr auto major_size() const noexcept -> size_type
     {
         return MajorSize == std::dynamic_extent ? m_major_size : MajorSize;
     }
 
-    [[nodiscard]] constexpr auto minor_size() const noexcept -> size_type
+    [[nodiscard]]
+    constexpr auto minor_size() const noexcept -> size_type
     {
         return MinorSize == std::dynamic_extent ? m_minor_size : MinorSize;
     }
 
-    [[nodiscard]] constexpr auto major_step() const noexcept -> difference_type
+    [[nodiscard]]
+    constexpr auto major_step() const noexcept -> difference_type
     {
         return MajorStep == dynamic_stride ? m_major_step : MajorStep;
     }
 
-    [[nodiscard]] constexpr auto minor_step() const noexcept -> difference_type
+    [[nodiscard]]
+    constexpr auto minor_step() const noexcept -> difference_type
     {
         return MinorStep == dynamic_stride ? m_minor_step : MinorStep;
     }
 
-    [[nodiscard]] constexpr auto begin() const noexcept -> iterator
+    [[nodiscard]]
+    constexpr auto begin() const noexcept -> iterator
     {
         return {m_data, major_step(), minor_size(), minor_step()};
     }
 
-    [[nodiscard]] constexpr auto cbegin() const noexcept -> const_iterator
+    [[nodiscard]]
+    constexpr auto cbegin() const noexcept -> const_iterator
     {
         return {m_data, major_step(), minor_size(), minor_step()};
     }
 
-    [[nodiscard]] constexpr auto end() const noexcept -> iterator
+    [[nodiscard]]
+    constexpr auto end() const noexcept -> iterator
     {
         return {m_data + major_size() * major_step(),
                 major_step(),
@@ -318,7 +338,8 @@ public:
                 minor_step()};
     }
 
-    [[nodiscard]] constexpr auto cend() const noexcept -> const_iterator
+    [[nodiscard]]
+    constexpr auto cend() const noexcept -> const_iterator
     {
         return {m_data + major_size() * major_step(),
                 major_step(),
@@ -326,7 +347,8 @@ public:
                 minor_step()};
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator[](size_type major_index) const noexcept -> minor_span_type<T>
     {
         if constexpr (MinorStep == dynamic_stride)
@@ -346,7 +368,8 @@ public:
             std::size_t ToMinorSize,
             std::ptrdiff_t ToMajorStep,
             std::ptrdiff_t ToMinorStep>
-    [[nodiscard]] constexpr auto cast() const noexcept
+    [[nodiscard]]
+    constexpr auto cast() const noexcept
             -> table_view<T, ToMajorSize, ToMinorSize, ToMajorStep, ToMinorStep>
     {
         static_assert(

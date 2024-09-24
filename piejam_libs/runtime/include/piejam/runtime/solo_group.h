@@ -48,14 +48,16 @@ public:
         m_solo_state.set(channel_index, solo);
     }
 
-    [[nodiscard]] auto any_solo() const noexcept -> bool
+    [[nodiscard]]
+    auto any_solo() const noexcept -> bool
     {
         return m_solo_state.any();
     }
 
     void calculate_mutes() noexcept;
 
-    [[nodiscard]] auto mutes() const noexcept -> boost::dynamic_bitset<> const&
+    [[nodiscard]]
+    auto mutes() const noexcept -> boost::dynamic_bitset<> const&
     {
         return m_mutes;
     }

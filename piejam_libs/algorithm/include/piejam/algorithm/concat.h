@@ -12,7 +12,8 @@ namespace piejam::algorithm
 {
 
 template <class Result, std::ranges::sized_range... Range>
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 concat(Range&&... rng) -> Result
 {
     Result result;

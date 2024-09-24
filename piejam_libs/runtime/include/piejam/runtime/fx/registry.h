@@ -39,7 +39,8 @@ private:
     }
 };
 
-[[nodiscard]] inline auto
+[[nodiscard]]
+inline auto
 find_ladspa_plugin_descriptor(
         fx::registry const& registry,
         ladspa::plugin_id_t id) -> ladspa::plugin_descriptor const*
@@ -61,7 +62,8 @@ struct is_available_for_bus_type
 {
     audio::bus_type bus_type;
 
-    [[nodiscard]] auto operator()(internal_id const id) const -> bool
+    [[nodiscard]]
+    auto operator()(internal_id const id) const -> bool
     {
         switch (bus_type)
         {
@@ -73,8 +75,8 @@ struct is_available_for_bus_type
         }
     }
 
-    [[nodiscard]] auto
-    operator()(ladspa::plugin_descriptor const& pd) const -> bool
+    [[nodiscard]]
+    auto operator()(ladspa::plugin_descriptor const& pd) const -> bool
     {
         switch (bus_type)
         {
@@ -90,7 +92,8 @@ struct is_available_for_bus_type
         }
     }
 
-    [[nodiscard]] auto operator()(registry::item const& item) const -> bool
+    [[nodiscard]]
+    auto operator()(registry::item const& item) const -> bool
     {
         return std::visit(*this, item);
     }

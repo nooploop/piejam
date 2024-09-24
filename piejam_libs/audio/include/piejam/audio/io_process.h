@@ -17,11 +17,13 @@ class io_process
 public:
     virtual ~io_process() = default;
 
-    [[nodiscard]] virtual auto is_open() const noexcept -> bool = 0;
+    [[nodiscard]]
+    virtual auto is_open() const noexcept -> bool = 0;
 
     virtual void close() = 0;
 
-    [[nodiscard]] virtual auto is_running() const noexcept -> bool = 0;
+    [[nodiscard]]
+    virtual auto is_running() const noexcept -> bool = 0;
 
     virtual void
     start(thread::configuration const&,
@@ -30,8 +32,10 @@ public:
 
     virtual void stop() = 0;
 
-    [[nodiscard]] virtual auto cpu_load() const noexcept -> float = 0;
-    [[nodiscard]] virtual auto xruns() const noexcept -> std::size_t = 0;
+    [[nodiscard]]
+    virtual auto cpu_load() const noexcept -> float = 0;
+    [[nodiscard]]
+    virtual auto xruns() const noexcept -> std::size_t = 0;
 };
 
 auto make_dummy_io_process() -> std::unique_ptr<io_process>;

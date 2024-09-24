@@ -34,7 +34,8 @@ public:
     process_step(process_step&&);
     ~process_step();
 
-    [[nodiscard]] auto operator()() -> std::error_condition;
+    [[nodiscard]]
+    auto operator()() -> std::error_condition;
 
 private:
     system::device& m_input_fd;

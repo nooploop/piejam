@@ -44,7 +44,8 @@ TEST_F(audio_engine_middleware_test,
 {
     struct non_device_action : reducible_action
     {
-        [[nodiscard]] auto clone() const -> std::unique_ptr<action> override
+        [[nodiscard]]
+        auto clone() const -> std::unique_ptr<action> override
         {
             return std::make_unique<non_device_action>();
         }

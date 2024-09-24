@@ -52,91 +52,104 @@ public:
     {
     }
 
-    [[nodiscard]] constexpr auto begin() const noexcept -> iterator
+    [[nodiscard]]
+    constexpr auto begin() const noexcept -> iterator
     {
         return make_iterator<iterator>(m_data, stride());
     }
 
-    [[nodiscard]] constexpr auto cbegin() const noexcept -> const_iterator
+    [[nodiscard]]
+    constexpr auto cbegin() const noexcept -> const_iterator
     {
         return make_iterator<const_iterator>(m_data, stride());
     }
 
-    [[nodiscard]] constexpr auto end() const noexcept -> iterator
+    [[nodiscard]]
+    constexpr auto end() const noexcept -> iterator
     {
         return make_iterator<iterator>(m_data + m_size * stride(), stride());
     }
 
-    [[nodiscard]] constexpr auto cend() const noexcept -> const_iterator
+    [[nodiscard]]
+    constexpr auto cend() const noexcept -> const_iterator
     {
         return make_iterator<const_iterator>(
                 m_data + m_size * stride(),
                 stride());
     }
 
-    [[nodiscard]] constexpr auto rbegin() const noexcept -> reverse_iterator
+    [[nodiscard]]
+    constexpr auto rbegin() const noexcept -> reverse_iterator
     {
         return std::make_reverse_iterator(end());
     }
 
-    [[nodiscard]] constexpr auto
-    crbegin() const noexcept -> const_reverse_iterator
+    [[nodiscard]]
+    constexpr auto crbegin() const noexcept -> const_reverse_iterator
     {
         return std::make_reverse_iterator(cend());
     }
 
-    [[nodiscard]] constexpr auto rend() const noexcept -> reverse_iterator
+    [[nodiscard]]
+    constexpr auto rend() const noexcept -> reverse_iterator
     {
         return std::make_reverse_iterator(begin());
     }
 
-    [[nodiscard]] constexpr auto
-    crend() const noexcept -> const_reverse_iterator
+    [[nodiscard]]
+    constexpr auto crend() const noexcept -> const_reverse_iterator
     {
         return std::make_reverse_iterator(cbegin());
     }
 
-    [[nodiscard]] constexpr auto front() const -> reference
+    [[nodiscard]]
+    constexpr auto front() const -> reference
     {
         BOOST_ASSERT(m_size);
         return *begin();
     }
 
-    [[nodiscard]] constexpr auto back() const -> reference
+    [[nodiscard]]
+    constexpr auto back() const -> reference
     {
         BOOST_ASSERT(m_size);
         return *std::prev(end());
     }
 
-    [[nodiscard]] constexpr auto data() const noexcept -> pointer
+    [[nodiscard]]
+    constexpr auto data() const noexcept -> pointer
     {
         return m_data;
     }
 
-    [[nodiscard]] constexpr auto operator[](size_type idx) const -> reference
+    [[nodiscard]]
+    constexpr auto operator[](size_type idx) const -> reference
     {
         BOOST_ASSERT(m_data && idx < m_size);
         return m_data[idx * stride()];
     }
 
-    [[nodiscard]] constexpr auto size() const noexcept -> size_type
+    [[nodiscard]]
+    constexpr auto size() const noexcept -> size_type
     {
         return m_size;
     }
 
-    [[nodiscard]] constexpr auto stride() const noexcept -> difference_type
+    [[nodiscard]]
+    constexpr auto stride() const noexcept -> difference_type
     {
         return Stride == dynamic_stride ? m_stride : Stride;
     }
 
-    [[nodiscard]] constexpr auto empty() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto empty() const noexcept -> bool
     {
         return m_size == 0;
     }
 
     template <difference_type ToStride>
-    [[nodiscard]] constexpr auto
-    stride_cast() const noexcept -> strided_span<T, ToStride>
+    [[nodiscard]]
+    constexpr auto stride_cast() const noexcept -> strided_span<T, ToStride>
         requires(Stride == dynamic_stride && ToStride != dynamic_stride)
     {
         BOOST_ASSERT(m_stride == ToStride);

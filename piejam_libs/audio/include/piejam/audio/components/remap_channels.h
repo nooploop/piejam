@@ -30,22 +30,26 @@ public:
         BOOST_ASSERT(m_node);
     }
 
-    [[nodiscard]] auto inputs() const -> endpoints override
+    [[nodiscard]]
+    auto inputs() const -> endpoints override
     {
         return m_inputs;
     }
 
-    [[nodiscard]] auto outputs() const -> endpoints override
+    [[nodiscard]]
+    auto outputs() const -> endpoints override
     {
         return m_node->outputs();
     }
 
-    [[nodiscard]] auto event_inputs() const -> endpoints override
+    [[nodiscard]]
+    auto event_inputs() const -> endpoints override
     {
         return m_node->event_inputs();
     }
 
-    [[nodiscard]] auto event_outputs() const -> endpoints override
+    [[nodiscard]]
+    auto event_outputs() const -> endpoints override
     {
         return m_node->event_outputs();
     }

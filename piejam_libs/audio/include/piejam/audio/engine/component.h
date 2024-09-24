@@ -18,21 +18,27 @@ public:
 
     virtual ~component() = default;
 
-    [[nodiscard]] virtual auto inputs() const -> endpoints = 0;
-    [[nodiscard]] virtual auto outputs() const -> endpoints = 0;
+    [[nodiscard]]
+    virtual auto inputs() const -> endpoints = 0;
+    [[nodiscard]]
+    virtual auto outputs() const -> endpoints = 0;
 
-    [[nodiscard]] constexpr auto num_inputs() const noexcept -> std::size_t
+    [[nodiscard]]
+    constexpr auto num_inputs() const noexcept -> std::size_t
     {
         return inputs().size();
     }
 
-    [[nodiscard]] constexpr auto num_outputs() const noexcept -> std::size_t
+    [[nodiscard]]
+    constexpr auto num_outputs() const noexcept -> std::size_t
     {
         return outputs().size();
     }
 
-    [[nodiscard]] virtual auto event_inputs() const -> endpoints = 0;
-    [[nodiscard]] virtual auto event_outputs() const -> endpoints = 0;
+    [[nodiscard]]
+    virtual auto event_inputs() const -> endpoints = 0;
+    [[nodiscard]]
+    virtual auto event_outputs() const -> endpoints = 0;
 
     virtual void connect(graph&) const = 0;
 };

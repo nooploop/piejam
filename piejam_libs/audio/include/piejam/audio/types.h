@@ -17,7 +17,8 @@ enum class bus_type : bool
 };
 
 template <class T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 bus_type_to(bus_type const b, T&& mono_value, T&& stereo_value)
         -> decltype(auto)
 {
@@ -30,7 +31,8 @@ bus_type_to(bus_type const b, T&& mono_value, T&& stereo_value)
     }
 }
 
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 num_channels(bus_type const b) -> std::size_t
 {
     return bus_type_to(b, std::size_t{1}, std::size_t{2});

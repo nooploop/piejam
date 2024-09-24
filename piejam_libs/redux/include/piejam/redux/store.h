@@ -36,7 +36,8 @@ public:
         };
     }
 
-    [[nodiscard]] auto state() const noexcept -> State const&
+    [[nodiscard]]
+    auto state() const noexcept -> State const&
     {
         return m_state;
     }

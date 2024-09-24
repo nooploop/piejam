@@ -20,27 +20,32 @@ public:
         m_engine_input = engine_input;
     }
 
-    [[nodiscard]] auto type_name() const noexcept -> std::string_view override
+    [[nodiscard]]
+    auto type_name() const noexcept -> std::string_view override
     {
         return "input";
     }
 
-    [[nodiscard]] auto num_inputs() const noexcept -> std::size_t override
+    [[nodiscard]]
+    auto num_inputs() const noexcept -> std::size_t override
     {
         return 0;
     }
 
-    [[nodiscard]] auto num_outputs() const noexcept -> std::size_t override
+    [[nodiscard]]
+    auto num_outputs() const noexcept -> std::size_t override
     {
         return 1;
     }
 
-    [[nodiscard]] auto event_inputs() const noexcept -> event_ports override
+    [[nodiscard]]
+    auto event_inputs() const noexcept -> event_ports override
     {
         return {};
     }
 
-    [[nodiscard]] auto event_outputs() const noexcept -> event_ports override
+    [[nodiscard]]
+    auto event_outputs() const noexcept -> event_ports override
     {
         return {};
     }

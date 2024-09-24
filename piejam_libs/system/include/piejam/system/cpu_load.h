@@ -23,14 +23,16 @@ struct cpu_load_data
     std::size_t guest_nice{}; // running a low priority VCPU for guest OS
 };
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 active_time(cpu_load_data const& data) -> std::size_t
 {
     return data.user + data.nice + data.system + data.irq + data.softirq +
            data.steal + data.guest + data.guest_nice;
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 idle_time(cpu_load_data const& data) -> std::size_t
 {
     return data.idle + data.iowait;

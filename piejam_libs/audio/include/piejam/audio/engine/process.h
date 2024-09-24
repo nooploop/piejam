@@ -19,7 +19,8 @@ public:
     process();
     ~process();
 
-    [[nodiscard]] bool swap_executor(std::unique_ptr<dag_executor>);
+    [[nodiscard]]
+    bool swap_executor(std::unique_ptr<dag_executor>);
 
     void operator()(std::size_t buffer_size) noexcept;
 

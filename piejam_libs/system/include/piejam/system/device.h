@@ -33,25 +33,27 @@ public:
         return m_fd != invalid;
     }
 
-    [[nodiscard]] auto ioctl(unsigned long request) noexcept -> std::error_code;
+    [[nodiscard]]
+    auto ioctl(unsigned long request) noexcept -> std::error_code;
 
     template <class T>
-    [[nodiscard]] auto
-    ioctl(unsigned long request, T& x) noexcept -> std::error_code
+    [[nodiscard]]
+    auto ioctl(unsigned long request, T& x) noexcept -> std::error_code
     {
         return ioctl(request, &x, sizeof(T));
     }
 
-    [[nodiscard]] auto read(std::span<std::byte> buffer) noexcept
+    [[nodiscard]]
+    auto read(std::span<std::byte> buffer) noexcept
             -> outcome::std_result<std::size_t>;
 
-    [[nodiscard]] auto set_nonblock(bool set = true) -> std::error_code;
+    [[nodiscard]]
+    auto set_nonblock(bool set = true) -> std::error_code;
 
 private:
-    [[nodiscard]] auto
-    ioctl(unsigned long request,
-          void* p,
-          std::size_t size) noexcept -> std::error_code;
+    [[nodiscard]]
+    auto ioctl(unsigned long request, void* p, std::size_t size) noexcept
+            -> std::error_code;
 
     static constexpr int invalid = -1;
 
@@ -63,8 +65,8 @@ auto device::ioctl(unsigned long request, device&) noexcept
         -> std::error_code = delete;
 
 template <>
-[[nodiscard]] auto
-device::ioctl(unsigned long request, device const& other) noexcept
+[[nodiscard]]
+auto device::ioctl(unsigned long request, device const& other) noexcept
         -> std::error_code;
 
 } // namespace piejam::system

@@ -13,7 +13,8 @@ namespace
 class dummy_device final : public io_process
 {
 public:
-    [[nodiscard]] auto is_open() const noexcept -> bool override
+    [[nodiscard]]
+    auto is_open() const noexcept -> bool override
     {
         return false;
     }
@@ -22,7 +23,8 @@ public:
     {
     }
 
-    [[nodiscard]] auto is_running() const noexcept -> bool override
+    [[nodiscard]]
+    auto is_running() const noexcept -> bool override
     {
         return false;
     }
@@ -38,12 +40,14 @@ public:
     {
     }
 
-    [[nodiscard]] auto cpu_load() const noexcept -> float override
+    [[nodiscard]]
+    auto cpu_load() const noexcept -> float override
     {
         return 0.f;
     }
 
-    [[nodiscard]] auto xruns() const noexcept -> std::size_t override
+    [[nodiscard]]
+    auto xruns() const noexcept -> std::size_t override
     {
         return 0;
     }

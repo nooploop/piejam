@@ -42,12 +42,14 @@ public:
         m_squared_history.push_back(sq);
     }
 
-    [[nodiscard]] auto peak_level() const noexcept -> float
+    [[nodiscard]]
+    auto peak_level() const noexcept -> float
     {
         return m_peak_level;
     }
 
-    [[nodiscard]] auto rms_level() const noexcept -> float
+    [[nodiscard]]
+    auto rms_level() const noexcept -> float
     {
         double const squared_sum = std::max(m_squared_sum, 0.);
 

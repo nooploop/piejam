@@ -21,7 +21,8 @@ enum class BusType : bool
 
 Q_ENUM_NS(BusType)
 
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 toBusType(audio::bus_type bt) -> BusType
 {
     switch (bt)
@@ -33,7 +34,8 @@ toBusType(audio::bus_type bt) -> BusType
     }
 }
 
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 toBusType(BusType bt) -> audio::bus_type
 {
     switch (bt)
@@ -46,7 +48,8 @@ toBusType(BusType bt) -> audio::bus_type
 }
 
 template <class T>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 busTypeTo(BusType const b, T&& mono_value, T&& stereo_value) -> decltype(auto)
 {
     switch (b)

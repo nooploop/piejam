@@ -10,7 +10,8 @@ namespace piejam::range
 {
 
 template <std::ranges::sized_range R>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 indices(R&& rng) noexcept
 {
     return std::views::iota(

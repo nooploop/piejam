@@ -293,7 +293,8 @@ private:
 };
 
 template <std::size_t NumChannels>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 filter_channel_name(std::size_t ch)
 {
     using namespace std::string_view_literals;

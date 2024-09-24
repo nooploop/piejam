@@ -27,25 +27,27 @@ public:
     {
     }
 
-    [[nodiscard]] auto type() const noexcept -> std::type_index const&
+    [[nodiscard]]
+    auto type() const noexcept -> std::type_index const&
     {
         return m_type;
     }
 
-    [[nodiscard]] auto name() const noexcept -> std::string const&
+    [[nodiscard]]
+    auto name() const noexcept -> std::string const&
     {
         return m_name;
     }
 
-    [[nodiscard]] auto
-    make_event_buffer(std::pmr::memory_resource*& event_memory) const
+    [[nodiscard]]
+    auto make_event_buffer(std::pmr::memory_resource*& event_memory) const
             -> std::unique_ptr<abstract_event_buffer>
     {
         return m_make_event_buffer(event_memory);
     }
 
-    [[nodiscard]] auto
-    empty_event_buffer() const -> abstract_event_buffer const&
+    [[nodiscard]]
+    auto empty_event_buffer() const -> abstract_event_buffer const&
     {
         return m_empty_event_buffer();
     }

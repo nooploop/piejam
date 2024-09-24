@@ -21,7 +21,8 @@ namespace piejam::gui::model
 namespace
 {
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 makeBrowserEntry(
         runtime::store_dispatch dispatch,
         runtime::subscriber& state_change_subscriber,
@@ -33,7 +34,8 @@ makeBrowserEntry(
             fx_type);
 }
 
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 makeBrowserEntry(
         runtime::store_dispatch dispatch,
         runtime::subscriber& state_change_subscriber,

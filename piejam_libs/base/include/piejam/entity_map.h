@@ -21,38 +21,45 @@ public:
     using map_t = boost::container::flat_map<id_t, Entity>;
     using value_type = typename map_t::value_type;
 
-    [[nodiscard]] auto empty() const noexcept
+    [[nodiscard]]
+    auto empty() const noexcept
     {
         return m_map->empty();
     }
 
-    [[nodiscard]] auto size() const noexcept
+    [[nodiscard]]
+    auto size() const noexcept
     {
         return m_map->size();
     }
 
-    [[nodiscard]] auto begin() const noexcept
+    [[nodiscard]]
+    auto begin() const noexcept
     {
         return m_map->begin();
     }
 
-    [[nodiscard]] auto end() const noexcept
+    [[nodiscard]]
+    auto end() const noexcept
     {
         return m_map->end();
     }
 
-    [[nodiscard]] auto contains(id_t const id) const noexcept
+    [[nodiscard]]
+    auto contains(id_t const id) const noexcept
     {
         return m_map->contains(id);
     }
 
-    [[nodiscard]] auto find(id_t const id) const noexcept -> Entity const*
+    [[nodiscard]]
+    auto find(id_t const id) const noexcept -> Entity const*
     {
         auto it = m_map->find(id);
         return it != m_map->end() ? std::addressof(it->second) : nullptr;
     }
 
-    [[nodiscard]] auto operator[](id_t const id) const noexcept -> Entity const&
+    [[nodiscard]]
+    auto operator[](id_t const id) const noexcept -> Entity const&
     {
         auto it = m_map->find(id);
         BOOST_ASSERT(it != m_map->end());
@@ -67,24 +74,28 @@ public:
         {
         }
 
-        [[nodiscard]] auto begin() noexcept
+        [[nodiscard]]
+        auto begin() noexcept
         {
             return m_->begin();
         }
 
-        [[nodiscard]] auto end() noexcept
+        [[nodiscard]]
+        auto end() noexcept
         {
             return m_->end();
         }
 
-        [[nodiscard]] auto operator[](id_t const id) -> Entity&
+        [[nodiscard]]
+        auto operator[](id_t const id) -> Entity&
         {
             auto it = m_->find(id);
             BOOST_ASSERT(it != m_->end());
             return it->second;
         }
 
-        [[nodiscard]] auto insert(Entity value) -> id_t
+        [[nodiscard]]
+        auto insert(Entity value) -> id_t
         {
             auto id = id_t::generate();
             m_->emplace_hint(m_->end(), id, std::move(value));
@@ -92,7 +103,8 @@ public:
         }
 
         template <class... Args>
-        [[nodiscard]] auto emplace(Args&&... args) -> id_t
+        [[nodiscard]]
+        auto emplace(Args&&... args) -> id_t
         {
             auto id = id_t::generate();
             m_->emplace_hint(
@@ -126,13 +138,15 @@ public:
         return locked{*this};
     }
 
-    [[nodiscard]] auto insert(Entity value) -> id_t
+    [[nodiscard]]
+    auto insert(Entity value) -> id_t
     {
         return lock().insert(std::move(value));
     }
 
     template <class... Args>
-    [[nodiscard]] auto emplace(Args&&... args) -> id_t
+    [[nodiscard]]
+    auto emplace(Args&&... args) -> id_t
     {
         return lock().emplace(std::forward<Args>(args)...);
     }

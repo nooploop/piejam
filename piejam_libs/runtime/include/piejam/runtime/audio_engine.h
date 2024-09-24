@@ -38,15 +38,18 @@ public:
             const;
 
     template <class P>
-    [[nodiscard]] auto get_parameter_update(parameter::id_t<P>) const
+    [[nodiscard]]
+    auto get_parameter_update(parameter::id_t<P>) const
             -> std::optional<typename P::value_type>;
 
-    [[nodiscard]] auto
-    get_learned_midi() const -> std::optional<midi::external_event>;
+    [[nodiscard]]
+    auto get_learned_midi() const -> std::optional<midi::external_event>;
 
-    [[nodiscard]] auto get_stream(audio_stream_id) const -> audio_stream_buffer;
+    [[nodiscard]]
+    auto get_stream(audio_stream_id) const -> audio_stream_buffer;
 
-    [[nodiscard]] auto
+    [[nodiscard]]
+    auto
     rebuild(state const&,
             fx::simple_ladspa_processor_factory const&,
             std::unique_ptr<midi::input_event_handler>) -> bool;

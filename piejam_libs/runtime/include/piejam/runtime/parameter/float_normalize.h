@@ -12,19 +12,22 @@
 namespace piejam::runtime::parameter
 {
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 to_normalized_linear(float_ const& p, float const value) -> float
 {
     return math::linear_map(value, p.min, p.max, 0.f, 1.f);
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 from_normalized_linear(float_ const& p, float const norm_value) -> float
 {
     return math::linear_map(norm_value, 0.f, 1.f, p.min, p.max);
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 to_normalized_log(float_ const& p, float const value) -> float
 {
     return math::linear_map(
@@ -35,20 +38,23 @@ to_normalized_log(float_ const& p, float const value) -> float
             1.f);
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 from_normalized_log(float_ const& p, float const norm_value) -> float
 {
     return std::pow(p.min, 1.f - norm_value) * std::pow(p.max, norm_value);
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 to_normalized_dB(float_ const& p, float const value) -> float
 {
     return to_normalized_log(p, value);
 }
 
 template <class Interval_dB>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 to_normalized_dB(float_ const&, float const value) -> float
 {
     float const value_dB = std::log10(value) * 20.f;
@@ -56,14 +62,16 @@ to_normalized_dB(float_ const&, float const value) -> float
            (Interval_dB::max - Interval_dB::min);
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 from_normalized_dB(float_ const& p, float const norm_value) -> float
 {
     return from_normalized_log(p, norm_value);
 }
 
 template <class Interval_dB>
-[[nodiscard]] constexpr auto
+[[nodiscard]]
+constexpr auto
 from_normalized_dB(float_ const&, float const norm_value) -> float
 {
     float const value_dB = norm_value * (Interval_dB::max - Interval_dB::min) +

@@ -45,23 +45,26 @@ public:
         BOOST_ASSERT(stride != 0);
     }
 
-    [[nodiscard]] constexpr auto stride() const noexcept -> difference_type
+    [[nodiscard]]
+    constexpr auto stride() const noexcept -> difference_type
     {
         return Stride == dynamic_stride ? m_stride : Stride;
     }
 
-    [[nodiscard]] constexpr auto operator*() const noexcept -> reference
+    [[nodiscard]]
+    constexpr auto operator*() const noexcept -> reference
     {
         return *m_p;
     }
 
-    [[nodiscard]] constexpr auto operator->() const noexcept -> pointer
+    [[nodiscard]]
+    constexpr auto operator->() const noexcept -> pointer
     {
         return m_p;
     }
 
-    [[nodiscard]] constexpr auto
-    operator[](difference_type n) const noexcept -> reference
+    [[nodiscard]]
+    constexpr auto operator[](difference_type n) const noexcept -> reference
     {
         return *(m_p + n * stride());
     }
@@ -72,8 +75,8 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto
-    operator++(int) noexcept -> stride_pointer_iterator
+    [[nodiscard]]
+    constexpr auto operator++(int) noexcept -> stride_pointer_iterator
     {
         stride_pointer_iterator temp(*this);
         ++(*this);
@@ -86,8 +89,8 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto
-    operator--(int) noexcept -> stride_pointer_iterator
+    [[nodiscard]]
+    constexpr auto operator--(int) noexcept -> stride_pointer_iterator
     {
         stride_pointer_iterator temp(*this);
         --(*this);
@@ -101,14 +104,16 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator+(difference_type n) const noexcept -> stride_pointer_iterator
     {
         stride_pointer_iterator temp(*this);
         return temp += n;
     }
 
-    [[nodiscard]] friend constexpr auto
+    [[nodiscard]]
+    friend constexpr auto
     operator+(difference_type n, stride_pointer_iterator const& it) noexcept
             -> stride_pointer_iterator
     {
@@ -121,53 +126,61 @@ public:
         return *this += -n;
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator-(difference_type n) const noexcept -> stride_pointer_iterator
     {
         stride_pointer_iterator temp(*this);
         return temp -= n;
     }
 
-    [[nodiscard]] constexpr auto operator-(stride_pointer_iterator const& rhs)
-            const noexcept -> difference_type
+    [[nodiscard]]
+    constexpr auto operator-(stride_pointer_iterator const& rhs) const noexcept
+            -> difference_type
     {
         verify_precondition(rhs);
         return (m_p - rhs.m_p) / stride();
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator==(stride_pointer_iterator const& rhs) const noexcept -> bool
     {
         verify_precondition(rhs);
         return m_p == rhs.m_p;
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator!=(stride_pointer_iterator const& rhs) const noexcept -> bool
     {
         return !(*this == rhs);
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator<(stride_pointer_iterator const& rhs) const noexcept -> bool
     {
         verify_precondition(rhs);
         return m_p < rhs.m_p;
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator>(stride_pointer_iterator const& rhs) const noexcept -> bool
     {
         return rhs < *this;
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator<=(stride_pointer_iterator const& rhs) const noexcept -> bool
     {
         return !(rhs < *this);
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator>=(stride_pointer_iterator const& rhs) const noexcept -> bool
     {
         return !(*this < rhs);

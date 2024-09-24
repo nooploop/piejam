@@ -17,12 +17,14 @@ class avg_cpu_load_tracker final
 public:
     explicit avg_cpu_load_tracker(std::size_t num_cores);
 
-    [[nodiscard]] auto total() const noexcept -> float
+    [[nodiscard]]
+    auto total() const noexcept -> float
     {
         return m_total_avg;
     }
 
-    [[nodiscard]] auto per_core() const noexcept -> std::span<float const>
+    [[nodiscard]]
+    auto per_core() const noexcept -> std::span<float const>
     {
         return m_per_core_avg;
     }

@@ -35,29 +35,34 @@ public:
     {
     }
 
-    [[nodiscard]] constexpr auto is_constant() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto is_constant() const noexcept -> bool
     {
         return std::holds_alternative<T>(m_value);
     }
 
-    [[nodiscard]] constexpr auto constant() const noexcept -> constant_t
+    [[nodiscard]]
+    constexpr auto constant() const noexcept -> constant_t
     {
         BOOST_ASSERT(is_constant());
         return *std::get_if<0>(&m_value);
     }
 
-    [[nodiscard]] constexpr auto is_span() const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto is_span() const noexcept -> bool
     {
         return std::holds_alternative<span_t>(m_value);
     }
 
-    [[nodiscard]] constexpr auto span() const noexcept -> span_t const&
+    [[nodiscard]]
+    constexpr auto span() const noexcept -> span_t const&
     {
         BOOST_ASSERT(is_span());
         return *std::get_if<1>(&m_value);
     }
 
-    [[nodiscard]] constexpr auto as_variant() const noexcept -> variant_t const&
+    [[nodiscard]]
+    constexpr auto as_variant() const noexcept -> variant_t const&
     {
         return m_value;
     }

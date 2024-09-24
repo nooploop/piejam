@@ -11,7 +11,8 @@
 namespace piejam::algorithm
 {
 
-[[nodiscard]] inline auto
+[[nodiscard]]
+inline auto
 escape_html(std::string_view const src) -> std::string
 {
     std::string dst;

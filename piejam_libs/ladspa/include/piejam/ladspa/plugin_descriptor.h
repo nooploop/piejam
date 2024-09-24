@@ -26,13 +26,15 @@ struct plugin_descriptor
     std::size_t num_outputs{};
 };
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 operator==(plugin_descriptor const& l, plugin_descriptor const& r) -> bool
 {
     return l.id == r.id;
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 operator!=(plugin_descriptor const& l, plugin_descriptor const& r) -> bool
 {
     return l.id != r.id;

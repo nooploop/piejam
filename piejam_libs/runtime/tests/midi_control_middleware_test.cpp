@@ -28,7 +28,8 @@ TEST_F(midi_control_middleware_test, unknown_action_is_passed_to_next)
 {
     struct some_action final : public reducible_action
     {
-        [[nodiscard]] auto clone() const -> std::unique_ptr<action> override
+        [[nodiscard]]
+        auto clone() const -> std::unique_ptr<action> override
         {
             return std::make_unique<some_action>();
         }

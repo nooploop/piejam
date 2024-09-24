@@ -27,7 +27,8 @@ public:
     auto load(plugin_descriptor const&) -> instance_id override;
     void unload(instance_id const&) override;
 
-    [[nodiscard]] auto control_inputs(instance_id const&) const
+    [[nodiscard]]
+    auto control_inputs(instance_id const&) const
             -> std::span<port_descriptor const> override;
 
     auto make_processor(instance_id const&, audio::sample_rate)

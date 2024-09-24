@@ -21,7 +21,8 @@ class abstract_event_buffer
 public:
     virtual ~abstract_event_buffer() = default;
 
-    [[nodiscard]] virtual auto type() const -> std::type_index const& = 0;
+    [[nodiscard]]
+    virtual auto type() const -> std::type_index const& = 0;
 
     virtual void clear() = 0;
 };
@@ -50,28 +51,33 @@ public:
     {
     }
 
-    [[nodiscard]] auto type() const -> std::type_index const& override
+    [[nodiscard]]
+    auto type() const -> std::type_index const& override
     {
         static std::type_index const s_type(typeid(T));
         return s_type;
     }
 
-    [[nodiscard]] auto empty() const noexcept -> bool
+    [[nodiscard]]
+    auto empty() const noexcept -> bool
     {
         return m_event_container.empty();
     }
 
-    [[nodiscard]] auto size() const noexcept
+    [[nodiscard]]
+    auto size() const noexcept
     {
         return m_event_container.size();
     }
 
-    [[nodiscard]] auto begin() const noexcept -> const_iterator
+    [[nodiscard]]
+    auto begin() const noexcept -> const_iterator
     {
         return m_event_container.begin();
     }
 
-    [[nodiscard]] auto end() const noexcept -> const_iterator
+    [[nodiscard]]
+    auto end() const noexcept -> const_iterator
     {
         return m_event_container.end();
     }

@@ -19,7 +19,8 @@ struct edit_script_deletion
 {
     std::size_t pos{};
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator==(edit_script_deletion const&) const noexcept -> bool = default;
 };
 
@@ -29,7 +30,8 @@ struct edit_script_insertion
     std::size_t pos{};
     T value{};
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator==(edit_script_insertion const&) const noexcept -> bool = default;
 };
 
@@ -48,7 +50,8 @@ using common_range_value_type_t =
         std::common_type_t<std::ranges::range_value_t<Range>...>;
 
 template <class Src, class Dst>
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 edit_script(Src const& src, Dst const& dst)
         -> edit_script_ops<common_range_value_type_t<Src, Dst>>
 {
@@ -165,7 +168,8 @@ namespace detail
 {
 
 template <class T>
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> ops)
         -> edit_script_ops<T>
 {
@@ -192,7 +196,8 @@ prepare_edit_script_ops_for_linear_execution(edit_script_ops<T> ops)
 } // namespace detail
 
 template <class T, class Visitor>
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 apply_edit_script(edit_script_ops<T> ops, Visitor&& v)
 {
     for_each_visit(

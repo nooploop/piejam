@@ -34,12 +34,14 @@ class midi_io
 public:
     midi_io();
 
-    [[nodiscard]] auto client_id() const noexcept -> midi_client_id_t
+    [[nodiscard]]
+    auto client_id() const noexcept -> midi_client_id_t
     {
         return m_client_id;
     }
 
-    [[nodiscard]] auto in_port() const noexcept -> midi_port_t
+    [[nodiscard]]
+    auto in_port() const noexcept -> midi_port_t
     {
         return m_in_port;
     }
@@ -61,14 +63,14 @@ struct midi_device
     midi_port_t port{};
     std::string name;
 
-    [[nodiscard]] constexpr auto
-    operator==(midi_device const& other) const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto operator==(midi_device const& other) const noexcept -> bool
     {
         return client_id == other.client_id && port == other.port;
     }
 
-    [[nodiscard]] constexpr auto
-    operator!=(midi_device const& other) const noexcept -> bool
+    [[nodiscard]]
+    constexpr auto operator!=(midi_device const& other) const noexcept -> bool
     {
         return !(*this == other);
     }
@@ -92,10 +94,12 @@ public:
     midi_devices(midi_client_id_t in_client_id, midi_port_t in_port);
     ~midi_devices();
 
-    [[nodiscard]] auto connect_input(midi_client_id_t, midi_port_t) -> bool;
+    [[nodiscard]]
+    auto connect_input(midi_client_id_t, midi_port_t) -> bool;
     void disconnect_input(midi_client_id_t, midi_port_t);
 
-    [[nodiscard]] auto update() -> std::vector<midi_device_event>;
+    [[nodiscard]]
+    auto update() -> std::vector<midi_device_event>;
 
 private:
     midi_client_id_t m_in_client_id{};

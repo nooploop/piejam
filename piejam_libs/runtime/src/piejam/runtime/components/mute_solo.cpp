@@ -29,22 +29,26 @@ public:
     {
     }
 
-    [[nodiscard]] auto inputs() const -> endpoints override
+    [[nodiscard]]
+    auto inputs() const -> endpoints override
     {
         return m_mute_solo_amp->inputs();
     }
 
-    [[nodiscard]] auto outputs() const -> endpoints override
+    [[nodiscard]]
+    auto outputs() const -> endpoints override
     {
         return m_mute_solo_amp->outputs();
     }
 
-    [[nodiscard]] auto event_inputs() const -> endpoints override
+    [[nodiscard]]
+    auto event_inputs() const -> endpoints override
     {
         return m_event_inputs;
     }
 
-    [[nodiscard]] auto event_outputs() const -> endpoints override
+    [[nodiscard]]
+    auto event_outputs() const -> endpoints override
     {
         return {};
     }

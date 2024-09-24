@@ -22,22 +22,26 @@ class event_output_buffers final
 public:
     using size_type = std::size_t;
 
-    [[nodiscard]] auto empty() const noexcept -> bool
+    [[nodiscard]]
+    auto empty() const noexcept -> bool
     {
         return m_event_buffers.empty();
     }
 
-    [[nodiscard]] auto size() const noexcept -> size_type
+    [[nodiscard]]
+    auto size() const noexcept -> size_type
     {
         return m_event_buffers.size();
     }
 
-    [[nodiscard]] auto begin() const
+    [[nodiscard]]
+    auto begin() const
     {
         return m_event_buffers.begin();
     }
 
-    [[nodiscard]] auto end() const
+    [[nodiscard]]
+    auto end() const
     {
         return m_event_buffers.end();
     }

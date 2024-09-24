@@ -14,7 +14,8 @@ namespace piejam::runtime::ui
 template <class DerivedAction, class ActionInterface>
 struct cloneable_action : public ActionInterface
 {
-    [[nodiscard]] auto clone() const -> std::unique_ptr<action> override
+    [[nodiscard]]
+    auto clone() const -> std::unique_ptr<action> override
     {
         return std::make_unique<DerivedAction>(
                 static_cast<DerivedAction const&>(*this));

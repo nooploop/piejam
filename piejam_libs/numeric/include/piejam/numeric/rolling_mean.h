@@ -23,7 +23,8 @@ public:
     {
     }
 
-    [[nodiscard]] constexpr auto operator()(T x) -> T
+    [[nodiscard]]
+    constexpr auto operator()(T x) -> T
     {
         m_acc(x);
         return boost::accumulators::rolling_mean(m_acc);

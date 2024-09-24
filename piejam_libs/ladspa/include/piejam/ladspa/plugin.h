@@ -21,13 +21,14 @@ class plugin
 public:
     virtual ~plugin() = default;
 
-    [[nodiscard]] virtual auto
-    descriptor() const -> plugin_descriptor const& = 0;
+    [[nodiscard]]
+    virtual auto descriptor() const -> plugin_descriptor const& = 0;
 
-    [[nodiscard]] virtual auto
-    control_inputs() const -> std::span<port_descriptor const> = 0;
+    [[nodiscard]]
+    virtual auto control_inputs() const -> std::span<port_descriptor const> = 0;
 
-    [[nodiscard]] virtual auto make_processor(audio::sample_rate) const
+    [[nodiscard]]
+    virtual auto make_processor(audio::sample_rate) const
             -> std::unique_ptr<audio::engine::processor> = 0;
 };
 

@@ -12,7 +12,8 @@ namespace piejam::algorithm
 {
 
 template <std::ranges::input_range Range, class F>
-[[nodiscard]] auto
+[[nodiscard]]
+auto
 transform_to_vector(Range const& rng, F&& f)
 {
     auto transformed = std::views::transform(rng, std::forward<F>(f));

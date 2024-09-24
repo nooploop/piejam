@@ -25,27 +25,32 @@ public:
         using const_iterator = typename map_t::const_iterator;
         using value_type = typename map_t::value_type;
 
-        [[nodiscard]] auto empty() const noexcept
+        [[nodiscard]]
+        auto empty() const noexcept
         {
             return m_wires.empty();
         }
 
-        [[nodiscard]] auto size() const noexcept
+        [[nodiscard]]
+        auto size() const noexcept
         {
             return m_wires.size();
         }
 
-        [[nodiscard]] auto begin() const noexcept
+        [[nodiscard]]
+        auto begin() const noexcept
         {
             return m_wires.begin();
         }
 
-        [[nodiscard]] auto end() const noexcept
+        [[nodiscard]]
+        auto end() const noexcept
         {
             return m_wires.end();
         }
 
-        [[nodiscard]] auto equal_range(graph_endpoint const& src) const noexcept
+        [[nodiscard]]
+        auto equal_range(graph_endpoint const& src) const noexcept
         {
             return m_wires.equal_range(src);
         }
@@ -86,25 +91,29 @@ public:
 
 using wire_t = graph::wires_map::value_type;
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 src_processor(wire_t const& w) -> processor&
 {
     return w.first.proc;
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 src_port(wire_t const& w) -> std::size_t
 {
     return w.first.port;
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 dst_processor(wire_t const& w) -> processor&
 {
     return w.second.proc;
 }
 
-[[nodiscard]] inline constexpr auto
+[[nodiscard]]
+inline constexpr auto
 dst_port(wire_t const& w) -> std::size_t
 {
     return w.second.port;

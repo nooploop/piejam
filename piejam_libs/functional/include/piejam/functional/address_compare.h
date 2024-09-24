@@ -19,23 +19,27 @@ struct unwrap_const_addressof
 {
     using R = T const*;
 
-    [[nodiscard]] constexpr auto operator()(T const& t) const noexcept -> R
+    [[nodiscard]]
+    constexpr auto operator()(T const& t) const noexcept -> R
     {
         return std::addressof(t);
     }
 
-    [[nodiscard]] constexpr auto operator()(T const* t) const noexcept -> R
+    [[nodiscard]]
+    constexpr auto operator()(T const* t) const noexcept -> R
     {
         return t;
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator()(std::reference_wrapper<T> const& t) const noexcept -> R
     {
         return std::addressof(t.get());
     }
 
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator()(std::reference_wrapper<T const> const& t) const noexcept -> R
     {
         return std::addressof(t.get());

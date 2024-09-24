@@ -29,12 +29,14 @@ public:
         stop();
     }
 
-    [[nodiscard]] auto is_running() const noexcept -> bool
+    [[nodiscard]]
+    auto is_running() const noexcept -> bool
     {
         return m_running.load(std::memory_order_relaxed);
     }
 
-    [[nodiscard]] auto error() const -> std::error_condition const&
+    [[nodiscard]]
+    auto error() const -> std::error_condition const&
     {
         BOOST_ASSERT(!m_running);
         return m_error;

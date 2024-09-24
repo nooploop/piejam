@@ -26,9 +26,9 @@ struct index_of_if_fn
             std::sentinel_for<I> S,
             class Proj = std::identity,
             std::indirect_unary_predicate<std::projected<I, Proj>> Predicate>
-    [[nodiscard]] constexpr auto
-    operator()(I first, S last, Predicate pred, Proj proj = {}) const
-            -> std::size_t
+    [[nodiscard]]
+    constexpr auto operator()(I first, S last, Predicate pred, Proj proj = {})
+            const -> std::size_t
     {
         std::size_t pos{};
         while (first != last)
@@ -50,7 +50,8 @@ struct index_of_if_fn
             class Proj = std::identity,
             std::indirect_unary_predicate<
                     std::projected<std::ranges::iterator_t<R>, Proj>> Predicate>
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator()(R&& r, Predicate pred, Proj proj = {}) const -> std::size_t
     {
         return (*this)(
@@ -79,9 +80,9 @@ struct index_of_fn
                          std::ranges::equal_to,
                          std::projected<I, Proj>,
                          T const*>
-    [[nodiscard]] constexpr auto
-    operator()(I first, S last, T const& value, Proj proj = {}) const
-            -> std::size_t
+    [[nodiscard]]
+    constexpr auto operator()(I first, S last, T const& value, Proj proj = {})
+            const -> std::size_t
     {
         std::size_t pos{};
         while (first != last)
@@ -103,7 +104,8 @@ struct index_of_fn
                          std::ranges::equal_to,
                          std::projected<std::ranges::iterator_t<R>, Proj>,
                          T const*>
-    [[nodiscard]] constexpr auto
+    [[nodiscard]]
+    constexpr auto
     operator()(R&& r, T const& value, Proj proj = {}) const -> std::size_t
     {
         return (*this)(

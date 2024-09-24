@@ -7,6 +7,7 @@
 namespace piejam::system
 {
 
-[[nodiscard]] auto cpu_temp() noexcept -> int;
+[[nodiscard]]
+auto cpu_temp() noexcept -> int;
 
 } // namespace piejam::system
