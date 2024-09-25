@@ -4,43 +4,36 @@
 
 #pragma once
 
-#include <piejam/numeric/bitops.h>
+#include <piejam/numeric/bit.h>
+#include <piejam/numeric/concepts.h>
 #include <piejam/numeric/type_traits.h>
 
 namespace piejam::numeric::intops
 {
 
-template <class Source>
+template <integral T>
+constexpr std::size_t const sign_bit = sizeof(T) * CHAR_BIT - 1;
+
+template <integral Source>
 [[nodiscard]]
 constexpr auto
 sign_map(Source const x) noexcept -> Source
 {
-    static_assert(
-            is_integral_v<Source>,
-            "sign_map can only be applied to integer types");
     return x;
 }
 
 //! map integer ranges of different signedness:
 //! [0 ; UMAX] <-> [SMIN ; SMAX]
-template <class Target, class Source>
+template <integral Target, integral Source>
 [[nodiscard]]
 constexpr auto
-sign_map(Source const x) noexcept
-        -> std::enable_if_t<is_signed_v<Target> != is_signed_v<Source>, Target>
+sign_map(Source const x) noexcept -> Target
+    requires(
+            (is_signed_v<Target> != is_signed_v<Source>) &&
+            (sizeof(Target) == sizeof(Source)))
 {
-    static_assert(
-            is_integral_v<Target>,
-            "sign_map: Target must be an integer type");
-    static_assert(
-            is_integral_v<Source>,
-            "sign_map: Source must be an integer type");
-    static_assert(
-            sizeof(Target) == sizeof(Source),
-            "sign_map can only be applied to types of same size");
-
     // toggle the sign bit
-    return bitops::toggle(x, sizeof(Source) * 8u - 1);
+    return static_cast<Target>(bit::toggle<sign_bit<Source>>(x));
 }
 
 } // namespace piejam::numeric::intops

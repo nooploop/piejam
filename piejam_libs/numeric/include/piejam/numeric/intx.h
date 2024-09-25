@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <climits>
 #include <compare>
 #include <concepts>
 
@@ -15,7 +16,7 @@ namespace piejam::numeric
 template <std::integral Integer, std::size_t Bits>
 struct intx_t
 {
-    static_assert(sizeof(Integer) * 8 >= Bits);
+    static_assert(sizeof(Integer) * CHAR_BIT >= Bits);
 
     Integer value : Bits;
 

@@ -28,6 +28,20 @@ template <class T>
 using make_signed_t = typename make_signed<T>::type;
 
 template <class T>
+struct make_unsigned : std::make_unsigned<T>
+{
+};
+
+template <std::integral Integer, std::size_t Bits>
+struct make_unsigned<intx_t<Integer, Bits>>
+{
+    using type = intx_t<std::make_unsigned_t<Integer>, Bits>;
+};
+
+template <class T>
+using make_unsigned_t = typename make_unsigned<T>::type;
+
+template <class T>
 struct is_signed : std::is_signed<T>
 {
 };
