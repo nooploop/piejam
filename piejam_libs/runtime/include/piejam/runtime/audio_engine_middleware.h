@@ -12,7 +12,6 @@
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/fwd.h>
 
-#include <functional>
 #include <memory>
 #include <span>
 #include <vector>
@@ -46,21 +45,21 @@ private:
             middleware_functors const&,
             actions::set_parameter_value<Parameter> const&);
 
-    void close_device();
-    void open_device(middleware_functors const&);
-    void start_engine(middleware_functors const&);
+    void close_sound_card();
+    void open_sound_card(state const&);
+    void start_engine(state const&);
 
-    void rebuild(middleware_functors const&);
+    void rebuild(state const&);
 
     thread::configuration m_audio_thread_config;
     std::vector<thread::worker> m_workers;
 
-    audio::sound_card_manager& m_device_manager;
+    audio::sound_card_manager& m_sound_card_manager;
     ladspa::processor_factory& m_ladspa_processor_factory;
     std::unique_ptr<midi_input_controller> m_midi_controller;
 
     std::unique_ptr<audio_engine> m_engine;
-    std::unique_ptr<audio::io_process> m_device;
+    std::unique_ptr<audio::io_process> m_io_process;
 };
 
 } // namespace piejam::runtime

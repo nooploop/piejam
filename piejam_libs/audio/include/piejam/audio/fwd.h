@@ -16,9 +16,9 @@ class sound_card_manager;
 class process_thread;
 
 struct sound_card_descriptor;
-struct pcm_device_config;
+struct sound_card_config;
 struct sound_card_hw_params;
-struct pcm_process_config;
+struct sound_card_buffer_config;
 struct io_process_config;
 
 template <class T>

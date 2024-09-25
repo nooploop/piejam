@@ -185,7 +185,7 @@ private:
 auto
 make_reader(
         system::device& fd,
-        pcm_device_config const& config,
+        sound_card_config const& config,
         audio::period_size const period_size) -> std::unique_ptr<pcm_reader>
 {
     if (!fd)
@@ -338,7 +338,7 @@ private:
 auto
 make_writer(
         system::device& fd,
-        pcm_device_config const& config,
+        sound_card_config const& config,
         audio::period_size const period_size) -> std::unique_ptr<pcm_writer>
 {
     if (!fd)
@@ -405,15 +405,15 @@ process_step::process_step(
     , m_reader(make_reader(
               m_input_fd,
               m_io_config.in_config,
-              m_io_config.process_config.period_size))
+              m_io_config.buffer_config.period_size))
     , m_writer(make_writer(
               m_output_fd,
               m_io_config.out_config,
-              m_io_config.process_config.period_size))
+              m_io_config.buffer_config.period_size))
     , m_cpu_load_mean_acc(
-              io_config.process_config.sample_rate.to_samples(
+              io_config.buffer_config.sample_rate.to_samples(
                       std::chrono::seconds{1}) /
-              io_config.process_config.period_size.value()) // 1sec window
+              io_config.buffer_config.period_size.value()) // 1sec window
 {
     m_xruns.store(0, std::memory_order_relaxed);
 
@@ -441,7 +441,7 @@ process_step::operator()() -> std::error_condition
             m_writer->clear();
 
             for (unsigned i = 0;
-                 i < m_io_config.process_config.period_count.value();
+                 i < m_io_config.buffer_config.period_count.value();
                  ++i)
             {
                 if (auto err = m_writer->transfer())
@@ -468,10 +468,10 @@ process_step::operator()() -> std::error_condition
     if (!err)
     {
         cpu_load_meter cpu_load_meter(
-                m_io_config.process_config.period_size.value(),
-                m_io_config.process_config.sample_rate);
+                m_io_config.buffer_config.period_size.value(),
+                m_io_config.buffer_config.sample_rate);
 
-        m_process_function(m_io_config.process_config.period_size.value());
+        m_process_function(m_io_config.buffer_config.period_size.value());
 
         m_cpu_load.store(
                 m_cpu_load_mean_acc(cpu_load_meter.stop()),

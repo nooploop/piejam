@@ -229,7 +229,7 @@ pcm_to_alsa_format(pcm_format pf) -> unsigned
 
 auto
 get_hw_params(
-        sound_card_descriptor const& pcm,
+        sound_card_descriptor const& sound_card,
         sample_rate const* const sample_rate,
         period_size const* const period_size) -> sound_card_hw_params
 {
@@ -237,7 +237,7 @@ get_hw_params(
 
     auto hw_params = make_snd_pcm_hw_params_for_refine_any();
 
-    system::device fd(pcm.path);
+    system::device fd(sound_card.path);
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_REFINE, hw_params))
     {
         throw std::system_error(err);
@@ -273,7 +273,7 @@ get_hw_params(
             SNDRV_PCM_FORMAT_S8,
             SNDRV_PCM_FORMAT_U8};
 
-    auto it_format = std::ranges::find_if(
+    auto const it_format = std::ranges::find_if(
             preferred_formats,
             test_mask_bit(hw_params, SNDRV_PCM_HW_PARAM_FORMAT));
     result.format =
@@ -327,8 +327,8 @@ get_hw_params(
 void
 set_hw_params(
         system::device& fd,
-        pcm_device_config const& device_config,
-        pcm_process_config const& process_config)
+        sound_card_config const& sound_card_config,
+        sound_card_buffer_config const& buffer_config)
 {
     auto hw_params = make_snd_pcm_hw_params_for_refine_any();
 
@@ -340,29 +340,29 @@ set_hw_params(
     hw_params.cmask = 0;
 
     unsigned const interleaved_bit =
-            device_config.interleaved ? SNDRV_PCM_ACCESS_RW_INTERLEAVED
-                                      : SNDRV_PCM_ACCESS_RW_NONINTERLEAVED;
+            sound_card_config.interleaved ? SNDRV_PCM_ACCESS_RW_INTERLEAVED
+                                          : SNDRV_PCM_ACCESS_RW_NONINTERLEAVED;
     set_mask_bit(hw_params, SNDRV_PCM_HW_PARAM_ACCESS, interleaved_bit);
     set_mask_bit(
             hw_params,
             SNDRV_PCM_HW_PARAM_FORMAT,
-            pcm_to_alsa_format(device_config.format));
+            pcm_to_alsa_format(sound_card_config.format));
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_CHANNELS,
-            device_config.num_channels);
+            sound_card_config.num_channels);
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_RATE,
-            process_config.sample_rate.value());
+            buffer_config.sample_rate.value());
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_PERIOD_SIZE,
-            process_config.period_size.value());
+            buffer_config.period_size.value());
     set_interval_value(
             hw_params,
             SNDRV_PCM_HW_PARAM_PERIODS,
-            process_config.period_count.value());
+            buffer_config.period_count.value());
 
     if (auto err = fd.ioctl(SNDRV_PCM_IOCTL_HW_PARAMS, hw_params))
     {

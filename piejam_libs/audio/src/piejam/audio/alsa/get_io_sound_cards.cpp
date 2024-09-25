@@ -26,24 +26,24 @@ namespace piejam::audio::alsa
 namespace
 {
 
-struct soundcard
+struct sound_card_info
 {
-    std::filesystem::path ctl_path;
+    std::filesystem::path control_path;
     snd_ctl_card_info info;
 };
 
-std::filesystem::path const s_sound_devices_dir("/dev/snd");
+std::filesystem::path const s_sound_cards_dir("/dev/snd");
 
 auto
-soundcards() -> std::vector<soundcard>
+scan_for_sound_cards() -> std::vector<sound_card_info>
 {
-    std::vector<soundcard> cards;
+    std::vector<sound_card_info> cards;
 
     std::error_code ec;
-    if (std::filesystem::exists(s_sound_devices_dir, ec))
+    if (std::filesystem::exists(s_sound_cards_dir, ec))
     {
         for (auto const& entry :
-             std::filesystem::directory_iterator(s_sound_devices_dir, ec))
+             std::filesystem::directory_iterator(s_sound_cards_dir, ec))
         {
             unsigned card{};
             if (1 == std::sscanf(
@@ -57,12 +57,12 @@ soundcards() -> std::vector<soundcard>
                 if (auto err = fd.ioctl(SNDRV_CTL_IOCTL_CARD_INFO, card_info))
                 {
                     auto const message = err.message();
-                    spdlog::error("soundcards: {}", message);
+                    spdlog::error("scan_for_sound_cards: {}", message);
                 }
                 else
                 {
-                    cards.emplace_back(soundcard{
-                            .ctl_path = entry.path(),
+                    cards.emplace_back(sound_card_info{
+                            .control_path = entry.path(),
                             .info = card_info});
                 }
             }
@@ -73,15 +73,16 @@ soundcards() -> std::vector<soundcard>
 }
 
 auto
-get_devices(soundcard const& sc, int stream_type) -> std::vector<snd_pcm_info>
+get_sound_card_pcm_infos(sound_card_info const& sc, int stream_type)
+        -> std::vector<snd_pcm_info>
 {
     BOOST_ASSERT(
             stream_type == SNDRV_PCM_STREAM_CAPTURE ||
             stream_type == SNDRV_PCM_STREAM_PLAYBACK);
 
-    std::vector<snd_pcm_info> devices;
+    std::vector<snd_pcm_info> sound_card_pcm_infos;
 
-    system::device fd(sc.ctl_path);
+    system::device fd(sc.control_path);
 
     int device{-1};
     do
@@ -89,7 +90,7 @@ get_devices(soundcard const& sc, int stream_type) -> std::vector<snd_pcm_info>
         if (auto err = fd.ioctl(SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE, device))
         {
             auto const message = err.message();
-            spdlog::error("get_devices: {}", message);
+            spdlog::error("get_sound_card_pcm_infos: {}", message);
             break;
         }
 
@@ -111,33 +112,33 @@ get_devices(soundcard const& sc, int stream_type) -> std::vector<snd_pcm_info>
             if (err != error_to_ignore)
             {
                 auto const message = err.message();
-                spdlog::error("get_devices: {}", message);
+                spdlog::error("get_sound_card_pcm_infos: {}", message);
             }
         }
         else
         {
-            devices.emplace_back(info);
+            sound_card_pcm_infos.emplace_back(info);
         }
     } while (device != -1);
 
-    return devices;
+    return sound_card_pcm_infos;
 }
 
 auto
-input_devices(soundcard const& sc) -> std::vector<snd_pcm_info>
+input_pcm_infos(sound_card_info const& sc) -> std::vector<snd_pcm_info>
 {
-    return get_devices(sc, SNDRV_PCM_STREAM_CAPTURE);
+    return get_sound_card_pcm_infos(sc, SNDRV_PCM_STREAM_CAPTURE);
 }
 
 auto
-output_devices(soundcard const& sc) -> std::vector<snd_pcm_info>
+output_pcm_infos(sound_card_info const& sc) -> std::vector<snd_pcm_info>
 {
-    return get_devices(sc, SNDRV_PCM_STREAM_PLAYBACK);
+    return get_sound_card_pcm_infos(sc, SNDRV_PCM_STREAM_PLAYBACK);
 }
 
-struct to_pcm_descriptor
+struct to_sound_card_descriptor
 {
-    to_pcm_descriptor(soundcard const& sc, char stream_type)
+    to_sound_card_descriptor(sound_card_info const& sc, char stream_type)
         : sc{sc}
         , stream_type{stream_type}
     {
@@ -158,7 +159,7 @@ struct to_pcm_descriptor
                         stream_type)};
     }
 
-    soundcard const& sc;
+    sound_card_info const& sc;
     char stream_type;
 };
 
@@ -169,16 +170,16 @@ get_io_sound_cards() -> io_sound_cards
 {
     io_pair<std::vector<sound_card_descriptor>> result;
 
-    for (soundcard const& sc : soundcards())
+    for (sound_card_info const& sc_info : scan_for_sound_cards())
     {
         std::ranges::transform(
-                input_devices(sc),
+                input_pcm_infos(sc_info),
                 std::back_inserter(result.in),
-                to_pcm_descriptor{sc, 'c'});
+                to_sound_card_descriptor{sc_info, 'c'});
         std::ranges::transform(
-                output_devices(sc),
+                output_pcm_infos(sc_info),
                 std::back_inserter(result.out),
-                to_pcm_descriptor{sc, 'p'});
+                to_sound_card_descriptor{sc_info, 'p'});
     }
 
     return io_sound_cards{

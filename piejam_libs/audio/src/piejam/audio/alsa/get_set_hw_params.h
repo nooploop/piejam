@@ -17,7 +17,7 @@ auto get_hw_params(
 
 void set_hw_params(
         system::device&,
-        pcm_device_config const&,
-        pcm_process_config const&);
+        sound_card_config const&,
+        sound_card_buffer_config const&);
 
 } // namespace piejam::audio::alsa
