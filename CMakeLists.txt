@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.25)
 
 project(piejam VERSION 0.7.0)
 
@@ -67,9 +67,11 @@ set_target_properties(SndFile::sndfile
 add_library(nod INTERFACE)
 target_include_directories(nod SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/libs/nod/include)
 
-add_library(mipp INTERFACE)
-target_include_directories(mipp SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/libs/MIPP/src)
-target_compile_definitions(mipp INTERFACE MIPP_ALIGNED_LOADS)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libs/MIPP")
+set(MIPP_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/MIPP")
+find_package(MIPP REQUIRED)
+target_compile_definitions(MIPP INTERFACE MIPP_ALIGNED_LOADS)
+set_target_properties(MIPP PROPERTIES SYSTEM ON)
 
 set(PIEJAM_QML_IMPORT_PATHS "")
 

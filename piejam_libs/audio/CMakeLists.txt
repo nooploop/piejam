@@ -121,9 +121,7 @@ target_compile_options(piejam_audio PRIVATE -Wall -Wextra -Werror -pedantic-erro
 target_include_directories(piejam_audio
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_audio
-    INTERFACE mipp)
-target_link_libraries(piejam_audio
-    PUBLIC piejam_algorithm piejam_functional piejam_system piejam_numeric piejam_thread mipp
+    PUBLIC piejam_algorithm piejam_functional piejam_system piejam_numeric piejam_thread MIPP
     PRIVATE fmt spdlog::spdlog piejam_range)
 
 add_subdirectory(benchmarks)
