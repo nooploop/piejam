@@ -354,7 +354,7 @@ get_default_route_name(
 {
     static boxed_string const s_none{"None"};
     static boxed_string const s_mix{"Mix"};
-    static boxed_string const s_send{"Send..."};
+    static boxed_string const s_send{"Send"};
 
     switch (io_socket)
     {
