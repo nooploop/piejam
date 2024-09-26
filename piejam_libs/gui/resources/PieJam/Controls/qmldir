@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2020-2024 Dimitrij Kotrev
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+module PieJam.Controls
+ValueIndicatorBar 1.0 ValueIndicatorBar.qml

@@ -8,6 +8,7 @@ import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
 import PieJam 1.0
+import PieJam.Controls 1.0
 import PieJam.FxChainControls 1.0
 import PieJam.Models 1.0 as PJModels
 import PieJam.Util 1.0
@@ -46,6 +47,18 @@ SubscribableItem {
             horizontalAlignment: Qt.AlignHCenter
             font.pixelSize: 96
             font.bold: true
+        }
+
+        ValueIndicatorBar {
+            Layout.fillWidth: true
+            Layout.leftMargin: 32
+            Layout.rightMargin: 32
+            Layout.preferredHeight: 16
+
+            color: private_.primaryColor
+
+            bipolar: true
+            value: private_.validPitch ? root.model.detectedCents / 50 + 0.5 : 0.5
         }
 
         Label {

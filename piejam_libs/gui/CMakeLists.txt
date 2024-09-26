@@ -142,6 +142,7 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/StereoLevelParameter.cpp
     src/piejam/gui/model/WaveformDataGenerator.cpp
     src/piejam/gui/qt_log.cpp
+    resources/PieJam/Controls/qmldir
 )
 
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

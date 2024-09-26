@@ -94,5 +94,7 @@ SPDX-License-Identifier: CC0-1.0
         <file>images/icons/power.svg</file>
         <file>images/icons/tune-vertical.svg</file>
         <file>qtquickcontrols2.conf</file>
+        <file>PieJam/Controls/ValueIndicatorBar.qml</file>
+        <file>PieJam/Controls/qmldir</file>
     </qresource>
 </RCC>

@@ -32,25 +32,17 @@ SubscribableItem {
         RowLayout {
             spacing: 2
 
-            Rectangle {
-                color: Material.backgroundColor
-
+            ValueIndicatorBar {
                 Layout.preferredWidth: 0.10 * parent.width
                 Layout.fillHeight: true
                 Layout.leftMargin: 2
                 Layout.topMargin: 2
                 Layout.bottomMargin: 2
 
-                Rectangle {
-                    id: indicator
-
-                    color: Material.accentColor
-
-                    x: 0
-                    y: (private_.bipolar ? Math.min(0.5, 1 - private_.value) : (1 - private_.value)) * parent.height
-                    width: parent.width
-                    height: (private_.bipolar ? Math.abs(private_.value - 0.5) : private_.value) * parent.height
-                }
+                value: private_.value
+                bipolar: private_.bipolar
+                orientation: Qt.Vertical
+                direction: Qt.RightToLeft
             }
 
             Touchstrip {
