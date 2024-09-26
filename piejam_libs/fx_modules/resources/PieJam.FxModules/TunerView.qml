@@ -58,13 +58,13 @@ SubscribableItem {
             color: private_.primaryColor
 
             bipolar: true
-            value: private_.validPitch ? root.model.detectedCents / 50 + 0.5 : 0.5
+            value: private_.validPitch ? (root.model.detectedCents + 50) / 100 : 0.5
         }
 
         Label {
             Layout.fillWidth: true
 
-            text: (private_.validPitch ? root.model.detectedCents : "-") + " Cents"
+            text: (private_.validPitch ? root.model.detectedCents : "-") + " ct"
 
             color: private_.secondaryColor
 

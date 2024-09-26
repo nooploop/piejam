@@ -43,9 +43,12 @@ struct Args
 template <StereoChannel SC>
 class Generator final : public SubStreamProcessor<float>
 {
+    static constexpr std::size_t windowSize{8192};
+    static constexpr std::size_t captureSize{4096};
+
 public:
     explicit Generator(Args const& args)
-        : m_signal(m_windowSize)
+        : m_signal(windowSize)
         , m_pitchDetector{args.sampleRate}
     {
     }
@@ -71,7 +74,7 @@ public:
                 streamFrames | std::views::transform(StereoFrameValue<SC>{}));
 
         m_capturedFrames += stream.num_frames();
-        if (m_capturedFrames >= m_windowSize)
+        if (m_capturedFrames >= captureSize)
         {
             if (math::to_dB(audio::dsp::simd::rms(
                         std::span{std::as_const(m_signal)})) < -60.f)
@@ -83,7 +86,7 @@ public:
                 m_lastFrequency = m_pitchDetector.run(m_signal);
             }
 
-            m_capturedFrames = 0;
+            m_capturedFrames %= captureSize;
         }
 
         return m_lastFrequency;
@@ -95,7 +98,6 @@ public:
     }
 
 private:
-    std::size_t m_windowSize{8192};
     std::vector<float> m_signal;
     std::size_t m_capturedFrames{};
     float m_lastFrequency{};
