@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <benchmark/benchmark.h>
-
 #include <piejam/audio/dsp/simd.h>
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/slice_algorithms.h>
+
+#include <benchmark/benchmark.h>
 
 #include <algorithm>
 #include <cstdlib>

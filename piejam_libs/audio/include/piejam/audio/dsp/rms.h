@@ -4,11 +4,14 @@
 
 #pragma once
 
+#include <piejam/numeric/pow_n.h>
+
 #include <mipp.h>
 
 #include <boost/assert.hpp>
 
 #include <cmath>
+#include <numeric>
 #include <span>
 
 namespace piejam::audio::dsp
@@ -20,14 +23,14 @@ rms(std::span<T const> const in) -> T
 {
     BOOST_ASSERT(in.size() > 0);
 
-    T sum{};
-
-    for (auto const x : in)
-    {
-        sum += x * x;
-    }
-
-    return std::sqrt(sum / in.size());
+    return std::sqrt(
+            std::transform_reduce(
+                    in.begin(),
+                    in.end(),
+                    T{},
+                    std::plus<>{},
+                    numeric::pow_n<2>) /
+            in.size());
 }
 
 namespace simd
