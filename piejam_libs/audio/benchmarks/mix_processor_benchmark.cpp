@@ -10,9 +10,10 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
 
+#include <mipp.h>
+
 #include <benchmark/benchmark.h>
 
-#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <vector>
@@ -29,10 +30,10 @@ BM_mix_processor_2_inputs(benchmark::State& state)
 
     std::size_t const buffer_size = state.range(0);
 
-    std::vector<float> in_buf1(
+    mipp::vector<float> in_buf1(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
-    std::vector<float> in_buf2(
+    mipp::vector<float> in_buf2(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     std::vector<audio_slice> in_slices{in_buf1, in_buf2};
@@ -40,7 +41,7 @@ BM_mix_processor_2_inputs(benchmark::State& state)
             in_slices.begin(),
             in_slices.end());
 
-    std::vector<float> out_buf(buffer_size);
+    mipp::vector<float> out_buf(buffer_size);
     std::vector<std::span<float>> out{out_buf};
 
     std::vector<audio_slice> res{{}};
@@ -63,13 +64,13 @@ BM_mix_processor_3_inputs(benchmark::State& state)
 
     std::size_t const buffer_size = state.range(0);
 
-    std::vector<float> in_buf1(
+    mipp::vector<float> in_buf1(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
-    std::vector<float> in_buf2(
+    mipp::vector<float> in_buf2(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
-    std::vector<float> in_buf3(
+    mipp::vector<float> in_buf3(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     std::vector<audio_slice> in_slices{in_buf1, in_buf2, in_buf3};
@@ -77,7 +78,7 @@ BM_mix_processor_3_inputs(benchmark::State& state)
             in_slices.begin(),
             in_slices.end());
 
-    std::vector<float> out_buf(buffer_size);
+    mipp::vector<float> out_buf(buffer_size);
     std::vector<std::span<float>> out{out_buf};
 
     std::vector<audio_slice> res{{}};
@@ -100,16 +101,16 @@ BM_mix_processor_4_inputs(benchmark::State& state)
 
     std::size_t const buffer_size = state.range(0);
 
-    std::vector<float> in_buf1(
+    mipp::vector<float> in_buf1(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
-    std::vector<float> in_buf2(
+    mipp::vector<float> in_buf2(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
-    std::vector<float> in_buf3(
+    mipp::vector<float> in_buf3(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
-    std::vector<float> in_buf4(
+    mipp::vector<float> in_buf4(
             buffer_size,
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     std::vector<audio_slice> in_slices{in_buf1, in_buf2, in_buf3, in_buf4};
@@ -117,7 +118,7 @@ BM_mix_processor_4_inputs(benchmark::State& state)
             in_slices.begin(),
             in_slices.end());
 
-    std::vector<float> out_buf(buffer_size);
+    mipp::vector<float> out_buf(buffer_size);
     std::vector<std::span<float>> out{out_buf};
 
     std::vector<audio_slice> res{{}};
@@ -131,8 +132,14 @@ BM_mix_processor_4_inputs(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_mix_processor_2_inputs)->RangeMultiplier(2)->Range(1, 1024);
-BENCHMARK(BM_mix_processor_3_inputs)->RangeMultiplier(2)->Range(1, 1024);
-BENCHMARK(BM_mix_processor_4_inputs)->RangeMultiplier(2)->Range(1, 1024);
+BENCHMARK(BM_mix_processor_2_inputs)
+        ->RangeMultiplier(2)
+        ->Range(mipp::N<float>(), 1024);
+BENCHMARK(BM_mix_processor_3_inputs)
+        ->RangeMultiplier(2)
+        ->Range(mipp::N<float>(), 1024);
+BENCHMARK(BM_mix_processor_4_inputs)
+        ->RangeMultiplier(2)
+        ->Range(mipp::N<float>(), 1024);
 
 } // namespace piejam::audio::engine

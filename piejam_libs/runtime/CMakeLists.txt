@@ -214,5 +214,4 @@ target_link_libraries(piejam_runtime
     spdlog::spdlog
     SndFile::sndfile)
 
-add_subdirectory(benchmarks)
 add_subdirectory(tests)

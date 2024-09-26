@@ -4,9 +4,9 @@
 
 #include <benchmark/benchmark.h>
 
+#include <piejam/audio/dsp/simd.h>
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/slice_algorithms.h>
-#include <piejam/audio/simd.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -14,7 +14,6 @@
 #include <functional>
 #include <numeric>
 #include <span>
-#include <vector>
 
 constexpr auto min_period_size = 16;
 constexpr auto max_period_size = 1024;
@@ -128,7 +127,7 @@ multiply(
         std::span<float const> const in2,
         std::span<float> const dst)
 {
-    piejam::audio::simd::transform(
+    piejam::audio::dsp::simd::transform(
             in1,
             in2.data(),
             dst.data(),
