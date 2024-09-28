@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/audio/dsp/mipp_iterator.h>
+
 #include <piejam/numeric/pow_n.h>
 
 #include <mipp.h>
@@ -11,6 +13,7 @@
 #include <boost/assert.hpp>
 
 #include <cmath>
+#include <concepts>
 #include <numeric>
 #include <span>
 
@@ -18,11 +21,11 @@ namespace piejam::audio::dsp
 {
 
 template <std::floating_point T>
+[[nodiscard]]
 auto
 rms(std::span<T const> const in) -> T
 {
     BOOST_ASSERT(in.size() > 0);
-
     return std::sqrt(
             std::transform_reduce(
                     in.begin(),
@@ -37,23 +40,19 @@ namespace simd
 {
 
 template <std::floating_point T>
+[[nodiscard]]
 auto
 rms(std::span<T const> const in) -> T
 {
-    BOOST_ASSERT(in.size() > 0);
-    BOOST_ASSERT(mipp::isAligned(in.data()));
-    BOOST_ASSERT(in.size() % mipp::N<T>() == 0);
+    auto rng = mipp_range(in);
+    auto sums = std::transform_reduce(
+            rng.begin(),
+            rng.end(),
+            mipp::Reg<T>(T{}),
+            std::plus<>{},
+            numeric::pow_n<2>);
 
-    mipp::Reg<T> sum(T{});
-
-    constexpr auto const step = mipp::N<T>();
-    for (auto i = in.data(), e = (i + in.size()); i != e; i += step)
-    {
-        mipp::Reg<T> reg_in = i;
-        sum = mipp::fmadd(reg_in, reg_in, sum);
-    }
-
-    return std::sqrt(mipp::sum(sum) / in.size());
+    return std::sqrt(mipp::sum(sums) / in.size());
 }
 
 } // namespace simd

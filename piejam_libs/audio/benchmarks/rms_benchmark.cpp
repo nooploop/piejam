@@ -18,16 +18,14 @@ BM_rms(benchmark::State& state)
 {
     std::srand(std::time(nullptr));
 
-    mipp::vector<float> in_buf1(
+    mipp::vector<float> buf(
             state.range(0),
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     benchmark::ClobberMemory();
 
-    float rms{};
     for (auto _ : state)
     {
-        rms = piejam::audio::dsp::rms(std::span{std::as_const(in_buf1)});
-        (void)rms;
+        benchmark::DoNotOptimize(piejam::audio::dsp::rms<float>(buf));
     }
 }
 
@@ -38,16 +36,14 @@ BM_simd_rms(benchmark::State& state)
 {
     std::srand(std::time(nullptr));
 
-    mipp::vector<float> in_buf1(
+    mipp::vector<float> buf(
             state.range(0),
             static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     benchmark::ClobberMemory();
 
-    float rms{};
     for (auto _ : state)
     {
-        rms = piejam::audio::dsp::simd::rms(std::span{std::as_const(in_buf1)});
-        (void)rms;
+        benchmark::DoNotOptimize(piejam::audio::dsp::simd::rms<float>(buf));
     }
 }
 

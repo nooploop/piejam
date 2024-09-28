@@ -2,13 +2,11 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/range/indices.h>
-
 #include <cmath>
 #include <numbers>
 #include <span>
 
-namespace piejam::audio::dsp::test
+namespace piejam::audio::dsp
 {
 
 template <std::floating_point T>
@@ -21,10 +19,10 @@ generate_sine(
         T const phi = T{0})
 {
     T const two_pi_freq_div_sr = 2.f * std::numbers::pi_v<T> * freq / sr;
-    for (auto n : range::indices(out))
+    for (std::size_t n = 0, e = out.size(); n < e; ++n)
     {
         out[n] = amp * std::sin(n * two_pi_freq_div_sr + phi);
     }
 }
 
-} // namespace piejam::audio::dsp::test
+} // namespace piejam::audio::dsp

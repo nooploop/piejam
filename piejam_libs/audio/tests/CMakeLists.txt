@@ -21,7 +21,6 @@ add_executable(piejam_audio_test
     event_test.cpp
     event_to_audio_processor_test.cpp
     fake_processor.h
-    generate_sine.h
     graph_algorithms_test.cpp
     graph_test.cpp
     graph_to_dag_test.cpp

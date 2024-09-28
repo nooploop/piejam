@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "generate_sine.h"
-
 #include <piejam/audio/dsp/pitch_yin.h>
+
+#include <piejam/audio/dsp/generate_sine.h>
 
 #include <mipp.h>
 
@@ -27,12 +27,11 @@ struct pitch_yin_test : public testing::TestWithParam<float>
     }
 
     mipp::vector<float> signal;
-    pitch_yin<float> sut{sr};
 };
 
 TEST_P(pitch_yin_test, simple)
 {
-    auto result = sut.run(std::span{signal});
+    auto result = pitch_yin<float>(signal, sr);
 
     EXPECT_NEAR(GetParam(), result, 0.5);
 }

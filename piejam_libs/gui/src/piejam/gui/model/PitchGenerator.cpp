@@ -49,7 +49,7 @@ class Generator final : public SubStreamProcessor<float>
 public:
     explicit Generator(Args const& args)
         : m_signal(windowSize)
-        , m_pitchDetector{args.sampleRate}
+        , m_sr{args.sampleRate}
     {
     }
 
@@ -76,14 +76,13 @@ public:
         m_capturedFrames += stream.num_frames();
         if (m_capturedFrames >= captureSize)
         {
-            if (math::to_dB(audio::dsp::simd::rms(
-                        std::span{std::as_const(m_signal)})) < -60.f)
+            if (math::to_dB(audio::dsp::simd::rms<float>(m_signal)) < -60.f)
             {
                 m_lastFrequency = 0.f;
             }
             else
             {
-                m_lastFrequency = m_pitchDetector.run(m_signal);
+                m_lastFrequency = audio::dsp::pitch_yin<float>(m_signal, m_sr);
             }
 
             m_capturedFrames %= captureSize;
@@ -101,8 +100,7 @@ private:
     std::vector<float> m_signal;
     std::size_t m_capturedFrames{};
     float m_lastFrequency{};
-
-    audio::dsp::pitch_yin<float> m_pitchDetector;
+    audio::sample_rate m_sr;
 };
 
 struct Factory

@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "generate_sine.h"
-
 #include <piejam/audio/dsp/rms.h>
+
+#include <piejam/audio/dsp/generate_sine.h>
 
 #include <gtest/gtest.h>
 
