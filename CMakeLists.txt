@@ -68,7 +68,7 @@ add_library(nod INTERFACE)
 target_include_directories(nod SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/libs/nod/include)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libs/MIPP")
-set(MIPP_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/MIPP")
+set(MIPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/libs/MIPP/include")
 find_package(MIPP REQUIRED)
 target_compile_definitions(MIPP INTERFACE MIPP_ALIGNED_LOADS)
 set_target_properties(MIPP PROPERTIES SYSTEM ON)
