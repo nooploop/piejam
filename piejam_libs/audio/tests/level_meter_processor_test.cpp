@@ -25,7 +25,7 @@ namespace piejam::audio::engine::test
 struct level_meter_processor_test : ::testing::Test
 {
     std::unique_ptr<processor> sut{
-            make_level_meter_processor(sample_rate(48000))};
+            make_peak_level_meter_processor(sample_rate(48000))};
     alignas(mipp::RequiredAlignment) std::array<float, 4> in_buf{};
     std::vector<audio_slice> in_buf_spans{in_buf};
     std::vector<std::reference_wrapper<audio_slice const>> in_bufs{

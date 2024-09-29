@@ -13,7 +13,7 @@
 namespace piejam::audio::components
 {
 
-auto make_stereo_level_meter(sample_rate, std::string_view name = "level_meter")
+auto make_stereo_level_meter(sample_rate, std::string_view name = "")
         -> std::unique_ptr<engine::component>;
 
 } // namespace piejam::audio::components

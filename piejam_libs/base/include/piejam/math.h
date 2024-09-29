@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include <concepts>
+#include <functional>
 #include <limits>
 
 namespace piejam::math
@@ -50,6 +51,14 @@ clamp(T v, T const min, T const max) -> T
     }
 
     return v;
+}
+
+template <class T, std::invocable<T> P>
+[[nodiscard]]
+constexpr auto
+flush_to_zero_if(T value, P&& p) -> T
+{
+    return static_cast<T>(!std::invoke(std::forward<P>(p), value)) * value;
 }
 
 template <std::floating_point T>

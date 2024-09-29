@@ -24,8 +24,7 @@ struct mipp_iterator
               mipp::Reg<std::remove_const_t<T>>,
               T*>
 {
-    using element_type = std::remove_const_t<T>;
-    static constexpr auto N = mipp::N<element_type>();
+    static constexpr auto N = mipp::N<std::remove_const_t<T>>();
 
     constexpr mipp_iterator() noexcept = default;
     constexpr mipp_iterator(T* p) noexcept
@@ -35,7 +34,8 @@ struct mipp_iterator
     }
 
     [[nodiscard]]
-    constexpr auto operator*() const noexcept -> mipp::Reg<element_type>
+    constexpr auto
+    operator*() const noexcept -> mipp::Reg<std::remove_const_t<T>>
     {
         return m_p;
     }

@@ -13,7 +13,10 @@
 namespace piejam::audio::engine
 {
 
-auto make_level_meter_processor(sample_rate, std::string_view name = {})
+auto make_peak_level_meter_processor(sample_rate, std::string_view name = {})
+        -> std::unique_ptr<processor>;
+
+auto make_rms_level_meter_processor(sample_rate, std::string_view name = {})
         -> std::unique_ptr<processor>;
 
 } // namespace piejam::audio::engine

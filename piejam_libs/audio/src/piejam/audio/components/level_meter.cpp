@@ -8,6 +8,7 @@
 #include <piejam/audio/engine/event_converter_processor.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_endpoint.h>
+#include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/level_meter_processor.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/pair.h>
@@ -27,12 +28,18 @@ class stereo_level_meter final : public engine::component
 {
 public:
     stereo_level_meter(sample_rate const sample_rate, std::string_view name)
-        : m_left_lm_proc(engine::make_level_meter_processor(
+        : m_left_peak_lm_proc(engine::make_peak_level_meter_processor(
                   sample_rate,
-                  fmt::format("{} L", name)))
-        , m_right_lm_proc(engine::make_level_meter_processor(
+                  fmt::format("{} peak L", name)))
+        , m_left_rms_lm_proc(engine::make_rms_level_meter_processor(
                   sample_rate,
-                  fmt::format("{} R", name)))
+                  fmt::format("{} rms L", name)))
+        , m_right_peak_lm_proc(engine::make_peak_level_meter_processor(
+                  sample_rate,
+                  fmt::format("{} peak R", name)))
+        , m_right_rms_lm_proc(engine::make_rms_level_meter_processor(
+                  sample_rate,
+                  fmt::format("{} rms R", name)))
     {
     }
 
@@ -58,11 +65,25 @@ public:
 
     void connect(engine::graph& g) const override
     {
-        g.event.insert({*m_left_lm_proc, 0}, {*m_peak_level_convert_proc, 0});
-        g.event.insert({*m_right_lm_proc, 0}, {*m_peak_level_convert_proc, 1});
+        g.audio.insert({*m_left_input_proc, 0}, {*m_left_peak_lm_proc, 0});
+        g.audio.insert({*m_left_input_proc, 0}, {*m_left_rms_lm_proc, 0});
 
-        g.event.insert({*m_left_lm_proc, 1}, {*m_rms_level_convert_proc, 0});
-        g.event.insert({*m_right_lm_proc, 1}, {*m_rms_level_convert_proc, 1});
+        g.audio.insert({*m_right_input_proc, 0}, {*m_right_peak_lm_proc, 0});
+        g.audio.insert({*m_right_input_proc, 0}, {*m_right_rms_lm_proc, 0});
+
+        g.event.insert(
+                {*m_left_peak_lm_proc, 0},
+                {*m_peak_level_convert_proc, 0});
+        g.event.insert(
+                {*m_right_peak_lm_proc, 0},
+                {*m_peak_level_convert_proc, 1});
+
+        g.event.insert(
+                {*m_left_rms_lm_proc, 0},
+                {*m_rms_level_convert_proc, 0});
+        g.event.insert(
+                {*m_right_rms_lm_proc, 0},
+                {*m_rms_level_convert_proc, 1});
     }
 
 private:
@@ -83,16 +104,22 @@ private:
                         name)};
     }
 
-    std::unique_ptr<engine::processor> m_left_lm_proc;
-    std::unique_ptr<engine::processor> m_right_lm_proc;
+    std::unique_ptr<engine::processor> m_left_input_proc{
+            engine::make_identity_processor()};
+    std::unique_ptr<engine::processor> m_right_input_proc{
+            engine::make_identity_processor()};
+    std::unique_ptr<engine::processor> m_left_peak_lm_proc;
+    std::unique_ptr<engine::processor> m_left_rms_lm_proc;
+    std::unique_ptr<engine::processor> m_right_peak_lm_proc;
+    std::unique_ptr<engine::processor> m_right_rms_lm_proc;
     std::unique_ptr<engine::processor> m_peak_level_convert_proc{
             make_stereo_level_converter("peak_level")};
     std::unique_ptr<engine::processor> m_rms_level_convert_proc{
             make_stereo_level_converter("rms_level")};
 
     std::array<engine::graph_endpoint, 2> m_inputs{{
-            {*m_left_lm_proc, 0},
-            {*m_right_lm_proc, 0},
+            {*m_left_input_proc, 0},
+            {*m_right_input_proc, 0},
     }};
     std::array<engine::graph_endpoint, 2> m_event_outputs{{
             {*m_peak_level_convert_proc, 0},
