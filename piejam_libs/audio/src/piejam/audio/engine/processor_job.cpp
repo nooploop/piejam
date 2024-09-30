@@ -4,7 +4,6 @@
 
 #include <piejam/audio/engine/processor_job.h>
 
-#include <piejam/audio/dsp/simd.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
 #include <piejam/audio/engine/thread_context.h>
@@ -32,10 +31,9 @@ processor_job::processor_job(processor& proc)
     , m_process_context(
               {m_inputs, m_outputs, m_results, m_event_inputs, m_event_outputs})
 {
-    BOOST_ASSERT((std::ranges::all_of(
-            m_output_buffers,
-            dsp::simd::is_aligned,
-            [](auto const& b) { return b.data(); })));
+    BOOST_ASSERT((std::ranges::all_of(m_output_buffers, [](auto const& b) {
+        return mipp::isAligned(b.data());
+    })));
     for (event_port const& port : m_proc.event_inputs())
     {
         m_event_inputs.add(port);

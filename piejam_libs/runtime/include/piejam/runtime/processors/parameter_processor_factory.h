@@ -16,6 +16,7 @@
 #include <string_view>
 #include <tuple>
 #include <unordered_map>
+#include <variant>
 
 namespace piejam::runtime::processors
 {

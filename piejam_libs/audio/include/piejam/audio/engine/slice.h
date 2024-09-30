@@ -7,8 +7,8 @@
 #include <boost/assert.hpp>
 
 #include <concepts>
+#include <functional>
 #include <span>
-#include <variant>
 
 namespace piejam::audio::engine
 {
@@ -17,65 +17,113 @@ template <class T>
 class slice
 {
 public:
+    enum class kind : bool
+    {
+        constant,
+        span,
+    };
+
     using value_type = T;
     using constant_t = T;
     using span_t = std::span<T const>;
-    using variant_t = std::variant<T, span_t>;
 
     constexpr slice() noexcept = default;
 
     constexpr slice(constant_t v) noexcept
-        : m_value(v)
+        : m_kind{kind::constant}
+        , m_value{.constant = v}
     {
     }
 
     template <std::convertible_to<span_t> U>
     constexpr slice(U&& u) noexcept(noexcept(span_t(std::forward<U>(u))))
-        : m_value(span_t(std::forward<U>(u)))
+        : m_kind{kind::span}
+        , m_value{.span = span_t(std::forward<U>(u))}
     {
     }
 
     [[nodiscard]]
     constexpr auto is_constant() const noexcept -> bool
     {
-        return std::holds_alternative<T>(m_value);
+        return m_kind == kind::constant;
     }
 
     [[nodiscard]]
     constexpr auto constant() const noexcept -> constant_t
     {
         BOOST_ASSERT(is_constant());
-        return *std::get_if<0>(&m_value);
+        return m_value.constant;
     }
 
     [[nodiscard]]
     constexpr auto is_span() const noexcept -> bool
     {
-        return std::holds_alternative<span_t>(m_value);
+        return m_kind == kind::span;
     }
 
     [[nodiscard]]
     constexpr auto span() const noexcept -> span_t const&
     {
         BOOST_ASSERT(is_span());
-        return *std::get_if<1>(&m_value);
+        return m_value.span;
     }
 
-    [[nodiscard]]
-    constexpr auto as_variant() const noexcept -> variant_t const&
+    template <class Visitor>
+    static auto visit(Visitor&& v, slice const s)
     {
-        return m_value;
+        switch (s.m_kind)
+        {
+            case kind::constant:
+                return std::invoke(v, s.m_value.constant);
+
+            case kind::span:
+                return std::invoke(v, s.m_value.span);
+        }
     }
 
-    template <class Visitor, class... S>
-    static auto visit(Visitor&& v, S&&... s)
-        requires(std::is_same_v<slice<T>, std::decay_t<S>> && ...)
+    template <class Visitor>
+    static auto visit(Visitor&& v, slice const s1, slice const s2)
     {
-        return std::visit(std::forward<Visitor>(v), s.m_value...);
+        switch (s1.m_kind)
+        {
+            case kind::constant:
+                switch (s2.m_kind)
+                {
+                    case kind::constant:
+                        return std::invoke(
+                                v,
+                                s1.m_value.constant,
+                                s2.m_value.constant);
+
+                    case kind::span:
+                        return std::invoke(
+                                v,
+                                s1.m_value.constant,
+                                s2.m_value.span);
+                }
+
+            case kind::span:
+                switch (s2.m_kind)
+                {
+                    case kind::constant:
+                        return std::invoke(
+                                v,
+                                s1.m_value.span,
+                                s2.m_value.constant);
+
+                    case kind::span:
+                        return std::invoke(v, s1.m_value.span, s2.m_value.span);
+                }
+        }
     }
 
 private:
-    variant_t m_value{};
+    kind m_kind{};
+    union
+    {
+        constant_t constant{};
+        span_t span;
+    } m_value{};
 };
 
 } // namespace piejam::audio::engine

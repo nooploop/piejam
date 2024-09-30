@@ -6,7 +6,8 @@
 
 #include <piejam/audio/engine/slice.h>
 
-#include <piejam/audio/dsp/simd.h>
+#include <piejam/audio/dsp/mipp_iterator.h>
+
 #include <piejam/math.h>
 #include <piejam/switch_cast.h>
 
@@ -45,9 +46,11 @@ struct slice_add
         if (r_c != T{})
         {
             BOOST_ASSERT(l_buf.size() == m_out.size());
-            dsp::simd::transform(
-                    l_buf,
-                    m_out.data(),
+
+            std::transform(
+                    dsp::mipp_begin(l_buf),
+                    dsp::mipp_end(l_buf),
+                    dsp::mipp_begin(m_out),
                     bhof::capture(mipp::Reg<T>(r_c))(std::plus<>{}));
 
             return m_out;
@@ -71,7 +74,14 @@ struct slice_add
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
-        dsp::simd::transform(l_buf, r_buf.data(), m_out.data(), std::plus<>{});
+
+        std::transform(
+                dsp::mipp_begin(l_buf),
+                dsp::mipp_end(l_buf),
+                dsp::mipp_begin(r_buf),
+                dsp::mipp_begin(m_out),
+                std::plus<>{});
+
         return m_out;
     }
 
@@ -108,17 +118,21 @@ struct slice_multiply
 
             case switch_cast(T{-1}):
                 BOOST_ASSERT(l_buf.size() == m_out.size());
-                dsp::simd::transform(
-                        l_buf,
-                        m_out.data(),
+
+                std::transform(
+                        dsp::mipp_begin(l_buf),
+                        dsp::mipp_end(l_buf),
+                        dsp::mipp_begin(m_out),
                         bhof::capture(mipp::Reg<T>(T{}))(std::minus<>{}));
                 return m_out;
 
             default:
                 BOOST_ASSERT(l_buf.size() == m_out.size());
-                dsp::simd::transform(
-                        l_buf,
-                        m_out.data(),
+
+                std::transform(
+                        dsp::mipp_begin(l_buf),
+                        dsp::mipp_end(l_buf),
+                        dsp::mipp_begin(m_out),
                         bhof::capture(mipp::Reg<T>(r_c))(std::multiplies<>{}));
 
                 return m_out;
@@ -138,11 +152,14 @@ struct slice_multiply
     {
         BOOST_ASSERT(l_buf.size() == r_buf.size());
         BOOST_ASSERT(l_buf.size() == m_out.size());
-        dsp::simd::transform(
-                l_buf,
-                r_buf.data(),
-                m_out.data(),
+
+        std::transform(
+                dsp::mipp_begin(l_buf),
+                dsp::mipp_end(l_buf),
+                dsp::mipp_begin(r_buf),
+                dsp::mipp_begin(m_out),
                 std::multiplies<>{});
+
         return m_out;
     }
 
@@ -162,7 +179,7 @@ struct slice_clamp
         , m_out(out)
     {
         BOOST_ASSERT(min <= max);
-        BOOST_ASSERT(dsp::simd::is_aligned(out.data()));
+        BOOST_ASSERT(mipp::isAligned(out.data()));
     }
 
     constexpr auto
@@ -174,16 +191,14 @@ struct slice_clamp
     constexpr auto
     operator()(typename slice<T>::span_t const buf) const -> slice<T>
     {
-        BOOST_ASSERT(dsp::simd::is_aligned(buf.data()));
-        dsp::simd::transform(
-                buf,
-                m_out.data(),
+        BOOST_ASSERT(mipp::isAligned(buf.data()));
+        std::transform(
+                dsp::mipp_begin(buf),
+                dsp::mipp_end(buf),
+                dsp::mipp_begin(m_out),
                 [min = mipp::Reg<T>(m_min),
-                 max = mipp::Reg<T>(m_max)](auto&& x) {
-                    return dsp::simd::clamp(
-                            std::forward<decltype(x)>(x),
-                            min,
-                            max);
+                 max = mipp::Reg<T>(m_max)](mipp::Reg<T> const x) {
+                    return mipp::max(min, mipp::min(max, x));
                 });
         return m_out;
     }
@@ -250,64 +265,6 @@ private:
     std::size_t const m_size;
 };
 
-template <class T, class F>
-struct slice_transform
-{
-    template <std::convertible_to<F> G>
-    constexpr slice_transform(std::span<T> const out, G&& g)
-        : m_out(out)
-        , m_f(std::forward<G>(g))
-    {
-    }
-
-    constexpr auto
-    operator()(typename slice<T>::constant_t const c) const noexcept -> slice<T>
-    {
-        return m_f(c);
-    }
-
-    constexpr auto
-    operator()(typename slice<T>::span_t const buf) const noexcept -> slice<T>
-    {
-        BOOST_ASSERT(buf.size() == m_out.size());
-        dsp::simd::transform(buf, m_out.data(), m_f);
-        return m_out;
-    }
-
-private:
-    std::span<T> const m_out;
-    F m_f;
-};
-
-template <class T>
-struct slice_interleave
-{
-    constexpr slice_interleave(std::span<T> const out) noexcept
-        : m_out(out)
-    {
-    }
-
-    template <class I1, class I2>
-    constexpr void operator()(I1&& l, I2&& r) const noexcept
-    {
-        dsp::simd::interleave(std::forward<I1>(l), std::forward<I2>(r), m_out);
-    }
-
-    template <class I1, class I2, class I3, class I4>
-    constexpr void operator()(I1&& i1, I2&& i2, I3&& i3, I4&& i4) const noexcept
-    {
-        dsp::simd::interleave(
-                std::forward<I1>(i1),
-                std::forward<I2>(i2),
-                std::forward<I3>(i3),
-                std::forward<I4>(i4),
-                m_out);
-    }
-
-private:
-    std::span<T> const m_out;
-};
-
 } // namespace detail
 
 template <class T>
@@ -344,15 +301,6 @@ copy(slice<T> const& s, std::span<T> const out) noexcept
     slice<T>::visit(detail::slice_copy(out), s);
 }
 
-template <class T, class F>
-constexpr auto
-transform(slice<T> const& s, std::span<T> const out, F&& f) noexcept -> slice<T>
-{
-    return slice<T>::visit(
-            detail::slice_transform<T, F>(out, std::forward<F>(f)),
-            s);
-}
-
 template <class T>
 constexpr auto
 subslice(
@@ -361,28 +309,6 @@ subslice(
         std::size_t const size) noexcept -> slice<T>
 {
     return slice<T>::visit(detail::subslice<T>(offset, size), s);
-}
-
-template <class T>
-constexpr auto
-interleave(
-        slice<T> const& s1,
-        slice<T> const& s2,
-        std::span<T> const out) noexcept
-{
-    slice<T>::visit(detail::slice_interleave(out), s1, s2);
-}
-
-template <class T>
-constexpr auto
-interleave(
-        slice<T> const& s1,
-        slice<T> const& s2,
-        slice<T> const& s3,
-        slice<T> const& s4,
-        std::span<T> const out) noexcept
-{
-    slice<T>::visit(detail::slice_interleave(out), s1, s2, s3, s4);
 }
 
 } // namespace piejam::audio::engine

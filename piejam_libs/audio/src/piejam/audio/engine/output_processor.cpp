@@ -11,8 +11,6 @@
 
 #include <boost/assert.hpp>
 
-#include <array>
-
 namespace piejam::audio::engine
 {
 
@@ -26,7 +24,15 @@ output_processor::process(process_context const& ctx)
 {
     verify_process_context(*this, ctx);
 
-    m_engine_output(ctx.inputs[0].get().as_variant());
+    auto const in = ctx.inputs[0].get();
+    if (in.is_constant())
+    {
+        m_engine_output(in.constant());
+    }
+    else
+    {
+        m_engine_output(in.span());
+    }
 }
 
 } // namespace piejam::audio::engine

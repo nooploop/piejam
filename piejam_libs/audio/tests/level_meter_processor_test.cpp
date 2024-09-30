@@ -4,7 +4,6 @@
 
 #include <piejam/audio/engine/level_meter_processor.h>
 
-#include <piejam/audio/dsp/simd.h>
 #include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
@@ -12,6 +11,8 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
 #include <piejam/audio/sample_rate.h>
+
+#include <mipp.h>
 
 #include <gtest/gtest.h>
 
