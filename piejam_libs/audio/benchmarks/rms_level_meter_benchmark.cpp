@@ -27,7 +27,7 @@ BM_rms_level_meter(benchmark::State& state)
     for (auto _ : state)
     {
         std::ranges::copy(
-                piejam::audio::dsp::mipp_range(std::span{buf}),
+                piejam::audio::dsp::mipp_range(std::span<float const>{buf}),
                 std::back_inserter(lm));
     }
 

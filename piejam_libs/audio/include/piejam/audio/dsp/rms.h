@@ -44,7 +44,7 @@ template <std::floating_point T>
 auto
 rms(std::span<T const> const in) -> T
 {
-    auto rng = mipp_range(in);
+    auto const rng = mipp_range(in);
     auto sums = std::transform_reduce(
             rng.begin(),
             rng.end(),
