@@ -20,7 +20,7 @@ Pane {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 24
 
-            text: "Hint: Turn off you speakers first."
+            text: "Tip: Turn off you speakers first."
         }
 
         Button {
