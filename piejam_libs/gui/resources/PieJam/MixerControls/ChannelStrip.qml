@@ -5,11 +5,13 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
+import "../Controls"
+
 Item {
     id: root
 
     property alias perform: performStrip.model
-    property alias edit: editStrip.model
+    property var edit: null
     property alias fx: fxStrip.model
     property alias auxSend: auxSendStrip.model
 
@@ -27,10 +29,12 @@ Item {
             id: performStrip
         }
 
-        ChannelEditStrip {
-            id: editStrip
+        BusyLoader {
+            sourceComponent: ChannelEditStrip {
+                model: root.edit
 
-            deletable: root.deletable
+                deletable: root.deletable
+            }
         }
 
         ChannelFxStrip {
