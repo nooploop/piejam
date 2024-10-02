@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -14,8 +13,8 @@ namespace piejam
 template <class F>
 struct on_scope_exit
 {
-    on_scope_exit(F&& f) noexcept(std::is_nothrow_move_constructible_v<F>)
-        : m_f(std::move(f))
+    explicit on_scope_exit(F&& f) noexcept(std::is_nothrow_move_constructible_v<F>)
+        : m_f{std::move(f)}
     {
     }
 

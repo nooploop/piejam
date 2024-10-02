@@ -13,7 +13,7 @@ namespace piejam
 
 template <class Container, class T>
 auto
-insert_at(Container&& c, std::size_t const index, T&& value)
+insert_at(Container&& c, std::size_t index, T&& value)
 {
     using std::begin;
     using std::size;
@@ -27,7 +27,7 @@ insert_at(Container&& c, std::size_t const index, T&& value)
 
 template <class Container>
 auto
-erase_at(Container&& c, std::size_t const index)
+erase_at(Container&& c, std::size_t index)
 {
     using std::begin;
     using std::size;

@@ -20,7 +20,7 @@ constexpr T negative_inf = -std::numeric_limits<T>::infinity();
 template <std::floating_point T>
 [[nodiscard]]
 constexpr auto
-to_dB(T const log, T const min_log = T{}) -> T
+to_dB(T log, T min_log = T{}) -> T
 {
     static_assert(std::numeric_limits<T>::is_iec559, "IEEE 754 required");
     return log <= min_log ? negative_inf<T> : std::log10(log) * T{20};
@@ -29,16 +29,16 @@ to_dB(T const log, T const min_log = T{}) -> T
 template <std::floating_point T>
 [[nodiscard]]
 constexpr auto
-from_dB(T const dB, T const min_dB = negative_inf<T>) -> T
+from_dB(T dB, T min_dB = negative_inf<T>) -> T
 {
     return dB <= min_dB ? T{} : std::pow(T{10}, dB / T{20});
 }
 
 template <class T>
+    requires(std::is_arithmetic_v<T>)
 [[nodiscard]]
 constexpr auto
-clamp(T v, T const min, T const max) -> T
-    requires(std::is_arithmetic_v<T>)
+clamp(T v, T min, T max) -> T
 {
     if (v < min)
     {
@@ -64,12 +64,7 @@ flush_to_zero_if(T value, P&& p) -> T
 template <std::floating_point T>
 [[nodiscard]]
 constexpr auto
-linear_map(
-        T const v,
-        T const src_lo,
-        T const src_hi,
-        T const dst_lo,
-        T const dst_hi) -> T
+linear_map(T v, T src_lo, T src_hi, T dst_lo, T dst_hi) -> T
 {
     return ((v - src_lo) / (src_hi - src_lo)) * (dst_hi - dst_lo) + dst_lo;
 }

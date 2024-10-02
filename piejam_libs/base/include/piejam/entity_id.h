@@ -24,6 +24,9 @@ struct entity_id
 
     constexpr entity_id() noexcept = default;
 
+    constexpr auto
+    operator==(entity_id const& other) const noexcept -> bool = default;
+
     constexpr auto operator<=>(entity_id const& other) const noexcept = default;
 
     [[nodiscard]]
@@ -41,8 +44,8 @@ struct entity_id
 private:
     using id_t = std::size_t;
 
-    constexpr explicit entity_id(id_t const id) noexcept
-        : m_id(id)
+    constexpr explicit entity_id(id_t id) noexcept
+        : m_id{id}
     {
     }
 

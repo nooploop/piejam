@@ -46,20 +46,20 @@ public:
     }
 
     [[nodiscard]]
-    auto contains(id_t const id) const noexcept
+    auto contains(id_t id) const noexcept
     {
         return m_map->contains(id);
     }
 
     [[nodiscard]]
-    auto find(id_t const id) const noexcept -> Entity const*
+    auto find(id_t id) const noexcept -> Entity const*
     {
         auto it = m_map->find(id);
         return it != m_map->end() ? std::addressof(it->second) : nullptr;
     }
 
     [[nodiscard]]
-    auto operator[](id_t const id) const noexcept -> Entity const&
+    auto operator[](id_t id) const noexcept -> Entity const&
     {
         auto it = m_map->find(id);
         BOOST_ASSERT(it != m_map->end());
@@ -87,7 +87,7 @@ public:
         }
 
         [[nodiscard]]
-        auto operator[](id_t const id) -> Entity&
+        auto operator[](id_t id) -> Entity&
         {
             auto it = m_->find(id);
             BOOST_ASSERT(it != m_->end());
@@ -115,7 +115,7 @@ public:
             return id;
         }
 
-        auto erase(id_t const id) -> typename map_t::size_type
+        auto erase(id_t id) -> typename map_t::size_type
         {
             return m_->erase(id);
         }
@@ -151,7 +151,7 @@ public:
         return lock().emplace(std::forward<Args>(args)...);
     }
 
-    auto erase(id_t const id) -> typename map_t::size_type
+    auto erase(id_t id) -> typename map_t::size_type
     {
         return lock().erase(id);
     }

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/scope_guard.h>
+#include <piejam/on_scope_exit.h>
 
 #include <boost/callable_traits/args.hpp>
 

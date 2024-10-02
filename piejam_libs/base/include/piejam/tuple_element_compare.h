@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <cstddef>
 #include <functional>
+#include <utility>
 
 namespace piejam::tuple
 {
@@ -16,7 +18,7 @@ struct element_compare
     static constexpr auto compare(Value&& v) -> decltype(auto)
     {
         return [v](auto&& tup) {
-            return Compare{}(v, std::get<I>(std::forward<decltype(tup)>(tup)));
+            return Compare{}(v, get<I>(std::forward<decltype(tup)>(tup)));
         };
     }
 

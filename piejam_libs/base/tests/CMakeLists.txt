@@ -7,12 +7,13 @@ if(NOT PIEJAM_TESTS)
 endif()
 
 add_executable(piejam_base_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/box_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/decay_tuple_elements_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/entity_map_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/indexed_access_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/math_test.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/type_traits_test.cpp
+    box_test.cpp
+    decay_tuple_elements_test.cpp
+    entity_map_test.cpp
+    indexed_access_test.cpp
+    math_test.cpp
+    tuple_test.cpp
+    type_traits_test.cpp
 )
 target_link_libraries(piejam_base_test gtest_driver piejam_base)
 target_compile_options(piejam_base_test PRIVATE -Wall -Wextra -Werror -pedantic-errors)

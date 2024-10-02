@@ -13,19 +13,19 @@ namespace piejam
 
 template <std::signed_integral T>
 constexpr auto
-switch_cast(T const x) noexcept
+switch_cast(T x) noexcept
 {
     return x;
 }
 
 constexpr auto
-switch_cast(float const x) noexcept
+switch_cast(float x) noexcept
 {
     return std::bit_cast<std::int32_t>(x);
 }
 
 constexpr auto
-switch_cast(double const x) noexcept
+switch_cast(double x) noexcept
 {
     return std::bit_cast<std::int64_t>(x);
 }

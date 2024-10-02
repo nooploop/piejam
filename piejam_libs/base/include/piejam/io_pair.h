@@ -21,8 +21,8 @@ struct io_pair
     T out;
 
     constexpr io_pair() noexcept(std::is_nothrow_default_constructible_v<T>)
-        : in()
-        , out()
+        : in{}
+        , out{}
     {
     }
 
@@ -42,12 +42,12 @@ struct io_pair
 
     auto operator==(io_pair const&) const noexcept -> bool = default;
 
-    constexpr auto get(io_direction const io_dir) const noexcept -> T const&
+    constexpr auto get(io_direction io_dir) const noexcept -> T const&
     {
         return io_dir == io_direction::input ? in : out;
     }
 
-    constexpr auto get(io_direction const io_dir) noexcept -> T&
+    constexpr auto get(io_direction io_dir) noexcept -> T&
     {
         return io_dir == io_direction::input ? in : out;
     }
