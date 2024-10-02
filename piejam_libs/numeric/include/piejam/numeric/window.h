@@ -14,7 +14,7 @@ namespace piejam::numeric::window
 constexpr auto
 hamming(std::size_t const size, std::size_t const n) noexcept -> float
 {
-    constexpr float const two_pi = 2.f * std::numbers::pi_v<float>;
+    constexpr float two_pi = 2.f * std::numbers::pi_v<float>;
     float const two_pi_div_size_minus_1 = two_pi / (size - 1);
     return 0.54f - 0.46f * std::cos(two_pi_div_size_minus_1 * n);
 }
@@ -31,7 +31,7 @@ hamming_c(std::size_t const n) noexcept -> float
 constexpr auto
 hann(std::size_t const size, std::size_t const n) noexcept -> float
 {
-    constexpr float const two_pi = 2.f * std::numbers::pi_v<float>;
+    constexpr float two_pi = 2.f * std::numbers::pi_v<float>;
     float const two_pi_div_size_minus_1 = two_pi / (size - 1);
     return 0.5f - 0.5f * std::cos(two_pi_div_size_minus_1 * n);
 }

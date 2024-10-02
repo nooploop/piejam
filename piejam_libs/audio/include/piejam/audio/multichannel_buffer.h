@@ -11,7 +11,6 @@
 #include <boost/assert.hpp>
 
 #include <span>
-#include <vector>
 
 namespace piejam::audio
 {
@@ -19,7 +18,7 @@ namespace piejam::audio
 template <class T, class Layout = multichannel_layout_runtime_defined>
 class multichannel_buffer
 {
-    static inline constexpr auto default_layout = std::conditional_t<
+    static constexpr auto default_layout = std::conditional_t<
             std::is_same_v<Layout, multichannel_layout_runtime_defined>,
             multichannel_layout_non_interleaved,
             Layout>::value;

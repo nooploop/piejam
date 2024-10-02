@@ -31,7 +31,7 @@ sqr_difference_sum(
         std::size_t const e,
         std::size_t const tau) -> T
 {
-    constexpr auto const N = mipp::N<T>();
+    constexpr auto N = mipp::N<T>();
     auto const data = in.data();
     auto const offset = tau % N;
     if (offset == 0)
@@ -82,7 +82,7 @@ template <std::floating_point T>
 auto
 pitch_yin(std::span<T const> const in, sample_rate const sr) -> T
 {
-    constexpr T const threshold{0.1f};
+    constexpr T threshold{0.1f};
 
     std::size_t const e = in.size() / 2;
     T a = T{1};

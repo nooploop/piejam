@@ -26,7 +26,7 @@ log_message_handler(
     int const line = context.line;
     char const* const function = context.function ? context.function : "";
 
-    constexpr auto const pattern = "{} ({}:{}, {})";
+    constexpr auto pattern = "{} ({}:{}, {})";
 
     switch (type)
     {

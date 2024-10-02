@@ -29,7 +29,7 @@ public:
             piejam::gui::model::ParameterId const&);
     ~FloatParameter();
 
-    static inline constexpr auto StaticType = Type::Float;
+    static constexpr auto StaticType = Type::Float;
 
     auto value() const noexcept -> double
     {

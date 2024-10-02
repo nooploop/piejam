@@ -8,7 +8,6 @@
 
 #include <piejam/npos.h>
 
-#include <cassert>
 #include <functional>
 #include <iterator>
 #include <ranges>

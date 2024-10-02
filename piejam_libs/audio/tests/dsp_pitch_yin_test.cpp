@@ -17,7 +17,7 @@ namespace piejam::audio::dsp::test
 struct pitch_yin_test : public testing::TestWithParam<float>
 {
     static constexpr std::size_t buffer_size{8192};
-    static constexpr sample_rate const sr{48000};
+    static constexpr sample_rate sr{48000};
 
     pitch_yin_test()
         : signal(buffer_size)

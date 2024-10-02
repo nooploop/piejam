@@ -79,17 +79,17 @@ struct num_regs;
 template <>
 struct num_regs<mipp::Reg>
 {
-    static constexpr std::size_t const value{1};
+    static constexpr std::size_t value{1};
 };
 
 template <>
 struct num_regs<mipp::Regx2>
 {
-    static constexpr std::size_t const value{2};
+    static constexpr std::size_t value{2};
 };
 
 template <template <class> class Reg>
-constexpr std::size_t const num_regs_v = num_regs<Reg>::value;
+constexpr std::size_t num_regs_v = num_regs<Reg>::value;
 
 } // namespace detail
 

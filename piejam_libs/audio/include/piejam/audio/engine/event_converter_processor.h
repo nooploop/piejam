@@ -40,16 +40,15 @@ class event_converter_processor final : public named_processor
     using inputs_t = tuple::decay_elements_t<
             boost::callable_traits::args_t<OutputGenerator>>;
 
-    static inline constexpr std::size_t num_event_inputs{
-            std::tuple_size_v<inputs_t>};
-    static inline constexpr std::size_t num_event_outputs{
+    static constexpr std::size_t num_event_inputs{std::tuple_size_v<inputs_t>};
+    static constexpr std::size_t num_event_outputs{
             std::tuple_size_v<outputs_t>};
 
     static_assert(num_event_inputs > 0);
 
-    static inline constexpr auto input_index_sequence{
+    static constexpr auto input_index_sequence{
             std::make_index_sequence<num_event_inputs>{}};
-    static inline constexpr auto output_index_sequence{
+    static constexpr auto output_index_sequence{
             std::make_index_sequence<num_event_outputs>{}};
 
 public:

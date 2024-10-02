@@ -7,7 +7,6 @@
 #include <piejam/algorithm/concepts.h>
 
 #include <algorithm>
-#include <concepts>
 #include <iterator>
 #include <ranges>
 
@@ -52,7 +51,7 @@ struct contains_fn
 
 } // namespace detail
 
-inline constexpr detail::contains_fn contains{};
+inline constexpr detail::contains_fn contains;
 
 namespace detail
 {

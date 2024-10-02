@@ -99,11 +99,8 @@ auto
 make_coefficent_converter_processor(audio::sample_rate const sample_rate)
 {
     using namespace std::string_view_literals;
-    static constexpr std::array const s_input_names{
-            "type"sv,
-            "cutoff"sv,
-            "res"sv};
-    static constexpr std::array const s_output_names{"coeffs"sv};
+    static constexpr std::array s_input_names{"type"sv, "cutoff"sv, "res"sv};
+    static constexpr std::array s_output_names{"coeffs"sv};
     return audio::engine::make_event_converter_processor(
             [inv_sr = 1.f / sample_rate.as_float()](
                     int const type,
@@ -334,7 +331,7 @@ make_in_out_stream(
 template <std::size_t... Channel>
 class component final : public audio::engine::component
 {
-    static inline constexpr std::size_t num_channels = sizeof...(Channel);
+    static constexpr std::size_t num_channels = sizeof...(Channel);
 
 public:
     component(runtime::internal_fx_component_factory_args const& args)

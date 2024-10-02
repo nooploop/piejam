@@ -17,8 +17,8 @@ make_pan_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     using namespace std::string_view_literals;
-    static constexpr std::array const s_input_names{"pan"sv};
-    static constexpr std::array const s_output_names{"gain L"sv, "gain R"sv};
+    static constexpr std::array s_input_names{"pan"sv};
+    static constexpr std::array s_output_names{"gain L"sv, "gain R"sv};
     return make_event_converter_processor(
             [](float param) -> std::tuple<float, float> {
                 auto stereo_gain = dsp::sinusoidal_constant_power_pan(param);
@@ -34,8 +34,8 @@ make_volume_pan_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     using namespace std::string_view_literals;
-    static constexpr std::array const s_input_names{"volume"sv, "pan"sv};
-    static constexpr std::array const s_output_names{"gain L"sv, "gain R"sv};
+    static constexpr std::array s_input_names{"volume"sv, "pan"sv};
+    static constexpr std::array s_output_names{"gain L"sv, "gain R"sv};
     return make_event_converter_processor(
             [](float volume, float pan) -> std::tuple<float, float> {
                 auto pan_gain = dsp::sinusoidal_constant_power_pan(pan);
@@ -53,8 +53,8 @@ make_balance_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     using namespace std::string_view_literals;
-    static constexpr std::array const s_input_names{"balance"sv};
-    static constexpr std::array const s_output_names{"gain L"sv, "gain R"sv};
+    static constexpr std::array s_input_names{"balance"sv};
+    static constexpr std::array s_output_names{"gain L"sv, "gain R"sv};
     return make_event_converter_processor(
             [](float param) -> std::tuple<float, float> {
                 auto stereo_gain = dsp::stereo_balance(param);
@@ -70,8 +70,8 @@ make_volume_balance_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     using namespace std::string_view_literals;
-    static constexpr std::array const s_input_names{"volume"sv, "balance"sv};
-    static constexpr std::array const s_output_names{"gain L"sv, "gain R"sv};
+    static constexpr std::array s_input_names{"volume"sv, "balance"sv};
+    static constexpr std::array s_output_names{"gain L"sv, "gain R"sv};
     return make_event_converter_processor(
             [](float volume, float param) -> std::tuple<float, float> {
                 auto balance_gain = dsp::stereo_balance(param);

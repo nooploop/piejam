@@ -25,8 +25,8 @@ enum class pitchclass : int
     G_sharp
 };
 
-static inline constexpr int const semitones_per_octave = 12;
-static inline constexpr int const cents_per_octave = 1200;
+inline constexpr int semitones_per_octave = 12;
+inline constexpr int cents_per_octave = 1200;
 
 template <int Subdivisions, std::floating_point T>
 [[nodiscard]]
@@ -53,7 +53,7 @@ struct pitch
 
         pitch result;
 
-        constexpr float const A4_freq = 440.f;
+        constexpr float A4_freq = 440.f;
 
         float const semitones_interval_f =
                 interval_from_frequency<semitones_per_octave>(
@@ -65,9 +65,9 @@ struct pitch
         result.pitchclass_ = static_cast<pitchclass>(
                 math::pos_mod(semitones_interval, semitones_per_octave));
 
-        constexpr int const base_octave = 4;
-        constexpr int const octave_start_offset = 9;
-        constexpr int const octaves_calc_offset = 8;
+        constexpr int base_octave = 4;
+        constexpr int octave_start_offset = 9;
+        constexpr int octaves_calc_offset = 8;
 
         result.octave =
                 (semitones_interval + base_octave * semitones_per_octave +

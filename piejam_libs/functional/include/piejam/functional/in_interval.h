@@ -31,16 +31,16 @@ struct interval_check
 
 } // namespace detail
 
-inline constexpr auto const in_closed =
+inline constexpr auto in_closed =
         detail::interval_check<std::less_equal<>, std::less_equal<>>{};
 
-inline constexpr auto const in_open =
+inline constexpr auto in_open =
         detail::interval_check<std::less<>, std::less<>>{};
 
-inline constexpr auto const in_left_open =
+inline constexpr auto in_left_open =
         detail::interval_check<std::less<>, std::less_equal<>>{};
 
-inline constexpr auto const in_right_open =
+inline constexpr auto in_right_open =
         detail::interval_check<std::less_equal<>, std::less<>>{};
 
 } // namespace piejam

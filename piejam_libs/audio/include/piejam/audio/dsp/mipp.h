@@ -68,7 +68,7 @@ struct is_mipp_integral<std::uint64_t> : std::true_type
 } // namespace detail
 
 template <class T>
-constexpr bool const is_mipp_integral_v =
+constexpr bool is_mipp_integral_v =
         detail::is_mipp_integral<std::remove_cv_t<T>>::value;
 
 template <class T>

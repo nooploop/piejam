@@ -15,7 +15,7 @@ namespace piejam::math
 {
 
 template <std::floating_point T>
-constexpr inline T negative_inf = -std::numeric_limits<T>::infinity();
+constexpr T negative_inf = -std::numeric_limits<T>::infinity();
 
 template <std::floating_point T>
 [[nodiscard]]

@@ -18,8 +18,8 @@ using stereo_gain = pair<float>;
 constexpr auto
 sinusoidal_constant_power_pan_exact(float pan_pos) -> stereo_gain
 {
-    constexpr float const pi_div_4 = std::numbers::pi_v<float> / 4.f;
-    constexpr float const one_div_sqrt2 = 1.f / std::numbers::sqrt2_v<float>;
+    constexpr float pi_div_4 = std::numbers::pi_v<float> / 4.f;
+    constexpr float one_div_sqrt2 = 1.f / std::numbers::sqrt2_v<float>;
     float const cos_pan_pos = std::cos(pan_pos * pi_div_4);
     float const sin_pan_pos = std::sin(pan_pos * pi_div_4);
     return {one_div_sqrt2 * (cos_pan_pos - sin_pan_pos),

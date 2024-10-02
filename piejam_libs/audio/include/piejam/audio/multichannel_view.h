@@ -33,7 +33,7 @@ class multichannel_view
 {
     using difference_type = typename range::table_view<T>::difference_type;
 
-    static inline constexpr bool layout_is_runtime_defined =
+    static constexpr bool layout_is_runtime_defined =
             std::is_same_v<Layout, multichannel_layout_runtime_defined>;
 
 public:

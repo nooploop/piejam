@@ -29,7 +29,7 @@ public:
             piejam::gui::model::ParameterId const&);
     ~IntParameter();
 
-    static inline constexpr auto StaticType = Type::Int;
+    static constexpr auto StaticType = Type::Int;
 
     auto value() const noexcept -> int
     {

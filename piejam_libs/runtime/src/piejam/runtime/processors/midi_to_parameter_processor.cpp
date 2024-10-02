@@ -25,7 +25,7 @@
 namespace piejam::runtime::processors
 {
 
-static constexpr std::array const s_input_names{std::string_view("cc in")};
+static constexpr std::array s_input_names{std::string_view("cc in")};
 
 static auto
 make_cc_to_float_lut(float_parameter const& param) -> std::array<float, 128>
@@ -46,7 +46,7 @@ auto
 make_midi_cc_to_parameter_processor(float_parameter const& param)
         -> std::unique_ptr<audio::engine::processor>
 {
-    static constexpr std::array const s_output_names{std::string_view("float")};
+    static constexpr std::array s_output_names{std::string_view("float")};
     return audio::engine::make_event_converter_processor(
             [lut = make_cc_to_float_lut(param)](midi::cc_event const& cc_ev)
                     -> float { return lut[cc_ev.value]; },
@@ -75,7 +75,7 @@ auto
 make_midi_cc_to_parameter_processor(int_parameter const& param)
         -> std::unique_ptr<audio::engine::processor>
 {
-    static constexpr std::array const s_output_names{std::string_view("int")};
+    static constexpr std::array s_output_names{std::string_view("int")};
     return audio::engine::make_event_converter_processor(
             [lut = make_cc_to_int_lut(param)](
                     midi::cc_event const& cc_ev) -> int {
@@ -91,7 +91,7 @@ auto
 make_midi_cc_to_parameter_processor(bool_parameter const&)
         -> std::unique_ptr<audio::engine::processor>
 {
-    static constexpr std::array const s_output_names{std::string_view("bool")};
+    static constexpr std::array s_output_names{std::string_view("bool")};
     return audio::engine::make_event_converter_processor(
             [](midi::cc_event const& cc_ev) -> bool {
                 return cc_ev.value != 0;

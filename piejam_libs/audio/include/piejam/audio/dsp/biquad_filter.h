@@ -71,7 +71,7 @@ template <std::floating_point T>
 constexpr auto
 calc_b2_bp_br(T const phi, T const Q) noexcept -> T
 {
-    constexpr T const pi_div_four = std::numbers::pi_v<T> / T{4};
+    constexpr T pi_div_four = std::numbers::pi_v<T> / T{4};
     return std::tan(pi_div_four - phi / (T{2} * Q));
 }
 

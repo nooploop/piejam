@@ -35,7 +35,7 @@ struct pan_balance_processor_test : public testing::TestWithParam<float>
     audio::engine::event_buffer<float> ev_in_buf{ev_buf_pmr_mem};
     audio::engine::event_input_buffers ev_in_bufs;
     audio::engine::event_output_buffers ev_out_bufs;
-    static constexpr std::size_t const buffer_size{16};
+    static constexpr std::size_t buffer_size{16};
     audio::engine::process_context ctx{
             .outputs = {},
             .results = {},

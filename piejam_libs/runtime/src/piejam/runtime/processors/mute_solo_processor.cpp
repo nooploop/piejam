@@ -14,10 +14,8 @@ make_mute_solo_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {
     using namespace std::string_view_literals;
-    static constexpr std::array const s_input_names{
-            "mute"sv,
-            "muted_by_solo"sv};
-    static constexpr std::array const s_output_names{"gain"sv};
+    static constexpr std::array s_input_names{"mute"sv, "muted_by_solo"sv};
+    static constexpr std::array s_output_names{"gain"sv};
     return std::unique_ptr<audio::engine::processor>{
             new audio::engine::event_converter_processor(
                     [](bool mute, bool muted_by_solo) -> float {

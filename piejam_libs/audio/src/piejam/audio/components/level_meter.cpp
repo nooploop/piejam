@@ -91,10 +91,8 @@ private:
             -> std::unique_ptr<engine::processor>
     {
         using namespace std::string_view_literals;
-        static constexpr std::array const s_input_names{
-                "level l"sv,
-                "level r"sv};
-        static constexpr std::array const s_output_names{"stereo_level"sv};
+        static constexpr std::array s_input_names{"level L"sv, "level R"sv};
+        static constexpr std::array s_output_names{"stereo_level"sv};
 
         return std::unique_ptr<engine::processor>{
                 new engine::event_converter_processor(

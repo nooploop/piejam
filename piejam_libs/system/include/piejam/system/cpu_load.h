@@ -24,7 +24,7 @@ struct cpu_load_data
 };
 
 [[nodiscard]]
-inline constexpr auto
+constexpr auto
 active_time(cpu_load_data const& data) -> std::size_t
 {
     return data.user + data.nice + data.system + data.irq + data.softirq +
@@ -32,7 +32,7 @@ active_time(cpu_load_data const& data) -> std::size_t
 }
 
 [[nodiscard]]
-inline constexpr auto
+constexpr auto
 idle_time(cpu_load_data const& data) -> std::size_t
 {
     return data.idle + data.iowait;

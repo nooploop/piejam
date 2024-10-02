@@ -58,8 +58,8 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
 
     os << "node [shape=plaintext]" << std::endl;
 
-    constexpr auto const audio_color = "#00ff00";
-    constexpr auto const event_color = "#ff00ff";
+    constexpr auto audio_color = "#00ff00";
+    constexpr auto event_color = "#ff00ff";
 
     for (processor const& p : all_procs)
     {

@@ -12,7 +12,7 @@ namespace piejam::numeric::intops
 {
 
 template <integral T>
-constexpr std::size_t const sign_bit = sizeof(T) * CHAR_BIT - 1;
+constexpr std::size_t sign_bit = sizeof(T) * CHAR_BIT - 1;
 
 template <integral Source>
 [[nodiscard]]

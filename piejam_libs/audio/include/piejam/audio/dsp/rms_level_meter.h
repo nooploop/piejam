@@ -23,9 +23,8 @@ namespace piejam::audio::dsp
 template <std::floating_point T = float>
 class rms_level_meter
 {
-    static constexpr std::chrono::milliseconds const default_rms_measure_time{
-            800};
-    static constexpr float const default_min_level = 0.001f; // -60 dB
+    static constexpr std::chrono::milliseconds default_rms_measure_time{800};
+    static constexpr float default_min_level = 0.001f; // -60 dB
 
 public:
     using value_type = mipp::Reg<std::remove_const_t<T>>;

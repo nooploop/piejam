@@ -7,7 +7,7 @@
 namespace piejam
 {
 
-constexpr inline auto
+constexpr auto
 toggle_bool(bool& x) -> bool
 {
     return x = !x;

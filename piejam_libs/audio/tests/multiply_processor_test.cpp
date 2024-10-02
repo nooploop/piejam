@@ -113,7 +113,7 @@ TEST(mix_processor, multiply_three_non_silence_channels)
 {
     auto sut = make_multiply_processor(3);
 
-    constexpr auto const buffer_size = 8u;
+    constexpr auto buffer_size = 8u;
 
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf1;
     in_buf1.fill(0.23f);
@@ -144,7 +144,7 @@ TEST(mix_processor, multiply_eight_non_silence_and_one_constant_channel)
 {
     auto sut = make_multiply_processor(9);
 
-    constexpr auto const buffer_size = 8u;
+    constexpr auto buffer_size = 8u;
 
     audio_slice const constant_slice(0.58f);
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf;

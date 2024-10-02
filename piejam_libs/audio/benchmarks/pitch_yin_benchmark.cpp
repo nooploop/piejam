@@ -20,7 +20,7 @@ constexpr std::array freqs{22.34f, 76.53f, 222.33f, 345.67f, 450.99f, 1230.45f};
 static void
 BM_pitch_yin(benchmark::State& state)
 {
-    constexpr piejam::audio::sample_rate const sr{48000};
+    constexpr piejam::audio::sample_rate sr{48000};
 
     mipp::vector<float> in_buf(8192);
     piejam::audio::dsp::generate_sine(

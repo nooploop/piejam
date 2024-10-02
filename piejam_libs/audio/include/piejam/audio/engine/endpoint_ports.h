@@ -17,7 +17,7 @@ struct from_t : std::index_sequence<Is...>
 };
 
 template <std::size_t... Is>
-constexpr auto const from = from_t<Is...>{};
+constexpr auto from = from_t<Is...>{};
 
 template <std::size_t... Is>
 struct to_t : std::index_sequence<Is...>
@@ -25,6 +25,6 @@ struct to_t : std::index_sequence<Is...>
 };
 
 template <std::size_t... Is>
-constexpr auto const to = to_t<Is...>{};
+constexpr auto to = to_t<Is...>{};
 
 } // namespace piejam::audio::engine::endpoint_ports

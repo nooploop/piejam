@@ -24,7 +24,7 @@ public:
             piejam::gui::model::ParameterId const&);
     ~BoolParameter() override;
 
-    static inline constexpr auto StaticType = Type::Bool;
+    static constexpr auto StaticType = Type::Bool;
 
     auto value() const noexcept -> bool
     {

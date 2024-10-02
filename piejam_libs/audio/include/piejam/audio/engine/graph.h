@@ -69,7 +69,7 @@ public:
         map_t m_wires;
     };
 
-    enum class wire_type
+    enum class wire_type : bool
     {
         audio,
         event
@@ -92,28 +92,28 @@ public:
 using wire_t = graph::wires_map::value_type;
 
 [[nodiscard]]
-inline constexpr auto
+constexpr auto
 src_processor(wire_t const& w) -> processor&
 {
     return w.first.proc;
 }
 
 [[nodiscard]]
-inline constexpr auto
+constexpr auto
 src_port(wire_t const& w) -> std::size_t
 {
     return w.first.port;
 }
 
 [[nodiscard]]
-inline constexpr auto
+constexpr auto
 dst_processor(wire_t const& w) -> processor&
 {
     return w.second.proc;
 }
 
 [[nodiscard]]
-inline constexpr auto
+constexpr auto
 dst_port(wire_t const& w) -> std::size_t
 {
     return w.second.port;

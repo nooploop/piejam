@@ -152,7 +152,7 @@ TEST(mix_processor, mix_two_non_silence_channels)
 {
     auto sut = make_mix_processor(2);
 
-    constexpr auto const buffer_size = 8u;
+    constexpr auto buffer_size = 8u;
 
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf1;
     in_buf1.fill(0.23f);
@@ -207,7 +207,7 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
 {
     auto sut = make_mix_processor(3);
 
-    constexpr auto const buffer_size = 8u;
+    constexpr auto buffer_size = 8u;
 
     audio_slice const silence;
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf1;
@@ -239,7 +239,7 @@ TEST(mix_processor, mix_one_silence_and_eight_buffers)
 {
     auto sut = make_mix_processor(9);
 
-    constexpr auto const buffer_size = 8u;
+    constexpr auto buffer_size = 8u;
 
     audio_slice const silence;
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf;

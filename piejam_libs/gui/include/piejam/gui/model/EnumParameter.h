@@ -28,7 +28,7 @@ public:
             piejam::gui::model::ParameterId const&);
     ~EnumParameter() override;
 
-    static inline constexpr auto StaticType = Type::Enum;
+    static constexpr auto StaticType = Type::Enum;
 
     auto type() const noexcept -> Type override
     {

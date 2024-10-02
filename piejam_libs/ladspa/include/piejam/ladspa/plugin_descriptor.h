@@ -8,7 +8,6 @@
 
 #include <filesystem>
 #include <string>
-#include <vector>
 
 namespace piejam::ladspa
 {
@@ -27,14 +26,14 @@ struct plugin_descriptor
 };
 
 [[nodiscard]]
-inline constexpr auto
+constexpr auto
 operator==(plugin_descriptor const& l, plugin_descriptor const& r) -> bool
 {
     return l.id == r.id;
 }
 
 [[nodiscard]]
-inline constexpr auto
+constexpr auto
 operator!=(plugin_descriptor const& l, plugin_descriptor const& r) -> bool
 {
     return l.id != r.id;

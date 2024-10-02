@@ -32,7 +32,7 @@ struct graph_endpoint
 };
 
 template <std::size_t Port>
-inline constexpr auto make_graph_endpoint = [](processor& proc) {
+constexpr auto make_graph_endpoint = [](processor& proc) {
     return graph_endpoint{.proc = proc, .port = Port};
 };
 
