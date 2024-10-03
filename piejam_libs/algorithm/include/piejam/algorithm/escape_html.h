@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <algorithm>
 #include <string>
 #include <string_view>
 
@@ -15,10 +14,13 @@ namespace piejam::algorithm
 inline auto
 escape_html(std::string_view const src) -> std::string
 {
-    std::string dst;
-    dst.reserve(static_cast<std::size_t>(1.05f * src.size()));
+    constexpr auto grow_factor{1.05f};
 
-    for (char ch : src)
+    std::string dst;
+    dst.reserve(static_cast<std::size_t>(
+            grow_factor * static_cast<float>(src.size())));
+
+    for (char const ch : src)
     {
         switch (ch)
         {

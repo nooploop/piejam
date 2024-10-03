@@ -19,13 +19,12 @@ template <
         std::indirect_binary_predicate<It, It> BinaryPredicate>
 [[nodiscard]]
 constexpr auto
-all_of_adjacent(It&& first, It&& last, BinaryPredicate&& p) -> bool
+all_of_adjacent(It first, It last, BinaryPredicate&& p) -> bool
 {
-    return std::forward<It>(last) ==
-           std::ranges::adjacent_find(
-                   std::forward<It>(first),
-                   std::forward<It>(last),
-                   std::not_fn(std::forward<BinaryPredicate>(p)));
+    return last == std::ranges::adjacent_find(
+                           std::move(first),
+                           last,
+                           std::not_fn(std::forward<BinaryPredicate>(p)));
 }
 
 template <
@@ -33,14 +32,11 @@ template <
         range_binary_predicate<Range> BinaryPredicate>
 [[nodiscard]]
 constexpr auto
-all_of_adjacent(Range&& rng, BinaryPredicate&& p) -> bool
+all_of_adjacent(Range const& rng, BinaryPredicate&& p) -> bool
 {
-    using std::begin;
-    using std::end;
-
     return all_of_adjacent(
-            begin(std::forward<Range>(rng)),
-            end(std::forward<Range>(rng)),
+            std::ranges::begin(rng),
+            std::ranges::end(rng),
             std::forward<BinaryPredicate>(p));
 }
 

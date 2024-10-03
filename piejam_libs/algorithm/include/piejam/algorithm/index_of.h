@@ -29,16 +29,12 @@ struct index_of_if_fn
     constexpr auto operator()(I first, S last, Predicate pred, Proj proj = {})
             const -> std::size_t
     {
-        std::size_t pos{};
-        while (first != last)
+        for (std::size_t pos = 0; first != last; ++pos, ++first)
         {
             if (std::invoke(pred, std::invoke(proj, *first)))
             {
                 return pos;
             }
-
-            ++pos;
-            ++first;
         }
 
         return npos;
@@ -51,7 +47,7 @@ struct index_of_if_fn
                     std::projected<std::ranges::iterator_t<R>, Proj>> Predicate>
     [[nodiscard]]
     constexpr auto
-    operator()(R&& r, Predicate pred, Proj proj = {}) const -> std::size_t
+    operator()(R const& r, Predicate pred, Proj proj = {}) const -> std::size_t
     {
         return (*this)(
                 std::ranges::begin(r),
@@ -80,19 +76,15 @@ struct index_of_fn
                          std::projected<I, Proj>,
                          T const*>
     [[nodiscard]]
-    constexpr auto operator()(I first, S last, T const& value, Proj proj = {})
-            const -> std::size_t
+    constexpr auto
+    operator()(I first, S last, T value, Proj proj = {}) const -> std::size_t
     {
-        std::size_t pos{};
-        while (first != last)
+        for (std::size_t pos = 0; first != last; ++pos, ++first)
         {
             if (std::invoke(proj, *first) == value)
             {
                 return pos;
             }
-
-            ++pos;
-            ++first;
         }
 
         return npos;
@@ -105,12 +97,12 @@ struct index_of_fn
                          T const*>
     [[nodiscard]]
     constexpr auto
-    operator()(R&& r, T const& value, Proj proj = {}) const -> std::size_t
+    operator()(R const& r, T value, Proj proj = {}) const -> std::size_t
     {
         return (*this)(
                 std::ranges::begin(r),
                 std::ranges::end(r),
-                value,
+                std::move(value),
                 std::move(proj));
     }
 };

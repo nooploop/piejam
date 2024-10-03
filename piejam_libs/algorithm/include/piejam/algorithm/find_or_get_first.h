@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iterator>
 #include <ranges>
 
 namespace piejam::algorithm
@@ -17,15 +16,10 @@ namespace piejam::algorithm
 template <std::ranges::input_range Range, convertible_to_range_value<Range> T>
 [[nodiscard]]
 constexpr auto
-find_or_get_first(Range const& rng, T&& value)
+find_or_get_first(Range&& rng, T const& value)
 {
-    using std::begin;
-    using std::end;
-
-    auto first = begin(rng);
-    auto last = end(rng);
-    auto it = std::find(first, last, std::forward<T>(value));
-    return it == last ? first : it;
+    auto it = std::ranges::find(std::forward<Range>(rng), value);
+    return it == std::ranges::end(rng) ? std::ranges::begin(rng) : it;
 }
 
 } // namespace piejam::algorithm

@@ -33,7 +33,11 @@ struct contains_fn
     constexpr auto
     operator()(I first, S last, T const& value, Proj proj = {}) const -> bool
     {
-        return std::ranges::find(std::move(first), last, value, proj) != last;
+        return std::ranges::find(
+                       std::move(first),
+                       last,
+                       value,
+                       std::move(proj)) != last;
     }
 
     template <std::ranges::input_range R, class T, class Proj = std::identity>
@@ -43,9 +47,13 @@ struct contains_fn
                          T const*>
     [[nodiscard]]
     constexpr auto
-    operator()(R&& r, T const& value, Proj proj = {}) const -> bool
+    operator()(R const& r, T const& value, Proj proj = {}) const -> bool
     {
-        return (*this)(std::ranges::begin(r), std::ranges::end(r), value, proj);
+        return (*this)(
+                std::ranges::begin(r),
+                std::ranges::end(r),
+                value,
+                std::move(proj));
     }
 };
 
@@ -81,7 +89,7 @@ struct contains_if_fn
                     std::projected<std::ranges::iterator_t<R>, Proj>> Predicate>
     [[nodiscard]]
     constexpr auto
-    operator()(R&& r, Predicate pred, Proj proj = {}) const -> bool
+    operator()(R const& r, Predicate pred, Proj proj = {}) const -> bool
     {
         return (*this)(
                 std::ranges::begin(r),

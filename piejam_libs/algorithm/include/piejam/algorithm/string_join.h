@@ -4,34 +4,27 @@
 
 #pragma once
 
-#include <algorithm>
-#include <iterator>
+#include <ranges>
 #include <string>
 
 namespace piejam::algorithm
 {
 
-template <class Range>
+template <std::ranges::input_range Range>
 auto
 string_join(Range const& rng, char sep) -> std::string
 {
-    using std::begin;
-    using std::empty;
-    using std::end;
-
-    if (!empty(rng))
+    if (!std::ranges::empty(rng))
     {
-        auto first = begin(rng);
-        std::string acc(*first);
-        std::for_each(std::next(first), end(rng), [&acc, sep](auto const& s) {
+        std::string acc(*std::ranges::begin(rng));
+        for (auto const& s : std::views::drop(rng, 1))
+        {
             (acc += sep) += s;
-        });
+        }
         return acc;
     }
-    else
-    {
-        return {};
-    }
+
+    return {};
 }
 
 } // namespace piejam::algorithm

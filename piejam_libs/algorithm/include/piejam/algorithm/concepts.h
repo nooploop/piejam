@@ -23,8 +23,8 @@ concept range_binary_predicate = std::indirect_binary_predicate<
 template <class Op, class Range>
 concept range_binary_op = std::invocable<
         Op,
-        std::ranges::range_value_t<Range>,
-        std::ranges::range_value_t<Range>>;
+        std::ranges::range_reference_t<Range>,
+        std::ranges::range_reference_t<Range>>;
 
 template <class T, class Range>
 concept convertible_to_range_value =
