@@ -34,7 +34,7 @@ SubscribableItem {
 
                 placeholderText: qsTr("Name")
 
-                onTextEdited: root.model.changeName(nameText.text)
+                onEditingFinished: root.model.changeName(nameText.text)
             }
 
             ColorSelector {

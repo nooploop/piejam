@@ -36,7 +36,7 @@ Item {
             anchors.rightMargin: 8
             anchors.left: parent.left
 
-            onTextEdited: nameEdited(nameTextField.text)
+            onEditingFinished: nameEdited(nameTextField.text)
         }
 
         ComboBox {
