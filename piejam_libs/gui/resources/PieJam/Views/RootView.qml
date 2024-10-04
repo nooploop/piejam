@@ -43,10 +43,8 @@ Item {
                     display: AbstractButton.IconOnly
 
                     onClicked: {
-                        if (root.modelManager.rootView.mode === PJModels.RootView.Mode.Mixer)
-                            MixerViewSettings.switchMode(MixerViewSettings.perform)
-                        else
-                            root.modelManager.rootView.showMixer()
+                        MixerViewSettings.forceMode(MixerViewSettings.perform)
+                        root.modelManager.rootView.showMixer()
                     }
                 }
 
@@ -55,7 +53,14 @@ Item {
 
                     enabled: root.modelManager.rootView.canShowFxModule
 
-                    onClicked: root.modelManager.rootView.showFxModule()
+                    onClicked: {
+                        if (root.modelManager.rootView.mode !== PJModels.RootView.Mode.FxModule) {
+                            root.modelManager.rootView.showFxModule()
+                        } else {
+                            MixerViewSettings.forceMode(MixerViewSettings.fx)
+                            root.modelManager.rootView.showMixer()
+                        }
+                    }
                 }
 
                 Item {

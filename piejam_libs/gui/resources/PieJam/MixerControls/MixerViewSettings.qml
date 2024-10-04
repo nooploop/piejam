@@ -16,7 +16,11 @@ Item {
 
     property int mode: root.perform
 
-    function switchMode(newMode) {
+    function toggleMode(newMode) {
         root.mode = root.mode === newMode ? root.perform : newMode
+    }
+
+    function forceMode(newMode) {
+        root.mode = newMode
     }
 }

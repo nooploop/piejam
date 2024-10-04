@@ -139,21 +139,21 @@ ViewPane {
             iconSource: "qrc:///images/icons/pencil.svg"
             checked: MixerViewSettings.mode === MixerViewSettings.edit
 
-            onClicked: MixerViewSettings.switchMode(MixerViewSettings.edit)
+            onClicked: MixerViewSettings.toggleMode(MixerViewSettings.edit)
         }
 
         ViewToolBarButton {
             text: "FX"
             checked: MixerViewSettings.mode === MixerViewSettings.fx
 
-            onClicked: MixerViewSettings.switchMode(MixerViewSettings.fx)
+            onClicked: MixerViewSettings.toggleMode(MixerViewSettings.fx)
         }
 
         ViewToolBarButton {
             iconSource: "qrc:///images/icons/aux.svg"
             checked: MixerViewSettings.mode === MixerViewSettings.auxSend
 
-            onClicked: MixerViewSettings.switchMode(MixerViewSettings.auxSend)
+            onClicked: MixerViewSettings.toggleMode(MixerViewSettings.auxSend)
         }
 
         Item {
