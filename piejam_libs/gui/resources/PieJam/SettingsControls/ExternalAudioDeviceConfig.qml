@@ -4,6 +4,7 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 
 Item {
 
@@ -23,7 +24,7 @@ Item {
 
     id: root
 
-    Item {
+    RowLayout {
 
         anchors.fill: parent
         anchors.margins: 4
@@ -31,10 +32,7 @@ Item {
         TextField {
             id: nameTextField
 
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: stereoLeftChannelSelect.left
-            anchors.rightMargin: 8
-            anchors.left: parent.left
+            Layout.fillWidth: true
 
             onEditingFinished: nameEdited(nameTextField.text)
         }
@@ -42,11 +40,7 @@ Item {
         ComboBox {
             id: monoChannelSelect
 
-            width: 64 + 8 + 64
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: deleteConfig.left
-            anchors.rightMargin: 8
+            Layout.preferredWidth: 64 + 6 + 64
 
             model: root.channels
             currentIndex: root.monoChannelIndex
@@ -59,11 +53,7 @@ Item {
         ComboBox {
             id: stereoLeftChannelSelect
 
-            width: 64
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: stereoRightChannelSelect.left
-            anchors.rightMargin: 8
+            Layout.preferredWidth: 64
 
             model: root.channels
             currentIndex: root.stereoLeftChannelIndex
@@ -76,11 +66,7 @@ Item {
         ComboBox {
             id: stereoRightChannelSelect
 
-            width: 64
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: deleteConfig.left
-            anchors.rightMargin: 8
+            Layout.preferredWidth: 64
 
             model: root.channels
             currentIndex: root.stereoRightChannelIndex
@@ -93,12 +79,9 @@ Item {
         Button {
             id: deleteConfig
 
-            width: 38
+            Layout.preferredWidth: 38
 
             text: "X"
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
 
             onClicked: deleteConfigClicked()
         }
