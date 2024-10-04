@@ -107,6 +107,8 @@ main(int argc, char* argv[]) -> int
 {
     using namespace piejam;
 
+    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+
     // run app on the second cpu, first one is for the system
     this_thread::set_affinity(1);
 
