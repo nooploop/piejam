@@ -13,6 +13,8 @@ class GenericListModel;
 class EnumListModel;
 class StringList;
 
+using MaterialColor = int;
+
 class AudioDeviceSettings;
 class AudioInputOutputSettings;
 
@@ -25,8 +27,8 @@ class Info;
 class Log;
 
 class Mixer;
-class MixerChannel;
-using MixerChannelsList = GenericListModel<MixerChannel>;
+class MixerChannelModels;
+using MixerChannelsList = GenericListModel<MixerChannelModels>;
 class MixerChannelPerform;
 class MixerChannelEdit;
 class MixerChannelFx;

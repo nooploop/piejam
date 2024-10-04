@@ -72,6 +72,7 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/MixerChannelAuxSend.h
     include/piejam/gui/model/MixerChannelEdit.h
     include/piejam/gui/model/MixerChannelFx.h
+    include/piejam/gui/model/MixerChannelModels.h
     include/piejam/gui/model/MixerChannelPerform.h
     include/piejam/gui/model/MixerDbScales.h
     include/piejam/gui/model/Parameter.h
@@ -132,6 +133,7 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/MixerChannelAuxSend.cpp
     src/piejam/gui/model/MixerChannelEdit.cpp
     src/piejam/gui/model/MixerChannelFx.cpp
+    src/piejam/gui/model/MixerChannelModels.cpp
     src/piejam/gui/model/MixerChannelPerform.cpp
     src/piejam/gui/model/MixerDbScales.cpp
     src/piejam/gui/model/Parameter.cpp
@@ -142,7 +144,6 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/StereoLevelParameter.cpp
     src/piejam/gui/model/WaveformDataGenerator.cpp
     src/piejam/gui/qt_log.cpp
-    resources/PieJam/Controls/qmldir
 )
 
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

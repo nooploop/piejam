@@ -5,11 +5,8 @@
 #pragma once
 
 #include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/model/StringList.h>
-#include <piejam/gui/model/Subscribable.h>
-#include <piejam/gui/model/SubscribableModel.h>
-#include <piejam/gui/model/Types.h>
-#include <piejam/gui/model/fwd.h>
 
 #include <piejam/audio/types.h>
 #include <piejam/runtime/mixer_fwd.h>
@@ -19,11 +16,10 @@
 namespace piejam::gui::model
 {
 
-class MixerChannelFx final : public Subscribable<SubscribableModel>
+class MixerChannelFx final : public MixerChannel
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(bool focused READ focused NOTIFY focusedChanged FINAL)
     Q_PROPERTY(QAbstractListModel* fxChain READ fxChain CONSTANT)
     Q_PROPERTY(bool canMoveUpFxModule READ canMoveUpFxModule NOTIFY
@@ -37,11 +33,6 @@ public:
             runtime::subscriber&,
             runtime::mixer::channel_id);
     ~MixerChannelFx() override;
-
-    auto name() const noexcept -> QString const&
-    {
-        return m_name;
-    }
 
     auto focused() const noexcept -> bool
     {
@@ -65,21 +56,11 @@ public:
     Q_INVOKABLE void moveDownFxModule();
 
 signals:
-    void nameChanged();
     void focusedChanged();
     void canMoveUpFxModuleChanged();
     void canMoveDownFxModuleChanged();
 
 private:
-    void setName(QString const& x)
-    {
-        if (m_name != x)
-        {
-            m_name = x;
-            emit nameChanged();
-        }
-    }
-
     void setFocused(bool const x)
     {
         if (m_focused != x)
@@ -112,7 +93,6 @@ private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
-    QString m_name;
     bool m_focused{};
     bool m_canMoveUpFxModule{};
     bool m_canMoveDownFxModule{};

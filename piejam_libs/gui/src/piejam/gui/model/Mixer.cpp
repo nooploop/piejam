@@ -8,7 +8,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/gui/model/GenericListModel.h>
-#include <piejam/gui/model/MixerChannel.h>
+#include <piejam/gui/model/MixerChannelModels.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/selectors.h>
@@ -33,7 +33,7 @@ struct Mixer::Impl
     box<runtime::mixer::channel_ids_t> user_channel_ids;
     runtime::mixer::channel_ids_t all_channel_ids;
 
-    MixerChannel mainChannel;
+    MixerChannelModels mainChannel;
     MixerChannelsList userChannels;
 };
 
@@ -51,13 +51,13 @@ Mixer::Mixer(
 Mixer::~Mixer() = default;
 
 auto
-Mixer::userChannels() -> MixerChannelsList*
+Mixer::userChannels() const -> MixerChannelsList*
 {
     return &m_impl->userChannels;
 }
 
 auto
-Mixer::mainChannel() const -> MixerChannel*
+Mixer::mainChannel() const -> MixerChannelModels*
 {
     return &m_impl->mainChannel;
 }
@@ -74,7 +74,7 @@ Mixer::onSubscribe()
                         piejam::gui::generic_list_model_edit_script_executor{
                                 *userChannels(),
                                 [this](auto const& channel_id) {
-                                    return std::make_unique<MixerChannel>(
+                                    return std::make_unique<MixerChannelModels>(
                                             dispatch(),
                                             state_change_subscriber(),
                                             channel_id);

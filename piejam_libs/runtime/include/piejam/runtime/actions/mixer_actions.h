@@ -7,6 +7,7 @@
 #include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/actions/ladspa_fx_action.h>
 #include <piejam/runtime/fwd.h>
+#include <piejam/runtime/material_color.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
@@ -50,6 +51,15 @@ struct set_mixer_channel_name final
 {
     mixer::channel_id channel_id;
     std::string name;
+
+    void reduce(state&) const override;
+};
+
+struct set_mixer_channel_color final
+    : ui::cloneable_action<set_mixer_channel_name, reducible_action>
+{
+    mixer::channel_id channel_id;
+    material_color color{material_color::pink};
 
     void reduce(state&) const override;
 };

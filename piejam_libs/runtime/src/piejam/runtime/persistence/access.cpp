@@ -311,17 +311,21 @@ export_mixer_aux_sends(state const& st, mixer::aux_sends_t const& aux_sends)
 }
 
 static auto
-export_mixer_channel(state const& st, mixer::channel const& mixer_channel)
+export_mixer_channel(
+        state const& st,
+        mixer::channel_id channel_id,
+        mixer::channel const& channel)
 {
     session::mixer_channel result;
-    result.name = mixer_channel.name;
-    result.bus_type = mixer_channel.bus_type;
-    result.fx_chain = export_fx_chain(st, *mixer_channel.fx_chain);
-    result.midi = export_mixer_midi(st, mixer_channel);
-    result.parameter = export_mixer_parameters(st, mixer_channel);
-    result.in = export_mixer_io(st, mixer_channel.in);
-    result.out = export_mixer_io(st, mixer_channel.out);
-    result.aux_sends = export_mixer_aux_sends(st, mixer_channel.aux_sends);
+    result.name = channel.name;
+    result.color = st.gui_state.mixer_colors[channel_id];
+    result.bus_type = channel.bus_type;
+    result.fx_chain = export_fx_chain(st, *channel.fx_chain);
+    result.midi = export_mixer_midi(st, channel);
+    result.parameter = export_mixer_parameters(st, channel);
+    result.in = export_mixer_io(st, channel.in);
+    result.out = export_mixer_io(st, channel.out);
+    result.aux_sends = export_mixer_aux_sends(st, channel.aux_sends);
     return result;
 }
 
@@ -331,9 +335,10 @@ export_mixer_channels(state const& st, mixer::channel_ids_t const& channel_ids)
     return algorithm::transform_to_vector(
             channel_ids,
             [&st](mixer::channel_id const channel_id) {
-                mixer::channel const& mixer_channel =
-                        st.mixer_state.channels[channel_id];
-                return export_mixer_channel(st, mixer_channel);
+                return export_mixer_channel(
+                        st,
+                        channel_id,
+                        st.mixer_state.channels[channel_id]);
             });
 }
 
@@ -362,6 +367,7 @@ save_session(std::filesystem::path const& file, state const& st)
         ses.mixer_channels = export_mixer_channels(st, *st.mixer_state.inputs);
         ses.main_mixer_channel = export_mixer_channel(
                 st,
+                st.mixer_state.main,
                 st.mixer_state.channels[st.mixer_state.main]);
 
         save_session(out, ses);

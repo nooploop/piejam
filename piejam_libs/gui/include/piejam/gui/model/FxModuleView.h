@@ -19,6 +19,7 @@ class FxModuleView : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
+    Q_PROPERTY(MaterialColor color READ color NOTIFY colorChanged FINAL)
     Q_PROPERTY(QString chainName READ chainName NOTIFY chainNameChanged FINAL)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(bool bypassed READ bypassed NOTIFY bypassedChanged FINAL)
@@ -29,6 +30,11 @@ class FxModuleView : public Subscribable<SubscribableModel>
 public:
     FxModuleView(runtime::store_dispatch, runtime::subscriber&);
     ~FxModuleView();
+
+    auto color() const noexcept -> MaterialColor
+    {
+        return m_color;
+    }
 
     auto chainName() const noexcept -> QString const&
     {
@@ -50,6 +56,7 @@ public:
     Q_INVOKABLE void toggleBypass();
 
 signals:
+    void colorChanged();
     void chainNameChanged();
     void nameChanged();
     void bypassedChanged();
@@ -57,6 +64,15 @@ signals:
 
 private:
     void onSubscribe() override;
+
+    void setColor(MaterialColor x)
+    {
+        if (m_color != x)
+        {
+            m_color = x;
+            emit colorChanged();
+        }
+    }
 
     void setChainName(QString const& x)
     {
@@ -88,6 +104,7 @@ private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
+    MaterialColor m_color{};
     QString m_chainName;
     QString m_name;
     bool m_bypassed{};

@@ -12,6 +12,7 @@
 #include <piejam/audio/types.h>
 #include <piejam/box.h>
 #include <piejam/boxed_vector.h>
+#include <piejam/entity_data_map.h>
 #include <piejam/entity_id_hash.h>
 #include <piejam/io_direction.h>
 #include <piejam/ladspa/fwd.h>
@@ -23,6 +24,7 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/fx/registry.h>
+#include <piejam/runtime/material_color.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/midi_device_config.h>
 #include <piejam/runtime/midi_devices.h>
@@ -92,6 +94,8 @@ struct state
 
         mixer::channel_id focused_fx_chain_id;
         fx::module_id focused_fx_mod_id;
+
+        entity_data_map<mixer::channel_id, material_color> mixer_colors;
     } gui_state;
 };
 

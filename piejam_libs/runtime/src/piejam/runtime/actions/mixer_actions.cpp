@@ -54,6 +54,12 @@ set_mixer_channel_name::reduce(state& st) const
 }
 
 void
+set_mixer_channel_color::reduce(state& st) const
+{
+    st.gui_state.mixer_colors.set(channel_id, color);
+}
+
+void
 set_mixer_channel_route::reduce(state& st) const
 {
     [this](mixer::channel& mixer_channel) {

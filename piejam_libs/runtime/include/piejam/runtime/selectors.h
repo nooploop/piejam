@@ -19,6 +19,7 @@
 #include <piejam/runtime/external_audio_fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/material_color.h>
 #include <piejam/runtime/midi_assignment_id.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
@@ -70,6 +71,8 @@ extern selector<mixer::channel_id> const select_mixer_main_channel;
 
 auto make_mixer_channel_bus_type_selector(mixer::channel_id)
         -> selector<audio::bus_type>;
+auto make_mixer_channel_color_selector(mixer::channel_id)
+        -> selector<material_color>;
 auto make_mixer_channel_volume_parameter_selector(mixer::channel_id)
         -> selector<float_parameter_id>;
 auto make_mixer_channel_pan_balance_parameter_selector(mixer::channel_id)
@@ -221,6 +224,7 @@ extern selector<mixer::channel_id> const select_fx_browser_fx_chain;
 extern selector<mixer::channel_id> const select_focused_fx_chain;
 extern selector<fx::module_id> const select_focused_fx_module;
 extern selector<boxed_string> const select_focused_fx_module_name;
+extern selector<material_color> const select_focused_fx_module_color;
 extern selector<bool> const select_focused_fx_module_bypassed;
 
 } // namespace piejam::runtime::selectors

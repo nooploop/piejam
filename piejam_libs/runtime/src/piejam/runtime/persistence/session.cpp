@@ -51,6 +51,29 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         control_type,
         control_id);
 
+NLOHMANN_JSON_SERIALIZE_ENUM(
+        material_color,
+        {
+                {material_color::amber, "amber"},
+                {material_color::blue, "blue"},
+                {material_color::blue_grey, "blue_grey"},
+                {material_color::brown, "brown"},
+                {material_color::cyan, "cyan"},
+                {material_color::deep_orange, "deep_orange"},
+                {material_color::deep_purple, "deep_purple"},
+                {material_color::green, "green"},
+                {material_color::grey, "grey"},
+                {material_color::indigo, "indigo"},
+                {material_color::light_blue, "light_blue"},
+                {material_color::light_green, "light_green"},
+                {material_color::lime, "lime"},
+                {material_color::orange, "orange"},
+                {material_color::pink, "pink"},
+                {material_color::red, "red"},
+                {material_color::teal, "teal"},
+                {material_color::yellow, "yellow"},
+        });
+
 } // namespace piejam::runtime
 
 namespace piejam::runtime::fx
@@ -192,6 +215,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         session::mixer_channel,
         name,
+        color,
         bus_type,
         parameter,
         midi,

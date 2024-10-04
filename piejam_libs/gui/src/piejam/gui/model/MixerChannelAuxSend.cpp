@@ -17,10 +17,7 @@ struct MixerChannelAuxSend::Impl
     Impl(runtime::store_dispatch store_dispatch,
          runtime::subscriber& state_change_subscriber,
          runtime::mixer::channel_id const id)
-        : channel_id{id}
-        , bus_type{state_change_subscriber.observe_once(
-                  runtime::selectors::make_mixer_channel_bus_type_selector(id))}
-        , selected{
+        : selected{
                   store_dispatch,
                   state_change_subscriber,
                   id,
@@ -28,9 +25,6 @@ struct MixerChannelAuxSend::Impl
     {
     }
 
-    runtime::mixer::channel_id channel_id;
-
-    audio::bus_type bus_type;
     AudioRoutingSelection selected;
 
     boxed_vector<runtime::selectors::mixer_device_route> devices;
@@ -43,11 +37,11 @@ MixerChannelAuxSend::MixerChannelAuxSend(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
-    : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(
+    : MixerChannel{store_dispatch, state_change_subscriber, id}
+    , m_impl{std::make_unique<Impl>(
               store_dispatch,
               state_change_subscriber,
-              id))
+              id)}
 {
     connectSubscribableChild(m_impl->selected);
 }
@@ -69,11 +63,7 @@ MixerChannelAuxSend::volume() const noexcept -> FloatParameter*
 void
 MixerChannelAuxSend::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_channel_name_selector(
-                    m_impl->channel_id),
-            [this](boxed_string const& name) {
-                setName(QString::fromStdString(*name));
-            });
+    MixerChannel::onSubscribe();
 
     observe(runtime::selectors::make_mixer_device_routes_selector(
                     audio::bus_type::stereo,
@@ -92,7 +82,7 @@ MixerChannelAuxSend::onSubscribe()
             });
 
     observe(runtime::selectors::make_mixer_channel_routes_selector(
-                    m_impl->channel_id,
+                    channel_id(),
                     runtime::mixer::io_socket::aux),
             [this](boxed_vector<runtime::selectors::mixer_channel_route> const&
                            channels) {
@@ -108,16 +98,16 @@ MixerChannelAuxSend::onSubscribe()
             });
 
     observe(runtime::selectors::make_mixer_channel_aux_enabled_selector(
-                    m_impl->channel_id),
+                    channel_id()),
             [this](bool const enabled) { setEnabled(enabled); });
 
     observe(runtime::selectors::make_mixer_channel_can_toggle_aux_selector(
-                    m_impl->channel_id),
+                    channel_id()),
             [this](bool const x) { setCanToggle(x); });
 
     observe(runtime::selectors::
                     make_mixer_channel_aux_volume_parameter_selector(
-                            m_impl->channel_id),
+                            channel_id()),
             [this](runtime::float_parameter_id const volume_id) {
                 if (m_impl->volume_id != volume_id)
                 {
@@ -138,7 +128,7 @@ void
 MixerChannelAuxSend::toggleEnabled()
 {
     runtime::actions::enable_mixer_channel_aux_route action;
-    action.channel_id = m_impl->channel_id;
+    action.channel_id = channel_id();
     action.enabled = !m_enabled;
     dispatch(action);
 }
@@ -149,7 +139,7 @@ MixerChannelAuxSend::changeToDevice(unsigned index)
     BOOST_ASSERT(index < m_impl->devices->size());
 
     runtime::actions::select_mixer_channel_aux_route action;
-    action.channel_id = m_impl->channel_id;
+    action.channel_id = channel_id();
     action.route = (*m_impl->devices)[index].device_id;
     dispatch(action);
 }
@@ -160,7 +150,7 @@ MixerChannelAuxSend::changeToChannel(unsigned index)
     BOOST_ASSERT(index < m_impl->channels->size());
 
     runtime::actions::select_mixer_channel_aux_route action;
-    action.channel_id = m_impl->channel_id;
+    action.channel_id = channel_id();
     action.route = (*m_impl->channels)[index].channel_id;
     dispatch(action);
 }

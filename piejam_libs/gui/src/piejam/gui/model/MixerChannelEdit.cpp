@@ -17,11 +17,8 @@ struct MixerChannelEdit::Impl
 {
     Impl(runtime::store_dispatch store_dispatch,
          runtime::subscriber& state_change_subscriber,
-         runtime::mixer::channel_id const id,
-         audio::bus_type const bus_type)
-        : channel_id{id}
-        , bus_type{bus_type}
-        , in{store_dispatch,
+         runtime::mixer::channel_id const id)
+        : in{store_dispatch,
              state_change_subscriber,
              id,
              runtime::mixer::io_socket::in}
@@ -32,9 +29,6 @@ struct MixerChannelEdit::Impl
     {
     }
 
-    runtime::mixer::channel_id channel_id;
-    audio::bus_type bus_type;
-
     AudioRouting in;
     AudioRouting out;
 };
@@ -43,15 +37,11 @@ MixerChannelEdit::MixerChannelEdit(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
-    : Subscribable(store_dispatch, state_change_subscriber)
+    : MixerChannel{store_dispatch, state_change_subscriber, id}
     , m_impl(std::make_unique<Impl>(
               store_dispatch,
               state_change_subscriber,
-              id,
-              observe_once(
-                      runtime::selectors::make_mixer_channel_bus_type_selector(
-                              id))))
-    , m_busType(toBusType(m_impl->bus_type))
+              id))
 {
 }
 
@@ -72,18 +62,14 @@ MixerChannelEdit::out() const -> AudioRouting*
 void
 MixerChannelEdit::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_channel_name_selector(
-                    m_impl->channel_id),
-            [this](boxed_string const& name) {
-                setName(QString::fromStdString(*name));
-            });
+    MixerChannel::onSubscribe();
 
     observe(runtime::selectors::make_mixer_channel_can_move_left_selector(
-                    m_impl->channel_id),
+                    channel_id()),
             [this](bool const x) { setCanMoveLeft(x); });
 
     observe(runtime::selectors::make_mixer_channel_can_move_right_selector(
-                    m_impl->channel_id),
+                    channel_id()),
             [this](bool const x) { setCanMoveRight(x); });
 }
 
@@ -91,8 +77,17 @@ void
 MixerChannelEdit::changeName(QString const& name)
 {
     runtime::actions::set_mixer_channel_name action;
-    action.channel_id = m_impl->channel_id;
+    action.channel_id = channel_id();
     action.name = name.toStdString();
+    dispatch(action);
+}
+
+void
+MixerChannelEdit::changeColor(MaterialColor color)
+{
+    runtime::actions::set_mixer_channel_color action;
+    action.channel_id = channel_id();
+    action.color = static_cast<runtime::material_color>(color);
     dispatch(action);
 }
 
@@ -101,7 +96,7 @@ MixerChannelEdit::moveLeft()
 {
     BOOST_ASSERT(canMoveLeft());
     runtime::actions::move_mixer_channel_left action;
-    action.channel_id = m_impl->channel_id;
+    action.channel_id = channel_id();
     dispatch(action);
 }
 
@@ -110,7 +105,7 @@ MixerChannelEdit::moveRight()
 {
     BOOST_ASSERT(canMoveRight());
     runtime::actions::move_mixer_channel_right action;
-    action.channel_id = m_impl->channel_id;
+    action.channel_id = channel_id();
     dispatch(action);
 }
 
@@ -118,7 +113,7 @@ void
 MixerChannelEdit::deleteChannel()
 {
     runtime::actions::delete_mixer_channel action;
-    action.mixer_channel_id = m_impl->channel_id;
+    action.mixer_channel_id = channel_id();
     dispatch(action);
 }
 

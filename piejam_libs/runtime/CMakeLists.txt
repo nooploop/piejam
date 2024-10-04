@@ -73,6 +73,7 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/ladspa_fx/ladspa_fx_module.h
     include/piejam/runtime/ladspa_fx_middleware.h
     include/piejam/runtime/locations.h
+    include/piejam/runtime/material_color.h
     include/piejam/runtime/middleware_functors.h
     include/piejam/runtime/midi_assignment.h
     include/piejam/runtime/midi_assignment_id.h

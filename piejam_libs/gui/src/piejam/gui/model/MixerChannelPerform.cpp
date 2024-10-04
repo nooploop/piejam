@@ -21,8 +21,6 @@ namespace piejam::gui::model
 
 struct MixerChannelPerform::Impl
 {
-    runtime::mixer::channel_id channel_id;
-
     std::unique_ptr<StereoLevelParameter> peakLevel;
     std::unique_ptr<StereoLevelParameter> rmsLevel;
     std::unique_ptr<FloatParameter> volume;
@@ -36,10 +34,8 @@ MixerChannelPerform::MixerChannelPerform(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
-    : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(id))
-    , m_busType(toBusType(observe_once(
-              runtime::selectors::make_mixer_channel_bus_type_selector(id))))
+    : MixerChannel{store_dispatch, state_change_subscriber, id}
+    , m_impl{std::make_unique<Impl>()}
 {
     makeParameter(
             m_impl->peakLevel,
@@ -134,13 +130,9 @@ MixerChannelPerform::mute() const noexcept -> BoolParameter*
 void
 MixerChannelPerform::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_channel_name_selector(
-                    m_impl->channel_id),
-            [this](boxed_string const& name) {
-                setName(QString::fromStdString(*name));
-            });
+    MixerChannel::onSubscribe();
 
-    observe(runtime::selectors::make_muted_by_solo_selector(m_impl->channel_id),
+    observe(runtime::selectors::make_muted_by_solo_selector(channel_id()),
             [this](bool x) { setMutedBySolo(x); });
 }
 

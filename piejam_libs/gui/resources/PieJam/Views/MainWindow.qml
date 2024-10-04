@@ -15,10 +15,6 @@ Window {
     width: 800
     height: 480
 
-    Material.theme: Material.Dark
-    Material.primary: Material.Pink
-    Material.accent: Material.Pink
-
     RootView {
         anchors.fill: parent
 

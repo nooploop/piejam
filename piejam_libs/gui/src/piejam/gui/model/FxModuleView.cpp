@@ -68,6 +68,9 @@ FxModuleView::content() noexcept -> FxModule*
 void
 FxModuleView::onSubscribe()
 {
+    setColor(static_cast<MaterialColor>(
+            observe_once(runtime::selectors::select_focused_fx_module_color)));
+
     setChainName(QString::fromStdString(observe_once(
             runtime::selectors::make_mixer_channel_name_selector(observe_once(
                     runtime::selectors::select_focused_fx_chain)))));

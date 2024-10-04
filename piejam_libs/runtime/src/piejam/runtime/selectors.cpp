@@ -21,6 +21,37 @@
 namespace piejam::runtime::selectors
 {
 
+namespace
+{
+
+template <std::invocable<state const&> GetDataMap, class Id, class Data>
+    requires(std::is_same_v<
+                    std::invoke_result_t<GetDataMap, state const&>,
+                    entity_data_map<Id, Data> const&>)
+auto
+make_entity_data_map_selector(
+        Id id,
+        GetDataMap&& get_data_map,
+        Data&& default_data) -> selector<Data>
+{
+    return [id,
+            get_data_map,
+            default_data,
+            cached = cached_entity_data_ptr<material_color>{}](
+                   state const& st) mutable {
+        if (cached)
+        {
+            return *cached;
+        }
+
+        auto const& data_map = std::invoke(get_data_map, st);
+        cached = data_map.cached(id);
+        return cached ? *cached : default_data;
+    };
+}
+
+} // namespace
+
 selector<box<sample_rate_choice>> const select_sample_rate([](state const& st) {
     static auto const get_sample_rate =
             memo([](box<audio::sound_card_hw_params> const& input_hw_params,
@@ -242,6 +273,16 @@ make_mixer_channel_bus_type_selector(mixer::channel_id const channel_id)
 {
     return make_mixer_channel_member_selector<&mixer::channel::bus_type>(
             channel_id);
+}
+
+auto
+make_mixer_channel_color_selector(mixer::channel_id const channel_id)
+        -> selector<material_color>
+{
+    return make_entity_data_map_selector(
+            channel_id,
+            [](state const& st) -> auto& { return st.gui_state.mixer_colors; },
+            material_color::pink);
 }
 
 auto
@@ -1119,6 +1160,22 @@ get_focused_fx_module_name(
 selector<boxed_string> const select_focused_fx_module_name(
         [get = memo(&get_focused_fx_module_name)](state const& st) {
             return get(st.fx_modules, st.gui_state.focused_fx_mod_id);
+        });
+
+selector<material_color> const select_focused_fx_module_color(
+        [focused_fx_chain = std::optional<mixer::channel_id>{},
+         color = cached_entity_data_ptr<material_color>{}](
+                state const& st) mutable {
+            if (focused_fx_chain &&
+                *focused_fx_chain == st.gui_state.focused_fx_chain_id && color)
+                    [[likely]]
+            {
+                return *color;
+            }
+
+            focused_fx_chain = st.gui_state.focused_fx_chain_id;
+            color = st.gui_state.mixer_colors.cached(*focused_fx_chain);
+            return color ? *color : material_color::pink;
         });
 
 static auto

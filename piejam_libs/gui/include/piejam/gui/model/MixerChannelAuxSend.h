@@ -4,9 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/Subscribable.h>
-#include <piejam/gui/model/SubscribableModel.h>
-#include <piejam/gui/model/fwd.h>
+#include <piejam/gui/model/MixerChannel.h>
 
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
@@ -16,11 +14,10 @@
 namespace piejam::gui::model
 {
 
-class MixerChannelAuxSend final : public Subscribable<SubscribableModel>
+class MixerChannelAuxSend final : public MixerChannel
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
     Q_PROPERTY(piejam::gui::model::AudioRoutingSelection* selected READ selected
                        CONSTANT FINAL)
     Q_PROPERTY(bool canToggle READ canToggle NOTIFY canToggleChanged FINAL)
@@ -36,20 +33,6 @@ public:
             runtime::subscriber&,
             runtime::mixer::channel_id);
     ~MixerChannelAuxSend() override;
-
-    auto name() const noexcept -> QString const&
-    {
-        return m_name;
-    }
-
-    void setName(QString const& x)
-    {
-        if (m_name != x)
-        {
-            m_name = x;
-            emit nameChanged();
-        }
-    }
 
     auto selected() const noexcept -> AudioRoutingSelection*;
 
@@ -116,7 +99,6 @@ public:
     Q_INVOKABLE void changeToChannel(unsigned index);
 
 signals:
-    void nameChanged();
     void canToggleChanged();
     void enabledChanged();
     void volumeChanged();
@@ -129,7 +111,6 @@ private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
-    QString m_name;
     bool m_canToggle{};
     bool m_enabled{};
     QStringList m_devices;

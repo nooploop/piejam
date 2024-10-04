@@ -25,6 +25,9 @@ ViewPane {
         readonly property var contentType: private_.content ? private_.content.type : null
     }
 
+    Material.primary: root.model ? root.model.color : Material.Pink
+    Material.accent: root.model ? root.model.color : Material.Pink
+
     RowLayout {
         anchors.fill: parent
 

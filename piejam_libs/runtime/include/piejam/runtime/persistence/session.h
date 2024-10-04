@@ -7,6 +7,7 @@
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/fx/parameter_assignment.h>
+#include <piejam/runtime/material_color.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/persistence/fx_midi_assignments.h>
@@ -105,6 +106,7 @@ struct session
     struct mixer_channel
     {
         std::string name;
+        material_color color;
         audio::bus_type bus_type;
         mixer_parameters parameter;
         mixer_midi midi;

@@ -19,8 +19,6 @@ namespace piejam::gui::model
 
 struct MixerChannelFx::Impl
 {
-    runtime::mixer::channel_id mixer_channel_id;
-
     box<runtime::fx::chain_t> fx_chain;
 
     FxChainModulesList modules;
@@ -30,8 +28,8 @@ MixerChannelFx::MixerChannelFx(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const mixer_channel_id)
-    : Subscribable{store_dispatch, state_change_subscriber}
-    , m_impl{std::make_unique<Impl>(mixer_channel_id)}
+    : MixerChannel{store_dispatch, state_change_subscriber, mixer_channel_id}
+    , m_impl{std::make_unique<Impl>()}
 {
 }
 
@@ -47,7 +45,7 @@ void
 MixerChannelFx::appendFxModule()
 {
     runtime::actions::show_fx_browser action;
-    action.fx_chain_id = m_impl->mixer_channel_id;
+    action.fx_chain_id = channel_id();
     dispatch(action);
 }
 
@@ -70,27 +68,22 @@ MixerChannelFx::moveDownFxModule()
 void
 MixerChannelFx::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_channel_name_selector(
-                    m_impl->mixer_channel_id),
-            [this](boxed_string const& name) {
-                setName(QString::fromStdString(*name));
-            });
+    MixerChannel::onSubscribe();
 
     observe(runtime::selectors::select_focused_fx_chain,
             [this](auto const mixer_channel_id) {
-                setFocused(m_impl->mixer_channel_id == mixer_channel_id);
+                setFocused(channel_id() == mixer_channel_id);
             });
 
     observe(runtime::selectors::make_fx_module_can_move_up_selector(
-                    m_impl->mixer_channel_id),
+                    channel_id()),
             [this](bool const x) { setCanMoveUp(x); });
 
     observe(runtime::selectors::make_fx_module_can_move_down_selector(
-                    m_impl->mixer_channel_id),
+                    channel_id()),
             [this](bool const x) { setCanMoveDown(x); });
 
-    observe(runtime::selectors::make_fx_chain_selector(
-                    m_impl->mixer_channel_id),
+    observe(runtime::selectors::make_fx_chain_selector(channel_id()),
             [this](auto const& fx_chain) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->fx_chain, *fx_chain),
@@ -101,7 +94,7 @@ MixerChannelFx::onSubscribe()
                                     return std::make_unique<FxChainModule>(
                                             dispatch(),
                                             state_change_subscriber(),
-                                            m_impl->mixer_channel_id,
+                                            channel_id(),
                                             fx_mod_id);
                                 }});
 

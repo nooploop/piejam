@@ -36,6 +36,7 @@
 #include <piejam/gui/model/MixerChannelAuxSend.h>
 #include <piejam/gui/model/MixerChannelEdit.h>
 #include <piejam/gui/model/MixerChannelFx.h>
+#include <piejam/gui/model/MixerChannelModels.h>
 #include <piejam/gui/model/MixerChannelPerform.h>
 #include <piejam/gui/model/MixerDbScales.h>
 #include <piejam/gui/model/Parameter.h>
@@ -55,6 +56,10 @@ namespace piejam::gui
 static void
 runRegistration()
 {
+    using namespace model;
+
+    qRegisterMetaType<MaterialColor>("MaterialColor");
+
     qRegisterMetaType<piejam::gui::model::FxModuleType>();
     qRegisterMetaType<piejam::gui::model::FxModuleRegistryItem>();
 
@@ -83,6 +88,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::MixerChannelAuxSend*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelEdit*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelFx*>();
+    qRegisterMetaType<piejam::gui::model::MixerChannelModels*>();
     qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();
     qRegisterMetaType<piejam::gui::model::Parameter*>();
     qRegisterMetaType<piejam::gui::model::RootView*>();

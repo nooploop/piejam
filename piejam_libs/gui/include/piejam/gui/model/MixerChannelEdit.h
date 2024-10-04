@@ -4,10 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/Subscribable.h>
-#include <piejam/gui/model/SubscribableModel.h>
-#include <piejam/gui/model/Types.h>
-#include <piejam/gui/model/fwd.h>
+#include <piejam/gui/model/MixerChannel.h>
 
 #include <piejam/runtime/mixer_fwd.h>
 
@@ -18,13 +15,9 @@
 namespace piejam::gui::model
 {
 
-class MixerChannelEdit final : public Subscribable<SubscribableModel>
+class MixerChannelEdit final : public MixerChannel
 {
     Q_OBJECT
-
-    Q_PROPERTY(QString name READ name NOTIFY nameChanged FINAL)
-
-    Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
 
     Q_PROPERTY(
             bool canMoveLeft READ canMoveLeft NOTIFY canMoveLeftChanged FINAL)
@@ -41,28 +34,10 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::channel_id);
-    ~MixerChannelEdit();
-
-    auto name() const noexcept -> QString const&
-    {
-        return m_name;
-    }
-
-    void setName(QString const& x)
-    {
-        if (m_name != x)
-        {
-            m_name = x;
-            emit nameChanged();
-        }
-    }
-
-    auto busType() const noexcept -> BusType
-    {
-        return m_busType;
-    }
+    ~MixerChannelEdit() override;
 
     Q_INVOKABLE void changeName(QString const&);
+    Q_INVOKABLE void changeColor(MaterialColor);
 
     auto canMoveLeft() const noexcept -> bool
     {
@@ -102,8 +77,6 @@ public:
     Q_INVOKABLE void deleteChannel();
 
 signals:
-
-    void nameChanged();
     void canMoveLeftChanged();
     void canMoveRightChanged();
 
@@ -113,8 +86,6 @@ private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 
-    QString m_name;
-    BusType m_busType{BusType::Mono};
     bool m_canMoveLeft{};
     bool m_canMoveRight{};
 };

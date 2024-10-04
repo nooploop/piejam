@@ -21,24 +21,10 @@ TEST(mixer_valid_io, test1)
     auto channel1 = channels.insert({
             .name = box("foo"s),
             .bus_type = audio::bus_type::stereo,
-            .volume = {},
-            .pan_balance = {},
-            .record = {},
-            .mute = {},
-            .solo = {},
-            .peak_level = {},
-            .rms_level = {},
     });
     auto channel2 = channels.insert({
             .name = box("bar"s),
             .bus_type = audio::bus_type::stereo,
-            .volume = {},
-            .pan_balance = {},
-            .record = {},
-            .mute = {},
-            .solo = {},
-            .peak_level = {},
-            .rms_level = {},
     });
 
     auto vs1 = valid_channels(io_socket::in, channels, channel1);
@@ -67,13 +53,6 @@ TEST(mixer_valid_io, test2)
             .name = box("foo"s),
             .bus_type = audio::bus_type::stereo,
             .in = channel1,
-            .volume = {},
-            .pan_balance = {},
-            .record = {},
-            .mute = {},
-            .solo = {},
-            .peak_level = {},
-            .rms_level = {},
     });
 
     auto vs1 = valid_channels(io_socket::in, channels, channel1);

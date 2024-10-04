@@ -10,6 +10,7 @@ import QtQuick.Layouts 1.15
 import PieJam.Models 1.0 as PJModels
 
 import ".."
+import "../Controls"
 
 SubscribableItem {
     id: root
@@ -34,6 +35,16 @@ SubscribableItem {
                 placeholderText: qsTr("Name")
 
                 onTextEdited: root.model.changeName(nameText.text)
+            }
+
+            ColorSelector {
+                Layout.preferredWidth: 40
+                Layout.preferredHeight: 52
+                Layout.alignment: Qt.AlignHCenter
+
+                selectedColor: root.model ? root.model.color : Material.Pink
+
+                onColorSelected: root.model.changeColor(newSelectedColor)
             }
 
             RowLayout {

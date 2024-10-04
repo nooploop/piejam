@@ -658,6 +658,8 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
         }
     }
 
+    st.gui_state.mixer_colors.insert(channel_id, material_color::pink);
+
     return channel_id;
 }
 
@@ -719,6 +721,8 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
         set_if(channel.out, equal_to_mixer_channel, mixer::io_address_t{});
         set_if(channel.aux, equal_to_mixer_channel, mixer::io_address_t{});
     }
+
+    st.gui_state.mixer_colors.erase(mixer_channel_id);
 }
 
 void

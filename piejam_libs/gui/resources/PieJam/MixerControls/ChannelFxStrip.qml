@@ -18,6 +18,9 @@ SubscribableItem {
 
     implicitWidth: 132
 
+    Material.primary: root.model ? root.model.color : Material.Pink
+    Material.accent: root.model ? root.model.color : Material.Pink
+
     Frame {
         id: frame
 
