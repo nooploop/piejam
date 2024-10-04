@@ -120,7 +120,8 @@ apply_mixer_parameters(
 auto
 find_mixer_channel_route(
         mixer::state const& mixer_state,
-        std::size_t const& index)
+        std::size_t const& index,
+        std::string const& name)
 {
     if (index == 0)
     {
@@ -132,7 +133,7 @@ find_mixer_channel_route(
     }
     else
     {
-        return mixer::io_address_t{};
+        return mixer::io_address_t{mixer::deleted_channel_address{box{name}}};
     }
 }
 
@@ -170,7 +171,10 @@ apply_mixer_io(
                         mixer_io.name);
 
             case persistence::session::mixer_io_type::channel:
-                return find_mixer_channel_route(mixer_state, mixer_io.index);
+                return find_mixer_channel_route(
+                        mixer_state,
+                        mixer_io.index,
+                        mixer_io.name);
 
             default:
                 return mixer::io_address_t();

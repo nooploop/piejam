@@ -671,6 +671,8 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
     mixer::channel const& mixer_channel =
             st.mixer_state.channels[mixer_channel_id];
 
+    auto const name = mixer_channel.name;
+
     remove_parameter(st, mixer_channel.volume);
     remove_parameter(st, mixer_channel.pan_balance);
     remove_parameter(st, mixer_channel.record);
@@ -717,7 +719,9 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
     auto const equal_to_mixer_channel = equal_to<>(addr);
     for (auto& [_, channel] : mixer_channels)
     {
-        set_if(channel.in, equal_to_mixer_channel, mixer::io_address_t{});
+        set_if(channel.in,
+               equal_to_mixer_channel,
+               mixer::io_address_t{mixer::deleted_channel_address{name}});
         set_if(channel.out, equal_to_mixer_channel, mixer::io_address_t{});
         set_if(channel.aux, equal_to_mixer_channel, mixer::io_address_t{});
     }

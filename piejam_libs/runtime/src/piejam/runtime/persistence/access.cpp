@@ -289,6 +289,12 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                                 .type = session::mixer_io_type::device,
                                 .index = npos,
                                 .name = missing.name};
+                    },
+                    [](mixer::deleted_channel_address const& deleted) {
+                        return session::mixer_io{
+                                .type = session::mixer_io_type::channel,
+                                .index = npos,
+                                .name = deleted.name};
                     }),
             addr);
 }

@@ -403,8 +403,6 @@ connect_mixer_input(
 {
     std::visit(
             boost::hof::match(
-                    [](default_t) {},
-                    [](mixer::missing_device_address const&) {},
                     [&](external_audio::device_id const device_id) {
                         external_audio::device const& device =
                                 device_buses[device_id];
@@ -440,7 +438,8 @@ connect_mixer_input(
                                 g,
                                 *source_mixer_channel_out,
                                 mixer_channel_in);
-                    }),
+                    },
+                    [](auto const&) {}),
             mixer_channel.in);
 }
 
@@ -457,7 +456,6 @@ connect_mixer_output(
 {
     std::visit(
             boost::hof::match(
-                    [](default_t) {},
                     [&](external_audio::device_id const device_id) {
                         external_audio::device const& device =
                                 external_audio_devices[device_id];
@@ -513,7 +511,7 @@ connect_mixer_output(
                                     *dst_mb_in);
                         }
                     },
-                    [](mixer::missing_device_address const&) {}),
+                    [](auto const&) {}),
             mixer_channel_out);
 }
 

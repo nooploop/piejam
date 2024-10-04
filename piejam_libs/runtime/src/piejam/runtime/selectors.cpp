@@ -514,6 +514,11 @@ static struct
                             return selected_route{
                                     .state = selected_route::state_t::invalid,
                                     .name = missing.name};
+                        },
+                        [](mixer::deleted_channel_address const& deleted) {
+                            return selected_route{
+                                    .state = selected_route::state_t::invalid,
+                                    .name = deleted.name};
                         }),
                 mixer_channel->get_io_addr(io_socket)));
     }

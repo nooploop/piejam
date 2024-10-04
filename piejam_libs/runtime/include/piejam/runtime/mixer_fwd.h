@@ -39,10 +39,31 @@ struct missing_device_address
     }
 };
 
+struct deleted_channel_address
+{
+    boxed_string name;
+
+    auto operator<=>(deleted_channel_address const& other) const
+    {
+        return name.get() <=> other.name.get();
+    }
+
+    auto operator==(deleted_channel_address const& other) const
+    {
+        return name.get() == other.name.get();
+    }
+
+    auto operator!=(deleted_channel_address const& other) const
+    {
+        return name.get() == other.name.get();
+    }
+};
+
 using io_address_t = std::variant<
         default_t,
         missing_device_address,
         external_audio::device_id,
+        deleted_channel_address,
         channel_id>;
 
 enum class io_socket
