@@ -65,7 +65,7 @@ SubscribableItem {
                         height: 32
                         anchors.verticalCenter: delegateRoot.verticalCenter
 
-                        border.color: model.item.focused ? Material.primaryColor : Material.frameColor
+                        border.color: model.item && model.item.focused ? Material.primaryColor : Material.frameColor
                         border.width: 2
                         color: Material.backgroundColor
                         radius: 4
