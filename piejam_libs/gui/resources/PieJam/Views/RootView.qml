@@ -16,6 +16,7 @@ import PieJam.Models 1.0 as PJModels
 import ".."
 import "../Controls"
 import "../MixerControls"
+import "../Util/QmlExt.js" as QmlExt
 
 Item {
     id: root
@@ -183,6 +184,22 @@ Item {
 
         anchors.left: parent.left
         anchors.right: parent.right
+    }
+
+    Connections {
+        target: inputPanel.keyboard
+
+        function onLayoutChanged() {
+            if (inputPanel.keyboard.layout !== "") {
+                var hideKey = QmlExt.findChild(inputPanel.keyboard, function(obj) { return obj instanceof HideKeyboardKey })
+                if (hideKey !== null)
+                    hideKey.visible = false
+
+                var changeLanguageKey = QmlExt.findChild(inputPanel.keyboard, function(obj) { return obj instanceof ChangeLanguageKey })
+                if (changeLanguageKey !== null)
+                    changeLanguageKey.visible = false
+            }
+        }
     }
 
     Binding {
