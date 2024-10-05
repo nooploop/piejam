@@ -32,6 +32,8 @@ Item {
                 Layout.fillWidth: true
 
                 placeholderText: qsTr("Name")
+
+                onEditingFinished: focus = false
             }
 
             Item {

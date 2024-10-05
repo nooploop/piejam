@@ -23,7 +23,10 @@ SubscribableItem {
 
             text: root.model ? root.model.name : ""
 
-            onEditingFinished: if (root.model) root.model.changeName(text)
+            onEditingFinished: {
+                root.model.changeName(text)
+                focus = false
+            }
         }
 
         ComboBox {
