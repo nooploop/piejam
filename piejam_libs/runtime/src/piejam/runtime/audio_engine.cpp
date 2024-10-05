@@ -190,7 +190,7 @@ make_solo_group_components(
 {
     comps.insert(
             solo_group_key{},
-            components::make_solo_switch(solo_groups, param_procs, "solo"));
+            components::make_solo_switch(solo_groups, param_procs));
 }
 
 auto

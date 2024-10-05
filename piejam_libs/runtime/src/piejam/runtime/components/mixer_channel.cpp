@@ -54,15 +54,18 @@ public:
             mixer::channel const& mixer_channel,
             parameter_processor_factory& param_procs,
             audio::sample_rate const sample_rate)
-        : m_volume_input_proc(param_procs.make_processor(
+        : m_volume_input_proc(param_procs.find_or_make_processor(
                   mixer_channel.volume,
                   format_name(*mixer_channel.name, "volume")))
-        , m_pan_balance_input_proc(param_procs.make_processor(
+        , m_pan_balance_input_proc(param_procs.find_or_make_processor(
                   mixer_channel.pan_balance,
                   mixer_channel.bus_type == audio::bus_type::mono
                           ? format_name(*mixer_channel.name, "pan")
                           : format_name(*mixer_channel.name, "balance")))
-        , m_mute_input_proc(param_procs.make_processor(
+        , m_solo_input_proc(param_procs.find_or_make_processor(
+                  mixer_channel.solo,
+                  format_name(*mixer_channel.name, "solo")))
+        , m_mute_input_proc(param_procs.find_or_make_processor(
                   mixer_channel.mute,
                   format_name(*mixer_channel.name, "mute")))
         , m_volume_pan_balance{make_volume_pan_balance_component(
@@ -70,10 +73,10 @@ public:
                   *mixer_channel.name)}
         , m_mute_solo(components::make_mute_solo(*mixer_channel.name))
         , m_level_meter(audio::components::make_stereo_level_meter(sample_rate))
-        , m_peak_level_proc(param_procs.make_processor(
+        , m_peak_level_proc(param_procs.find_or_make_processor(
                   mixer_channel.peak_level,
                   format_name(*mixer_channel.name, "peak_level")))
-        , m_rms_level_proc(param_procs.make_processor(
+        , m_rms_level_proc(param_procs.find_or_make_processor(
                   mixer_channel.rms_level,
                   format_name(*mixer_channel.name, "rms_level")))
     {
@@ -123,10 +126,17 @@ public:
 
         audio::engine::connect_event(
                 g,
-                *m_mute_input_proc,
+                *m_solo_input_proc,
                 from<0>,
                 *m_mute_solo,
                 to<0>);
+
+        audio::engine::connect_event(
+                g,
+                *m_mute_input_proc,
+                from<0>,
+                *m_mute_solo,
+                to<1>);
 
         audio::engine::connect(g, *m_volume_pan_balance, *m_mute_solo);
         audio::engine::connect(g, *m_volume_pan_balance, *m_level_meter);
@@ -151,6 +161,7 @@ private:
             m_volume_input_proc;
     std::shared_ptr<audio::engine::value_io_processor<float>>
             m_pan_balance_input_proc;
+    std::shared_ptr<audio::engine::value_io_processor<bool>> m_solo_input_proc;
     std::shared_ptr<audio::engine::value_io_processor<bool>> m_mute_input_proc;
     std::unique_ptr<audio::engine::component> m_volume_pan_balance;
     std::unique_ptr<audio::engine::component> m_mute_solo;
@@ -161,7 +172,7 @@ private:
             m_rms_level_proc;
 
     std::array<audio::engine::graph_endpoint, 1> m_event_inputs{
-            {m_mute_solo->event_inputs()[1]}};
+            {m_mute_solo->event_inputs()[2]}};
 };
 
 class mixer_channel_aux_send final : public audio::engine::component
@@ -171,7 +182,7 @@ public:
             mixer::channel const& mixer_channel,
             float_parameter_id aux_volume,
             parameter_processor_factory& param_procs)
-        : m_volume_param(param_procs.make_processor(
+        : m_volume_param(param_procs.find_or_make_processor(
                   aux_volume,
                   format_name(*mixer_channel.name, "aux_volume")))
         , m_volume_amp{audio::components::make_stereo_amplifier(

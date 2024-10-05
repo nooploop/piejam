@@ -66,8 +66,10 @@ private:
     std::unique_ptr<audio::engine::processor> m_mute_solo_proc;
     std::unique_ptr<audio::engine::component> m_mute_solo_amp;
 
-    std::array<audio::engine::graph_endpoint, 2> m_event_inputs{
-            {{*m_mute_solo_proc, 0}, {*m_mute_solo_proc, 1}}};
+    std::array<audio::engine::graph_endpoint, 3> m_event_inputs{
+            {{*m_mute_solo_proc, 0},
+             {*m_mute_solo_proc, 1},
+             {*m_mute_solo_proc, 2}}};
 };
 
 } // namespace

@@ -59,7 +59,7 @@ public:
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
             m_param_input_procs.emplace_back(
-                    processors::make_parameter_processor(
+                    processors::find_or_make_parameter_processor(
                             param_proc_factory,
                             id,
                             get_fx_param_name(id)));
@@ -135,7 +135,7 @@ public:
         for (auto&& [key, id] : fx_mod.parameters.get())
         {
             m_param_input_procs.emplace_back(
-                    processors::make_parameter_processor(
+                    processors::find_or_make_parameter_processor(
                             param_proc_factory,
                             id,
                             get_fx_param_name(id)));

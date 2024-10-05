@@ -32,10 +32,12 @@ public:
             runtime::fx::module const& fx_mod,
             runtime::parameter_processor_factory& proc_factory,
             std::string_view const name)
-        : m_gain_input_proc(runtime::processors::make_parameter_processor(
-                  proc_factory,
-                  fx_mod.parameters->at(to_underlying(parameter_key::gain)),
-                  fmt::format("tool_gain {}", name)))
+        : m_gain_input_proc(
+                  runtime::processors::find_or_make_parameter_processor(
+                          proc_factory,
+                          fx_mod.parameters->at(
+                                  to_underlying(parameter_key::gain)),
+                          fmt::format("tool_gain {}", name)))
         , m_amplifier(
                   fx_mod.bus_type == audio::bus_type::mono
                           ? audio::components::make_mono_amplifier(

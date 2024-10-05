@@ -181,8 +181,9 @@ private:
 
         for (auto const& [channel_id, group] : solo_groups)
         {
-            result.emplace_back(
-                    param_procs.make_processor(group.solo_param, "solo"));
+            result.emplace_back(param_procs.find_or_make_processor(
+                    group.solo_param,
+                    "solo"));
         }
 
         return result;

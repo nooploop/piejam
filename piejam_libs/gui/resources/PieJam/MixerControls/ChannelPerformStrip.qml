@@ -51,7 +51,7 @@ SubscribableItem {
                 peakLevel: root.model ? root.model.peakLevel : null
                 rmsLevel: root.model ? root.model.rmsLevel : null
 
-                muted: root.model && (root.model.mute.value || root.model.mutedBySolo)
+                muted: root.model && !root.model.solo.value && (root.model.mute.value || root.model.mutedBySolo)
 
                 levelMeterScale: PJModels.MixerDbScales.levelMeterScale
                 volumeFaderScale: PJModels.MixerDbScales.volumeFaderScale

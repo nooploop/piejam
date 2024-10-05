@@ -35,7 +35,7 @@ public:
             std::weak_ptr<parameter_processor<P>>>;
 
     template <class P>
-    auto make_processor(parameter::id_t<P> id, std::string_view const name = {})
+    auto make_processor(parameter::id_t<P> id, std::string_view name = {})
             -> std::shared_ptr<parameter_processor<P>>
     {
         BOOST_ASSERT(id.valid());
@@ -51,6 +51,19 @@ public:
         auto const& map = std::get<processor_map<P>>(m_procs);
         auto it = map.find(id);
         return it != map.end() ? it->second.lock() : nullptr;
+    }
+
+    template <class P>
+    auto
+    find_or_make_processor(parameter::id_t<P> id, std::string_view name = {})
+            -> std::shared_ptr<parameter_processor<P>>
+    {
+        if (auto proc = find_processor(id); proc)
+        {
+            return proc;
+        }
+
+        return make_processor(id, name);
     }
 
     template <class FindValue>
@@ -132,8 +145,26 @@ make_parameter_processor(
 {
     return std::visit(
             [&proc_factory,
-             &name](auto&& p) -> std::shared_ptr<audio::engine::processor> {
+             name](auto&& p) -> std::shared_ptr<audio::engine::processor> {
                 return proc_factory.make_processor(
+                        std::forward<decltype(p)>(p),
+                        name);
+            },
+            param);
+}
+
+template <class ProcessorFactory, class... P>
+auto
+find_or_make_parameter_processor(
+        ProcessorFactory& proc_factory,
+        std::variant<parameter::id_t<P>...> const& param,
+        std::string_view const name = {})
+        -> std::shared_ptr<audio::engine::processor>
+{
+    return std::visit(
+            [&proc_factory,
+             name](auto&& p) -> std::shared_ptr<audio::engine::processor> {
+                return proc_factory.find_or_make_processor(
                         std::forward<decltype(p)>(p),
                         name);
             },

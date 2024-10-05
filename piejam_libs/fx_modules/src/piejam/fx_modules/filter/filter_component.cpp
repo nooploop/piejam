@@ -335,21 +335,24 @@ class component final : public audio::engine::component
 
 public:
     component(runtime::internal_fx_component_factory_args const& args)
-        : m_type_input_proc(runtime::processors::make_parameter_processor(
-                  args.param_procs,
-                  args.fx_mod.parameters->at(
-                          to_underlying(parameter_key::type)),
-                  "type"))
-        , m_cutoff_input_proc(runtime::processors::make_parameter_processor(
-                  args.param_procs,
-                  args.fx_mod.parameters->at(
-                          to_underlying(parameter_key::cutoff)),
-                  "cutoff"))
-        , m_resonance_input_proc(runtime::processors::make_parameter_processor(
-                  args.param_procs,
-                  args.fx_mod.parameters->at(
-                          to_underlying(parameter_key::resonance)),
-                  "res"))
+        : m_type_input_proc(
+                  runtime::processors::find_or_make_parameter_processor(
+                          args.param_procs,
+                          args.fx_mod.parameters->at(
+                                  to_underlying(parameter_key::type)),
+                          "type"))
+        , m_cutoff_input_proc(
+                  runtime::processors::find_or_make_parameter_processor(
+                          args.param_procs,
+                          args.fx_mod.parameters->at(
+                                  to_underlying(parameter_key::cutoff)),
+                          "cutoff"))
+        , m_resonance_input_proc(
+                  runtime::processors::find_or_make_parameter_processor(
+                          args.param_procs,
+                          args.fx_mod.parameters->at(
+                                  to_underlying(parameter_key::resonance)),
+                          "res"))
         , m_coeffs_proc(make_coefficent_converter_processor(args.sample_rate))
         , m_in_out_stream(make_in_out_stream(
                   args.fx_mod.bus_type,

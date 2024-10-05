@@ -36,15 +36,18 @@ public:
             runtime::fx::module const& fx_mod,
             runtime::parameter_processor_factory& proc_factory,
             std::string_view const name)
-        : m_left_param_proc(runtime::processors::make_parameter_processor(
-                  proc_factory,
-                  fx_mod.parameters->at(to_underlying(parameter_key::left_pan)),
-                  fmt::format("left_pan {}", name)))
-        , m_right_param_proc(runtime::processors::make_parameter_processor(
-                  proc_factory,
-                  fx_mod.parameters->at(
-                          to_underlying(parameter_key::right_pan)),
-                  fmt::format("right_pan {}", name)))
+        : m_left_param_proc(
+                  runtime::processors::find_or_make_parameter_processor(
+                          proc_factory,
+                          fx_mod.parameters->at(
+                                  to_underlying(parameter_key::left_pan)),
+                          fmt::format("left_pan {}", name)))
+        , m_right_param_proc(
+                  runtime::processors::find_or_make_parameter_processor(
+                          proc_factory,
+                          fx_mod.parameters->at(
+                                  to_underlying(parameter_key::right_pan)),
+                          fmt::format("right_pan {}", name)))
 
     {
     }
