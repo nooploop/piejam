@@ -30,27 +30,19 @@ SubscribableItem {
 
             clip: true
 
-            delegate: ExternalAudioDeviceConfig {
+            delegate: Item {
+                property var itemModel: model.item
+
                 height: 64
-                name: model.item.name
-                mono: model.item.mono
-                channels: root.model.channels
-                monoChannelIndex: model.item.monoChannel
-                stereoLeftChannelIndex: model.item.stereoLeftChannel
-                stereoRightChannelIndex: model.item.stereoRightChannel
 
                 anchors.left: parent ? parent.left : undefined
                 anchors.right: parent ? parent.right : undefined
 
-                onMonoChannelSelected: model.item.changeMonoChannel(ch)
-                onStereoLeftChannelSelected: model.item.changeStereoLeftChannel(ch)
-                onStereoRightChannelSelected: model.item.changeStereoRightChannel(ch)
-                onDeleteConfigClicked: model.item.remove()
-                onNameEdited: model.item.changeName(name)
+                ExternalAudioDeviceConfig {
+                    anchors.fill: parent
 
-                ModelSubscription {
-                    target: model.item
-                    subscribed: visible
+                    model: itemModel
+                    channels: root.model ? root.model.channels : ["-"]
                 }
             }
         }

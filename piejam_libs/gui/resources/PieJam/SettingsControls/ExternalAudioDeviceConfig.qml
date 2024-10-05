@@ -6,23 +6,12 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-Item {
+import ".."
 
-    property bool mono: true
-    property variant channels: [ "-" ]
-    property alias name: nameTextField.text
-
-    property int monoChannelIndex: 0
-    property int stereoLeftChannelIndex: 0
-    property int stereoRightChannelIndex: 0
-
-    signal nameEdited(string name)
-    signal monoChannelSelected(int ch)
-    signal stereoLeftChannelSelected(int ch)
-    signal stereoRightChannelSelected(int ch)
-    signal deleteConfigClicked()
-
+SubscribableItem {
     id: root
+
+    property variant channels: [ "-" ]
 
     RowLayout {
 
@@ -30,60 +19,49 @@ Item {
         anchors.margins: 4
 
         TextField {
-            id: nameTextField
-
             Layout.fillWidth: true
 
-            onEditingFinished: nameEdited(nameTextField.text)
+            text: root.model ? root.model.name : ""
+
+            onEditingFinished: if (root.model) root.model.changeName(text)
         }
 
         ComboBox {
-            id: monoChannelSelect
-
             Layout.preferredWidth: 64 + 6 + 64
 
             model: root.channels
-            currentIndex: root.monoChannelIndex
-            visible: root.mono
+            currentIndex: root.model ? root.model.monoChannel : -1
+            visible: root.model && root.model.mono
 
-            onActivated: monoChannelSelected(index)
-            onModelChanged: currentIndex = Qt.binding(function() { return root.monoChannelIndex })
+            onActivated: if (root.model) root.model.changeMonoChannel(index)
         }
 
         ComboBox {
-            id: stereoLeftChannelSelect
-
             Layout.preferredWidth: 64
 
             model: root.channels
-            currentIndex: root.stereoLeftChannelIndex
-            visible: !root.mono
+            currentIndex: root.model ? root.model.stereoLeftChannel : -1
+            visible: root.model && !root.model.mono
 
-            onActivated: stereoLeftChannelSelected(index)
-            onModelChanged: currentIndex = Qt.binding(function() { return root.stereoLeftChannelIndex })
+            onActivated: if (root.model) root.model.changeStereoLeftChannel(index)
         }
 
         ComboBox {
-            id: stereoRightChannelSelect
-
             Layout.preferredWidth: 64
 
             model: root.channels
-            currentIndex: root.stereoRightChannelIndex
-            visible: !root.mono
+            currentIndex: root.model ? root.model.stereoRightChannel : -1
+            visible: root.model && !root.model.mono
 
-            onActivated: stereoRightChannelSelected(index)
-            onModelChanged: currentIndex = Qt.binding(function() { return root.stereoRightChannelIndex })
+            onActivated: if (root.model) root.model.changeStereoRightChannel(index)
         }
 
         Button {
-            id: deleteConfig
-
             Layout.preferredWidth: 38
 
             text: "X"
 
-            onClicked: deleteConfigClicked()
+            onClicked: if (root.model) root.model.remove()
         }
     }
 }
