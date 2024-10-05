@@ -22,6 +22,8 @@ class Scope : public QQuickItem
     Q_PROPERTY(piejam::gui::model::ScopeData* scopeData READ scopeData WRITE
                        setScopeData NOTIFY scopeDataChanged FINAL)
 
+    Q_PROPERTY(float peakLevel READ peakLevel NOTIFY peakLevelChanged FINAL)
+
     QML_ELEMENT
 
 public:
@@ -34,11 +36,15 @@ public:
     auto scopeData() const noexcept -> model::ScopeData*;
     void setScopeData(model::ScopeData*);
 
+    auto peakLevel() const noexcept -> float;
+    Q_INVOKABLE void syncPeakLevel(float otherPeakLevel);
+
     auto updatePaintNode(QSGNode*, UpdatePaintNodeData*) -> QSGNode* override;
 
 signals:
     void colorChanged();
     void scopeDataChanged();
+    void peakLevelChanged();
 
 private:
     struct Impl;

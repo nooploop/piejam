@@ -15,6 +15,7 @@ import PieJam.FxModules.Models 1.0
 
 import PieJam 1.0
 import PieJam.FxChainControls 1.0
+import PieJam.Util 1.0
 
 SubscribableItem {
     id: root
@@ -58,7 +59,17 @@ SubscribableItem {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
+                property real syncedPeakLevel: scopeA.visible ? (scopeB.visible ? Math.max(scopeA.peakLevel, scopeB.peakLevel) : scopeA.peakLevel)
+                                                              : (scopeB.visible ? scopeB.peakLevel : 0)
+
+                onSyncedPeakLevelChanged: {
+                    if (scopeA.visible) scopeA.syncPeakLevel(syncedPeakLevel)
+                    if (scopeB.visible) scopeB.syncPeakLevel(syncedPeakLevel)
+                }
+
                 PJItems.Scope {
+                    id: scopeA
+
                     anchors.fill: parent
 
                     visible: root.model && root.model.activeA.value
@@ -68,12 +79,21 @@ SubscribableItem {
                 }
 
                 PJItems.Scope {
+                    id: scopeB
+
                     anchors.fill: parent
 
-                    visible: private_.isStereo && (root.model && root.model.activeB.value)
+                    visible: private_.isStereo && root.model && root.model.activeB.value
 
                     scopeData: root.model ? root.model.scopeDataB : null
                     color: Material.color(Material.Blue)
+                }
+
+                Label {
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+
+                    text: "Level: " + (scopeView.syncedPeakLevel === 0 ? "-inf dB" : (DbConvert.to_dB(scopeView.syncedPeakLevel).toFixed(1) + " dB"))
                 }
             }
 

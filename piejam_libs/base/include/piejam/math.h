@@ -5,6 +5,7 @@
 #pragma once
 
 #include <boost/assert.hpp>
+#include <boost/hof/lift.hpp>
 
 #include <cmath>
 #include <concepts>
@@ -76,5 +77,7 @@ pos_mod(T x, T y)
     auto n = x % y;
     return n < 0 ? n + y : n;
 }
+
+inline constexpr auto abs = BOOST_HOF_LIFT(std::abs);
 
 } // namespace piejam::math
