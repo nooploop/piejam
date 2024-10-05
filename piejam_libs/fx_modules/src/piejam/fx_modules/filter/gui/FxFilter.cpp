@@ -6,6 +6,7 @@
 
 #include <piejam/fx_modules/filter/filter_internal_id.h>
 #include <piejam/fx_modules/filter/filter_module.h>
+
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
@@ -112,13 +113,13 @@ FxFilter::type() const noexcept -> FxModuleType
 }
 
 auto
-FxFilter::dataIn() noexcept -> SpectrumData*
+FxFilter::dataIn() const noexcept -> SpectrumData*
 {
     return &m_impl->spectrumDataIn;
 }
 
 auto
-FxFilter::dataOut() noexcept -> SpectrumData*
+FxFilter::dataOut() const noexcept -> SpectrumData*
 {
     return &m_impl->spectrumDataOut;
 }
@@ -131,19 +132,19 @@ FxFilter::clear()
 }
 
 auto
-FxFilter::filterType() -> EnumParameter*
+FxFilter::filterType() const noexcept -> EnumParameter*
 {
     return m_impl->filterTypeParam.get();
 }
 
 auto
-FxFilter::cutoff() -> FloatParameter*
+FxFilter::cutoff() const noexcept -> FloatParameter*
 {
     return m_impl->cutoffParam.get();
 }
 
 auto
-FxFilter::resonance() -> FloatParameter*
+FxFilter::resonance() const noexcept -> FloatParameter*
 {
     return m_impl->resonanceParam.get();
 }

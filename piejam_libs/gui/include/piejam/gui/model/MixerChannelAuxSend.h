@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/MixerChannel.h>
 
 #include <piejam/runtime/mixer_fwd.h>
@@ -18,14 +19,15 @@ class MixerChannelAuxSend final : public MixerChannel
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::AudioRoutingSelection* selected READ selected
-                       CONSTANT FINAL)
-    Q_PROPERTY(bool canToggle READ canToggle NOTIFY canToggleChanged FINAL)
-    Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged FINAL)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::AudioRoutingSelection*,
+            selected)
+    M_PIEJAM_GUI_PROPERTY(bool, canToggle, setCanToggle)
+    M_PIEJAM_GUI_PROPERTY(bool, enabled, setEnabled)
     Q_PROPERTY(piejam::gui::model::FloatParameter* volume READ volume NOTIFY
                        volumeChanged FINAL)
-    Q_PROPERTY(QStringList devices READ devices NOTIFY devicesChanged FINAL)
-    Q_PROPERTY(QStringList channels READ channels NOTIFY channelsChanged FINAL)
+    M_PIEJAM_GUI_PROPERTY(QStringList, devices, setDevices)
+    M_PIEJAM_GUI_PROPERTY(QStringList, channels, setChannels)
 
 public:
     MixerChannelAuxSend(
@@ -34,87 +36,20 @@ public:
             runtime::mixer::channel_id);
     ~MixerChannelAuxSend() override;
 
-    auto selected() const noexcept -> AudioRoutingSelection*;
-
-    auto canToggle() const noexcept -> bool
-    {
-        return m_canToggle;
-    }
-
-    void setCanToggle(bool x)
-    {
-        if (m_canToggle != x)
-        {
-            m_canToggle = x;
-            emit canToggleChanged();
-        }
-    }
-
-    auto enabled() const noexcept -> bool
-    {
-        return m_enabled;
-    }
-
-    void setEnabled(bool x)
-    {
-        if (m_enabled != x)
-        {
-            m_enabled = x;
-            emit enabledChanged();
-        }
-    }
-
     auto volume() const noexcept -> FloatParameter*;
-
-    auto devices() const -> QStringList const&
-    {
-        return m_devices;
-    }
-
-    void setDevices(QStringList const& x)
-    {
-        if (m_devices != x)
-        {
-            m_devices = x;
-            emit devicesChanged();
-        }
-    }
-
-    auto channels() const -> QStringList const&
-    {
-        return m_channels;
-    }
-
-    void setChannels(QStringList const& x)
-    {
-        if (m_channels != x)
-        {
-            m_channels = x;
-            emit channelsChanged();
-        }
-    }
 
     Q_INVOKABLE void toggleEnabled();
     Q_INVOKABLE void changeToDevice(unsigned index);
     Q_INVOKABLE void changeToChannel(unsigned index);
 
 signals:
-    void canToggleChanged();
-    void enabledChanged();
     void volumeChanged();
-    void devicesChanged();
-    void channelsChanged();
 
 private:
     void onSubscribe() override;
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
-
-    bool m_canToggle{};
-    bool m_enabled{};
-    QStringList m_devices;
-    QStringList m_channels;
 };
 
 } // namespace piejam::gui::model

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
@@ -17,13 +18,11 @@ class FxBrowser final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractListModel* entries READ entries CONSTANT)
+    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, entries)
 
 public:
     FxBrowser(runtime::store_dispatch, runtime::subscriber&);
     ~FxBrowser() override;
-
-    auto entries() noexcept -> FxBrowserList*;
 
     Q_INVOKABLE void showMixer();
 

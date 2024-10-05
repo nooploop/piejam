@@ -26,7 +26,7 @@ Info::onSubscribe()
             [this](bool const x) { setRecording(x); });
 
     observe(runtime::selectors::select_xruns, [this](std::size_t const xruns) {
-        setXRuns(static_cast<unsigned>(xruns));
+        setXruns(static_cast<unsigned>(xruns));
     });
 
     observe(runtime::selectors::select_cpu_load,

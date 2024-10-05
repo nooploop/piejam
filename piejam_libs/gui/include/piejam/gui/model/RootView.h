@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -16,14 +17,7 @@ namespace piejam::gui::model
 class RootView final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
-
-    Q_PROPERTY(bool canShowFxModule READ canShowFxModule NOTIFY
-                       canShowFxModuleChanged FINAL)
-
 public:
-    RootView(runtime::store_dispatch, runtime::subscriber&);
-    ~RootView() override;
-
     enum class Mode : int
     {
         Mixer,
@@ -36,17 +30,13 @@ public:
 
     Q_ENUM(Mode)
 
-    Q_PROPERTY(Mode mode READ mode NOTIFY modeChanged FINAL)
+private:
+    M_PIEJAM_GUI_PROPERTY(bool, canShowFxModule, setCanShowFxModule)
+    M_PIEJAM_GUI_PROPERTY(Mode, mode, setMode)
 
-    auto mode() const -> Mode
-    {
-        return m_mode;
-    }
-
-    auto canShowFxModule() const -> bool
-    {
-        return m_canShowFxModule;
-    }
+public:
+    RootView(runtime::store_dispatch, runtime::subscriber&);
+    ~RootView() override;
 
     Q_INVOKABLE void showMixer();
     Q_INVOKABLE void showFxModule();
@@ -54,35 +44,10 @@ public:
     Q_INVOKABLE void showSettings();
     Q_INVOKABLE void showPower();
 
-signals:
-    void modeChanged();
-    void canShowFxModuleChanged();
-
 private:
     void onSubscribe() override;
 
-    void setMode(Mode x)
-    {
-        if (m_mode != x)
-        {
-            m_mode = x;
-            emit modeChanged();
-        }
-    }
-
-    void setCanShowFxModule(bool const x)
-    {
-        if (m_canShowFxModule != x)
-        {
-            m_canShowFxModule = x;
-            emit canShowFxModuleChanged();
-        }
-    }
-
     void switchRootViewMode(runtime::root_view_mode);
-
-    Mode m_mode{};
-    bool m_canShowFxModule{};
 };
 
 } // namespace piejam::gui::model

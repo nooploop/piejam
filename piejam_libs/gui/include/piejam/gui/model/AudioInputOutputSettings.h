@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+
 #include <piejam/io_direction.h>
 
 #include <QStringList>
@@ -21,9 +23,8 @@ class AudioInputOutputSettings : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(QStringList channels READ channels NOTIFY channelsChanged FINAL)
-    Q_PROPERTY(
-            QAbstractListModel* deviceConfigs READ deviceConfigs CONSTANT FINAL)
+    M_PIEJAM_GUI_PROPERTY(QStringList, channels, setChannels)
+    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, deviceConfigs)
 
 protected:
     AudioInputOutputSettings(
@@ -32,37 +33,16 @@ protected:
             io_direction);
 
 public:
-    ~AudioInputOutputSettings();
-
-    auto channels() -> QStringList
-    {
-        return m_channels;
-    }
-
-    void setChannels(QStringList const& channels)
-    {
-        if (m_channels != channels)
-        {
-            m_channels = channels;
-            emit channelsChanged();
-        }
-    }
-
-    auto deviceConfigs() -> ExternalAudioDeviceConfigList*;
+    ~AudioInputOutputSettings() override;
 
     Q_INVOKABLE void addMonoDevice();
     Q_INVOKABLE void addStereoDevice();
-
-signals:
-    void channelsChanged();
 
 private:
     void onSubscribe() override;
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
-
-    QStringList m_channels;
 };
 
 class AudioInputSettings final : public AudioInputOutputSettings

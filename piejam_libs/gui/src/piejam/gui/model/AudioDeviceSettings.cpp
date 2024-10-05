@@ -4,9 +4,10 @@
 
 #include <piejam/gui/model/AudioDeviceSettings.h>
 
+#include <piejam/gui/model/StringList.h>
+
 #include <piejam/algorithm/index_of.h>
 #include <piejam/audio/sound_card_descriptor.h>
-#include <piejam/gui/model/StringList.h>
 #include <piejam/redux/store.h>
 #include <piejam/reselect/subscriptions_manager.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
@@ -60,31 +61,33 @@ AudioDeviceSettings::AudioDeviceSettings(
 AudioDeviceSettings::~AudioDeviceSettings() = default;
 
 auto
-AudioDeviceSettings::inputSoundCards() -> StringList*
+AudioDeviceSettings::inputSoundCards() const noexcept
+        -> inputSoundCards_property_t
 {
     return &m_impl->input_sound_cards;
 }
 
 auto
-AudioDeviceSettings::outputSoundCards() -> StringList*
+AudioDeviceSettings::outputSoundCards() const noexcept
+        -> outputSoundCards_property_t
 {
     return &m_impl->output_sound_cards;
 }
 
 auto
-AudioDeviceSettings::sampleRates() -> StringList*
+AudioDeviceSettings::sampleRates() const noexcept -> sampleRates_property_t
 {
     return &m_impl->sample_rates;
 }
 
 auto
-AudioDeviceSettings::periodSizes() -> StringList*
+AudioDeviceSettings::periodSizes() const noexcept -> periodSizes_property_t
 {
     return &m_impl->period_sizes;
 }
 
 auto
-AudioDeviceSettings::periodCounts() -> StringList*
+AudioDeviceSettings::periodCounts() const noexcept -> periodCounts_property_t
 {
     return &m_impl->period_counts;
 }

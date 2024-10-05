@@ -4,10 +4,11 @@
 
 #include <piejam/fx_modules/scope/gui/FxScope.h>
 
-#include <piejam/audio/types.h>
-#include <piejam/functional/in_interval.h>
 #include <piejam/fx_modules/scope/scope_internal_id.h>
 #include <piejam/fx_modules/scope/scope_module.h>
+
+#include <piejam/audio/types.h>
+#include <piejam/functional/in_interval.h>
 #include <piejam/gui/model/AudioStreamAmplifier.h>
 #include <piejam/gui/model/AudioStreamChannelDuplicator.h>
 #include <piejam/gui/model/BoolParameter.h>
@@ -80,6 +81,11 @@ struct FxScope::Impl
     std::unique_ptr<FloatParameter> gainB;
     std::unique_ptr<BoolParameter> freeze;
     std::unique_ptr<FxStream> stream;
+
+    piejam::gui::model::WaveformDataObject waveformDataA;
+    piejam::gui::model::WaveformDataObject waveformDataB;
+    piejam::gui::model::ScopeData scopeDataA;
+    piejam::gui::model::ScopeData scopeDataB;
 };
 
 FxScope::FxScope(
@@ -179,11 +185,11 @@ FxScope::FxScope(
             &ScopeDataGenerator::generated,
             this,
             [this](std::span<ScopeData::Samples const> scopeDataSamples) {
-                m_scopeDataA.set(scopeDataSamples[0]);
+                m_impl->scopeDataA.set(scopeDataSamples[0]);
 
                 if (m_impl->busType == BusType::Stereo)
                 {
-                    m_scopeDataB.set(scopeDataSamples[1]);
+                    m_impl->scopeDataB.set(scopeDataSamples[1]);
                 }
             });
 
@@ -402,6 +408,30 @@ FxScope::freeze() const noexcept -> BoolParameter*
     return m_impl->freeze.get();
 }
 
+auto
+FxScope::waveformDataA() const noexcept -> WaveformDataObject*
+{
+    return &m_impl->waveformDataA;
+}
+
+auto
+FxScope::waveformDataB() const noexcept -> WaveformDataObject*
+{
+    return &m_impl->waveformDataB;
+}
+
+auto
+FxScope::scopeDataA() const noexcept -> ScopeData*
+{
+    return &m_impl->scopeDataA;
+}
+
+auto
+FxScope::scopeDataB() const noexcept -> ScopeData*
+{
+    return &m_impl->scopeDataB;
+}
+
 void
 FxScope::setViewSize(int const x)
 {
@@ -418,26 +448,26 @@ FxScope::setViewSize(int const x)
 void
 FxScope::clear()
 {
-    m_waveformDataA.get().clear();
-    m_waveformDataB.get().clear();
-    m_scopeDataA.clear();
-    m_scopeDataB.clear();
+    m_impl->waveformDataA.get().clear();
+    m_impl->waveformDataB.get().clear();
+    m_impl->scopeDataA.clear();
+    m_impl->scopeDataB.clear();
 
     if (m_impl->activeA->value())
     {
-        m_waveformDataA.get().resize(m_viewSize);
+        m_impl->waveformDataA.get().resize(m_viewSize);
     }
 
     if (m_impl->activeB->value())
     {
-        m_waveformDataB.get().resize(m_viewSize);
+        m_impl->waveformDataB.get().resize(m_viewSize);
     }
 
     m_impl->waveformGenerator.clear();
     m_impl->scopeDataGenerator.clear();
 
-    m_waveformDataA.update();
-    m_waveformDataB.update();
+    m_impl->waveformDataA.update();
+    m_impl->waveformDataB.update();
 }
 
 void

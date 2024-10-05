@@ -6,6 +6,7 @@
 
 #include <piejam/fx_modules/spectrum/spectrum_internal_id.h>
 #include <piejam/fx_modules/spectrum/spectrum_module.h>
+
 #include <piejam/gui/model/AudioStreamAmplifier.h>
 #include <piejam/gui/model/AudioStreamChannelDuplicator.h>
 #include <piejam/gui/model/BoolParameter.h>
@@ -68,6 +69,9 @@ struct FxSpectrum::Impl
     std::unique_ptr<FloatParameter> gainB;
     std::unique_ptr<BoolParameter> freeze;
     std::unique_ptr<FxStream> stream;
+
+    piejam::gui::model::SpectrumData spectrumDataA;
+    piejam::gui::model::SpectrumData spectrumDataB;
 };
 
 FxSpectrum::FxSpectrum(
@@ -260,6 +264,25 @@ auto
 FxSpectrum::freeze() const noexcept -> BoolParameter*
 {
     return m_impl->freeze.get();
+}
+
+auto
+FxSpectrum::dataA() const noexcept -> SpectrumData*
+{
+    return &m_impl->spectrumDataA;
+}
+
+auto
+FxSpectrum::dataB() const noexcept -> SpectrumData*
+{
+    return &m_impl->spectrumDataB;
+}
+
+void
+FxSpectrum::clear()
+{
+    m_impl->spectrumDataA.clear();
+    m_impl->spectrumDataB.clear();
 }
 
 void

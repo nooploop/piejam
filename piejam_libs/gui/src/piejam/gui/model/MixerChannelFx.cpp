@@ -36,7 +36,7 @@ MixerChannelFx::MixerChannelFx(
 MixerChannelFx::~MixerChannelFx() = default;
 
 auto
-MixerChannelFx::fxChain() noexcept -> FxChainModulesList*
+MixerChannelFx::fxChain() const noexcept -> QAbstractListModel*
 {
     return &m_impl->modules;
 }
@@ -77,18 +77,18 @@ MixerChannelFx::onSubscribe()
 
     observe(runtime::selectors::make_fx_module_can_move_up_selector(
                     channel_id()),
-            [this](bool const x) { setCanMoveUp(x); });
+            [this](bool const x) { setCanMoveUpFxModule(x); });
 
     observe(runtime::selectors::make_fx_module_can_move_down_selector(
                     channel_id()),
-            [this](bool const x) { setCanMoveDown(x); });
+            [this](bool const x) { setCanMoveDownFxModule(x); });
 
     observe(runtime::selectors::make_fx_chain_selector(channel_id()),
             [this](auto const& fx_chain) {
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->fx_chain, *fx_chain),
                         piejam::gui::generic_list_model_edit_script_executor{
-                                *fxChain(),
+                                m_impl->modules,
                                 [this](runtime::fx::module_id const&
                                                fx_mod_id) {
                                     return std::make_unique<FxChainModule>(

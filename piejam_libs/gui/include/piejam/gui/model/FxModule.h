@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/FxModuleType.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/fwd.h>
+
 #include <piejam/runtime/fx/fwd.h>
 
 #include <memory>
@@ -21,7 +23,8 @@ class FxModule : public Subscribable<SubscribableModel>
     Q_OBJECT
 
     Q_PROPERTY(piejam::gui::model::FxModuleType type READ type CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::BusType busType READ busType CONSTANT FINAL)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BusType, busType)
+
 public:
     FxModule(
             runtime::store_dispatch,
@@ -30,11 +33,6 @@ public:
     ~FxModule();
 
     virtual auto type() const noexcept -> FxModuleType = 0;
-
-    auto busType() const noexcept -> BusType
-    {
-        return m_busType;
-    }
 
 protected:
     auto parameters() const -> runtime::fx::module_parameters const&;

@@ -98,7 +98,7 @@ FxBrowser::FxBrowser(
 FxBrowser::~FxBrowser() = default;
 
 auto
-FxBrowser::entries() noexcept -> FxBrowserList*
+FxBrowser::entries() const noexcept -> QAbstractListModel*
 {
     return &m_impl->entries;
 }

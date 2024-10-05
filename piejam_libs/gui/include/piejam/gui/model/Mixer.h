@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
@@ -18,17 +19,14 @@ class Mixer final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractListModel* userChannels READ userChannels CONSTANT)
-    Q_PROPERTY(piejam::gui::model::MixerChannelModels* mainChannel READ
-                       mainChannel CONSTANT FINAL)
+    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, userChannels)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::MixerChannelModels*,
+            mainChannel)
 
 public:
     Mixer(runtime::store_dispatch, runtime::subscriber&);
     ~Mixer() override;
-
-    auto userChannels() const -> MixerChannelsList*;
-
-    auto mainChannel() const -> MixerChannelModels*;
 
     Q_INVOKABLE void addMonoChannel(QString const& newChannelName);
     Q_INVOKABLE void addStereoChannel(QString const& newChannelName);

@@ -39,7 +39,7 @@ EnumParameter::EnumParameter(
 EnumParameter::~EnumParameter() = default;
 
 auto
-EnumParameter::values() const noexcept -> EnumListModel*
+EnumParameter::values() const noexcept -> QAbstractListModel*
 {
     return &m_impl->values;
 }

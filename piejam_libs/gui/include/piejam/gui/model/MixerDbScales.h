@@ -24,7 +24,7 @@ class MixerDbScales : public QObject
                        sendFaderScale CONSTANT)
 public:
     MixerDbScales();
-    ~MixerDbScales();
+    ~MixerDbScales() override;
 
     auto levelMeterScale() const noexcept -> DbScaleData*
     {

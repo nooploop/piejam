@@ -10,9 +10,6 @@
 #include <QList>
 #include <QStringList>
 
-#include <memory>
-#include <string>
-
 namespace piejam::gui::model
 {
 

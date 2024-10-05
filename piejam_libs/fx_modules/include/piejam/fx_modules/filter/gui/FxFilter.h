@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/fwd.h>
+
 #include <piejam/runtime/fx/fwd.h>
 
 #include <memory>
@@ -18,14 +20,16 @@ class FxFilter final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::SpectrumData* dataIn READ dataIn CONSTANT)
-    Q_PROPERTY(piejam::gui::model::SpectrumData* dataOut READ dataOut CONSTANT)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::SpectrumData*, dataIn)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::SpectrumData*, dataOut)
 
-    Q_PROPERTY(piejam::gui::model::EnumParameter* filterType READ filterType
-                       CONSTANT)
-    Q_PROPERTY(piejam::gui::model::FloatParameter* cutoff READ cutoff CONSTANT)
-    Q_PROPERTY(piejam::gui::model::FloatParameter* resonance READ resonance
-                       CONSTANT)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::EnumParameter*,
+            filterType)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, cutoff)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::FloatParameter*,
+            resonance)
 
 public:
     FxFilter(
@@ -36,14 +40,7 @@ public:
 
     auto type() const noexcept -> piejam::gui::model::FxModuleType override;
 
-    auto dataIn() noexcept -> piejam::gui::model::SpectrumData*;
-    auto dataOut() noexcept -> piejam::gui::model::SpectrumData*;
-
     Q_INVOKABLE void clear();
-
-    auto filterType() -> piejam::gui::model::EnumParameter*;
-    auto cutoff() -> piejam::gui::model::FloatParameter*;
-    auto resonance() -> piejam::gui::model::FloatParameter*;
 
 private:
     void onSubscribe() override;

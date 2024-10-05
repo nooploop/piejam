@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/Parameter.h>
 
 #include <memory>
@@ -15,7 +16,7 @@ class BoolParameter final : public Parameter
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool value READ value NOTIFY valueChanged FINAL)
+    M_PIEJAM_GUI_PROPERTY(bool, value, setValue)
 
 public:
     BoolParameter(
@@ -26,32 +27,13 @@ public:
 
     static constexpr auto StaticType = Type::Bool;
 
-    auto value() const noexcept -> bool
-    {
-        return m_value;
-    }
-
     Q_INVOKABLE void changeValue(bool);
-
-signals:
-    void valueChanged();
 
 private:
     void onSubscribe() override;
 
-    void setValue(bool x)
-    {
-        if (m_value != x)
-        {
-            m_value = x;
-            emit valueChanged();
-        }
-    }
-
     struct Impl;
     std::unique_ptr<Impl> m_impl;
-
-    bool m_value{};
 };
 
 } // namespace piejam::gui::model

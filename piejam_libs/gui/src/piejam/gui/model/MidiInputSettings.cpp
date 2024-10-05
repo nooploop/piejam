@@ -4,10 +4,11 @@
 
 #include <piejam/gui/model/MidiInputSettings.h>
 
-#include <piejam/algorithm/edit_script.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/MidiDeviceConfig.h>
+
+#include <piejam/algorithm/edit_script.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::gui::model
@@ -30,7 +31,7 @@ MidiInputSettings::MidiInputSettings(
 MidiInputSettings::~MidiInputSettings() = default;
 
 auto
-MidiInputSettings::devices() -> MidiDeviceList*
+MidiInputSettings::devices() const noexcept -> QAbstractListModel*
 {
     return &m_impl->devices;
 }
@@ -43,7 +44,7 @@ MidiInputSettings::onSubscribe()
                 algorithm::apply_edit_script(
                         algorithm::edit_script(*m_impl->device_ids, *devs),
                         piejam::gui::generic_list_model_edit_script_executor{
-                                *devices(),
+                                m_impl->devices,
                                 [this](midi::device_id_t device_id) {
                                     return std::make_unique<MidiDeviceConfig>(
                                             dispatch(),

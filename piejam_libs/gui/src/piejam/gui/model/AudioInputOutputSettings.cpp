@@ -35,7 +35,7 @@ AudioInputOutputSettings::AudioInputOutputSettings(
 AudioInputOutputSettings::~AudioInputOutputSettings() = default;
 
 auto
-AudioInputOutputSettings::deviceConfigs() -> ExternalAudioDeviceConfigList*
+AudioInputOutputSettings::deviceConfigs() const noexcept -> QAbstractListModel*
 {
     return &m_impl->deviceConfigs;
 }

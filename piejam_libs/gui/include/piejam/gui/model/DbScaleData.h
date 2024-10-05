@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/DbScaleTick.h>
 
 #include <QObject>
@@ -15,18 +16,15 @@ namespace piejam::gui::model
 class DbScaleData : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(
-            QVector<piejam::gui::model::DbScaleTick> ticks READ ticks CONSTANT)
+
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            QVector<piejam::gui::model::DbScaleTick>,
+            ticks)
 public:
     DbScaleData() noexcept = default;
     DbScaleData(QVector<DbScaleTick> ticks) noexcept
         : m_ticks(std::move(ticks))
     {
-    }
-
-    auto ticks() const -> QVector<DbScaleTick>
-    {
-        return m_ticks;
     }
 
     Q_INVOKABLE float dBToPosition(float const dB) const;

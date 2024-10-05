@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/MixerChannel.h>
 #include <piejam/gui/model/StringList.h>
@@ -20,12 +21,10 @@ class MixerChannelFx final : public MixerChannel
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool focused READ focused NOTIFY focusedChanged FINAL)
-    Q_PROPERTY(QAbstractListModel* fxChain READ fxChain CONSTANT)
-    Q_PROPERTY(bool canMoveUpFxModule READ canMoveUpFxModule NOTIFY
-                       canMoveUpFxModuleChanged FINAL)
-    Q_PROPERTY(bool canMoveDownFxModule READ canMoveDownFxModule NOTIFY
-                       canMoveDownFxModuleChanged FINAL)
+    M_PIEJAM_GUI_PROPERTY(bool, focused, setFocused)
+    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, fxChain)
+    M_PIEJAM_GUI_PROPERTY(bool, canMoveUpFxModule, setCanMoveUpFxModule)
+    M_PIEJAM_GUI_PROPERTY(bool, canMoveDownFxModule, setCanMoveDownFxModule)
 
 public:
     MixerChannelFx(
@@ -34,68 +33,15 @@ public:
             runtime::mixer::channel_id);
     ~MixerChannelFx() override;
 
-    auto focused() const noexcept -> bool
-    {
-        return m_focused;
-    }
-
-    auto canMoveUpFxModule() const noexcept -> bool
-    {
-        return m_canMoveUpFxModule;
-    }
-
-    auto canMoveDownFxModule() const noexcept -> bool
-    {
-        return m_canMoveDownFxModule;
-    }
-
-    auto fxChain() noexcept -> FxChainModulesList*;
-
     Q_INVOKABLE void appendFxModule();
     Q_INVOKABLE void moveUpFxModule();
     Q_INVOKABLE void moveDownFxModule();
 
-signals:
-    void focusedChanged();
-    void canMoveUpFxModuleChanged();
-    void canMoveDownFxModuleChanged();
-
 private:
-    void setFocused(bool const x)
-    {
-        if (m_focused != x)
-        {
-            m_focused = x;
-            emit focusedChanged();
-        }
-    }
-
-    void setCanMoveUp(bool const x)
-    {
-        if (m_canMoveUpFxModule != x)
-        {
-            m_canMoveUpFxModule = x;
-            emit canMoveUpFxModuleChanged();
-        }
-    }
-
-    void setCanMoveDown(bool const x)
-    {
-        if (m_canMoveDownFxModule != x)
-        {
-            m_canMoveDownFxModule = x;
-            emit canMoveDownFxModuleChanged();
-        }
-    }
-
     void onSubscribe() override;
 
     struct Impl;
     std::unique_ptr<Impl> m_impl;
-
-    bool m_focused{};
-    bool m_canMoveUpFxModule{};
-    bool m_canMoveDownFxModule{};
 };
 
 } // namespace piejam::gui::model

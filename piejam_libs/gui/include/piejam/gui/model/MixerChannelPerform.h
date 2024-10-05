@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/MixerChannel.h>
 
 #include <piejam/audio/types.h>
@@ -20,20 +21,20 @@ class MixerChannelPerform final : public MixerChannel
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::FloatParameter* volume READ volume CONSTANT
-                       FINAL)
-    Q_PROPERTY(piejam::gui::model::StereoLevelParameter* peakLevel READ
-                       peakLevel CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::StereoLevelParameter* rmsLevel READ rmsLevel
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::FloatParameter* panBalance READ panBalance
-                       CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::BoolParameter* record READ record CONSTANT
-                       FINAL)
-    Q_PROPERTY(piejam::gui::model::BoolParameter* solo READ solo CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::BoolParameter* mute READ mute CONSTANT FINAL)
-    Q_PROPERTY(
-            bool mutedBySolo READ mutedBySolo NOTIFY mutedBySoloChanged FINAL)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, volume)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::StereoLevelParameter*,
+            peakLevel)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::StereoLevelParameter*,
+            rmsLevel)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::FloatParameter*,
+            panBalance)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, record)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, solo)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, mute)
+    M_PIEJAM_GUI_PROPERTY(bool, mutedBySolo, setMutedBySolo)
 
 public:
     MixerChannelPerform(
@@ -42,38 +43,11 @@ public:
             runtime::mixer::channel_id);
     ~MixerChannelPerform() override;
 
-    auto volume() const noexcept -> FloatParameter*;
-    auto peakLevel() const noexcept -> StereoLevelParameter*;
-    auto rmsLevel() const noexcept -> StereoLevelParameter*;
-    auto panBalance() const noexcept -> FloatParameter*;
-    auto record() const noexcept -> BoolParameter*;
-    auto solo() const noexcept -> BoolParameter*;
-    auto mute() const noexcept -> BoolParameter*;
-
-    auto mutedBySolo() const noexcept -> bool
-    {
-        return m_mutedBySolo;
-    }
-
-signals:
-    void mutedBySoloChanged();
-
 private:
     void onSubscribe() override;
 
-    void setMutedBySolo(bool const x)
-    {
-        if (m_mutedBySolo != x)
-        {
-            m_mutedBySolo = x;
-            emit mutedBySoloChanged();
-        }
-    }
-
     struct Impl;
     std::unique_ptr<Impl> m_impl;
-
-    bool m_mutedBySolo{};
 };
 
 } // namespace piejam::gui::model

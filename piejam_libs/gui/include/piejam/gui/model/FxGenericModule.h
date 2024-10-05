@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/FxModule.h>
 #include <piejam/gui/model/GenericListModel.h>
+
 #include <piejam/runtime/fx/fwd.h>
 
 #include <memory>
@@ -17,8 +19,7 @@ class FxGenericModule : public FxModule
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractListModel* parametersList READ parametersList CONSTANT
-                       FINAL)
+    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, parametersList)
 
 public:
     FxGenericModule(
@@ -31,8 +32,6 @@ public:
     {
         return {};
     }
-
-    auto parametersList() noexcept -> FxParametersList*;
 
 private:
     void onSubscribe() override;

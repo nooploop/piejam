@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/EnumListModel.h>
 #include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/Subscribable.h>
@@ -19,7 +20,7 @@ class EnumParameter final : public IntParameter
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractListModel* values READ values CONSTANT FINAL)
+    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, values)
 
 public:
     EnumParameter(
@@ -34,8 +35,6 @@ public:
     {
         return EnumParameter::StaticType;
     }
-
-    auto values() const noexcept -> EnumListModel*;
 
 private:
     struct Impl;

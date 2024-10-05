@@ -4,11 +4,12 @@
 
 #include <piejam/gui/model/Mixer.h>
 
-#include <piejam/algorithm/edit_script.h>
-#include <piejam/audio/types.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/gui/model/GenericListModel.h>
 #include <piejam/gui/model/MixerChannelModels.h>
+
+#include <piejam/algorithm/edit_script.h>
+#include <piejam/audio/types.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/selectors.h>
@@ -51,13 +52,13 @@ Mixer::Mixer(
 Mixer::~Mixer() = default;
 
 auto
-Mixer::userChannels() const -> MixerChannelsList*
+Mixer::userChannels() const noexcept -> QAbstractListModel*
 {
     return &m_impl->userChannels;
 }
 
 auto
-Mixer::mainChannel() const -> MixerChannelModels*
+Mixer::mainChannel() const noexcept -> MixerChannelModels*
 {
     return &m_impl->mainChannel;
 }
@@ -72,7 +73,7 @@ Mixer::onSubscribe()
                                 *m_impl->user_channel_ids,
                                 *user_channel_ids),
                         piejam::gui::generic_list_model_edit_script_executor{
-                                *userChannels(),
+                                m_impl->userChannels,
                                 [this](auto const& channel_id) {
                                     return std::make_unique<MixerChannelModels>(
                                             dispatch(),

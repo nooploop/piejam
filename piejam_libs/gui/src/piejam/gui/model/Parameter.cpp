@@ -8,6 +8,7 @@
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/MidiAssignable.h>
+
 #include <piejam/integral_constant.h>
 #include <piejam/math.h>
 #include <piejam/runtime/actions/reset_fx_parameter_to_default_value.h>
@@ -87,7 +88,7 @@ Parameter::onSubscribe()
 }
 
 auto
-Parameter::midi() const -> MidiAssignable*
+Parameter::midi() const noexcept -> MidiAssignable*
 {
     return m_impl->midi.get();
 }

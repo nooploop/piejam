@@ -4,9 +4,10 @@
 
 #include <piejam/fx_modules/tuner/gui/FxTuner.h>
 
-#include <piejam/audio/pitch.h>
 #include <piejam/fx_modules/tuner/tuner_internal_id.h>
 #include <piejam/fx_modules/tuner/tuner_module.h>
+
+#include <piejam/audio/pitch.h>
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/PitchGenerator.h>

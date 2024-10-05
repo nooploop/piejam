@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
@@ -20,13 +21,14 @@ class MixerChannelModels final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::MixerChannelPerform* perform READ perform
-                       CONSTANT FINAL)
-    Q_PROPERTY(
-            piejam::gui::model::MixerChannelEdit* edit READ edit CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::MixerChannelFx* fx READ fx CONSTANT FINAL)
-    Q_PROPERTY(piejam::gui::model::MixerChannelAuxSend* auxSend READ auxSend
-                       CONSTANT FINAL)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::MixerChannelPerform*,
+            perform)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::MixerChannelEdit*, edit)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::MixerChannelFx*, fx)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::MixerChannelAuxSend*,
+            auxSend)
 
 public:
     MixerChannelModels(
@@ -34,11 +36,6 @@ public:
             runtime::subscriber&,
             runtime::mixer::channel_id);
     ~MixerChannelModels() override;
-
-    auto perform() const -> MixerChannelPerform*;
-    auto edit() const -> MixerChannelEdit*;
-    auto fx() const -> MixerChannelFx*;
-    auto auxSend() const -> MixerChannelAuxSend*;
 
 private:
     void onSubscribe() override;

@@ -14,15 +14,21 @@ MixerChannel::MixerChannel(
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
     : Subscribable{store_dispatch, state_change_subscriber}
+    , m_color{static_cast<MaterialColor>(observe_once(
+              runtime::selectors::make_mixer_channel_color_selector(id)))}
     , m_channel_id{id}
     , m_busType{toBusType(observe_once(
               runtime::selectors::make_mixer_channel_bus_type_selector(id)))}
-    , m_color{static_cast<MaterialColor>(observe_once(
-              runtime::selectors::make_mixer_channel_color_selector(id)))}
 {
 }
 
 MixerChannel::~MixerChannel() = default;
+
+auto
+MixerChannel::busType() const noexcept -> BusType
+{
+    return m_busType;
+}
 
 void
 MixerChannel::onSubscribe()

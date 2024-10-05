@@ -55,6 +55,12 @@ AudioRouting::AudioRouting(
 AudioRouting::~AudioRouting() = default;
 
 auto
+AudioRouting::defaultName() const noexcept -> QString const&
+{
+    return m_defaultName;
+}
+
+auto
 AudioRouting::selected() const noexcept -> AudioRoutingSelection*
 {
     return m_impl->selected.get();

@@ -40,7 +40,7 @@ FxGenericModule::FxGenericModule(
 FxGenericModule::~FxGenericModule() = default;
 
 auto
-FxGenericModule::parametersList() noexcept -> FxParametersList*
+FxGenericModule::parametersList() const noexcept -> QAbstractListModel*
 {
     return &m_impl->parametersList;
 }

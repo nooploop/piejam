@@ -50,25 +50,25 @@ MixerChannelModels::onSubscribe()
 }
 
 auto
-MixerChannelModels::perform() const -> MixerChannelPerform*
+MixerChannelModels::perform() const noexcept -> MixerChannelPerform*
 {
     return &m_impl->m_perform;
 }
 
 auto
-MixerChannelModels::edit() const -> MixerChannelEdit*
+MixerChannelModels::edit() const noexcept -> MixerChannelEdit*
 {
     return &m_impl->m_edit;
 }
 
 auto
-MixerChannelModels::fx() const -> MixerChannelFx*
+MixerChannelModels::fx() const noexcept -> MixerChannelFx*
 {
     return &m_impl->m_fx;
 }
 
 auto
-MixerChannelModels::auxSend() const -> MixerChannelAuxSend*
+MixerChannelModels::auxSend() const noexcept -> MixerChannelAuxSend*
 {
     return &m_impl->m_auxSend;
 }

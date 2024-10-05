@@ -10,6 +10,7 @@
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/gui/model/MixerDbScales.h>
 #include <piejam/gui/model/StereoLevelParameter.h>
+
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/parameter/float_.h>
 #include <piejam/runtime/parameter/generic_value.h>

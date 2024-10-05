@@ -22,6 +22,12 @@ namespace piejam::gui::model
 static constexpr float s_min_dB = -160.f;
 static constexpr float s_inf = std::numeric_limits<float>::infinity();
 
+auto
+DbScaleData::ticks() const noexcept -> QVector<DbScaleTick> const&
+{
+    return m_ticks;
+}
+
 float
 DbScaleData::dBToPosition(float const dB) const
 {

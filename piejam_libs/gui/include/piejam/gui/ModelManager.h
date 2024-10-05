@@ -42,7 +42,7 @@ class ModelManager final : public QObject
 
 public:
     ModelManager(runtime::store_dispatch, runtime::subscriber&);
-    ~ModelManager();
+    ~ModelManager() override;
 
     auto audioDeviceSettings() const -> model::AudioDeviceSettings*
     {

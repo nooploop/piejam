@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+
+#include <QAbstractListModel>
 
 #include <memory>
 
@@ -17,13 +20,11 @@ class MidiInputSettings final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractListModel* devices READ devices CONSTANT)
+    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, devices)
 
 public:
     MidiInputSettings(runtime::store_dispatch, runtime::subscriber&);
-    ~MidiInputSettings();
-
-    auto devices() -> MidiDeviceList*;
+    ~MidiInputSettings() override;
 
 private:
     void onSubscribe() override;

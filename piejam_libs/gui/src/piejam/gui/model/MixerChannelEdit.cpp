@@ -48,13 +48,13 @@ MixerChannelEdit::MixerChannelEdit(
 MixerChannelEdit::~MixerChannelEdit() = default;
 
 auto
-MixerChannelEdit::in() const -> AudioRouting*
+MixerChannelEdit::in() const noexcept -> AudioRouting*
 {
     return &m_impl->in;
 }
 
 auto
-MixerChannelEdit::out() const -> AudioRouting*
+MixerChannelEdit::out() const noexcept -> AudioRouting*
 {
     return &m_impl->out;
 }

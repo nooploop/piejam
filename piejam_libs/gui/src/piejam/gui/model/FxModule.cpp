@@ -34,6 +34,12 @@ FxModule::FxModule(
 FxModule::~FxModule() = default;
 
 auto
+FxModule::busType() const noexcept -> busType_property_t
+{
+    return m_busType;
+}
+
+auto
 FxModule::parameters() const -> runtime::fx::module_parameters const&
 {
     return m_impl->parameters;

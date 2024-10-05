@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
@@ -18,62 +19,26 @@ class FloatParameter : public Parameter
 {
     Q_OBJECT
 
-    Q_PROPERTY(double value READ value NOTIFY valueChanged FINAL)
-    Q_PROPERTY(double normalizedValue READ normalizedValue NOTIFY
-                       normalizedValueChanged FINAL)
+    M_PIEJAM_GUI_PROPERTY(double, value, setValue)
+    M_PIEJAM_GUI_PROPERTY(double, normalizedValue, setNormalizedValue)
 
 public:
     FloatParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
             piejam::gui::model::ParameterId const&);
-    ~FloatParameter();
+    ~FloatParameter() override;
 
     static constexpr auto StaticType = Type::Float;
-
-    auto value() const noexcept -> double
-    {
-        return m_value;
-    }
-
-    auto normalizedValue() const noexcept -> double
-    {
-        return m_normalizedValue;
-    }
 
     Q_INVOKABLE void changeValue(double);
     Q_INVOKABLE void changeNormalizedValue(double);
 
-signals:
-    void valueChanged();
-    void normalizedValueChanged();
-
 private:
     void onSubscribe() override;
 
-    void setValue(double x)
-    {
-        if (m_value != x)
-        {
-            m_value = x;
-            emit valueChanged();
-        }
-    }
-
-    void setNormalizedValue(double x)
-    {
-        if (m_normalizedValue != x)
-        {
-            m_normalizedValue = x;
-            emit normalizedValueChanged();
-        }
-    }
-
     struct Impl;
     std::unique_ptr<Impl> m_impl;
-
-    double m_value{};
-    double m_normalizedValue{};
 };
 
 } // namespace piejam::gui::model

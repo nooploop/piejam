@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
+
 #include <piejam/runtime/parameters.h>
 
 #include <memory>
@@ -18,8 +20,8 @@ class StereoLevelParameter : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    Q_PROPERTY(double levelLeft READ levelLeft NOTIFY levelLeftChanged FINAL)
-    Q_PROPERTY(double levelRight READ levelRight NOTIFY levelRightChanged FINAL)
+    M_PIEJAM_GUI_PROPERTY(double, levelLeft, setLevelLeft)
+    M_PIEJAM_GUI_PROPERTY(double, levelRight, setLevelRight)
 
 public:
     StereoLevelParameter(
@@ -28,43 +30,11 @@ public:
             runtime::stereo_level_parameter_id const&);
     ~StereoLevelParameter() override;
 
-    auto levelLeft() const noexcept -> double
-    {
-        return m_levelLeft;
-    }
-
-    auto levelRight() const noexcept -> double
-    {
-        return m_levelRight;
-    }
-
-signals:
-    void levelLeftChanged();
-    void levelRightChanged();
-
 private:
     void onSubscribe() override;
 
-    void setLevel(double left, double right)
-    {
-        if (m_levelLeft != left)
-        {
-            m_levelLeft = left;
-            emit levelLeftChanged();
-        }
-
-        if (m_levelRight != right)
-        {
-            m_levelRight = right;
-            emit levelRightChanged();
-        }
-    }
-
     struct Impl;
     std::unique_ptr<Impl> m_impl;
-
-    double m_levelLeft{};
-    double m_levelRight{};
 };
 
 } // namespace piejam::gui::model

@@ -35,7 +35,8 @@ StereoLevelParameter::onSubscribe()
     observe(runtime::selectors::make_level_parameter_value_selector(
                     m_impl->param_id),
             [this](runtime::stereo_level const& x) {
-                setLevel(x.left, x.right);
+                setLevelLeft(x.left);
+                setLevelRight(x.right);
             });
 }
 
