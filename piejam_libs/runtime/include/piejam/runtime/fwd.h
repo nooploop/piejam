@@ -26,7 +26,6 @@ using get_state_f = ui::get_state_f<state>;
 using dispatch_f = ui::dispatch_f;
 using next_f = ui::next_f;
 using thunk_action = ui::thunk_action<state>;
-using batch_action = ui::batch_action;
 using update_state_action = ui::update_state_action<state>;
 
 using stereo_level = audio::pair<float>;

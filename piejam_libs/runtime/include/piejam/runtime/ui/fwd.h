@@ -27,8 +27,6 @@ using next_f = redux::next_f<action>;
 template <class State>
 struct thunk_action;
 
-struct batch_action;
-
 template <class State>
 struct update_state_action;
 
