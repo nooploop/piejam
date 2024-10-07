@@ -23,7 +23,6 @@ class Parameter : public Subscribable<SubscribableModel>
     M_PIEJAM_GUI_PROPERTY(QString, name, setName)
     M_PIEJAM_GUI_PROPERTY(QString, valueString, setValueString)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::MidiAssignable*, midi)
-    M_PIEJAM_GUI_PROPERTY(bool, bipolar, setBipolar)
 
 public:
     Parameter(

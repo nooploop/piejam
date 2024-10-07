@@ -621,6 +621,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                             .default_value = 0.f,
                             .min = -1.f,
                             .max = 1.f,
+                            .bipolar = true,
                             .to_normalized = &parameter::to_normalized_linear,
                             .from_normalized =
                                     &parameter::from_normalized_linear},

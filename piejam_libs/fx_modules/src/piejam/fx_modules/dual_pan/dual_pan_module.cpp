@@ -39,6 +39,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .default_value = -1.f,
                                      .min = -1.f,
                                      .max = 1.f,
+                                     .bipolar = true,
                                      .to_normalized =
                                              &runtime::parameter::
                                                      to_normalized_linear,
@@ -51,7 +52,6 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .value_to_string =
                                              &runtime::
                                                      float_parameter_value_to_string,
-                                     .bipolar = true,
                              })},
                     {to_underlying(parameter_key::right_pan),
                      ui_params_factory.make_parameter(
@@ -59,6 +59,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .default_value = 1.f,
                                      .min = -1.f,
                                      .max = 1.f,
+                                     .bipolar = true,
                                      .to_normalized =
                                              &runtime::parameter::
                                                      to_normalized_linear,
@@ -71,7 +72,6 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .value_to_string =
                                              &runtime::
                                                      float_parameter_value_to_string,
-                                     .bipolar = true,
                              })},
             }),
             .streams = {}};

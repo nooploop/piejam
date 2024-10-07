@@ -31,6 +31,9 @@ FloatParameter::FloatParameter(
     , m_impl{std::make_unique<Impl>(
               std::get<runtime::float_parameter_id>(param))}
 {
+    setBipolar(observe_once(
+            runtime::selectors::make_float_parameter_bipolar_selector(
+                    m_impl->param_id)));
 }
 
 FloatParameter::~FloatParameter() = default;

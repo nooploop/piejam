@@ -18,7 +18,6 @@ struct ui_parameter_map_slot
 
     boxed_string name;
     value_to_string_fn value_to_string{};
-    bool bipolar{};
 };
 
 using ui_parameters_map = parameter::map<ui_parameter_map_slot>;

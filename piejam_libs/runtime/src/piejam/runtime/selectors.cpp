@@ -945,20 +945,6 @@ make_fx_parameter_value_string_selector(fx::parameter_id const fx_param_id)
 }
 
 auto
-make_fx_parameter_bipolar_selector(fx::parameter_id const fx_param_id)
-        -> selector<bool>
-{
-    return std::visit(
-            [](auto param_id) -> selector<bool> {
-                return [param_id](state const& st) {
-                    auto const* const desc = st.ui_params.find(param_id);
-                    return desc && desc->bipolar;
-                };
-            },
-            fx_param_id);
-}
-
-auto
 make_fx_module_streams_selector(fx::module_id fx_mod_id)
         -> selector<box<fx::module_streams>>
 {
@@ -1043,6 +1029,16 @@ make_float_parameter_normalized_value_selector(
             return desc->param.to_normalized(desc->param, value);
         }
         return 0.f;
+    };
+}
+
+auto
+make_float_parameter_bipolar_selector(float_parameter_id const fx_param_id)
+        -> selector<bool>
+{
+    return [fx_param_id](state const& st) {
+        auto const* const desc = st.params.find(fx_param_id);
+        return desc && desc->param.bipolar;
     };
 }
 

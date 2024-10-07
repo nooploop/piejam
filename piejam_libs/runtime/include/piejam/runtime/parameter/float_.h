@@ -18,6 +18,8 @@ struct float_
     float min{};
     float max{1.f};
 
+    bool bipolar{};
+
     to_normalized_f to_normalized{[](auto const&, float x) { return x; }};
     from_normalized_f from_normalized{[](auto const&, float x) { return x; }};
 };

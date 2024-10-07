@@ -61,13 +61,13 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .default_value = 1.f,
                                      .min = math::from_dB(dB_ival::min),
                                      .max = math::from_dB(dB_ival::max),
+                                     .bipolar = true,
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
                              {
                                      .name = box("Gain"s),
                                      .value_to_string = &to_dB_string,
-                                     .bipolar = true,
                              })}}),
             .streams = {}};
 }

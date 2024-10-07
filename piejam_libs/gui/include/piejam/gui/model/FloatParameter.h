@@ -21,6 +21,7 @@ class FloatParameter : public Parameter
 
     M_PIEJAM_GUI_PROPERTY(double, value, setValue)
     M_PIEJAM_GUI_PROPERTY(double, normalizedValue, setNormalizedValue)
+    M_PIEJAM_GUI_PROPERTY(bool, bipolar, setBipolar)
 
 public:
     FloatParameter(
