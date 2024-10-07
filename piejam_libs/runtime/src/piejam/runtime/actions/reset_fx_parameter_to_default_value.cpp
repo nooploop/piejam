@@ -5,9 +5,9 @@
 #include <piejam/runtime/actions/reset_fx_parameter_to_default_value.h>
 
 #include <piejam/runtime/actions/set_parameter_value.h>
-#include <piejam/runtime/parameter/float_.h>
-#include <piejam/runtime/parameter/generic_value.h>
-#include <piejam/runtime/parameter/int_.h>
+#include <piejam/runtime/parameter/bool_descriptor.h>
+#include <piejam/runtime/parameter/float_descriptor.h>
+#include <piejam/runtime/parameter/int_descriptor.h>
 #include <piejam/runtime/state.h>
 #include <piejam/runtime/ui/thunk_action.h>
 

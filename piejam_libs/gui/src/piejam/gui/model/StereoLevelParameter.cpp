@@ -4,7 +4,6 @@
 
 #include <piejam/gui/model/StereoLevelParameter.h>
 
-#include <piejam/runtime/parameter/generic_value.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 

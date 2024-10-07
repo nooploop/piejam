@@ -75,10 +75,8 @@ pcm_io::pcm_io(
         io_process_config const& io_config)
     : m_input_fd(
               open_pcm(in.path, io_config.in_config, io_config.buffer_config))
-    , m_output_fd(open_pcm(
-              out.path,
-              io_config.out_config,
-              io_config.buffer_config))
+    , m_output_fd(
+              open_pcm(out.path, io_config.out_config, io_config.buffer_config))
     , m_io_config(io_config)
 {
     if (m_input_fd && m_output_fd)

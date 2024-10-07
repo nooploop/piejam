@@ -7,11 +7,11 @@
 namespace piejam::runtime::parameter
 {
 
-struct float_
+struct float_descriptor
 {
     using value_type = float;
-    using to_normalized_f = float (*)(float_ const&, float);
-    using from_normalized_f = float (*)(float_ const&, float);
+    using to_normalized_f = float (*)(float_descriptor const&, float);
+    using from_normalized_f = float (*)(float_descriptor const&, float);
 
     float default_value{};
 

@@ -4,9 +4,6 @@
 
 #include <piejam/gui/model/EnumParameter.h>
 
-#include <piejam/runtime/parameter/float_.h>
-#include <piejam/runtime/parameter/generic_value.h>
-#include <piejam/runtime/parameter/int_.h>
 #include <piejam/runtime/selectors.h>
 
 #include <fmt/format.h>

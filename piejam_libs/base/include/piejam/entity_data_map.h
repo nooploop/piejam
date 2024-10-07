@@ -98,7 +98,8 @@ public:
     }
 
 private:
-    using map_t = boost::container::flat_map<id_type, std::shared_ptr<data_type>>;
+    using map_t =
+            boost::container::flat_map<id_type, std::shared_ptr<data_type>>;
 
     map_t m_map;
 };

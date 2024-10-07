@@ -6,10 +6,10 @@
 
 #include <piejam/ladspa/port_descriptor.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/bool_descriptor.h>
+#include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/float_normalize.h>
-#include <piejam/runtime/parameter/generic_value.h>
-#include <piejam/runtime/parameter/int_.h>
+#include <piejam/runtime/parameter/int_descriptor.h>
 #include <piejam/runtime/parameter_factory.h>
 #include <piejam/runtime/parameter_value_to_string.h>
 #include <piejam/runtime/ui_parameter_descriptors_map.h>

@@ -9,9 +9,9 @@
 #include <piejam/audio/multichannel_buffer.h>
 #include <piejam/entity_map.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/float_normalize.h>
-#include <piejam/runtime/parameter/int_.h>
+#include <piejam/runtime/parameter/int_descriptor.h>
 #include <piejam/runtime/parameter_factory.h>
 #include <piejam/runtime/ui_parameter_descriptors_map.h>
 #include <piejam/to_underlying.h>

@@ -4,15 +4,16 @@
 
 #pragma once
 
+#include <piejam/audio/pair.h>
+
 namespace piejam::runtime::parameter
 {
 
-template <class Value>
-struct generic_value
+struct stereo_level_descriptor
 {
-    using value_type = Value;
+    using value_type = audio::pair<float>;
 
-    Value default_value{};
+    value_type default_value{};
 };
 
 } // namespace piejam::runtime::parameter

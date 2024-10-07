@@ -479,7 +479,7 @@ make_aux_send_parameter(ParameterFactory& ui_params_factory)
     using namespace std::string_literals;
 
     return ui_params_factory.make_parameter(
-            parameter::float_{
+            parameter::float_descriptor{
                     .default_value = 0.f,
                     .min = 0.f,
                     .max = 1.f,
@@ -608,7 +608,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                     st.external_audio_state.outputs,
                     ui_params_factory)),
             .volume = ui_params_factory.make_parameter(
-                    parameter::float_{
+                    float_parameter{
                             .default_value = 1.f,
                             .min = 0.f,
                             .max = math::from_dB(6.f),
@@ -617,7 +617,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                     {.name = box("Volume"s),
                      .value_to_string = &volume_to_string}),
             .pan_balance = ui_params_factory.make_parameter(
-                    parameter::float_{
+                    float_parameter{
                             .default_value = 0.f,
                             .min = -1.f,
                             .max = 1.f,
@@ -628,21 +628,21 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                     {.name = box(bus_type_to(bus_type, "Pan"s, "Balance"s)),
                      .value_to_string = &float_parameter_value_to_string}),
             .record = ui_params_factory.make_parameter(
-                    parameter::bool_{.default_value = false},
+                    bool_parameter{.default_value = false},
                     {.name = box("Record"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .mute = ui_params_factory.make_parameter(
-                    parameter::bool_{.default_value = false},
+                    bool_parameter{.default_value = false},
                     {.name = box("Mute"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .solo = ui_params_factory.make_parameter(
-                    parameter::bool_{.default_value = false},
+                    bool_parameter{.default_value = false},
                     {.name = box("Solo"s),
                      .value_to_string = &bool_parameter_value_to_string}),
             .peak_level = parameter_factory{st.params}.make_parameter(
-                    parameter::stereo_level{}),
+                    parameter::stereo_level_descriptor{}),
             .rms_level = parameter_factory{st.params}.make_parameter(
-                    parameter::stereo_level{}),
+                    parameter::stereo_level_descriptor{}),
             .fx_chain = {},
     });
     emplace_back(st.mixer_state.inputs, channel_id);

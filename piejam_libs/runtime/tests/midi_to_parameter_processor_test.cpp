@@ -11,10 +11,10 @@
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/slice.h>
 #include <piejam/midi/event.h>
-#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/bool_descriptor.h>
+#include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/float_normalize.h>
-#include <piejam/runtime/parameter/generic_value.h>
-#include <piejam/runtime/parameter/int_.h>
+#include <piejam/runtime/parameter/int_descriptor.h>
 
 #include <gtest/gtest.h>
 

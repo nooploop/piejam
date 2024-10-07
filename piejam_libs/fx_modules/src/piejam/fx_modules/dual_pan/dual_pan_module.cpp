@@ -6,7 +6,7 @@
 
 #include <piejam/fx_modules/dual_pan/dual_pan_internal_id.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_factory.h>
 #include <piejam/runtime/parameter_value_to_string.h>

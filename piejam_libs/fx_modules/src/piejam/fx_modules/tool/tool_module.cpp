@@ -7,7 +7,7 @@
 #include <piejam/fx_modules/tool/tool_internal_id.h>
 #include <piejam/math.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/parameter/float_.h>
+#include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_factory.h>
 #include <piejam/runtime/ui_parameter_descriptors_map.h>

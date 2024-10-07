@@ -83,11 +83,11 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/midi_input_controller.h
     include/piejam/runtime/mixer.h
     include/piejam/runtime/mixer_fwd.h
-    include/piejam/runtime/parameter/float_.h
+    include/piejam/runtime/parameter/float_descriptor.h
     include/piejam/runtime/parameter/float_normalize.h
     include/piejam/runtime/parameter/fwd.h
-    include/piejam/runtime/parameter/generic_value.h
-    include/piejam/runtime/parameter/int_.h
+
+    include/piejam/runtime/parameter/int_descriptor.h
     include/piejam/runtime/parameter/map.h
     include/piejam/runtime/parameter_factory.h
     include/piejam/runtime/parameter_processor_factory.h
@@ -190,6 +190,8 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/state.cpp
     src/piejam/runtime/store_dispatch.cpp
     src/piejam/runtime/thunk_action.cpp
+    include/piejam/runtime/parameter/bool_.h
+    include/piejam/runtime/parameter/stereo_level_descriptor.h
 )
 
 find_package(nlohmann_json REQUIRED)

@@ -7,14 +7,11 @@
 namespace piejam::runtime::parameter
 {
 
-struct int_
+struct bool_descriptor
 {
-    using value_type = int;
+    using value_type = bool;
 
-    int default_value{};
-
-    int min{};
-    int max{1};
+    value_type default_value{};
 };
 
 } // namespace piejam::runtime::parameter
