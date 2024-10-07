@@ -96,7 +96,6 @@ struct enable_mixer_channel_aux_route final
 
 struct move_mixer_channel_left final
     : ui::cloneable_action<move_mixer_channel_left, reducible_action>
-    , visitable_audio_engine_action<move_mixer_channel_left>
 {
     mixer::channel_id channel_id;
 
@@ -105,7 +104,6 @@ struct move_mixer_channel_left final
 
 struct move_mixer_channel_right final
     : ui::cloneable_action<move_mixer_channel_right, reducible_action>
-    , visitable_audio_engine_action<move_mixer_channel_right>
 {
     mixer::channel_id channel_id;
 

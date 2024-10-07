@@ -18,8 +18,6 @@ struct midi_control_action;
 struct persistence_action;
 struct recorder_action;
 
-struct renotify;
-
 struct apply_app_config;
 
 struct refresh_devices;
