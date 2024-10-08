@@ -19,4 +19,11 @@ target_compile_options(piejam_midi PRIVATE -Wall -Wextra -Werror -pedantic-error
 target_include_directories(piejam_midi
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(piejam_midi
-    PRIVATE piejam_algorithm piejam_system fmt spdlog::spdlog)
+    PUBLIC
+    piejam_base
+
+    PRIVATE
+    piejam_algorithm
+    piejam_system
+    fmt
+    spdlog::spdlog)

@@ -100,7 +100,7 @@ public:
                         .control_type = midi_assignment::type::cc,
                         .control_id = ev.data.cc});
 
-        if (out_index != npos)
+        if (out_index != algorithm::npos)
         {
             auto& out = ctx.event_outputs.get<midi::cc_event>(out_index);
             out.insert(offset, ev.data);

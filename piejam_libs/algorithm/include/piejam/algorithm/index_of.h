@@ -5,8 +5,7 @@
 #pragma once
 
 #include <piejam/algorithm/concepts.h>
-
-#include <piejam/npos.h>
+#include <piejam/algorithm/npos.h>
 
 #include <functional>
 #include <iterator>
