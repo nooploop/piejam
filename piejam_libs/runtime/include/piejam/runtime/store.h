@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <piejam/redux/fwd.h>
 #include <piejam/runtime/fwd.h>
+
+#include <piejam/redux/fwd.h>
 
 namespace piejam::runtime
 {

@@ -4,8 +4,9 @@
 
 #include <piejam/runtime/store_dispatch.h>
 
-#include <piejam/redux/store.h>
 #include <piejam/runtime/state.h>
+
+#include <piejam/redux/store.h>
 
 namespace piejam::runtime
 {
