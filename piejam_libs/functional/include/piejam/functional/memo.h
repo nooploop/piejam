@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <piejam/tuple.h>
-
 #include <boost/callable_traits/args.hpp>
 #include <boost/callable_traits/return_type.hpp>
+#include <boost/mp11/algorithm.hpp>
 
 #include <functional>
 #include <optional>
@@ -47,8 +46,8 @@ public:
 private:
     struct args_and_result
     {
-        using args_tuple_type =
-                tuple::decay_elements_t<boost::callable_traits::args_t<F>>;
+        using args_tuple_type = boost::mp11::
+                mp_transform<std::decay_t, boost::callable_traits::args_t<F>>;
         using result_type =
                 std::decay_t<boost::callable_traits::return_type_t<F>>;
 
