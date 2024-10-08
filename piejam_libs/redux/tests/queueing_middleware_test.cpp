@@ -2,8 +2,9 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/redux/make_middleware.h>
 #include <piejam/redux/queueing_middleware.h>
+
+#include <piejam/redux/middleware_factory.h>
 #include <piejam/redux/store.h>
 
 #include <gtest/gtest.h>

@@ -5,7 +5,6 @@
 #pragma once
 
 #include <piejam/redux/concepts.h>
-#include <piejam/redux/flag_resetter.h>
 #include <piejam/redux/functors.h>
 #include <piejam/redux/middleware_functors.h>
 
@@ -29,6 +28,11 @@ public:
         else
         {
             m_dispatching = true;
+
+            using flag_resetter =
+                    std::unique_ptr<bool, decltype([](bool* flag) {
+                                        *flag = false;
+                                    })>;
             flag_resetter reset_dispatching{&m_dispatching};
 
             mw_fs.next(a);

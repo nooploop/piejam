@@ -5,7 +5,6 @@
 #pragma once
 
 #include <piejam/redux/functors.h>
-#include <piejam/redux/make_middleware.h>
 #include <piejam/redux/middleware_functors.h>
 
 namespace piejam::redux

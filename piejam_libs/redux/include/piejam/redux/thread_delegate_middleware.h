@@ -6,10 +6,8 @@
 
 #include <piejam/redux/concepts.h>
 #include <piejam/redux/functors.h>
-#include <piejam/redux/make_middleware.h>
 #include <piejam/redux/middleware_functors.h>
 
-#include <memory>
 #include <thread>
 
 namespace piejam::redux
