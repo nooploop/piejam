@@ -6,7 +6,6 @@
 
 #include <piejam/thread/configuration.h>
 
-#include <atomic>
 #include <concepts>
 #include <functional>
 #include <semaphore>

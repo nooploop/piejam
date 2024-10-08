@@ -126,6 +126,7 @@ target_include_directories(piejam_audio
 target_link_libraries(piejam_audio
     PUBLIC
         piejam_algorithm
+        piejam_base
         piejam_functional
         piejam_numeric
         piejam_range
