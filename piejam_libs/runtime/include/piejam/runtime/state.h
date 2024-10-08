@@ -22,13 +22,13 @@
 #include <piejam/runtime/external_audio.h>
 #include <piejam/runtime/fx/ladspa_instances.h>
 #include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/material_color.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/midi_device_config.h>
 #include <piejam/runtime/midi_devices.h>
 #include <piejam/runtime/mixer.h>
+#include <piejam/runtime/parameter/assignment.h>
 #include <piejam/runtime/parameter/bool_descriptor.h>
 #include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/int_descriptor.h>

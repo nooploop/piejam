@@ -39,17 +39,14 @@ struct registry;
 
 using parameter_id =
         std::variant<bool_parameter_id, float_parameter_id, int_parameter_id>;
-using parameter_key = std::size_t;
+
 using parameter_value = std::variant<bool, float, int>;
 
-template <class Value>
-struct parameter_assignment;
-
-using parameter_value_assignment = parameter_assignment<parameter_value>;
-using parameter_midi_assignment = parameter_assignment<midi_assignment>;
+using parameter_value_assignment = parameter::assignment<parameter_value>;
+using parameter_midi_assignment = parameter::assignment<midi_assignment>;
 
 using module_parameters =
-        boost::container::flat_map<parameter_key, parameter_id>;
+        boost::container::flat_map<parameter::key, parameter_id>;
 
 using stream_key = std::size_t;
 using module_streams = boost::container::flat_map<stream_key, audio_stream_id>;

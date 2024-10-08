@@ -6,10 +6,10 @@
 
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/fx/parameter_assignment.h>
 #include <piejam/runtime/material_color.h>
 #include <piejam/runtime/midi_assignment.h>
 #include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/parameter/assignment.h>
 #include <piejam/runtime/persistence/fx_midi_assignments.h>
 #include <piejam/runtime/persistence/fx_preset.h>
 

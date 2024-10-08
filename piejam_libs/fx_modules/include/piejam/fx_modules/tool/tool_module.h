@@ -12,7 +12,7 @@
 namespace piejam::fx_modules::tool
 {
 
-enum class parameter_key : runtime::fx::parameter_key
+enum class parameter_key : runtime::parameter::key
 {
     gain
 };

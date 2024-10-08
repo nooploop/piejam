@@ -4,7 +4,7 @@
 
 #include <piejam/runtime/persistence/session.h>
 
-#include <piejam/runtime/fx/parameter_assignment.h>
+#include <piejam/runtime/parameter/assignment.h>
 #include <piejam/runtime/persistence/fx_internal_id.h>
 #include <piejam/runtime/persistence/optional.h>
 #include <piejam/runtime/persistence/variant.h>
@@ -74,14 +74,25 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
                 {material_color::yellow, "yellow"},
         });
 
-} // namespace piejam::runtime
-
-namespace piejam::runtime::fx
+namespace parameter
 {
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(parameter_midi_assignment, key, value);
+template <class Value>
+void
+to_json(nlohmann::json& j, assignment<Value> const& p)
+{
+    j = {{"key", p.key}, {"value", p.value}};
+}
 
-auto const parameter_value_assignment_serializer =
+template <class Value>
+void
+from_json(nlohmann::json const& j, assignment<Value>& p)
+{
+    j.at("key").get_to(p.key);
+    j.at("value").get_to(p.value);
+}
+
+static auto const parameter_value_assignment_serializer =
         persistence::variant_serializer{
                 persistence::variant_option<float>{"float"},
                 persistence::variant_option<int>{"int"},
@@ -89,14 +100,16 @@ auto const parameter_value_assignment_serializer =
         };
 
 void
-to_json(nlohmann::json& j, parameter_value_assignment const& p)
+to_json(nlohmann::json& j, parameter::assignment<fx::parameter_value> const& p)
 {
     j = {{"key", p.key},
          {"value", parameter_value_assignment_serializer.to_json(p.value)}};
 }
 
 void
-from_json(nlohmann::json const& j, parameter_value_assignment& p)
+from_json(
+        nlohmann::json const& j,
+        parameter::assignment<fx::parameter_value>& p)
 {
     j.at("key").get_to(p.key);
 
@@ -104,9 +117,9 @@ from_json(nlohmann::json const& j, parameter_value_assignment& p)
     parameter_value_assignment_serializer.from_json(v, p.value);
 }
 
-} // namespace piejam::runtime::fx
+} // namespace parameter
 
-namespace piejam::runtime::persistence
+namespace persistence
 {
 
 static auto const s_key_version = "version";
@@ -307,4 +320,6 @@ save_session(std::ostream& out, session const& ses)
     out << json_ses.dump(4) << std::endl;
 }
 
-} // namespace piejam::runtime::persistence
+} // namespace persistence
+
+} // namespace piejam::runtime

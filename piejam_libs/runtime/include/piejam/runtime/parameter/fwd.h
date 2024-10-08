@@ -17,10 +17,15 @@ struct stereo_level_descriptor;
 template <class Parameter>
 using id_t = entity_id<Parameter>;
 
+template <class Parameter>
+using value_type_t = typename Parameter::value_type;
+
 template <template <class> class Slot>
 class map;
 
-template <class Parameter>
-using value_type_t = typename Parameter::value_type;
+using key = unsigned;
+
+template <class Value>
+struct assignment;
 
 } // namespace piejam::runtime::parameter

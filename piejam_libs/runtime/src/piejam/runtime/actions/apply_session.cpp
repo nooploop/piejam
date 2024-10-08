@@ -6,7 +6,7 @@
 
 #include <piejam/functional/operators.h>
 #include <piejam/range/indices.h>
-#include <piejam/runtime/fx/parameter_assignment.h>
+#include <piejam/runtime/parameter/assignment.h>
 #include <piejam/runtime/persistence/session.h>
 #include <piejam/runtime/state.h>
 #include <piejam/set_if.h>

@@ -480,7 +480,7 @@ FxScope::onSubscribe()
 void
 FxScope::onTriggerSourceChanged()
 {
-    switch (static_cast<runtime::fx::parameter_key>(m_impl->mode->value()))
+    switch (static_cast<runtime::parameter::key>(m_impl->mode->value()))
     {
         case to_underlying(mode::trigger_a):
             m_impl->scopeDataGenerator.setTriggerStream(0);

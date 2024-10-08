@@ -63,7 +63,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/fx/ladspa_instances.h
     include/piejam/runtime/fx/ladspa_processor_factory.h
     include/piejam/runtime/fx/module.h
-    include/piejam/runtime/fx/parameter_assignment.h
     include/piejam/runtime/fx/registry.h
     include/piejam/runtime/fx/unavailable_ladspa.h
     include/piejam/runtime/generic_action_visitor.h
@@ -83,6 +82,7 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/midi_input_controller.h
     include/piejam/runtime/mixer.h
     include/piejam/runtime/mixer_fwd.h
+    include/piejam/runtime/parameter/assignment.h
     include/piejam/runtime/parameter/float_descriptor.h
     include/piejam/runtime/parameter/float_normalize.h
     include/piejam/runtime/parameter/fwd.h

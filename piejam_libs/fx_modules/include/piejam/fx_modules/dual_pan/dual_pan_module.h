@@ -12,7 +12,7 @@
 namespace piejam::fx_modules::dual_pan
 {
 
-enum class parameter_key : runtime::fx::parameter_key
+enum class parameter_key : runtime::parameter::key
 {
     left_pan,
     right_pan

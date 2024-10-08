@@ -27,7 +27,7 @@ enum class type
     br
 };
 
-enum class parameter_key : runtime::fx::parameter_key
+enum class parameter_key : runtime::parameter::key
 {
     type,
     cutoff,

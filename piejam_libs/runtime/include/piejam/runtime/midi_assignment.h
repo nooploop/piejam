@@ -20,7 +20,7 @@ struct midi_assignment
     enum class type
     {
         cc,
-    } control_type;
+    } control_type{};
 
     std::size_t control_id{};
 
