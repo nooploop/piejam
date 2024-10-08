@@ -79,7 +79,7 @@ FxSpectrum::FxSpectrum(
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
     : FxModule{store_dispatch, state_change_subscriber, fx_mod_id}
-    , m_impl(std::make_unique<Impl>(busType()))
+    , m_impl{make_pimpl<Impl>(busType())}
 {
     auto const& parameters = this->parameters();
 
@@ -215,8 +215,6 @@ FxSpectrum::FxSpectrum(
             this,
             &FxSpectrum::onFreezeChanged);
 }
-
-FxSpectrum::~FxSpectrum() = default;
 
 auto
 FxSpectrum::type() const noexcept -> FxModuleType

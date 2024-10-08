@@ -4,18 +4,19 @@
 
 #pragma once
 
+#include <piejam/runtime/audio_stream.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/ladspa_processor_factory.h>
+#include <piejam/runtime/stereo_level.h>
+
 #include <piejam/audio/fwd.h>
 #include <piejam/audio/pair.h>
 #include <piejam/audio/pcm_buffer_converter.h>
 #include <piejam/audio/types.h>
 #include <piejam/midi/fwd.h>
-#include <piejam/runtime/audio_stream.h>
-#include <piejam/runtime/fwd.h>
-#include <piejam/runtime/fx/ladspa_processor_factory.h>
-#include <piejam/runtime/stereo_level.h>
+#include <piejam/pimpl.h>
 #include <piejam/thread/fwd.h>
 
-#include <map>
 #include <memory>
 #include <optional>
 #include <span>
@@ -31,7 +32,6 @@ public:
             audio::sample_rate,
             unsigned num_device_input_channels,
             unsigned num_device_output_channels);
-    ~audio_engine();
 
     template <class P>
     void set_parameter_value(parameter::id_t<P>, typename P::value_type const&)
@@ -62,7 +62,7 @@ public:
 
 private:
     struct impl;
-    std::unique_ptr<impl> const m_impl;
+    pimpl<impl> const m_impl;
 };
 
 } // namespace piejam::runtime

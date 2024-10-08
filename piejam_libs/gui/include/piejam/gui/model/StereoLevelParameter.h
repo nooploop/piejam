@@ -9,9 +9,8 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <piejam/pimpl.h>
 #include <piejam/runtime/parameters.h>
-
-#include <memory>
 
 namespace piejam::gui::model
 {
@@ -28,13 +27,12 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::stereo_level_parameter_id const&);
-    ~StereoLevelParameter() override;
 
 private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

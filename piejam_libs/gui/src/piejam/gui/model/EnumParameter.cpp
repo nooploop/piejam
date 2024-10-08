@@ -26,14 +26,12 @@ EnumParameter::EnumParameter(
         runtime::subscriber& state_change_subscriber,
         ParameterId const& param)
     : IntParameter{store_dispatch, state_change_subscriber, param}
-    , m_impl{std::make_unique<Impl>(observe_once(
+    , m_impl{make_pimpl<Impl>(observe_once(
               runtime::selectors::make_int_parameter_enum_values_selector(
                       std::get<runtime::int_parameter_id>(param))))}
 
 {
 }
-
-EnumParameter::~EnumParameter() = default;
 
 auto
 EnumParameter::values() const noexcept -> QAbstractListModel*

@@ -6,10 +6,10 @@
 
 #include <piejam/gui/model/fwd.h>
 
+#include <piejam/pimpl.h>
+
 #include <QQuickItem>
 #include <QVariantList>
-
-#include <memory>
 
 namespace piejam::gui::item
 {
@@ -52,7 +52,6 @@ class Spectrum : public QQuickItem
 
 public:
     Spectrum(QQuickItem* parent = nullptr);
-    ~Spectrum();
 
     auto levelLabels() const -> QVariantList;
     auto frequencyLabels() const -> QVariantList;
@@ -88,7 +87,7 @@ private:
             bool& dirtyMaterialFlag) -> QSGNode*;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::item

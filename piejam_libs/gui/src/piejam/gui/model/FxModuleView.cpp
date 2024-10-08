@@ -6,6 +6,7 @@
 
 #include <piejam/gui/model/FxGenericModule.h>
 #include <piejam/gui/model/FxModuleFactory.h>
+
 #include <piejam/runtime/actions/fx_chain_actions.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/selectors.h>
@@ -53,11 +54,9 @@ FxModuleView::FxModuleView(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl{std::make_unique<Impl>()}
+    , m_impl{make_pimpl<Impl>()}
 {
 }
-
-FxModuleView::~FxModuleView() = default;
 
 auto
 FxModuleView::content() noexcept -> FxModule*

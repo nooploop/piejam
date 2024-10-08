@@ -9,9 +9,8 @@
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <piejam/pimpl.h>
 #include <piejam/runtime/fx/fwd.h>
-
-#include <memory>
 
 namespace piejam::fx_modules::filter::gui
 {
@@ -36,7 +35,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::fx::module_id);
-    ~FxFilter();
 
     auto type() const noexcept -> piejam::gui::model::FxModuleType override;
 
@@ -46,7 +44,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::fx_modules::filter::gui

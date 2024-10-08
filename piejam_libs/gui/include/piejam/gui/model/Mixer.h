@@ -10,7 +10,7 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
-#include <memory>
+#include <piejam/pimpl.h>
 
 namespace piejam::gui::model
 {
@@ -26,7 +26,6 @@ class Mixer final : public Subscribable<SubscribableModel>
 
 public:
     Mixer(runtime::store_dispatch, runtime::subscriber&);
-    ~Mixer() override;
 
     Q_INVOKABLE void addMonoChannel(QString const& newChannelName);
     Q_INVOKABLE void addStereoChannel(QString const& newChannelName);
@@ -37,7 +36,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> const m_impl;
+    pimpl<Impl> const m_impl;
 };
 
 } // namespace piejam::gui::model

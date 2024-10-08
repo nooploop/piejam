@@ -24,12 +24,9 @@ BoolParameter::BoolParameter(
         runtime::subscriber& state_change_subscriber,
         ParameterId const& param)
     : Parameter(store_dispatch, state_change_subscriber, param)
-    , m_impl{std::make_unique<Impl>(
-              std::get<runtime::bool_parameter_id>(param))}
+    , m_impl{make_pimpl<Impl>(std::get<runtime::bool_parameter_id>(param))}
 {
 }
-
-BoolParameter::~BoolParameter() = default;
 
 void
 BoolParameter::onSubscribe()

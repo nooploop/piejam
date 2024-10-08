@@ -8,8 +8,8 @@
 #include <piejam/gui/model/Types.h>
 
 #include <piejam/audio/fwd.h>
+#include <piejam/pimpl.h>
 
-#include <memory>
 #include <span>
 
 namespace piejam::gui::model
@@ -20,7 +20,6 @@ class PitchGenerator final : public AudioStreamListener
     Q_OBJECT
 public:
     PitchGenerator(std::span<BusType const> substreamConfigs);
-    ~PitchGenerator() override;
 
     void setSampleRate(audio::sample_rate);
 
@@ -34,7 +33,7 @@ signals:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

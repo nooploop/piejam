@@ -27,7 +27,7 @@ struct DbScale::Impl
 
 DbScale::DbScale(QQuickItem* parent)
     : QQuickItem(parent)
-    , m_impl(std::make_unique<Impl>())
+    , m_impl{make_pimpl<Impl>()}
 {
     setFlag(ItemHasContents);
 
@@ -41,8 +41,6 @@ DbScale::DbScale(QQuickItem* parent)
         update();
     });
 }
-
-DbScale::~DbScale() = default;
 
 auto
 DbScale::scaleData() const noexcept -> model::DbScaleData*

@@ -179,11 +179,9 @@ struct WaveformDataGenerator::Impl
 
 WaveformDataGenerator::WaveformDataGenerator(
         std::span<BusType const> substreamConfigs)
-    : m_impl(std::make_unique<Impl>(substreamConfigs))
+    : m_impl{make_pimpl<Impl>(substreamConfigs)}
 {
 }
-
-WaveformDataGenerator::~WaveformDataGenerator() = default;
 
 void
 WaveformDataGenerator::setSamplesPerPixel(int const samplesPerPixel)

@@ -28,9 +28,12 @@ using namespace piejam::gui::model;
 struct FxFilter::Impl
 {
     Impl(BusType busType)
-        : dataGenerator{std::array{busType, busType}}
+        : busType{busType}
+        , dataGenerator{std::array{busType, busType}}
     {
     }
+
+    BusType busType;
 
     SpectrumDataGenerator dataGenerator;
 
@@ -48,11 +51,11 @@ FxFilter::FxFilter(
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
     : FxModule{store_dispatch, state_change_subscriber, fx_mod_id}
+    , m_impl{make_pimpl<Impl>(toBusType(
+              observe_once(runtime::selectors::make_fx_module_bus_type_selector(
+                      fx_mod_id))))}
 {
-    auto const busType = observe_once(
-            runtime::selectors::make_fx_module_bus_type_selector(fx_mod_id));
-
-    m_impl = std::make_unique<Impl>(toBusType(busType));
+    auto const busType = toBusType(m_impl->busType);
 
     auto const& parameters = this->parameters();
 
@@ -96,8 +99,6 @@ FxFilter::FxFilter(
             &m_impl->dataGenerator,
             &SpectrumDataGenerator::update);
 }
-
-FxFilter::~FxFilter() = default;
 
 void
 FxFilter::onSubscribe()

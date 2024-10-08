@@ -21,11 +21,9 @@ AudioRoutingSelection::AudioRoutingSelection(
         runtime::mixer::channel_id const id,
         runtime::mixer::io_socket const io_socket)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl{std::make_unique<Impl>(id, io_socket)}
+    , m_impl{make_pimpl<Impl>(id, io_socket)}
 {
 }
-
-AudioRoutingSelection::~AudioRoutingSelection() = default;
 
 void
 AudioRoutingSelection::onSubscribe()

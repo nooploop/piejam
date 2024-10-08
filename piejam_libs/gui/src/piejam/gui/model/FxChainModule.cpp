@@ -28,11 +28,9 @@ FxChainModule::FxChainModule(
         runtime::mixer::channel_id const fx_chain_id,
         runtime::fx::module_id const fx_mod_id)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(fx_chain_id, fx_mod_id))
+    , m_impl(make_pimpl<Impl>(fx_chain_id, fx_mod_id))
 {
 }
-
-FxChainModule::~FxChainModule() = default;
 
 void
 FxChainModule::onSubscribe()

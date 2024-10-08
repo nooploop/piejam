@@ -6,9 +6,9 @@
 
 #include <piejam/gui/model/fwd.h>
 
-#include <QQuickItem>
+#include <piejam/pimpl.h>
 
-#include <memory>
+#include <QQuickItem>
 
 namespace piejam::gui::item
 {
@@ -27,7 +27,6 @@ class Waveform : public QQuickItem
 
 public:
     Waveform(QQuickItem* parent = nullptr);
-    ~Waveform();
 
     auto waveformData() const noexcept -> model::WaveformDataObject*;
     void setWaveformData(model::WaveformDataObject*);
@@ -45,7 +44,7 @@ private:
     void updateTransformMatrix(QSGTransformNode&);
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::item

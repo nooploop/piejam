@@ -159,11 +159,9 @@ struct PitchGenerator::Impl
 };
 
 PitchGenerator::PitchGenerator(std::span<BusType const> substreamConfigs)
-    : m_impl{std::make_unique<Impl>(substreamConfigs)}
+    : m_impl{make_pimpl<Impl>(substreamConfigs)}
 {
 }
-
-PitchGenerator::~PitchGenerator() = default;
 
 void
 PitchGenerator::setSampleRate(audio::sample_rate const sampleRate)

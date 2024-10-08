@@ -11,6 +11,8 @@
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <piejam/pimpl.h>
+
 namespace piejam::gui::model
 {
 
@@ -22,7 +24,6 @@ class FxBrowser final : public Subscribable<SubscribableModel>
 
 public:
     FxBrowser(runtime::store_dispatch, runtime::subscriber&);
-    ~FxBrowser() override;
 
     Q_INVOKABLE void showMixer();
 
@@ -30,7 +31,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

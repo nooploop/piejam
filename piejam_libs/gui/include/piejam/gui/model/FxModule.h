@@ -11,9 +11,8 @@
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <piejam/pimpl.h>
 #include <piejam/runtime/fx/fwd.h>
-
-#include <memory>
 
 namespace piejam::gui::model
 {
@@ -30,7 +29,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::fx::module_id);
-    ~FxModule();
 
     virtual auto type() const noexcept -> FxModuleType = 0;
 
@@ -40,7 +38,7 @@ protected:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 
     BusType m_busType;
 };

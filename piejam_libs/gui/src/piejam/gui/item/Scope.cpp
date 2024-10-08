@@ -126,7 +126,7 @@ struct Scope::Impl
 
 Scope::Scope(QQuickItem* parent)
     : QQuickItem(parent)
-    , m_impl(std::make_unique<Impl>())
+    , m_impl{make_pimpl<Impl>()}
 {
     setFlag(ItemHasContents);
 
@@ -135,8 +135,6 @@ Scope::Scope(QQuickItem* parent)
         update();
     });
 }
-
-Scope::~Scope() = default;
 
 auto
 Scope::color() const noexcept -> QColor const&

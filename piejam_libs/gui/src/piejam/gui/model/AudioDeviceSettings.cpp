@@ -54,11 +54,9 @@ AudioDeviceSettings::AudioDeviceSettings(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>())
+    , m_impl{make_pimpl<Impl>()}
 {
 }
-
-AudioDeviceSettings::~AudioDeviceSettings() = default;
 
 auto
 AudioDeviceSettings::inputSoundCards() const noexcept

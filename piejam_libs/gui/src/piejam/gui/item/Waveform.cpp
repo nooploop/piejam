@@ -268,7 +268,7 @@ struct Waveform::Impl
 
 Waveform::Waveform(QQuickItem* parent)
     : QQuickItem(parent)
-    , m_impl(std::make_unique<Impl>())
+    , m_impl{make_pimpl<Impl>()}
 {
     setFlag(ItemHasContents);
     connect(this, &Waveform::heightChanged, [this]() {
@@ -276,8 +276,6 @@ Waveform::Waveform(QQuickItem* parent)
         update();
     });
 }
-
-Waveform::~Waveform() = default;
 
 auto
 Waveform::waveformData() const noexcept -> model::WaveformDataObject*

@@ -212,11 +212,9 @@ struct SpectrumDataGenerator::Impl
 
 SpectrumDataGenerator::SpectrumDataGenerator(
         std::span<BusType const> substreamConfigs)
-    : m_impl{std::make_unique<Impl>(substreamConfigs)}
+    : m_impl{make_pimpl<Impl>(substreamConfigs)}
 {
 }
-
-SpectrumDataGenerator::~SpectrumDataGenerator() = default;
 
 void
 SpectrumDataGenerator::setSampleRate(audio::sample_rate const sampleRate)

@@ -33,7 +33,7 @@ MixerChannelPerform::MixerChannelPerform(
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
     : MixerChannel{store_dispatch, state_change_subscriber, id}
-    , m_impl{std::make_unique<Impl>()}
+    , m_impl{make_pimpl<Impl>()}
 {
     makeParameter(
             m_impl->peakLevel,
@@ -80,8 +80,6 @@ MixerChannelPerform::MixerChannelPerform(
                     runtime::selectors::
                             make_mixer_channel_mute_parameter_selector(id)));
 }
-
-MixerChannelPerform::~MixerChannelPerform() = default;
 
 auto
 MixerChannelPerform::peakLevel() const noexcept -> StereoLevelParameter*

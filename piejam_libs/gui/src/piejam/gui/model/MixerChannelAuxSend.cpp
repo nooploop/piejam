@@ -6,6 +6,7 @@
 
 #include <piejam/gui/model/AudioRoutingSelection.h>
 #include <piejam/gui/model/FloatParameter.h>
+
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/selectors.h>
 
@@ -38,15 +39,10 @@ MixerChannelAuxSend::MixerChannelAuxSend(
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
     : MixerChannel{store_dispatch, state_change_subscriber, id}
-    , m_impl{std::make_unique<Impl>(
-              store_dispatch,
-              state_change_subscriber,
-              id)}
+    , m_impl{make_pimpl<Impl>(store_dispatch, state_change_subscriber, id)}
 {
     connectSubscribableChild(m_impl->selected);
 }
-
-MixerChannelAuxSend::~MixerChannelAuxSend() = default;
 
 auto
 MixerChannelAuxSend::selected() const noexcept -> AudioRoutingSelection*

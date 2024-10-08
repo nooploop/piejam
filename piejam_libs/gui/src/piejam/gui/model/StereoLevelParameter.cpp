@@ -22,11 +22,9 @@ StereoLevelParameter::StereoLevelParameter(
         runtime::subscriber& state_change_subscriber,
         runtime::stereo_level_parameter_id const& param_id)
     : Subscribable{store_dispatch, state_change_subscriber}
-    , m_impl{std::make_unique<Impl>(param_id)}
+    , m_impl{make_pimpl<Impl>(param_id)}
 {
 }
-
-StereoLevelParameter::~StereoLevelParameter() = default;
 
 void
 StereoLevelParameter::onSubscribe()

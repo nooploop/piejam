@@ -20,7 +20,7 @@ FxModule::FxModule(
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
     : Subscribable{store_dispatch, state_change_subscriber}
-    , m_impl{std::make_unique<Impl>(
+    , m_impl{make_pimpl<Impl>(
               observe_once(
                       runtime::selectors::make_fx_module_parameters_selector(
                               fx_mod_id)),
@@ -30,8 +30,6 @@ FxModule::FxModule(
               runtime::selectors::make_fx_module_bus_type_selector(fx_mod_id)))}
 {
 }
-
-FxModule::~FxModule() = default;
 
 auto
 FxModule::busType() const noexcept -> busType_property_t

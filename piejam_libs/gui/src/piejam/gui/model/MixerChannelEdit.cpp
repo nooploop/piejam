@@ -5,6 +5,7 @@
 #include <piejam/gui/model/MixerChannelEdit.h>
 
 #include <piejam/gui/model/AudioRouting.h>
+
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/selectors.h>
@@ -38,14 +39,9 @@ MixerChannelEdit::MixerChannelEdit(
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const id)
     : MixerChannel{store_dispatch, state_change_subscriber, id}
-    , m_impl(std::make_unique<Impl>(
-              store_dispatch,
-              state_change_subscriber,
-              id))
+    , m_impl{make_pimpl<Impl>(store_dispatch, state_change_subscriber, id)}
 {
 }
-
-MixerChannelEdit::~MixerChannelEdit() = default;
 
 auto
 MixerChannelEdit::in() const noexcept -> AudioRouting*

@@ -6,8 +6,9 @@
 
 #include <piejam/runtime/fwd.h>
 
+#include <piejam/pimpl.h>
+
 #include <filesystem>
-#include <memory>
 
 namespace piejam::runtime
 {
@@ -15,14 +16,13 @@ namespace piejam::runtime
 class recorder_middleware final
 {
 public:
-    recorder_middleware(std::filesystem::path recordings_dir);
-    ~recorder_middleware();
+    explicit recorder_middleware(std::filesystem::path recordings_dir);
 
     void operator()(middleware_functors const&, action const&);
 
 private:
     struct impl;
-    std::unique_ptr<impl> m_impl;
+    pimpl<impl> m_impl;
 };
 
 } // namespace piejam::runtime

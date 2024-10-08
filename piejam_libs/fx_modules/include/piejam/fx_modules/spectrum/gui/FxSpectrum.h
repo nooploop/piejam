@@ -11,9 +11,8 @@
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <piejam/pimpl.h>
 #include <piejam/runtime/fx/fwd.h>
-
-#include <memory>
 
 namespace piejam::fx_modules::spectrum::gui
 {
@@ -37,7 +36,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::fx::module_id);
-    ~FxSpectrum() override;
 
     auto type() const noexcept -> piejam::gui::model::FxModuleType override;
 
@@ -55,7 +53,7 @@ private:
     void onFreezeChanged();
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::fx_modules::spectrum::gui

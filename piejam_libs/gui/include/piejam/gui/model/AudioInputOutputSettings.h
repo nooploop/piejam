@@ -11,10 +11,9 @@
 #include <piejam/gui/model/fwd.h>
 
 #include <piejam/io_direction.h>
+#include <piejam/pimpl.h>
 
 #include <QStringList>
-
-#include <memory>
 
 namespace piejam::gui::model
 {
@@ -33,8 +32,6 @@ protected:
             io_direction);
 
 public:
-    ~AudioInputOutputSettings() override;
-
     Q_INVOKABLE void addMonoDevice();
     Q_INVOKABLE void addStereoDevice();
 
@@ -42,7 +39,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 class AudioInputSettings final : public AudioInputOutputSettings

@@ -9,9 +9,9 @@
 
 #include <piejam/runtime/mixer_fwd.h>
 
-#include <QStringList>
+#include <piejam/pimpl.h>
 
-#include <memory>
+#include <QStringList>
 
 namespace piejam::gui::model
 {
@@ -30,7 +30,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::channel_id);
-    ~MixerChannelEdit() override;
 
     Q_INVOKABLE void changeName(QString const&);
     Q_INVOKABLE void changeColor(MaterialColor);
@@ -42,7 +41,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

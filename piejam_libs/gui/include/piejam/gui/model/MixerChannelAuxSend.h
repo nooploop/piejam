@@ -7,10 +7,9 @@
 #include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/MixerChannel.h>
 
+#include <piejam/pimpl.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
-
-#include <memory>
 
 namespace piejam::gui::model
 {
@@ -34,7 +33,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::channel_id);
-    ~MixerChannelAuxSend() override;
 
     auto volume() const noexcept -> FloatParameter*;
 
@@ -49,7 +47,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

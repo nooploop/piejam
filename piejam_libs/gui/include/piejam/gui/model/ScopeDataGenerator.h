@@ -9,9 +9,9 @@
 #include <piejam/gui/model/Types.h>
 
 #include <piejam/audio/fwd.h>
+#include <piejam/pimpl.h>
 
 #include <chrono>
-#include <memory>
 
 namespace piejam::gui::model
 {
@@ -21,7 +21,6 @@ class ScopeDataGenerator final : public AudioStreamListener
     Q_OBJECT
 public:
     explicit ScopeDataGenerator(std::span<BusType const> substreamConfigs);
-    ~ScopeDataGenerator() override;
 
     void setSampleRate(audio::sample_rate);
     void setResolution(std::size_t resolution); // 1 .. 4
@@ -43,7 +42,7 @@ signals:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

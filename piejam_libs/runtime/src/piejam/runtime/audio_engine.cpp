@@ -4,6 +4,24 @@
 
 #include <piejam/runtime/audio_engine.h>
 
+#include <piejam/runtime/channel_index_pair.h>
+#include <piejam/runtime/components/make_fx.h>
+#include <piejam/runtime/components/mixer_channel.h>
+#include <piejam/runtime/components/mute_solo.h>
+#include <piejam/runtime/components/solo_switch.h>
+#include <piejam/runtime/dynamic_key_shared_object_map.h>
+#include <piejam/runtime/external_audio.h>
+#include <piejam/runtime/fx/module.h>
+#include <piejam/runtime/mixer.h>
+#include <piejam/runtime/parameter_processor_factory.h>
+#include <piejam/runtime/processors/midi_assignment_processor.h>
+#include <piejam/runtime/processors/midi_input_processor.h>
+#include <piejam/runtime/processors/midi_learn_processor.h>
+#include <piejam/runtime/processors/midi_to_parameter_processor.h>
+#include <piejam/runtime/processors/stream_processor_factory.h>
+#include <piejam/runtime/solo_group.h>
+#include <piejam/runtime/state.h>
+
 #include <piejam/algorithm/for_each_adjacent.h>
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/clip_processor.h>
@@ -25,23 +43,6 @@
 #include <piejam/midi/input_event_handler.h>
 #include <piejam/range/indices.h>
 #include <piejam/range/iota.h>
-#include <piejam/runtime/channel_index_pair.h>
-#include <piejam/runtime/components/make_fx.h>
-#include <piejam/runtime/components/mixer_channel.h>
-#include <piejam/runtime/components/mute_solo.h>
-#include <piejam/runtime/components/solo_switch.h>
-#include <piejam/runtime/dynamic_key_shared_object_map.h>
-#include <piejam/runtime/external_audio.h>
-#include <piejam/runtime/fx/module.h>
-#include <piejam/runtime/mixer.h>
-#include <piejam/runtime/parameter_processor_factory.h>
-#include <piejam/runtime/processors/midi_assignment_processor.h>
-#include <piejam/runtime/processors/midi_input_processor.h>
-#include <piejam/runtime/processors/midi_learn_processor.h>
-#include <piejam/runtime/processors/midi_to_parameter_processor.h>
-#include <piejam/runtime/processors/stream_processor_factory.h>
-#include <piejam/runtime/solo_group.h>
-#include <piejam/runtime/state.h>
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/worker.h>
 
@@ -750,15 +751,13 @@ audio_engine::audio_engine(
         audio::sample_rate const sample_rate,
         unsigned const num_device_input_channels,
         unsigned const num_device_output_channels)
-    : m_impl(std::make_unique<impl>(
+    : m_impl(make_pimpl<impl>(
               sample_rate,
               workers,
               num_device_input_channels,
               num_device_output_channels))
 {
 }
-
-audio_engine::~audio_engine() = default;
 
 template <class P>
 void

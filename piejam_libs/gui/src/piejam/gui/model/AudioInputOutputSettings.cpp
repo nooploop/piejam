@@ -18,9 +18,9 @@ namespace piejam::gui::model
 struct AudioInputOutputSettings::Impl
 {
     io_direction io_dir;
-    box<runtime::external_audio::device_ids_t> device_ids;
+    box<runtime::external_audio::device_ids_t> device_ids{};
 
-    ExternalAudioDeviceConfigList deviceConfigs;
+    ExternalAudioDeviceConfigList deviceConfigs{};
 };
 
 AudioInputOutputSettings::AudioInputOutputSettings(
@@ -28,11 +28,9 @@ AudioInputOutputSettings::AudioInputOutputSettings(
         runtime::subscriber& state_change_subscriber,
         io_direction const settings_type)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(settings_type))
+    , m_impl{make_pimpl<Impl>(settings_type)}
 {
 }
-
-AudioInputOutputSettings::~AudioInputOutputSettings() = default;
 
 auto
 AudioInputOutputSettings::deviceConfigs() const noexcept -> QAbstractListModel*

@@ -42,14 +42,12 @@ Mixer::Mixer(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
     : Subscribable{store_dispatch, state_change_subscriber}
-    , m_impl{std::make_unique<Impl>(
+    , m_impl{make_pimpl<Impl>(
               store_dispatch,
               state_change_subscriber,
               observe_once(runtime::selectors::select_mixer_main_channel))}
 {
 }
-
-Mixer::~Mixer() = default;
 
 auto
 Mixer::userChannels() const noexcept -> QAbstractListModel*

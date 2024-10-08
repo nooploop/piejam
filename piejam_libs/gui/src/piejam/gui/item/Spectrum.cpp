@@ -125,7 +125,7 @@ struct Spectrum::Impl
 
 Spectrum::Spectrum(QQuickItem* parent)
     : QQuickItem(parent)
-    , m_impl(std::make_unique<Impl>())
+    , m_impl{make_pimpl<Impl>()}
 {
     setFlag(ItemHasContents);
 
@@ -180,8 +180,6 @@ Spectrum::Spectrum(QQuickItem* parent)
         update();
     });
 }
-
-Spectrum::~Spectrum() = default;
 
 auto
 Spectrum::levelLabels() const -> QVariantList

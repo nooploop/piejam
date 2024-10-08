@@ -29,8 +29,8 @@ struct FxTuner::Impl
 
     PitchGenerator pitchGenerator{std::span{&busType, 1}};
 
-    std::unique_ptr<EnumParameter> channel;
-    std::unique_ptr<FxStream> stream;
+    std::unique_ptr<EnumParameter> channel{};
+    std::unique_ptr<FxStream> stream{};
 };
 
 FxTuner::FxTuner(
@@ -38,7 +38,7 @@ FxTuner::FxTuner(
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
     : FxModule{store_dispatch, state_change_subscriber, fx_mod_id}
-    , m_impl(std::make_unique<Impl>(busType()))
+    , m_impl{make_pimpl<Impl>(busType())}
 {
     auto const& parameters = this->parameters();
 
@@ -126,8 +126,6 @@ FxTuner::FxTuner(
                 &FxTuner::onChannelChanged);
     }
 }
-
-FxTuner::~FxTuner() = default;
 
 auto
 FxTuner::type() const noexcept -> FxModuleType

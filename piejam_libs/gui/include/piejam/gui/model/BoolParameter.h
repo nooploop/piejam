@@ -7,7 +7,7 @@
 #include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/Parameter.h>
 
-#include <memory>
+#include <piejam/pimpl.h>
 
 namespace piejam::gui::model
 {
@@ -23,7 +23,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             piejam::gui::model::ParameterId const&);
-    ~BoolParameter() override;
 
     static constexpr auto StaticType = Type::Bool;
 
@@ -33,7 +32,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

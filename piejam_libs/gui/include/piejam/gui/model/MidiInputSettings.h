@@ -9,9 +9,9 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
-#include <QAbstractListModel>
+#include <piejam/pimpl.h>
 
-#include <memory>
+#include <QAbstractListModel>
 
 namespace piejam::gui::model
 {
@@ -24,13 +24,12 @@ class MidiInputSettings final : public Subscribable<SubscribableModel>
 
 public:
     MidiInputSettings(runtime::store_dispatch, runtime::subscriber&);
-    ~MidiInputSettings() override;
 
 private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

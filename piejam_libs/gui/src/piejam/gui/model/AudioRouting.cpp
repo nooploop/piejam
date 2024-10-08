@@ -22,8 +22,8 @@ struct AudioRouting::Impl
 
     std::unique_ptr<AudioRoutingSelection> selected;
 
-    boxed_vector<runtime::selectors::mixer_device_route> devices;
-    boxed_vector<runtime::selectors::mixer_channel_route> channels;
+    boxed_vector<runtime::selectors::mixer_device_route> devices{};
+    boxed_vector<runtime::selectors::mixer_channel_route> channels{};
 };
 
 AudioRouting::AudioRouting(
@@ -32,7 +32,7 @@ AudioRouting::AudioRouting(
         runtime::mixer::channel_id const id,
         runtime::mixer::io_socket const io_socket)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl{std::make_unique<Impl>(
+    , m_impl{make_pimpl<Impl>(
               id,
               io_socket,
               observe_once(
@@ -51,8 +51,6 @@ AudioRouting::AudioRouting(
 {
     connectSubscribableChild(*m_impl->selected);
 }
-
-AudioRouting::~AudioRouting() = default;
 
 auto
 AudioRouting::defaultName() const noexcept -> QString const&

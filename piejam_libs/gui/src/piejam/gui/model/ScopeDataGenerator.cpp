@@ -224,11 +224,9 @@ struct ScopeDataGenerator::Impl
 
 ScopeDataGenerator::ScopeDataGenerator(
         std::span<BusType const> substreamConfigs)
-    : m_impl(std::make_unique<Impl>(substreamConfigs))
+    : m_impl{make_pimpl<Impl>(substreamConfigs)}
 {
 }
-
-ScopeDataGenerator::~ScopeDataGenerator() = default;
 
 void
 ScopeDataGenerator::setSampleRate(audio::sample_rate const sampleRate)

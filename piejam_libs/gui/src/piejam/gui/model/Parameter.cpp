@@ -45,7 +45,7 @@ Parameter::Parameter(
         runtime::subscriber& state_change_subscriber,
         ParameterId const& param)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(
+    , m_impl(make_pimpl<Impl>(
               param,
               std::make_unique<MidiAssignable>(
                       store_dispatch,
@@ -55,8 +55,6 @@ Parameter::Parameter(
     setName(QString::fromStdString(observe_once(
             runtime::selectors::make_fx_parameter_name_selector(param))));
 }
-
-Parameter::~Parameter() = default;
 
 auto
 Parameter::type() const noexcept -> Type

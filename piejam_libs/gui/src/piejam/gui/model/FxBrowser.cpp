@@ -4,11 +4,12 @@
 
 #include <piejam/gui/model/FxBrowser.h>
 
-#include <piejam/algorithm/edit_script.h>
 #include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/gui/model/FxBrowserEntryInternal.h>
 #include <piejam/gui/model/FxBrowserEntryLADSPA.h>
 #include <piejam/gui/model/GenericListModel.h>
+
+#include <piejam/algorithm/edit_script.h>
 #include <piejam/runtime/actions/root_view_actions.h>
 #include <piejam/runtime/fx/registry.h>
 #include <piejam/runtime/selectors.h>
@@ -91,11 +92,9 @@ FxBrowser::FxBrowser(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>())
+    , m_impl(make_pimpl<Impl>())
 {
 }
-
-FxBrowser::~FxBrowser() = default;
 
 auto
 FxBrowser::entries() const noexcept -> QAbstractListModel*

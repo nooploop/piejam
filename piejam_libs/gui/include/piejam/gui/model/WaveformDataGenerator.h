@@ -8,7 +8,7 @@
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/fwd.h>
 
-#include <memory>
+#include <piejam/pimpl.h>
 
 namespace piejam::gui::model
 {
@@ -19,7 +19,6 @@ class WaveformDataGenerator final : public AudioStreamListener
 
 public:
     explicit WaveformDataGenerator(std::span<BusType const> substreamConfigs);
-    ~WaveformDataGenerator() override;
 
     void setSamplesPerPixel(int x);
 
@@ -36,7 +35,7 @@ signals:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

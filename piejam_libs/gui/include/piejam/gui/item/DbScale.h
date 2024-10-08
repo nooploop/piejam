@@ -6,9 +6,9 @@
 
 #include <piejam/gui/model/fwd.h>
 
-#include <QQuickItem>
+#include <piejam/pimpl.h>
 
-#include <memory>
+#include <QQuickItem>
 
 namespace piejam::gui::item
 {
@@ -29,7 +29,6 @@ class DbScale : public QQuickItem
 
 public:
     explicit DbScale(QQuickItem* parent = nullptr);
-    ~DbScale() override;
 
     auto scaleData() const noexcept -> model::DbScaleData*;
     void setScaleData(model::DbScaleData*);
@@ -74,7 +73,7 @@ signals:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 
     QColor m_color{255, 255, 255};
     int m_tickOffset{};

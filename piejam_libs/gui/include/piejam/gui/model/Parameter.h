@@ -10,7 +10,7 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
-#include <memory>
+#include <piejam/pimpl.h>
 
 namespace piejam::gui::model
 {
@@ -29,7 +29,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             piejam::gui::model::ParameterId const&);
-    ~Parameter() override;
 
     auto paramId() const -> ParameterId;
 
@@ -52,7 +51,7 @@ protected:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 auto makeParameter(

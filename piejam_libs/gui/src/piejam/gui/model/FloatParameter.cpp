@@ -25,15 +25,12 @@ FloatParameter::FloatParameter(
         runtime::subscriber& state_change_subscriber,
         ParameterId const& param)
     : Parameter{store_dispatch, state_change_subscriber, param}
-    , m_impl{std::make_unique<Impl>(
-              std::get<runtime::float_parameter_id>(param))}
+    , m_impl{make_pimpl<Impl>(std::get<runtime::float_parameter_id>(param))}
 {
     setBipolar(observe_once(
             runtime::selectors::make_float_parameter_bipolar_selector(
                     m_impl->param_id)));
 }
-
-FloatParameter::~FloatParameter() = default;
 
 void
 FloatParameter::onSubscribe()

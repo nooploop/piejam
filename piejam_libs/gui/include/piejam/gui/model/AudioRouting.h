@@ -9,11 +9,10 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <piejam/pimpl.h>
 #include <piejam/runtime/mixer_fwd.h>
 
 #include <QStringList>
-
-#include <memory>
 
 namespace piejam::gui::model
 {
@@ -36,7 +35,6 @@ public:
             runtime::subscriber&,
             runtime::mixer::channel_id,
             runtime::mixer::io_socket);
-    ~AudioRouting() override;
 
     Q_INVOKABLE void changeToDefault();
     Q_INVOKABLE void changeToDevice(unsigned index);
@@ -46,7 +44,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 
     QString m_defaultName;
 };

@@ -9,10 +9,9 @@
 #include <piejam/gui/model/SubscribableModel.h>
 #include <piejam/gui/model/fwd.h>
 
+#include <piejam/pimpl.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
-
-#include <memory>
 
 namespace piejam::gui::model
 {
@@ -30,7 +29,6 @@ public:
             runtime::subscriber&,
             runtime::mixer::channel_id fx_chain_id,
             runtime::fx::module_id);
-    ~FxChainModule();
 
     Q_INVOKABLE void remove();
     Q_INVOKABLE void focus();
@@ -40,7 +38,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

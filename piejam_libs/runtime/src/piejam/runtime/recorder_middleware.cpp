@@ -227,11 +227,9 @@ struct recorder_middleware::impl
 };
 
 recorder_middleware::recorder_middleware(std::filesystem::path recordings_dir)
-    : m_impl(std::make_unique<impl>(std::move(recordings_dir)))
+    : m_impl(make_pimpl<impl>(std::move(recordings_dir)))
 {
 }
-
-recorder_middleware::~recorder_middleware() = default;
 
 void
 recorder_middleware::operator()(

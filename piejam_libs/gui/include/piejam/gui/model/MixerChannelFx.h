@@ -10,9 +10,8 @@
 #include <piejam/gui/model/StringList.h>
 
 #include <piejam/audio/types.h>
+#include <piejam/pimpl.h>
 #include <piejam/runtime/mixer_fwd.h>
-
-#include <memory>
 
 namespace piejam::gui::model
 {
@@ -31,7 +30,6 @@ public:
             runtime::store_dispatch,
             runtime::subscriber&,
             runtime::mixer::channel_id);
-    ~MixerChannelFx() override;
 
     Q_INVOKABLE void appendFxModule();
     Q_INVOKABLE void moveUpFxModule();
@@ -41,7 +39,7 @@ private:
     void onSubscribe() override;
 
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model

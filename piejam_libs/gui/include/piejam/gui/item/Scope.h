@@ -6,9 +6,9 @@
 
 #include <piejam/gui/model/fwd.h>
 
-#include <QQuickItem>
+#include <piejam/pimpl.h>
 
-#include <memory>
+#include <QQuickItem>
 
 namespace piejam::gui::item
 {
@@ -28,7 +28,6 @@ class Scope : public QQuickItem
 
 public:
     Scope(QQuickItem* parent = nullptr);
-    ~Scope() override;
 
     auto color() const noexcept -> QColor const&;
     void setColor(QColor const&);
@@ -48,7 +47,7 @@ signals:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::item

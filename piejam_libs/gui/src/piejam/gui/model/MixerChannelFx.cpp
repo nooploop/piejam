@@ -29,11 +29,9 @@ MixerChannelFx::MixerChannelFx(
         runtime::subscriber& state_change_subscriber,
         runtime::mixer::channel_id const mixer_channel_id)
     : MixerChannel{store_dispatch, state_change_subscriber, mixer_channel_id}
-    , m_impl{std::make_unique<Impl>()}
+    , m_impl{make_pimpl<Impl>()}
 {
 }
-
-MixerChannelFx::~MixerChannelFx() = default;
 
 auto
 MixerChannelFx::fxChain() const noexcept -> QAbstractListModel*

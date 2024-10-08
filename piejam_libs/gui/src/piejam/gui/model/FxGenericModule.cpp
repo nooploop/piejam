@@ -6,6 +6,7 @@
 
 #include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/ParameterId.h>
+
 #include <piejam/runtime/selectors.h>
 
 #include <boost/container/flat_map.hpp>
@@ -23,7 +24,7 @@ FxGenericModule::FxGenericModule(
         runtime::subscriber& state_change_subscriber,
         runtime::fx::module_id const fx_mod_id)
     : FxModule{store_dispatch, state_change_subscriber, fx_mod_id}
-    , m_impl{std::make_unique<Impl>()}
+    , m_impl{make_pimpl<Impl>()}
 {
     for (auto const& [key, paramId] : parameters())
     {
@@ -36,8 +37,6 @@ FxGenericModule::FxGenericModule(
                 std::move(param));
     }
 }
-
-FxGenericModule::~FxGenericModule() = default;
 
 auto
 FxGenericModule::parametersList() const noexcept -> QAbstractListModel*

@@ -23,11 +23,9 @@ FxStream::FxStream(
         runtime::subscriber& state_change_subscriber,
         StreamId const& streamId)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl(std::make_unique<Impl>(streamId))
+    , m_impl{make_pimpl<Impl>(streamId)}
 {
 }
-
-FxStream::~FxStream() = default;
 
 void
 FxStream::onSubscribe()

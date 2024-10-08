@@ -9,8 +9,8 @@
 #include <piejam/gui/model/Types.h>
 
 #include <piejam/audio/fwd.h>
+#include <piejam/pimpl.h>
 
-#include <memory>
 #include <span>
 
 namespace piejam::gui::model
@@ -21,7 +21,6 @@ class SpectrumDataGenerator final : public AudioStreamListener
     Q_OBJECT
 public:
     explicit SpectrumDataGenerator(std::span<BusType const> substreamConfigs);
-    ~SpectrumDataGenerator() override;
 
     void setSampleRate(audio::sample_rate);
     void setResolution(DFTResolution);
@@ -37,7 +36,7 @@ signals:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    pimpl<Impl> m_impl;
 };
 
 } // namespace piejam::gui::model
