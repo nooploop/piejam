@@ -101,8 +101,7 @@ replace_missing_ladspa_fx_module::reduce(state& st) const
                     ladspa_instance.plugin_desc.name,
                     mixer_channel.bus_type,
                     ladspa_instance.control_inputs,
-                    st.params,
-                    st.ui_params));
+                    st.params));
 
             (*fx_chain)[pos] = fx_mod_id;
 

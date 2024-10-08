@@ -39,7 +39,6 @@
 #include <piejam/runtime/recorder.h>
 #include <piejam/runtime/root_view_mode.h>
 #include <piejam/runtime/selected_sound_card.h>
-#include <piejam/runtime/ui_parameter_descriptors_map.h>
 
 #include <optional>
 #include <span>
@@ -65,7 +64,6 @@ struct state
     box<midi_devices_t> midi_devices;
 
     parameters_map params;
-    ui_parameters_map ui_params;
     audio_streams_cache streams;
 
     fx::registry fx_registry;

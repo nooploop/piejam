@@ -338,7 +338,7 @@ TEST_F(midi_control_middleware_test,
                         _)));
 
         actions::request_parameters_update::parameter_ids_t expected_ids;
-        std::get<0>(expected_ids).emplace(param_id);
+        std::get<1>(expected_ids).emplace(param_id);
 
         EXPECT_CALL(
                 mf_mock,

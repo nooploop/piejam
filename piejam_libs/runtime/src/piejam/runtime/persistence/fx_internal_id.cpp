@@ -4,6 +4,8 @@
 
 #include <piejam/runtime/persistence/fx_internal_id.h>
 
+#include <piejam/entity_id.h>
+
 #include <nlohmann/json.hpp>
 
 #include <boost/assert.hpp>

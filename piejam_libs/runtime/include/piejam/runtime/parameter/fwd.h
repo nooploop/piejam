@@ -17,7 +17,7 @@ struct stereo_level_descriptor;
 template <class Parameter>
 using id_t = entity_id<Parameter>;
 
-template <template <class> class Value>
+template <template <class> class Slot>
 class map;
 
 template <class Parameter>

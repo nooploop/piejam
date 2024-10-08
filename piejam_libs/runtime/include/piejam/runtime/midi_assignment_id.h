@@ -12,7 +12,7 @@ namespace piejam::runtime
 {
 
 using midi_assignment_id =
-        std::variant<float_parameter_id, int_parameter_id, bool_parameter_id>;
+        std::variant<bool_parameter_id, float_parameter_id, int_parameter_id>;
 
 auto is_valid_midi_assignment_id(midi_assignment_id const&) noexcept -> bool;
 

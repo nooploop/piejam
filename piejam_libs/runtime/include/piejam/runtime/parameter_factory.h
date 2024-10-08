@@ -27,14 +27,17 @@ public:
     {
     }
 
-    template <class P>
-    auto make_parameter(P&& param, Value<P>... aux_value) const
+    template <class P, class... Vs>
+    auto make_parameter(P&& param, Vs&&... aux_value) const
     {
         auto param_id = parameter::id_t<P>::generate();
         m_params.emplace(param_id, std::forward<P>(param));
         std::apply(
                 [&](auto&&... aux_map) {
-                    (aux_map.emplace(param_id, std::move(aux_value)), ...);
+                    (aux_map.emplace(
+                             param_id,
+                             Value<P>{std::forward<Vs>(aux_value)}),
+                     ...);
                 },
                 m_aux_param_maps);
         return param_id;

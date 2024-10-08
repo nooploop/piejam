@@ -10,8 +10,6 @@
 #include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_factory.h>
-#include <piejam/runtime/parameter_value_to_string.h>
-#include <piejam/runtime/ui_parameter_descriptors_map.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
@@ -32,7 +30,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 {
     using namespace std::string_literals;
 
-    runtime::parameter_factory ui_params_factory{args.params, args.ui_params};
+    runtime::parameter_factory params_factory{args.params};
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
@@ -40,39 +38,25 @@ make_module(runtime::internal_fx_module_factory_args const& args)
             .bus_type = args.bus_type,
             .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::left_pan),
-                     ui_params_factory.make_parameter(
-                             runtime::float_parameter{
-                                     .name = box("Left Pan"s),
-                                     .default_value = -1.f,
-                                     .min = -1.f,
-                                     .max = 1.f,
-                                     .bipolar = true,
-                                     .to_normalized = s_pan_to_noramlized,
-                                     .from_normalized = s_pan_from_noramlized,
-                             },
-                             {
-
-                                     .value_to_string =
-                                             &runtime::
-                                                     float_parameter_value_to_string,
-                             })},
+                     params_factory.make_parameter(runtime::float_parameter{
+                             .name = box("Left Pan"s),
+                             .default_value = -1.f,
+                             .min = -1.f,
+                             .max = 1.f,
+                             .bipolar = true,
+                             .to_normalized = s_pan_to_noramlized,
+                             .from_normalized = s_pan_from_noramlized,
+                     })},
                     {to_underlying(parameter_key::right_pan),
-                     ui_params_factory.make_parameter(
-                             runtime::float_parameter{
-                                     .name = box("Right Pan"s),
-                                     .default_value = 1.f,
-                                     .min = -1.f,
-                                     .max = 1.f,
-                                     .bipolar = true,
-                                     .to_normalized = s_pan_to_noramlized,
-                                     .from_normalized = s_pan_from_noramlized,
-                             },
-                             {
-
-                                     .value_to_string =
-                                             &runtime::
-                                                     float_parameter_value_to_string,
-                             })},
+                     params_factory.make_parameter(runtime::float_parameter{
+                             .name = box("Right Pan"s),
+                             .default_value = 1.f,
+                             .min = -1.f,
+                             .max = 1.f,
+                             .bipolar = true,
+                             .to_normalized = s_pan_to_noramlized,
+                             .from_normalized = s_pan_from_noramlized,
+                     })},
             }),
             .streams = {}};
 }

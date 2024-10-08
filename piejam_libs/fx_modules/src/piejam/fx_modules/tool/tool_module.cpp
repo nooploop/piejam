@@ -10,7 +10,6 @@
 #include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/float_normalize.h>
 #include <piejam/runtime/parameter_factory.h>
-#include <piejam/runtime/ui_parameter_descriptors_map.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
@@ -48,7 +47,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 {
     using namespace std::string_literals;
 
-    runtime::parameter_factory ui_params_factory{args.params, args.ui_params};
+    runtime::parameter_factory params_factory{args.params};
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
@@ -56,20 +55,15 @@ make_module(runtime::internal_fx_module_factory_args const& args)
             .bus_type = args.bus_type,
             .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::gain),
-                     ui_params_factory.make_parameter(
-                             runtime::float_parameter{
-                                     .name = box("Gain"s),
-                                     .default_value = 1.f,
-                                     .min = math::from_dB(dB_ival::min),
-                                     .max = math::from_dB(dB_ival::max),
-                                     .bipolar = true,
-                                     .to_normalized = dB_ival::to_normalized,
-                                     .from_normalized =
-                                             dB_ival::from_normalized},
-                             {
-
-                                     .value_to_string = &to_dB_string,
-                             })}}),
+                     params_factory.make_parameter(runtime::float_parameter{
+                             .name = box("Gain"s),
+                             .default_value = 1.f,
+                             .min = math::from_dB(dB_ival::min),
+                             .max = math::from_dB(dB_ival::max),
+                             .bipolar = true,
+                             .value_to_string = &to_dB_string,
+                             .to_normalized = dB_ival::to_normalized,
+                             .from_normalized = dB_ival::from_normalized})}}),
             .streams = {}};
 }
 

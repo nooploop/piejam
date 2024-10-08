@@ -909,8 +909,8 @@ make_fx_parameter_value_string_selector(fx::parameter_id const fx_param_id)
                 using parameter_t = typename decltype(param_id)::tag;
                 using cached_value_type = typename parameter_map_slot<
                         parameter_t>::value_slot::cached_type;
-                using value_to_string_fn = typename ui_parameter_map_slot<
-                        parameter_t>::value_to_string_fn;
+                using value_to_string_fn = typename parameter_map_slot<
+                        parameter_t>::parameter_type::value_to_string_fn;
                 using memoed_value_to_string_fn =
                         decltype(memo(std::declval<value_to_string_fn>()));
 
@@ -925,17 +925,15 @@ make_fx_parameter_value_string_selector(fx::parameter_id const fx_param_id)
                     }
 
                     auto const* const desc = st.params.find(param_id);
-                    auto const* const ui_desc =
-                            desc ? st.ui_params.find(param_id) : nullptr;
 
-                    if (desc && ui_desc)
+                    if (desc)
                     {
                         cached_value = desc->value.cached();
                         value_to_string =
                                 std::make_shared<memoed_value_to_string_fn>(
-                                        memo(ui_desc->value_to_string));
+                                        memo(desc->param.value_to_string));
 
-                        return ui_desc->value_to_string(desc->value.get());
+                        return desc->param.value_to_string(desc->value.get());
                     }
 
                     return std::string{};
@@ -1077,12 +1075,11 @@ make_int_parameter_enum_values_selector(int_parameter_id const param_id)
         std::vector<std::pair<std::string, int>> result;
 
         auto const* const desc = st.params.find(param_id);
-        auto const* const ui_desc = st.ui_params.find(param_id);
-        if (desc && ui_desc)
+        if (desc)
         {
             for (int value = desc->param.min; value <= desc->param.max; ++value)
             {
-                result.emplace_back(ui_desc->value_to_string(value), value);
+                result.emplace_back(desc->param.value_to_string(value), value);
             }
         }
 

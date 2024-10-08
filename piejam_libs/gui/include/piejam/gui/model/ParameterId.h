@@ -5,11 +5,16 @@
 #pragma once
 
 #include <piejam/entity_id.h>
-#include <piejam/runtime/ui_parameter.h>
+#include <piejam/runtime/parameters.h>
+
+#include <variant>
 
 namespace piejam::gui::model
 {
 
-using ParameterId = runtime::ui_parameter_id;
+using ParameterId = std::variant<
+        runtime::bool_parameter_id,
+        runtime::float_parameter_id,
+        runtime::int_parameter_id>;
 
 } // namespace piejam::gui::model

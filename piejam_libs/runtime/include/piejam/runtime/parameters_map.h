@@ -14,6 +14,8 @@ namespace piejam::runtime
 template <class Parameter>
 struct parameter_map_slot
 {
+    using parameter_type = Parameter;
+
     Parameter param;
 
     struct value_slot

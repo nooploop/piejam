@@ -86,12 +86,11 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/parameter/float_descriptor.h
     include/piejam/runtime/parameter/float_normalize.h
     include/piejam/runtime/parameter/fwd.h
-
     include/piejam/runtime/parameter/int_descriptor.h
     include/piejam/runtime/parameter/map.h
+    include/piejam/runtime/parameter/stereo_level_descriptor.h
     include/piejam/runtime/parameter_factory.h
     include/piejam/runtime/parameter_processor_factory.h
-    include/piejam/runtime/parameter_value_to_string.h
     include/piejam/runtime/parameters.h
     include/piejam/runtime/parameters_map.h
     include/piejam/runtime/persistence/access.h
@@ -134,8 +133,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/ui/thunk_action.h
     include/piejam/runtime/ui/thunk_action_impl.h
     include/piejam/runtime/ui/update_state_action.h
-    include/piejam/runtime/ui_parameter.h
-    include/piejam/runtime/ui_parameter_descriptors_map.h
     src/piejam/runtime/actions/activate_midi_device.cpp
     src/piejam/runtime/actions/apply_app_config.cpp
     src/piejam/runtime/actions/apply_session.cpp
@@ -172,7 +169,6 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/midi_control_middleware.cpp
     src/piejam/runtime/midi_input_controller.cpp
     src/piejam/runtime/mixer.cpp
-    src/piejam/runtime/parameter_value_to_string.cpp
     src/piejam/runtime/persistence/access.cpp
     src/piejam/runtime/persistence/app_config.cpp
     src/piejam/runtime/persistence/fx_internal_id.cpp
@@ -190,8 +186,6 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/state.cpp
     src/piejam/runtime/store_dispatch.cpp
     src/piejam/runtime/thunk_action.cpp
-    include/piejam/runtime/parameter/bool_.h
-    include/piejam/runtime/parameter/stereo_level_descriptor.h
 )
 
 find_package(nlohmann_json REQUIRED)

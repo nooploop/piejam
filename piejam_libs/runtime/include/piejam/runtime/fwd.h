@@ -34,13 +34,7 @@ struct locations;
 
 template <class Parameter>
 struct parameter_map_slot;
-
 using parameters_map = parameter::map<parameter_map_slot>;
-
-template <class Parameter>
-struct ui_parameter_map_slot;
-
-using ui_parameters_map = parameter::map<ui_parameter_map_slot>;
 
 using parameter_processor_factory = boost::mp11::
         mp_rename<parameters_t, processors::parameter_processor_factory>;

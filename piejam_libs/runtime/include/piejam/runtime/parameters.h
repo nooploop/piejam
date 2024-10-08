@@ -24,8 +24,8 @@ using stereo_level_parameter = parameter::stereo_level_descriptor;
 using stereo_level_parameter_id = parameter::id_t<stereo_level_parameter>;
 
 using parameters_t = boost::mp11::mp_list<
-        float_parameter,
         bool_parameter,
+        float_parameter,
         int_parameter,
         stereo_level_parameter>;
 

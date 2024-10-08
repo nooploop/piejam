@@ -8,6 +8,7 @@
 
 #include <piejam/audio/types.h>
 #include <piejam/boxed_vector.h>
+#include <piejam/entity_id.h>
 #include <piejam/ladspa/plugin_descriptor.h>
 #include <piejam/registry_map.h>
 

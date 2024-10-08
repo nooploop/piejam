@@ -11,8 +11,6 @@
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/parameter/int_descriptor.h>
 #include <piejam/runtime/parameter_factory.h>
-#include <piejam/runtime/parameter_value_to_string.h>
-#include <piejam/runtime/ui_parameter_descriptors_map.h>
 #include <piejam/to_underlying.h>
 
 #include <fmt/format.h>
@@ -54,7 +52,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 {
     using namespace std::string_literals;
 
-    runtime::parameter_factory ui_params_factory{args.params, args.ui_params};
+    runtime::parameter_factory params_factory{args.params};
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
@@ -62,15 +60,13 @@ make_module(runtime::internal_fx_module_factory_args const& args)
             .bus_type = args.bus_type,
             .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::channel),
-                     ui_params_factory.make_parameter(
-                             runtime::int_parameter{
-                                     .name = box("Channel"s),
-                                     .default_value = to_underlying(
-                                             stereo_channel::middle),
-                                     .min = to_underlying(stereo_channel::_min),
-                                     .max = to_underlying(
-                                             stereo_channel::_max)},
-                             {.value_to_string = &to_stereo_channel_string})},
+                     params_factory.make_parameter(runtime::int_parameter{
+                             .name = box("Channel"s),
+                             .default_value =
+                                     to_underlying(stereo_channel::middle),
+                             .min = to_underlying(stereo_channel::_min),
+                             .max = to_underlying(stereo_channel::_max),
+                             .value_to_string = &to_stereo_channel_string})},
             }),
             .streams = box(runtime::fx::module_streams{
                     {to_underlying(stream_key::input),

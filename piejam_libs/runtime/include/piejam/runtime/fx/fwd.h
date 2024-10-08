@@ -7,7 +7,6 @@
 #include <piejam/ladspa/fwd.h>
 #include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/parameters.h>
-#include <piejam/runtime/ui_parameter.h>
 
 #include <boost/container/container_fwd.hpp>
 
@@ -38,9 +37,10 @@ class ladspa_manager;
 struct module;
 struct registry;
 
-using parameter_id = ui_parameter_id;
+using parameter_id =
+        std::variant<bool_parameter_id, float_parameter_id, int_parameter_id>;
 using parameter_key = std::size_t;
-using parameter_value = ui_parameter_value;
+using parameter_value = std::variant<bool, float, int>;
 
 template <class Value>
 struct parameter_assignment;
