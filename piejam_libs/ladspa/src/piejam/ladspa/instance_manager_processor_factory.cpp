@@ -4,11 +4,12 @@
 
 #include <piejam/ladspa/instance_manager_processor_factory.h>
 
+#include <piejam/ladspa/plugin.h>
+#include <piejam/ladspa/plugin_descriptor.h>
+
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id_hash.h>
-#include <piejam/ladspa/plugin.h>
-#include <piejam/ladspa/plugin_descriptor.h>
 
 #include <spdlog/spdlog.h>
 

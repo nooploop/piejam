@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <piejam/ladspa/fwd.h>
+
 #include <piejam/audio/engine/fwd.h>
 #include <piejam/audio/fwd.h>
-#include <piejam/ladspa/fwd.h>
 
 #include <memory>
 

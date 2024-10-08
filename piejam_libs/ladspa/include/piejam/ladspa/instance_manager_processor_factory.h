@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include <piejam/audio/engine/fwd.h>
-#include <piejam/audio/fwd.h>
 #include <piejam/ladspa/fwd.h>
 #include <piejam/ladspa/instance_manager.h>
 #include <piejam/ladspa/processor_factory.h>
+
+#include <piejam/audio/engine/fwd.h>
+#include <piejam/audio/fwd.h>
 
 #include <map>
 #include <memory>

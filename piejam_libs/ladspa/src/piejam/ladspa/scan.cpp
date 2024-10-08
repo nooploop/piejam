@@ -5,6 +5,7 @@
 #include <piejam/ladspa/scan.h>
 
 #include <piejam/ladspa/plugin_descriptor.h>
+
 #include <piejam/system/dll.h>
 
 #include <ladspa.h>

@@ -4,6 +4,9 @@
 
 #include <piejam/ladspa/plugin.h>
 
+#include <piejam/ladspa/plugin_descriptor.h>
+#include <piejam/ladspa/port_descriptor.h>
+
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_port.h>
@@ -12,8 +15,6 @@
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
-#include <piejam/ladspa/plugin_descriptor.h>
-#include <piejam/ladspa/port_descriptor.h>
 #include <piejam/npos.h>
 #include <piejam/range/indices.h>
 #include <piejam/range/iota.h>
