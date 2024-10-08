@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/midi/device_id.h>
 #include <piejam/midi/fwd.h>
 
 namespace piejam::midi

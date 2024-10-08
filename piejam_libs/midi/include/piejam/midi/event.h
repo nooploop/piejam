@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <piejam/entity_id.h>
 #include <piejam/midi/device_id.h>
+
+#include <piejam/entity_id.h>
 
 #include <cstddef>
 #include <variant>

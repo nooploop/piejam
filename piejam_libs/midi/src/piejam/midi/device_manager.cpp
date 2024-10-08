@@ -6,12 +6,13 @@
 
 #include "alsa.h"
 
-#include <piejam/algorithm/contains.h>
-#include <piejam/entity_id_hash.h>
 #include <piejam/midi/device_update.h>
 #include <piejam/midi/event.h>
 #include <piejam/midi/event_handler.h>
 #include <piejam/midi/input_event_handler.h>
+
+#include <piejam/algorithm/contains.h>
+#include <piejam/entity_id_hash.h>
 
 #include <fmt/format.h>
 
