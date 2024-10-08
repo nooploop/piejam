@@ -64,13 +64,13 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                     {to_underlying(parameter_key::channel),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Channel"s),
                                      .default_value = to_underlying(
                                              stereo_channel::middle),
                                      .min = to_underlying(stereo_channel::_min),
                                      .max = to_underlying(
                                              stereo_channel::_max)},
-                             {.name = box("Channel"s),
-                              .value_to_string = &to_stereo_channel_string})},
+                             {.value_to_string = &to_stereo_channel_string})},
             }),
             .streams = box(runtime::fx::module_streams{
                     {to_underlying(stream_key::input),

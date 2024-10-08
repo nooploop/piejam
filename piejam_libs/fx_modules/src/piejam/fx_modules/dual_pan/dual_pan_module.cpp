@@ -5,6 +5,7 @@
 #include <piejam/fx_modules/dual_pan/dual_pan_module.h>
 
 #include <piejam/fx_modules/dual_pan/dual_pan_internal_id.h>
+
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/float_normalize.h>
@@ -19,6 +20,11 @@
 
 namespace piejam::fx_modules::dual_pan
 {
+
+static constexpr auto s_pan_to_noramlized =
+        &runtime::parameter::to_normalized_linear_static<-1.f, 1.f>;
+static constexpr auto s_pan_from_noramlized =
+        &runtime::parameter::from_normalized_linear_static<-1.f, 1.f>;
 
 auto
 make_module(runtime::internal_fx_module_factory_args const& args)
@@ -36,19 +42,16 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                     {to_underlying(parameter_key::left_pan),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Left Pan"s),
                                      .default_value = -1.f,
                                      .min = -1.f,
                                      .max = 1.f,
                                      .bipolar = true,
-                                     .to_normalized =
-                                             &runtime::parameter::
-                                                     to_normalized_linear,
-                                     .from_normalized =
-                                             &runtime::parameter::
-                                                     from_normalized_linear,
+                                     .to_normalized = s_pan_to_noramlized,
+                                     .from_normalized = s_pan_from_noramlized,
                              },
                              {
-                                     .name = box("Left Pan"s),
+
                                      .value_to_string =
                                              &runtime::
                                                      float_parameter_value_to_string,
@@ -56,19 +59,16 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                     {to_underlying(parameter_key::right_pan),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Right Pan"s),
                                      .default_value = 1.f,
                                      .min = -1.f,
                                      .max = 1.f,
                                      .bipolar = true,
-                                     .to_normalized =
-                                             &runtime::parameter::
-                                                     to_normalized_linear,
-                                     .from_normalized =
-                                             &runtime::parameter::
-                                                     from_normalized_linear,
+                                     .to_normalized = s_pan_to_noramlized,
+                                     .from_normalized = s_pan_from_noramlized,
                              },
                              {
-                                     .name = box("Right Pan"s),
+
                                      .value_to_string =
                                              &runtime::
                                                      float_parameter_value_to_string,

@@ -19,12 +19,29 @@ to_normalized_linear(float_descriptor const& p, float const value) -> float
     return math::linear_map(value, p.min, p.max, 0.f, 1.f);
 }
 
+template <float Min, float Max>
+[[nodiscard]]
+constexpr auto
+to_normalized_linear_static(float_descriptor const&, float const value) -> float
+{
+    return math::linear_map(value, Min, Max, 0.f, 1.f);
+}
+
 [[nodiscard]]
 constexpr auto
 from_normalized_linear(float_descriptor const& p, float const norm_value)
         -> float
 {
     return math::linear_map(norm_value, 0.f, 1.f, p.min, p.max);
+}
+
+template <float Min, float Max>
+[[nodiscard]]
+constexpr auto
+from_normalized_linear_static(float_descriptor const&, float const norm_value)
+        -> float
+{
+    return math::linear_map(norm_value, 0.f, 1.f, Min, Max);
 }
 
 [[nodiscard]]

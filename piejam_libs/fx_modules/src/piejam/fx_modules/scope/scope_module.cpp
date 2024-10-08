@@ -186,6 +186,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                     {to_underlying(parameter_key::mode),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Mode"s),
                                      .default_value = bus_type_to(
                                              args.bus_type,
                                              to_underlying(mode::trigger),
@@ -195,21 +196,21 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                              args.bus_type,
                                              to_underlying(mode::trigger),
                                              to_underlying(mode::trigger_b))},
-                             {.name = box("Mode"s),
-                              .value_to_string =
+                             {.value_to_string =
                                       to_mode_string(args.bus_type)})},
                     {to_underlying(parameter_key::trigger_slope),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Slope"s),
                                      .default_value = to_underlying(
                                              trigger_slope::rising_edge),
                                      .min = to_underlying(trigger_slope::_min),
                                      .max = to_underlying(trigger_slope::_max)},
-                             {.name = box("Slope"s),
-                              .value_to_string = &to_trigger_slope_string})},
+                             {.value_to_string = &to_trigger_slope_string})},
                     {to_underlying(parameter_key::trigger_level),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Trigger Level"s),
                                      .default_value = 0.f,
                                      .min = -1.f,
                                      .max = 1.f,
@@ -219,13 +220,13 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .from_normalized =
                                              &runtime::parameter::
                                                      from_normalized_linear},
-                             {.name = box("Trigger Level"s),
-                              .value_to_string =
+                             {.value_to_string =
                                       &runtime::
                                               float_parameter_value_to_string})},
                     {to_underlying(parameter_key::hold_time),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Hold Time"s),
                                      .default_value = 80.f,
                                      .min = 16.f,
                                      .max = 1600.f,
@@ -235,87 +236,89 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .from_normalized =
                                              &runtime::parameter::
                                                      from_normalized_linear},
-                             {.name = box("Hold Time"s),
-                              .value_to_string = &to_hold_time_string})},
+                             {.value_to_string = &to_hold_time_string})},
                     {to_underlying(parameter_key::waveform_window_size),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Window Size"s),
                                      .default_value =
                                              to_underlying(window_size::large),
                                      .min = to_underlying(window_size::_min),
                                      .max = to_underlying(window_size::_max)},
-                             {.name = box("Window Size"s),
-                              .value_to_string = &to_window_size_string})},
+                             {.value_to_string = &to_window_size_string})},
                     {to_underlying(parameter_key::scope_window_size),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Window Size"s),
                                      .default_value = to_underlying(
                                              window_size::very_small),
                                      .min = to_underlying(window_size::_min),
                                      .max = to_underlying(window_size::_max)},
-                             {.name = box("Window Size"s),
-                              .value_to_string = &to_window_size_string})},
+                             {.value_to_string = &to_window_size_string})},
                     {to_underlying(parameter_key::stream_a_active),
                      ui_params_factory.make_parameter(
-                             runtime::bool_parameter{.default_value = true},
-                             {.name = box("Stream A Active"s),
-                              .value_to_string =
+                             runtime::bool_parameter{
+                                     .name = box("Stream A Active"s),
+                                     .default_value = true},
+                             {.value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
                     {to_underlying(parameter_key::stream_b_active),
                      ui_params_factory.make_parameter(
-                             runtime::bool_parameter{.default_value = false},
-                             {.name = box("Stream B Active"s),
-                              .value_to_string =
+                             runtime::bool_parameter{
+                                     .name = box("Stream B Active"s),
+                                     .default_value = false},
+                             {.value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
                     {to_underlying(parameter_key::channel_a),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Channel A"s),
                                      .default_value = to_underlying(
                                              stereo_channel::left),
                                      .min = to_underlying(stereo_channel::_min),
                                      .max = to_underlying(
                                              stereo_channel::_max)},
-                             {.name = box("Channel A"s),
-                              .value_to_string = &to_stereo_channel_string})},
+                             {.value_to_string = &to_stereo_channel_string})},
                     {to_underlying(parameter_key::channel_b),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Channel B"s),
                                      .default_value = to_underlying(
                                              stereo_channel::right),
                                      .min = to_underlying(stereo_channel::_min),
                                      .max = to_underlying(
                                              stereo_channel::_max)},
-                             {.name = box("Channel B"s),
-                              .value_to_string = &to_stereo_channel_string})},
+                             {.value_to_string = &to_stereo_channel_string})},
                     {to_underlying(parameter_key::gain_a),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Gain A"s),
                                      .default_value = 1.f,
                                      .min = dB_ival::min_gain,
                                      .max = dB_ival::max_gain,
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
-                             {.name = box("Gain A"s),
-                              .value_to_string = &to_dB_string})},
+                             {.value_to_string = &to_dB_string})},
                     {to_underlying(parameter_key::gain_b),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Gain B"s),
                                      .default_value = 1.f,
                                      .min = dB_ival::min_gain,
                                      .max = dB_ival::max_gain,
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
-                             {.name = box("Gain B"s),
-                              .value_to_string = &to_dB_string})},
+                             {.value_to_string = &to_dB_string})},
                     {to_underlying(parameter_key::freeze),
                      ui_params_factory.make_parameter(
-                             runtime::bool_parameter{.default_value = false},
-                             {.name = box("Freeze"s),
-                              .value_to_string =
+                             runtime::bool_parameter{
+                                     .name = box("Freeze"s),
+                                     .default_value = false},
+                             {.value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
             }),

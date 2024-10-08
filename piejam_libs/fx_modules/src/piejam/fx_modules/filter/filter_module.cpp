@@ -85,14 +85,15 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                     {to_underlying(parameter_key::type),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Type"s),
                                      .default_value = to_underlying(type::lp2),
                                      .min = 0,
                                      .max = 7},
-                             {.name = box("Type"s),
-                              .value_to_string = &to_type_string})},
+                             {.value_to_string = &to_type_string})},
                     {to_underlying(parameter_key::cutoff),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Cutoff"s),
                                      .default_value = 440.f,
                                      .min = 10.f,
                                      .max = 20000.f,
@@ -101,11 +102,11 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .from_normalized =
                                              &runtime::parameter::
                                                      from_normalized_log},
-                             {.name = box("Cutoff"s),
-                              .value_to_string = &to_cutoff_string})},
+                             {.value_to_string = &to_cutoff_string})},
                     {to_underlying(parameter_key::resonance),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Resonance"s),
                                      .default_value = 0.f,
                                      .min = 0.f,
                                      .max = 1.f,
@@ -115,8 +116,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .from_normalized =
                                              &runtime::parameter::
                                                      from_normalized_linear},
-                             {.name = box("Resonance"s),
-                              .value_to_string = &to_resonance_string})}}),
+                             {.value_to_string = &to_resonance_string})}}),
             .streams = box(runtime::fx::module_streams{
                     {to_underlying(stream_key::in_out),
                      args.streams.emplace(

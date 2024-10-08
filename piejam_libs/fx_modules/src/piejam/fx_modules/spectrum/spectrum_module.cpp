@@ -88,65 +88,68 @@ make_module(runtime::internal_fx_module_factory_args const& args)
             .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::stream_a_active),
                      ui_params_factory.make_parameter(
-                             runtime::bool_parameter{.default_value = true},
-                             {.name = box("Stream A Active"s),
-                              .value_to_string =
+                             runtime::bool_parameter{
+                                     .name = box("Stream A Active"s),
+                                     .default_value = true},
+                             {.value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
                     {to_underlying(parameter_key::stream_b_active),
                      ui_params_factory.make_parameter(
-                             runtime::bool_parameter{.default_value = false},
-                             {.name = box("Stream B Active"s),
-                              .value_to_string =
+                             runtime::bool_parameter{
+                                     .name = box("Stream B Active"s),
+                                     .default_value = false},
+                             {.value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
                     {to_underlying(parameter_key::channel_a),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Channel A"s),
                                      .default_value = to_underlying(
                                              stereo_channel::left),
                                      .min = to_underlying(stereo_channel::_min),
                                      .max = to_underlying(
                                              stereo_channel::_max)},
-                             {.name = box("Channel A"s),
-                              .value_to_string = &to_stereo_channel_string})},
+                             {.value_to_string = &to_stereo_channel_string})},
                     {to_underlying(parameter_key::channel_b),
                      ui_params_factory.make_parameter(
                              runtime::int_parameter{
+                                     .name = box("Channel B"s),
                                      .default_value = to_underlying(
                                              stereo_channel::right),
                                      .min = to_underlying(stereo_channel::_min),
                                      .max = to_underlying(
                                              stereo_channel::_max)},
-                             {.name = box("Channel B"s),
-                              .value_to_string = &to_stereo_channel_string})},
+                             {.value_to_string = &to_stereo_channel_string})},
                     {to_underlying(parameter_key::gain_a),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Gain A"s),
                                      .default_value = 1.f,
                                      .min = dB_ival::min_gain,
                                      .max = dB_ival::max_gain,
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
-                             {.name = box("Gain A"s),
-                              .value_to_string = &to_dB_string})},
+                             {.value_to_string = &to_dB_string})},
                     {to_underlying(parameter_key::gain_b),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Gain B"s),
                                      .default_value = 1.f,
                                      .min = dB_ival::min_gain,
                                      .max = dB_ival::max_gain,
                                      .to_normalized = dB_ival::to_normalized,
                                      .from_normalized =
                                              dB_ival::from_normalized},
-                             {.name = box("Gain B"s),
-                              .value_to_string = &to_dB_string})},
+                             {.value_to_string = &to_dB_string})},
                     {to_underlying(parameter_key::freeze),
                      ui_params_factory.make_parameter(
-                             runtime::bool_parameter{.default_value = false},
-                             {.name = box("Freeze"s),
-                              .value_to_string =
+                             runtime::bool_parameter{
+                                     .name = box("Freeze"s),
+                                     .default_value = false},
+                             {.value_to_string =
                                       &runtime::
                                               bool_parameter_value_to_string})},
             }),

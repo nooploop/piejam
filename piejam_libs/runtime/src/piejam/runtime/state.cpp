@@ -480,12 +480,13 @@ make_aux_send_parameter(ParameterFactory& ui_params_factory)
 
     return ui_params_factory.make_parameter(
             parameter::float_descriptor{
+                    .name = box("Send"s),
                     .default_value = 0.f,
                     .min = 0.f,
                     .max = 1.f,
                     .to_normalized = &to_normalized_send,
                     .from_normalized = &from_normalized_send},
-            {.name = box("Send"s), .value_to_string = &volume_to_string});
+            {.value_to_string = &volume_to_string});
 }
 
 template <class ParameterFactory>
@@ -609,15 +610,17 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                     ui_params_factory)),
             .volume = ui_params_factory.make_parameter(
                     float_parameter{
+                            .name = box("Volume"s),
                             .default_value = 1.f,
                             .min = 0.f,
                             .max = math::from_dB(6.f),
                             .to_normalized = &to_normalized_volume,
                             .from_normalized = &from_normalized_volume},
-                    {.name = box("Volume"s),
-                     .value_to_string = &volume_to_string}),
+                    {.value_to_string = &volume_to_string}),
             .pan_balance = ui_params_factory.make_parameter(
                     float_parameter{
+                            .name = box(
+                                    bus_type_to(bus_type, "Pan"s, "Balance"s)),
                             .default_value = 0.f,
                             .min = -1.f,
                             .max = 1.f,
@@ -625,20 +628,22 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                             .to_normalized = &parameter::to_normalized_linear,
                             .from_normalized =
                                     &parameter::from_normalized_linear},
-                    {.name = box(bus_type_to(bus_type, "Pan"s, "Balance"s)),
-                     .value_to_string = &float_parameter_value_to_string}),
+                    {.value_to_string = &float_parameter_value_to_string}),
             .record = ui_params_factory.make_parameter(
-                    bool_parameter{.default_value = false},
-                    {.name = box("Record"s),
-                     .value_to_string = &bool_parameter_value_to_string}),
+                    bool_parameter{
+                            .name = box("Record"s),
+                            .default_value = false},
+                    {.value_to_string = &bool_parameter_value_to_string}),
             .mute = ui_params_factory.make_parameter(
-                    bool_parameter{.default_value = false},
-                    {.name = box("Mute"s),
-                     .value_to_string = &bool_parameter_value_to_string}),
+                    bool_parameter{
+                            .name = box("Mute"s),
+                            .default_value = false},
+                    {.value_to_string = &bool_parameter_value_to_string}),
             .solo = ui_params_factory.make_parameter(
-                    bool_parameter{.default_value = false},
-                    {.name = box("Solo"s),
-                     .value_to_string = &bool_parameter_value_to_string}),
+                    bool_parameter{
+                            .name = box("Solo"s),
+                            .default_value = false},
+                    {.value_to_string = &bool_parameter_value_to_string}),
             .peak_level = parameter_factory{st.params}.make_parameter(
                     parameter::stereo_level_descriptor{}),
             .rms_level = parameter_factory{st.params}.make_parameter(

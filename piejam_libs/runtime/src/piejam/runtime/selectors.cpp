@@ -893,8 +893,8 @@ make_fx_parameter_name_selector(fx::parameter_id const fx_param_id)
     return std::visit(
             [](auto param_id) -> selector<boxed_string> {
                 return [param_id](state const& st) {
-                    auto const* const desc = st.ui_params.find(param_id);
-                    return desc ? desc->name : boxed_string{};
+                    auto const* const desc = st.params.find(param_id);
+                    return desc ? desc->param.name : boxed_string{};
                 };
             },
             fx_param_id);

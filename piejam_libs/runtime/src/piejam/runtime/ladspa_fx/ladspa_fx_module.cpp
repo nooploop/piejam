@@ -61,6 +61,7 @@ private:
                 port_desc.index,
                 ui_params_factory.make_parameter(
                         float_parameter{
+                                .name = box(port_desc.name),
                                 .default_value = p.default_value,
                                 .min = p.min,
                                 .max = p.max,
@@ -76,7 +77,6 @@ private:
                                                 : &parameter::
                                                           from_normalized_linear},
                         {
-                                .name = box(port_desc.name),
                                 .value_to_string =
                                         &float_parameter_value_to_string,
                         }));
@@ -95,11 +95,11 @@ private:
                 port_desc.index,
                 ui_params_factory.make_parameter(
                         int_parameter{
+                                .name = box(port_desc.name),
                                 .default_value = p.default_value,
                                 .min = p.min,
                                 .max = p.max},
                         {
-                                .name = box(port_desc.name),
                                 .value_to_string =
                                         &int_parameter_value_to_string,
                         }));
@@ -115,9 +115,10 @@ private:
         module_params.emplace(
                 port_desc.index,
                 ui_params_factory.make_parameter(
-                        bool_parameter{.default_value = p.default_value},
-                        {
+                        bool_parameter{
                                 .name = box(port_desc.name),
+                                .default_value = p.default_value},
+                        {
                                 .value_to_string =
                                         &bool_parameter_value_to_string,
                         }));

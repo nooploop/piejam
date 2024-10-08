@@ -4,12 +4,16 @@
 
 #pragma once
 
+#include <piejam/boxed_string.h>
+
 namespace piejam::runtime::parameter
 {
 
 struct bool_descriptor
 {
     using value_type = bool;
+
+    boxed_string name;
 
     value_type default_value{};
 };

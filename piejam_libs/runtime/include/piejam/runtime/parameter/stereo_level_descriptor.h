@@ -5,6 +5,7 @@
 #pragma once
 
 #include <piejam/audio/pair.h>
+#include <piejam/boxed_string.h>
 
 namespace piejam::runtime::parameter
 {
@@ -12,6 +13,8 @@ namespace piejam::runtime::parameter
 struct stereo_level_descriptor
 {
     using value_type = audio::pair<float>;
+
+    boxed_string name;
 
     value_type default_value{};
 };

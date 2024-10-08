@@ -198,17 +198,17 @@ make_fx_chain_components(
         component_map& comps,
         component_map& prev_comps,
         fx::modules_t const& fx_modules,
-        ui_parameters_map const& ui_params,
+        parameters_map const& params,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
         fx::simple_ladspa_processor_factory const& ladspa_fx_proc_factory,
         audio::sample_rate const sample_rate)
 {
     auto get_fx_param_name =
-            [&ui_params](fx::parameter_id id) -> std::string_view {
+            [&params](fx::parameter_id id) -> std::string_view {
         return std::visit(
                 [&](auto param_id) -> std::string_view {
-                    return *ui_params[param_id].name;
+                    return *params[param_id].param.name;
                 },
                 id);
     };
@@ -846,7 +846,7 @@ audio_engine::rebuild(
             comps,
             m_impl->comps,
             st.fx_modules,
-            st.ui_params,
+            st.params,
             m_impl->param_procs,
             m_impl->stream_procs,
             ladspa_fx_proc_factory,

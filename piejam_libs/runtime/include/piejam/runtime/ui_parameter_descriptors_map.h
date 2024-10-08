@@ -16,7 +16,6 @@ struct ui_parameter_map_slot
     using value_to_string_fn =
             std::string (*)(parameter::value_type_t<Parameter>);
 
-    boxed_string name;
     value_to_string_fn value_to_string{};
 };
 

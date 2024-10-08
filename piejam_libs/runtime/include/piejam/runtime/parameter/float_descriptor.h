@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/boxed_string.h>
+
 namespace piejam::runtime::parameter
 {
 
@@ -12,6 +14,8 @@ struct float_descriptor
     using value_type = float;
     using to_normalized_f = float (*)(float_descriptor const&, float);
     using from_normalized_f = float (*)(float_descriptor const&, float);
+
+    boxed_string name;
 
     float default_value{};
 

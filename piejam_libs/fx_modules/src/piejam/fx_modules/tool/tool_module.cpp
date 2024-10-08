@@ -58,6 +58,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                     {to_underlying(parameter_key::gain),
                      ui_params_factory.make_parameter(
                              runtime::float_parameter{
+                                     .name = box("Gain"s),
                                      .default_value = 1.f,
                                      .min = math::from_dB(dB_ival::min),
                                      .max = math::from_dB(dB_ival::max),
@@ -66,7 +67,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                      .from_normalized =
                                              dB_ival::from_normalized},
                              {
-                                     .name = box("Gain"s),
+
                                      .value_to_string = &to_dB_string,
                              })}}),
             .streams = {}};

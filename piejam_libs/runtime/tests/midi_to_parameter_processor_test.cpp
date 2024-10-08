@@ -118,6 +118,7 @@ struct midi_to_float_parameter_processor_test
             .buffer_size = 16};
 
     float_parameter param{
+            .name = boxed_string{},
             .default_value = 7.f,
             .min = 5.f,
             .max = 10.f,
@@ -185,7 +186,12 @@ struct midi_to_int_parameter_processor_test
             .event_outputs = ev_out_bufs,
             .buffer_size = 16};
 
-    int_parameter param{.default_value = 10, .min = 10, .max = 19};
+    int_parameter param{
+            .name = boxed_string{},
+            .default_value = 10,
+            .min = 10,
+            .max = 19,
+    };
 
     std::unique_ptr<audio::engine::processor> proc{
             make_midi_cc_to_parameter_processor(param)};
