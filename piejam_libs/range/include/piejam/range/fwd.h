@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <cstddef>
-
 namespace piejam::range
 {
 
