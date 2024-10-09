@@ -35,8 +35,8 @@ public:
         }
         else
         {
-            m_delegate_method(
-                    [&mw_fs, clone = a.clone()]() { mw_fs.dispatch(*clone); });
+            m_delegate_method([dispatch = mw_fs.dispatch_f(),
+                               clone = a.clone()]() { dispatch(*clone); });
         }
     }
 

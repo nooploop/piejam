@@ -18,11 +18,9 @@ public:
             middleware_functors<State, Action> const& mw_fs,
             Action const& a) const
     {
-        using mw_fs_t = middleware_functors<State, Action>;
         if (auto* const ta = as_thunk_action(a))
         {
-            (*ta)(std::bind_front(&mw_fs_t::get_state, mw_fs),
-                  std::bind_front(&mw_fs_t::dispatch, mw_fs));
+            (*ta)(mw_fs.get_state_f(), mw_fs.dispatch_f());
         }
         else
         {

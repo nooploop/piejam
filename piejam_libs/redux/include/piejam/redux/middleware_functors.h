@@ -7,7 +7,7 @@
 #include <piejam/redux/concepts.h>
 #include <piejam/redux/functors.h>
 
-#include <cassert>
+#include <boost/assert.hpp>
 
 namespace piejam::redux
 {
@@ -29,25 +29,35 @@ public:
 
     auto get_state() const -> State const&
     {
-        assert(m_get_state);
+        BOOST_ASSERT(m_get_state);
         return m_get_state();
+    }
+
+    auto get_state_f() const
+    {
+        return m_get_state;
     }
 
     void dispatch(Action const& a) const
     {
-        assert(m_dispatch);
+        BOOST_ASSERT(m_dispatch);
         m_dispatch(a);
+    }
+
+    auto dispatch_f() const
+    {
+        return m_dispatch;
     }
 
     void next(Action const& a) const
     {
-        assert(m_next);
+        BOOST_ASSERT(m_next);
         m_next(a);
     }
 
 private:
-    get_state_f<State> m_get_state;
-    dispatch_f<Action> m_dispatch;
+    redux::get_state_f<State> m_get_state;
+    redux::dispatch_f<Action> m_dispatch;
     next_f<Action> m_next;
 };
 
