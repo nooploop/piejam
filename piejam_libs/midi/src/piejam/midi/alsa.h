@@ -92,7 +92,14 @@ class midi_devices
 {
 public:
     midi_devices(midi_client_id_t in_client_id, midi_port_t in_port);
+
+    midi_devices(midi_devices const&) = delete;
+    midi_devices(midi_devices&&) noexcept = delete;
+
     ~midi_devices();
+
+    auto operator=(midi_devices const&) -> midi_devices& = delete;
+    auto operator=(midi_devices&&) noexcept -> midi_devices& = delete;
 
     [[nodiscard]]
     auto connect_input(midi_client_id_t, midi_port_t) -> bool;

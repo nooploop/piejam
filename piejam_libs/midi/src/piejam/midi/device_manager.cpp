@@ -65,9 +65,9 @@ private:
     alsa_midi_devices_t const& m_devices;
 };
 
-struct alsa_input_processor final : input_event_handler
+struct alsa_input_event_handler final : input_event_handler
 {
-    alsa_input_processor(
+    alsa_input_event_handler(
             alsa::midi_io& mio,
             std::unordered_map<device_id_t, alsa::midi_device> const& devices)
         : m_midi_io(mio)
@@ -98,8 +98,8 @@ private:
 class alsa_device_manager final : public device_manager
 {
 public:
-    auto activate_input_device(device_id_t const& device_id) -> bool override;
-    void deactivate_input_device(device_id_t const& device_id) override;
+    auto activate_input_device(device_id_t device_id) -> bool override;
+    void deactivate_input_device(device_id_t device_id) override;
 
     auto update_devices() -> std::vector<device_update> override;
 
@@ -172,7 +172,7 @@ private:
 };
 
 auto
-alsa_device_manager::activate_input_device(device_id_t const& device_id) -> bool
+alsa_device_manager::activate_input_device(device_id_t const device_id) -> bool
 {
     if (auto it = m_alsa_input_devices.find(device_id);
         it != m_alsa_input_devices.end())
@@ -186,7 +186,7 @@ alsa_device_manager::activate_input_device(device_id_t const& device_id) -> bool
 }
 
 void
-alsa_device_manager::deactivate_input_device(device_id_t const& device_id)
+alsa_device_manager::deactivate_input_device(device_id_t const device_id)
 {
     if (auto it = m_alsa_input_devices.find(device_id);
         it != m_alsa_input_devices.end())
@@ -217,7 +217,7 @@ auto
 alsa_device_manager::make_input_event_handler()
         -> std::unique_ptr<input_event_handler>
 {
-    return std::make_unique<alsa_input_processor>(
+    return std::make_unique<alsa_input_event_handler>(
             m_midi_io,
             m_alsa_input_devices);
 }

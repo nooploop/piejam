@@ -18,8 +18,8 @@ class device_manager
 public:
     virtual ~device_manager() = default;
 
-    virtual auto activate_input_device(device_id_t const&) -> bool = 0;
-    virtual void deactivate_input_device(device_id_t const&) = 0;
+    virtual auto activate_input_device(device_id_t) -> bool = 0;
+    virtual void deactivate_input_device(device_id_t) = 0;
 
     virtual auto update_devices() -> std::vector<device_update> = 0;
 
