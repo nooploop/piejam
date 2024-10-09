@@ -28,4 +28,13 @@ using key = unsigned;
 template <class Value>
 struct assignment;
 
+template <class Parameter>
+concept has_default_value = requires { Parameter::default_value; };
+
+template <class Parameter>
+concept has_value_to_string_fn = requires {
+    typename Parameter::value_to_string_fn;
+    Parameter::value_to_string;
+};
+
 } // namespace piejam::runtime::parameter

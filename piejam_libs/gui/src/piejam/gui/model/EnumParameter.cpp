@@ -24,11 +24,11 @@ struct EnumParameter::Impl
 EnumParameter::EnumParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        ParameterId const& param)
-    : IntParameter{store_dispatch, state_change_subscriber, param}
+        runtime::parameter_id param_id)
+    : IntParameter{store_dispatch, state_change_subscriber, param_id}
     , m_impl{make_pimpl<Impl>(observe_once(
               runtime::selectors::make_int_parameter_enum_values_selector(
-                      std::get<runtime::int_parameter_id>(param))))}
+                      std::get<runtime::int_parameter_id>(param_id))))}
 
 {
 }

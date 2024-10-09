@@ -10,6 +10,6 @@
 namespace piejam::runtime::actions
 {
 
-auto reset_fx_parameter_to_default_value(fx::parameter_id) -> thunk_action;
+auto reset_fx_parameter_to_default_value(parameter_id) -> thunk_action;
 
 } // namespace piejam::runtime::actions

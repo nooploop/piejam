@@ -5,8 +5,7 @@
 #pragma once
 
 #include <piejam/gui/PropertyMacros.h>
-#include <piejam/gui/model/Subscribable.h>
-#include <piejam/gui/model/SubscribableModel.h>
+#include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <piejam/pimpl.h>
@@ -15,7 +14,7 @@
 namespace piejam::gui::model
 {
 
-class StereoLevelParameter : public Subscribable<SubscribableModel>
+class StereoLevelParameter : public Parameter
 {
     Q_OBJECT
 
@@ -26,7 +25,9 @@ public:
     StereoLevelParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            runtime::stereo_level_parameter_id const&);
+            runtime::parameter_id);
+
+    static constexpr auto StaticType = Type::StereoLevel;
 
 private:
     void onSubscribe() override;

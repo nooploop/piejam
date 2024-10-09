@@ -292,6 +292,11 @@ apply_fx_midi_assignments(
         if (auto it = fx_mod.parameters->find(key);
             it != fx_mod.parameters->end())
         {
+            BOOST_ASSERT(std::visit(
+                    []<class ParamId>(ParamId) {
+                        return is_midi_assignable_v<ParamId>;
+                    },
+                    it->second));
             new_assignments.emplace(it->second, value);
         }
     }

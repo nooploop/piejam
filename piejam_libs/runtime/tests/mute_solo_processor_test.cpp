@@ -32,12 +32,14 @@ struct mute_solo_processor_test
             ev_in_bufs.add(ev_port);
         }
 
-        ev_in_bufs.set(0, ev_in_mute_buf);
-        ev_in_bufs.set(1, ev_in_muted_by_solo_buf);
+        ev_in_bufs.set(0, ev_in_solo_buf);
+        ev_in_bufs.set(1, ev_in_mute_buf);
+        ev_in_bufs.set(2, ev_in_muted_by_solo_buf);
     }
 
     audio::engine::event_buffer_memory ev_buf_mem{1024};
     std::pmr::memory_resource* ev_buf_pmr_mem{&ev_buf_mem.memory_resource()};
+    audio::engine::event_buffer<bool> ev_in_solo_buf{ev_buf_pmr_mem};
     audio::engine::event_buffer<bool> ev_in_mute_buf{ev_buf_pmr_mem};
     audio::engine::event_buffer<bool> ev_in_muted_by_solo_buf{ev_buf_pmr_mem};
     audio::engine::event_input_buffers ev_in_bufs;

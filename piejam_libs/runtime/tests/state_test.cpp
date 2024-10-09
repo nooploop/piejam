@@ -51,11 +51,13 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_channel)
     auto mute_value = sut.params[channel.mute].value.get();
     EXPECT_EQ(false, mute_value);
 
-    auto const& level_param = sut.params[channel.peak_level].param;
-    EXPECT_EQ(stereo_level{}, level_param.default_value);
-    auto level_value = sut.params[channel.peak_level].value.get();
-    EXPECT_EQ(0.f, level_value.left);
-    EXPECT_EQ(0.f, level_value.right);
+    auto peak_level_value = sut.params[channel.peak_level].value.get();
+    EXPECT_EQ(0.f, peak_level_value.left);
+    EXPECT_EQ(0.f, peak_level_value.right);
+
+    auto rms_level_value = sut.params[channel.rms_level].value.get();
+    EXPECT_EQ(0.f, rms_level_value.left);
+    EXPECT_EQ(0.f, rms_level_value.right);
 }
 
 TEST_F(state_with_one_mixer_input,

@@ -37,7 +37,7 @@ struct parameter_map_slot;
 using parameters_map = parameter::map<parameter_map_slot>;
 
 using parameter_processor_factory = boost::mp11::
-        mp_rename<parameters_t, processors::parameter_processor_factory>;
+        mp_rename<parameter_ids_t, processors::parameter_processor_factory>;
 
 template <template <class> class... Value>
 class parameter_factory;

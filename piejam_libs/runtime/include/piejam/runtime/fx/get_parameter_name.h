@@ -12,7 +12,6 @@
 namespace piejam::runtime::fx
 {
 
-using get_parameter_name =
-        std::function<std::string_view(fx::parameter_id const&)>;
+using get_parameter_name = std::function<std::string_view(parameter_id const&)>;
 
 } // namespace piejam::runtime::fx

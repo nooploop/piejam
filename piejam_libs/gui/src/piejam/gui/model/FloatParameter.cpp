@@ -23,9 +23,9 @@ struct FloatParameter::Impl
 FloatParameter::FloatParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        ParameterId const& param)
-    : Parameter{store_dispatch, state_change_subscriber, param}
-    , m_impl{make_pimpl<Impl>(std::get<runtime::float_parameter_id>(param))}
+        runtime::parameter_id param_id)
+    : Parameter{store_dispatch, state_change_subscriber, param_id}
+    , m_impl{make_pimpl<Impl>(std::get<runtime::float_parameter_id>(param_id))}
 {
     setBipolar(observe_once(
             runtime::selectors::make_float_parameter_bipolar_selector(

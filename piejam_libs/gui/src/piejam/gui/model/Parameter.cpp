@@ -8,6 +8,7 @@
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/MidiAssignable.h>
+#include <piejam/gui/model/StereoLevelParameter.h>
 
 #include <piejam/integral_constant.h>
 #include <piejam/math.h>
@@ -30,7 +31,10 @@ namespace
 using parameter_id_to_FxParameter = boost::mp11::mp_list<
         boost::mp11::mp_list<runtime::bool_parameter_id, BoolParameter>,
         boost::mp11::mp_list<runtime::float_parameter_id, FloatParameter>,
-        boost::mp11::mp_list<runtime::int_parameter_id, IntParameter>>;
+        boost::mp11::mp_list<runtime::int_parameter_id, IntParameter>,
+        boost::mp11::mp_list<
+                runtime::stereo_level_parameter_id,
+                StereoLevelParameter>>;
 
 } // namespace
 
@@ -106,15 +110,17 @@ makeParameter(
         -> std::unique_ptr<Parameter>
 {
     return std::visit(
-            [&]<class T>(T const&) -> std::unique_ptr<Parameter> {
+            [&]<class ParamId>(ParamId const typed_param_id)
+                    -> std::unique_ptr<Parameter> {
                 using FxParameterType = boost::mp11::mp_at_c<
-                        boost::mp11::
-                                mp_map_find<parameter_id_to_FxParameter, T>,
+                        boost::mp11::mp_map_find<
+                                parameter_id_to_FxParameter,
+                                ParamId>,
                         1>;
                 return std::make_unique<FxParameterType>(
                         dispatch,
                         state_change_subscriber,
-                        paramId);
+                        typed_param_id);
             },
             paramId);
 }

@@ -37,11 +37,6 @@ class ladspa_manager;
 struct module;
 struct registry;
 
-using parameter_id =
-        std::variant<bool_parameter_id, float_parameter_id, int_parameter_id>;
-
-using parameter_value = std::variant<bool, float, int>;
-
 using parameter_value_assignment = parameter::assignment<parameter_value>;
 using parameter_midi_assignment = parameter::assignment<midi_assignment>;
 

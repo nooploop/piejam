@@ -22,9 +22,9 @@ struct BoolParameter::Impl
 BoolParameter::BoolParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        ParameterId const& param)
-    : Parameter(store_dispatch, state_change_subscriber, param)
-    , m_impl{make_pimpl<Impl>(std::get<runtime::bool_parameter_id>(param))}
+        runtime::parameter_id param_id)
+    : Parameter(store_dispatch, state_change_subscriber, param_id)
+    , m_impl{make_pimpl<Impl>(std::get<runtime::bool_parameter_id>(param_id))}
 {
 }
 

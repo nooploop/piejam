@@ -27,7 +27,7 @@ public:
     FloatParameter(
             runtime::store_dispatch,
             runtime::subscriber&,
-            piejam::gui::model::ParameterId const&);
+            runtime::parameter_id);
 
     static constexpr auto StaticType = Type::Float;
 

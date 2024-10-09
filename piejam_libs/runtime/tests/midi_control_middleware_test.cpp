@@ -337,7 +337,7 @@ TEST_F(midi_control_middleware_test,
                 next(WhenDynamicCastTo<actions::request_info_update const&>(
                         _)));
 
-        actions::request_parameters_update::parameter_ids_t expected_ids;
+        actions::request_parameters_update::parameter_id_sets expected_ids;
         std::get<1>(expected_ids).emplace(param_id);
 
         EXPECT_CALL(

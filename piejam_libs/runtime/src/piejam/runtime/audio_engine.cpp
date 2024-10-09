@@ -206,12 +206,12 @@ make_fx_chain_components(
         audio::sample_rate const sample_rate)
 {
     auto get_fx_param_name =
-            [&params](fx::parameter_id id) -> std::string_view {
+            [&params](parameter_id param_id) -> std::string_view {
         return std::visit(
-                [&](auto param_id) -> std::string_view {
-                    return *params[param_id].param.name;
+                [&](auto typed_param_id) -> std::string_view {
+                    return *params[typed_param_id].param.name;
                 },
-                id);
+                param_id);
     };
 
     for (auto const& [fx_mod_id, fx_mod] : fx_modules)
@@ -279,18 +279,18 @@ make_midi_assignment_processors(
             engine_processors::midi_assign,
             processors::make_midi_assignment_processor(assignments));
 
-    for (auto const& [id, assignment] : assignments)
+    for (auto const& [param_id, assignment] : assignments)
     {
         std::visit(
-                [&](auto const& param_id) {
-                    auto const& param = params[param_id].param;
+                [&]<class ParamId>(ParamId const typed_param_id) {
+                    auto const& param = params[typed_param_id].param;
 
-                    std::tuple const proc_id{param_id, assignment};
+                    std::tuple const proc_id{typed_param_id, assignment};
                     if (auto proc = prev_procs.find(proc_id))
                     {
                         procs.insert(proc_id, std::move(proc));
                     }
-                    else
+                    else if constexpr (is_midi_assignable_v<ParamId>)
                     {
                         procs.insert(
                                 proc_id,
@@ -298,7 +298,7 @@ make_midi_assignment_processors(
                                         param));
                     }
                 },
-                id);
+                param_id);
     }
 }
 

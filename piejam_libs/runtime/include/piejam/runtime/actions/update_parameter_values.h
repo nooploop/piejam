@@ -6,15 +6,10 @@
 
 #include <piejam/audio/pair.h>
 #include <piejam/runtime/fwd.h>
-#include <piejam/runtime/parameter/bool_descriptor.h>
-#include <piejam/runtime/parameter/float_descriptor.h>
-#include <piejam/runtime/parameter/int_descriptor.h>
-#include <piejam/runtime/parameter/stereo_level_descriptor.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
 
 #include <boost/container/flat_map.hpp>
-#include <boost/mp11/algorithm.hpp>
 
 #include <tuple>
 
@@ -27,10 +22,10 @@ struct update_parameter_values final
     template <class Parameter>
     using id_value_map_t = boost::container::flat_map<
             parameter::id_t<Parameter>,
-            parameter::value_type_t<Parameter>>;
+            parameter_value_type_t<Parameter>>;
 
     using parameter_values_t = boost::mp11::mp_rename<
-            boost::mp11::mp_transform<id_value_map_t, parameters_t>,
+            boost::mp11::mp_transform<id_value_map_t, parameter_ids_t>,
             std::tuple>;
 
     parameter_values_t values;

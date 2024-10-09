@@ -58,9 +58,23 @@ struct parameter_map_slot
     private:
         std::shared_ptr<value_type> m_value{
                 std::make_shared<value_type>(value_type{})};
-    } value{param.default_value};
+    } value{get_default_value(param)};
 
     auto operator==(parameter_map_slot const&) const -> bool = default;
+
+private:
+    auto get_default_value(Parameter const& param)
+            -> parameter::value_type_t<Parameter>
+    {
+        if constexpr (parameter::has_default_value<Parameter>)
+        {
+            return param.default_value;
+        }
+        else
+        {
+            return {};
+        }
+    }
 };
 
 using parameters_map = parameter::map<parameter_map_slot>;

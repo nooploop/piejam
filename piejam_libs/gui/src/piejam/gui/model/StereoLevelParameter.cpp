@@ -20,9 +20,10 @@ struct StereoLevelParameter::Impl
 StereoLevelParameter::StereoLevelParameter(
         runtime::store_dispatch store_dispatch,
         runtime::subscriber& state_change_subscriber,
-        runtime::stereo_level_parameter_id const& param_id)
-    : Subscribable{store_dispatch, state_change_subscriber}
-    , m_impl{make_pimpl<Impl>(param_id)}
+        runtime::parameter_id param_id)
+    : Parameter{store_dispatch, state_change_subscriber, param_id}
+    , m_impl{make_pimpl<Impl>(
+              std::get<runtime::stereo_level_parameter_id>(param_id))}
 {
 }
 

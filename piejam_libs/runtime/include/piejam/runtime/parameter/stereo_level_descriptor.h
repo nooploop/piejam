@@ -15,8 +15,6 @@ struct stereo_level_descriptor
     using value_type = audio::pair<float>;
 
     boxed_string name;
-
-    value_type default_value{};
 };
 
 } // namespace piejam::runtime::parameter

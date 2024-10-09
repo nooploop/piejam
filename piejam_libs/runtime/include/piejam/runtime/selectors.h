@@ -183,9 +183,8 @@ auto make_fx_module_parameters_selector(fx::module_id)
         -> selector<box<fx::module_parameters>>;
 auto make_fx_module_can_move_up_selector(mixer::channel_id) -> selector<bool>;
 auto make_fx_module_can_move_down_selector(mixer::channel_id) -> selector<bool>;
-auto make_fx_parameter_name_selector(fx::parameter_id)
-        -> selector<boxed_string>;
-auto make_fx_parameter_value_string_selector(fx::parameter_id)
+auto make_fx_parameter_name_selector(parameter_id) -> selector<boxed_string>;
+auto make_fx_parameter_value_string_selector(parameter_id)
         -> selector<std::string>;
 auto make_fx_module_streams_selector(fx::module_id)
         -> selector<box<fx::module_streams>>;

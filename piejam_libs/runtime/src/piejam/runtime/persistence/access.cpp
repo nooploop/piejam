@@ -67,7 +67,10 @@ save_app_config(
     }
 }
 
-static auto
+namespace
+{
+
+auto
 export_external_audio_device_configs(
         external_audio::devices_t const& devices,
         external_audio::device_ids_t const& device_ids)
@@ -83,7 +86,7 @@ export_external_audio_device_configs(
             });
 }
 
-static auto
+auto
 export_parameter_values(fx::module const& fx_mod, parameters_map const& params)
         -> std::vector<fx::parameter_value_assignment>
 {
@@ -92,10 +95,13 @@ export_parameter_values(fx::module const& fx_mod, parameters_map const& params)
     for (auto&& [key, fx_param_id] : *fx_mod.parameters)
     {
         std::visit(
-                [&](auto&& param) {
-                    result.emplace_back(fx::parameter_value_assignment{
-                            key,
-                            params[param].value.get()});
+                [&]<class ParamId>(ParamId param) {
+                    if constexpr (is_persistable_parameter_v<ParamId>)
+                    {
+                        result.emplace_back(fx::parameter_value_assignment{
+                                key,
+                                params[param].value.get()});
+                    }
                 },
                 fx_param_id);
     }
@@ -103,7 +109,7 @@ export_parameter_values(fx::module const& fx_mod, parameters_map const& params)
     return result;
 }
 
-static auto
+auto
 export_fx_midi_assignments(
         fx::module const& fx_mod,
         midi_assignments_map const& midi_assigns)
@@ -128,7 +134,7 @@ export_fx_midi_assignments(
     return result;
 }
 
-static auto
+auto
 export_fx_plugin(
         state const& st,
         fx::module const& fx_mod,
@@ -144,7 +150,7 @@ export_fx_plugin(
     return fx;
 }
 
-static auto
+auto
 export_fx_plugin(
         state const& st,
         fx::module const& fx_mod,
@@ -161,7 +167,7 @@ export_fx_plugin(
     return plug;
 }
 
-static auto
+auto
 export_fx_plugin(
         state const& st,
         fx::module const& fx_mod,
@@ -179,7 +185,7 @@ export_fx_plugin(
     return plug;
 }
 
-static auto
+auto
 export_fx_chain(state const& st, fx::chain_t const& fx_chain)
         -> persistence::session::fx_chain_t
 {
@@ -198,7 +204,7 @@ export_fx_chain(state const& st, fx::chain_t const& fx_chain)
     return result;
 }
 
-static auto
+auto
 export_mixer_midi(state const& st, mixer::channel const& mixer_channel)
         -> persistence::session::mixer_midi
 {
@@ -225,7 +231,7 @@ export_mixer_midi(state const& st, mixer::channel const& mixer_channel)
     return result;
 }
 
-static auto
+auto
 export_mixer_parameters(state const& st, mixer::channel const& mixer_channel)
 {
     session::mixer_parameters result;
@@ -235,7 +241,7 @@ export_mixer_parameters(state const& st, mixer::channel const& mixer_channel)
     return result;
 }
 
-static auto
+auto
 channel_index(mixer::state const& st, mixer::channel_id const channel_id)
 {
     return channel_id == st.main
@@ -243,7 +249,7 @@ channel_index(mixer::state const& st, mixer::channel_id const channel_id)
                    : algorithm::index_of(*st.inputs, channel_id) + 1;
 }
 
-static auto
+auto
 device_index(
         external_audio::state const& st,
         external_audio::device_id const device_id)
@@ -253,7 +259,7 @@ device_index(
                             : algorithm::index_of(*st.outputs, device_id);
 }
 
-static auto
+auto
 export_mixer_io(state const& st, mixer::io_address_t const& addr)
 {
     return std::visit(
@@ -299,7 +305,7 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
             addr);
 }
 
-static auto
+auto
 export_mixer_aux_sends(state const& st, mixer::aux_sends_t const& aux_sends)
 {
     std::vector<session::mixer_aux_send> result;
@@ -316,7 +322,7 @@ export_mixer_aux_sends(state const& st, mixer::aux_sends_t const& aux_sends)
     return result;
 }
 
-static auto
+auto
 export_mixer_channel(
         state const& st,
         mixer::channel_id channel_id,
@@ -335,7 +341,7 @@ export_mixer_channel(
     return result;
 }
 
-static auto
+auto
 export_mixer_channels(state const& st, mixer::channel_ids_t const& channel_ids)
 {
     return algorithm::transform_to_vector(
@@ -347,6 +353,8 @@ export_mixer_channels(state const& st, mixer::channel_ids_t const& channel_ids)
                         st.mixer_state.channels[channel_id]);
             });
 }
+
+} // namespace
 
 void
 save_session(std::filesystem::path const& file, state const& st)
