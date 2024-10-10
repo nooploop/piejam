@@ -7,6 +7,7 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/actions/apply_app_config.h
     include/piejam/runtime/actions/apply_session.h
     include/piejam/runtime/actions/audio_engine_action.h
+    include/piejam/runtime/actions/audio_engine_sync.h
     include/piejam/runtime/actions/audio_io_process_action.h
     include/piejam/runtime/actions/control_midi_assignment.h
     include/piejam/runtime/actions/deactivate_midi_device.h
@@ -30,9 +31,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/actions/refresh_midi_devices.h
     include/piejam/runtime/actions/reload_missing_plugins.h
     include/piejam/runtime/actions/request_info_update.h
-    include/piejam/runtime/actions/request_mixer_levels_update.h
-    include/piejam/runtime/actions/request_parameters_update.h
-    include/piejam/runtime/actions/request_streams_update.h
     include/piejam/runtime/actions/reset_fx_parameter_to_default_value.h
     include/piejam/runtime/actions/root_view_actions.h
     include/piejam/runtime/actions/save_app_config.h
@@ -43,8 +41,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/actions/select_sample_rate.h
     include/piejam/runtime/actions/set_float_parameter_normalized.h
     include/piejam/runtime/actions/set_parameter_value.h
-    include/piejam/runtime/actions/update_parameter_values.h
-    include/piejam/runtime/actions/update_streams.h
     include/piejam/runtime/audio_engine.h
     include/piejam/runtime/audio_engine_middleware.h
     include/piejam/runtime/audio_stream.h
@@ -136,6 +132,7 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/actions/activate_midi_device.cpp
     src/piejam/runtime/actions/apply_app_config.cpp
     src/piejam/runtime/actions/apply_session.cpp
+    src/piejam/runtime/actions/audio_engine_sync.cpp
     src/piejam/runtime/actions/control_midi_assignment.cpp
     src/piejam/runtime/actions/deactivate_midi_device.cpp
     src/piejam/runtime/actions/delete_fx_module.cpp
@@ -145,16 +142,11 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/actions/insert_fx_module.cpp
     src/piejam/runtime/actions/mixer_actions.cpp
     src/piejam/runtime/actions/move_fx_module.cpp
-    src/piejam/runtime/actions/recording.cpp
-    src/piejam/runtime/actions/request_mixer_levels_update.cpp
-    src/piejam/runtime/actions/request_parameters_update.cpp
     src/piejam/runtime/actions/reset_fx_parameter_to_default_value.cpp
     src/piejam/runtime/actions/root_view_actions.cpp
     src/piejam/runtime/actions/scan_ladspa_fx_plugins.cpp
     src/piejam/runtime/actions/set_float_parameter_normalized.cpp
     src/piejam/runtime/actions/set_parameter_value.cpp
-    src/piejam/runtime/actions/update_parameter_values.cpp
-    src/piejam/runtime/actions/update_streams.cpp
     src/piejam/runtime/audio_engine.cpp
     src/piejam/runtime/audio_engine_middleware.cpp
     src/piejam/runtime/components/make_fx.cpp

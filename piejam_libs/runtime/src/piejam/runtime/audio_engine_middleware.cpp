@@ -7,6 +7,7 @@
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/apply_session.h>
+#include <piejam/runtime/actions/audio_engine_sync.h>
 #include <piejam/runtime/actions/control_midi_assignment.h>
 #include <piejam/runtime/actions/deactivate_midi_device.h>
 #include <piejam/runtime/actions/delete_fx_module.h>
@@ -17,14 +18,10 @@
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/move_fx_module.h>
 #include <piejam/runtime/actions/recording.h>
-#include <piejam/runtime/actions/request_parameters_update.h>
-#include <piejam/runtime/actions/request_streams_update.h>
 #include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_sample_rate.h>
 #include <piejam/runtime/actions/set_parameter_value.h>
-#include <piejam/runtime/actions/update_parameter_values.h>
-#include <piejam/runtime/actions/update_streams.h>
 #include <piejam/runtime/audio_engine.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/middleware_functors.h>
@@ -438,24 +435,96 @@ audio_engine_middleware::process_engine_action(
 template <>
 void
 audio_engine_middleware::process_engine_action(
+        middleware_functors const&,
+        actions::sync_parameter const& a)
+{
+    m_synced_parameters.insert(a.param);
+}
+
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        middleware_functors const&,
+        actions::unsync_parameter const& a)
+{
+    m_synced_parameters.erase(a.param);
+}
+
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        middleware_functors const&,
+        actions::sync_stream const& a)
+{
+    m_synced_streams.insert(a.stream);
+}
+
+template <>
+void
+audio_engine_middleware::process_engine_action(
+        middleware_functors const&,
+        actions::unsync_stream const& a)
+{
+    m_synced_streams.erase(a.stream);
+}
+
+template <std::ranges::range Parameters>
+static void
+collect_parameter_updates(
+        Parameters&& params,
+        audio_engine const& engine,
+        actions::audio_engine_sync_update& action)
+{
+    algorithm::for_each_visit(std::forward<Parameters>(params), [&](auto id) {
+        if (auto value = engine.get_parameter_update(id); value)
+        {
+            action.push_back(id, *value);
+        }
+    });
+}
+
+template <std::ranges::range Streams>
+static void
+collect_stream_updates(
+        Streams&& streams,
+        audio_engine const& engine,
+        actions::audio_engine_sync_update& action)
+{
+    for (auto id : streams)
+    {
+        if (auto captured = engine.get_stream(id); !captured->empty())
+        {
+            action.streams.emplace(id, std::move(captured));
+        }
+    }
+}
+
+template <>
+void
+audio_engine_middleware::process_engine_action(
         middleware_functors const& mw_fs,
-        actions::request_parameters_update const& a)
+        actions::request_audio_engine_sync const&)
 {
     if (m_engine)
     {
-        actions::update_parameter_values next_action;
+        state const& st = mw_fs.get_state();
 
-        boost::mp11::tuple_for_each(
-                a.param_ids,
-                [this, &next_action](auto&& ids) {
-                    for (auto&& id : ids)
-                    {
-                        if (auto value = m_engine->get_parameter_update(id))
-                        {
-                            next_action.push_back(id, *value);
-                        }
-                    }
-                });
+        actions::audio_engine_sync_update next_action;
+
+        collect_parameter_updates(m_synced_parameters, *m_engine, next_action);
+        collect_parameter_updates(
+                st.midi_assignments.get() | std::views::keys,
+                *m_engine,
+                next_action);
+
+        collect_stream_updates(m_synced_streams, *m_engine, next_action);
+        if (st.recording && !st.recorder_streams->empty())
+        {
+            collect_stream_updates(
+                    *st.recorder_streams | std::views::values,
+                    *m_engine,
+                    next_action);
+        }
 
         if (!next_action.empty())
         {
@@ -468,54 +537,8 @@ template <>
 void
 audio_engine_middleware::process_engine_action(
         middleware_functors const& mw_fs,
-        actions::request_streams_update const& a)
-{
-    if (m_engine)
-    {
-        actions::update_streams next_action;
-
-        for (auto const& id : a.streams)
-        {
-            auto const& st = mw_fs.get_state();
-            if (audio_stream_buffer const* stream = st.streams.find(id); stream)
-            {
-                if (auto captured = m_engine->get_stream(id);
-                    !captured->empty())
-                {
-                    BOOST_ASSERT(stream->get().num_channels() != 0);
-                    BOOST_ASSERT(
-                            captured->num_channels() ==
-                            stream->get().num_channels());
-                    next_action.streams.emplace(id, std::move(captured));
-                }
-            }
-        }
-
-        if (!next_action.streams.empty())
-        {
-            mw_fs.next(next_action);
-        }
-    }
-}
-
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        middleware_functors const& mw_fs,
         actions::stop_recording const& a)
 {
-    actions::request_streams_update streams_update;
-    for (auto const& [channel_id, stream_id] :
-         *mw_fs.get_state().recorder_streams)
-    {
-        streams_update.streams.emplace(stream_id);
-    }
-
-    if (!streams_update.streams.empty())
-    {
-        process_engine_action(mw_fs, streams_update);
-    }
-
     mw_fs.next(a);
     rebuild(mw_fs.get_state());
 }

@@ -9,7 +9,6 @@
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
-#include <piejam/runtime/ui/thunk_action.h>
 
 namespace piejam::runtime::actions
 {
@@ -27,7 +26,5 @@ struct stop_recording final
     , visitable_audio_engine_action<stop_recording>
 {
 };
-
-auto request_recorder_streams_update() -> thunk_action;
 
 } // namespace piejam::runtime::actions

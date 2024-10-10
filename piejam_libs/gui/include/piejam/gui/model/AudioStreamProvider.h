@@ -17,9 +17,6 @@ class AudioStreamProvider : public SubscribableModel
 {
     Q_OBJECT
 
-public:
-    Q_INVOKABLE virtual void requestUpdate() = 0;
-
 signals:
     void captured(piejam::gui::model::AudioStream);
 };

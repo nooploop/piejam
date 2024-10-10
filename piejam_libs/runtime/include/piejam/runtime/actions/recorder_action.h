@@ -14,7 +14,7 @@ struct recorder_action_visitor
     : ui::action_visitor_interface<
               start_recording,
               stop_recording,
-              update_streams>
+              audio_engine_sync_update>
 {
 };
 

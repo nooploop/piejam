@@ -10,8 +10,6 @@
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/apply_app_config.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
-#include <piejam/runtime/actions/request_info_update.h>
-#include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/state.h>
@@ -204,27 +202,6 @@ midi_control_middleware::process_midi_control_action(
     boost::unique_erase(m_enabled_devices);
 
     mw_fs.next(action);
-}
-
-template <>
-void
-midi_control_middleware::process_midi_control_action(
-        middleware_functors const& mw_fs,
-        actions::request_info_update const& action)
-{
-    mw_fs.next(action);
-
-    actions::request_parameters_update param_update;
-
-    auto const& midi_assigns = *mw_fs.get_state().midi_assignments;
-    algorithm::for_each_visit(
-            midi_assigns | std::views::keys,
-            [&param_update](auto const& id) { param_update.push_back(id); });
-
-    if (!param_update.empty())
-    {
-        mw_fs.next(param_update);
-    }
 }
 
 } // namespace piejam::runtime

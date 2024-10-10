@@ -21,6 +21,7 @@
 #include <piejam/redux/thunk_middleware.h>
 #include <piejam/reselect/subscriber.h>
 #include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/runtime/actions/audio_engine_sync.h>
 #include <piejam/runtime/actions/load_app_config.h>
 #include <piejam/runtime/actions/load_session.h>
 #include <piejam/runtime/actions/recording.h>
@@ -48,6 +49,7 @@
 #include <piejam/thread/affinity.h>
 
 #include <QQuickStyle>
+#include <QQuickWindow>
 #include <QStandardPaths>
 #include <QTimer>
 #include <QtGui/QGuiApplication>
@@ -58,6 +60,7 @@
 #include <spdlog/spdlog.h>
 
 #include <boost/core/demangle.hpp>
+#include <boost/polymorphic_cast.hpp>
 
 #include <filesystem>
 
@@ -255,24 +258,34 @@ main(int argc, char* argv[]) -> int
 
     system::avg_cpu_load_tracker avg_cpu_load(4);
 
-    auto timer = new QTimer(&app);
-    QObject::connect(timer, &QTimer::timeout, [&]() {
-        store.dispatch(runtime::actions::refresh_midi_devices{});
+    // slow updates
+    {
+        auto timer = new QTimer(&app);
+        QObject::connect(timer, &QTimer::timeout, [&]() {
+            store.dispatch(runtime::actions::refresh_midi_devices{});
 
-        store.dispatch(runtime::actions::request_recorder_streams_update());
+            modelManager.info()->setCpuTemp(system::cpu_temp());
 
-        modelManager.info()->setCpuTemp(system::cpu_temp());
+            avg_cpu_load.update();
+            auto cpu_load_per_core = avg_cpu_load.per_core();
+            modelManager.info()->setCpuLoad(QList<float>(
+                    cpu_load_per_core.begin(),
+                    cpu_load_per_core.end()));
 
-        avg_cpu_load.update();
-        auto cpu_load_per_core = avg_cpu_load.per_core();
-        modelManager.info()->setCpuLoad(QList<float>(
-                cpu_load_per_core.begin(),
-                cpu_load_per_core.end()));
+            modelManager.info()->setDiskUsage(static_cast<int>(
+                    std::round(system::disk_usage(locs.home_dir) * 100)));
+        });
+        timer->start(std::chrono::seconds(1));
+    }
 
-        modelManager.info()->setDiskUsage(static_cast<int>(
-                std::round(system::disk_usage(locs.home_dir) * 100)));
-    });
-    timer->start(std::chrono::seconds(1));
+    // gui frame updates
+    {
+        auto timer = new QTimer(&app);
+        QObject::connect(timer, &QTimer::timeout, [&]() {
+            store.dispatch(runtime::actions::request_audio_engine_sync{});
+        });
+        timer->start(std::chrono::milliseconds(16));
+    }
 
     auto const app_exec_result = app.exec();
 

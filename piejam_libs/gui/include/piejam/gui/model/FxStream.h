@@ -18,10 +18,9 @@ class FxStream final : public Subscribable<AudioStreamProvider>
 public:
     FxStream(runtime::store_dispatch, runtime::subscriber&, StreamId const&);
 
-    void requestUpdate() override;
-
 private:
     void onSubscribe() override;
+    void onUnsubscribe() override;
 
     struct Impl;
     pimpl<Impl> m_impl;

@@ -12,6 +12,8 @@
 #include <piejam/thread/configuration.h>
 #include <piejam/thread/fwd.h>
 
+#include <boost/container/flat_set.hpp>
+
 #include <memory>
 #include <span>
 #include <vector>
@@ -60,6 +62,9 @@ private:
 
     std::unique_ptr<audio_engine> m_engine;
     std::unique_ptr<audio::io_process> m_io_process;
+
+    boost::container::flat_set<parameter_id> m_synced_parameters;
+    boost::container::flat_set<audio_stream_id> m_synced_streams;
 };
 
 } // namespace piejam::runtime

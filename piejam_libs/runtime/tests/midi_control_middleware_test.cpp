@@ -7,8 +7,6 @@
 #include <piejam/midi/device_update.h>
 #include <piejam/runtime/actions/activate_midi_device.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
-#include <piejam/runtime/actions/request_info_update.h>
-#include <piejam/runtime/actions/request_parameters_update.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/midi_control_middleware.h>
 #include <piejam/runtime/ui/action.h>
@@ -307,47 +305,6 @@ TEST_F(midi_control_middleware_test,
                         Field(&actions::save_app_config::enabled_midi_devices,
                               ElementsAre(std::string("test"))))));
 
-        sut(make_middleware_functors(mf_mock), action);
-    }
-}
-
-TEST_F(midi_control_middleware_test,
-       request_info_update_will_request_parameter_updates_for_each_midi_assignment)
-{
-    using testing::_;
-    using testing::Field;
-    using testing::InSequence;
-    using testing::ReturnRef;
-    using testing::WhenDynamicCastTo;
-
-    midi_control_middleware sut(
-            [=]() -> std::vector<midi::device_update> { return {}; });
-
-    state st;
-    EXPECT_CALL(mf_mock, get_state()).WillRepeatedly(ReturnRef(st));
-
-    auto param_id = float_parameter_id::generate();
-    st.midi_assignments = midi_assignments_map{{param_id, midi_assignment{}}};
-
-    {
-        InSequence seq;
-
-        EXPECT_CALL(
-                mf_mock,
-                next(WhenDynamicCastTo<actions::request_info_update const&>(
-                        _)));
-
-        actions::request_parameters_update::parameter_id_sets expected_ids;
-        std::get<1>(expected_ids).emplace(param_id);
-
-        EXPECT_CALL(
-                mf_mock,
-                next(WhenDynamicCastTo<
-                        actions::request_parameters_update const&>(
-                        Field(&actions::request_parameters_update::param_ids,
-                              expected_ids))));
-
-        actions::request_info_update action;
         sut(make_middleware_functors(mf_mock), action);
     }
 }

@@ -7,7 +7,7 @@
 #include <piejam/gui/model/AudioStreamListener.h>
 
 #include <piejam/audio/multichannel_buffer.h>
-#include <piejam/runtime/actions/request_streams_update.h>
+#include <piejam/runtime/actions/audio_engine_sync.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::gui::model
@@ -38,16 +38,16 @@ FxStream::onSubscribe()
                 }
             });
 
-    requestUpdates(std::chrono::milliseconds{16}, [this]() {
-        requestUpdate();
-    });
+    runtime::actions::sync_stream action;
+    action.stream = m_impl->streamId;
+    dispatch(action);
 }
 
 void
-FxStream::requestUpdate()
+FxStream::onUnsubscribe()
 {
-    runtime::actions::request_streams_update action;
-    action.streams.emplace(m_impl->streamId);
+    runtime::actions::unsync_stream action;
+    action.stream = m_impl->streamId;
     dispatch(action);
 }
 

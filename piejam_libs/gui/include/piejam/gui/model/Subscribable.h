@@ -75,6 +75,10 @@ protected:
     {
     }
 
+    virtual void onUnsubscribe()
+    {
+    }
+
     template <class ParameterT, class ParameterIdT>
     void makeParameter(
             std::unique_ptr<ParameterT>& param,
@@ -107,6 +111,8 @@ private:
 
     void unsubscribe() override
     {
+        onUnsubscribe();
+
         m_subs.erase(m_subs_id);
 
         if (m_updateTimerId != 0)

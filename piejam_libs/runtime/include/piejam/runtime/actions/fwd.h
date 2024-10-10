@@ -31,6 +31,7 @@ struct select_period_count;
 struct activate_midi_device;
 struct deactivate_midi_device;
 
+struct set_external_audio_device_name;
 struct set_external_audio_device_bus_channel;
 struct add_external_audio_device;
 struct remove_external_audio_device;
@@ -43,19 +44,20 @@ struct move_mixer_channel_left;
 struct move_mixer_channel_right;
 struct show_fx_browser;
 
-struct request_parameters_update;
 struct request_info_update;
-struct request_streams_update;
-
-struct update_streams;
-
-struct set_external_audio_device_name;
 
 template <class>
 struct set_parameter_value;
 using set_bool_parameter = set_parameter_value<bool_parameter>;
 using set_float_parameter = set_parameter_value<float_parameter>;
 using set_int_parameter = set_parameter_value<int_parameter>;
+
+struct sync_parameter;
+struct unsync_parameter;
+struct sync_stream;
+struct unsync_stream;
+struct request_audio_engine_sync;
+struct audio_engine_sync_update;
 
 struct delete_fx_module;
 struct insert_internal_fx_module;

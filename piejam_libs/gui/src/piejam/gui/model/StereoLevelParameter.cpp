@@ -4,8 +4,8 @@
 
 #include <piejam/gui/model/StereoLevelParameter.h>
 
+#include <piejam/runtime/actions/audio_engine_sync.h>
 #include <piejam/runtime/selectors.h>
-#include <piejam/runtime/ui/thunk_action.h>
 
 #include <fmt/format.h>
 
@@ -36,6 +36,18 @@ StereoLevelParameter::onSubscribe()
                 setLevelLeft(x.left);
                 setLevelRight(x.right);
             });
+
+    runtime::actions::sync_parameter action;
+    action.param = this->paramId();
+    dispatch(action);
+}
+
+void
+StereoLevelParameter::onUnsubscribe()
+{
+    runtime::actions::unsync_parameter action;
+    action.param = this->paramId();
+    dispatch(action);
 }
 
 } // namespace piejam::gui::model

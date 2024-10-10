@@ -4,10 +4,9 @@
 
 #include <piejam/runtime/recorder_middleware.h>
 
+#include <piejam/runtime/actions/audio_engine_sync.h>
 #include <piejam/runtime/actions/recorder_action.h>
 #include <piejam/runtime/actions/recording.h>
-#include <piejam/runtime/actions/request_streams_update.h>
-#include <piejam/runtime/actions/update_streams.h>
 #include <piejam/runtime/generic_action_visitor.h>
 #include <piejam/runtime/middleware_functors.h>
 #include <piejam/runtime/state.h>
@@ -158,7 +157,7 @@ struct recorder_action_visitor
         }});
     }
 
-    void operator()(actions::update_streams const& a)
+    void operator()(actions::audio_engine_sync_update const& a)
     {
         for (auto const& [stream_id, buffer] : a.streams)
         {

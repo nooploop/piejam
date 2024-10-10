@@ -11,11 +11,7 @@
 #include <piejam/algorithm/edit_script.h>
 #include <piejam/audio/types.h>
 #include <piejam/runtime/actions/mixer_actions.h>
-#include <piejam/runtime/actions/request_mixer_levels_update.h>
 #include <piejam/runtime/selectors.h>
-#include <piejam/runtime/ui/thunk_action.h>
-
-#include <boost/range/algorithm_ext/push_back.hpp>
 
 namespace piejam::gui::model
 {
@@ -25,14 +21,11 @@ struct Mixer::Impl
     Impl(runtime::store_dispatch store_dispatch,
          runtime::subscriber& state_change_subscriber,
          runtime::mixer::channel_id main_channel)
-        : main_channel_id{main_channel}
-        , mainChannel{store_dispatch, state_change_subscriber, main_channel}
+        : mainChannel{store_dispatch, state_change_subscriber, main_channel}
     {
     }
 
-    runtime::mixer::channel_id main_channel_id;
     box<runtime::mixer::channel_ids_t> user_channel_ids;
-    runtime::mixer::channel_ids_t all_channel_ids;
 
     MixerChannelModels mainChannel;
     MixerChannelsList userChannels;
@@ -80,15 +73,6 @@ Mixer::onSubscribe()
                                 }});
 
                 m_impl->user_channel_ids = user_channel_ids;
-
-                m_impl->all_channel_ids.clear();
-
-                // main channel must be added first, for correct order in
-                // fxchains list
-                m_impl->all_channel_ids.emplace_back(m_impl->main_channel_id);
-                boost::range::push_back(
-                        m_impl->all_channel_ids,
-                        *m_impl->user_channel_ids);
             });
 }
 
@@ -110,13 +94,6 @@ Mixer::addStereoChannel(QString const& newChannelName)
     action.bus_type = audio::bus_type::stereo;
     action.auto_assign_input = true;
     dispatch(action);
-}
-
-void
-Mixer::requestLevelsUpdate()
-{
-    dispatch(runtime::actions::request_mixer_levels_update(
-            m_impl->all_channel_ids));
 }
 
 } // namespace piejam::gui::model
