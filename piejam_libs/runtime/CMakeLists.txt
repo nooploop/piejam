@@ -123,7 +123,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/ui/action_visitor.h
     include/piejam/runtime/ui/cloneable_action.h
     include/piejam/runtime/ui/fwd.h
-    include/piejam/runtime/ui/profiling_reducer.h
     include/piejam/runtime/ui/thunk_action.h
     include/piejam/runtime/ui/thunk_action_impl.h
     include/piejam/runtime/ui/update_state_action.h
