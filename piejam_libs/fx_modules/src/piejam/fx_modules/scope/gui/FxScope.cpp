@@ -125,6 +125,13 @@ FxScope::FxScope(
             m_impl->activeA,
             parameters.at(to_underlying(parameter_key::stream_a_active)));
 
+    if (m_impl->busType == BusType::Mono)
+    {
+        // There is no control visible in mono mode, so we subscribe when parent
+        // is subscribed.
+        connectSubscribableChild(*m_impl->activeA);
+    }
+
     makeParameter(
             m_impl->activeB,
             parameters.at(to_underlying(parameter_key::stream_b_active)));
