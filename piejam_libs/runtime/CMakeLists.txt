@@ -61,7 +61,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/fx/module.h
     include/piejam/runtime/fx/registry.h
     include/piejam/runtime/fx/unavailable_ladspa.h
-    include/piejam/runtime/generic_action_visitor.h
     include/piejam/runtime/internal_fx_component_factory.h
     include/piejam/runtime/internal_fx_module_factory.h
     include/piejam/runtime/ladspa_fx/ladspa_fx_component.h
@@ -124,7 +123,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/ui/action_visitor.h
     include/piejam/runtime/ui/cloneable_action.h
     include/piejam/runtime/ui/fwd.h
-    include/piejam/runtime/ui/generic_action_visitor.h
     include/piejam/runtime/ui/profiling_reducer.h
     include/piejam/runtime/ui/thunk_action.h
     include/piejam/runtime/ui/thunk_action_impl.h

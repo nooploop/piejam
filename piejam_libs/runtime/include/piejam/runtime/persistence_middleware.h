@@ -13,6 +13,10 @@ class persistence_middleware
 {
 public:
     void operator()(middleware_functors const&, action const&);
+
+private:
+    template <class Action>
+    void process_persistence_action(middleware_functors const&, Action const&);
 };
 
 } // namespace piejam::runtime

@@ -21,6 +21,9 @@ public:
     void operator()(middleware_functors const&, action const&);
 
 private:
+    template <class Action>
+    void process_recorder_action(middleware_functors const&, Action const&);
+
     struct impl;
     pimpl<impl> m_impl;
 };
