@@ -187,7 +187,6 @@ target_link_libraries(piejam_runtime
     piejam_midi
     piejam_range
     piejam_redux
-    piejam_reselect
 
     PRIVATE
     piejam_algorithm

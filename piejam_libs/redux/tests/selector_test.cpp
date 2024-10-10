@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/reselect/selector.h>
+#include <piejam/redux/selector.h>
 
 #include <gtest/gtest.h>
 
-namespace piejam::reselect::test
+namespace piejam::redux::test
 {
 
 namespace
@@ -33,4 +33,4 @@ TEST(selector, make_selector_from_lambda)
     EXPECT_EQ(10, sut.get(st));
 }
 
-} // namespace piejam::reselect::test
+} // namespace piejam::redux::test

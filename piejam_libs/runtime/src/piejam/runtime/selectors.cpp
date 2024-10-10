@@ -13,7 +13,7 @@
 #include <piejam/functional/memo.h>
 #include <piejam/npos.h>
 #include <piejam/range/indices.h>
-#include <piejam/reselect/selector.h>
+#include <piejam/redux/selector.h>
 
 #include <boost/hof/match.hpp>
 #include <boost/hof/unpack.hpp>

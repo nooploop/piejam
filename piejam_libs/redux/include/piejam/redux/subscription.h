@@ -9,7 +9,7 @@
 #include <cassert>
 #include <memory>
 
-namespace piejam::reselect
+namespace piejam::redux
 {
 
 class subscription
@@ -41,4 +41,4 @@ private:
     std::shared_ptr<token> m_token;
 };
 
-} // namespace piejam::reselect
+} // namespace piejam::redux

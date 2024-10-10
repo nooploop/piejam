@@ -19,8 +19,8 @@
 #include <piejam/redux/store.h>
 #include <piejam/redux/thread_delegate_middleware.h>
 #include <piejam/redux/thunk_middleware.h>
-#include <piejam/reselect/subscriber.h>
-#include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/redux/subscriber.h>
+#include <piejam/redux/subscriptions_manager.h>
 #include <piejam/runtime/actions/audio_engine_sync.h>
 #include <piejam/runtime/actions/load_app_config.h>
 #include <piejam/runtime/actions/load_session.h>

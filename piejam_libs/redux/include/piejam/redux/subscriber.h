@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <piejam/reselect/selector.h>
-#include <piejam/reselect/subscription.h>
+#include <piejam/redux/selector.h>
+#include <piejam/redux/subscription.h>
 
 #include <nod/nod.hpp>
 
@@ -13,7 +13,7 @@
 #include <memory>
 #include <utility>
 
-namespace piejam::reselect
+namespace piejam::redux
 {
 
 template <class State>
@@ -74,4 +74,4 @@ private:
     nod::signal<void(State const&)> m_observer;
 };
 
-} // namespace piejam::reselect
+} // namespace piejam::redux

@@ -5,7 +5,7 @@
 #include <piejam/gui/model/Log.h>
 
 #include <piejam/log/generic_log_sink.h>
-#include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/redux/subscriptions_manager.h>
 #include <piejam/runtime/selectors.h>
 
 #include <fmt/chrono.h>

@@ -6,9 +6,8 @@
 
 #include <concepts>
 #include <functional>
-#include <type_traits>
 
-namespace piejam::reselect
+namespace piejam::redux
 {
 
 template <class Value, class State>
@@ -35,4 +34,4 @@ private:
     function_type m_f;
 };
 
-} // namespace piejam::reselect
+} // namespace piejam::redux

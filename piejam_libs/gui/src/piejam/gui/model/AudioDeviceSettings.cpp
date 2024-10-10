@@ -9,7 +9,7 @@
 #include <piejam/algorithm/index_of.h>
 #include <piejam/audio/sound_card_descriptor.h>
 #include <piejam/redux/store.h>
-#include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/redux/subscriptions_manager.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
 #include <piejam/runtime/actions/refresh_devices.h>
 #include <piejam/runtime/actions/select_period_count.h>

@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <piejam/reselect/subscriber.h>
+#include <piejam/redux/subscriber.h>
 
 #include <unordered_map>
 
-namespace piejam::reselect
+namespace piejam::redux
 {
 
 template <class Id>
@@ -36,4 +36,4 @@ private:
     std::unordered_multimap<Id, subscription> m_conns;
 };
 
-} // namespace piejam::reselect
+} // namespace piejam::redux

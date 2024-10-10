@@ -15,7 +15,7 @@
 #include <piejam/entity_id.h>
 #include <piejam/io_direction.h>
 #include <piejam/midi/device_id.h>
-#include <piejam/reselect/fwd.h>
+#include <piejam/redux/fwd.h>
 #include <piejam/runtime/external_audio_fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/fwd.h>
@@ -32,7 +32,7 @@ namespace piejam::runtime::selectors
 {
 
 template <class Value>
-using selector = reselect::selector<Value, state>;
+using selector = redux::selector<Value, state>;
 
 template <class Available, class Current>
 struct choice_model

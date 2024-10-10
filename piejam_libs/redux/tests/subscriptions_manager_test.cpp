@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/reselect/subscriptions_manager.h>
+#include <piejam/redux/subscriptions_manager.h>
 
 #include <gtest/gtest.h>
 
-namespace piejam::reselect::test
+namespace piejam::redux::test
 {
 
 namespace
@@ -93,4 +93,4 @@ TEST(subscriptions_manager, destruction_will_disconnect_all_observers)
     EXPECT_EQ(1, handler_called);
 }
 
-} // namespace piejam::reselect::test
+} // namespace piejam::redux::test

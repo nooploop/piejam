@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/reselect/subscriber.h>
+#include <piejam/redux/subscriber.h>
 
 #include <gtest/gtest.h>
 
-namespace piejam::reselect::test
+namespace piejam::redux::test
 {
 
 namespace
@@ -122,4 +122,4 @@ TEST(subscriber, observe_once_will_get_current_state)
     EXPECT_EQ(5, sut.observe_once(sel));
 }
 
-} // namespace piejam::reselect::test
+} // namespace piejam::redux::test
