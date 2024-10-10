@@ -41,7 +41,6 @@
 #include <piejam/runtime/store.h>
 #include <piejam/runtime/subscriber.h>
 #include <piejam/runtime/ui/action.h>
-#include <piejam/runtime/ui/action_tracker_middleware.h>
 #include <piejam/runtime/ui/thunk_action.h>
 #include <piejam/system/avg_cpu_load_tracker.h>
 #include <piejam/system/cpu_temp.h>

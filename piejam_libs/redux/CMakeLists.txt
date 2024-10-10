@@ -5,6 +5,7 @@
 add_library(piejam_redux INTERFACE)
 
 target_sources(piejam_redux INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/action_tracker_middleware.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/concepts.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/functors.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/redux/fwd.h

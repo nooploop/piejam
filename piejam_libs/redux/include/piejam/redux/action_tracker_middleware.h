@@ -4,9 +4,7 @@
 
 #pragma once
 
-#include <piejam/runtime/ui/fwd.h>
-
-#include <piejam/runtime/ui/action.h>
+#include <piejam/redux/middleware_functors.h>
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/statistics/count.hpp>
@@ -15,25 +13,25 @@
 #include <boost/core/demangle.hpp>
 
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <typeindex>
 #include <unordered_map>
 
-namespace piejam::runtime::ui
+namespace piejam::redux
 {
 
 class action_tracker_middleware
 {
 public:
-    action_tracker_middleware(next_f next, std::string name)
-        : m_next(std::move(next))
-        , m_name(std::move(name))
+    action_tracker_middleware(std::filesystem::path stats_path)
+        : m_stats_path(std::move(stats_path))
     {
     }
 
     ~action_tracker_middleware()
     {
-        std::ofstream stats_file(m_name);
+        std::ofstream stats_file(m_stats_path);
 
         for (auto const& [ty, acc] : m_stats)
         {
@@ -42,22 +40,24 @@ public:
                        << std::chrono::duration_cast<std::chrono::microseconds>(
                                   boost::accumulators::mean(acc))
                                   .count()
-                       << std::endl;
+                       << " us\n";
         }
     }
 
-    void operator()(action const& a)
+    template <class State, class Action>
+    void operator()(
+            redux::middleware_functors<State, Action> const& mw_fs,
+            Action const& a)
     {
         auto const started = std::chrono::steady_clock::now();
-        m_next(a);
+        mw_fs.next(a);
         auto const stopped = std::chrono::steady_clock::now();
 
         m_stats[typeid(a)](stopped - started);
     }
 
 private:
-    next_f m_next;
-    std::string m_name;
+    std::filesystem::path m_stats_path;
 
     using acc_t = boost::accumulators::accumulator_set<
             std::chrono::steady_clock::duration,
@@ -68,4 +68,4 @@ private:
     std::unordered_map<std::type_index, acc_t> m_stats;
 };
 
-} // namespace piejam::runtime::ui
+} // namespace piejam::redux
