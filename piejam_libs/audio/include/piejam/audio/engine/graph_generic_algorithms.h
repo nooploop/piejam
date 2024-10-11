@@ -13,7 +13,6 @@
 #include <boost/assert.hpp>
 
 #include <algorithm>
-#include <memory>
 #include <utility>
 #include <vector>
 

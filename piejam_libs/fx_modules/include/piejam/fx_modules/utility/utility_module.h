@@ -14,7 +14,10 @@ namespace piejam::fx_modules::utility
 
 enum class parameter_key : runtime::parameter::key
 {
-    gain
+    invert,
+    invert_left,
+    invert_right,
+    gain,
 };
 
 auto make_module(runtime::internal_fx_module_factory_args const&)
