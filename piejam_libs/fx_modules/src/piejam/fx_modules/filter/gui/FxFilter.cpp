@@ -7,14 +7,13 @@
 #include <piejam/fx_modules/filter/filter_internal_id.h>
 #include <piejam/fx_modules/filter/filter_module.h>
 
+#include <piejam/gui/model/AudioStreamChannelSplitter.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
-#include <piejam/gui/model/ParameterId.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
-#include <piejam/gui/model/StreamId.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
 
@@ -29,13 +28,15 @@ struct FxFilter::Impl
 {
     Impl(BusType busType)
         : busType{busType}
-        , dataGenerator{std::array{busType, busType}}
     {
     }
 
     BusType busType;
 
-    SpectrumDataGenerator dataGenerator;
+    AudioStreamChannelSplitter channelSplitter{std::array{busType, busType}};
+
+    SpectrumDataGenerator dataInGenerator{std::array{busType}};
+    SpectrumDataGenerator dataOutGenerator{std::array{busType}};
 
     SpectrumData spectrumDataIn;
     SpectrumData spectrumDataOut;
@@ -77,34 +78,63 @@ FxFilter::FxFilter(
             streams());
 
     auto stereoChannel =
-            bus_type_to(busType, StereoChannel::Left, StereoChannel::Right);
-    m_impl->dataGenerator.setActive(0, true);
-    m_impl->dataGenerator.setChannel(0, stereoChannel);
+            bus_type_to(busType, StereoChannel::Left, StereoChannel::Middle);
+    m_impl->dataInGenerator.setActive(0, true);
+    m_impl->dataInGenerator.setChannel(0, stereoChannel);
 
-    m_impl->dataGenerator.setActive(1, true);
-    m_impl->dataGenerator.setChannel(1, stereoChannel);
-
-    QObject::connect(
-            &m_impl->dataGenerator,
-            &SpectrumDataGenerator::generated,
-            this,
-            [this](std::span<SpectrumDataPoints const> const dataPoints) {
-                m_impl->spectrumDataIn.set(dataPoints[0]);
-                m_impl->spectrumDataOut.set(dataPoints[1]);
-            });
+    m_impl->dataOutGenerator.setActive(0, true);
+    m_impl->dataOutGenerator.setChannel(0, stereoChannel);
 
     QObject::connect(
             m_impl->inOutStream.get(),
             &AudioStreamProvider::captured,
-            &m_impl->dataGenerator,
-            &SpectrumDataGenerator::update);
+            &m_impl->channelSplitter,
+            &AudioStreamChannelSplitter::update);
+
+    QObject::connect(
+            &m_impl->channelSplitter,
+            &AudioStreamChannelSplitter::splitted,
+            this,
+            [this](std::size_t substreamIndex, AudioStream stream) {
+                switch (substreamIndex)
+                {
+                    case 0:
+                        m_impl->dataInGenerator.update(stream);
+                        break;
+
+                    case 1:
+                        m_impl->dataOutGenerator.update(stream);
+                        break;
+
+                    default:
+                        BOOST_ASSERT(false);
+                }
+            });
+
+    QObject::connect(
+            &m_impl->dataInGenerator,
+            &SpectrumDataGenerator::generated,
+            this,
+            [this](std::span<SpectrumDataPoints const> const dataPoints) {
+                m_impl->spectrumDataIn.set(dataPoints[0]);
+            });
+
+    QObject::connect(
+            &m_impl->dataOutGenerator,
+            &SpectrumDataGenerator::generated,
+            this,
+            [this](std::span<SpectrumDataPoints const> const dataPoints) {
+                m_impl->spectrumDataOut.set(dataPoints[0]);
+            });
 }
 
 void
 FxFilter::onSubscribe()
 {
-    m_impl->dataGenerator.setSampleRate(
-            observe_once(runtime::selectors::select_sample_rate)->current);
+    auto const sample_rate =
+            observe_once(runtime::selectors::select_sample_rate)->current;
+    m_impl->dataInGenerator.setSampleRate(sample_rate);
+    m_impl->dataOutGenerator.setSampleRate(sample_rate);
 }
 
 auto

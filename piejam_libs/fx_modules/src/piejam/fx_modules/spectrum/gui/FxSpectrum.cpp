@@ -8,7 +8,6 @@
 #include <piejam/fx_modules/spectrum/spectrum_module.h>
 
 #include <piejam/gui/model/AudioStreamAmplifier.h>
-#include <piejam/gui/model/AudioStreamChannelDuplicator.h>
 #include <piejam/gui/model/BoolParameter.h>
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
@@ -24,30 +23,6 @@ namespace piejam::fx_modules::spectrum::gui
 
 using namespace piejam::gui::model;
 
-namespace
-{
-
-auto
-substreamConfigs(BusType busType) -> std::span<BusType const>
-{
-    switch (busType)
-    {
-        case BusType::Mono:
-        {
-            static std::array const configs{BusType::Mono};
-            return configs;
-        }
-
-        case BusType::Stereo:
-        {
-            static std::array const configs{BusType::Stereo, BusType::Stereo};
-            return configs;
-        }
-    }
-}
-
-} // namespace
-
 struct FxSpectrum::Impl
 {
     Impl(BusType busType)
@@ -57,9 +32,11 @@ struct FxSpectrum::Impl
 
     BusType busType;
 
-    AudioStreamAmplifier channelAmplifier{busType == BusType::Stereo ? 2u : 1u};
-    AudioStreamChannelDuplicator channelDuplicator;
-    SpectrumDataGenerator spectrumGenerator{substreamConfigs(busType)};
+    AudioStreamAmplifier channelAAmplifier{1u};
+    AudioStreamAmplifier channelBAmplifier{1u};
+
+    SpectrumDataGenerator spectrumAGenerator{std::array{busType}};
+    SpectrumDataGenerator spectrumBGenerator{std::array{busType}};
 
     std::unique_ptr<BoolParameter> activeA;
     std::unique_ptr<BoolParameter> activeB;
@@ -120,26 +97,33 @@ FxSpectrum::FxSpectrum(
 
     makeStream(to_underlying(stream_key::input), m_impl->stream, streams());
 
-    m_impl->spectrumGenerator.setActive(0, false);
-    m_impl->spectrumGenerator.setChannel(0, StereoChannel::Left);
+    m_impl->spectrumAGenerator.setActive(0, false);
+    m_impl->spectrumAGenerator.setChannel(0, StereoChannel::Left);
 
     if (m_impl->busType == BusType::Stereo)
     {
-        m_impl->spectrumGenerator.setActive(1, false);
-        m_impl->spectrumGenerator.setChannel(1, StereoChannel::Right);
+        m_impl->spectrumBGenerator.setActive(0, false);
+        m_impl->spectrumBGenerator.setChannel(0, StereoChannel::Right);
     }
 
     QObject::connect(
-            &m_impl->spectrumGenerator,
+            m_impl->stream.get(),
+            &AudioStreamProvider::captured,
+            &m_impl->channelAAmplifier,
+            &AudioStreamAmplifier::update);
+
+    QObject::connect(
+            &m_impl->channelAAmplifier,
+            &AudioStreamAmplifier::amplified,
+            &m_impl->spectrumAGenerator,
+            &SpectrumDataGenerator::update);
+
+    QObject::connect(
+            &m_impl->spectrumAGenerator,
             &SpectrumDataGenerator::generated,
             this,
             [this](std::span<SpectrumDataPoints const> dataPoints) {
                 dataA()->set(dataPoints[0]);
-
-                if (m_impl->busType == BusType::Stereo)
-                {
-                    dataB()->set(dataPoints[1]);
-                }
             });
 
     if (m_impl->busType == BusType::Stereo)
@@ -147,34 +131,22 @@ FxSpectrum::FxSpectrum(
         QObject::connect(
                 m_impl->stream.get(),
                 &AudioStreamProvider::captured,
-                &m_impl->channelDuplicator,
-                &AudioStreamChannelDuplicator::update);
-
-        QObject::connect(
-                &m_impl->channelDuplicator,
-                &AudioStreamChannelDuplicator::duplicated,
-                &m_impl->channelAmplifier,
+                &m_impl->channelBAmplifier,
                 &AudioStreamAmplifier::update);
 
         QObject::connect(
-                &m_impl->channelAmplifier,
+                &m_impl->channelBAmplifier,
                 &AudioStreamAmplifier::amplified,
-                &m_impl->spectrumGenerator,
+                &m_impl->spectrumBGenerator,
                 &SpectrumDataGenerator::update);
-    }
-    else
-    {
-        QObject::connect(
-                m_impl->stream.get(),
-                &AudioStreamProvider::captured,
-                &m_impl->channelAmplifier,
-                &AudioStreamAmplifier::update);
 
         QObject::connect(
-                &m_impl->channelAmplifier,
-                &AudioStreamAmplifier::amplified,
-                &m_impl->spectrumGenerator,
-                &SpectrumDataGenerator::update);
+                &m_impl->spectrumBGenerator,
+                &SpectrumDataGenerator::generated,
+                this,
+                [this](std::span<SpectrumDataPoints const> dataPoints) {
+                    dataB()->set(dataPoints[0]);
+                });
     }
 
     QObject::connect(
@@ -293,15 +265,17 @@ FxSpectrum::clear()
 void
 FxSpectrum::onSubscribe()
 {
-    m_impl->spectrumGenerator.setSampleRate(
-            observe_once(runtime::selectors::select_sample_rate)->current);
+    auto const sample_rate =
+            observe_once(runtime::selectors::select_sample_rate)->current;
+    m_impl->spectrumAGenerator.setSampleRate(sample_rate);
+    m_impl->spectrumBGenerator.setSampleRate(sample_rate);
 }
 
 void
 FxSpectrum::onActiveAChanged()
 {
     bool const active = m_impl->activeA->value();
-    m_impl->spectrumGenerator.setActive(0, active);
+    m_impl->spectrumAGenerator.setActive(0, active);
 
     clear();
 }
@@ -310,7 +284,7 @@ void
 FxSpectrum::onActiveBChanged()
 {
     bool const active = m_impl->activeB->value();
-    m_impl->spectrumGenerator.setActive(1, active);
+    m_impl->spectrumBGenerator.setActive(0, active);
 
     clear();
 }
@@ -319,7 +293,7 @@ void
 FxSpectrum::onChannelAChanged()
 {
     auto const x = StereoChannel{m_impl->channelA->value()};
-    m_impl->spectrumGenerator.setChannel(0, x);
+    m_impl->spectrumAGenerator.setChannel(0, x);
 
     clear();
 }
@@ -328,7 +302,7 @@ void
 FxSpectrum::onChannelBChanged()
 {
     auto const x = StereoChannel{m_impl->channelB->value()};
-    m_impl->spectrumGenerator.setChannel(1, x);
+    m_impl->spectrumBGenerator.setChannel(0, x);
 
     clear();
 }
@@ -336,20 +310,21 @@ FxSpectrum::onChannelBChanged()
 void
 FxSpectrum::onGainAChanged()
 {
-    m_impl->channelAmplifier.setGain(0, m_impl->gainA->value());
+    m_impl->channelAAmplifier.setGain(0, m_impl->gainA->value());
 }
 
 void
 FxSpectrum::onGainBChanged()
 {
-    m_impl->channelAmplifier.setGain(1, m_impl->gainB->value());
+    m_impl->channelBAmplifier.setGain(0, m_impl->gainB->value());
 }
 
 void
 FxSpectrum::onFreezeChanged()
 {
     bool const freeze = m_impl->freeze->value();
-    m_impl->spectrumGenerator.setFreeze(freeze);
+    m_impl->spectrumAGenerator.setFreeze(freeze);
+    m_impl->spectrumBGenerator.setFreeze(freeze);
 }
 
 } // namespace piejam::fx_modules::spectrum::gui
