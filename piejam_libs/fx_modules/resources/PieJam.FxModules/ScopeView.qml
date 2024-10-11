@@ -67,6 +67,14 @@ SubscribableItem {
                     if (scopeB.visible) scopeB.syncPeakLevel(syncedPeakLevel)
                 }
 
+                PJItems.FixedLinearScaleGrid {
+                    anchors.fill: parent
+
+                    ticks: [1.0, 0.0, -1.0]
+                    orientation: Qt.Vertical
+                    color: Material.frameColor
+                }
+
                 PJItems.Scope {
                     id: scopeA
 
@@ -102,6 +110,14 @@ SubscribableItem {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                PJItems.FixedLinearScaleGrid {
+                    anchors.fill: parent
+
+                    ticks: [1.0, 0.0, -1.0]
+                    orientation: Qt.Vertical
+                    color: Material.frameColor
+                }
 
                 PJItems.Waveform {
                     anchors.fill: parent
