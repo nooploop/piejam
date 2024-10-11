@@ -21,12 +21,15 @@ More [documentation](https://piejam.readthedocs.io/en/stable/)
 * Panning, stereo balance and volume controls
 * Mute and solo
 * Flexible routing between mixer channels
+* Sends
 * Fx chain per mixer channel
 * Fx modules:
     * Dual Pan
     * Filter
     * Oscilloscope
     * Spectrum Analyzer
+    * Tuner
+    * Utility
 * Support for LADSPA plugins
 * Parameter control through MIDI CC
 * Session Recorder
