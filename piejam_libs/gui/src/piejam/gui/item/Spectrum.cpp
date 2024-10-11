@@ -4,8 +4,9 @@
 
 #include <piejam/gui/item/Spectrum.h>
 
-#include <piejam/functional/in_interval.h>
 #include <piejam/gui/model/SpectrumData.h>
+
+#include <piejam/functional/in_interval.h>
 #include <piejam/math.h>
 
 #include <QSGFlatColorMaterial>
@@ -14,10 +15,9 @@
 #include <QVariant>
 
 #include <boost/assert.hpp>
+#include <boost/polymorphic_cast.hpp>
 
-#include <array>
 #include <cmath>
-#include <span>
 
 namespace piejam::gui::item
 {
@@ -68,43 +68,18 @@ struct LevelScale final
     }
 };
 
-std::array s_frequencyTicks{10.f,   20.f,   30.f,   40.f,    50.f,   60.f,
-                            70.f,   80.f,   90.f,   100.f,   200.f,  300.f,
-                            400.f,  500.f,  600.f,  700.f,   800.f,  900.f,
-                            1000.f, 2000.f, 3000.f, 4000.f,  5000.f, 6000.f,
-                            7000.f, 8000.f, 9000.f, 10000.f, 20000.f};
-std::array s_frequencyLabels{10.f, 100.f, 1000.f, 10000.f};
-
-std::array s_levelTicks{-100.f, -80.f, -60.f, -40.f, -20.f, 0.f};
-std::array s_levelLabels{-80.f, -60.f, -40.f, -20.f, 0.f};
-
 } // namespace
 
 struct Spectrum::Impl
 {
-    bool scaleIsDirty{true};
-    bool spectrumDataADirty{true};
-    bool spectrumDataBDirty{true};
-    bool spectrumColorADirty{true};
-    bool spectrumColorBDirty{true};
+    bool spectrumDataDirty{true};
+    bool colorDirty{true};
 
     FrequencyScale frequencyScale;
-    decltype(s_frequencyTicks) frequencyPositions;
-    QVariantList frequencyLabels;
-
     LevelScale levelScale;
-    decltype(s_levelTicks) levelPositions;
-    QVariantList levelLabels;
 
-    model::SpectrumData* spectrumDataA{};
-    QMetaObject::Connection spectrumDataAChangedConnection;
-    std::vector<QPointF> spectrumA;
-    model::SpectrumData* spectrumDataB{};
-    QMetaObject::Connection spectrumDataBChangedConnection;
-    std::vector<QPointF> spectrumB;
-
-    QColor spectrumColorA{255, 0, 0};
-    QColor spectrumColorB{0, 0, 255};
+    QMetaObject::Connection spectrumDataChangedConnection;
+    std::vector<QPointF> spectrumPoints;
 
     auto calcSpectrum(
             piejam::gui::model::SpectrumDataPoints const& dataPoints,
@@ -131,250 +106,40 @@ Spectrum::Spectrum(QQuickItem* parent)
 
     connect(this, &Spectrum::widthChanged, [this]() {
         m_impl->frequencyScale.size = static_cast<int>(width());
-        std::ranges::transform(
-                s_frequencyTicks,
-                m_impl->frequencyPositions.begin(),
-                [this](float const f) {
-                    return m_impl->frequencyScale.frequencyToPosition(f);
-                });
-        m_impl->frequencyLabels.clear();
-        std::ranges::transform(
-                s_frequencyLabels,
-                std::back_inserter(m_impl->frequencyLabels),
-                [this](float const f) {
-                    SpectrumScaleLabel r;
-                    r.position = m_impl->frequencyScale.frequencyToPosition(f);
-                    r.value = f;
-                    return QVariant::fromValue(r);
-                });
-        emit frequencyLabelsChanged();
-        m_impl->scaleIsDirty = true;
-        m_impl->spectrumDataADirty = true;
-        m_impl->spectrumDataBDirty = true;
+        m_impl->spectrumDataDirty = true;
         update();
     });
 
     connect(this, &Spectrum::heightChanged, [this]() {
         m_impl->levelScale.size = static_cast<int>(height());
-        std::ranges::transform(
-                s_levelTicks,
-                m_impl->levelPositions.begin(),
-                [this](float const level) {
-                    return height() - m_impl->levelScale.levelToPosition(level);
-                });
-        m_impl->levelLabels.clear();
-        std::ranges::transform(
-                s_levelLabels,
-                std::back_inserter(m_impl->levelLabels),
-                [this](float const level) {
-                    SpectrumScaleLabel r;
-                    r.position = height() -
-                                 m_impl->levelScale.levelToPosition(level);
-                    r.value = level;
-                    return QVariant::fromValue(r);
-                });
-        emit levelLabelsChanged();
-        m_impl->scaleIsDirty = true;
-        m_impl->spectrumDataADirty = true;
-        m_impl->spectrumDataBDirty = true;
+        m_impl->spectrumDataDirty = true;
         update();
     });
-}
 
-auto
-Spectrum::levelLabels() const -> QVariantList
-{
-    return m_impl->levelLabels;
-}
-
-auto
-Spectrum::spectrumAData() const noexcept -> model::SpectrumData*
-{
-    return m_impl->spectrumDataA;
-}
-
-void
-Spectrum::setSpectrumAData(model::SpectrumData* const x)
-{
-    if (m_impl->spectrumDataA != x)
-    {
-        m_impl->spectrumDataA = x;
-        emit spectrumADataChanged();
-
-        if (m_impl->spectrumDataA)
+    connect(this, &Spectrum::spectrumDataChanged, this, [this]() {
+        if (m_spectrumData)
         {
-            m_impl->spectrumDataAChangedConnection = QObject::connect(
-                    m_impl->spectrumDataA,
+            m_impl->spectrumDataChangedConnection = QObject::connect(
+                    m_spectrumData,
                     &piejam::gui::model::SpectrumData::changed,
                     this,
                     [this]() {
-                        m_impl->spectrumA = m_impl->calcSpectrum(
-                                m_impl->spectrumDataA->get(),
+                        m_impl->spectrumPoints = m_impl->calcSpectrum(
+                                m_spectrumData->get(),
                                 height());
-                        m_impl->spectrumDataADirty = true;
+                        m_impl->spectrumDataDirty = true;
                         update();
                     });
         }
         else
         {
-            QObject::disconnect(m_impl->spectrumDataAChangedConnection);
+            QObject::disconnect(m_impl->spectrumDataChangedConnection);
         }
 
-        m_impl->spectrumA.clear();
-        m_impl->spectrumDataADirty = true;
+        m_impl->spectrumPoints.clear();
+        m_impl->spectrumDataDirty = true;
         update();
-    }
-}
-
-auto
-Spectrum::spectrumBData() const noexcept -> model::SpectrumData*
-{
-    return m_impl->spectrumDataB;
-}
-
-void
-Spectrum::setSpectrumBData(model::SpectrumData* const x)
-{
-    if (m_impl->spectrumDataB != x)
-    {
-        m_impl->spectrumDataB = x;
-        emit spectrumADataChanged();
-
-        if (m_impl->spectrumDataB)
-        {
-            m_impl->spectrumDataBChangedConnection = QObject::connect(
-                    m_impl->spectrumDataB,
-                    &piejam::gui::model::SpectrumData::changed,
-                    this,
-                    [this]() {
-                        m_impl->spectrumB = m_impl->calcSpectrum(
-                                m_impl->spectrumDataB->get(),
-                                height());
-                        m_impl->spectrumDataBDirty = true;
-                        update();
-                    });
-        }
-        else
-        {
-            QObject::disconnect(m_impl->spectrumDataBChangedConnection);
-        }
-
-        m_impl->spectrumB.clear();
-        m_impl->spectrumDataBDirty = true;
-        update();
-    }
-}
-
-auto
-Spectrum::spectrumAColor() const noexcept -> QColor const&
-{
-    return m_impl->spectrumColorA;
-}
-
-void
-Spectrum::setSpectrumAColor(QColor const& c)
-{
-    if (m_impl->spectrumColorA != c)
-    {
-        m_impl->spectrumColorA = c;
-        emit spectrumAColorChanged();
-
-        m_impl->spectrumColorADirty = true;
-        update();
-    }
-}
-
-auto
-Spectrum::spectrumBColor() const noexcept -> QColor const&
-{
-    return m_impl->spectrumColorB;
-}
-
-void
-Spectrum::setSpectrumBColor(QColor const& c)
-{
-    if (m_impl->spectrumColorB != c)
-    {
-        m_impl->spectrumColorB = c;
-        emit spectrumBColorChanged();
-
-        m_impl->spectrumColorBDirty = true;
-        update();
-    }
-}
-
-auto
-Spectrum::frequencyLabels() const -> QVariantList
-{
-    return m_impl->frequencyLabels;
-}
-
-auto
-Spectrum::updateDataNode(
-        QSGNode* node,
-        std::vector<QPointF> const& data,
-        QColor const& color,
-        bool& dirtyGeometryFlag,
-        bool& dirtyMaterialFlag) -> QSGNode*
-{
-    QSGGeometryNode* geometryNode{};
-    QSGGeometry* geometry{};
-    QSGFlatColorMaterial* material{};
-
-    int const dataSize = static_cast<int>(data.size());
-    if (!node)
-    {
-        geometryNode = new QSGGeometryNode();
-        geometry = new QSGGeometry(
-                QSGGeometry::defaultAttributes_Point2D(),
-                dataSize);
-
-        geometry->setDrawingMode(QSGGeometry::DrawLineStrip);
-        geometry->setLineWidth(2);
-        geometryNode->setGeometry(geometry);
-        geometryNode->setFlag(QSGNode::OwnsGeometry);
-
-        material = new QSGFlatColorMaterial;
-        material->setColor(QColor(255, 0, 0));
-        geometryNode->setMaterial(material);
-        geometryNode->setFlag(QSGNode::OwnsMaterial);
-    }
-    else
-    {
-        geometryNode = static_cast<QSGGeometryNode*>(node);
-        geometry = geometryNode->geometry();
-        material = static_cast<QSGFlatColorMaterial*>(geometryNode->material());
-
-        if (dataSize != geometry->vertexCount())
-        {
-            geometry->allocate(dataSize);
-        }
-    }
-
-    if (dirtyGeometryFlag)
-    {
-        QSGGeometry::Point2D* vertices = geometry->vertexDataAsPoint2D();
-        for (QPointF const& p : data)
-        {
-            vertices->set(p.x(), p.y());
-            ++vertices;
-        }
-
-        geometryNode->markDirty(QSGNode::DirtyGeometry);
-
-        dirtyGeometryFlag = false;
-    }
-
-    if (dirtyMaterialFlag)
-    {
-        material->setColor(color);
-
-        geometryNode->markDirty(QSGNode::DirtyMaterial);
-
-        dirtyMaterialFlag = false;
-    }
-
-    return geometryNode;
+    });
 }
 
 auto
@@ -383,89 +148,60 @@ Spectrum::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*)
 {
     QSGGeometryNode* node{};
     QSGGeometry* geometry{};
+    QSGFlatColorMaterial* material{};
 
+    int const dataSize = static_cast<int>(m_impl->spectrumPoints.size());
     if (!oldNode)
     {
         node = new QSGGeometryNode();
         geometry = new QSGGeometry(
                 QSGGeometry::defaultAttributes_Point2D(),
-                (m_impl->frequencyPositions.size() +
-                 m_impl->levelPositions.size()) *
-                        2);
-        geometry->setDrawingMode(QSGGeometry::DrawLines);
+                dataSize);
+
+        geometry->setDrawingMode(QSGGeometry::DrawLineStrip);
+        geometry->setLineWidth(2);
         node->setGeometry(geometry);
         node->setFlag(QSGNode::OwnsGeometry);
 
-        QSGFlatColorMaterial* material = new QSGFlatColorMaterial;
-        material->setColor(QColor(255, 255, 255));
+        material = new QSGFlatColorMaterial;
+        material->setColor(QColor(255, 0, 0));
         node->setMaterial(material);
         node->setFlag(QSGNode::OwnsMaterial);
-
-        node->appendChildNode(updateDataNode(
-                nullptr,
-                m_impl->spectrumA,
-                m_impl->spectrumColorA,
-                m_impl->spectrumDataADirty,
-                m_impl->spectrumColorADirty));
-        node->appendChildNode(updateDataNode(
-                nullptr,
-                m_impl->spectrumB,
-                m_impl->spectrumColorB,
-                m_impl->spectrumDataBDirty,
-                m_impl->spectrumColorBDirty));
     }
     else
     {
-        node = static_cast<QSGGeometryNode*>(oldNode);
+        node = boost::polymorphic_downcast<QSGGeometryNode*>(oldNode);
         geometry = node->geometry();
+        material = boost::polymorphic_downcast<QSGFlatColorMaterial*>(
+                node->material());
 
-        auto dataANode = node->firstChild();
-        BOOST_ASSERT(dataANode);
-        BOOST_VERIFY(
-                dataANode == updateDataNode(
-                                     dataANode,
-                                     m_impl->spectrumA,
-                                     m_impl->spectrumColorA,
-                                     m_impl->spectrumDataADirty,
-                                     m_impl->spectrumColorADirty));
-
-        auto dataBNode = dataANode->nextSibling();
-        BOOST_ASSERT(dataBNode);
-        BOOST_VERIFY(
-                dataBNode == updateDataNode(
-                                     dataBNode,
-                                     m_impl->spectrumB,
-                                     m_impl->spectrumColorB,
-                                     m_impl->spectrumDataBDirty,
-                                     m_impl->spectrumColorBDirty));
+        if (dataSize != geometry->vertexCount())
+        {
+            geometry->allocate(dataSize);
+        }
     }
 
-    if (m_impl->scaleIsDirty)
+    if (m_impl->spectrumDataDirty)
     {
         QSGGeometry::Point2D* vertices = geometry->vertexDataAsPoint2D();
-
-        for (std::size_t i = 0; i < m_impl->frequencyPositions.size();
-             ++i, vertices += 2)
+        for (QPointF const& p : m_impl->spectrumPoints)
         {
-            auto x = m_impl->frequencyPositions[i];
-            vertices[0].x = x;
-            vertices[0].y = 0;
-            vertices[1].x = x;
-            vertices[1].y = height() - 1;
-        }
-
-        for (std::size_t i = 0; i < m_impl->levelPositions.size();
-             ++i, vertices += 2)
-        {
-            auto y = m_impl->levelPositions[i];
-            vertices[0].x = 0;
-            vertices[0].y = y;
-            vertices[1].x = width() - 1;
-            vertices[1].y = y;
+            vertices->set(p.x(), p.y());
+            ++vertices;
         }
 
         node->markDirty(QSGNode::DirtyGeometry);
-        m_impl->scaleIsDirty = false;
+
+        m_impl->spectrumDataDirty = false;
+    }
+
+    if (m_impl->colorDirty)
+    {
+        material->setColor(m_color);
+
+        node->markDirty(QSGNode::DirtyMaterial);
+
+        m_impl->colorDirty = false;
     }
 
     return node;

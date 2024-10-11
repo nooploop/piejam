@@ -9,6 +9,7 @@ import QtQuick.Layouts 1.15
 
 import PieJam.Items 1.0 as PJItems
 import PieJam.Models 1.0 as PJModels
+import PieJam.Util 1.0
 
 import PieJam 1.0
 import PieJam.FxChainControls 1.0
@@ -23,17 +24,28 @@ SubscribableItem {
     ColumnLayout {
         anchors.fill: parent
 
-        PJItems.Spectrum {
-            id: spectrum
-
+        Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            spectrumAData: root.model ? root.model.dataA : null
-            spectrumAColor: Material.color(Material.Pink)
+            SpectrumGrid {
+                anchors.fill: parent
+            }
 
-            spectrumBData: root.model ? root.model.dataB : null
-            spectrumBColor: Material.color(Material.Blue)
+            PJItems.Spectrum {
+                anchors.fill: parent
+
+                spectrumData: root.model ? root.model.dataA : null
+                color: Material.color(Material.Pink)
+            }
+
+            PJItems.Spectrum {
+                anchors.fill: parent
+
+                visible: root.model && root.model.busType === PJModels.Types.BusType.Stereo
+                spectrumData: root.model ? root.model.dataB : null
+                color: Material.color(Material.Blue)
+            }
         }
 
         StreamSourceSettings {
@@ -46,31 +58,4 @@ SubscribableItem {
 
     onBypassedChanged: if (root.bypassed && root.model)
                            root.model.clear()
-
-    Repeater {
-        model: spectrum.levelLabels
-
-        delegate: Label {
-            x: spectrum.width - implicitWidth - 4
-            y: modelData.position
-
-            font.pointSize: 6
-
-            text: modelData.value + " dB"
-        }
-    }
-
-    Repeater {
-        model: spectrum.frequencyLabels
-
-        delegate: Label {
-            x: modelData.position + 2
-            y: spectrum.height - implicitHeight
-
-            font.pointSize: 6
-
-            text: modelData.value >= 1000 ? (modelData.value / 1000)
-                                            + " kHz" : modelData.value + " Hz"
-        }
-    }
 }

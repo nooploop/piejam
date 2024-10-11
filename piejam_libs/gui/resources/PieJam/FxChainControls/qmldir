@@ -9,4 +9,5 @@ IntSlider 1.0 IntSlider.qml
 ParameterControl 1.0 ParameterControl.qml
 ParameterQuickSpinBox 1.0 ParameterQuickSpinBox.qml
 ParameterXYPad 1.0 ParameterXYPad.qml
+SpectrumGrid 1.0 SpectrumGrid.qml
 StreamSourceSettings 1.0 StreamSourceSettings.qml

@@ -150,6 +150,10 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/SpectrumDataGenerator.cpp
     src/piejam/gui/model/WaveformDataGenerator.cpp
     src/piejam/gui/qt_log.cpp
+    include/piejam/gui/item/FixedLinearScaleGrid.h
+    src/piejam/gui/item/FixedLinearScaleGrid.cpp
+    include/piejam/gui/item/FixedLogScaleGrid.h
+    src/piejam/gui/item/FixedLogScaleGrid.cpp
 )
 
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

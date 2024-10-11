@@ -49,3 +49,32 @@ public:                                                                        \
     auto name() const noexcept -> name##_property_t;                           \
                                                                                \
 private:
+
+#define M_PIEJAM_GUI_WRITABLE_PROPERTY(type, name, setterName)                 \
+private:                                                                       \
+    Q_PROPERTY(                                                                \
+            type name READ name WRITE setterName NOTIFY name##Changed FINAL)   \
+    type m_##name{};                                                           \
+                                                                               \
+public:                                                                        \
+    using name##_property_t = std::conditional_t<                              \
+            std::is_trivially_copyable_v<type>,                                \
+            type,                                                              \
+            type const&>;                                                      \
+                                                                               \
+    Q_SIGNAL void name##Changed();                                             \
+    auto name() const noexcept -> name##_property_t                            \
+    {                                                                          \
+        return m_##name;                                                       \
+    }                                                                          \
+                                                                               \
+    void setterName(name##_property_t x)                                       \
+    {                                                                          \
+        if (m_##name != x)                                                     \
+        {                                                                      \
+            m_##name = x;                                                      \
+            Q_EMIT name##Changed();                                            \
+        }                                                                      \
+    }                                                                          \
+                                                                               \
+private:

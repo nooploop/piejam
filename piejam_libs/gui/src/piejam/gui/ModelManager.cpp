@@ -5,6 +5,8 @@
 #include <piejam/gui/ModelManager.h>
 
 #include <piejam/gui/item/DbScale.h>
+#include <piejam/gui/item/FixedLinearScaleGrid.h>
+#include <piejam/gui/item/FixedLogScaleGrid.h>
 #include <piejam/gui/item/Scope.h>
 #include <piejam/gui/item/Spectrum.h>
 #include <piejam/gui/item/Waveform.h>
@@ -98,8 +100,6 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::StringList*>();
     qRegisterMetaType<piejam::gui::model::WaveformDataObject*>();
 
-    qRegisterMetaType<piejam::gui::item::SpectrumScaleLabel>();
-
     qmlRegisterUncreatableType<piejam::gui::model::AudioRoutingSelection>(
             "PieJam.Models",
             1,
@@ -144,6 +144,16 @@ runRegistration()
             1,
             0,
             "DbScale");
+    qmlRegisterType<piejam::gui::item::FixedLinearScaleGrid>(
+            "PieJam.Items",
+            1,
+            0,
+            "FixedLinearScaleGrid");
+    qmlRegisterType<piejam::gui::item::FixedLogScaleGrid>(
+            "PieJam.Items",
+            1,
+            0,
+            "FixedLogScaleGrid");
 
     qmlRegisterUncreatableMetaObject(
             piejam::gui::model::staticMetaObject,

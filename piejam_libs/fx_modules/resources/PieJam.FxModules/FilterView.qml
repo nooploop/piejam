@@ -12,6 +12,7 @@ import PieJam.Models 1.0 as PJModels
 
 import PieJam 1.0
 import PieJam.FxChainControls 1.0
+import PieJam.Util 1.0
 
 SubscribableItem {
     id: root
@@ -33,62 +34,43 @@ SubscribableItem {
             model: root.model ? root.model.filterType : null
         }
 
-        PJItems.Spectrum {
-            id: spectrum
-
+        Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            spectrumAData: root.model ? root.model.dataIn : null
-            spectrumAColor: Material.color(Material.Pink)
+            SpectrumGrid {
+                anchors.fill: parent
 
-            spectrumBData: root.model ? root.model.dataOut : null
-            spectrumBColor: Material.color(Material.Blue)
+                Repeater {
+                    model: [100, 80, 60, 40, 20]
 
-            // HACK: we reuse the level labels positions for resonance percentage labels
-            // Since levels go from 0 to -80 in 20dB steps, this comes extremely handy
-            // to split up the resonance percentage axis in 20% steps.
-            Repeater {
-                model: spectrum.levelLabels
+                    delegate: Label {
+                        id: resLabel
 
-                delegate: Label {
-                    id: resLabel
+                        x: parent.width - width - 2
+                        y: MathExt.mapTo(modelData, 100, 0, 0, parent.height) + 2
+                        width: 24
 
-                    x: 1
-                    y: modelData.position
+                        font.pointSize: 6
 
-                    font.pointSize: 5
-
-                    text: (100 + modelData.value) + "%"
+                        text: modelData + "%"
+                        horizontalAlignment: Text.AlignRight
+                    }
                 }
             }
 
-            Repeater {
-                model: spectrum.levelLabels
+            PJItems.Spectrum {
+                anchors.fill: parent
 
-                delegate: Label {
-                    id: levelLabel
-
-                    x: spectrum.width - levelLabel.implicitWidth - 4
-                    y: modelData.position
-
-                    font.pointSize: 5
-
-                    text: modelData.value + " dB"
-                }
+                spectrumData: root.model ? root.model.dataIn : null
+                color: Material.color(Material.Pink)
             }
 
-            Repeater {
-                model: spectrum.frequencyLabels
+            PJItems.Spectrum {
+                anchors.fill: parent
 
-                delegate: Label {
-                    x: modelData.position + 2
-                    y: spectrum.height - implicitHeight
-
-                    font.pointSize: 5
-
-                    text: modelData.value >= 1000 ? (modelData.value / 1000) + " kHz" : modelData.value + " Hz"
-                }
+                spectrumData: root.model ? root.model.dataOut : null
+                color: Material.color(Material.Blue)
             }
 
             ParameterXYPad {
