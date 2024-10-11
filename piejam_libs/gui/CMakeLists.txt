@@ -25,6 +25,7 @@ set(PIEJAM_QML_IMPORT_PATHS ${PIEJAM_QML_IMPORT_PATHS} PARENT_SCOPE)
 add_library(piejam_gui STATIC
     ${RESOURCES}
     include/piejam/gui/ModelManager.h
+    include/piejam/gui/PropertyMacros.h
     include/piejam/gui/generic_list_model_edit_script_executor.h
     include/piejam/gui/init.h
     include/piejam/gui/item/DbScale.h
@@ -38,6 +39,7 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/AudioStream.h
     include/piejam/gui/model/AudioStreamAmplifier.h
     include/piejam/gui/model/AudioStreamChannelDuplicator.h
+    include/piejam/gui/model/AudioStreamChannelSplitter.h
     include/piejam/gui/model/AudioStreamListener.h
     include/piejam/gui/model/AudioStreamProvider.h
     include/piejam/gui/model/BoolParameter.h
@@ -108,6 +110,7 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/AudioRoutingSelection.cpp
     src/piejam/gui/model/AudioStreamAmplifier.cpp
     src/piejam/gui/model/AudioStreamChannelDuplicator.cpp
+    src/piejam/gui/model/AudioStreamChannelSplitter.cpp
     src/piejam/gui/model/BoolParameter.cpp
     src/piejam/gui/model/DbScaleData.cpp
     src/piejam/gui/model/EnumParameter.cpp
@@ -144,7 +147,6 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/StereoLevelParameter.cpp
     src/piejam/gui/model/WaveformDataGenerator.cpp
     src/piejam/gui/qt_log.cpp
-    include/piejam/gui/PropertyMacros.h
 )
 
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
