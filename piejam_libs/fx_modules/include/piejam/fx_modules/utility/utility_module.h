@@ -9,7 +9,7 @@
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/internal_fx_module_factory.h>
 
-namespace piejam::fx_modules::tool
+namespace piejam::fx_modules::utility
 {
 
 enum class parameter_key : runtime::parameter::key
@@ -20,4 +20,4 @@ enum class parameter_key : runtime::parameter::key
 auto make_module(runtime::internal_fx_module_factory_args const&)
         -> runtime::fx::module;
 
-} // namespace piejam::fx_modules::tool
+} // namespace piejam::fx_modules::utility

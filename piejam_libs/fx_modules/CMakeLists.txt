@@ -64,14 +64,14 @@ add_library(piejam_fx_modules STATIC
     src/piejam/fx_modules/dual_pan/dual_pan_internal_id.cpp
     src/piejam/fx_modules/dual_pan/dual_pan_module.cpp
 
-    include/piejam/fx_modules/tool/gui/FxTool.h
-    include/piejam/fx_modules/tool/tool_component.h
-    include/piejam/fx_modules/tool/tool_internal_id.h
-    include/piejam/fx_modules/tool/tool_module.h
-    src/piejam/fx_modules/tool/gui/FxTool.cpp
-    src/piejam/fx_modules/tool/tool_component.cpp
-    src/piejam/fx_modules/tool/tool_internal_id.cpp
-    src/piejam/fx_modules/tool/tool_module.cpp
+    include/piejam/fx_modules/utility/gui/FxUtility.h
+    include/piejam/fx_modules/utility/utility_component.h
+    include/piejam/fx_modules/utility/utility_internal_id.h
+    include/piejam/fx_modules/utility/utility_module.h
+    src/piejam/fx_modules/utility/gui/FxUtility.cpp
+    src/piejam/fx_modules/utility/utility_component.cpp
+    src/piejam/fx_modules/utility/utility_internal_id.cpp
+    src/piejam/fx_modules/utility/utility_module.cpp
 
     include/piejam/fx_modules/tuner/tuner_internal_id.h
     src/piejam/fx_modules/tuner/tuner_internal_id.cpp

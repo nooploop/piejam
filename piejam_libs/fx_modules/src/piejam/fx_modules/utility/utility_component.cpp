@@ -2,12 +2,12 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/fx_modules/tool/tool_component.h>
+#include <piejam/fx_modules/utility/utility_component.h>
 
 #include <piejam/audio/components/amplifier.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
-#include <piejam/fx_modules/tool/tool_module.h>
+#include <piejam/fx_modules/utility/utility_module.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/internal_fx_component_factory.h>
 #include <piejam/runtime/parameter_processor_factory.h>
@@ -17,9 +17,7 @@
 
 #include <boost/container/flat_map.hpp>
 
-#include <array>
-
-namespace piejam::fx_modules::tool
+namespace piejam::fx_modules::utility
 {
 
 namespace
@@ -37,13 +35,13 @@ public:
                           proc_factory,
                           fx_mod.parameters->at(
                                   to_underlying(parameter_key::gain)),
-                          fmt::format("tool_gain {}", name)))
+                          fmt::format("utility_gain {}", name)))
         , m_amplifier(
                   fx_mod.bus_type == audio::bus_type::mono
                           ? audio::components::make_mono_amplifier(
-                                    fmt::format("tool {}", name))
+                                    fmt::format("utility {}", name))
                           : audio::components::make_stereo_amplifier(
-                                    fmt::format("tool {}", name)))
+                                    fmt::format("utility {}", name)))
     {
     }
 
@@ -91,4 +89,4 @@ make_component(runtime::internal_fx_component_factory_args const& args)
             args.name);
 }
 
-} // namespace piejam::fx_modules::tool
+} // namespace piejam::fx_modules::utility

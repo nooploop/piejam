@@ -9,12 +9,11 @@
 #include <piejam/runtime/fx/fwd.h>
 
 #include <memory>
-#include <string_view>
 
-namespace piejam::fx_modules::tool
+namespace piejam::fx_modules::utility
 {
 
 auto make_component(runtime::internal_fx_component_factory_args const&)
         -> std::unique_ptr<audio::engine::component>;
 
-} // namespace piejam::fx_modules::tool
+} // namespace piejam::fx_modules::utility

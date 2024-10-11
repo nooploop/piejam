@@ -6,9 +6,9 @@
 
 #include <piejam/runtime/fx/fwd.h>
 
-namespace piejam::fx_modules::tool
+namespace piejam::fx_modules::utility
 {
 
 auto internal_id() -> runtime::fx::internal_id;
 
-} // namespace piejam::fx_modules::tool
+} // namespace piejam::fx_modules::utility

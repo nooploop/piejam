@@ -6,10 +6,10 @@
 
 #include <piejam/gui/model/FxGenericModule.h>
 
-namespace piejam::fx_modules::tool::gui
+namespace piejam::fx_modules::utility::gui
 {
 
-class FxTool : public piejam::gui::model::FxGenericModule
+class FxUtility : public piejam::gui::model::FxGenericModule
 {
 public:
     using Base = piejam::gui::model::FxGenericModule;
@@ -19,4 +19,4 @@ public:
     auto type() const noexcept -> piejam::gui::model::FxModuleType override;
 };
 
-} // namespace piejam::fx_modules::tool::gui
+} // namespace piejam::fx_modules::utility::gui

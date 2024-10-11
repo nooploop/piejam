@@ -18,7 +18,6 @@
 
 #include <fmt/format.h>
 
-
 namespace piejam::audio::components
 {
 

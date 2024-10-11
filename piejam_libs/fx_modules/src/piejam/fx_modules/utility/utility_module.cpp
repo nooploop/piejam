@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/fx_modules/tool/tool_module.h>
+#include <piejam/fx_modules/utility/utility_module.h>
 
-#include <piejam/fx_modules/tool/tool_internal_id.h>
+#include <piejam/fx_modules/utility/utility_internal_id.h>
 #include <piejam/math.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/parameter/float_descriptor.h>
@@ -16,7 +16,7 @@
 
 #include <boost/container/flat_map.hpp>
 
-namespace piejam::fx_modules::tool
+namespace piejam::fx_modules::utility
 {
 
 namespace
@@ -51,7 +51,7 @@ make_module(runtime::internal_fx_module_factory_args const& args)
 
     return runtime::fx::module{
             .fx_instance_id = internal_id(),
-            .name = box("Tool"s),
+            .name = box("Utility"s),
             .bus_type = args.bus_type,
             .parameters = box(runtime::fx::module_parameters{
                     {to_underlying(parameter_key::gain),
@@ -67,4 +67,4 @@ make_module(runtime::internal_fx_module_factory_args const& args)
             .streams = {}};
 }
 
-} // namespace piejam::fx_modules::tool
+} // namespace piejam::fx_modules::utility
