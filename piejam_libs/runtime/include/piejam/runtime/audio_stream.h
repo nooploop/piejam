@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <piejam/runtime/audio_stream_id.h>
+
 #include <piejam/audio/multichannel_buffer.h>
-#include <piejam/box.h>
 #include <piejam/fwd.h>
 
 namespace piejam::runtime
@@ -14,7 +15,8 @@ namespace piejam::runtime
 using audio_stream_buffer = box<audio::multichannel_buffer<
         float,
         audio::multichannel_layout_non_interleaved>>;
-using audio_streams_cache = entity_map<audio_stream_buffer>;
-using audio_stream_id = entity_id<audio_stream_buffer>;
+using audio_streams_t = entity_data_map<audio_stream_id, audio_stream_buffer>;
+
+auto make_stream(audio_streams_t&, std::size_t num_channels) -> audio_stream_id;
 
 } // namespace piejam::runtime

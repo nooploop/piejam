@@ -37,6 +37,18 @@ public:
     }
 
     [[nodiscard]]
+    auto begin() const noexcept
+    {
+        return m_map.begin();
+    }
+
+    [[nodiscard]]
+    auto end() const noexcept
+    {
+        return m_map.end();
+    }
+
+    [[nodiscard]]
     auto contains(id_type id) const noexcept
     {
         return m_map.contains(id);

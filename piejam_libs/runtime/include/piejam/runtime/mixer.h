@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <piejam/runtime/audio_stream_id.h>
 #include <piejam/runtime/external_audio_fwd.h>
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
@@ -48,6 +49,8 @@ struct channel
     bool_parameter_id solo{};
     stereo_level_parameter_id peak_level{};
     stereo_level_parameter_id rms_level{};
+
+    audio_stream_id out_stream{};
 
     box<fx::chain_t> fx_chain{};
 

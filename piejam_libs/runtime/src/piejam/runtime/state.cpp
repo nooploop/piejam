@@ -634,6 +634,7 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
                     parameter::stereo_level_descriptor{}),
             .rms_level = params_factory.make_parameter(
                     parameter::stereo_level_descriptor{}),
+            .out_stream = make_stream(st.streams, 2),
             .fx_chain = {},
     });
     emplace_back(st.mixer_state.inputs, channel_id);
@@ -705,6 +706,8 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
 
     BOOST_ASSERT(algorithm::contains(*st.mixer_state.inputs, mixer_channel_id));
     remove_erase(st.mixer_state.inputs, mixer_channel_id);
+
+    st.streams.erase(mixer_channel.out_stream);
 
     mixer_channels.erase(mixer_channel_id);
 

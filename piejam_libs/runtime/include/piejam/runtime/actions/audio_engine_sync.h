@@ -35,20 +35,6 @@ struct unsync_parameter
     parameter_id param;
 };
 
-struct sync_stream
-    : ui::cloneable_action<sync_stream, action>
-    , visitable_audio_engine_action<sync_stream>
-{
-    audio_stream_id stream;
-};
-
-struct unsync_stream
-    : ui::cloneable_action<unsync_stream, action>
-    , visitable_audio_engine_action<unsync_stream>
-{
-    audio_stream_id stream;
-};
-
 struct request_audio_engine_sync final
     : ui::cloneable_action<request_audio_engine_sync, action>
     , visitable_audio_engine_action<request_audio_engine_sync>

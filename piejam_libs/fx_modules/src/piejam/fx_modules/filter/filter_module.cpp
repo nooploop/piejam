@@ -113,9 +113,10 @@ make_module(runtime::internal_fx_module_factory_args const& args)
                                              from_normalized_linear})}}),
             .streams = box(runtime::fx::module_streams{
                     {to_underlying(stream_key::in_out),
-                     args.streams.emplace(
-                             std::in_place,
-                             num_channels(args.bus_type) * 2)}})};
+                     make_stream(
+                             args.streams,
+                             num_channels(args.bus_type) * 2)},
+            })};
 }
 
 } // namespace piejam::fx_modules::filter

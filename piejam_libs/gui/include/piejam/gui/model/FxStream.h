@@ -20,7 +20,6 @@ public:
 
 private:
     void onSubscribe() override;
-    void onUnsubscribe() override;
 
     struct Impl;
     pimpl<Impl> m_impl;

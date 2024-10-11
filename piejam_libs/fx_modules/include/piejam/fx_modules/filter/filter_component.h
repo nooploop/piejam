@@ -10,7 +10,6 @@
 #include <piejam/runtime/fx/fwd.h>
 
 #include <memory>
-#include <string_view>
 
 namespace piejam::fx_modules::filter
 {

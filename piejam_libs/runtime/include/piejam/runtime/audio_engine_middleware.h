@@ -64,7 +64,6 @@ private:
     std::unique_ptr<audio::io_process> m_io_process;
 
     boost::container::flat_set<parameter_id> m_synced_parameters;
-    boost::container::flat_set<audio_stream_id> m_synced_streams;
 };
 
 } // namespace piejam::runtime

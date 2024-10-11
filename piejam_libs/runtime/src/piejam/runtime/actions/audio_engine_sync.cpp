@@ -24,17 +24,10 @@ audio_engine_sync_update::reduce(state& st) const
         }
     });
 
-    if (!streams.empty())
+    for (auto&& [id, buffer] : streams)
     {
-        auto st_streams = st.streams.lock();
-
-        for (auto&& [id, buffer] : streams)
-        {
-            auto& stored = st_streams[id];
-
-            BOOST_ASSERT(stored->num_channels() == buffer->num_channels());
-            stored = buffer;
-        }
+        BOOST_ASSERT(st.streams.contains(id));
+        st.streams.set(id, buffer);
     }
 }
 

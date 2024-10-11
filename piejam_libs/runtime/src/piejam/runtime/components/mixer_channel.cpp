@@ -13,11 +13,13 @@
 #include <piejam/audio/engine/graph_algorithms.h>
 #include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/pan_balance_processor.h>
+#include <piejam/audio/engine/stream_processor.h>
 #include <piejam/audio/sample_rate.h>
 #include <piejam/entity_id.h>
 #include <piejam/runtime/components/mute_solo.h>
 #include <piejam/runtime/mixer.h>
 #include <piejam/runtime/parameter_processor_factory.h>
+#include <piejam/runtime/processors/stream_processor_factory.h>
 
 #include <fmt/format.h>
 
@@ -53,6 +55,7 @@ public:
     mixer_channel_output(
             mixer::channel const& mixer_channel,
             parameter_processor_factory& param_procs,
+            processors::stream_processor_factory& stream_procs,
             audio::sample_rate const sample_rate)
         : m_volume_input_proc(param_procs.find_or_make_processor(
                   mixer_channel.volume,
@@ -72,6 +75,11 @@ public:
                   mixer_channel.bus_type,
                   *mixer_channel.name)}
         , m_mute_solo(components::make_mute_solo(*mixer_channel.name))
+        , m_out_stream{stream_procs.make_processor(
+                  mixer_channel.out_stream,
+                  num_channels(mixer_channel.bus_type),
+                  sample_rate.to_samples(std::chrono::milliseconds{40}),
+                  *mixer_channel.name)}
         , m_level_meter(audio::components::make_stereo_level_meter(sample_rate))
         , m_peak_level_proc(param_procs.find_or_make_processor(
                   mixer_channel.peak_level,
@@ -139,6 +147,7 @@ public:
                 to<1>);
 
         audio::engine::connect(g, *m_volume_pan_balance, *m_mute_solo);
+        audio::engine::connect(g, *m_volume_pan_balance, *m_out_stream);
         audio::engine::connect(g, *m_volume_pan_balance, *m_level_meter);
 
         audio::engine::connect_event(
@@ -165,6 +174,7 @@ private:
     std::shared_ptr<audio::engine::value_io_processor<bool>> m_mute_input_proc;
     std::unique_ptr<audio::engine::component> m_volume_pan_balance;
     std::unique_ptr<audio::engine::component> m_mute_solo;
+    std::shared_ptr<audio::engine::processor> m_out_stream;
     std::unique_ptr<audio::engine::component> m_level_meter;
     std::shared_ptr<audio::engine::value_io_processor<stereo_level>>
             m_peak_level_proc;
@@ -242,12 +252,14 @@ auto
 make_mixer_channel_output(
         mixer::channel const& mixer_channel,
         parameter_processor_factory& param_procs,
+        processors::stream_processor_factory& stream_procs,
         audio::sample_rate const sample_rate)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<mixer_channel_output>(
             mixer_channel,
             param_procs,
+            stream_procs,
             sample_rate);
 }
 

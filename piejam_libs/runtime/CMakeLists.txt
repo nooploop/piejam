@@ -107,7 +107,7 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/processors/mute_solo_processor.h
     include/piejam/runtime/processors/parameter_processor_factory.h
     include/piejam/runtime/processors/stream_processor_factory.h
-    include/piejam/runtime/recorder.h
+
     include/piejam/runtime/recorder_middleware.h
     include/piejam/runtime/root_view_mode.h
     include/piejam/runtime/selected_sound_card.h
@@ -174,6 +174,8 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/state.cpp
     src/piejam/runtime/store_dispatch.cpp
     src/piejam/runtime/thunk_action.cpp
+    include/piejam/runtime/audio_stream_id.h
+    src/piejam/runtime/audio_stream.cpp
 )
 
 find_package(nlohmann_json REQUIRED)

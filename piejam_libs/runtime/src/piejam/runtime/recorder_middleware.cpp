@@ -82,7 +82,6 @@ recorder_middleware::process_recorder_action(
     auto const& st = mw_fs.get_state();
 
     BOOST_ASSERT(!st.recording);
-    BOOST_ASSERT(st.recorder_streams->empty());
 
     auto take_dir = m_impl->recordings_dir /
                     fmt::format("session_{:06}", st.rec_session) /
@@ -96,8 +95,6 @@ recorder_middleware::process_recorder_action(
         return;
     }
 
-    recorder_streams_t recorder_streams;
-    auto streams = st.streams;
     impl::open_streams_t open_streams;
 
     for (auto const& [mixer_channel_id, mixer_channel] :
@@ -130,9 +127,9 @@ recorder_middleware::process_recorder_action(
 
             if (sndfile)
             {
-                auto stream_id = streams.emplace(std::in_place, num_channels);
-                recorder_streams.emplace(mixer_channel_id, stream_id);
-                open_streams.emplace(stream_id, std::move(sndfile));
+                open_streams.emplace(
+                        mixer_channel.out_stream,
+                        std::move(sndfile));
             }
             else
             {
@@ -157,13 +154,7 @@ recorder_middleware::process_recorder_action(
 
     m_impl->open_streams = std::move(open_streams);
 
-    mw_fs.next(update_state_action{
-            [streams = std::move(streams),
-             recorder_streams = std::move(recorder_streams)](state& st) {
-                st.recording = true;
-                st.recorder_streams = std::move(recorder_streams);
-                st.streams = std::move(streams);
-            }});
+    mw_fs.next(update_state_action{[](state& st) { st.recording = true; }});
 }
 
 template <>
@@ -179,10 +170,6 @@ recorder_middleware::process_recorder_action(
     mw_fs.next(update_state_action{[](state& new_st) {
         new_st.recording = false;
         ++new_st.rec_take;
-
-        new_st.streams.erase(*new_st.recorder_streams | std::views::values);
-
-        new_st.recorder_streams = {};
     }});
 }
 

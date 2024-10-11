@@ -54,8 +54,6 @@ using set_int_parameter = set_parameter_value<int_parameter>;
 
 struct sync_parameter;
 struct unsync_parameter;
-struct sync_stream;
-struct unsync_stream;
 struct request_audio_engine_sync;
 struct audio_engine_sync_update;
 

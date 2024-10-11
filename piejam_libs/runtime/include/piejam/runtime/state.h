@@ -36,7 +36,6 @@
 #include <piejam/runtime/parameter/stereo_level_descriptor.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/parameters_map.h>
-#include <piejam/runtime/recorder.h>
 #include <piejam/runtime/root_view_mode.h>
 #include <piejam/runtime/selected_sound_card.h>
 
@@ -64,7 +63,7 @@ struct state
     box<midi_devices_t> midi_devices;
 
     parameters_map params;
-    audio_streams_cache streams;
+    audio_streams_t streams;
 
     fx::registry fx_registry;
 
@@ -78,7 +77,6 @@ struct state
     std::optional<midi_assignment_id> midi_learning{};
 
     bool recording{};
-    box<recorder_streams_t> recorder_streams;
     std::size_t rec_session{};
     std::size_t rec_take{};
 

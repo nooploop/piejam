@@ -974,15 +974,15 @@ make_audio_stream_selector(audio_stream_id stream_id)
 {
     static audio_stream_buffer s_empty(std::in_place, 1);
 
-    auto get_audio_stream =
-            memo([stream_id](audio_streams_cache const& streams) {
-                auto* stream = streams.find(stream_id);
-                return stream ? *stream : s_empty;
-            });
+    return [stream_id, cached = cached_entity_data_ptr<audio_stream_buffer>{}](
+                   state const& st) mutable -> audio_stream_buffer {
+        if (cached) [[likely]]
+        {
+            return *cached;
+        }
 
-    return [get = std::move(get_audio_stream)](
-                   state const& st) -> audio_stream_buffer {
-        return get(st.streams);
+        cached = st.streams.cached(stream_id);
+        return cached ? *cached : s_empty;
     };
 }
 

@@ -450,24 +450,6 @@ audio_engine_middleware::process_engine_action(
     m_synced_parameters.erase(a.param);
 }
 
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        middleware_functors const&,
-        actions::sync_stream const& a)
-{
-    m_synced_streams.insert(a.stream);
-}
-
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        middleware_functors const&,
-        actions::unsync_stream const& a)
-{
-    m_synced_streams.erase(a.stream);
-}
-
 template <std::ranges::range Parameters>
 static void
 collect_parameter_updates(
@@ -486,7 +468,7 @@ collect_parameter_updates(
 template <std::ranges::range Streams>
 static void
 collect_stream_updates(
-        Streams&& streams,
+        Streams const& streams,
         audio_engine const& engine,
         actions::audio_engine_sync_update& action)
 {
@@ -517,14 +499,10 @@ audio_engine_middleware::process_engine_action(
                 *m_engine,
                 next_action);
 
-        collect_stream_updates(m_synced_streams, *m_engine, next_action);
-        if (st.recording && !st.recorder_streams->empty())
-        {
-            collect_stream_updates(
-                    *st.recorder_streams | std::views::values,
-                    *m_engine,
-                    next_action);
-        }
+        collect_stream_updates(
+                std::views::keys(st.streams),
+                *m_engine,
+                next_action);
 
         if (!next_action.empty())
         {

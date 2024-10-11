@@ -7,7 +7,6 @@
 #include <piejam/gui/model/AudioStreamListener.h>
 
 #include <piejam/audio/multichannel_buffer.h>
-#include <piejam/runtime/actions/audio_engine_sync.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::gui::model
@@ -37,18 +36,6 @@ FxStream::onSubscribe()
                     emit captured(buf->view());
                 }
             });
-
-    runtime::actions::sync_stream action;
-    action.stream = m_impl->streamId;
-    dispatch(action);
-}
-
-void
-FxStream::onUnsubscribe()
-{
-    runtime::actions::unsync_stream action;
-    action.stream = m_impl->streamId;
-    dispatch(action);
 }
 
 } // namespace piejam::gui::model

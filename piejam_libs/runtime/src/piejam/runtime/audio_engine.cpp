@@ -112,17 +112,14 @@ using value_io_processor_ptr =
 using get_device_processor_f =
         std::function<audio::engine::processor&(std::size_t)>;
 
-using recorders_t = std::unordered_map<
-        mixer::channel_id,
-        std::shared_ptr<audio::engine::processor>>;
-
 void
 make_mixer_components(
         component_map& comps,
         component_map& prev_comps,
         audio::sample_rate const sample_rate,
         mixer::channels_t const& channels,
-        parameter_processor_factory& param_procs)
+        parameter_processor_factory& param_procs,
+        processors::stream_processor_factory& stream_procs)
 {
     for (auto const& [mixer_channel_id, mixer_channel] : channels)
     {
@@ -152,6 +149,7 @@ make_mixer_components(
                     components::make_mixer_channel_output(
                             mixer_channel,
                             param_procs,
+                            stream_procs,
                             sample_rate));
         }
 
@@ -303,41 +301,6 @@ make_midi_assignment_processors(
 }
 
 auto
-make_recorder_processors(
-        mixer::channels_t const& channels,
-        recorder_streams_t const& recorder_streams,
-        processors::stream_processor_factory& stream_procs,
-        std::size_t const frames_capacity)
-{
-    recorders_t recorders;
-
-    for (auto const& [channel_id, stream_id] : recorder_streams)
-    {
-        if (auto proc = stream_procs.find_processor(stream_id))
-        {
-            recorders.emplace(channel_id, std::move(proc));
-        }
-        else
-        {
-            if (mixer::channel const* const mixer_channel =
-                        channels.find(channel_id);
-                mixer_channel)
-            {
-                recorders.emplace(
-                        channel_id,
-                        stream_procs.make_processor(
-                                stream_id,
-                                audio::num_channels(mixer_channel->bus_type),
-                                frames_capacity,
-                                "recorder"));
-            }
-        }
-    }
-
-    return recorders;
-}
-
-auto
 connect_fx_chain(
         audio::engine::graph& g,
         std::vector<audio::engine::component*> const& fx_chain_comps)
@@ -360,8 +323,7 @@ connect_mixer_channel_with_fx_chain(
         component_map const& comps,
         audio::engine::component& mixer_channel_in,
         fx::chain_t const& fx_chain,
-        audio::engine::component& mixer_channel_out,
-        std::shared_ptr<audio::engine::processor> const& recorder)
+        audio::engine::component& mixer_channel_out)
 {
     auto fx_chain_comps = algorithm::transform_to_vector(
             fx_chain,
@@ -373,22 +335,12 @@ connect_mixer_channel_with_fx_chain(
     if (fx_chain_comps.empty())
     {
         connect(g, mixer_channel_in, mixer_channel_out);
-
-        if (recorder)
-        {
-            connect(g, mixer_channel_in, *recorder);
-        }
     }
     else
     {
         connect(g, mixer_channel_in, *fx_chain_comps.front());
         connect_fx_chain(g, fx_chain_comps);
         connect(g, *fx_chain_comps.back(), mixer_channel_out);
-
-        if (recorder)
-        {
-            connect(g, *fx_chain_comps.back(), *recorder);
-        }
     }
 }
 
@@ -523,8 +475,7 @@ make_graph(
         external_audio::devices_t const& device_buses,
         std::span<audio::engine::input_processor> const input_procs,
         std::span<audio::engine::output_processor> const output_procs,
-        std::span<processor_ptr> const output_clip_procs,
-        recorders_t const& recorders)
+        std::span<processor_ptr> const output_clip_procs)
 {
     audio::engine::graph g;
 
@@ -535,12 +486,6 @@ make_graph(
                         .get();
         audio::engine::component* mixer_channel_out =
                 comps.find(mixer_output_key{mixer_channel_id}).get();
-
-        std::shared_ptr<audio::engine::processor> recorder;
-        if (auto it = recorders.find(mixer_channel_id); it != recorders.end())
-        {
-            recorder = it->second;
-        }
 
         BOOST_ASSERT(mixer_channel_in);
         BOOST_ASSERT(mixer_channel_out);
@@ -562,8 +507,7 @@ make_graph(
                 comps,
                 *mixer_channel_in,
                 mixer_channel.fx_chain,
-                *mixer_channel_out,
-                recorder);
+                *mixer_channel_out);
 
         connect_mixer_output(
                 g,
@@ -741,8 +685,6 @@ struct audio_engine::impl
     parameter_processor_factory param_procs;
     processors::stream_processor_factory stream_procs;
 
-    recorders_t recorders;
-
     audio::engine::graph graph;
 };
 
@@ -840,7 +782,8 @@ audio_engine::rebuild(
             m_impl->comps,
             m_impl->sample_rate,
             st.mixer_state.channels,
-            m_impl->param_procs);
+            m_impl->param_procs,
+            m_impl->stream_procs);
     make_fx_chain_components(
             comps,
             m_impl->comps,
@@ -867,16 +810,6 @@ audio_engine::rebuild(
                                  midi::external_event>>("midi_learned")
                        : nullptr;
 
-    recorders_t recorders;
-    if (st.recording)
-    {
-        recorders = make_recorder_processors(
-                st.mixer_state.channels,
-                st.recorder_streams,
-                m_impl->stream_procs,
-                st.sample_rate.to_samples(std::chrono::seconds(3)));
-    }
-
     std::vector<processor_ptr> output_clip_procs(
             m_impl->output_clip_procs.size());
 
@@ -886,8 +819,7 @@ audio_engine::rebuild(
             st.external_audio_state.devices,
             m_impl->input_procs,
             m_impl->output_procs,
-            output_clip_procs,
-            recorders);
+            output_clip_procs);
 
     connect_midi(
             new_graph,
@@ -918,7 +850,6 @@ audio_engine::rebuild(
     m_impl->midi_learn_output_proc = std::move(midi_learn_output_proc);
     m_impl->procs = std::move(procs);
     m_impl->comps = std::move(comps);
-    m_impl->recorders = std::move(recorders);
 
     m_impl->param_procs.clear_expired();
     m_impl->stream_procs.clear_expired();
