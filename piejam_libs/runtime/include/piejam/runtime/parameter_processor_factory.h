@@ -7,7 +7,6 @@
 #include <piejam/runtime/parameter/bool_descriptor.h>
 #include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/int_descriptor.h>
-#include <piejam/runtime/parameter/stereo_level_descriptor.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/processors/parameter_processor_factory.h>
 

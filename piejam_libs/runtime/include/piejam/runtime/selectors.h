@@ -23,7 +23,6 @@
 #include <piejam/runtime/midi_assignment_id.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
-#include <piejam/runtime/stereo_level.h>
 
 #include <cstddef>
 #include <optional>
@@ -83,10 +82,8 @@ auto make_mixer_channel_mute_parameter_selector(mixer::channel_id)
         -> selector<bool_parameter_id>;
 auto make_mixer_channel_solo_parameter_selector(mixer::channel_id)
         -> selector<bool_parameter_id>;
-auto make_mixer_channel_peak_level_parameter_selector(mixer::channel_id)
-        -> selector<stereo_level_parameter_id>;
-auto make_mixer_channel_rms_level_parameter_selector(mixer::channel_id)
-        -> selector<stereo_level_parameter_id>;
+auto make_mixer_channel_out_stream_selector(mixer::channel_id)
+        -> selector<audio_stream_id>;
 auto make_mixer_channel_aux_volume_parameter_selector(mixer::channel_id)
         -> selector<float_parameter_id>;
 auto make_mixer_channel_aux_enabled_selector(mixer::channel_id)
@@ -202,9 +199,6 @@ auto make_int_parameter_min_selector(int_parameter_id) -> selector<int>;
 auto make_int_parameter_max_selector(int_parameter_id) -> selector<int>;
 auto make_int_parameter_enum_values_selector(int_parameter_id)
         -> selector<std::vector<std::pair<std::string, int>>>;
-
-auto make_level_parameter_value_selector(stereo_level_parameter_id)
-        -> selector<stereo_level>;
 
 auto make_midi_assignment_selector(midi_assignment_id)
         -> selector<std::optional<midi_assignment>>;

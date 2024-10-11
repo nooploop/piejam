@@ -741,9 +741,6 @@ template auto audio_engine::get_parameter_update(float_parameter_id) const
 template auto audio_engine::get_parameter_update(int_parameter_id) const
         -> std::optional<int>;
 
-template auto audio_engine::get_parameter_update(
-        stereo_level_parameter_id) const -> std::optional<stereo_level>;
-
 auto
 audio_engine::get_learned_midi() const -> std::optional<midi::external_event>
 {

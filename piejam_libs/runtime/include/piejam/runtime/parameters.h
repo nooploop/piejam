@@ -6,8 +6,6 @@
 
 #include <piejam/runtime/parameter/fwd.h>
 
-#include <piejam/audio/fwd.h>
-
 #include <boost/mp11/algorithm.hpp>
 #include <boost/mp11/list.hpp>
 #include <boost/mp11/map.hpp>
@@ -26,16 +24,12 @@ using bool_parameter_id = parameter::id_t<bool_parameter>;
 using int_parameter = parameter::int_descriptor;
 using int_parameter_id = parameter::id_t<int_parameter>;
 
-using stereo_level_parameter = parameter::stereo_level_descriptor;
-using stereo_level_parameter_id = parameter::id_t<stereo_level_parameter>;
-
 // Store the value type here, so we don't have to include the descriptor
 // headers.
 using parameters_t = boost::mp11::mp_list<
         boost::mp11::mp_list<bool_parameter, bool>,
         boost::mp11::mp_list<float_parameter, float>,
-        boost::mp11::mp_list<int_parameter, int>,
-        boost::mp11::mp_list<stereo_level_parameter, audio::pair<float>>>;
+        boost::mp11::mp_list<int_parameter, int>>;
 
 using parameter_ids_t = boost::mp11::mp_map_keys<parameters_t>;
 

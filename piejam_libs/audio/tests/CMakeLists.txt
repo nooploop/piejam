@@ -27,7 +27,6 @@ add_executable(piejam_audio_test
     identity_processor_test.cpp
     input_processor_test.cpp
     io_process_test.cpp
-    level_meter_processor_test.cpp
     lockstep_events_test.cpp
     mipp_iterator_test.cpp
     mix_processor_test.cpp

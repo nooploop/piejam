@@ -44,6 +44,7 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/audio_engine.h
     include/piejam/runtime/audio_engine_middleware.h
     include/piejam/runtime/audio_stream.h
+    include/piejam/runtime/audio_stream_id.h
     include/piejam/runtime/channel_index_pair.h
     include/piejam/runtime/components/make_fx.h
     include/piejam/runtime/components/mixer_channel.h
@@ -83,7 +84,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/parameter/fwd.h
     include/piejam/runtime/parameter/int_descriptor.h
     include/piejam/runtime/parameter/map.h
-    include/piejam/runtime/parameter/stereo_level_descriptor.h
     include/piejam/runtime/parameter_factory.h
     include/piejam/runtime/parameter_processor_factory.h
     include/piejam/runtime/parameters.h
@@ -107,14 +107,12 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/processors/mute_solo_processor.h
     include/piejam/runtime/processors/parameter_processor_factory.h
     include/piejam/runtime/processors/stream_processor_factory.h
-
     include/piejam/runtime/recorder_middleware.h
     include/piejam/runtime/root_view_mode.h
     include/piejam/runtime/selected_sound_card.h
     include/piejam/runtime/selectors.h
     include/piejam/runtime/solo_group.h
     include/piejam/runtime/state.h
-    include/piejam/runtime/stereo_level.h
     include/piejam/runtime/store.h
     include/piejam/runtime/store_dispatch.h
     include/piejam/runtime/subscriber.h
@@ -145,6 +143,7 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/actions/set_parameter_value.cpp
     src/piejam/runtime/audio_engine.cpp
     src/piejam/runtime/audio_engine_middleware.cpp
+    src/piejam/runtime/audio_stream.cpp
     src/piejam/runtime/components/make_fx.cpp
     src/piejam/runtime/components/mixer_channel.cpp
     src/piejam/runtime/components/mute_solo.cpp
@@ -174,8 +173,6 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/state.cpp
     src/piejam/runtime/store_dispatch.cpp
     src/piejam/runtime/thunk_action.cpp
-    include/piejam/runtime/audio_stream_id.h
-    src/piejam/runtime/audio_stream.cpp
 )
 
 find_package(nlohmann_json REQUIRED)

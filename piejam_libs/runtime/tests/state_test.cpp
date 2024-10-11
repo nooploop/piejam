@@ -50,14 +50,6 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_channel)
     EXPECT_EQ(false, mute_param.default_value);
     auto mute_value = sut.params[channel.mute].value.get();
     EXPECT_EQ(false, mute_value);
-
-    auto peak_level_value = sut.params[channel.peak_level].value.get();
-    EXPECT_EQ(0.f, peak_level_value.left);
-    EXPECT_EQ(0.f, peak_level_value.right);
-
-    auto rms_level_value = sut.params[channel.rms_level].value.get();
-    EXPECT_EQ(0.f, rms_level_value.left);
-    EXPECT_EQ(0.f, rms_level_value.right);
 }
 
 TEST_F(state_with_one_mixer_input,
@@ -67,7 +59,6 @@ TEST_F(state_with_one_mixer_input,
     ASSERT_EQ(2u, sut.params.get_map<float_parameter>().size());
     ASSERT_EQ(3u, sut.params.get_map<bool_parameter>().size());
     ASSERT_EQ(0u, sut.params.get_map<int_parameter>().size());
-    ASSERT_EQ(2u, sut.params.get_map<stereo_level_parameter>().size());
 
     remove_mixer_channel(sut, channel_id);
 
@@ -75,7 +66,6 @@ TEST_F(state_with_one_mixer_input,
     EXPECT_EQ(nullptr, sut.mixer_state.channels.find(channel_id));
     EXPECT_TRUE(sut.params.get_map<float_parameter>().empty());
     EXPECT_TRUE(sut.params.get_map<bool_parameter>().empty());
-    EXPECT_TRUE(sut.params.get_map<stereo_level_parameter>().empty());
 }
 
 } // namespace piejam::runtime::test

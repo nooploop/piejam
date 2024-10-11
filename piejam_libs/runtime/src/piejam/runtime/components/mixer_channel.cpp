@@ -6,7 +6,6 @@
 
 #include <piejam/audio/components/amplifier.h>
 #include <piejam/audio/components/identity.h>
-#include <piejam/audio/components/level_meter.h>
 #include <piejam/audio/components/pan_balance.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
@@ -77,16 +76,9 @@ public:
         , m_mute_solo(components::make_mute_solo(*mixer_channel.name))
         , m_out_stream{stream_procs.make_processor(
                   mixer_channel.out_stream,
-                  num_channels(mixer_channel.bus_type),
+                  2,
                   sample_rate.to_samples(std::chrono::milliseconds{40}),
                   *mixer_channel.name)}
-        , m_level_meter(audio::components::make_stereo_level_meter(sample_rate))
-        , m_peak_level_proc(param_procs.find_or_make_processor(
-                  mixer_channel.peak_level,
-                  format_name(*mixer_channel.name, "peak_level")))
-        , m_rms_level_proc(param_procs.find_or_make_processor(
-                  mixer_channel.rms_level,
-                  format_name(*mixer_channel.name, "rms_level")))
     {
     }
 
@@ -114,7 +106,6 @@ public:
     {
         m_volume_pan_balance->connect(g);
         m_mute_solo->connect(g);
-        m_level_meter->connect(g);
 
         using namespace audio::engine::endpoint_ports;
 
@@ -148,21 +139,6 @@ public:
 
         audio::engine::connect(g, *m_volume_pan_balance, *m_mute_solo);
         audio::engine::connect(g, *m_volume_pan_balance, *m_out_stream);
-        audio::engine::connect(g, *m_volume_pan_balance, *m_level_meter);
-
-        audio::engine::connect_event(
-                g,
-                *m_level_meter,
-                from<0>,
-                *m_peak_level_proc,
-                to<0>);
-
-        audio::engine::connect_event(
-                g,
-                *m_level_meter,
-                from<1>,
-                *m_rms_level_proc,
-                to<0>);
     }
 
 private:
@@ -175,11 +151,6 @@ private:
     std::unique_ptr<audio::engine::component> m_volume_pan_balance;
     std::unique_ptr<audio::engine::component> m_mute_solo;
     std::shared_ptr<audio::engine::processor> m_out_stream;
-    std::unique_ptr<audio::engine::component> m_level_meter;
-    std::shared_ptr<audio::engine::value_io_processor<stereo_level>>
-            m_peak_level_proc;
-    std::shared_ptr<audio::engine::value_io_processor<stereo_level>>
-            m_rms_level_proc;
 
     std::array<audio::engine::graph_endpoint, 1> m_event_inputs{
             {m_mute_solo->event_inputs()[2]}};

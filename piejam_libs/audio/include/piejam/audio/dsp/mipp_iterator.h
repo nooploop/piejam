@@ -9,6 +9,7 @@
 #include <boost/assert.hpp>
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
+#include <bit>
 #include <ranges>
 #include <span>
 
@@ -206,6 +207,28 @@ mipp_range(std::span<T> const in)
     return std::ranges::subrange{
             mipp_iterator{data},
             mipp_iterator{data + in.size()}};
+}
+
+template <mipp_number T>
+[[nodiscard]]
+constexpr auto
+mipp_range_from_unaligned(std::span<T> const in)
+{
+    auto const data = in.data();
+
+    constexpr auto N = mipp::N<T>();
+
+    auto start_offset = std::bit_cast<std::uintptr_t>(data) % N;
+    auto rest_size = in.size() - std::min(in.size(), start_offset);
+    auto post_offset = data + start_offset + (rest_size / N) * N;
+    auto post_size = rest_size % N;
+
+    return std::tuple{
+            std::span{data, start_offset},
+            std::ranges::subrange{
+                    mipp_iterator{data + start_offset},
+                    mipp_iterator{post_offset}},
+            std::span{post_offset, post_size}};
 }
 
 } // namespace piejam::audio::dsp

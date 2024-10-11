@@ -28,8 +28,6 @@ using next_f = ui::next_f;
 using thunk_action = ui::thunk_action<state>;
 using update_state_action = ui::update_state_action<state>;
 
-using stereo_level = audio::pair<float>;
-
 struct locations;
 
 template <class Parameter>

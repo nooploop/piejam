@@ -22,10 +22,10 @@ class MixerChannelPerform final : public MixerChannel
 
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, volume)
     M_PIEJAM_GUI_READONLY_PROPERTY(
-            piejam::gui::model::StereoLevelParameter*,
+            piejam::gui::model::StereoLevel*,
             peakLevel)
     M_PIEJAM_GUI_READONLY_PROPERTY(
-            piejam::gui::model::StereoLevelParameter*,
+            piejam::gui::model::StereoLevel*,
             rmsLevel)
     M_PIEJAM_GUI_READONLY_PROPERTY(
             piejam::gui::model::FloatParameter*,

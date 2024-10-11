@@ -43,7 +43,7 @@
 #include <piejam/gui/model/RootView.h>
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/SpectrumData.h>
-#include <piejam/gui/model/StereoLevelParameter.h>
+#include <piejam/gui/model/StereoLevel.h>
 #include <piejam/gui/model/StringList.h>
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/WaveformDataObject.h>
@@ -94,7 +94,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::RootView*>();
     qRegisterMetaType<piejam::gui::model::ScopeData*>();
     qRegisterMetaType<piejam::gui::model::SpectrumData*>();
-    qRegisterMetaType<piejam::gui::model::StereoLevelParameter*>();
+    qRegisterMetaType<piejam::gui::model::StereoLevel*>();
     qRegisterMetaType<piejam::gui::model::StringList*>();
     qRegisterMetaType<piejam::gui::model::WaveformDataObject*>();
 

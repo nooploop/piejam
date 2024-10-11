@@ -40,17 +40,29 @@ public:
                           std::chrono::duration_cast<std::chrono::duration<T>>(
                                   rms_measure_time)
                                   .count() *
-                          sr.as_float<T>()) /
-                          mipp::N<T>(),
+                          sr.as_float<T>()),
                   0.f}
     {
     }
 
-    void push_back(value_type const x)
+    void push_back(T const x)
     {
-        T const sq = mipp::sum(x * x);
+        T const sq = x * x;
         m_squared_sum = m_squared_sum - m_squared_history.front() + sq;
         m_squared_history.push_back(sq);
+    }
+
+    void push_back(mipp::Reg<T> const x)
+    {
+        auto const sqN = x * x;
+        alignas(mipp::RequiredAlignment) std::array<T, mipp::N<T>()> sqN_buffer;
+        sqN.store(sqN_buffer.data());
+
+        for (auto sq : sqN_buffer)
+        {
+            m_squared_sum = m_squared_sum - m_squared_history.front() + sq;
+            m_squared_history.push_back(sq);
+        }
     }
 
     [[nodiscard]]
@@ -65,8 +77,7 @@ private:
     T m_min_level;
 
     boost::circular_buffer<T> m_squared_history;
-    T m_squared_history_size{
-            static_cast<T>(m_squared_history.size()) * mipp::N<T>()};
+    T m_squared_history_size{static_cast<T>(m_squared_history.size())};
     T m_squared_sum{};
 };
 

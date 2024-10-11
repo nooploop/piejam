@@ -7,7 +7,6 @@
 #include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/fx/ladspa_processor_factory.h>
-#include <piejam/runtime/stereo_level.h>
 
 #include <piejam/audio/fwd.h>
 #include <piejam/audio/pair.h>

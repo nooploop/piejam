@@ -326,20 +326,10 @@ make_mixer_channel_solo_parameter_selector(mixer::channel_id const channel_id)
 }
 
 auto
-make_mixer_channel_peak_level_parameter_selector(
-        mixer::channel_id const channel_id)
-        -> selector<stereo_level_parameter_id>
+make_mixer_channel_out_stream_selector(mixer::channel_id const channel_id)
+        -> selector<audio_stream_id>
 {
-    return make_mixer_channel_member_selector<&mixer::channel::peak_level>(
-            channel_id);
-}
-
-auto
-make_mixer_channel_rms_level_parameter_selector(
-        mixer::channel_id const channel_id)
-        -> selector<stereo_level_parameter_id>
-{
-    return make_mixer_channel_member_selector<&mixer::channel::rms_level>(
+    return make_mixer_channel_member_selector<&mixer::channel::out_stream>(
             channel_id);
 }
 
@@ -1094,13 +1084,6 @@ make_int_parameter_enum_values_selector(int_parameter_id const param_id)
 
         return result;
     };
-}
-
-auto
-make_level_parameter_value_selector(stereo_level_parameter_id const param_id)
-        -> selector<stereo_level>
-{
-    return make_parameter_value_selector(param_id);
 }
 
 auto

@@ -137,14 +137,4 @@ Item {
             tickOffset: 6
         }
     }
-
-    ModelSubscription {
-        target: root.peakLevel
-        subscribed: root.visible
-    }
-
-    ModelSubscription {
-        target: root.rmsLevel
-        subscribed: root.visible
-    }
 }

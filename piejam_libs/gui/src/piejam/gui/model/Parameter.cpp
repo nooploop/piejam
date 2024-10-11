@@ -8,7 +8,7 @@
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/IntParameter.h>
 #include <piejam/gui/model/MidiAssignable.h>
-#include <piejam/gui/model/StereoLevelParameter.h>
+#include <piejam/gui/model/StereoLevel.h>
 
 #include <piejam/integral_constant.h>
 #include <piejam/math.h>
@@ -31,10 +31,7 @@ namespace
 using parameter_id_to_FxParameter = boost::mp11::mp_list<
         boost::mp11::mp_list<runtime::bool_parameter_id, BoolParameter>,
         boost::mp11::mp_list<runtime::float_parameter_id, FloatParameter>,
-        boost::mp11::mp_list<runtime::int_parameter_id, IntParameter>,
-        boost::mp11::mp_list<
-                runtime::stereo_level_parameter_id,
-                StereoLevelParameter>>;
+        boost::mp11::mp_list<runtime::int_parameter_id, IntParameter>>;
 
 } // namespace
 

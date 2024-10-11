@@ -630,10 +630,6 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
             .solo = params_factory.make_parameter(bool_parameter{
                     .name = box("Solo"s),
                     .default_value = false}),
-            .peak_level = params_factory.make_parameter(
-                    parameter::stereo_level_descriptor{}),
-            .rms_level = params_factory.make_parameter(
-                    parameter::stereo_level_descriptor{}),
             .out_stream = make_stream(st.streams, 2),
             .fx_chain = {},
     });
@@ -671,8 +667,6 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
     remove_parameter(st, mixer_channel.record);
     remove_parameter(st, mixer_channel.mute);
     remove_parameter(st, mixer_channel.solo);
-    remove_parameter(st, mixer_channel.peak_level);
-    remove_parameter(st, mixer_channel.rms_level);
 
     // remove own aux_sends
     for (auto& aux_send : mixer_channel.aux_sends.get())

@@ -4,28 +4,50 @@
 
 #include <piejam/gui/model/MixerChannelPerform.h>
 
+#include <piejam/gui/model/AudioStreamChannelSplitter.h>
 #include <piejam/gui/model/BoolParameter.h>
 #include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/FloatParameter.h>
+#include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/MidiAssignable.h>
 #include <piejam/gui/model/MixerDbScales.h>
-#include <piejam/gui/model/StereoLevelParameter.h>
+#include <piejam/gui/model/PeakLevelMeter.h>
+#include <piejam/gui/model/RmsLevelMeter.h>
+#include <piejam/gui/model/StereoLevel.h>
 
 #include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/selectors.h>
+
+#include <array>
 
 namespace piejam::gui::model
 {
 
 struct MixerChannelPerform::Impl
 {
-    std::unique_ptr<StereoLevelParameter> peakLevel;
-    std::unique_ptr<StereoLevelParameter> rmsLevel;
+    StereoLevel peakLevel;
+    StereoLevel rmsLevel;
+    std::unique_ptr<FxStream> outStream;
+    AudioStreamChannelSplitter stereoSplitter{
+            std::array{BusType::Mono, BusType::Mono}};
+    PeakLevelMeter peakLevelMeterLeft{audio::sample_rate{48000u}};
+    PeakLevelMeter peakLevelMeterRight{audio::sample_rate{48000u}};
+    RmsLevelMeter rmsLevelMeterLeft{audio::sample_rate{48000u}};
+    RmsLevelMeter rmsLevelMeterRight{audio::sample_rate{48000u}};
+
     std::unique_ptr<FloatParameter> volume;
     std::unique_ptr<FloatParameter> panBalance;
     std::unique_ptr<BoolParameter> record;
     std::unique_ptr<BoolParameter> solo;
     std::unique_ptr<BoolParameter> mute;
+
+    void updateSampleRate(audio::sample_rate sr)
+    {
+        peakLevelMeterLeft.setSampleRate(sr);
+        peakLevelMeterRight.setSampleRate(sr);
+        rmsLevelMeterLeft.setSampleRate(sr);
+        rmsLevelMeterRight.setSampleRate(sr);
+    }
 };
 
 MixerChannelPerform::MixerChannelPerform(
@@ -35,19 +57,78 @@ MixerChannelPerform::MixerChannelPerform(
     : MixerChannel{store_dispatch, state_change_subscriber, id}
     , m_impl{make_pimpl<Impl>()}
 {
-    makeParameter(
-            m_impl->peakLevel,
+    m_impl->outStream = std::make_unique<FxStream>(
+            dispatch(),
+            this->state_change_subscriber(),
             observe_once(
-                    runtime::selectors::
-                            make_mixer_channel_peak_level_parameter_selector(
-                                    id)));
+                    runtime::selectors::make_mixer_channel_out_stream_selector(
+                            id)));
+    MixerChannel::connectSubscribableChild(*m_impl->outStream);
 
-    makeParameter(
-            m_impl->rmsLevel,
-            observe_once(
-                    runtime::selectors::
-                            make_mixer_channel_rms_level_parameter_selector(
-                                    id)));
+    m_impl->updateSampleRate(
+            observe_once(runtime::selectors::select_sample_rate)->current);
+
+    QObject::connect(
+            m_impl->outStream.get(),
+            &AudioStreamProvider::captured,
+            &m_impl->stereoSplitter,
+            &AudioStreamListener::update);
+
+    QObject::connect(
+            &m_impl->stereoSplitter,
+            &AudioStreamChannelSplitter::splitted,
+            this,
+            [this](std::size_t substreamIndex, AudioStream stream) {
+                switch (substreamIndex)
+                {
+                    case 0:
+                        m_impl->peakLevelMeterLeft.update(stream);
+                        m_impl->rmsLevelMeterLeft.update(stream);
+                        break;
+
+                    case 1:
+                        m_impl->peakLevelMeterRight.update(stream);
+                        m_impl->rmsLevelMeterRight.update(stream);
+                        break;
+
+                    default:
+                        BOOST_ASSERT(false);
+                }
+            });
+
+    QObject::connect(
+            &m_impl->peakLevelMeterLeft,
+            &PeakLevelMeter::levelChanged,
+            this,
+            [this]() {
+                m_impl->peakLevel.setLevelLeft(
+                        m_impl->peakLevelMeterLeft.level());
+            });
+    QObject::connect(
+            &m_impl->peakLevelMeterRight,
+            &PeakLevelMeter::levelChanged,
+            this,
+            [this]() {
+                m_impl->peakLevel.setLevelRight(
+                        m_impl->peakLevelMeterRight.level());
+            });
+
+    QObject::connect(
+            &m_impl->rmsLevelMeterLeft,
+            &RmsLevelMeter::levelChanged,
+            this,
+            [this]() {
+                m_impl->rmsLevel.setLevelLeft(
+                        m_impl->rmsLevelMeterLeft.level());
+            });
+    QObject::connect(
+            &m_impl->rmsLevelMeterRight,
+            &RmsLevelMeter::levelChanged,
+            this,
+            [this]() {
+                m_impl->rmsLevel.setLevelRight(
+                        m_impl->rmsLevelMeterRight.level());
+            });
 
     makeParameter(
             m_impl->volume,
@@ -82,15 +163,15 @@ MixerChannelPerform::MixerChannelPerform(
 }
 
 auto
-MixerChannelPerform::peakLevel() const noexcept -> StereoLevelParameter*
+MixerChannelPerform::peakLevel() const noexcept -> StereoLevel*
 {
-    return m_impl->peakLevel.get();
+    return &m_impl->peakLevel;
 }
 
 auto
-MixerChannelPerform::rmsLevel() const noexcept -> StereoLevelParameter*
+MixerChannelPerform::rmsLevel() const noexcept -> StereoLevel*
 {
-    return m_impl->rmsLevel.get();
+    return &m_impl->rmsLevel;
 }
 
 auto
@@ -127,6 +208,9 @@ void
 MixerChannelPerform::onSubscribe()
 {
     MixerChannel::onSubscribe();
+
+    m_impl->updateSampleRate(
+            observe_once(runtime::selectors::select_sample_rate)->current);
 
     observe(runtime::selectors::make_muted_by_solo_selector(channel_id()),
             [this](bool x) { setMutedBySolo(x); });

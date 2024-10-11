@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/components/level_meter.h>
+#include <piejam/audio/components/pan_balance.h>
 
 #include <piejam/audio/components/amplifier.h>
 #include <piejam/audio/components/remap_channels.h>
@@ -18,7 +18,6 @@
 
 #include <fmt/format.h>
 
-#include <array>
 
 namespace piejam::audio::components
 {

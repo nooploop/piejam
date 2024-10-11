@@ -9,7 +9,6 @@
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
-#include <piejam/runtime/stereo_level.h>
 
 #include <piejam/audio/types.h>
 #include <piejam/boxed_string.h>
@@ -47,8 +46,6 @@ struct channel
     bool_parameter_id record{};
     bool_parameter_id mute{};
     bool_parameter_id solo{};
-    stereo_level_parameter_id peak_level{};
-    stereo_level_parameter_id rms_level{};
 
     audio_stream_id out_stream{};
 

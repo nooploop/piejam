@@ -5,7 +5,6 @@
 add_library(piejam_audio STATIC
     include/piejam/audio/components/amplifier.h
     include/piejam/audio/components/identity.h
-    include/piejam/audio/components/level_meter.h
     include/piejam/audio/components/pan_balance.h
     include/piejam/audio/components/remap_channels.h
     include/piejam/audio/cpu_load_meter.h
@@ -42,7 +41,6 @@ add_library(piejam_audio STATIC
     include/piejam/audio/engine/graph_to_dag.h
     include/piejam/audio/engine/identity_processor.h
     include/piejam/audio/engine/input_processor.h
-    include/piejam/audio/engine/level_meter_processor.h
     include/piejam/audio/engine/lockstep_events.h
     include/piejam/audio/engine/mix_processor.h
     include/piejam/audio/engine/multiply_processor.h
@@ -96,7 +94,6 @@ add_library(piejam_audio STATIC
     src/piejam/audio/alsa/process_step.h
     src/piejam/audio/components/amplifier.cpp
     src/piejam/audio/components/identity.cpp
-    src/piejam/audio/components/level_meter.cpp
     src/piejam/audio/components/pan_balance.cpp
     src/piejam/audio/cpu_load_meter.cpp
     src/piejam/audio/engine/clip_processor.cpp
@@ -107,7 +104,6 @@ add_library(piejam_audio STATIC
     src/piejam/audio/engine/graph_to_dag.cpp
     src/piejam/audio/engine/identity_processor.cpp
     src/piejam/audio/engine/input_processor.cpp
-    src/piejam/audio/engine/level_meter_processor.cpp
     src/piejam/audio/engine/mix_processor.cpp
     src/piejam/audio/engine/multiply_processor.cpp
     src/piejam/audio/engine/output_processor.cpp

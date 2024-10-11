@@ -79,14 +79,16 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/MixerDbScales.h
     include/piejam/gui/model/Parameter.h
     include/piejam/gui/model/ParameterId.h
+    include/piejam/gui/model/PeakLevelMeter.h
     include/piejam/gui/model/PitchGenerator.h
+    include/piejam/gui/model/RmsLevelMeter.h
     include/piejam/gui/model/RootView.h
     include/piejam/gui/model/ScopeData.h
     include/piejam/gui/model/ScopeDataGenerator.h
     include/piejam/gui/model/SpectrumData.h
     include/piejam/gui/model/SpectrumDataGenerator.h
     include/piejam/gui/model/SpectrumDataPoint.h
-    include/piejam/gui/model/StereoLevelParameter.h
+    include/piejam/gui/model/StereoLevel.h
     include/piejam/gui/model/StreamId.h
     include/piejam/gui/model/StreamProcessor.h
     include/piejam/gui/model/StringList.h
@@ -140,11 +142,12 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/MixerChannelPerform.cpp
     src/piejam/gui/model/MixerDbScales.cpp
     src/piejam/gui/model/Parameter.cpp
+    src/piejam/gui/model/PeakLevelMeter.cpp
     src/piejam/gui/model/PitchGenerator.cpp
+    src/piejam/gui/model/RmsLevelMeter.cpp
     src/piejam/gui/model/RootView.cpp
     src/piejam/gui/model/ScopeDataGenerator.cpp
     src/piejam/gui/model/SpectrumDataGenerator.cpp
-    src/piejam/gui/model/StereoLevelParameter.cpp
     src/piejam/gui/model/WaveformDataGenerator.cpp
     src/piejam/gui/qt_log.cpp
 )

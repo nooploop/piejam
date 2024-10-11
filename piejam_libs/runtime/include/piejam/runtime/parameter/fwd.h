@@ -12,7 +12,6 @@ namespace piejam::runtime::parameter
 struct bool_descriptor;
 struct float_descriptor;
 struct int_descriptor;
-struct stereo_level_descriptor;
 
 template <class Parameter>
 using id_t = entity_id<Parameter>;

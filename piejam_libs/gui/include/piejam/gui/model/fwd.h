@@ -47,7 +47,7 @@ class BoolParameter;
 class IntParameter;
 class EnumParameter;
 class FloatParameter;
-class StereoLevelParameter;
+class StereoLevel;
 
 class FxBrowser;
 class FxBrowserEntry;

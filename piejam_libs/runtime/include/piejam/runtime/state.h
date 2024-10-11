@@ -33,7 +33,6 @@
 #include <piejam/runtime/parameter/float_descriptor.h>
 #include <piejam/runtime/parameter/int_descriptor.h>
 #include <piejam/runtime/parameter/map.h>
-#include <piejam/runtime/parameter/stereo_level_descriptor.h>
 #include <piejam/runtime/parameters.h>
 #include <piejam/runtime/parameters_map.h>
 #include <piejam/runtime/root_view_mode.h>
