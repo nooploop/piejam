@@ -13,6 +13,7 @@
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
+#include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
 
@@ -45,6 +46,16 @@ struct FxFilter::Impl
     std::unique_ptr<FloatParameter> cutoffParam;
     std::unique_ptr<FloatParameter> resonanceParam;
     std::unique_ptr<FxStream> inOutStream;
+
+    void updateSampleRate(audio::sample_rate sr)
+    {
+        if (sr.valid() && sample_rate != sr)
+        {
+            sample_rate = sr;
+            renew(dataInGenerator, sr);
+            renew(dataOutGenerator, sr);
+        }
+    }
 };
 
 FxFilter::FxFilter(
@@ -121,13 +132,8 @@ FxFilter::FxFilter(
 void
 FxFilter::onSubscribe()
 {
-    auto const sample_rate =
-            observe_once(runtime::selectors::select_sample_rate)->current;
-    if (sample_rate.valid() && m_impl->sample_rate != sample_rate)
-    {
-        m_impl->dataInGenerator = SpectrumDataGenerator{sample_rate};
-        m_impl->dataOutGenerator = SpectrumDataGenerator{sample_rate};
-    }
+    m_impl->updateSampleRate(
+            observe_once(runtime::selectors::select_sample_rate)->current);
 }
 
 auto

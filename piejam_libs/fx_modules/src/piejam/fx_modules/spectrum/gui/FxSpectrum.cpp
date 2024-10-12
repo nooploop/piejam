@@ -13,6 +13,7 @@
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/SpectrumDataGenerator.h>
+#include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/switch_cast.h>
 #include <piejam/to_underlying.h>
@@ -52,6 +53,16 @@ struct FxSpectrum::Impl
 
     std::unique_ptr<BoolParameter> freeze;
     std::unique_ptr<FxStream> stream;
+
+    void updateSampleRate(audio::sample_rate sr)
+    {
+        if (sr.valid() && sample_rate != sr)
+        {
+            sample_rate = sr;
+            renew(spectrumGenerator.first, sr);
+            renew(spectrumGenerator.second, sr);
+        }
+    }
 
     template <std::size_t I, class Samples>
     void process(Samples&& samples)
@@ -281,13 +292,8 @@ FxSpectrum::clear()
 void
 FxSpectrum::onSubscribe()
 {
-    auto const sample_rate =
-            observe_once(runtime::selectors::select_sample_rate)->current;
-    if (sample_rate.valid() && m_impl->sample_rate != sample_rate)
-    {
-        m_impl->spectrumGenerator.first = SpectrumDataGenerator{sample_rate};
-        m_impl->spectrumGenerator.second = SpectrumDataGenerator{sample_rate};
-    }
+    m_impl->updateSampleRate(
+            observe_once(runtime::selectors::select_sample_rate)->current);
 }
 
 } // namespace piejam::fx_modules::spectrum::gui

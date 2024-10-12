@@ -13,6 +13,7 @@
 #include <piejam/audio/dsp/peak_level_meter.h>
 #include <piejam/audio/dsp/rms_level_meter.h>
 #include <piejam/audio/pair.h>
+#include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
 
 namespace piejam::gui::model
@@ -21,7 +22,7 @@ namespace piejam::gui::model
 struct MixerChannelPerform::Impl
 {
     static constexpr audio::sample_rate default_sample_rate{48000u};
-    audio::sample_rate current_sample_rate{default_sample_rate};
+    audio::sample_rate sample_rate{default_sample_rate};
 
     StereoLevel peakLevel;
     StereoLevel rmsLevel;
@@ -40,11 +41,11 @@ struct MixerChannelPerform::Impl
 
     void updateSampleRate(audio::sample_rate sr)
     {
-        if (sr.valid() && current_sample_rate != sr)
+        if (sr.valid() && sample_rate != sr)
         {
-            peak_level_meter = audio::pair<audio::dsp::peak_level_meter<>>{sr};
-            rms_level_meter = audio::pair<audio::dsp::rms_level_meter<>>{sr};
-            current_sample_rate = sr;
+            sample_rate = sr;
+            renew(peak_level_meter, sr);
+            renew(rms_level_meter, sr);
         }
     }
 
@@ -82,9 +83,6 @@ MixerChannelPerform::MixerChannelPerform(
                     runtime::selectors::make_mixer_channel_out_stream_selector(
                             id)));
     MixerChannel::connectSubscribableChild(*m_impl->outStream);
-
-    m_impl->updateSampleRate(
-            observe_once(runtime::selectors::select_sample_rate)->current);
 
     QObject::connect(
             m_impl->outStream.get(),

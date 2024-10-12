@@ -23,6 +23,7 @@ target_sources(piejam_base INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/on_scope_exit.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/pimpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/registry_map.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/renew.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/set_if.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/switch_cast.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/piejam/to_underlying.h

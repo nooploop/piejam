@@ -10,6 +10,7 @@
 #include <piejam/audio/pitch.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/PitchGenerator.h>
+#include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
 
@@ -32,6 +33,15 @@ struct FxTuner::Impl
     PitchGenerator pitchGenerator{sample_rate};
 
     std::unique_ptr<FxStream> stream{};
+
+    void updateSampleRate(audio::sample_rate sr)
+    {
+        if (sr.valid() && sample_rate != sr)
+        {
+            sample_rate = sr;
+            renew(pitchGenerator, sr);
+        }
+    }
 };
 
 FxTuner::FxTuner(
@@ -125,13 +135,8 @@ FxTuner::type() const noexcept -> FxModuleType
 void
 FxTuner::onSubscribe()
 {
-    auto const sample_rate =
-            observe_once(runtime::selectors::select_sample_rate)->current;
-    if (sample_rate.valid() && m_impl->sample_rate != sample_rate)
-    {
-        m_impl->pitchGenerator = PitchGenerator{sample_rate};
-        m_impl->sample_rate = sample_rate;
-    }
+    m_impl->updateSampleRate(
+            observe_once(runtime::selectors::select_sample_rate)->current);
 }
 
 } // namespace piejam::fx_modules::tuner::gui
