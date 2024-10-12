@@ -26,7 +26,7 @@ public:
     void setActive(std::size_t substreamIndex, bool active);
     void setChannel(std::size_t substreamIndex, StereoChannel);
 
-    void update(AudioStream const&) override;
+    void update(AudioStream) override;
 
 signals:
     void generated(float frequency);

@@ -28,7 +28,7 @@ public:
 
     void clear();
 
-    void update(AudioStream const&) override;
+    void update(AudioStream) override;
 
 signals:
     void generated(std::span<piejam::gui::model::WaveformData const>);

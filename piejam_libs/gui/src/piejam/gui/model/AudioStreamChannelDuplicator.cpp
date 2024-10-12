@@ -10,7 +10,7 @@ namespace piejam::gui::model
 {
 
 void
-AudioStreamChannelDuplicator::update(AudioStream const& stream)
+AudioStreamChannelDuplicator::update(AudioStream stream)
 {
     auto const buffer = duplicate_channels(stream);
     duplicated(buffer.view());

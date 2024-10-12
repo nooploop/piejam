@@ -186,7 +186,7 @@ PitchGenerator::setChannel(
 }
 
 void
-PitchGenerator::update(AudioStream const& stream)
+PitchGenerator::update(AudioStream stream)
 {
     m_impl->streamProcessor.process(stream);
     BOOST_ASSERT(m_impl->streamProcessor.results.size() == 1);

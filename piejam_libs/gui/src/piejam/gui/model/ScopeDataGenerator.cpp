@@ -304,7 +304,7 @@ ScopeDataGenerator::setFreeze(bool const freeze)
 }
 
 void
-ScopeDataGenerator::update(AudioStream const& stream)
+ScopeDataGenerator::update(AudioStream stream)
 {
     if (m_impl->freeze)
     {

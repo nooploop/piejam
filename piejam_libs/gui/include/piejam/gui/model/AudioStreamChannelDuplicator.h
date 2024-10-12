@@ -14,7 +14,7 @@ class AudioStreamChannelDuplicator final : public AudioStreamListener
     Q_OBJECT
 
 public:
-    void update(AudioStream const&) override;
+    void update(AudioStream) override;
 
 signals:
     void duplicated(piejam::gui::model::AudioStream);

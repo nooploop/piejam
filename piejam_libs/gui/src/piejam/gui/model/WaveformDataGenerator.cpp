@@ -230,7 +230,7 @@ WaveformDataGenerator::clear()
 }
 
 void
-WaveformDataGenerator::update(AudioStream const& stream)
+WaveformDataGenerator::update(AudioStream stream)
 {
     if (m_impl->freeze)
     {

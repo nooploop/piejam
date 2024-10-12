@@ -26,10 +26,11 @@ struct pair
     {
     }
 
-    explicit constexpr pair(T const& t) noexcept(
-            std::is_nothrow_copy_constructible_v<T>)
-        : left(t)
-        , right(t)
+    template <class U>
+    explicit constexpr pair(U const& u) noexcept(
+            std::is_nothrow_constructible_v<T, U>)
+        : left(u)
+        , right(u)
     {
     }
 
@@ -50,10 +51,53 @@ struct pair
     constexpr pair(pair const&) = default;
     constexpr pair(pair&&) = default;
 
+    constexpr ~pair() = default;
+
     constexpr auto operator=(pair const&) -> pair& = default;
     constexpr auto operator=(pair&&) -> pair& = default;
 
     constexpr auto operator==(pair const&) const noexcept -> bool = default;
 };
 
+template <std::size_t I, class T>
+    requires(I < 2)
+auto
+get(pair<T> const& p) -> T const&
+{
+    return I == 0 ? p.left : p.right;
+}
+
+template <std::size_t I, class T>
+    requires(I < 2)
+auto
+get(pair<T>& p) -> T&
+{
+    return I == 0 ? p.left : p.right;
+}
+
+template <std::size_t I, class T>
+    requires(I < 2)
+auto
+get(pair<T>&& p) -> T&&
+{
+    return I == 0 ? std::move(p).left : std::move(p).right;
+}
+
 } // namespace piejam::audio
+
+namespace std
+{
+
+template <class T>
+struct tuple_size<piejam::audio::pair<T>>
+    : std::integral_constant<std::size_t, 2>
+{
+};
+
+template <std::size_t I, class T>
+struct tuple_element<I, piejam::audio::pair<T>>
+{
+    using type = T;
+};
+
+} // namespace std

@@ -17,7 +17,7 @@ AudioStreamAmplifier::AudioStreamAmplifier(std::size_t numSubstreams)
 }
 
 void
-AudioStreamAmplifier::update(AudioStream const& stream)
+AudioStreamAmplifier::update(AudioStream stream)
 {
     // fast path if all gains are at unity
     if (std::ranges::all_of(m_gains, equal_to<>(1.f)))

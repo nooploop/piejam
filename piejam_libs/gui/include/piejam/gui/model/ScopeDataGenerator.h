@@ -33,7 +33,7 @@ public:
     void setChannel(std::size_t substreamIndex, StereoChannel);
     void setFreeze(bool);
 
-    void update(AudioStream const&) override;
+    void update(AudioStream) override;
 
     void clear();
 

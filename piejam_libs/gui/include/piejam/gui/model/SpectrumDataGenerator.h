@@ -29,7 +29,7 @@ public:
     void setChannel(std::size_t substreamIndex, StereoChannel);
     void setFreeze(bool);
 
-    void update(AudioStream const&) override;
+    void update(AudioStream) override;
 
 signals:
     void generated(std::span<piejam::gui::model::SpectrumDataPoints const>);

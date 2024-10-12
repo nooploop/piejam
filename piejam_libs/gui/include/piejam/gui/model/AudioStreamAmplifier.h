@@ -18,7 +18,7 @@ class AudioStreamAmplifier final : public AudioStreamListener
 public:
     explicit AudioStreamAmplifier(std::size_t numSubstreams);
 
-    void update(AudioStream const&) override;
+    void update(AudioStream) override;
 
     void setGain(std::size_t substreamIndex, float gain);
 

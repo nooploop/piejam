@@ -16,7 +16,7 @@ AudioStreamChannelSplitter::AudioStreamChannelSplitter(
 }
 
 void
-AudioStreamChannelSplitter::update(AudioStream const& stream)
+AudioStreamChannelSplitter::update(AudioStream stream)
 {
     std::size_t substream_index{};
     std::size_t start_channel{};

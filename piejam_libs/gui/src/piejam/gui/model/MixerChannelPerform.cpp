@@ -4,36 +4,33 @@
 
 #include <piejam/gui/model/MixerChannelPerform.h>
 
-#include <piejam/gui/model/AudioStreamChannelSplitter.h>
 #include <piejam/gui/model/BoolParameter.h>
-#include <piejam/gui/model/DbScaleData.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
-#include <piejam/gui/model/MidiAssignable.h>
-#include <piejam/gui/model/MixerDbScales.h>
-#include <piejam/gui/model/PeakLevelMeter.h>
-#include <piejam/gui/model/RmsLevelMeter.h>
 #include <piejam/gui/model/StereoLevel.h>
 
-#include <piejam/runtime/actions/fwd.h>
+#include <piejam/audio/dsp/mipp_iterator.h>
+#include <piejam/audio/dsp/peak_level_meter.h>
+#include <piejam/audio/dsp/rms_level_meter.h>
+#include <piejam/audio/pair.h>
 #include <piejam/runtime/selectors.h>
-
-#include <array>
 
 namespace piejam::gui::model
 {
 
 struct MixerChannelPerform::Impl
 {
+    static constexpr audio::sample_rate default_sample_rate{48000u};
+    audio::sample_rate current_sample_rate{default_sample_rate};
+
     StereoLevel peakLevel;
     StereoLevel rmsLevel;
     std::unique_ptr<FxStream> outStream;
-    AudioStreamChannelSplitter stereoSplitter{
-            std::array{BusType::Mono, BusType::Mono}};
-    PeakLevelMeter peakLevelMeterLeft{audio::sample_rate{48000u}};
-    PeakLevelMeter peakLevelMeterRight{audio::sample_rate{48000u}};
-    RmsLevelMeter rmsLevelMeterLeft{audio::sample_rate{48000u}};
-    RmsLevelMeter rmsLevelMeterRight{audio::sample_rate{48000u}};
+
+    audio::pair<audio::dsp::peak_level_meter<>> peak_level_meter{
+            default_sample_rate};
+    audio::pair<audio::dsp::rms_level_meter<>> rms_level_meter{
+            default_sample_rate};
 
     std::unique_ptr<FloatParameter> volume;
     std::unique_ptr<FloatParameter> panBalance;
@@ -43,10 +40,31 @@ struct MixerChannelPerform::Impl
 
     void updateSampleRate(audio::sample_rate sr)
     {
-        peakLevelMeterLeft.setSampleRate(sr);
-        peakLevelMeterRight.setSampleRate(sr);
-        rmsLevelMeterLeft.setSampleRate(sr);
-        rmsLevelMeterRight.setSampleRate(sr);
+        if (sr.valid() && current_sample_rate != sr)
+        {
+            peak_level_meter = audio::pair<audio::dsp::peak_level_meter<>>{sr};
+            rms_level_meter = audio::pair<audio::dsp::rms_level_meter<>>{sr};
+            current_sample_rate = sr;
+        }
+    }
+
+    template <std::size_t I>
+    void calcPeakLevel(std::span<float const> ch)
+    {
+        std::ranges::copy(ch, std::back_inserter(get<I>(peak_level_meter)));
+        peakLevel.setLevel<I>(get<I>(peak_level_meter).level());
+    }
+
+    template <std::size_t I>
+    void calcRmsLevel(std::span<float const> ch)
+    {
+        auto [pre, main, post] = audio::dsp::mipp_range_from_unaligned(ch);
+
+        std::ranges::copy(pre, std::back_inserter(get<I>(rms_level_meter)));
+        std::ranges::copy(main, std::back_inserter(get<I>(rms_level_meter)));
+        std::ranges::copy(post, std::back_inserter(get<I>(rms_level_meter)));
+
+        rmsLevel.setLevel<I>(get<I>(rms_level_meter).level());
     }
 };
 
@@ -71,63 +89,15 @@ MixerChannelPerform::MixerChannelPerform(
     QObject::connect(
             m_impl->outStream.get(),
             &AudioStreamProvider::captured,
-            &m_impl->stereoSplitter,
-            &AudioStreamListener::update);
-
-    QObject::connect(
-            &m_impl->stereoSplitter,
-            &AudioStreamChannelSplitter::splitted,
             this,
-            [this](std::size_t substreamIndex, AudioStream stream) {
-                switch (substreamIndex)
-                {
-                    case 0:
-                        m_impl->peakLevelMeterLeft.update(stream);
-                        m_impl->rmsLevelMeterLeft.update(stream);
-                        break;
+            [this](AudioStream captured) {
+                auto captured_stereo = captured.channels_cast<2>();
 
-                    case 1:
-                        m_impl->peakLevelMeterRight.update(stream);
-                        m_impl->rmsLevelMeterRight.update(stream);
-                        break;
+                m_impl->calcPeakLevel<0>(captured_stereo.channels()[0]);
+                m_impl->calcPeakLevel<1>(captured_stereo.channels()[1]);
 
-                    default:
-                        BOOST_ASSERT(false);
-                }
-            });
-
-    QObject::connect(
-            &m_impl->peakLevelMeterLeft,
-            &PeakLevelMeter::levelChanged,
-            this,
-            [this]() {
-                m_impl->peakLevel.setLevelLeft(
-                        m_impl->peakLevelMeterLeft.level());
-            });
-    QObject::connect(
-            &m_impl->peakLevelMeterRight,
-            &PeakLevelMeter::levelChanged,
-            this,
-            [this]() {
-                m_impl->peakLevel.setLevelRight(
-                        m_impl->peakLevelMeterRight.level());
-            });
-
-    QObject::connect(
-            &m_impl->rmsLevelMeterLeft,
-            &RmsLevelMeter::levelChanged,
-            this,
-            [this]() {
-                m_impl->rmsLevel.setLevelLeft(
-                        m_impl->rmsLevelMeterLeft.level());
-            });
-    QObject::connect(
-            &m_impl->rmsLevelMeterRight,
-            &RmsLevelMeter::levelChanged,
-            this,
-            [this]() {
-                m_impl->rmsLevel.setLevelRight(
-                        m_impl->rmsLevelMeterRight.level());
+                m_impl->calcRmsLevel<0>(captured_stereo.channels()[0]);
+                m_impl->calcRmsLevel<1>(captured_stereo.channels()[1]);
             });
 
     makeParameter(

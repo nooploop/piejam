@@ -260,7 +260,7 @@ SpectrumDataGenerator::setFreeze(bool const freeze)
 }
 
 void
-SpectrumDataGenerator::update(AudioStream const& stream)
+SpectrumDataGenerator::update(AudioStream stream)
 {
     if (m_impl->freeze)
     {

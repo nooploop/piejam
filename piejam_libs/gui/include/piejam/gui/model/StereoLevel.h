@@ -8,6 +8,8 @@
 
 #include <QObject>
 
+#include <boost/assert.hpp>
+
 namespace piejam::gui::model
 {
 
@@ -17,6 +19,31 @@ class StereoLevel : public QObject
 
     M_PIEJAM_GUI_PROPERTY(double, levelLeft, setLevelLeft)
     M_PIEJAM_GUI_PROPERTY(double, levelRight, setLevelRight)
+
+public:
+    void setLevel(std::size_t channelIndex, double level)
+    {
+        switch (channelIndex)
+        {
+            case 0:
+                setLevelLeft(level);
+                break;
+
+            case 1:
+                setLevelRight(level);
+                break;
+
+            default:
+                BOOST_ASSERT(false);
+        }
+    }
+
+    template <std::size_t ChannelIndex>
+        requires(ChannelIndex < 2)
+    void setLevel(double level)
+    {
+        ChannelIndex == 0 ? setLevelLeft(level) : setLevelRight(level);
+    }
 };
 
 } // namespace piejam::gui::model

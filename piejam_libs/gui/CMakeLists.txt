@@ -29,6 +29,8 @@ add_library(piejam_gui STATIC
     include/piejam/gui/generic_list_model_edit_script_executor.h
     include/piejam/gui/init.h
     include/piejam/gui/item/DbScale.h
+    include/piejam/gui/item/FixedLinearScaleGrid.h
+    include/piejam/gui/item/FixedLogScaleGrid.h
     include/piejam/gui/item/Scope.h
     include/piejam/gui/item/Spectrum.h
     include/piejam/gui/item/Waveform.h
@@ -79,9 +81,7 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/MixerDbScales.h
     include/piejam/gui/model/Parameter.h
     include/piejam/gui/model/ParameterId.h
-    include/piejam/gui/model/PeakLevelMeter.h
     include/piejam/gui/model/PitchGenerator.h
-    include/piejam/gui/model/RmsLevelMeter.h
     include/piejam/gui/model/RootView.h
     include/piejam/gui/model/ScopeData.h
     include/piejam/gui/model/ScopeDataGenerator.h
@@ -103,6 +103,8 @@ add_library(piejam_gui STATIC
     src/piejam/gui/ModelManager.cpp
     src/piejam/gui/init.cpp
     src/piejam/gui/item/DbScale.cpp
+    src/piejam/gui/item/FixedLinearScaleGrid.cpp
+    src/piejam/gui/item/FixedLogScaleGrid.cpp
     src/piejam/gui/item/Scope.cpp
     src/piejam/gui/item/Spectrum.cpp
     src/piejam/gui/item/Waveform.cpp
@@ -142,18 +144,12 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/MixerChannelPerform.cpp
     src/piejam/gui/model/MixerDbScales.cpp
     src/piejam/gui/model/Parameter.cpp
-    src/piejam/gui/model/PeakLevelMeter.cpp
     src/piejam/gui/model/PitchGenerator.cpp
-    src/piejam/gui/model/RmsLevelMeter.cpp
     src/piejam/gui/model/RootView.cpp
     src/piejam/gui/model/ScopeDataGenerator.cpp
     src/piejam/gui/model/SpectrumDataGenerator.cpp
     src/piejam/gui/model/WaveformDataGenerator.cpp
     src/piejam/gui/qt_log.cpp
-    include/piejam/gui/item/FixedLinearScaleGrid.h
-    src/piejam/gui/item/FixedLinearScaleGrid.cpp
-    include/piejam/gui/item/FixedLogScaleGrid.h
-    src/piejam/gui/item/FixedLogScaleGrid.cpp
 )
 
 target_include_directories(piejam_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

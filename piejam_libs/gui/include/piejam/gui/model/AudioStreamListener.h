@@ -16,7 +16,7 @@ class AudioStreamListener : public QObject
     Q_OBJECT
 
 public:
-    virtual void update(AudioStream const&) = 0;
+    virtual void update(AudioStream) = 0;
 };
 
 } // namespace piejam::gui::model

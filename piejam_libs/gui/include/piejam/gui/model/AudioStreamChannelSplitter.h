@@ -21,7 +21,7 @@ public:
     explicit AudioStreamChannelSplitter(
             std::span<BusType const> substreamConfigs);
 
-    void update(AudioStream const&) override;
+    void update(AudioStream) override;
 
 signals:
     void splitted(std::size_t substreamIndex, piejam::gui::model::AudioStream);
