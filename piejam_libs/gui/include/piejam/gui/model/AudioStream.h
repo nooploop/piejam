@@ -13,4 +13,14 @@ using AudioStream = audio::multichannel_view<
         float const,
         audio::multichannel_layout_non_interleaved>;
 
+using MonoAudioStream = audio::multichannel_view<
+        float const,
+        audio::multichannel_layout_non_interleaved,
+        1>;
+
+using StereoAudioStream = audio::multichannel_view<
+        float const,
+        audio::multichannel_layout_non_interleaved,
+        2>;
+
 } // namespace piejam::gui::model

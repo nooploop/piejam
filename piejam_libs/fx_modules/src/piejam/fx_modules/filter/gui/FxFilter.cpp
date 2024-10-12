@@ -7,7 +7,6 @@
 #include <piejam/fx_modules/filter/filter_internal_id.h>
 #include <piejam/fx_modules/filter/filter_module.h>
 
-#include <piejam/gui/model/AudioStreamChannelSplitter.h>
 #include <piejam/gui/model/AudioStreamProvider.h>
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
@@ -26,17 +25,18 @@ using namespace piejam::gui::model;
 
 struct FxFilter::Impl
 {
+    static constexpr audio::sample_rate default_sample_rate{48000u};
+
     Impl(BusType busType)
         : busType{busType}
     {
     }
 
     BusType busType;
+    audio::sample_rate sample_rate{default_sample_rate};
 
-    AudioStreamChannelSplitter channelSplitter{std::array{busType, busType}};
-
-    SpectrumDataGenerator dataInGenerator{std::array{busType}};
-    SpectrumDataGenerator dataOutGenerator{std::array{busType}};
+    SpectrumDataGenerator dataInGenerator{sample_rate};
+    SpectrumDataGenerator dataOutGenerator{sample_rate};
 
     SpectrumData spectrumDataIn;
     SpectrumData spectrumDataOut;
@@ -56,8 +56,6 @@ FxFilter::FxFilter(
               observe_once(runtime::selectors::make_fx_module_bus_type_selector(
                       fx_mod_id))))}
 {
-    auto const busType = toBusType(m_impl->busType);
-
     auto const& parameters = this->parameters();
 
     makeParameter(
@@ -77,55 +75,47 @@ FxFilter::FxFilter(
             m_impl->inOutStream,
             streams());
 
-    auto stereoChannel =
-            bus_type_to(busType, StereoChannel::Left, StereoChannel::Middle);
-    m_impl->dataInGenerator.setActive(0, true);
-    m_impl->dataInGenerator.setChannel(0, stereoChannel);
+    if (m_impl->busType == BusType::Mono)
+    {
+        QObject::connect(
+                m_impl->inOutStream.get(),
+                &AudioStreamProvider::captured,
+                this,
+                [this](AudioStream captured) {
+                    BOOST_ASSERT(captured.num_channels() == 2);
 
-    m_impl->dataOutGenerator.setActive(0, true);
-    m_impl->dataOutGenerator.setChannel(0, stereoChannel);
+                    m_impl->spectrumDataIn.set(m_impl->dataInGenerator.process(
+                            captured.channels_cast<2>().channels()[0]));
+                    m_impl->spectrumDataOut.set(
+                            m_impl->dataOutGenerator.process(
+                                    captured.channels_cast<2>().channels()[1]));
+                });
+    }
+    else
+    {
+        QObject::connect(
+                m_impl->inOutStream.get(),
+                &AudioStreamProvider::captured,
+                this,
+                [this](AudioStream captured) {
+                    BOOST_ASSERT(captured.num_channels() == 4);
 
-    QObject::connect(
-            m_impl->inOutStream.get(),
-            &AudioStreamProvider::captured,
-            &m_impl->channelSplitter,
-            &AudioStreamChannelSplitter::update);
-
-    QObject::connect(
-            &m_impl->channelSplitter,
-            &AudioStreamChannelSplitter::splitted,
-            this,
-            [this](std::size_t substreamIndex, AudioStream stream) {
-                switch (substreamIndex)
-                {
-                    case 0:
-                        m_impl->dataInGenerator.update(stream);
-                        break;
-
-                    case 1:
-                        m_impl->dataOutGenerator.update(stream);
-                        break;
-
-                    default:
-                        BOOST_ASSERT(false);
-                }
-            });
-
-    QObject::connect(
-            &m_impl->dataInGenerator,
-            &SpectrumDataGenerator::generated,
-            this,
-            [this](std::span<SpectrumDataPoints const> const dataPoints) {
-                m_impl->spectrumDataIn.set(dataPoints[0]);
-            });
-
-    QObject::connect(
-            &m_impl->dataOutGenerator,
-            &SpectrumDataGenerator::generated,
-            this,
-            [this](std::span<SpectrumDataPoints const> const dataPoints) {
-                m_impl->spectrumDataOut.set(dataPoints[0]);
-            });
+                    m_impl->spectrumDataIn.set(m_impl->dataInGenerator.process(
+                            captured.channels_subview(0, 2)
+                                    .channels_cast<2>()
+                                    .frames() |
+                            std::views::transform(StereoFrameValue<
+                                                  StereoChannel::Middle>{})));
+                    m_impl->spectrumDataOut.set(
+                            m_impl->dataOutGenerator.process(
+                                    captured.channels_subview(2, 2)
+                                            .channels_cast<2>()
+                                            .frames() |
+                                    std::views::transform(
+                                            StereoFrameValue<
+                                                    StereoChannel::Middle>{})));
+                });
+    }
 }
 
 void
@@ -133,8 +123,11 @@ FxFilter::onSubscribe()
 {
     auto const sample_rate =
             observe_once(runtime::selectors::select_sample_rate)->current;
-    m_impl->dataInGenerator.setSampleRate(sample_rate);
-    m_impl->dataOutGenerator.setSampleRate(sample_rate);
+    if (sample_rate.valid() && m_impl->sample_rate != sample_rate)
+    {
+        m_impl->dataInGenerator = SpectrumDataGenerator{sample_rate};
+        m_impl->dataOutGenerator = SpectrumDataGenerator{sample_rate};
+    }
 }
 
 auto

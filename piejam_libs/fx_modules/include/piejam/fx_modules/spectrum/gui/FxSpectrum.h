@@ -44,14 +44,6 @@ public:
 private:
     void onSubscribe() override;
 
-    void onActiveAChanged();
-    void onActiveBChanged();
-    void onChannelAChanged();
-    void onChannelBChanged();
-    void onGainAChanged();
-    void onGainBChanged();
-    void onFreezeChanged();
-
     struct Impl;
     pimpl<Impl> m_impl;
 };

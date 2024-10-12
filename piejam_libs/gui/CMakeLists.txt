@@ -41,7 +41,6 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/AudioStream.h
     include/piejam/gui/model/AudioStreamAmplifier.h
     include/piejam/gui/model/AudioStreamChannelDuplicator.h
-    include/piejam/gui/model/AudioStreamChannelSplitter.h
     include/piejam/gui/model/AudioStreamListener.h
     include/piejam/gui/model/AudioStreamProvider.h
     include/piejam/gui/model/BoolParameter.h
@@ -114,7 +113,6 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/AudioRoutingSelection.cpp
     src/piejam/gui/model/AudioStreamAmplifier.cpp
     src/piejam/gui/model/AudioStreamChannelDuplicator.cpp
-    src/piejam/gui/model/AudioStreamChannelSplitter.cpp
     src/piejam/gui/model/BoolParameter.cpp
     src/piejam/gui/model/DbScaleData.cpp
     src/piejam/gui/model/EnumParameter.cpp

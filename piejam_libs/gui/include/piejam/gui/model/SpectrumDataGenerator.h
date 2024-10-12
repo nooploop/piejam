@@ -4,39 +4,37 @@
 
 #pragma once
 
-#include <piejam/gui/model/AudioStreamListener.h>
 #include <piejam/gui/model/SpectrumDataPoint.h>
 #include <piejam/gui/model/Types.h>
 
+#include <piejam/algorithm/shift_push_back.h>
 #include <piejam/audio/fwd.h>
 #include <piejam/pimpl.h>
-
-#include <span>
 
 namespace piejam::gui::model
 {
 
-class SpectrumDataGenerator final : public AudioStreamListener
+class SpectrumDataGenerator
 {
-    Q_OBJECT
 public:
-    explicit SpectrumDataGenerator(std::span<BusType const> substreamConfigs);
+    explicit SpectrumDataGenerator(
+            audio::sample_rate,
+            DFTResolution = DFTResolution::Low);
 
-    void setSampleRate(audio::sample_rate);
-    void setResolution(DFTResolution);
-
-    void setActive(std::size_t substreamIndex, bool active);
-    void setChannel(std::size_t substreamIndex, StereoChannel);
-    void setFreeze(bool);
-
-    void update(AudioStream) override;
-
-signals:
-    void generated(std::span<piejam::gui::model::SpectrumDataPoints const>);
+    template <class Samples>
+    auto process(Samples const& samples) -> SpectrumDataPoints
+    {
+        algorithm::shift_push_back(m_dftPrepareBuffer, samples);
+        return process();
+    }
 
 private:
+    auto process() -> SpectrumDataPoints;
+
     struct Impl;
     pimpl<Impl> m_impl;
+
+    std::vector<float> m_dftPrepareBuffer;
 };
 
 } // namespace piejam::gui::model
