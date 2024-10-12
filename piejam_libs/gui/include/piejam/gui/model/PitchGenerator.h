@@ -4,36 +4,34 @@
 
 #pragma once
 
-#include <piejam/gui/model/AudioStreamListener.h>
-#include <piejam/gui/model/Types.h>
+#include <piejam/algorithm/shift_push_back.h>
+#include <piejam/audio/sample_rate.h>
 
-#include <piejam/audio/fwd.h>
-#include <piejam/pimpl.h>
-
-#include <span>
+#include <vector>
 
 namespace piejam::gui::model
 {
 
-class PitchGenerator final : public AudioStreamListener
+class PitchGenerator
 {
-    Q_OBJECT
 public:
-    PitchGenerator(std::span<BusType const> substreamConfigs);
+    explicit PitchGenerator(audio::sample_rate);
 
-    void setSampleRate(audio::sample_rate);
-
-    void setActive(std::size_t substreamIndex, bool active);
-    void setChannel(std::size_t substreamIndex, StereoChannel);
-
-    void update(AudioStream) override;
-
-signals:
-    void generated(float frequency);
+    template <class Samples>
+    auto process(Samples const& samples) -> float
+    {
+        algorithm::shift_push_back(m_signal, samples);
+        m_captured_samples += std::ranges::size(samples);
+        return process();
+    }
 
 private:
-    struct Impl;
-    pimpl<Impl> m_impl;
+    auto process() -> float;
+
+    std::vector<float> m_signal;
+    std::size_t m_captured_samples{};
+    float m_last_frequency{};
+    audio::sample_rate m_sample_rate;
 };
 
 } // namespace piejam::gui::model

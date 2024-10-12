@@ -14,21 +14,6 @@
 namespace piejam::fx_modules::tuner
 {
 
-enum class stereo_channel : int
-{
-    left,
-    right,
-    middle,
-
-    _min = left,
-    _max = middle,
-};
-
-enum class parameter_key : runtime::parameter::key
-{
-    channel,
-};
-
 enum class stream_key : runtime::fx::stream_key
 {
     input

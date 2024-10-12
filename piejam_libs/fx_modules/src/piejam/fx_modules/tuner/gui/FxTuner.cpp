@@ -8,7 +8,6 @@
 #include <piejam/fx_modules/tuner/tuner_module.h>
 
 #include <piejam/audio/pitch.h>
-#include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/PitchGenerator.h>
 #include <piejam/runtime/selectors.h>
@@ -25,11 +24,13 @@ using namespace piejam::gui::model;
 
 struct FxTuner::Impl
 {
+    static constexpr audio::sample_rate default_sample_rate{48000u};
+
     BusType busType;
+    audio::sample_rate sample_rate{default_sample_rate};
 
-    PitchGenerator pitchGenerator{std::span{&busType, 1}};
+    PitchGenerator pitchGenerator{sample_rate};
 
-    std::unique_ptr<EnumParameter> channel{};
     std::unique_ptr<FxStream> stream{};
 };
 
@@ -40,21 +41,24 @@ FxTuner::FxTuner(
     : FxModule{store_dispatch, state_change_subscriber, fx_mod_id}
     , m_impl{make_pimpl<Impl>(busType())}
 {
-    auto const& parameters = this->parameters();
-
-    makeParameter(
-            m_impl->channel,
-            parameters.at(to_underlying(parameter_key::channel)));
-
     makeStream(to_underlying(stream_key::input), m_impl->stream, streams());
 
-    m_impl->pitchGenerator.setActive(0, true);
-
     QObject::connect(
-            &m_impl->pitchGenerator,
-            &PitchGenerator::generated,
+            m_impl->stream.get(),
+            &AudioStreamProvider::captured,
             this,
-            [this](float const detectedFrequency) {
+            [this](AudioStream captured) {
+                float const detectedFrequency =
+                        m_impl->busType == BusType::Mono
+                                ? m_impl->pitchGenerator.process(
+                                          captured.samples())
+                                : m_impl->pitchGenerator.process(
+                                          captured.channels_cast<2>().frames() |
+                                          std::views::transform(
+                                                  StereoFrameValue<
+                                                          StereoChannel::
+                                                                  Middle>{}));
+
                 if (detectedFrequency != m_detectedFrequency)
                 {
                     setDetectedFrequency(detectedFrequency);
@@ -110,21 +114,6 @@ FxTuner::FxTuner(
                     }
                 }
             });
-
-    QObject::connect(
-            m_impl->stream.get(),
-            &AudioStreamProvider::captured,
-            &m_impl->pitchGenerator,
-            &PitchGenerator::update);
-
-    if (busType() == BusType::Stereo)
-    {
-        QObject::connect(
-                m_impl->channel.get(),
-                &EnumParameter::valueChanged,
-                this,
-                &FxTuner::onChannelChanged);
-    }
 }
 
 auto
@@ -133,25 +122,16 @@ FxTuner::type() const noexcept -> FxModuleType
     return {.id = internal_id()};
 }
 
-auto
-FxTuner::channel() const noexcept -> EnumParameter*
-{
-    return m_impl->channel.get();
-}
-
 void
 FxTuner::onSubscribe()
 {
-    m_impl->pitchGenerator.setSampleRate(
-            observe_once(runtime::selectors::select_sample_rate)->current);
-}
-
-void
-FxTuner::onChannelChanged()
-{
-    m_impl->pitchGenerator.setChannel(
-            0,
-            StereoChannel{m_impl->channel->value()});
+    auto const sample_rate =
+            observe_once(runtime::selectors::select_sample_rate)->current;
+    if (sample_rate.valid() && m_impl->sample_rate != sample_rate)
+    {
+        m_impl->pitchGenerator = PitchGenerator{sample_rate};
+        m_impl->sample_rate = sample_rate;
+    }
 }
 
 } // namespace piejam::fx_modules::tuner::gui

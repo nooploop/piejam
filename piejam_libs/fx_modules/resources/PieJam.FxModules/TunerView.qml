@@ -83,16 +83,5 @@ SubscribableItem {
             font.pixelSize: 24
             horizontalAlignment: Qt.AlignHCenter
         }
-
-
-        EnumButtonGroup {
-            visible: root.model && root.model.busType === PJModels.Types.BusType.Stereo
-
-            Layout.preferredWidth: 128
-            Layout.preferredHeight: 48
-            Layout.alignment: Qt.AlignHCenter
-
-            model: root.model ? root.model.channel : null
-        }
     }
 }
