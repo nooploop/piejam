@@ -49,7 +49,9 @@ FloatParameter::onSubscribe()
 void
 FloatParameter::changeValue(double value)
 {
-    dispatch(runtime::actions::set_float_parameter(m_impl->param_id, value));
+    dispatch(runtime::actions::set_float_parameter(
+            m_impl->param_id,
+            static_cast<float>(value)));
 }
 
 void
@@ -57,7 +59,7 @@ FloatParameter::changeNormalizedValue(double value)
 {
     dispatch(runtime::actions::set_float_parameter_normalized(
             m_impl->param_id,
-            value));
+            static_cast<float>(value)));
 }
 
 } // namespace piejam::gui::model

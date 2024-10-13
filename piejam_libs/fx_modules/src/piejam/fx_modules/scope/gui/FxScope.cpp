@@ -8,15 +8,15 @@
 #include <piejam/fx_modules/scope/scope_module.h>
 
 #include <piejam/audio/types.h>
-#include <piejam/functional/in_interval.h>
-#include <piejam/gui/model/AudioStreamAmplifier.h>
-#include <piejam/gui/model/AudioStreamChannelDuplicator.h>
 #include <piejam/gui/model/BoolParameter.h>
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/ScopeDataGenerator.h>
+#include <piejam/gui/model/StreamProcessor.h>
+#include <piejam/gui/model/StreamSamplesCache.h>
 #include <piejam/gui/model/WaveformDataGenerator.h>
+#include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
 
@@ -30,62 +30,111 @@ using namespace piejam::gui::model;
 namespace
 {
 
-auto
-substreamConfigs(BusType busType) -> std::span<BusType const>
+struct ScopeStreamProcessor : StreamProcessor<ScopeStreamProcessor>
 {
-    switch (busType)
+    template <class Samples>
+    void process(Samples&& samples)
     {
-        case BusType::Mono:
+        if (processAsWaveform)
         {
-            static std::array const configs{BusType::Mono};
-            return configs;
+            waveformData.get().shift_push_back(
+                    waveformGenerator.process(std::forward<Samples>(samples)));
+            waveformData.update();
         }
-
-        case BusType::Stereo:
+        else
         {
-            static std::array const configs{BusType::Stereo, BusType::Stereo};
-            return configs;
+            scopeDataCache.process(std::forward<Samples>(samples));
         }
     }
-}
+
+    bool processAsWaveform{};
+
+    WaveformDataGenerator waveformGenerator;
+    StreamSamplesCache scopeDataCache;
+
+    WaveformDataObject waveformData;
+    ScopeData scopeData;
+};
 
 } // namespace
 
 struct FxScope::Impl
 {
+    static constexpr audio::sample_rate default_sample_rate{48000u};
+
     Impl(BusType busType)
         : busType{busType}
-        , waveformGenerator{substreamConfigs(busType)}
-        , scopeDataGenerator{substreamConfigs(busType)}
     {
     }
 
     BusType busType;
-
-    AudioStreamAmplifier channelAmplifier{busType == BusType::Stereo ? 2u : 1u};
-    AudioStreamChannelDuplicator channelDuplicator;
-    WaveformDataGenerator waveformGenerator;
-    ScopeDataGenerator scopeDataGenerator;
+    audio::sample_rate sample_rate{default_sample_rate};
 
     std::unique_ptr<EnumParameter> mode;
     std::unique_ptr<EnumParameter> triggerSlope;
     std::unique_ptr<FloatParameter> triggerLevel;
     std::unique_ptr<FloatParameter> holdTime;
-    std::unique_ptr<IntParameter> waveformWindowSize;
-    std::unique_ptr<IntParameter> scopeWindowSize;
-    std::unique_ptr<BoolParameter> activeA;
-    std::unique_ptr<BoolParameter> activeB;
-    std::unique_ptr<EnumParameter> channelA;
-    std::unique_ptr<EnumParameter> channelB;
-    std::unique_ptr<FloatParameter> gainA;
-    std::unique_ptr<FloatParameter> gainB;
+    std::unique_ptr<IntParameter> waveformResolution;
+    std::unique_ptr<IntParameter> scopeResolution;
     std::unique_ptr<BoolParameter> freeze;
     std::unique_ptr<FxStream> stream;
 
-    piejam::gui::model::WaveformDataObject waveformDataA;
-    piejam::gui::model::WaveformDataObject waveformDataB;
-    piejam::gui::model::ScopeData scopeDataA;
-    piejam::gui::model::ScopeData scopeDataB;
+    std::pair<ScopeStreamProcessor, ScopeStreamProcessor> streamProcessor;
+    ScopeDataGenerator scopeDataGenerator;
+
+    auto modeEnum() const noexcept -> Mode
+    {
+        return mode->as<Mode>();
+    }
+
+    auto triggerSlopeEnum() const noexcept -> TriggerSlope
+    {
+        return triggerSlope->as<TriggerSlope>();
+    }
+
+    auto holdTimeInFrames() const noexcept -> std::size_t
+    {
+        return sample_rate.to_samples(
+                std::chrono::milliseconds{static_cast<int>(holdTime->value())});
+    }
+
+    void updateSampleRate(audio::sample_rate sr)
+    {
+        if (sr.valid())
+        {
+            sample_rate = sr;
+        }
+    }
+
+    void updateMode()
+    {
+        bool processAsWaveform =
+                mode->value() == to_underlying(scope::mode::free);
+        streamProcessor.first.processAsWaveform = processAsWaveform;
+        streamProcessor.second.processAsWaveform = processAsWaveform;
+    }
+
+    void updateWaveformGenerator()
+    {
+        int samplesPerPixel = std::pow(2, waveformResolution->value() * 3);
+        renew(streamProcessor.first.waveformGenerator, samplesPerPixel);
+        renew(streamProcessor.second.waveformGenerator, samplesPerPixel);
+    }
+
+    void updateWaveformData(std::size_t viewSize)
+    {
+        streamProcessor.first.waveformData.get().resize(viewSize);
+        streamProcessor.second.waveformData.get().resize(viewSize);
+    }
+
+    void updateScopeSamplesCache(std::size_t viewSize)
+    {
+
+        std::size_t doubleViewSize = viewSize * 2;
+        int stride = scopeResolution->value() * 2 + 1;
+        renew(streamProcessor.first.scopeDataCache, doubleViewSize, stride);
+        renew(streamProcessor.second.scopeDataCache, doubleViewSize, stride);
+    }
 };
 
 FxScope::FxScope(
@@ -114,42 +163,35 @@ FxScope::FxScope(
             parameters.at(to_underlying(parameter_key::hold_time)));
 
     makeParameter(
-            m_impl->waveformWindowSize,
+            m_impl->waveformResolution,
             parameters.at(to_underlying(parameter_key::waveform_window_size)));
 
     makeParameter(
-            m_impl->scopeWindowSize,
+            m_impl->scopeResolution,
             parameters.at(to_underlying(parameter_key::scope_window_size)));
 
     makeParameter(
-            m_impl->activeA,
+            m_impl->streamProcessor.first.active,
             parameters.at(to_underlying(parameter_key::stream_a_active)));
 
-    if (m_impl->busType == BusType::Mono)
-    {
-        // There is no control visible in mono mode, so we subscribe when parent
-        // is subscribed.
-        connectSubscribableChild(*m_impl->activeA);
-    }
-
     makeParameter(
-            m_impl->activeB,
+            m_impl->streamProcessor.second.active,
             parameters.at(to_underlying(parameter_key::stream_b_active)));
 
     makeParameter(
-            m_impl->channelA,
+            m_impl->streamProcessor.first.channel,
             parameters.at(to_underlying(parameter_key::channel_a)));
 
     makeParameter(
-            m_impl->channelB,
+            m_impl->streamProcessor.second.channel,
             parameters.at(to_underlying(parameter_key::channel_b)));
 
     makeParameter(
-            m_impl->gainA,
+            m_impl->streamProcessor.first.gain,
             parameters.at(to_underlying(parameter_key::gain_a)));
 
     makeParameter(
-            m_impl->gainB,
+            m_impl->streamProcessor.second.gain,
             parameters.at(to_underlying(parameter_key::gain_b)));
 
     makeParameter(
@@ -158,175 +200,141 @@ FxScope::FxScope(
 
     makeStream(to_underlying(stream_key::input), m_impl->stream, streams());
 
-    m_impl->waveformGenerator.setActive(0, true);
-    m_impl->waveformGenerator.setChannel(0, StereoChannel::Left);
-    m_impl->scopeDataGenerator.setActive(0, true);
-    m_impl->scopeDataGenerator.setChannel(0, StereoChannel::Left);
-    m_impl->scopeDataGenerator.setHoldTime(std::chrono::milliseconds{80});
+    auto clear_fn = [this]() { clear(); };
 
-    if (m_impl->busType == BusType::Stereo)
-    {
-        m_impl->waveformGenerator.setActive(1, false);
-        m_impl->waveformGenerator.setChannel(1, StereoChannel::Right);
-        m_impl->scopeDataGenerator.setActive(1, false);
-        m_impl->scopeDataGenerator.setChannel(1, StereoChannel::Right);
-    }
-
-    QObject::connect(
-            &m_impl->waveformGenerator,
-            &WaveformDataGenerator::generated,
-            this,
-            [this](std::span<WaveformData const> addedLines) {
-                waveformDataA()->get().shift_push_back(addedLines[0]);
-                waveformDataA()->update();
-
-                if (m_impl->busType == BusType::Stereo)
-                {
-                    waveformDataB()->get().shift_push_back(addedLines[1]);
-                    waveformDataB()->update();
-                }
-            });
-
-    QObject::connect(
-            &m_impl->scopeDataGenerator,
-            &ScopeDataGenerator::generated,
-            this,
-            [this](std::span<ScopeData::Samples const> scopeDataSamples) {
-                m_impl->scopeDataA.set(scopeDataSamples[0]);
-
-                if (m_impl->busType == BusType::Stereo)
-                {
-                    m_impl->scopeDataB.set(scopeDataSamples[1]);
-                }
-            });
-
-    if (m_impl->busType == BusType::Stereo)
+    if (m_impl->busType == BusType::Mono)
     {
         QObject::connect(
                 m_impl->stream.get(),
                 &AudioStreamProvider::captured,
-                &m_impl->channelDuplicator,
-                &AudioStreamChannelDuplicator::update);
+                this,
+                [this](AudioStream captured) {
+                    if (m_impl->freeze->value())
+                    {
+                        return;
+                    }
 
-        QObject::connect(
-                &m_impl->channelDuplicator,
-                &AudioStreamChannelDuplicator::duplicated,
-                &m_impl->channelAmplifier,
-                &AudioStreamAmplifier::update);
+                    BOOST_ASSERT(captured.num_channels() == 1);
+                    m_impl->streamProcessor.first.processSamples(
+                            captured.samples());
 
-        QObject::connect(
-                &m_impl->channelAmplifier,
-                &AudioStreamAmplifier::amplified,
-                &m_impl->waveformGenerator,
-                &WaveformDataGenerator::update);
+                    if (m_impl->modeEnum() != Mode::Free)
+                    {
+                        auto scopeData = m_impl->scopeDataGenerator.process(
+                                0,
+                                {m_impl->streamProcessor.first.scopeDataCache
+                                         .cached()},
+                                m_viewSize,
+                                m_impl->triggerSlopeEnum(),
+                                m_impl->triggerLevel->valueF(),
+                                captured.num_frames(),
+                                m_impl->holdTimeInFrames());
 
-        QObject::connect(
-                &m_impl->channelAmplifier,
-                &AudioStreamAmplifier::amplified,
-                &m_impl->scopeDataGenerator,
-                &ScopeDataGenerator::update);
+                        if (scopeData.size() == 1)
+                        {
+                            m_impl->streamProcessor.first.scopeData.set(
+                                    scopeData[0]);
+                        }
+                    }
+                });
     }
     else
     {
         QObject::connect(
                 m_impl->stream.get(),
                 &AudioStreamProvider::captured,
-                &m_impl->channelAmplifier,
-                &AudioStreamAmplifier::update);
+                this,
+                [this](AudioStream captured) {
+                    if (m_impl->freeze->value())
+                    {
+                        return;
+                    }
+
+                    auto stereo_captured = captured.channels_cast<2>();
+
+                    m_impl->streamProcessor.first.processStereo(
+                            stereo_captured);
+                    m_impl->streamProcessor.second.processStereo(
+                            stereo_captured);
+
+                    if (m_impl->modeEnum() != Mode::Free)
+                    {
+                        auto scopeData = m_impl->scopeDataGenerator.process(
+                                m_impl->modeEnum() == Mode::TriggerB,
+                                {m_impl->streamProcessor.first.scopeDataCache
+                                         .cached(),
+                                 m_impl->streamProcessor.second.scopeDataCache
+                                         .cached()},
+                                m_viewSize,
+                                m_impl->triggerSlopeEnum(),
+                                m_impl->triggerLevel->value(),
+                                captured.num_frames(),
+                                m_impl->holdTimeInFrames());
+
+                        if (scopeData.size() == 2)
+                        {
+                            m_impl->streamProcessor.first.scopeData.set(
+                                    scopeData[0]);
+                            m_impl->streamProcessor.second.scopeData.set(
+                                    scopeData[1]);
+                        }
+                    }
+                });
 
         QObject::connect(
-                &m_impl->channelAmplifier,
-                &AudioStreamAmplifier::amplified,
-                &m_impl->waveformGenerator,
-                &WaveformDataGenerator::update);
+                m_impl->streamProcessor.first.active.get(),
+                &BoolParameter::valueChanged,
+                this,
+                clear_fn);
 
         QObject::connect(
-                &m_impl->channelAmplifier,
-                &AudioStreamAmplifier::amplified,
-                &m_impl->scopeDataGenerator,
-                &ScopeDataGenerator::update);
+                m_impl->streamProcessor.first.channel.get(),
+                &EnumParameter::valueChanged,
+                this,
+                clear_fn);
+
+        QObject::connect(
+                m_impl->streamProcessor.second.active.get(),
+                &BoolParameter::valueChanged,
+                this,
+                clear_fn);
+
+        QObject::connect(
+                m_impl->streamProcessor.second.channel.get(),
+                &EnumParameter::valueChanged,
+                this,
+                clear_fn);
     }
 
     QObject::connect(
             m_impl->mode.get(),
             &EnumParameter::valueChanged,
             this,
-            &FxScope::onTriggerSourceChanged);
+            [this]() {
+                m_impl->updateMode();
+                clear();
+            });
 
     QObject::connect(
-            m_impl->triggerSlope.get(),
-            &EnumParameter::valueChanged,
-            this,
-            &FxScope::onTriggerSlopeChanged);
-
-    QObject::connect(
-            m_impl->triggerLevel.get(),
-            &FloatParameter::valueChanged,
-            this,
-            &FxScope::onTriggerLevelChanged);
-
-    QObject::connect(
-            m_impl->holdTime.get(),
-            &FloatParameter::valueChanged,
-            this,
-            &FxScope::onHoldTimeChanged);
-
-    QObject::connect(
-            m_impl->waveformWindowSize.get(),
+            m_impl->waveformResolution.get(),
             &IntParameter::valueChanged,
             this,
-            &FxScope::onWaveformWindowSizeChanged);
+            [this]() { m_impl->updateWaveformGenerator(); });
 
     QObject::connect(
-            m_impl->scopeWindowSize.get(),
+            m_impl->scopeResolution.get(),
             &IntParameter::valueChanged,
             this,
-            &FxScope::onScopeWindowSizeChanged);
+            [this]() {
+                m_impl->updateScopeSamplesCache(m_viewSize);
+                clear();
+            });
 
-    QObject::connect(
-            m_impl->activeA.get(),
-            &BoolParameter::valueChanged,
-            this,
-            &FxScope::onActiveAChanged);
-
-    QObject::connect(
-            m_impl->channelA.get(),
-            &EnumParameter::valueChanged,
-            this,
-            &FxScope::onChannelAChanged);
-
-    QObject::connect(
-            m_impl->gainA.get(),
-            &FloatParameter::valueChanged,
-            this,
-            &FxScope::onGainAChanged);
-
-    if (m_impl->busType == BusType::Stereo)
-    {
-        QObject::connect(
-                m_impl->activeB.get(),
-                &BoolParameter::valueChanged,
-                this,
-                &FxScope::onActiveBChanged);
-
-        QObject::connect(
-                m_impl->channelB.get(),
-                &EnumParameter::valueChanged,
-                this,
-                &FxScope::onChannelBChanged);
-
-        QObject::connect(
-                m_impl->gainB.get(),
-                &FloatParameter::valueChanged,
-                this,
-                &FxScope::onGainBChanged);
-    }
-
-    QObject::connect(
-            m_impl->freeze.get(),
-            &BoolParameter::valueChanged,
-            this,
-            &FxScope::onFreezeChanged);
+    QObject::connect(this, &FxScope::viewSizeChanged, this, [this]() {
+        m_impl->updateWaveformData(m_viewSize);
+        m_impl->updateScopeSamplesCache(m_viewSize);
+        clear();
+    });
 }
 
 auto
@@ -362,49 +370,49 @@ FxScope::holdTime() const noexcept -> FloatParameter*
 auto
 FxScope::waveformWindowSize() const noexcept -> IntParameter*
 {
-    return m_impl->waveformWindowSize.get();
+    return m_impl->waveformResolution.get();
 }
 
 auto
 FxScope::scopeWindowSize() const noexcept -> IntParameter*
 {
-    return m_impl->scopeWindowSize.get();
+    return m_impl->scopeResolution.get();
 }
 
 auto
 FxScope::activeA() const noexcept -> BoolParameter*
 {
-    return m_impl->activeA.get();
+    return m_impl->streamProcessor.first.active.get();
 }
 
 auto
 FxScope::activeB() const noexcept -> BoolParameter*
 {
-    return m_impl->activeB.get();
+    return m_impl->streamProcessor.second.active.get();
 }
 
 auto
 FxScope::channelA() const noexcept -> EnumParameter*
 {
-    return m_impl->channelA.get();
+    return m_impl->streamProcessor.first.channel.get();
 }
 
 auto
 FxScope::channelB() const noexcept -> EnumParameter*
 {
-    return m_impl->channelB.get();
+    return m_impl->streamProcessor.second.channel.get();
 }
 
 auto
 FxScope::gainA() const noexcept -> FloatParameter*
 {
-    return m_impl->gainA.get();
+    return m_impl->streamProcessor.first.gain.get();
 }
 
 auto
 FxScope::gainB() const noexcept -> FloatParameter*
 {
-    return m_impl->gainB.get();
+    return m_impl->streamProcessor.second.gain.get();
 }
 
 auto
@@ -416,185 +424,51 @@ FxScope::freeze() const noexcept -> BoolParameter*
 auto
 FxScope::waveformDataA() const noexcept -> WaveformDataObject*
 {
-    return &m_impl->waveformDataA;
+    return &m_impl->streamProcessor.first.waveformData;
 }
 
 auto
 FxScope::waveformDataB() const noexcept -> WaveformDataObject*
 {
-    return &m_impl->waveformDataB;
+    return &m_impl->streamProcessor.second.waveformData;
 }
 
 auto
 FxScope::scopeDataA() const noexcept -> ScopeData*
 {
-    return &m_impl->scopeDataA;
+    return &m_impl->streamProcessor.first.scopeData;
 }
 
 auto
 FxScope::scopeDataB() const noexcept -> ScopeData*
 {
-    return &m_impl->scopeDataB;
-}
-
-void
-FxScope::setViewSize(int const x)
-{
-    if (m_viewSize != x)
-    {
-        m_viewSize = x;
-        m_impl->scopeDataGenerator.setWindowSize(static_cast<std::size_t>(x));
-        emit viewSizeChanged();
-
-        clear();
-    }
+    return &m_impl->streamProcessor.second.scopeData;
 }
 
 void
 FxScope::clear()
 {
-    m_impl->waveformDataA.get().clear();
-    m_impl->waveformDataB.get().clear();
-    m_impl->scopeDataA.clear();
-    m_impl->scopeDataB.clear();
-
-    if (m_impl->activeA->value())
-    {
-        m_impl->waveformDataA.get().resize(m_viewSize);
-    }
-
-    if (m_impl->activeB->value())
-    {
-        m_impl->waveformDataB.get().resize(m_viewSize);
-    }
-
-    m_impl->waveformGenerator.clear();
+    m_impl->streamProcessor.first.scopeData.clear();
+    m_impl->streamProcessor.second.scopeData.clear();
     m_impl->scopeDataGenerator.clear();
 
-    m_impl->waveformDataA.update();
-    m_impl->waveformDataB.update();
+    m_impl->streamProcessor.first.waveformData.get().clear();
+    m_impl->streamProcessor.first.waveformData.get().resize(m_viewSize);
+    m_impl->streamProcessor.first.waveformData.update();
+
+    m_impl->streamProcessor.second.waveformData.get().clear();
+    m_impl->streamProcessor.second.waveformData.get().resize(m_viewSize);
+    m_impl->streamProcessor.second.waveformData.update();
+
+    m_impl->streamProcessor.first.waveformGenerator.clear();
+    m_impl->streamProcessor.second.waveformGenerator.clear();
 }
 
 void
 FxScope::onSubscribe()
 {
-    m_impl->scopeDataGenerator.setSampleRate(
+    m_impl->updateSampleRate(
             observe_once(runtime::selectors::select_sample_rate)->current);
-}
-
-void
-FxScope::onTriggerSourceChanged()
-{
-    switch (static_cast<runtime::parameter::key>(m_impl->mode->value()))
-    {
-        case to_underlying(mode::trigger_a):
-            m_impl->scopeDataGenerator.setTriggerStream(0);
-            break;
-
-        case to_underlying(mode::trigger_b):
-            m_impl->scopeDataGenerator.setTriggerStream(1);
-            break;
-
-        default:
-            break;
-    }
-
-    clear();
-}
-
-void
-FxScope::onTriggerSlopeChanged()
-{
-    m_impl->scopeDataGenerator.setTriggerSlope(
-            static_cast<TriggerSlope>(m_impl->triggerSlope->value()));
-}
-
-void
-FxScope::onTriggerLevelChanged()
-{
-    m_impl->scopeDataGenerator.setTriggerLevel(
-            static_cast<float>(m_impl->triggerLevel->value()));
-}
-
-void
-FxScope::onHoldTimeChanged()
-{
-    m_impl->scopeDataGenerator.setHoldTime(std::chrono::milliseconds{
-            static_cast<int>(m_impl->holdTime->value())});
-}
-
-void
-FxScope::onWaveformWindowSizeChanged()
-{
-    m_impl->waveformGenerator.setSamplesPerPixel(
-            std::pow(2, m_impl->waveformWindowSize->value() * 3));
-}
-
-void
-FxScope::onScopeWindowSizeChanged()
-{
-    m_impl->scopeDataGenerator.setResolution(
-            m_impl->scopeWindowSize->value() * 2 + 1);
-}
-
-void
-FxScope::onActiveAChanged()
-{
-    bool const active = m_impl->activeA->value();
-    m_impl->waveformGenerator.setActive(0, active);
-    m_impl->scopeDataGenerator.setActive(0, active);
-
-    clear();
-}
-
-void
-FxScope::onActiveBChanged()
-{
-    bool const active = m_impl->activeB->value();
-    m_impl->waveformGenerator.setActive(1, active);
-    m_impl->scopeDataGenerator.setActive(1, active);
-
-    clear();
-}
-
-void
-FxScope::onChannelAChanged()
-{
-    auto const x = StereoChannel{m_impl->channelA->value()};
-    m_impl->waveformGenerator.setChannel(0, x);
-    m_impl->scopeDataGenerator.setChannel(0, x);
-
-    clear();
-}
-
-void
-FxScope::onChannelBChanged()
-{
-    auto const x = StereoChannel{m_impl->channelB->value()};
-    m_impl->waveformGenerator.setChannel(1, x);
-    m_impl->scopeDataGenerator.setChannel(1, x);
-
-    clear();
-}
-
-void
-FxScope::onGainAChanged()
-{
-    m_impl->channelAmplifier.setGain(0, m_impl->gainA->value());
-}
-
-void
-FxScope::onGainBChanged()
-{
-    m_impl->channelAmplifier.setGain(1, m_impl->gainB->value());
-}
-
-void
-FxScope::onFreezeChanged()
-{
-    bool const freeze = m_impl->freeze->value();
-    m_impl->scopeDataGenerator.setFreeze(freeze);
-    m_impl->waveformGenerator.setFreeze(freeze);
 }
 
 } // namespace piejam::fx_modules::scope::gui

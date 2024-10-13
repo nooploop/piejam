@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <QObject>
+#include <qobjectdefs.h>
 
 #include <piejam/audio/types.h>
 
@@ -13,7 +13,7 @@ namespace piejam::gui::model
 
 Q_NAMESPACE
 
-enum class BusType : bool
+enum class BusType
 {
     Mono,
     Stereo
@@ -80,28 +80,6 @@ enum class StereoChannel
 };
 
 Q_ENUM_NS(StereoChannel)
-
-template <StereoChannel SC>
-struct StereoFrameValue
-{
-    constexpr auto operator()(auto const frame) const noexcept -> float
-    {
-        switch (SC)
-        {
-            case StereoChannel::Left:
-                return frame[0];
-            case StereoChannel::Right:
-                return frame[1];
-            case StereoChannel::Middle:
-                return frame[0] + frame[1];
-            case StereoChannel::Side:
-                return frame[0] - frame[1];
-        }
-    }
-};
-
-template <StereoChannel SC>
-static constexpr StereoFrameValue<SC> stereoFrameValue;
 
 enum class TriggerSlope
 {

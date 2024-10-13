@@ -1,119 +1,80 @@
 // PieJam - An audio mixer for Raspberry Pi.
-// SPDX-FileCopyrightText: 2020-2024 Dimitrij Kotrev
+// SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 
 #include <piejam/gui/model/AudioStream.h>
+#include <piejam/gui/model/BoolParameter.h>
+#include <piejam/gui/model/EnumParameter.h>
+#include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/Types.h>
 
-#include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/functional/operators.h>
+#include <piejam/switch_cast.h>
 
-#include <piejam/range/indices.h>
-#include <piejam/range/zip.h>
+#include <boost/range/adaptor/transformed.hpp>
+
+#include <memory>
+#include <ranges>
 
 namespace piejam::gui::model
 {
 
-struct SubStreamProcessorConfig
-{
-    BusType busType{BusType::Mono};
-    bool active{false};
-    StereoChannel channel{StereoChannel::Left};
-
-    // substream info
-    std::size_t startChannel{};
-    std::size_t numChannels{};
-};
-
-template <class Result>
-struct SubStreamProcessor
-{
-    virtual ~SubStreamProcessor() = default;
-
-    virtual auto process(AudioStream const&) -> Result = 0;
-    virtual void clear() = 0;
-};
-
-template <class Args, class Result, class StreamProcessorFactory>
+template <class Derived>
 struct StreamProcessor
 {
-    explicit StreamProcessor(std::span<BusType const> substreamConfigs)
-        : results(substreamConfigs.size())
+    template <class Samples>
+    auto processSamples(Samples&& samples)
     {
-        configs.reserve(substreamConfigs.size());
-        processors.reserve(substreamConfigs.size());
-
-        std::size_t startChannel{};
-        for (BusType const busType : substreamConfigs)
+        auto const g = static_cast<float>(gain->value());
+        switch (switch_cast(g))
         {
-            auto& config = configs.emplace_back(SubStreamProcessorConfig{
-                    .busType = busType,
-                    .startChannel = startChannel,
-                    .numChannels = num_channels(toBusType(busType))});
+            case switch_cast(1.f):
+                static_cast<Derived&>(*this).process(
+                        std::forward<Samples>(samples));
+                break;
 
-            processors.emplace_back(StreamProcessorFactory{}(config, args));
-
-            startChannel += config.numChannels;
+            default:
+                static_cast<Derived&>(*this).process(boost::adaptors::transform(
+                        boost::make_iterator_range(
+                                std::begin(samples),
+                                std::end(samples)),
+                        [g](auto x) { return g * x; }));
+                break;
         }
     }
 
-    void process(AudioStream const& stream)
+    void processStereo(StereoAudioStream stream)
     {
-        for (std::size_t substreamIndex : range::indices(configs))
+        if (!active->value())
         {
-            auto const& config = configs[substreamIndex];
+            return;
+        }
 
-            BOOST_ASSERT(substreamIndex < processors.size());
-            BOOST_ASSERT(substreamIndex < results.size());
-            results[substreamIndex] =
-                    processors[substreamIndex]->process(stream.channels_subview(
-                            config.startChannel,
-                            config.numChannels));
+        switch (static_cast<StereoChannel>(channel->value()))
+        {
+            case StereoChannel::Left:
+                processSamples(toLeft(stream));
+                break;
+
+            case StereoChannel::Right:
+                processSamples(toRight(stream));
+                break;
+
+            case StereoChannel::Middle:
+                processSamples(toMiddle(stream));
+                break;
+
+            case StereoChannel::Side:
+                processSamples(toSide(stream));
+                break;
         }
     }
 
-    void clear()
-    {
-        for (auto&& processor : processors)
-        {
-            processor->clear();
-        }
-    }
-
-    template <class T>
-    void updateProperty(T& member, T value)
-    {
-        if (member != value)
-        {
-            member = std::move(value);
-
-            for (auto&& [config, processor] : range::zip(configs, processors))
-            {
-                processor = StreamProcessorFactory{}(config, args);
-            }
-        }
-    }
-
-    void setActive(std::size_t const substreamIndex, bool const active)
-    {
-        BOOST_ASSERT(substreamIndex < configs.size());
-        updateProperty(configs[substreamIndex].active, active);
-    }
-
-    void setStereoChannel(
-            std::size_t const substreamIndex,
-            StereoChannel const channel)
-    {
-        BOOST_ASSERT(substreamIndex < configs.size());
-        updateProperty(configs[substreamIndex].channel, channel);
-    }
-
-    std::vector<Result> results;
-    std::vector<SubStreamProcessorConfig> configs;
-    std::vector<std::unique_ptr<SubStreamProcessor<Result>>> processors;
-
-    Args args{};
+    std::unique_ptr<BoolParameter> active;
+    std::unique_ptr<EnumParameter> channel;
+    std::unique_ptr<FloatParameter> gain;
 };
 
 } // namespace piejam::gui::model

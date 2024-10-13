@@ -364,7 +364,7 @@ public:
     }
 
     [[nodiscard]]
-    constexpr auto samples() const noexcept -> std::span<T> const&
+    constexpr auto samples() const noexcept -> std::span<T>
     {
         return m_data;
     }

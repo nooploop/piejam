@@ -112,19 +112,12 @@ FxFilter::FxFilter(
                     BOOST_ASSERT(captured.num_channels() == 4);
 
                     m_impl->spectrumDataIn.set(m_impl->dataInGenerator.process(
-                            captured.channels_subview(0, 2)
-                                    .channels_cast<2>()
-                                    .frames() |
-                            std::views::transform(StereoFrameValue<
-                                                  StereoChannel::Middle>{})));
+                            toMiddle(captured.channels_subview(0, 2)
+                                             .channels_cast<2>())));
                     m_impl->spectrumDataOut.set(
                             m_impl->dataOutGenerator.process(
-                                    captured.channels_subview(2, 2)
-                                            .channels_cast<2>()
-                                            .frames() |
-                                    std::views::transform(
-                                            StereoFrameValue<
-                                                    StereoChannel::Middle>{})));
+                                    toMiddle(captured.channels_subview(2, 2)
+                                                     .channels_cast<2>())));
                 });
     }
 }

@@ -42,7 +42,9 @@ public:
 
     void resize(std::size_t const sz)
     {
+        auto prev = std::move(m_data);
         m_data.resize(sz * 2, 0.f);
+        algorithm::shift_push_back(m_data, prev);
     }
 
     void reserve(std::size_t const capacity)

@@ -11,6 +11,8 @@
 #include <piejam/audio/fwd.h>
 #include <piejam/pimpl.h>
 
+#include <vector>
+
 namespace piejam::gui::model
 {
 

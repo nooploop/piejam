@@ -4,8 +4,6 @@
 
 #include <piejam/gui/model/FxStream.h>
 
-#include <piejam/gui/model/AudioStreamListener.h>
-
 #include <piejam/audio/multichannel_buffer.h>
 #include <piejam/runtime/selectors.h>
 

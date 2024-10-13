@@ -62,12 +62,8 @@ FxTuner::FxTuner(
                         m_impl->busType == BusType::Mono
                                 ? m_impl->pitchGenerator.process(
                                           captured.samples())
-                                : m_impl->pitchGenerator.process(
-                                          captured.channels_cast<2>().frames() |
-                                          std::views::transform(
-                                                  StereoFrameValue<
-                                                          StereoChannel::
-                                                                  Middle>{}));
+                                : m_impl->pitchGenerator.process(toMiddle(
+                                          captured.channels_cast<2>()));
 
                 if (detectedFrequency != m_detectedFrequency)
                 {

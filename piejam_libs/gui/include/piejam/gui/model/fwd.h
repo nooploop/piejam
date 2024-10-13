@@ -53,7 +53,6 @@ class FxBrowser;
 class FxBrowserEntry;
 using FxBrowserList = GenericListModel<FxBrowserEntry>;
 
-class AudioStreamListener;
 class AudioStreamProvider;
 using AudioStreamProviderList = GenericListModel<AudioStreamProvider>;
 

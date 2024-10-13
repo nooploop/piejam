@@ -80,7 +80,7 @@ SubscribableItem {
 
                     anchors.fill: parent
 
-                    visible: root.model && root.model.activeA.value
+                    visible: root.model && (!private_.isStereo || root.model.activeA.value)
 
                     scopeData: root.model ? root.model.scopeDataA : null
                     color: Material.color(Material.Pink)
@@ -122,7 +122,7 @@ SubscribableItem {
                 PJItems.Waveform {
                     anchors.fill: parent
 
-                    visible: root.model && root.model.activeA.value
+                    visible: root.model && (!private_.isStereo || root.model.activeA.value)
 
                     waveformData: root.model ? root.model.waveformDataA : null
                     color: Material.color(Material.Pink)

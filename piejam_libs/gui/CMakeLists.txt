@@ -39,9 +39,6 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/AudioRouting.h
     include/piejam/gui/model/AudioRoutingSelection.h
     include/piejam/gui/model/AudioStream.h
-    include/piejam/gui/model/AudioStreamAmplifier.h
-    include/piejam/gui/model/AudioStreamChannelDuplicator.h
-    include/piejam/gui/model/AudioStreamListener.h
     include/piejam/gui/model/AudioStreamProvider.h
     include/piejam/gui/model/BoolParameter.h
     include/piejam/gui/model/DbScaleData.h
@@ -90,6 +87,7 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/StereoLevel.h
     include/piejam/gui/model/StreamId.h
     include/piejam/gui/model/StreamProcessor.h
+    include/piejam/gui/model/StreamSamplesCache.h
     include/piejam/gui/model/StringList.h
     include/piejam/gui/model/Subscribable.h
     include/piejam/gui/model/SubscribableModel.h
@@ -111,8 +109,6 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/AudioInputOutputSettings.cpp
     src/piejam/gui/model/AudioRouting.cpp
     src/piejam/gui/model/AudioRoutingSelection.cpp
-    src/piejam/gui/model/AudioStreamAmplifier.cpp
-    src/piejam/gui/model/AudioStreamChannelDuplicator.cpp
     src/piejam/gui/model/BoolParameter.cpp
     src/piejam/gui/model/DbScaleData.cpp
     src/piejam/gui/model/EnumParameter.cpp
@@ -146,7 +142,6 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/RootView.cpp
     src/piejam/gui/model/ScopeDataGenerator.cpp
     src/piejam/gui/model/SpectrumDataGenerator.cpp
-    src/piejam/gui/model/WaveformDataGenerator.cpp
     src/piejam/gui/qt_log.cpp
 )
 

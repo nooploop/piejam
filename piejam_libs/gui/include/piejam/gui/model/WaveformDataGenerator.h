@@ -4,38 +4,68 @@
 
 #pragma once
 
-#include <piejam/gui/model/AudioStreamListener.h>
-#include <piejam/gui/model/Types.h>
+#include <piejam/gui/model/WaveformData.h>
 #include <piejam/gui/model/fwd.h>
 
-#include <piejam/pimpl.h>
+#include <piejam/math.h>
 
 namespace piejam::gui::model
 {
 
-class WaveformDataGenerator final : public AudioStreamListener
+class WaveformDataGenerator
 {
-    Q_OBJECT
-
 public:
-    explicit WaveformDataGenerator(std::span<BusType const> substreamConfigs);
+    explicit WaveformDataGenerator(int samplesPerPixel = 1)
+        : m_samplesPerPixel{samplesPerPixel}
+    {
+    }
 
-    void setSamplesPerPixel(int x);
+    template <class Samples>
+    auto process(Samples const& samples) -> WaveformData
+    {
+        WaveformData result;
 
-    void setActive(std::size_t substreamIndex, bool active);
-    void setChannel(std::size_t substreamIndex, StereoChannel);
-    void setFreeze(bool);
+        constexpr auto clip = [](float x) { return math::clamp(x, -1.f, 1.f); };
 
-    void clear();
+        for (auto const sample : samples)
+        {
+            if (m_accNumSamples) [[likely]]
+            {
+                m_accY0 = std::min(m_accY0, sample);
+                m_accY1 = std::max(m_accY1, sample);
+            }
+            else
+            {
+                m_accY0 = sample;
+                m_accY1 = sample;
+            }
 
-    void update(AudioStream) override;
+            ++m_accNumSamples;
 
-signals:
-    void generated(std::span<piejam::gui::model::WaveformData const>);
+            if (m_accNumSamples >= m_samplesPerPixel)
+            {
+                result.push_back(clip(m_accY0), clip(m_accY1));
+
+                m_accNumSamples = 0;
+            }
+        }
+
+        return result;
+    }
+
+    void clear()
+    {
+        m_accY0 = 0;
+        m_accY1 = 0;
+        m_accNumSamples = 0;
+    }
 
 private:
-    struct Impl;
-    pimpl<Impl> m_impl;
+    int m_samplesPerPixel;
+
+    float m_accY0{};
+    float m_accY1{};
+    int m_accNumSamples{};
 };
 
 } // namespace piejam::gui::model

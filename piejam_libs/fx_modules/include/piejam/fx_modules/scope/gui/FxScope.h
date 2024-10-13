@@ -22,8 +22,7 @@ class FxScope final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
 
-    Q_PROPERTY(int viewSize READ viewSize WRITE setViewSize NOTIFY
-                       viewSizeChanged FINAL)
+    M_PIEJAM_GUI_WRITABLE_PROPERTY(int, viewSize, setViewSize)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::EnumParameter*, mode)
     M_PIEJAM_GUI_READONLY_PROPERTY(
             piejam::gui::model::EnumParameter*,
@@ -63,49 +62,22 @@ public:
 
     auto type() const noexcept -> piejam::gui::model::FxModuleType override;
 
-    auto viewSize() const noexcept -> int
-    {
-        return m_viewSize;
-    }
-
-    void setViewSize(int const x);
-
     enum class Mode
     {
         Free,
-        StreamA,
-        StreamB,
+        TriggerA,
+        TriggerB,
     };
 
     Q_ENUM(Mode)
 
     Q_INVOKABLE void clear();
 
-signals:
-    void viewSizeChanged();
-    void freezeChanged();
-
 private:
     void onSubscribe() override;
 
-    void onTriggerSourceChanged();
-    void onTriggerSlopeChanged();
-    void onTriggerLevelChanged();
-    void onHoldTimeChanged();
-    void onWaveformWindowSizeChanged();
-    void onScopeWindowSizeChanged();
-    void onActiveAChanged();
-    void onActiveBChanged();
-    void onChannelAChanged();
-    void onChannelBChanged();
-    void onGainAChanged();
-    void onGainBChanged();
-    void onFreezeChanged();
-
     struct Impl;
     pimpl<Impl> m_impl;
-
-    int m_viewSize{};
 };
 
 } // namespace piejam::fx_modules::scope::gui

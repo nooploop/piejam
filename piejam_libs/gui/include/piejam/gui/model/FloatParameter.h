@@ -34,6 +34,16 @@ public:
     Q_INVOKABLE void changeValue(double);
     Q_INVOKABLE void changeNormalizedValue(double);
 
+    auto valueF() const noexcept -> float
+    {
+        return static_cast<float>(m_value);
+    }
+
+    auto normalizedValueF() const noexcept -> float
+    {
+        return static_cast<float>(m_normalizedValue);
+    }
+
 private:
     void onSubscribe() override;
 
