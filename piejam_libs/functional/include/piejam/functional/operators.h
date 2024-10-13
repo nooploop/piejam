@@ -4,26 +4,46 @@
 
 #pragma once
 
-#include <boost/hof/partial.hpp>
-
 #include <functional>
 
 namespace piejam
 {
 
-inline constexpr auto equal_to = boost::hof::partial(std::equal_to<>{});
+namespace detail
+{
 
-inline constexpr auto not_equal_to = boost::hof::partial(std::not_equal_to<>{});
+template <class Operator>
+struct op
+{
+    template <class X>
+    constexpr auto operator()(X&& x) const noexcept
+    {
+        return [x = std::forward<X>(x)]<class Y>(Y&& y) noexcept {
+            return Operator{}(std::forward<Y>(y), x);
+        };
+    }
 
-inline constexpr auto less = boost::hof::partial(std::less<>{});
+    template <class X, class Y>
+    constexpr auto operator()(X&& x, Y&& y) const noexcept
+    {
+        return Operator{}(std::forward<X>(x), std::forward<Y>(y));
+    }
+};
 
-inline constexpr auto less_equal = boost::hof::partial(std::less_equal<>{});
+} // namespace detail
 
-inline constexpr auto greater = boost::hof::partial(std::greater<>{});
+inline constexpr auto equal_to = detail::op<std::equal_to<>>{};
 
-inline constexpr auto greater_equal =
-        boost::hof::partial(std::greater_equal<>{});
+inline constexpr auto not_equal_to = detail::op<std::not_equal_to<>>{};
 
-inline constexpr auto multiplies = boost::hof::partial(std::multiplies<>{});
+inline constexpr auto less = detail::op<std::less<>>{};
+
+inline constexpr auto less_equal = detail::op<std::less_equal<>>{};
+
+inline constexpr auto greater = detail::op<std::greater<>>{};
+
+inline constexpr auto greater_equal = detail::op<std::greater_equal<>>{};
+
+inline constexpr auto multiplies = detail::op<std::multiplies<>>{};
 
 } // namespace piejam
