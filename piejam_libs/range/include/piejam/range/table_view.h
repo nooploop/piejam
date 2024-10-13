@@ -362,61 +362,6 @@ public:
         }
     }
 
-    template <
-            std::size_t ToMajorSize,
-            std::size_t ToMinorSize,
-            std::ptrdiff_t ToMajorStep,
-            std::ptrdiff_t ToMinorStep>
-    [[nodiscard]]
-    constexpr auto cast() const noexcept
-            -> table_view<T, ToMajorSize, ToMinorSize, ToMajorStep, ToMinorStep>
-    {
-        static_assert(
-                MajorSize == std::dynamic_extent ||
-                ToMajorSize == std::dynamic_extent || MajorSize == ToMajorSize);
-        static_assert(
-                MinorSize == std::dynamic_extent ||
-                ToMinorSize == std::dynamic_extent || MinorSize == ToMinorSize);
-        static_assert(
-                MajorStep == dynamic_stride || ToMajorSize == dynamic_stride ||
-                MajorStep == ToMajorStep);
-        static_assert(
-                MinorStep == dynamic_stride || ToMinorStep == dynamic_stride ||
-                MinorStep == ToMinorStep);
-
-        if constexpr (ToMajorSize != std::dynamic_extent)
-        {
-            BOOST_ASSERT(major_size() == ToMajorSize);
-        }
-
-        if constexpr (ToMinorSize != std::dynamic_extent)
-        {
-            BOOST_ASSERT(minor_size() == ToMinorSize);
-        }
-
-        if constexpr (ToMajorStep != dynamic_stride)
-        {
-            BOOST_ASSERT(major_step() == ToMajorStep);
-        }
-
-        if constexpr (ToMinorStep != dynamic_stride)
-        {
-            BOOST_ASSERT(minor_step() == ToMinorStep);
-        }
-
-        return table_view<
-                T,
-                ToMajorSize,
-                ToMinorSize,
-                ToMajorStep,
-                ToMinorStep>{
-                m_data,
-                major_size(),
-                minor_size(),
-                major_step(),
-                minor_step()};
-    }
-
 private:
     T* m_data{};
     size_type m_major_size{};
