@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/range/stride_pointer_iterator.h>
+#include <piejam/range/pointer_stride_iterator.h>
 
 #include <boost/assert.hpp>
 
@@ -26,8 +26,8 @@ public:
     using const_pointer = T const*;
     using reference = T&;
     using const_reference = T const&;
-    using iterator = stride_pointer_iterator<T, Stride>;
-    using const_iterator = stride_pointer_iterator<T const, Stride>;
+    using iterator = pointer_stride_iterator<T, Stride>;
+    using const_iterator = pointer_stride_iterator<T const, Stride>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -163,11 +163,11 @@ private:
     {
         if constexpr (Stride == dynamic_stride)
         {
-            return Iterator{d, stride};
+            return Iterator{std::forward<Data>(d), stride};
         }
         else
         {
-            return Iterator{d};
+            return Iterator{std::forward<Data>(d)};
         }
     }
 

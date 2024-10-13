@@ -15,10 +15,10 @@ namespace piejam::range
 {
 
 template <typename T, std::ptrdiff_t Stride = dynamic_stride>
-class stride_pointer_iterator
+class pointer_stride_iterator
 {
 public:
-    using iterator_category = std::conditional_t<
+    using iterator_concept = std::conditional_t<
             Stride == 1,
             std::contiguous_iterator_tag,
             std::random_access_iterator_tag>;
@@ -27,15 +27,15 @@ public:
     using reference = T&;
     using difference_type = std::ptrdiff_t;
 
-    constexpr stride_pointer_iterator() noexcept = default;
+    constexpr pointer_stride_iterator() noexcept = default;
 
-    explicit constexpr stride_pointer_iterator(pointer ptr) noexcept
+    explicit constexpr pointer_stride_iterator(pointer ptr) noexcept
         requires(Stride != dynamic_stride)
         : m_p(ptr)
     {
     }
 
-    constexpr stride_pointer_iterator(
+    constexpr pointer_stride_iterator(
             pointer ptr,
             difference_type stride) noexcept
         requires(Stride == dynamic_stride)
@@ -69,36 +69,36 @@ public:
         return *(m_p + n * stride());
     }
 
-    constexpr auto operator++() noexcept -> stride_pointer_iterator&
+    constexpr auto operator++() noexcept -> pointer_stride_iterator&
     {
         m_p += stride();
         return *this;
     }
 
     [[nodiscard]]
-    constexpr auto operator++(int) noexcept -> stride_pointer_iterator
+    constexpr auto operator++(int) noexcept -> pointer_stride_iterator
     {
-        stride_pointer_iterator temp(*this);
+        pointer_stride_iterator temp(*this);
         ++(*this);
         return temp;
     }
 
-    constexpr auto operator--() noexcept -> stride_pointer_iterator&
+    constexpr auto operator--() noexcept -> pointer_stride_iterator&
     {
         m_p -= stride();
         return *this;
     }
 
     [[nodiscard]]
-    constexpr auto operator--(int) noexcept -> stride_pointer_iterator
+    constexpr auto operator--(int) noexcept -> pointer_stride_iterator
     {
-        stride_pointer_iterator temp(*this);
+        pointer_stride_iterator temp(*this);
         --(*this);
         return temp;
     }
 
     constexpr auto
-    operator+=(difference_type n) noexcept -> stride_pointer_iterator&
+    operator+=(difference_type n) noexcept -> pointer_stride_iterator&
     {
         m_p += n * stride();
         return *this;
@@ -106,36 +106,36 @@ public:
 
     [[nodiscard]]
     constexpr auto
-    operator+(difference_type n) const noexcept -> stride_pointer_iterator
+    operator+(difference_type n) const noexcept -> pointer_stride_iterator
     {
-        stride_pointer_iterator temp(*this);
+        pointer_stride_iterator temp(*this);
         return temp += n;
     }
 
     [[nodiscard]]
     friend constexpr auto
-    operator+(difference_type n, stride_pointer_iterator const& it) noexcept
-            -> stride_pointer_iterator
+    operator+(difference_type n, pointer_stride_iterator const& it) noexcept
+            -> pointer_stride_iterator
     {
         return it + n;
     }
 
     constexpr auto
-    operator-=(difference_type n) noexcept -> stride_pointer_iterator&
+    operator-=(difference_type n) noexcept -> pointer_stride_iterator&
     {
         return *this += -n;
     }
 
     [[nodiscard]]
     constexpr auto
-    operator-(difference_type n) const noexcept -> stride_pointer_iterator
+    operator-(difference_type n) const noexcept -> pointer_stride_iterator
     {
-        stride_pointer_iterator temp(*this);
+        pointer_stride_iterator temp(*this);
         return temp -= n;
     }
 
     [[nodiscard]]
-    constexpr auto operator-(stride_pointer_iterator const& rhs) const noexcept
+    constexpr auto operator-(pointer_stride_iterator const& rhs) const noexcept
             -> difference_type
     {
         verify_precondition(rhs);
@@ -144,7 +144,7 @@ public:
 
     [[nodiscard]]
     constexpr auto
-    operator==(stride_pointer_iterator const& rhs) const noexcept -> bool
+    operator==(pointer_stride_iterator const& rhs) const noexcept -> bool
     {
         verify_precondition(rhs);
         return m_p == rhs.m_p;
@@ -152,14 +152,14 @@ public:
 
     [[nodiscard]]
     constexpr auto
-    operator!=(stride_pointer_iterator const& rhs) const noexcept -> bool
+    operator!=(pointer_stride_iterator const& rhs) const noexcept -> bool
     {
         return !(*this == rhs);
     }
 
     [[nodiscard]]
     constexpr auto
-    operator<(stride_pointer_iterator const& rhs) const noexcept -> bool
+    operator<(pointer_stride_iterator const& rhs) const noexcept -> bool
     {
         verify_precondition(rhs);
         return m_p < rhs.m_p;
@@ -167,31 +167,31 @@ public:
 
     [[nodiscard]]
     constexpr auto
-    operator>(stride_pointer_iterator const& rhs) const noexcept -> bool
+    operator>(pointer_stride_iterator const& rhs) const noexcept -> bool
     {
         return rhs < *this;
     }
 
     [[nodiscard]]
     constexpr auto
-    operator<=(stride_pointer_iterator const& rhs) const noexcept -> bool
+    operator<=(pointer_stride_iterator const& rhs) const noexcept -> bool
     {
         return !(rhs < *this);
     }
 
     [[nodiscard]]
     constexpr auto
-    operator>=(stride_pointer_iterator const& rhs) const noexcept -> bool
+    operator>=(pointer_stride_iterator const& rhs) const noexcept -> bool
     {
         return !(*this < rhs);
     }
 
 private:
-    void verify_precondition(stride_pointer_iterator const& rhs) const
+    void verify_precondition(
+            [[maybe_unused]] pointer_stride_iterator const& rhs) const
     {
         BOOST_ASSERT(stride() == rhs.stride());
         BOOST_ASSERT((m_p - rhs.m_p) % stride() == 0);
-        (void)rhs;
     }
 
     pointer m_p{};
@@ -199,6 +199,6 @@ private:
 };
 
 template <class T>
-stride_pointer_iterator(T*, std::ptrdiff_t) -> stride_pointer_iterator<T>;
+pointer_stride_iterator(T*, std::ptrdiff_t) -> pointer_stride_iterator<T>;
 
 } // namespace piejam::range
