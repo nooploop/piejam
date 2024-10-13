@@ -4,16 +4,11 @@
 
 #pragma once
 
+#include <cstddef>
+
 namespace piejam::range
 {
 
-template <class Iterator>
-class stride_pointer_iterator;
-
-template <class T>
-class strided_span;
-
-template <class T>
-class table_view;
+inline constexpr std::ptrdiff_t dynamic_stride{};
 
 } // namespace piejam::range

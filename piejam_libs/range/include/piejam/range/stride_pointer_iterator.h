@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/range/dynamic_stride.h>
+
 #include <boost/assert.hpp>
 
 #include <iterator>
@@ -11,8 +13,6 @@
 
 namespace piejam::range
 {
-
-inline constexpr std::ptrdiff_t dynamic_stride{};
 
 template <typename T, std::ptrdiff_t Stride = dynamic_stride>
 class stride_pointer_iterator
