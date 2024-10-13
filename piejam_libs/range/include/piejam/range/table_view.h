@@ -8,7 +8,6 @@
 
 #include <boost/assert.hpp>
 
-#include <algorithm>
 #include <span>
 
 namespace piejam::range
@@ -433,117 +432,5 @@ table_view(
         typename table_view<T>::size_type,
         typename table_view<T>::difference_type,
         typename table_view<T>::difference_type) -> table_view<T>;
-
-template <
-        class T,
-        std::size_t MajorSize,
-        std::size_t MinorSize,
-        std::ptrdiff_t MajorStep,
-        std::ptrdiff_t MinorStep>
-auto
-transpose(table_view<T, MajorSize, MinorSize, MajorStep, MinorStep> const&
-                  t) noexcept
-        -> table_view<T, MinorSize, MajorSize, MinorStep, MajorStep>
-{
-    return {t.data(),
-            t.minor_size(),
-            t.major_size(),
-            t.minor_step(),
-            t.major_step()};
-}
-
-template <
-        class T,
-        std::size_t TMajorSize,
-        std::size_t TMinorSize,
-        std::ptrdiff_t TMajorStep,
-        std::ptrdiff_t TMinorStep,
-        class U,
-        std::size_t UMajorSize,
-        std::size_t UMinorSize,
-        std::ptrdiff_t UMajorStep,
-        std::ptrdiff_t UMinorStep,
-        class UnaryOperation>
-auto
-transform(
-        table_view<T, TMajorSize, TMinorSize, TMajorStep, TMinorStep> const&
-                src,
-        table_view<U, UMajorSize, UMinorSize, UMajorStep, UMinorStep> const&
-                dst,
-        UnaryOperation&& op)
-{
-    static_assert(
-            TMajorSize == std::dynamic_extent ||
-            UMajorSize == std::dynamic_extent || TMajorSize == UMajorSize);
-    static_assert(
-            TMinorSize == std::dynamic_extent ||
-            UMinorSize == std::dynamic_extent || TMinorSize == UMinorSize);
-
-    BOOST_ASSERT(src.major_size() == dst.major_size());
-    BOOST_ASSERT(src.minor_size() == dst.minor_size());
-
-    for (auto src_it = src.begin(), src_end = src.end(), dst_it = dst.begin();
-         src_it != src_end;
-         ++src_it, ++dst_it)
-    {
-        std::ranges::transform(*src_it, dst_it->begin(), op);
-    }
-}
-
-template <
-        class T,
-        std::size_t TMajorSize,
-        std::size_t TMinorSize,
-        std::ptrdiff_t TMajorStep,
-        std::ptrdiff_t TMinorStep,
-        class U,
-        std::size_t UMajorSize,
-        std::size_t UMinorSize,
-        std::ptrdiff_t UMajorStep,
-        std::ptrdiff_t UMinorStep>
-auto
-copy(table_view<T, TMajorSize, TMinorSize, TMajorStep, TMinorStep> const& src,
-     table_view<U, UMajorSize, UMinorSize, UMajorStep, UMinorStep> const& dst)
-{
-    transform(src, dst, std::identity{});
-}
-
-template <
-        class T,
-        std::size_t MajorSize,
-        std::size_t MinorSize,
-        std::ptrdiff_t MajorStep,
-        std::ptrdiff_t MinorStep>
-void
-fill(table_view<T, MajorSize, MinorSize, MajorStep, MinorStep> const& tv,
-     T const value)
-{
-    for (auto row : tv)
-    {
-        std::ranges::fill(row, value);
-    }
-}
-
-template <
-        class T,
-        std::size_t MajorSize,
-        std::size_t MinorSize,
-        std::ptrdiff_t MajorStep,
-        std::ptrdiff_t MinorStep>
-auto
-as_const(table_view<T, MajorSize, MinorSize, MajorStep, MinorStep> const& tv)
-        -> table_view<
-                std::add_const_t<T>,
-                MajorSize,
-                MinorSize,
-                MajorStep,
-                MinorStep>
-{
-    return {tv.data(),
-            tv.major_size(),
-            tv.minor_size(),
-            tv.major_step(),
-            tv.minor_step()};
-}
 
 } // namespace piejam::range
