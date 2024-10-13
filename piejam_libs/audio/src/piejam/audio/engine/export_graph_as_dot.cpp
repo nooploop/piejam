@@ -15,8 +15,6 @@
 
 #include <algorithm>
 #include <ostream>
-#include <ranges>
-#include <unordered_set>
 #include <vector>
 
 namespace piejam::audio::engine
@@ -52,11 +50,11 @@ graph_processors(graph const& g)
 auto
 export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
 {
-    os << "digraph {" << std::endl;
+    os << "digraph {" << '\n';
 
     auto all_procs = graph_processors(g);
 
-    os << "node [shape=plaintext]" << std::endl;
+    os << "node [shape=plaintext]" << '\n';
 
     constexpr auto audio_color = "#00ff00";
     constexpr auto event_color = "#ff00ff";
@@ -67,11 +65,11 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
         auto const num_event_outputs = p.event_outputs().size();
 
         os << p.type_name() << '_' << std::addressof(p) << " [label=<<table>"
-           << std::endl;
+           << '\n';
 
         if (p.num_inputs() || num_event_inputs)
         {
-            os << "<tr>" << std::endl;
+            os << "<tr>" << '\n';
             for (std::size_t i = 0; i < p.num_inputs(); ++i)
             {
                 os << fmt::format(
@@ -79,7 +77,7 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
                               i,
                               audio_color,
                               i)
-                   << std::endl;
+                   << '\n';
             }
             for (std::size_t i = 0; i < num_event_inputs; ++i)
             {
@@ -89,12 +87,12 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
                               event_color,
                               algorithm::escape_html(
                                       p.event_inputs()[i].name()))
-                   << std::endl;
+                   << '\n';
             }
-            os << "</tr>" << std::endl;
+            os << "</tr>" << '\n';
         }
 
-        os << "<tr>" << std::endl;
+        os << "<tr>" << '\n';
         os << fmt::format(
                 "<td colspan=\"{}\">{}:{}</td>",
                 std::max(
@@ -102,11 +100,11 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
                         p.num_outputs() + p.event_outputs().size()),
                 p.type_name(),
                 algorithm::escape_html(p.name()));
-        os << "</tr>" << std::endl;
+        os << "</tr>" << '\n';
 
         if (p.num_outputs() || num_event_outputs)
         {
-            os << "<tr>" << std::endl;
+            os << "<tr>" << '\n';
             for (std::size_t i = 0; i < p.num_outputs(); ++i)
             {
                 os << fmt::format(
@@ -114,7 +112,7 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
                               i,
                               audio_color,
                               i)
-                   << std::endl;
+                   << '\n';
             }
             for (std::size_t i = 0; i < num_event_outputs; ++i)
             {
@@ -124,12 +122,12 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
                               event_color,
                               algorithm::escape_html(
                                       p.event_outputs()[i].name()))
-                   << std::endl;
+                   << '\n';
             }
-            os << "</tr>" << std::endl;
+            os << "</tr>" << '\n';
         }
 
-        os << "</table>>]" << std::endl;
+        os << "</table>>]" << '\n';
     }
 
     constexpr auto print_wire = [](auto& ss,
@@ -147,7 +145,7 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
                       wire_type,
                       w.second.port,
                       color)
-           << std::endl;
+           << '\n';
     };
 
     for (auto const& w : g.audio)
@@ -160,7 +158,7 @@ export_graph_as_dot(graph const& g, std::ostream& os) -> std::ostream&
         print_wire(os, w, 'e', event_color);
     }
 
-    os << "}" << std::endl; // digraph
+    os << "}" << '\n'; // digraph
 
     return os;
 }
