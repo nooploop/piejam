@@ -14,8 +14,10 @@ namespace piejam::fx_modules::dual_pan
 
 enum class parameter_key : runtime::parameter::key
 {
-    left_pan,
-    right_pan
+    mute_left,
+    pan_left,
+    pan_right,
+    mute_right,
 };
 
 auto make_module(runtime::internal_fx_module_factory_args const&)

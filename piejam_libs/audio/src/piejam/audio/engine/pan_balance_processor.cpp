@@ -49,6 +49,25 @@ make_volume_pan_processor(std::string_view const name)
 }
 
 auto
+make_mute_pan_processor(std::string_view const name)
+        -> std::unique_ptr<audio::engine::processor>
+{
+    using namespace std::string_view_literals;
+    static constexpr std::array s_input_names{"mute"sv, "pan"sv};
+    static constexpr std::array s_output_names{"gain L"sv, "gain R"sv};
+    return make_event_converter_processor(
+            [](bool mute, float pan) -> std::tuple<float, float> {
+                auto pan_gain = dsp::sinusoidal_constant_power_pan(pan);
+                return std::tuple{
+                        !mute * pan_gain.left,
+                        !mute * pan_gain.right};
+            },
+            s_input_names,
+            s_output_names,
+            fmt::format("mute_pan {}", name));
+}
+
+auto
 make_balance_processor(std::string_view const name)
         -> std::unique_ptr<audio::engine::processor>
 {

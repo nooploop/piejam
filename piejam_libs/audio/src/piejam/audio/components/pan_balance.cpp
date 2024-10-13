@@ -28,9 +28,9 @@ class pan_balance final : public engine::component
 {
 public:
     explicit pan_balance(
-            std::unique_ptr<engine::processor> param_proc,
+            std::unique_ptr<engine::processor> converter_proc,
             std::unique_ptr<engine::component> amp_comp)
-        : m_param_proc(std::move(param_proc))
+        : m_converter_proc(std::move(converter_proc))
         , m_amp_comp(std::move(amp_comp))
     {
     }
@@ -66,18 +66,18 @@ public:
         using namespace engine::endpoint_ports;
         engine::connect_event(
                 g,
-                *m_param_proc,
+                *m_converter_proc,
                 from<0, 1>,
                 *m_amp_comp,
                 to<0, 1>);
     }
 
 private:
-    std::unique_ptr<engine::processor> m_param_proc;
+    std::unique_ptr<engine::processor> m_converter_proc;
     std::unique_ptr<engine::component> m_amp_comp;
 
     std::vector<engine::graph_endpoint> m_event_inputs{
-            engine::in_event_endpoints(*m_param_proc)};
+            engine::in_event_endpoints(*m_converter_proc)};
 };
 
 } // namespace

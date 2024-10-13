@@ -22,6 +22,11 @@ make_pan_processor(std::string_view name = {}) -> std::unique_ptr<processor>;
 auto make_volume_pan_processor(std::string_view name = {})
         -> std::unique_ptr<processor>;
 
+// event in: mute, pan
+// event out: gain L, gain R
+auto make_mute_pan_processor(std::string_view name = {})
+        -> std::unique_ptr<processor>;
+
 // event in: balance
 // event out: gain L, gain R
 auto make_balance_processor(std::string_view name = {})

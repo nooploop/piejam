@@ -36,18 +36,30 @@ public:
             runtime::fx::module const& fx_mod,
             runtime::parameter_processor_factory& proc_factory,
             std::string_view const name)
-        : m_left_param_proc(
+        : m_mute_left_param_proc(
                   runtime::processors::find_or_make_parameter_processor(
                           proc_factory,
                           fx_mod.parameters->at(
-                                  to_underlying(parameter_key::left_pan)),
-                          fmt::format("left_pan {}", name)))
-        , m_right_param_proc(
+                                  to_underlying(parameter_key::mute_left)),
+                          fmt::format("mute_left {}", name)))
+        , m_mute_right_param_proc(
                   runtime::processors::find_or_make_parameter_processor(
                           proc_factory,
                           fx_mod.parameters->at(
-                                  to_underlying(parameter_key::right_pan)),
-                          fmt::format("right_pan {}", name)))
+                                  to_underlying(parameter_key::mute_right)),
+                          fmt::format("mute_right {}", name)))
+        , m_pan_left_param_proc(
+                  runtime::processors::find_or_make_parameter_processor(
+                          proc_factory,
+                          fx_mod.parameters->at(
+                                  to_underlying(parameter_key::pan_left)),
+                          fmt::format("pan_left {}", name)))
+        , m_pan_right_param_proc(
+                  runtime::processors::find_or_make_parameter_processor(
+                          proc_factory,
+                          fx_mod.parameters->at(
+                                  to_underlying(parameter_key::pan_right)),
+                          fmt::format("pan_right {}", name)))
 
     {
     }
@@ -64,7 +76,7 @@ public:
 
     auto event_inputs() const -> endpoints override
     {
-        return m_event_inputs;
+        return {};
     }
 
     auto event_outputs() const -> endpoints override
@@ -81,16 +93,29 @@ public:
         using namespace audio::engine::endpoint_ports;
         engine::connect_event(
                 g,
-                *m_left_param_proc,
+                *m_mute_left_param_proc,
                 from<0>,
                 *m_left_pan,
                 to<0>);
         engine::connect_event(
                 g,
-                *m_right_param_proc,
+                *m_pan_left_param_proc,
+                from<0>,
+                *m_left_pan,
+                to<1>);
+
+        engine::connect_event(
+                g,
+                *m_mute_right_param_proc,
                 from<0>,
                 *m_right_pan,
                 to<0>);
+        engine::connect_event(
+                g,
+                *m_pan_right_param_proc,
+                from<0>,
+                *m_right_pan,
+                to<1>);
 
         engine::connect(g, *m_left_pan, from<0>, *m_left_mix_proc, to<0>);
         engine::connect(g, *m_right_pan, from<0>, *m_left_mix_proc, to<1>);
@@ -100,23 +125,17 @@ public:
     }
 
 private:
-    std::shared_ptr<audio::engine::processor> m_left_param_proc;
-    std::shared_ptr<audio::engine::processor> m_right_param_proc;
-    std::array<audio::engine::graph_endpoint, 2> const m_event_inputs{
-            audio::engine::graph_endpoint{
-                    .proc = *m_left_param_proc,
-                    .port = 0},
-            audio::engine::graph_endpoint{
-                    .proc = *m_right_param_proc,
-                    .port = 0},
-    };
+    std::shared_ptr<audio::engine::processor> m_mute_left_param_proc;
+    std::shared_ptr<audio::engine::processor> m_mute_right_param_proc;
+    std::shared_ptr<audio::engine::processor> m_pan_left_param_proc;
+    std::shared_ptr<audio::engine::processor> m_pan_right_param_proc;
     std::unique_ptr<audio::engine::component> m_left_pan{
             audio::components::make_pan(
-                    audio::engine::make_pan_processor("left_pan"),
+                    audio::engine::make_mute_pan_processor("left_pan"),
                     "left_pan")};
     std::unique_ptr<audio::engine::component> m_right_pan{
             audio::components::make_pan(
-                    audio::engine::make_pan_processor("right_pan"),
+                    audio::engine::make_mute_pan_processor("right_pan"),
                     "right_pan")};
     std::array<audio::engine::graph_endpoint, 2> const m_inputs{
             audio::engine::in_endpoint(*m_left_pan, 0),
