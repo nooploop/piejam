@@ -156,8 +156,8 @@ set_external_audio_device_name::reduce(state& st) const
                     ? io_direction::input
                     : io_direction::output;
 
-    auto equal_to_device_name = equal_to<>(
-            mixer::io_address_t(mixer::missing_device_address(name)));
+    auto equal_to_device_name =
+            equal_to(mixer::io_address_t(mixer::missing_device_address(name)));
     auto const get_io_addr = io_dir == io_direction::input
                                      ? &mixer::channel::in
                                      : &mixer::channel::out;

@@ -50,7 +50,7 @@ public:
     [[nodiscard]]
     auto level() const noexcept -> T
     {
-        return math::flush_to_zero_if(m_peak_level, less<>(m_min_level));
+        return math::flush_to_zero_if(m_peak_level, less(m_min_level));
     }
 
 private:

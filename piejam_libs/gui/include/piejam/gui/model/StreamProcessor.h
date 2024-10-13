@@ -16,7 +16,6 @@
 #include <boost/range/adaptor/transformed.hpp>
 
 #include <memory>
-#include <ranges>
 
 namespace piejam::gui::model
 {
@@ -40,7 +39,7 @@ struct StreamProcessor
                         boost::make_iterator_range(
                                 std::begin(samples),
                                 std::end(samples)),
-                        [g](auto x) { return g * x; }));
+                        multiplies(g)));
                 break;
         }
     }

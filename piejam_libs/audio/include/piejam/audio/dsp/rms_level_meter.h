@@ -70,7 +70,7 @@ public:
     {
         return math::flush_to_zero_if(
                 std::sqrt(std::abs(m_squared_sum) / m_squared_history_size),
-                less<>(m_min_level));
+                less(m_min_level));
     }
 
 private:

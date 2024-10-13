@@ -145,7 +145,7 @@ is_mix_processor(processor const& proc) noexcept
 
     return std::ranges::any_of(
             mix_processor_typeids,
-            equal_to<>(std::type_index(typeid(proc))));
+            equal_to(std::type_index(typeid(proc))));
 }
 
 #undef PIEJAM_MAX_NUM_FIXED_INPUTS_MIX_PROCESSOR

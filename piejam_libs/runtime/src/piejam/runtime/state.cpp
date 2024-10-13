@@ -567,7 +567,7 @@ add_external_audio_device(
     parameter_factory params_factory{st.params};
 
     auto mixer_channels = st.mixer_state.channels.lock();
-    auto const equal_to_device_name = equal_to<>(
+    auto const equal_to_device_name = equal_to(
             mixer::io_address_t(mixer::missing_device_address{boxed_name}));
 
     for (auto& [_, mixer_channel] : mixer_channels)
@@ -695,7 +695,7 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
     }
 
     set_if(st.gui_state.fx_browser_fx_chain_id,
-           equal_to<>(mixer_channel_id),
+           equal_to(mixer_channel_id),
            mixer::channel_id{});
 
     BOOST_ASSERT(algorithm::contains(*st.mixer_state.inputs, mixer_channel_id));
@@ -705,7 +705,7 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
 
     mixer_channels.erase(mixer_channel_id);
 
-    auto const equal_to_mixer_channel = equal_to<>(addr);
+    auto const equal_to_mixer_channel = equal_to(addr);
     for (auto& [_, channel] : mixer_channels)
     {
         set_if(channel.in,
@@ -727,7 +727,7 @@ remove_external_audio_device(
 
     auto mixer_channels = st.mixer_state.channels.lock();
     {
-        auto const equal_to_device = equal_to<>(mixer::io_address_t(device_id));
+        auto const equal_to_device = equal_to(mixer::io_address_t(device_id));
         auto const missing_device_name = mixer::missing_device_address(name);
 
         for (auto& [_, mixer_channel] : mixer_channels)

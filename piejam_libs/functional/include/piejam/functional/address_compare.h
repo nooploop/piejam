@@ -6,6 +6,8 @@
 
 #include <piejam/functional/operators.h>
 
+#include <boost/hof/proj.hpp>
+
 #include <memory>
 
 namespace piejam
@@ -50,25 +52,26 @@ struct unwrap_const_addressof
 
 template <class T>
 inline constexpr auto address_equal_to =
-        equal_to<detail::unwrap_const_addressof<T>>;
+        boost::hof::proj(detail::unwrap_const_addressof<T>{}, equal_to);
 
 template <class T>
 inline constexpr auto address_not_equal_to =
-        not_equal_to<detail::unwrap_const_addressof<T>>;
+        boost::hof::proj(detail::unwrap_const_addressof<T>{}, not_equal_to);
 
 template <class T>
 inline constexpr auto address_greater =
-        greater<detail::unwrap_const_addressof<T>>;
+        boost::hof::proj(detail::unwrap_const_addressof<T>{}, greater);
 
 template <class T>
 inline constexpr auto address_greater_equal =
-        greater_equal<detail::unwrap_const_addressof<T>>;
+        boost::hof::proj(detail::unwrap_const_addressof<T>{}, greater_equal);
 
 template <class T>
-inline constexpr auto address_less = less<detail::unwrap_const_addressof<T>>;
+inline constexpr auto address_less =
+        boost::hof::proj(detail::unwrap_const_addressof<T>{}, less);
 
 template <class T>
 inline constexpr auto address_less_equal =
-        less_equal<detail::unwrap_const_addressof<T>>;
+        boost::hof::proj(detail::unwrap_const_addressof<T>{}, less_equal);
 
 } // namespace piejam

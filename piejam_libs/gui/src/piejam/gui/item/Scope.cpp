@@ -185,7 +185,7 @@ Scope::setScopeData(model::ScopeData* const x)
                                         0.f,
                                         std::ranges::max,
                                         math::abs),
-                                less<>(0.001f)); // -60 dB
+                                less(0.001f)); // -60 dB
 
                         if (m_impl->peakLevel != newPeakLevel)
                         {

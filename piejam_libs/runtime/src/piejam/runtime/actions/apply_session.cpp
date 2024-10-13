@@ -32,7 +32,7 @@ apply_external_audio_device_configs(
             D == io_direction::input ? st.external_audio_state.inputs->empty()
                                      : st.external_audio_state.outputs->empty(),
             "configs should be cleared before applying");
-    auto const gte_num_ch = greater_equal<>(num_ch);
+    auto const gte_num_ch = greater_equal(num_ch);
     for (auto const& config : configs)
     {
         auto chs = config.channels;

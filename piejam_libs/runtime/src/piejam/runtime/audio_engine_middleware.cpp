@@ -86,7 +86,7 @@ struct update_devices final
         auto devices = st.external_audio_state.devices.lock();
 
         auto update_channels = [&](auto num_channels, auto const& ids) {
-            auto const ge_num_channels = greater_equal<>(num_channels);
+            auto const ge_num_channels = greater_equal(num_channels);
             for (auto id : ids)
             {
                 auto& device = devices[id];
