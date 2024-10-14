@@ -34,13 +34,17 @@ SubscribableItem {
         id: private_
 
         readonly property bool isStereo: root.model && root.model.busType === PJModels.Types.BusType.Stereo
+        readonly property bool activeA: root.model && root.model.activeA.value
+        readonly property bool activeB: root.model && root.model.activeB.value
+        readonly property bool visibleA: !isStereo || activeA
+        readonly property bool visibleB: isStereo && activeB
         readonly property var mode: root.model ? root.model.mode : null
         readonly property var triggerSlope: root.model ? root.model.triggerSlope : null
         readonly property var triggerLevel: root.model ? root.model.triggerLevel : null
         readonly property var holdTime: root.model ? root.model.holdTime : null
-        readonly property bool freeMode: private_.mode && private_.mode.value === FxScope.Mode.Free
+        readonly property bool freeMode: mode && mode.value === FxScope.Mode.Free
         readonly property var windowSize: root.model
-                                          ? (private_.freeMode ? root.model.waveformWindowSize : root.model.scopeWindowSize)
+                                          ? (freeMode ? root.model.waveformWindowSize : root.model.scopeWindowSize)
                                           : null
     }
 
@@ -51,7 +55,7 @@ SubscribableItem {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            currentIndex: root.model ? (root.model.mode.value === FxScope.Mode.Free ? 1 : 0) : -1
+            currentIndex: root.model ? private_.freeMode : -1
 
             Frame {
                 id: scopeView
@@ -80,7 +84,7 @@ SubscribableItem {
 
                     anchors.fill: parent
 
-                    visible: root.model && (!private_.isStereo || root.model.activeA.value)
+                    visible: private_.visibleA
 
                     scopeData: root.model ? root.model.scopeDataA : null
                     color: Material.color(Material.Pink)
@@ -91,7 +95,7 @@ SubscribableItem {
 
                     anchors.fill: parent
 
-                    visible: private_.isStereo && root.model && root.model.activeB.value
+                    visible: private_.visibleB
 
                     scopeData: root.model ? root.model.scopeDataB : null
                     color: Material.color(Material.Blue)
@@ -122,18 +126,18 @@ SubscribableItem {
                 PJItems.Waveform {
                     anchors.fill: parent
 
-                    visible: root.model && (!private_.isStereo || root.model.activeA.value)
+                    visible: private_.visibleA
 
-                    waveformData: root.model ? root.model.waveformDataA : null
+                    waveform: root.model ? root.model.waveformA : null
                     color: Material.color(Material.Pink)
                 }
 
                 PJItems.Waveform {
                     anchors.fill: parent
 
-                    visible: private_.isStereo && (root.model && root.model.activeB.value)
+                    visible: private_.visibleB
 
-                    waveformData: root.model ? root.model.waveformDataB : null
+                    waveform: root.model ? root.model.waveformB : null
                     color: Material.color(Material.Blue)
                 }
             }
@@ -266,9 +270,7 @@ SubscribableItem {
         when: root.model
         target: root.model
         property: "viewSize"
-        value: root.model && root.model.mode.value === FxScope.Mode.Free
-               ? waveformView.availableWidth
-               : scopeView.availableWidth
+        value: private_.freeMode ? waveformView.availableWidth : scopeView.availableWidth
         restoreMode: Binding.RestoreBinding
     }
 }

@@ -17,9 +17,8 @@ class Waveform : public QQuickItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(piejam::gui::model::WaveformDataObject* waveformData READ
-                       waveformData WRITE setWaveformData NOTIFY
-                               waveformDataChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::WaveformSlot* waveform READ waveform WRITE
+                       setWaveform NOTIFY waveformChanged FINAL)
 
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged FINAL)
 
@@ -28,8 +27,8 @@ class Waveform : public QQuickItem
 public:
     Waveform(QQuickItem* parent = nullptr);
 
-    auto waveformData() const noexcept -> model::WaveformDataObject*;
-    void setWaveformData(model::WaveformDataObject*);
+    auto waveform() const noexcept -> model::WaveformSlot*;
+    void setWaveform(model::WaveformSlot*);
 
     auto color() const noexcept -> QColor const&;
     void setColor(QColor const&);
@@ -37,7 +36,7 @@ public:
     auto updatePaintNode(QSGNode*, UpdatePaintNodeData*) -> QSGNode* override;
 
 signals:
-    void waveformDataChanged();
+    void waveformChanged();
     void colorChanged();
 
 private:

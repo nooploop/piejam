@@ -4,7 +4,7 @@
 
 #include <piejam/gui/item/Waveform.h>
 
-#include <piejam/gui/model/WaveformDataObject.h>
+#include <piejam/gui/model/WaveformSlot.h>
 
 #include <QQuickWindow>
 #include <QSGFlatColorMaterial>
@@ -138,7 +138,7 @@ WaveformPointMaterial::createShader() const -> QSGMaterialShader*
 auto
 updateGeometry(
         QSGNode* const oldNode,
-        model::WaveformDataObject const* const waveformData,
+        model::WaveformSlot const* const waveformData,
         QColor const& color,
         bool& dirtyGeometry,
         bool& dirtyMaterial) -> QSGNode*
@@ -256,12 +256,12 @@ updateGeometry(
 struct Waveform::Impl
 {
     bool transformMatrixDirty{true};
-    bool waveformDataDirty{true};
+    bool waveformDirty{true};
     bool colorDirty{true};
 
-    model::WaveformDataObject* waveformData{};
+    QPointer<model::WaveformSlot> waveform{};
 
-    QMetaObject::Connection waveformDataChangedConnection;
+    QMetaObject::Connection waveformChangedConnection;
 
     QColor color{255, 0, 0};
 };
@@ -278,36 +278,36 @@ Waveform::Waveform(QQuickItem* parent)
 }
 
 auto
-Waveform::waveformData() const noexcept -> model::WaveformDataObject*
+Waveform::waveform() const noexcept -> model::WaveformSlot*
 {
-    return m_impl->waveformData;
+    return m_impl->waveform;
 }
 
 void
-Waveform::setWaveformData(model::WaveformDataObject* x)
+Waveform::setWaveform(model::WaveformSlot* x)
 {
-    if (m_impl->waveformData != x)
+    if (m_impl->waveform != x)
     {
-        m_impl->waveformData = x;
-        emit waveformDataChanged();
+        m_impl->waveform = x;
+        emit waveformChanged();
 
-        if (m_impl->waveformData)
+        if (m_impl->waveform)
         {
-            m_impl->waveformDataChangedConnection = QObject::connect(
-                    m_impl->waveformData,
-                    &model::WaveformDataObject::changed,
+            m_impl->waveformChangedConnection = QObject::connect(
+                    m_impl->waveform,
+                    &model::WaveformSlot::changed,
                     this,
                     [this]() {
-                        m_impl->waveformDataDirty = true;
+                        m_impl->waveformDirty = true;
                         update();
                     });
         }
         else
         {
-            QObject::disconnect(m_impl->waveformDataChangedConnection);
+            QObject::disconnect(m_impl->waveformChangedConnection);
         }
 
-        m_impl->waveformDataDirty = true;
+        m_impl->waveformDirty = true;
         update();
     }
 }
@@ -342,9 +342,9 @@ Waveform::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*)
         node = new QSGTransformNode();
         node->appendChildNode(updateGeometry(
                 nullptr,
-                m_impl->waveformData,
+                m_impl->waveform,
                 m_impl->color,
-                m_impl->waveformDataDirty,
+                m_impl->waveformDirty,
                 m_impl->colorDirty));
 
         updateTransformMatrix(*node);
@@ -362,9 +362,9 @@ Waveform::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*)
         BOOST_VERIFY(
                 geometryNode == updateGeometry(
                                         geometryNode,
-                                        m_impl->waveformData,
+                                        m_impl->waveform,
                                         m_impl->color,
-                                        m_impl->waveformDataDirty,
+                                        m_impl->waveformDirty,
                                         m_impl->colorDirty));
     }
 

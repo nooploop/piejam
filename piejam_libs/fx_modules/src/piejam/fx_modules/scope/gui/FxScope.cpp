@@ -15,7 +15,7 @@
 #include <piejam/gui/model/ScopeDataGenerator.h>
 #include <piejam/gui/model/StreamProcessor.h>
 #include <piejam/gui/model/StreamSamplesCache.h>
-#include <piejam/gui/model/WaveformDataGenerator.h>
+#include <piejam/gui/model/WaveformGenerator.h>
 #include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
@@ -37,9 +37,8 @@ struct ScopeStreamProcessor : StreamProcessor<ScopeStreamProcessor>
     {
         if (processAsWaveform)
         {
-            waveformData.get().shift_push_back(
+            waveform.update(
                     waveformGenerator.process(std::forward<Samples>(samples)));
-            waveformData.update();
         }
         else
         {
@@ -47,12 +46,12 @@ struct ScopeStreamProcessor : StreamProcessor<ScopeStreamProcessor>
         }
     }
 
-    bool processAsWaveform{};
+    bool processAsWaveform{true};
 
-    WaveformDataGenerator waveformGenerator;
+    WaveformGenerator waveformGenerator;
     StreamSamplesCache scopeDataCache;
 
-    WaveformDataObject waveformData;
+    WaveformSlot waveform;
     ScopeData scopeData;
 };
 
@@ -108,8 +107,7 @@ struct FxScope::Impl
 
     void updateMode()
     {
-        bool processAsWaveform =
-                mode->value() == to_underlying(scope::mode::free);
+        bool processAsWaveform = modeEnum() == Mode::Free;
         streamProcessor.first.processAsWaveform = processAsWaveform;
         streamProcessor.second.processAsWaveform = processAsWaveform;
     }
@@ -121,10 +119,10 @@ struct FxScope::Impl
         renew(streamProcessor.second.waveformGenerator, samplesPerPixel);
     }
 
-    void updateWaveformData(std::size_t viewSize)
+    void updateWaveform(std::size_t viewSize)
     {
-        streamProcessor.first.waveformData.get().resize(viewSize);
-        streamProcessor.second.waveformData.get().resize(viewSize);
+        streamProcessor.first.waveform.resize(viewSize);
+        streamProcessor.second.waveform.resize(viewSize);
     }
 
     void updateScopeSamplesCache(std::size_t viewSize)
@@ -331,7 +329,7 @@ FxScope::FxScope(
             });
 
     QObject::connect(this, &FxScope::viewSizeChanged, this, [this]() {
-        m_impl->updateWaveformData(m_viewSize);
+        m_impl->updateWaveform(m_viewSize);
         m_impl->updateScopeSamplesCache(m_viewSize);
         clear();
     });
@@ -422,15 +420,15 @@ FxScope::freeze() const noexcept -> BoolParameter*
 }
 
 auto
-FxScope::waveformDataA() const noexcept -> WaveformDataObject*
+FxScope::waveformA() const noexcept -> WaveformSlot*
 {
-    return &m_impl->streamProcessor.first.waveformData;
+    return &m_impl->streamProcessor.first.waveform;
 }
 
 auto
-FxScope::waveformDataB() const noexcept -> WaveformDataObject*
+FxScope::waveformB() const noexcept -> WaveformSlot*
 {
-    return &m_impl->streamProcessor.second.waveformData;
+    return &m_impl->streamProcessor.second.waveform;
 }
 
 auto
@@ -452,16 +450,10 @@ FxScope::clear()
     m_impl->streamProcessor.second.scopeData.clear();
     m_impl->scopeDataGenerator.clear();
 
-    m_impl->streamProcessor.first.waveformData.get().clear();
-    m_impl->streamProcessor.first.waveformData.get().resize(m_viewSize);
-    m_impl->streamProcessor.first.waveformData.update();
-
-    m_impl->streamProcessor.second.waveformData.get().clear();
-    m_impl->streamProcessor.second.waveformData.get().resize(m_viewSize);
-    m_impl->streamProcessor.second.waveformData.update();
-
-    m_impl->streamProcessor.first.waveformGenerator.clear();
-    m_impl->streamProcessor.second.waveformGenerator.clear();
+    m_impl->streamProcessor.first.waveform.clear();
+    m_impl->streamProcessor.second.waveform.clear();
+    m_impl->streamProcessor.first.waveformGenerator.reset();
+    m_impl->streamProcessor.second.waveformGenerator.reset();
 }
 
 void

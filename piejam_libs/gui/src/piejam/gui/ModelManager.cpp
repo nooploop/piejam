@@ -47,7 +47,7 @@
 #include <piejam/gui/model/StereoLevel.h>
 #include <piejam/gui/model/StringList.h>
 #include <piejam/gui/model/Types.h>
-#include <piejam/gui/model/WaveformDataObject.h>
+#include <piejam/gui/model/WaveformSlot.h>
 
 #include <mutex>
 
@@ -96,7 +96,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::SpectrumData*>();
     qRegisterMetaType<piejam::gui::model::StereoLevel*>();
     qRegisterMetaType<piejam::gui::model::StringList*>();
-    qRegisterMetaType<piejam::gui::model::WaveformDataObject*>();
+    qRegisterMetaType<piejam::gui::model::WaveformSlot*>();
 
     qmlRegisterUncreatableType<piejam::gui::model::AudioRoutingSelection>(
             "PieJam.Models",

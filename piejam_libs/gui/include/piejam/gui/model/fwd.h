@@ -56,9 +56,9 @@ using FxBrowserList = GenericListModel<FxBrowserEntry>;
 class AudioStreamProvider;
 using AudioStreamProviderList = GenericListModel<AudioStreamProvider>;
 
-class WaveformDataObject;
-class WaveformData;
-class WaveformDataGenerator;
+class WaveformSlot;
+class Waveform;
+class WaveformGenerator;
 
 class SpectrumData;
 

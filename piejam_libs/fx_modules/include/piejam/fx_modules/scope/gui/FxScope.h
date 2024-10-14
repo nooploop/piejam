@@ -9,7 +9,7 @@
 #include <piejam/gui/model/ScopeData.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/Types.h>
-#include <piejam/gui/model/WaveformDataObject.h>
+#include <piejam/gui/model/WaveformSlot.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <piejam/pimpl.h>
@@ -46,12 +46,8 @@ class FxScope final : public piejam::gui::model::FxModule
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, gainA)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, gainB)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, freeze)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
-            piejam::gui::model::WaveformDataObject*,
-            waveformDataA)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
-            piejam::gui::model::WaveformDataObject*,
-            waveformDataB)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::WaveformSlot*, waveformA)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::WaveformSlot*, waveformB)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::ScopeData*, scopeDataA)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::ScopeData*, scopeDataB)
 

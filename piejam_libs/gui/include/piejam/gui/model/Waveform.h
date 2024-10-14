@@ -14,7 +14,7 @@ namespace piejam::gui::model
 {
 
 //! \invariant y0.size() == y1.size()
-class WaveformData
+class Waveform
 {
 public:
     [[nodiscard]]
@@ -37,7 +37,7 @@ public:
 
     void clear()
     {
-        m_data.clear();
+        std::ranges::fill(m_data, 0.f);
     }
 
     void resize(std::size_t const sz)
@@ -61,13 +61,13 @@ public:
         m_data.emplace_back(y1);
     }
 
-    void shift_push_back(WaveformData const& other)
+    void shift_push_back(Waveform const& other)
     {
         algorithm::shift_push_back(m_data, other.m_data);
     }
 
     [[nodiscard]]
-    auto operator==(WaveformData const&) const noexcept -> bool = default;
+    auto operator==(Waveform const&) const noexcept -> bool = default;
 
 private:
     std::vector<float> m_data;

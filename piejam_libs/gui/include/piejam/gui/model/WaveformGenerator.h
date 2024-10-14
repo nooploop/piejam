@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/WaveformData.h>
+#include <piejam/gui/model/Waveform.h>
 #include <piejam/gui/model/fwd.h>
 
 #include <piejam/math.h>
@@ -12,18 +12,18 @@
 namespace piejam::gui::model
 {
 
-class WaveformDataGenerator
+class WaveformGenerator
 {
 public:
-    explicit WaveformDataGenerator(int samplesPerPixel = 1)
+    explicit WaveformGenerator(int samplesPerPixel = 1)
         : m_samplesPerPixel{samplesPerPixel}
     {
     }
 
     template <class Samples>
-    auto process(Samples const& samples) -> WaveformData
+    auto process(Samples const& samples) -> Waveform
     {
-        WaveformData result;
+        Waveform result;
 
         constexpr auto clip = [](float x) { return math::clamp(x, -1.f, 1.f); };
 
@@ -53,7 +53,7 @@ public:
         return result;
     }
 
-    void clear()
+    void reset()
     {
         m_accY0 = 0;
         m_accY1 = 0;
