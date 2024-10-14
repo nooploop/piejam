@@ -29,16 +29,8 @@ public:
 
         for (auto const sample : samples)
         {
-            if (m_accNumSamples) [[likely]]
-            {
-                m_accY0 = std::min(m_accY0, sample);
-                m_accY1 = std::max(m_accY1, sample);
-            }
-            else
-            {
-                m_accY0 = sample;
-                m_accY1 = sample;
-            }
+            m_accY0 = std::min(m_accY0, sample);
+            m_accY1 = std::max(m_accY1, sample);
 
             ++m_accNumSamples;
 
@@ -46,7 +38,7 @@ public:
             {
                 result.push_back(clip(m_accY0), clip(m_accY1));
 
-                m_accNumSamples = 0;
+                reset();
             }
         }
 
