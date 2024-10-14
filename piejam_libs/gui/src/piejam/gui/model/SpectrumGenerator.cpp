@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/SpectrumDataGenerator.h>
+#include <piejam/gui/model/SpectrumGenerator.h>
 
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/audio/sample_rate.h>
@@ -55,7 +55,7 @@ dftForResolution(DFTResolution const resolution) -> numeric::dft&
 
 } // namespace
 
-struct SpectrumDataGenerator::Impl
+struct SpectrumGenerator::Impl
 {
     explicit Impl(audio::sample_rate sample_rate, DFTResolution dftResolution)
         : m_dft{dftForResolution(dftResolution)}
@@ -107,7 +107,7 @@ struct SpectrumDataGenerator::Impl
             std::vector<SpectrumDataPoint>(m_dft.output_size())};
 };
 
-SpectrumDataGenerator::SpectrumDataGenerator(
+SpectrumGenerator::SpectrumGenerator(
         audio::sample_rate sample_rate,
         DFTResolution dftResolution)
     : m_impl{make_pimpl<Impl>(sample_rate, dftResolution)}
@@ -116,7 +116,7 @@ SpectrumDataGenerator::SpectrumDataGenerator(
 }
 
 auto
-SpectrumDataGenerator::process() -> SpectrumDataPoints
+SpectrumGenerator::process() -> SpectrumDataPoints
 {
     return m_impl->process(m_dftPrepareBuffer);
 }

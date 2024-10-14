@@ -4,7 +4,7 @@
 
 #include <piejam/gui/item/Spectrum.h>
 
-#include <piejam/gui/model/SpectrumData.h>
+#include <piejam/gui/model/SpectrumSlot.h>
 
 #include <piejam/functional/in_interval.h>
 #include <piejam/math.h>
@@ -72,7 +72,7 @@ struct LevelScale final
 
 struct Spectrum::Impl
 {
-    bool spectrumDataDirty{true};
+    bool spectrumDirty{true};
     bool colorDirty{true};
 
     FrequencyScale frequencyScale;
@@ -106,28 +106,28 @@ Spectrum::Spectrum(QQuickItem* parent)
 
     connect(this, &Spectrum::widthChanged, [this]() {
         m_impl->frequencyScale.size = static_cast<int>(width());
-        m_impl->spectrumDataDirty = true;
+        m_impl->spectrumDirty = true;
         update();
     });
 
     connect(this, &Spectrum::heightChanged, [this]() {
         m_impl->levelScale.size = static_cast<int>(height());
-        m_impl->spectrumDataDirty = true;
+        m_impl->spectrumDirty = true;
         update();
     });
 
-    connect(this, &Spectrum::spectrumDataChanged, this, [this]() {
-        if (m_spectrumData)
+    connect(this, &Spectrum::spectrumChanged, this, [this]() {
+        if (m_spectrum)
         {
             m_impl->spectrumDataChangedConnection = QObject::connect(
-                    m_spectrumData,
-                    &piejam::gui::model::SpectrumData::changed,
+                    m_spectrum,
+                    &piejam::gui::model::SpectrumSlot::changed,
                     this,
                     [this]() {
                         m_impl->spectrumPoints = m_impl->calcSpectrum(
-                                m_spectrumData->get(),
+                                m_spectrum->get(),
                                 height());
-                        m_impl->spectrumDataDirty = true;
+                        m_impl->spectrumDirty = true;
                         update();
                     });
         }
@@ -137,7 +137,7 @@ Spectrum::Spectrum(QQuickItem* parent)
         }
 
         m_impl->spectrumPoints.clear();
-        m_impl->spectrumDataDirty = true;
+        m_impl->spectrumDirty = true;
         update();
     });
 }
@@ -181,7 +181,7 @@ Spectrum::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*)
         }
     }
 
-    if (m_impl->spectrumDataDirty)
+    if (m_impl->spectrumDirty)
     {
         QSGGeometry::Point2D* vertices = geometry->vertexDataAsPoint2D();
         for (QPointF const& p : m_impl->spectrumPoints)
@@ -192,7 +192,7 @@ Spectrum::updatePaintNode(QSGNode* const oldNode, UpdatePaintNodeData*)
 
         node->markDirty(QSGNode::DirtyGeometry);
 
-        m_impl->spectrumDataDirty = false;
+        m_impl->spectrumDirty = false;
     }
 
     if (m_impl->colorDirty)

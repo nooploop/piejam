@@ -60,7 +60,7 @@ class WaveformSlot;
 class Waveform;
 class WaveformGenerator;
 
-class SpectrumData;
+class SpectrumSlot;
 
 class ScopeSlot;
 

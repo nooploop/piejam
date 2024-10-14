@@ -62,14 +62,14 @@ SubscribableItem {
             PJItems.Spectrum {
                 anchors.fill: parent
 
-                spectrumData: root.model ? root.model.dataIn : null
+                spectrum: root.model ? root.model.spectrumIn : null
                 color: Material.color(Material.Pink)
             }
 
             PJItems.Spectrum {
                 anchors.fill: parent
 
-                spectrumData: root.model ? root.model.dataOut : null
+                spectrum: root.model ? root.model.spectrumOut : null
                 color: Material.color(Material.Blue)
             }
 

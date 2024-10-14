@@ -12,7 +12,7 @@
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
-#include <piejam/gui/model/SpectrumDataGenerator.h>
+#include <piejam/gui/model/SpectrumGenerator.h>
 #include <piejam/gui/model/StreamProcessor.h>
 #include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
@@ -20,7 +20,6 @@
 #include <piejam/to_underlying.h>
 
 #include <boost/container/flat_map.hpp>
-
 
 namespace piejam::fx_modules::spectrum::gui
 {
@@ -37,7 +36,7 @@ struct SpectrumProcessor : StreamProcessor<SpectrumProcessor>
     template <class Samples>
     void process(Samples&& samples)
     {
-        spectrumData.set(
+        spectrum.update(
                 spectrumGenerator.process(std::forward<Samples>(samples)));
     }
 
@@ -51,8 +50,8 @@ struct SpectrumProcessor : StreamProcessor<SpectrumProcessor>
     }
 
     audio::sample_rate sample_rate{default_sample_rate};
-    SpectrumDataGenerator spectrumGenerator{sample_rate};
-    SpectrumData spectrumData;
+    SpectrumGenerator spectrumGenerator{sample_rate};
+    SpectrumSlot spectrum;
 };
 
 } // namespace
@@ -231,22 +230,22 @@ FxSpectrum::freeze() const noexcept -> BoolParameter*
 }
 
 auto
-FxSpectrum::dataA() const noexcept -> SpectrumData*
+FxSpectrum::spectrumA() const noexcept -> SpectrumSlot*
 {
-    return &m_impl->spectrumProcessor.first.spectrumData;
+    return &m_impl->spectrumProcessor.first.spectrum;
 }
 
 auto
-FxSpectrum::dataB() const noexcept -> SpectrumData*
+FxSpectrum::spectrumB() const noexcept -> SpectrumSlot*
 {
-    return &m_impl->spectrumProcessor.second.spectrumData;
+    return &m_impl->spectrumProcessor.second.spectrum;
 }
 
 void
 FxSpectrum::clear()
 {
-    m_impl->spectrumProcessor.first.spectrumData.clear();
-    m_impl->spectrumProcessor.second.spectrumData.clear();
+    m_impl->spectrumProcessor.first.spectrum.clear();
+    m_impl->spectrumProcessor.second.spectrum.clear();
 }
 
 void

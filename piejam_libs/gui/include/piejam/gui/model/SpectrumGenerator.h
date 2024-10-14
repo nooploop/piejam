@@ -16,10 +16,10 @@
 namespace piejam::gui::model
 {
 
-class SpectrumDataGenerator
+class SpectrumGenerator
 {
 public:
-    explicit SpectrumDataGenerator(
+    explicit SpectrumGenerator(
             audio::sample_rate,
             DFTResolution = DFTResolution::Low);
 

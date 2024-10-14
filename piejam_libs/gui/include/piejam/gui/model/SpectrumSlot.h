@@ -13,7 +13,7 @@
 namespace piejam::gui::model
 {
 
-class SpectrumData : public QObject
+class SpectrumSlot : public QObject
 {
     Q_OBJECT
 public:
@@ -22,7 +22,7 @@ public:
         return m_dataPoints;
     }
 
-    void set(SpectrumDataPoints const& dataPoints)
+    void update(SpectrumDataPoints const& dataPoints)
     {
         m_dataPoints = std::vector<SpectrumDataPoint>(
                 dataPoints.begin(),

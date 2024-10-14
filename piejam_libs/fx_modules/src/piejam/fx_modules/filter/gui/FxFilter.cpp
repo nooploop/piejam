@@ -11,8 +11,8 @@
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
-#include <piejam/gui/model/SpectrumData.h>
-#include <piejam/gui/model/SpectrumDataGenerator.h>
+#include <piejam/gui/model/SpectrumGenerator.h>
+#include <piejam/gui/model/SpectrumSlot.h>
 #include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/to_underlying.h>
@@ -36,11 +36,11 @@ struct FxFilter::Impl
     BusType busType;
     audio::sample_rate sample_rate{default_sample_rate};
 
-    SpectrumDataGenerator dataInGenerator{sample_rate};
-    SpectrumDataGenerator dataOutGenerator{sample_rate};
+    SpectrumGenerator spectrumInGenerator{sample_rate};
+    SpectrumGenerator spectrumOutGenerator{sample_rate};
 
-    SpectrumData spectrumDataIn;
-    SpectrumData spectrumDataOut;
+    SpectrumSlot spectrumIn;
+    SpectrumSlot spectrumOut;
 
     std::unique_ptr<EnumParameter> filterTypeParam;
     std::unique_ptr<FloatParameter> cutoffParam;
@@ -52,8 +52,8 @@ struct FxFilter::Impl
         if (sr.valid() && sample_rate != sr)
         {
             sample_rate = sr;
-            renew(dataInGenerator, sr);
-            renew(dataOutGenerator, sr);
+            renew(spectrumInGenerator, sr);
+            renew(spectrumOutGenerator, sr);
         }
     }
 };
@@ -95,10 +95,11 @@ FxFilter::FxFilter(
                 [this](AudioStream captured) {
                     BOOST_ASSERT(captured.num_channels() == 2);
 
-                    m_impl->spectrumDataIn.set(m_impl->dataInGenerator.process(
-                            captured.channels_cast<2>().channels()[0]));
-                    m_impl->spectrumDataOut.set(
-                            m_impl->dataOutGenerator.process(
+                    m_impl->spectrumIn.update(
+                            m_impl->spectrumInGenerator.process(
+                                    captured.channels_cast<2>().channels()[0]));
+                    m_impl->spectrumOut.update(
+                            m_impl->spectrumOutGenerator.process(
                                     captured.channels_cast<2>().channels()[1]));
                 });
     }
@@ -111,11 +112,12 @@ FxFilter::FxFilter(
                 [this](AudioStream captured) {
                     BOOST_ASSERT(captured.num_channels() == 4);
 
-                    m_impl->spectrumDataIn.set(m_impl->dataInGenerator.process(
-                            toMiddle(captured.channels_subview(0, 2)
-                                             .channels_cast<2>())));
-                    m_impl->spectrumDataOut.set(
-                            m_impl->dataOutGenerator.process(
+                    m_impl->spectrumIn.update(
+                            m_impl->spectrumInGenerator.process(
+                                    toMiddle(captured.channels_subview(0, 2)
+                                                     .channels_cast<2>())));
+                    m_impl->spectrumOut.update(
+                            m_impl->spectrumOutGenerator.process(
                                     toMiddle(captured.channels_subview(2, 2)
                                                      .channels_cast<2>())));
                 });
@@ -136,22 +138,22 @@ FxFilter::type() const noexcept -> FxModuleType
 }
 
 auto
-FxFilter::dataIn() const noexcept -> SpectrumData*
+FxFilter::spectrumIn() const noexcept -> SpectrumSlot*
 {
-    return &m_impl->spectrumDataIn;
+    return &m_impl->spectrumIn;
 }
 
 auto
-FxFilter::dataOut() const noexcept -> SpectrumData*
+FxFilter::spectrumOut() const noexcept -> SpectrumSlot*
 {
-    return &m_impl->spectrumDataOut;
+    return &m_impl->spectrumOut;
 }
 
 void
 FxFilter::clear()
 {
-    m_impl->spectrumDataIn.clear();
-    m_impl->spectrumDataOut.clear();
+    m_impl->spectrumIn.clear();
+    m_impl->spectrumOut.clear();
 }
 
 auto

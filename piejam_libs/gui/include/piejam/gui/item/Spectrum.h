@@ -20,9 +20,9 @@ class Spectrum : public QQuickItem
     Q_OBJECT
 
     M_PIEJAM_GUI_WRITABLE_PROPERTY(
-            piejam::gui::model::SpectrumData*,
-            spectrumData,
-            setSpectrumData)
+            piejam::gui::model::SpectrumSlot*,
+            spectrum,
+            setSpectrum)
     M_PIEJAM_GUI_WRITABLE_PROPERTY(QColor, color, setColor)
 
     QML_ELEMENT

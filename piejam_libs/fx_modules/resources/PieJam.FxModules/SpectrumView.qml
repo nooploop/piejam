@@ -35,7 +35,7 @@ SubscribableItem {
             PJItems.Spectrum {
                 anchors.fill: parent
 
-                spectrumData: root.model ? root.model.dataA : null
+                spectrum: root.model ? root.model.spectrumA : null
                 color: Material.color(Material.Pink)
             }
 
@@ -43,7 +43,7 @@ SubscribableItem {
                 anchors.fill: parent
 
                 visible: root.model && root.model.busType === PJModels.Types.BusType.Stereo
-                spectrumData: root.model ? root.model.dataB : null
+                spectrum: root.model ? root.model.spectrumB : null
                 color: Material.color(Material.Blue)
             }
         }

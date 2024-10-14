@@ -6,7 +6,7 @@
 
 #include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/FxModule.h>
-#include <piejam/gui/model/SpectrumData.h>
+#include <piejam/gui/model/SpectrumSlot.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/fwd.h>
@@ -21,8 +21,8 @@ class FxSpectrum final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::SpectrumData*, dataA)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::SpectrumData*, dataB)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::SpectrumSlot*, spectrumA)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::SpectrumSlot*, spectrumB)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, activeA)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, activeB)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::EnumParameter*, channelA)

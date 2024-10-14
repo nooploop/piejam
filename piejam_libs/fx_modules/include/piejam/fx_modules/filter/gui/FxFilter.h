@@ -19,8 +19,12 @@ class FxFilter final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::SpectrumData*, dataIn)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::SpectrumData*, dataOut)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::SpectrumSlot*,
+            spectrumIn)
+    M_PIEJAM_GUI_READONLY_PROPERTY(
+            piejam::gui::model::SpectrumSlot*,
+            spectrumOut)
 
     M_PIEJAM_GUI_READONLY_PROPERTY(
             piejam::gui::model::EnumParameter*,
