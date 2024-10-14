@@ -6,7 +6,7 @@
 
 #include <piejam/gui/PropertyMacros.h>
 #include <piejam/gui/model/FxModule.h>
-#include <piejam/gui/model/ScopeData.h>
+#include <piejam/gui/model/ScopeSlot.h>
 #include <piejam/gui/model/Subscribable.h>
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/WaveformSlot.h>
@@ -48,8 +48,8 @@ class FxScope final : public piejam::gui::model::FxModule
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, freeze)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::WaveformSlot*, waveformA)
     M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::WaveformSlot*, waveformB)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::ScopeData*, scopeDataA)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::ScopeData*, scopeDataB)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::ScopeSlot*, scopeA)
+    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::ScopeSlot*, scopeB)
 
 public:
     FxScope(runtime::store_dispatch,

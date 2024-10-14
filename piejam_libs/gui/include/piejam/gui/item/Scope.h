@@ -19,8 +19,8 @@ class Scope : public QQuickItem
 
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged FINAL)
 
-    Q_PROPERTY(piejam::gui::model::ScopeData* scopeData READ scopeData WRITE
-                       setScopeData NOTIFY scopeDataChanged FINAL)
+    Q_PROPERTY(piejam::gui::model::ScopeSlot* scope READ scope WRITE setScope
+                       NOTIFY scopeChanged FINAL)
 
     Q_PROPERTY(float peakLevel READ peakLevel NOTIFY peakLevelChanged FINAL)
 
@@ -32,8 +32,8 @@ public:
     auto color() const noexcept -> QColor const&;
     void setColor(QColor const&);
 
-    auto scopeData() const noexcept -> model::ScopeData*;
-    void setScopeData(model::ScopeData*);
+    auto scope() const noexcept -> model::ScopeSlot*;
+    void setScope(model::ScopeSlot*);
 
     auto peakLevel() const noexcept -> float;
     Q_INVOKABLE void syncPeakLevel(float otherPeakLevel);
@@ -42,7 +42,7 @@ public:
 
 signals:
     void colorChanged();
-    void scopeDataChanged();
+    void scopeChanged();
     void peakLevelChanged();
 
 private:

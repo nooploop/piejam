@@ -12,7 +12,7 @@
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/FloatParameter.h>
 #include <piejam/gui/model/FxStream.h>
-#include <piejam/gui/model/ScopeDataGenerator.h>
+#include <piejam/gui/model/ScopeGenerator.h>
 #include <piejam/gui/model/StreamProcessor.h>
 #include <piejam/gui/model/StreamSamplesCache.h>
 #include <piejam/gui/model/WaveformGenerator.h>
@@ -42,17 +42,17 @@ struct ScopeStreamProcessor : StreamProcessor<ScopeStreamProcessor>
         }
         else
         {
-            scopeDataCache.process(std::forward<Samples>(samples));
+            scopeCache.process(std::forward<Samples>(samples));
         }
     }
 
     bool processAsWaveform{true};
 
     WaveformGenerator waveformGenerator;
-    StreamSamplesCache scopeDataCache;
+    StreamSamplesCache scopeCache;
 
     WaveformSlot waveform;
-    ScopeData scopeData;
+    ScopeSlot scope;
 };
 
 } // namespace
@@ -79,7 +79,7 @@ struct FxScope::Impl
     std::unique_ptr<FxStream> stream;
 
     std::pair<ScopeStreamProcessor, ScopeStreamProcessor> streamProcessor;
-    ScopeDataGenerator scopeDataGenerator;
+    ScopeGenerator scopeGenerator;
 
     auto modeEnum() const noexcept -> Mode
     {
@@ -130,8 +130,8 @@ struct FxScope::Impl
 
         std::size_t doubleViewSize = viewSize * 2;
         int stride = scopeResolution->value() * 2 + 1;
-        renew(streamProcessor.first.scopeDataCache, doubleViewSize, stride);
-        renew(streamProcessor.second.scopeDataCache, doubleViewSize, stride);
+        renew(streamProcessor.first.scopeCache, doubleViewSize, stride);
+        renew(streamProcessor.second.scopeCache, doubleViewSize, stride);
     }
 };
 
@@ -218,9 +218,9 @@ FxScope::FxScope(
 
                     if (m_impl->modeEnum() != Mode::Free)
                     {
-                        auto scopeData = m_impl->scopeDataGenerator.process(
+                        auto scope = m_impl->scopeGenerator.process(
                                 0,
-                                {m_impl->streamProcessor.first.scopeDataCache
+                                {m_impl->streamProcessor.first.scopeCache
                                          .cached()},
                                 m_viewSize,
                                 m_impl->triggerSlopeEnum(),
@@ -228,10 +228,10 @@ FxScope::FxScope(
                                 captured.num_frames(),
                                 m_impl->holdTimeInFrames());
 
-                        if (scopeData.size() == 1)
+                        if (scope.size() == 1)
                         {
-                            m_impl->streamProcessor.first.scopeData.set(
-                                    scopeData[0]);
+                            m_impl->streamProcessor.first.scope.update(
+                                    scope[0]);
                         }
                     }
                 });
@@ -257,11 +257,11 @@ FxScope::FxScope(
 
                     if (m_impl->modeEnum() != Mode::Free)
                     {
-                        auto scopeData = m_impl->scopeDataGenerator.process(
+                        auto scopeSamples = m_impl->scopeGenerator.process(
                                 m_impl->modeEnum() == Mode::TriggerB,
-                                {m_impl->streamProcessor.first.scopeDataCache
+                                {m_impl->streamProcessor.first.scopeCache
                                          .cached(),
-                                 m_impl->streamProcessor.second.scopeDataCache
+                                 m_impl->streamProcessor.second.scopeCache
                                          .cached()},
                                 m_viewSize,
                                 m_impl->triggerSlopeEnum(),
@@ -269,12 +269,12 @@ FxScope::FxScope(
                                 captured.num_frames(),
                                 m_impl->holdTimeInFrames());
 
-                        if (scopeData.size() == 2)
+                        if (scopeSamples.size() == 2)
                         {
-                            m_impl->streamProcessor.first.scopeData.set(
-                                    scopeData[0]);
-                            m_impl->streamProcessor.second.scopeData.set(
-                                    scopeData[1]);
+                            m_impl->streamProcessor.first.scope.update(
+                                    scopeSamples[0]);
+                            m_impl->streamProcessor.second.scope.update(
+                                    scopeSamples[1]);
                         }
                     }
                 });
@@ -432,23 +432,23 @@ FxScope::waveformB() const noexcept -> WaveformSlot*
 }
 
 auto
-FxScope::scopeDataA() const noexcept -> ScopeData*
+FxScope::scopeA() const noexcept -> ScopeSlot*
 {
-    return &m_impl->streamProcessor.first.scopeData;
+    return &m_impl->streamProcessor.first.scope;
 }
 
 auto
-FxScope::scopeDataB() const noexcept -> ScopeData*
+FxScope::scopeB() const noexcept -> ScopeSlot*
 {
-    return &m_impl->streamProcessor.second.scopeData;
+    return &m_impl->streamProcessor.second.scope;
 }
 
 void
 FxScope::clear()
 {
-    m_impl->streamProcessor.first.scopeData.clear();
-    m_impl->streamProcessor.second.scopeData.clear();
-    m_impl->scopeDataGenerator.clear();
+    m_impl->streamProcessor.first.scope.clear();
+    m_impl->streamProcessor.second.scope.clear();
+    m_impl->scopeGenerator.clear();
 
     m_impl->streamProcessor.first.waveform.clear();
     m_impl->streamProcessor.second.waveform.clear();

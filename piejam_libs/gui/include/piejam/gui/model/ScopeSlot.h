@@ -12,7 +12,7 @@
 namespace piejam::gui::model
 {
 
-class ScopeData : public QObject
+class ScopeSlot : public QObject
 {
     Q_OBJECT
 public:
@@ -23,7 +23,7 @@ public:
         return m_samples;
     }
 
-    void set(Samples samples)
+    void update(Samples samples)
     {
         m_samples = std::vector(samples.begin(), samples.end());
         emit changed();

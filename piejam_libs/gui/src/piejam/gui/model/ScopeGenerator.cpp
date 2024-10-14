@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/gui/model/ScopeDataGenerator.h>
+#include <piejam/gui/model/ScopeGenerator.h>
 
 #include <piejam/functional/edge_detect.h>
 
@@ -34,7 +34,7 @@ findTrigger(
     auto itFirst = samples.begin();
     auto itLast = std::next(
             samples.begin(),
-            static_cast<std::ranges::range_difference_t<ScopeData::Samples>>(
+            static_cast<std::ranges::range_difference_t<ScopeSlot::Samples>>(
                     samples.size() - windowSize));
 
     auto itFound =
@@ -59,7 +59,7 @@ findTrigger(
 } // namespace
 
 auto
-ScopeDataGenerator::process(
+ScopeGenerator::process(
         std::size_t triggerStream,
         Streams streams,
         std::size_t windowSize,
@@ -78,7 +78,7 @@ ScopeDataGenerator::process(
 
     switch (m_state)
     {
-        case ScopeDataGeneratorState::WaitingForTrigger:
+        case State::WaitingForTrigger:
         {
             auto it = findTrigger(
                     triggerStreamSamples,
@@ -99,18 +99,18 @@ ScopeDataGenerator::process(
                             return r;
                         });
 
-                m_state = ScopeDataGeneratorState::Hold;
+                m_state = State::Hold;
                 m_holdCapturedSize = 0;
             }
             break;
         }
 
-        case ScopeDataGeneratorState::Hold:
+        case State::Hold:
         {
             m_holdCapturedSize += capturedFrames;
             if (m_holdCapturedSize >= holdTimeInFrames)
             {
-                m_state = ScopeDataGeneratorState::WaitingForTrigger;
+                m_state = State::WaitingForTrigger;
             }
             break;
         }

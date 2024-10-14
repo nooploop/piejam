@@ -4,7 +4,7 @@
 
 #include <piejam/gui/item/Scope.h>
 
-#include <piejam/gui/model/ScopeData.h>
+#include <piejam/gui/model/ScopeSlot.h>
 
 #include <piejam/functional/operators.h>
 #include <piejam/math.h>
@@ -51,8 +51,7 @@ struct Scope::Impl
         QSGGeometry* geometry{};
         QSGFlatColorMaterial* material{};
 
-        int const dataSize =
-                scopeData ? static_cast<int>(scopeData->get().size()) : 0;
+        int const dataSize = scope ? static_cast<int>(scope->get().size()) : 0;
         if (oldNode)
         {
             geometryNode =
@@ -84,22 +83,22 @@ struct Scope::Impl
             geometryNode->setFlag(QSGNode::OwnsMaterial);
         }
 
-        if (scopeDataDirty)
+        if (scopeDirty)
         {
-            if (scopeData)
+            if (scope)
             {
                 QSGGeometry::Point2D* vertices =
                         geometry->vertexDataAsPoint2D();
-                for (std::size_t n = 0; n < scopeData->get().size(); ++n)
+                for (std::size_t n = 0; n < scope->get().size(); ++n)
                 {
-                    vertices->set(static_cast<float>(n), scopeData->get()[n]);
+                    vertices->set(static_cast<float>(n), scope->get()[n]);
                     ++vertices;
                 }
             }
 
             geometryNode->markDirty(QSGNode::DirtyGeometry);
 
-            scopeDataDirty = false;
+            scopeDirty = false;
         }
 
         if (colorDirty)
@@ -117,11 +116,11 @@ struct Scope::Impl
     QColor color{};
     bool colorDirty{true};
     bool transformMatrixDirty{true};
-    bool scopeDataDirty{true};
-    model::ScopeData* scopeData{};
+    bool scopeDirty{true};
+    model::ScopeSlot* scope{};
     float peakLevel{0.f};
     std::optional<float> syncedPeakLevel;
-    QMetaObject::Connection scopeDataChangedConnection;
+    QMetaObject::Connection scopeChangedConnection;
 };
 
 Scope::Scope(QQuickItem* parent)
@@ -156,32 +155,32 @@ Scope::setColor(QColor const& c)
 }
 
 auto
-Scope::scopeData() const noexcept -> model::ScopeData*
+Scope::scope() const noexcept -> model::ScopeSlot*
 {
-    return m_impl->scopeData;
+    return m_impl->scope;
 }
 
 void
-Scope::setScopeData(model::ScopeData* const x)
+Scope::setScope(model::ScopeSlot* const x)
 {
-    if (m_impl->scopeData != x)
+    if (m_impl->scope != x)
     {
-        m_impl->scopeData = x;
-        emit scopeDataChanged();
+        m_impl->scope = x;
+        emit scopeChanged();
 
-        if (m_impl->scopeData)
+        if (m_impl->scope)
         {
-            m_impl->scopeDataChangedConnection = QObject::connect(
-                    m_impl->scopeData,
-                    &piejam::gui::model::ScopeData::changed,
+            m_impl->scopeChangedConnection = QObject::connect(
+                    m_impl->scope,
+                    &piejam::gui::model::ScopeSlot::changed,
                     this,
                     [this]() {
-                        m_impl->scopeDataDirty = true;
+                        m_impl->scopeDirty = true;
 
                         float newPeakLevel = math::flush_to_zero_if(
                                 std::transform_reduce(
-                                        m_impl->scopeData->get().begin(),
-                                        m_impl->scopeData->get().end(),
+                                        m_impl->scope->get().begin(),
+                                        m_impl->scope->get().end(),
                                         0.f,
                                         std::ranges::max,
                                         math::abs),
@@ -203,10 +202,10 @@ Scope::setScopeData(model::ScopeData* const x)
         }
         else
         {
-            QObject::disconnect(m_impl->scopeDataChangedConnection);
+            QObject::disconnect(m_impl->scopeChangedConnection);
         }
 
-        m_impl->scopeDataDirty = true;
+        m_impl->scopeDirty = true;
         update();
     }
 }

@@ -42,7 +42,7 @@
 #include <piejam/gui/model/MixerDbScales.h>
 #include <piejam/gui/model/Parameter.h>
 #include <piejam/gui/model/RootView.h>
-#include <piejam/gui/model/ScopeData.h>
+#include <piejam/gui/model/ScopeSlot.h>
 #include <piejam/gui/model/SpectrumData.h>
 #include <piejam/gui/model/StereoLevel.h>
 #include <piejam/gui/model/StringList.h>
@@ -92,7 +92,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::MixerChannelPerform*>();
     qRegisterMetaType<piejam::gui::model::Parameter*>();
     qRegisterMetaType<piejam::gui::model::RootView*>();
-    qRegisterMetaType<piejam::gui::model::ScopeData*>();
+    qRegisterMetaType<piejam::gui::model::ScopeSlot*>();
     qRegisterMetaType<piejam::gui::model::SpectrumData*>();
     qRegisterMetaType<piejam::gui::model::StereoLevel*>();
     qRegisterMetaType<piejam::gui::model::StringList*>();

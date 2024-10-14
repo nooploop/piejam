@@ -86,7 +86,7 @@ SubscribableItem {
 
                     visible: private_.visibleA
 
-                    scopeData: root.model ? root.model.scopeDataA : null
+                    scope: root.model ? root.model.scopeA : null
                     color: Material.color(Material.Pink)
                 }
 
@@ -97,7 +97,7 @@ SubscribableItem {
 
                     visible: private_.visibleB
 
-                    scopeData: root.model ? root.model.scopeDataB : null
+                    scope: root.model ? root.model.scopeB : null
                     color: Material.color(Material.Blue)
                 }
 

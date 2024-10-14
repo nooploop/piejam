@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/gui/model/ScopeData.h>
+#include <piejam/gui/model/ScopeSlot.h>
 #include <piejam/gui/model/Types.h>
 
 #include <boost/container/container_fwd.hpp>
@@ -12,7 +12,7 @@
 namespace piejam::gui::model
 {
 
-class ScopeDataGenerator
+class ScopeGenerator
 {
 public:
     using Streams = boost::container::static_vector<std::span<float const>, 2>;
@@ -28,18 +28,18 @@ public:
 
     void clear()
     {
-        m_state = ScopeDataGeneratorState::WaitingForTrigger;
+        m_state = State::WaitingForTrigger;
         m_holdCapturedSize = 0;
     }
 
 private:
-    enum class ScopeDataGeneratorState : bool
+    enum class State : bool
     {
         WaitingForTrigger,
         Hold
     };
 
-    ScopeDataGeneratorState m_state{};
+    State m_state{};
     std::size_t m_holdCapturedSize{};
 };
 

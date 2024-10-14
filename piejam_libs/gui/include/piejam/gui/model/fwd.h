@@ -62,7 +62,7 @@ class WaveformGenerator;
 
 class SpectrumData;
 
-class ScopeData;
+class ScopeSlot;
 
 class MidiDeviceConfig;
 using MidiDeviceList = GenericListModel<MidiDeviceConfig>;
