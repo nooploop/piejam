@@ -18,7 +18,7 @@ class FxGenericModule : public FxModule
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, parametersList)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(QAbstractListModel*, parametersList)
 
 public:
     FxGenericModule(

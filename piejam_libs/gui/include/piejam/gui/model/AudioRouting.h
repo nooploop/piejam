@@ -21,9 +21,9 @@ class AudioRouting final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(QString, defaultName)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(QString, defaultName)
     M_PIEJAM_GUI_PROPERTY(bool, defaultIsValid, setDefaultIsValid)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::AudioRoutingSelection*,
             selected)
     M_PIEJAM_GUI_PROPERTY(QStringList, devices, setDevices)

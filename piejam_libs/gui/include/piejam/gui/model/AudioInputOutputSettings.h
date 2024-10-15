@@ -23,7 +23,7 @@ class AudioInputOutputSettings : public Subscribable<SubscribableModel>
     Q_OBJECT
 
     M_PIEJAM_GUI_PROPERTY(QStringList, channels, setChannels)
-    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, deviceConfigs)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(QAbstractListModel*, deviceConfigs)
 
 protected:
     AudioInputOutputSettings(

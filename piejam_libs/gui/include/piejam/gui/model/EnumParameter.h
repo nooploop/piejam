@@ -20,7 +20,7 @@ class EnumParameter final : public IntParameter
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(QAbstractListModel*, values)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(QAbstractListModel*, values)
 
 public:
     EnumParameter(

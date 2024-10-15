@@ -19,7 +19,7 @@ class MixerChannel : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BusType, busType)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::BusType, busType)
     M_PIEJAM_GUI_PROPERTY(QString, name, setName)
     M_PIEJAM_GUI_PROPERTY(MaterialColor, color, setColor)
 

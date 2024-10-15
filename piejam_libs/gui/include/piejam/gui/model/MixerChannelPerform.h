@@ -20,15 +20,15 @@ class MixerChannelPerform final : public MixerChannel
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, volume)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::StereoLevel*, peakLevel)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::StereoLevel*, rmsLevel)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::FloatParameter*, volume)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::StereoLevel*, peakLevel)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::StereoLevel*, rmsLevel)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::FloatParameter*,
             panBalance)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, record)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, solo)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, mute)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::BoolParameter*, record)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::BoolParameter*, solo)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::BoolParameter*, mute)
     M_PIEJAM_GUI_PROPERTY(bool, mutedBySolo, setMutedBySolo)
 
 public:

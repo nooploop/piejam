@@ -22,7 +22,7 @@ class FxModule : public Subscribable<SubscribableModel>
     Q_OBJECT
 
     Q_PROPERTY(piejam::gui::model::FxModuleType type READ type CONSTANT FINAL)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BusType, busType)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::BusType, busType)
 
 public:
     FxModule(

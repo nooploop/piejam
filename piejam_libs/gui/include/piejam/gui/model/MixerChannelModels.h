@@ -21,12 +21,12 @@ class MixerChannelModels final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::MixerChannelPerform*,
             perform)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::MixerChannelEdit*, edit)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::MixerChannelFx*, fx)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::MixerChannelEdit*, edit)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::MixerChannelFx*, fx)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::MixerChannelAuxSend*,
             auxSend)
 

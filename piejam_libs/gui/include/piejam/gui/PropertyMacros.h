@@ -36,7 +36,7 @@ public:                                                                        \
                                                                                \
 private:
 
-#define M_PIEJAM_GUI_READONLY_PROPERTY(type, name)                             \
+#define M_PIEJAM_GUI_CONSTANT_PROPERTY(type, name)                             \
 private:                                                                       \
     Q_PROPERTY(type name READ name CONSTANT FINAL)                             \
                                                                                \

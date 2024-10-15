@@ -19,18 +19,18 @@ class FxFilter final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::SpectrumSlot*,
             spectrumIn)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::SpectrumSlot*,
             spectrumOut)
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::EnumParameter*,
             filterType)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, cutoff)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::FloatParameter*, cutoff)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::FloatParameter*,
             resonance)
 

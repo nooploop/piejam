@@ -18,7 +18,7 @@ class MixerChannelAuxSend final : public MixerChannel
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::AudioRoutingSelection*,
             selected)
     M_PIEJAM_GUI_PROPERTY(bool, canToggle, setCanToggle)

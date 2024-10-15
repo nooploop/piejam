@@ -23,33 +23,33 @@ class FxScope final : public piejam::gui::model::FxModule
     Q_OBJECT
 
     M_PIEJAM_GUI_WRITABLE_PROPERTY(int, viewSize, setViewSize)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::EnumParameter*, mode)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::EnumParameter*, mode)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::EnumParameter*,
             triggerSlope)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::FloatParameter*,
             triggerLevel)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::FloatParameter*,
             holdTime)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::IntParameter*,
             waveformWindowSize)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::IntParameter*,
             scopeWindowSize)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, activeA)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, activeB)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::EnumParameter*, channelA)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::EnumParameter*, channelB)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, gainA)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::FloatParameter*, gainB)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::BoolParameter*, freeze)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::WaveformSlot*, waveformA)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::WaveformSlot*, waveformB)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::ScopeSlot*, scopeA)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::ScopeSlot*, scopeB)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::BoolParameter*, activeA)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::BoolParameter*, activeB)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::EnumParameter*, channelA)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::EnumParameter*, channelB)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::FloatParameter*, gainA)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::FloatParameter*, gainB)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::BoolParameter*, freeze)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::WaveformSlot*, waveformA)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::WaveformSlot*, waveformB)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::ScopeSlot*, scopeA)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::ScopeSlot*, scopeB)
 
 public:
     FxScope(runtime::store_dispatch,

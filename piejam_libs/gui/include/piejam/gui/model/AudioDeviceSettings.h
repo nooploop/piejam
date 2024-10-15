@@ -18,15 +18,15 @@ class AudioDeviceSettings final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::StringList*,
             inputSoundCards)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::StringList*,
             outputSoundCards)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::StringList*, sampleRates)
-    M_PIEJAM_GUI_READONLY_PROPERTY(piejam::gui::model::StringList*, periodSizes)
-    M_PIEJAM_GUI_READONLY_PROPERTY(
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::StringList*, sampleRates)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::StringList*, periodSizes)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::StringList*,
             periodCounts)
     M_PIEJAM_GUI_PROPERTY(double, bufferLatency, setBufferLatency)
