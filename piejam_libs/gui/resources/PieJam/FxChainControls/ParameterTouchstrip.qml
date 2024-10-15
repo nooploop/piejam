@@ -48,7 +48,7 @@ SubscribableItem {
             Touchstrip {
                 value: private_.value
 
-                resolution: resolutionButton.checked ? 1000 : 250
+                resolution: height * (resolutionButton.checked ? 4 : 1)
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
