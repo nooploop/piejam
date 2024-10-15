@@ -85,9 +85,7 @@ public:
     [[nodiscard]]
     constexpr auto layout() const noexcept -> multichannel_layout
     {
-        if constexpr (std::is_same_v<
-                              Layout,
-                              multichannel_layout_runtime_defined>)
+        if constexpr (layout_is_runtime_defined)
         {
             return m_layout;
         }
@@ -217,9 +215,7 @@ public:
         BOOST_ASSERT(start_channel + num_channels_subview <= num_channels());
         BOOST_ASSERT(layout() == multichannel_layout::non_interleaved);
 
-        if constexpr (std::is_same_v<
-                              Layout,
-                              multichannel_layout_runtime_defined>)
+        if constexpr (layout_is_runtime_defined)
         {
             return multichannel_view<T>{
                     std::span{
@@ -241,9 +237,7 @@ public:
     [[nodiscard]]
     constexpr auto frames() const noexcept
     {
-        if constexpr (std::is_same_v<
-                              Layout,
-                              multichannel_layout_runtime_defined>)
+        if constexpr (layout_is_runtime_defined)
         {
             switch (layout())
             {
@@ -342,9 +336,7 @@ public:
         BOOST_ASSERT(start_frame + num_frames_subview <= num_frames());
         BOOST_ASSERT(layout() == multichannel_layout::interleaved);
 
-        if constexpr (std::is_same_v<
-                              Layout,
-                              multichannel_layout_runtime_defined>)
+        if constexpr (layout_is_runtime_defined)
         {
             return multichannel_view<T>{
                     std::span{
