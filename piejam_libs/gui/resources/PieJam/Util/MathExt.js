@@ -22,10 +22,10 @@ function toDeg(rad) {
 
 function fromNormalized(v, dstLo, dstHi)
 {
-    return mapTo(v, 0, 1, dstLo, dstHi)
+    return v * (dstHi - dstLo) + dstLo
 }
 
 function toNormalized(v, srcLo, srcHi)
 {
-    return mapTo(v, srcLo, srcHi, 0, 1);
+    return (v - srcLo) / (srcHi - srcLo)
 }
