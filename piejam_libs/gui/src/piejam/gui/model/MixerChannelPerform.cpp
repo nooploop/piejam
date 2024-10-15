@@ -49,23 +49,23 @@ struct MixerChannelPerform::Impl
         }
     }
 
-    template <std::size_t I>
+    template <audio::pair_channel C>
     void calcPeakLevel(std::span<float const> ch)
     {
-        std::ranges::copy(ch, std::back_inserter(get<I>(peak_level_meter)));
-        peakLevel.setLevel<I>(get<I>(peak_level_meter).level());
+        std::ranges::copy(ch, std::back_inserter(get<C>(peak_level_meter)));
+        peakLevel.setLevel<C>(get<C>(peak_level_meter).level());
     }
 
-    template <std::size_t I>
+    template <audio::pair_channel C>
     void calcRmsLevel(std::span<float const> ch)
     {
         auto [pre, main, post] = audio::dsp::mipp_range_from_unaligned(ch);
 
-        std::ranges::copy(pre, std::back_inserter(get<I>(rms_level_meter)));
-        std::ranges::copy(main, std::back_inserter(get<I>(rms_level_meter)));
-        std::ranges::copy(post, std::back_inserter(get<I>(rms_level_meter)));
+        std::ranges::copy(pre, std::back_inserter(get<C>(rms_level_meter)));
+        std::ranges::copy(main, std::back_inserter(get<C>(rms_level_meter)));
+        std::ranges::copy(post, std::back_inserter(get<C>(rms_level_meter)));
 
-        rmsLevel.setLevel<I>(get<I>(rms_level_meter).level());
+        rmsLevel.setLevel<C>(get<C>(rms_level_meter).level());
     }
 };
 
@@ -91,11 +91,15 @@ MixerChannelPerform::MixerChannelPerform(
             [this](AudioStream captured) {
                 auto captured_stereo = captured.channels_cast<2>();
 
-                m_impl->calcPeakLevel<0>(captured_stereo.channels()[0]);
-                m_impl->calcPeakLevel<1>(captured_stereo.channels()[1]);
+                m_impl->calcPeakLevel<audio::pair_channel::left>(
+                        captured_stereo.channels()[0]);
+                m_impl->calcPeakLevel<audio::pair_channel::right>(
+                        captured_stereo.channels()[1]);
 
-                m_impl->calcRmsLevel<0>(captured_stereo.channels()[0]);
-                m_impl->calcRmsLevel<1>(captured_stereo.channels()[1]);
+                m_impl->calcRmsLevel<audio::pair_channel::left>(
+                        captured_stereo.channels()[0]);
+                m_impl->calcRmsLevel<audio::pair_channel::right>(
+                        captured_stereo.channels()[1]);
             });
 
     makeParameter(

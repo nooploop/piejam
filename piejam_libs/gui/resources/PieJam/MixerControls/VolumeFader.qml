@@ -30,9 +30,7 @@ SubscribableItem {
     QtObject {
         id: private_
 
-        readonly property real position: root.model && root.scaleData
-                ? root.scaleData.dBToPosition(DbConvert.to_dB(root.model.value))
-                : 0
+        readonly property real normValue: root.model ? root.model.normalizedValue : 0
     }
 
     RowLayout {
@@ -51,7 +49,7 @@ SubscribableItem {
                     anchors.left: parent ? parent.left : undefined
                     anchors.right: parent ? parent.right : undefined
 
-                    y: (1 - modelData.position) * (parent.height - 12)
+                    y: (1 - modelData.normalized) * (parent.height - 12)
 
                     font.pixelSize: 10
                     font.bold: true
@@ -94,17 +92,17 @@ SubscribableItem {
         }
 
         onPositionChanged: {
-            var newPosition = MathExt.clamp(private_.position + (lastY - mouse.y) * inc, 0, 1)
+            var newNormValue = MathExt.clamp(private_.normValue + (lastY - mouse.y) / height, 0, 1)
+            root.model.changeNormalizedValue(newNormValue)
+            lastY = mouse.y
+            Info.showParameterValue(root.model)
+            root.moved()
+        }
 
-            if (root.model && root.scaleData) {
-                var newVolume = root.scaleData.dBAt(newPosition)
-                var newValue = DbConvert.from_dB(newVolume)
-                if (root.model.value !== newValue) {
-                    root.model.changeValue(newValue)
-                    lastY = mouse.y
-                    Info.showParameterValue(root.model)
-                    root.moved()
-                }
+        onDoubleClicked: {
+            if (root.model) {
+                root.model.resetToDefault()
+                Info.showParameterValue(root.model)
             }
         }
     }
@@ -112,7 +110,7 @@ SubscribableItem {
     Rectangle {
         id: handle
 
-        y: (1 - private_.position) * (root.height - 12) + 6 - Screen.devicePixelRatio
+        y: (1 - private_.normValue) * (root.height - 12) + 6 - Screen.devicePixelRatio
 
         anchors.left: parent.left
         anchors.right: parent.right

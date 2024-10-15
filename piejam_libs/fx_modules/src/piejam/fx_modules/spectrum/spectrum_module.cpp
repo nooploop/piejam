@@ -59,9 +59,9 @@ struct dB_ival
     static constexpr auto max_gain{math::from_dB(max)};
 
     static constexpr auto to_normalized =
-            &runtime::parameter::to_normalized_dB<dB_ival>;
+            &runtime::parameter::to_normalized_dB<min, max>;
     static constexpr auto from_normalized =
-            &runtime::parameter::from_normalized_dB<dB_ival>;
+            &runtime::parameter::from_normalized_dB<min, max>;
 };
 
 auto

@@ -54,6 +54,7 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/dynamic_key_shared_object_map.h
     include/piejam/runtime/external_audio.h
     include/piejam/runtime/external_audio_fwd.h
+    include/piejam/runtime/fader_mapping.h
     include/piejam/runtime/fwd.h
     include/piejam/runtime/fx/fwd.h
     include/piejam/runtime/fx/get_parameter_name.h

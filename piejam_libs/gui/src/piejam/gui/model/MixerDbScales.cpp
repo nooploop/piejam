@@ -8,74 +8,67 @@
 
 #include <piejam/functional/in_interval.h>
 #include <piejam/math.h>
+#include <piejam/runtime/fader_mapping.h>
 
-#include <array>
 #include <ranges>
 
 namespace piejam::gui::model
 {
 
-static constexpr auto s_volumeFaderScaleTickBoundaries = std::array{
-        DbScaleTick{.position = 0.05f, .dB = -60.f},
-        DbScaleTick{.position = 0.3f, .dB = -30.f},
-        DbScaleTick{.position = 0.55f, .dB = -12.f},
-        DbScaleTick{.position = 1.f, .dB = 6.f},
-};
-
-static constexpr auto s_sendFaderScaleTickBoundaries = std::array{
-        DbScaleTick{.position = 0.05f, .dB = -60.f},
-        DbScaleTick{.position = 0.3f, .dB = -30.f},
-        DbScaleTick{.position = 0.48f, .dB = -18.f},
-        DbScaleTick{.position = 1.f, .dB = 0.f},
-};
+namespace
+{
 
 template <std::ranges::range Boundaries>
-static constexpr auto
+constexpr auto
 makeScaleTick(Boundaries&& boundaries, float const dB)
 {
     auto const lower = std::ranges::adjacent_find(
             std::forward<Boundaries>(boundaries),
             in_closed(dB),
-            &DbScaleTick::dB);
+            [](auto b) { return b.dB; });
     BOOST_ASSERT(lower != std::ranges::end(boundaries));
     auto const upper = std::next(lower);
 
     return DbScaleTick{
-            .position = math::linear_map(
+            .normalized = math::linear_map(
                     dB,
                     lower->dB,
                     upper->dB,
-                    lower->position,
-                    upper->position),
+                    lower->normalized,
+                    upper->normalized),
             .dB = dB,
     };
 }
 
-static constexpr auto
+inline constexpr DbScaleTick infinityTick{
+        .normalized = 0.f,
+        .dB = -std::numeric_limits<float>::infinity()};
+
+constexpr auto
 makeLevelMeterScaleTick(float const dB) noexcept -> DbScaleTick
 {
     return DbScaleTick{
-            .position = math::linear_map(dB, -60.f, 0.f, 0.05f, 1.f),
+            .normalized = math::linear_map(dB, -60.f, 0.f, 0.05f, 1.f),
             .dB = dB};
 }
 
-static constexpr auto
+constexpr auto
 makeVolumeFaderScaleTick(float const dB) noexcept -> DbScaleTick
 {
-    return makeScaleTick(s_volumeFaderScaleTickBoundaries, dB);
+    return makeScaleTick(runtime::fader_mapping::volume, dB);
 }
 
-static constexpr auto
+constexpr auto
 makeSendFaderScaleTick(float const dB) noexcept -> DbScaleTick
 {
-    return makeScaleTick(s_sendFaderScaleTickBoundaries, dB);
+    return makeScaleTick(runtime::fader_mapping::send, dB);
 }
+
+} // namespace
 
 MixerDbScales::MixerDbScales()
     : m_levelMeterScale(std::make_unique<DbScaleData>(QVector<DbScaleTick>({
-              DbScaleTick{
-                      .position = 0.f,
-                      .dB = -std::numeric_limits<float>::infinity()},
+              infinityTick,
               makeLevelMeterScaleTick(-60.f),
               makeLevelMeterScaleTick(-54.f),
               makeLevelMeterScaleTick(-48.f),
@@ -89,9 +82,7 @@ MixerDbScales::MixerDbScales()
               makeLevelMeterScaleTick(0.f),
       })))
     , m_volumeFaderScale(std::make_unique<DbScaleData>(QVector<DbScaleTick>({
-              DbScaleTick{
-                      .position = 0.f,
-                      .dB = -std::numeric_limits<float>::infinity()},
+              infinityTick,
               makeVolumeFaderScaleTick(-60.f),
               makeVolumeFaderScaleTick(-50.f),
               makeVolumeFaderScaleTick(-40.f),
@@ -107,9 +98,7 @@ MixerDbScales::MixerDbScales()
               makeVolumeFaderScaleTick(6.f),
       })))
     , m_sendFaderScale(std::make_unique<DbScaleData>(QVector<DbScaleTick>({
-              DbScaleTick{
-                      .position = 0.f,
-                      .dB = -std::numeric_limits<float>::infinity()},
+              infinityTick,
               makeSendFaderScaleTick(-60.f),
               makeSendFaderScaleTick(-50.f),
               makeSendFaderScaleTick(-40.f),

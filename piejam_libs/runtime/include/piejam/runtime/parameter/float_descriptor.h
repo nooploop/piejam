@@ -20,10 +20,10 @@ struct float_descriptor
 
     boxed_string name;
 
-    float default_value;
+    float default_value{};
 
-    float min;
-    float max;
+    float min{};
+    float max{1.f};
 
     bool bipolar{};
 

@@ -148,7 +148,7 @@ DbScale::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData*) -> QSGNode*
         auto const h = height() - 2 * offset;
         for (int i = 0, e = ticks.size(); i < e; ++i, vertices += 2)
         {
-            auto y = (1 - ticks[i].position) * h + offset;
+            auto y = (1 - ticks[i].normalized) * h + offset;
             vertices[0].x = 0.5;
             vertices[0].y = y;
             vertices[1].x = width() - 0.5;

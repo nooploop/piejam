@@ -6,6 +6,8 @@
 
 #include <piejam/gui/PropertyMacros.h>
 
+#include <piejam/audio/pair.h>
+
 #include <QObject>
 
 #include <boost/assert.hpp>
@@ -21,28 +23,11 @@ class StereoLevel : public QObject
     M_PIEJAM_GUI_PROPERTY(double, levelRight, setLevelRight)
 
 public:
-    void setLevel(std::size_t channelIndex, double level)
-    {
-        switch (channelIndex)
-        {
-            case 0:
-                setLevelLeft(level);
-                break;
-
-            case 1:
-                setLevelRight(level);
-                break;
-
-            default:
-                BOOST_ASSERT(false);
-        }
-    }
-
-    template <std::size_t ChannelIndex>
-        requires(ChannelIndex < 2)
+    template <audio::pair_channel C>
     void setLevel(double level)
     {
-        ChannelIndex == 0 ? setLevelLeft(level) : setLevelRight(level);
+        C == audio::pair_channel::left ? setLevelLeft(level)
+                                       : setLevelRight(level);
     }
 };
 

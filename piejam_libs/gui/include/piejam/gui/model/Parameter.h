@@ -38,7 +38,6 @@ public:
         Int,
         Bool,
         Enum,
-        StereoLevel,
     };
 
     Q_ENUM(Type)

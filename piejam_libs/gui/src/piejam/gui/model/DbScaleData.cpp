@@ -41,7 +41,7 @@ DbScaleData::dBToPosition(float const dB) const
 
     if (dB == m_ticks.back().dB)
     {
-        return m_ticks.back().position;
+        return m_ticks.back().normalized;
     }
 
     if (dB > m_ticks.back().dB)
@@ -65,21 +65,21 @@ DbScaleData::dBToPosition(float const dB) const
                 dB,
                 s_min_dB,
                 upper->dB,
-                lower->position,
-                upper->position);
+                lower->normalized,
+                upper->normalized);
     }
 
     if (upper->dB == s_inf)
     {
-        return upper->position;
+        return upper->normalized;
     }
 
     return math::linear_map(
             dB,
             lower->dB,
             upper->dB,
-            lower->position,
-            upper->position);
+            lower->normalized,
+            upper->normalized);
 }
 
 float
@@ -87,17 +87,17 @@ DbScaleData::dBAt(float const position) const
 {
     BOOST_ASSERT(!m_ticks.empty());
 
-    if (position == 0. || position < m_ticks.front().position)
+    if (position == 0. || position < m_ticks.front().normalized)
     {
         return -s_inf;
     }
 
-    if (position == m_ticks.back().position)
+    if (position == m_ticks.back().normalized)
     {
         return m_ticks.back().dB;
     }
 
-    if (position > m_ticks.back().position)
+    if (position > m_ticks.back().normalized)
     {
         return s_inf;
     }
@@ -105,7 +105,7 @@ DbScaleData::dBAt(float const position) const
     auto const lower = std::ranges::adjacent_find(
             m_ticks,
             [position](DbScaleTick const& l, DbScaleTick const& r) {
-                return in_right_open(position, l.position, r.position);
+                return in_right_open(position, l.normalized, r.normalized);
             });
 
     BOOST_ASSERT(lower != m_ticks.end());
@@ -114,8 +114,8 @@ DbScaleData::dBAt(float const position) const
     {
         return math::linear_map(
                 position,
-                lower->position,
-                upper->position,
+                lower->normalized,
+                upper->normalized,
                 s_min_dB,
                 upper->dB);
     }
@@ -127,8 +127,8 @@ DbScaleData::dBAt(float const position) const
 
     return math::linear_map(
             position,
-            lower->position,
-            upper->position,
+            lower->normalized,
+            upper->normalized,
             lower->dB,
             upper->dB);
 }

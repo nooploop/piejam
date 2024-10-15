@@ -59,28 +59,31 @@ struct pair
     constexpr auto operator==(pair const&) const noexcept -> bool = default;
 };
 
-template <std::size_t I, class T>
-    requires(I < 2)
+enum class pair_channel : bool
+{
+    left,
+    right
+};
+
+template <pair_channel C, class T>
 auto
 get(pair<T> const& p) -> T const&
 {
-    return I == 0 ? p.left : p.right;
+    return C == pair_channel::left ? p.left : p.right;
 }
 
-template <std::size_t I, class T>
-    requires(I < 2)
+template <pair_channel C, class T>
 auto
 get(pair<T>& p) -> T&
 {
-    return I == 0 ? p.left : p.right;
+    return C == pair_channel::left ? p.left : p.right;
 }
 
-template <std::size_t I, class T>
-    requires(I < 2)
+template <pair_channel C, class T>
 auto
 get(pair<T>&& p) -> T&&
 {
-    return I == 0 ? std::move(p).left : std::move(p).right;
+    return C == pair_channel::left ? std::move(p).left : std::move(p).right;
 }
 
 } // namespace piejam::audio

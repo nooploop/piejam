@@ -12,10 +12,10 @@ namespace piejam::gui::model
 class DbScaleTick
 {
     Q_GADGET
-    Q_PROPERTY(float position MEMBER position)
+    Q_PROPERTY(float normalized MEMBER normalized)
     Q_PROPERTY(float dB MEMBER dB)
 public:
-    float position{};
+    float normalized{};
     float dB{};
 
     constexpr bool operator==(DbScaleTick const&) const noexcept = default;

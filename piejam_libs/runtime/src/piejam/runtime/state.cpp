@@ -9,6 +9,7 @@
 #include <piejam/functional/operators.h>
 #include <piejam/indexed_access.h>
 #include <piejam/ladspa/port_descriptor.h>
+#include <piejam/runtime/fader_mapping.h>
 #include <piejam/runtime/internal_fx_module_factory.h>
 #include <piejam/runtime/ladspa_fx/ladspa_fx_module.h>
 #include <piejam/runtime/parameter/float_normalize.h>
@@ -30,111 +31,36 @@ namespace piejam::runtime
 namespace
 {
 
-struct volume_low_dB_interval
-{
-    static constexpr float min = -60.f;
-    static constexpr float max = -12.f;
-};
-
-struct volume_high_dB_interval
-{
-    static constexpr float min = -12.f;
-    static constexpr float max = 12.f;
-};
-
 constexpr auto
-to_normalized_volume(float_parameter const& p, float const value)
+to_normalized_volume(float_parameter const&, float const value)
 {
-    if (value == 0.f)
-    {
-        return 0.f;
-    }
-    else if (0.f < value && value < 0.0625f)
-    {
-        return parameter::to_normalized_dB<volume_low_dB_interval>(p, value) /
-               4.f;
-    }
-    else
-    {
-        return (parameter::to_normalized_dB<volume_high_dB_interval>(p, value) *
-                0.75f) +
-               0.25f;
-    }
+    return parameter::to_normalized_dB_mapping<
+            fader_mapping::volume,
+            fader_mapping::min_gain_dB>(value);
 }
 
 constexpr auto
-from_normalized_volume(float_parameter const& p, float const norm_value)
-        -> float
+from_normalized_volume(float_parameter const&, float const norm_value) -> float
 {
-    if (norm_value == 0.f)
-    {
-        return 0.f;
-    }
-    else if (0.f < norm_value && norm_value < 0.25f)
-    {
-        return parameter::from_normalized_dB<volume_low_dB_interval>(
-                p,
-                4.f * norm_value);
-    }
-    else
-    {
-        return parameter::from_normalized_dB<volume_high_dB_interval>(
-                p,
-                (norm_value - 0.25f) / 0.75f);
-    }
-}
-
-struct send_low_dB_interval
-{
-    static constexpr float min = -60.f;
-    static constexpr float max = -24.f;
-};
-
-struct send_high_dB_interval
-{
-    static constexpr float min = -24.f;
-    static constexpr float max = 0.f;
-};
-
-constexpr auto
-to_normalized_send(float_parameter const& p, float const value)
-{
-    if (value == 0.f)
-    {
-        return 0.f;
-    }
-    else if (0.f < value && value < 0.0625f)
-    {
-        return parameter::to_normalized_dB<send_low_dB_interval>(p, value) /
-               4.f;
-    }
-    else
-    {
-        return (parameter::to_normalized_dB<send_high_dB_interval>(p, value) *
-                0.75f) +
-               0.25f;
-    }
+    return parameter::from_normalized_dB_maping<
+            fader_mapping::volume,
+            fader_mapping::min_gain_dB>(norm_value);
 }
 
 constexpr auto
-from_normalized_send(float_parameter const& p, float const norm_value) -> float
+to_normalized_send(float_parameter const&, float const value)
 {
-    if (norm_value == 0.f)
-    {
-        return 0.f;
-    }
-    else if (0.f < norm_value && norm_value < 0.25f)
-    {
-        return parameter::from_normalized_dB<send_low_dB_interval>(
-                p,
-                4.f * norm_value);
-    }
-    else
-    {
-        return parameter::from_normalized_dB<send_high_dB_interval>(
-                p,
-                (norm_value - 0.25f) / 0.75f);
-    }
+    return parameter::to_normalized_dB_mapping<
+            fader_mapping::send,
+            fader_mapping::min_gain_dB>(value);
+}
+
+constexpr auto
+from_normalized_send(float_parameter const&, float const norm_value) -> float
+{
+    return parameter::from_normalized_dB_maping<
+            fader_mapping::send,
+            fader_mapping::min_gain_dB>(norm_value);
 }
 
 auto

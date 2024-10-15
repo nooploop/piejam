@@ -10,6 +10,7 @@ import QtQuick.Layouts 1.15
 import PieJam.Items 1.0 as PJItems
 
 import ".."
+import "../Util/MathExt.js" as MathExt
 import "../Util/DbConvert.js" as DbConvert
 
 Item {
@@ -69,7 +70,7 @@ Item {
                     anchors.left: parent ? parent.left : undefined
                     anchors.right: parent ? parent.right : undefined
 
-                    y: (1 - modelData.position) * (parent.height - 12)
+                    y: (1 - modelData.normalized) * (parent.height - 12)
 
                     font.pixelSize: 10
                     font.bold: true
