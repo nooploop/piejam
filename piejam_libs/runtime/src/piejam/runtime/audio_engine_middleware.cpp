@@ -279,7 +279,7 @@ template <>
 void
 audio_engine_middleware::process_device_action(
         middleware_functors const& mw_fs,
-        actions::refresh_devices const&)
+        actions::refresh_sound_cards const&)
 {
     state const& current_state = mw_fs.get_state();
 

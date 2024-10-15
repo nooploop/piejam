@@ -18,19 +18,16 @@ struct midi_control_action;
 struct persistence_action;
 struct recorder_action;
 
-struct apply_app_config;
-
-struct refresh_devices;
-struct initiate_device_selection;
-struct refresh_midi_devices;
-
 struct select_sample_rate;
 struct select_period_size;
 struct select_period_count;
 
+struct refresh_midi_devices;
 struct activate_midi_device;
 struct deactivate_midi_device;
 
+struct refresh_sound_cards;
+struct initiate_device_selection;
 struct set_external_audio_device_name;
 struct set_external_audio_device_bus_channel;
 struct add_external_audio_device;
@@ -76,6 +73,7 @@ struct update_midi_assignments;
 
 struct load_app_config;
 struct save_app_config;
+struct apply_app_config;
 struct load_session;
 struct save_session;
 struct apply_session;

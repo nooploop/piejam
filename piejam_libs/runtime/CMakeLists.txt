@@ -27,7 +27,7 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/actions/persistence_action.h
     include/piejam/runtime/actions/recorder_action.h
     include/piejam/runtime/actions/recording.h
-    include/piejam/runtime/actions/refresh_devices.h
+    include/piejam/runtime/actions/refresh_sound_cards.h
     include/piejam/runtime/actions/refresh_midi_devices.h
     include/piejam/runtime/actions/reload_missing_plugins.h
     include/piejam/runtime/actions/request_info_update.h

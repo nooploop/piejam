@@ -11,7 +11,7 @@
 #include <piejam/redux/store.h>
 #include <piejam/redux/subscriptions_manager.h>
 #include <piejam/runtime/actions/initiate_device_selection.h>
-#include <piejam/runtime/actions/refresh_devices.h>
+#include <piejam/runtime/actions/refresh_sound_cards.h>
 #include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_sample_rate.h>
@@ -161,7 +161,7 @@ AudioDeviceSettings::onSubscribe()
 void
 AudioDeviceSettings::refreshSoundCardLists()
 {
-    dispatch(runtime::actions::refresh_devices{});
+    dispatch(runtime::actions::refresh_sound_cards{});
 }
 
 void

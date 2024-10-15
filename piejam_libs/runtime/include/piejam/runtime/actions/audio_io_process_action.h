@@ -13,7 +13,7 @@ namespace piejam::runtime::actions
 struct audio_io_process_action_visitor
     : ui::action_visitor_interface<
               apply_app_config,
-              refresh_devices,
+              refresh_sound_cards,
               initiate_device_selection,
               select_sample_rate,
               select_period_size,

@@ -25,7 +25,7 @@
 #include <piejam/runtime/actions/load_app_config.h>
 #include <piejam/runtime/actions/load_session.h>
 #include <piejam/runtime/actions/recording.h>
-#include <piejam/runtime/actions/refresh_devices.h>
+#include <piejam/runtime/actions/refresh_sound_cards.h>
 #include <piejam/runtime/actions/refresh_midi_devices.h>
 #include <piejam/runtime/actions/save_app_config.h>
 #include <piejam/runtime/actions/save_session.h>
@@ -250,7 +250,7 @@ main(int argc, char* argv[]) -> int
 
     auto session_file = locs.home_dir / "last.pjs";
 
-    store.dispatch(runtime::actions::refresh_devices{});
+    store.dispatch(runtime::actions::refresh_sound_cards{});
     store.dispatch(runtime::actions::refresh_midi_devices{});
     store.dispatch(runtime::actions::load_app_config(config_file_path(locs)));
     store.dispatch(runtime::actions::load_session(session_file));

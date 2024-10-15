@@ -12,9 +12,9 @@
 namespace piejam::runtime::actions
 {
 
-struct refresh_devices final
-    : ui::cloneable_action<refresh_devices, action>
-    , visitable_audio_io_process_action<refresh_devices>
+struct refresh_sound_cards final
+    : ui::cloneable_action<refresh_sound_cards, action>
+    , visitable_audio_io_process_action<refresh_sound_cards>
 {
 };
 
