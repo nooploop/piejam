@@ -27,8 +27,6 @@ struct audio_engine_action_visitor
               set_bool_parameter,
               set_float_parameter,
               set_int_parameter,
-              sync_parameter,
-              unsync_parameter,
               request_audio_engine_sync,
               request_info_update,
               move_fx_module_up,

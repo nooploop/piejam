@@ -432,24 +432,6 @@ audio_engine_middleware::process_engine_action(
     mw_fs.next(a);
 }
 
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        middleware_functors const&,
-        actions::sync_parameter const& a)
-{
-    m_synced_parameters.insert(a.param);
-}
-
-template <>
-void
-audio_engine_middleware::process_engine_action(
-        middleware_functors const&,
-        actions::unsync_parameter const& a)
-{
-    m_synced_parameters.erase(a.param);
-}
-
 template <std::ranges::range Parameters>
 static void
 collect_parameter_updates(
@@ -493,14 +475,13 @@ audio_engine_middleware::process_engine_action(
 
         actions::audio_engine_sync_update next_action;
 
-        collect_parameter_updates(m_synced_parameters, *m_engine, next_action);
         collect_parameter_updates(
                 st.midi_assignments.get() | std::views::keys,
                 *m_engine,
                 next_action);
 
         collect_stream_updates(
-                std::views::keys(st.streams),
+                st.streams | std::views::keys,
                 *m_engine,
                 next_action);
 

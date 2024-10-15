@@ -21,20 +21,6 @@
 namespace piejam::runtime::actions
 {
 
-struct sync_parameter
-    : ui::cloneable_action<sync_parameter, action>
-    , visitable_audio_engine_action<sync_parameter>
-{
-    parameter_id param;
-};
-
-struct unsync_parameter
-    : ui::cloneable_action<unsync_parameter, action>
-    , visitable_audio_engine_action<unsync_parameter>
-{
-    parameter_id param;
-};
-
 struct request_audio_engine_sync final
     : ui::cloneable_action<request_audio_engine_sync, action>
     , visitable_audio_engine_action<request_audio_engine_sync>
