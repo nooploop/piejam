@@ -13,7 +13,7 @@
 #include <piejam/runtime/actions/delete_fx_module.h>
 #include <piejam/runtime/actions/external_audio_device_actions.h>
 #include <piejam/runtime/actions/fx_chain_actions.h>
-#include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/initiate_sound_card_selection.h>
 #include <piejam/runtime/actions/insert_fx_module.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/actions/move_fx_module.h>
@@ -298,7 +298,7 @@ template <>
 void
 audio_engine_middleware::process_device_action(
         middleware_functors const& mw_fs,
-        actions::initiate_device_selection const& action)
+        actions::initiate_sound_card_selection const& action)
 {
     state const& current_state = mw_fs.get_state();
 

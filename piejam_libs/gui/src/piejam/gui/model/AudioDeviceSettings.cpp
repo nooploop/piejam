@@ -10,7 +10,7 @@
 #include <piejam/audio/sound_card_descriptor.h>
 #include <piejam/redux/store.h>
 #include <piejam/redux/subscriptions_manager.h>
-#include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/initiate_sound_card_selection.h>
 #include <piejam/runtime/actions/refresh_sound_cards.h>
 #include <piejam/runtime/actions/select_period_count.h>
 #include <piejam/runtime/actions/select_period_size.h>
@@ -167,7 +167,7 @@ AudioDeviceSettings::refreshSoundCardLists()
 void
 AudioDeviceSettings::selectInputSoundCard(unsigned const index)
 {
-    runtime::actions::initiate_device_selection action;
+    runtime::actions::initiate_sound_card_selection action;
     action.io_dir = io_direction::input;
     action.index = index;
     dispatch(action);
@@ -176,7 +176,7 @@ AudioDeviceSettings::selectInputSoundCard(unsigned const index)
 void
 AudioDeviceSettings::selectOutputSoundCard(unsigned const index)
 {
-    runtime::actions::initiate_device_selection action;
+    runtime::actions::initiate_sound_card_selection action;
     action.io_dir = io_direction::output;
     action.index = index;
     dispatch(action);

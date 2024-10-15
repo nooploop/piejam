@@ -27,7 +27,7 @@ struct activate_midi_device;
 struct deactivate_midi_device;
 
 struct refresh_sound_cards;
-struct initiate_device_selection;
+struct initiate_sound_card_selection;
 struct set_external_audio_device_name;
 struct set_external_audio_device_bus_channel;
 struct add_external_audio_device;

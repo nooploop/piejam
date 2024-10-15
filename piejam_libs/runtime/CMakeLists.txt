@@ -16,7 +16,7 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h
     include/piejam/runtime/actions/fwd.h
     include/piejam/runtime/actions/fx_chain_actions.h
-    include/piejam/runtime/actions/initiate_device_selection.h
+    include/piejam/runtime/actions/initiate_sound_card_selection.h
     include/piejam/runtime/actions/insert_fx_module.h
     include/piejam/runtime/actions/ladspa_fx_action.h
     include/piejam/runtime/actions/load_app_config.h

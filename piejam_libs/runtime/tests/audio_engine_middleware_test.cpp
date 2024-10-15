@@ -11,7 +11,7 @@
 #include <piejam/audio/period_count.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
-#include <piejam/runtime/actions/initiate_device_selection.h>
+#include <piejam/runtime/actions/initiate_sound_card_selection.h>
 #include <piejam/runtime/actions/select_period_size.h>
 #include <piejam/runtime/actions/select_sample_rate.h>
 #include <piejam/runtime/audio_engine_middleware.h>
@@ -176,7 +176,7 @@ TEST_F(audio_engine_middleware_test,
     EXPECT_CALL(audio_device_manager, make_io_process(_, _, _))
             .WillRepeatedly(Return(ByMove(audio::make_dummy_io_process())));
 
-    actions::initiate_device_selection in_action;
+    actions::initiate_sound_card_selection in_action;
     in_action.io_dir = io_direction::input;
     in_action.index = 1; // select another device
 

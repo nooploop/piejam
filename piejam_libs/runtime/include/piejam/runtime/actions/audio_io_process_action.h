@@ -14,7 +14,7 @@ struct audio_io_process_action_visitor
     : ui::action_visitor_interface<
               apply_app_config,
               refresh_sound_cards,
-              initiate_device_selection,
+              initiate_sound_card_selection,
               select_sample_rate,
               select_period_size,
               select_period_count,
