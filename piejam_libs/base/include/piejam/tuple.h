@@ -20,7 +20,7 @@ auto
 for_each_while(Tp&& tp, F&& f) -> bool
 {
     return []<std::size_t... I>(
-                   [[maybe_unused]] Tp tp,
+                   [[maybe_unused]] Tp&& tp,
                    [[maybe_unused]]
                    F f,
                    std::index_sequence<I...>) {
@@ -37,7 +37,7 @@ auto
 for_each_until(Tp&& tp, F&& f) -> bool
 {
     return []<std::size_t... I>(
-                   [[maybe_unused]] Tp tp,
+                   [[maybe_unused]] Tp&& tp,
                    [[maybe_unused]]
                    F f,
                    std::index_sequence<I...>) {
