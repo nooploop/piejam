@@ -43,6 +43,7 @@ SubscribableItem {
         readonly property var triggerLevel: root.model ? root.model.triggerLevel : null
         readonly property var holdTime: root.model ? root.model.holdTime : null
         readonly property bool freeMode: mode && mode.value === FxScope.Mode.Free
+        readonly property bool scopeWindowSize: root.model ? root.model.scopeWindowSize.value : 0
         readonly property var windowSize: root.model
                                           ? (freeMode ? root.model.waveformWindowSize : root.model.scopeWindowSize)
                                           : null
@@ -77,6 +78,33 @@ SubscribableItem {
                     ticks: [1.0, 0.0, -1.0]
                     orientation: Qt.Vertical
                     color: Material.frameColor
+
+                    PJItems.FixedLinearScaleGrid {
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+
+                        ticks: [0.0, 1.0, 5.0, 10.0]
+                        orientation: Qt.Horizontal
+                        color: Material.frameColor
+
+                        height: 4
+                        width: root.model ? root.model.sampleRate / 100 : parent.width
+                    }
+
+                    Repeater {
+                        model: [1.0, 5.0, 10.0]
+                        delegate: Label {
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 4
+
+                            visible: root.model
+                            x: (root.model ? modelData * (root.model.sampleRate / 1000) : 0) - 4
+
+                            text: modelData * (root.model ? (root.model.scopeWindowSize.value * 2 + 1) : 1) + " ms"
+                            color: Material.frameColor
+                            font.pixelSize: 12
+                        }
+                    }
                 }
 
                 PJItems.Scope {
@@ -243,7 +271,7 @@ SubscribableItem {
                     orientation: Qt.Horizontal
                     stepButtonsVisible: false
 
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: 148
                     Layout.preferredHeight: 40
                 }
             }

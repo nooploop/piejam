@@ -19,14 +19,14 @@ Item {
     property alias channelParam: channelParamButton.model
     property alias gainParam: gainParamButton.model
 
-    implicitWidth: 256
+    implicitWidth: 300
     implicitHeight: 40
 
     RowLayout {
 
         anchors.fill: parent
 
-        spacing: 8
+        spacing: 6
 
         ParameterToggleButton {
             id: activeParamButton

@@ -459,8 +459,10 @@ FxScope::clear()
 void
 FxScope::onSubscribe()
 {
-    m_impl->updateSampleRate(
-            observe_once(runtime::selectors::select_sample_rate)->current);
+    auto sample_rate =
+            observe_once(runtime::selectors::select_sample_rate)->current;
+    m_impl->updateSampleRate(sample_rate);
+    setSampleRate(sample_rate.as_float());
 }
 
 } // namespace piejam::fx_modules::scope::gui

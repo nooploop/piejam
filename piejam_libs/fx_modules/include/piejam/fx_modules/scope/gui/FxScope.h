@@ -22,6 +22,7 @@ class FxScope final : public piejam::gui::model::FxModule
 {
     Q_OBJECT
 
+    M_PIEJAM_GUI_PROPERTY(double, sampleRate, setSampleRate)
     M_PIEJAM_GUI_WRITABLE_PROPERTY(int, viewSize, setViewSize)
     M_PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::EnumParameter*, mode)
     M_PIEJAM_GUI_CONSTANT_PROPERTY(

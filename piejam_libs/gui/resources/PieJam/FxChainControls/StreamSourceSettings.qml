@@ -36,8 +36,6 @@ Item {
             gainParam: root.model ? root.model.gainA : null
 
             Material.accent: root.model && root.model.activeA.value ? Material.Pink : Material.Grey
-
-            Layout.fillWidth: true
         }
 
         ToolSeparator {
@@ -53,8 +51,6 @@ Item {
             gainParam: root.model ? root.model.gainB : null
 
             Material.accent: root.model && root.model.activeB.value ? Material.Blue : Material.Grey
-
-            Layout.fillWidth: true
         }
 
         ParameterQuickSpinBox {
@@ -67,9 +63,9 @@ Item {
         }
 
         Item {
-            visible: !private_.isStereo
+            Layout.preferredWidth: 497
 
-            Layout.fillWidth: true
+            visible: !private_.isStereo
         }
 
         ToolSeparator {}
@@ -77,7 +73,7 @@ Item {
         ParameterToggleButton {
             model: root.model ? root.model.freeze : null
 
-            Layout.preferredWidth: 32
+            Layout.preferredWidth: 34
             Layout.preferredHeight: 40
 
             flat: false
@@ -85,6 +81,10 @@ Item {
             icon.width: 24
             icon.height: 24
             icon.source: "qrc:///images/icons/snow.svg"
+        }
+
+        Item {
+            Layout.fillWidth: true
         }
     }
 }
