@@ -59,6 +59,9 @@ struct pair
     constexpr auto operator==(pair const&) const noexcept -> bool = default;
 };
 
+template <class T>
+pair(T&&) -> pair<T>;
+
 enum class pair_channel : bool
 {
     left,
