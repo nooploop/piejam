@@ -17,6 +17,7 @@ template <std::ranges::range... Rs>
 [[nodiscard]]
 constexpr auto
 zip(Rs&&... rs)
+    requires(std::is_lvalue_reference_v<Rs> && ...)
 {
     return boost::make_iterator_range(
             boost::make_zip_iterator(
