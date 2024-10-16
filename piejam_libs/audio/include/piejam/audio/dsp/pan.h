@@ -13,15 +13,14 @@
 namespace piejam::audio::dsp
 {
 
-using stereo_gain = pair<float>;
-
+template <std::floating_point T>
 constexpr auto
-sinusoidal_constant_power_pan_exact(float pan_pos) -> stereo_gain
+sinusoidal_constant_power_pan_exact(T pan_pos) -> pair<T>
 {
-    constexpr float pi_div_4 = std::numbers::pi_v<float> / 4.f;
-    constexpr float one_div_sqrt2 = 1.f / std::numbers::sqrt2_v<float>;
-    float const cos_pan_pos = std::cos(pan_pos * pi_div_4);
-    float const sin_pan_pos = std::sin(pan_pos * pi_div_4);
+    constexpr T pi_div_4 = std::numbers::pi_v<T> / T{4};
+    constexpr T one_div_sqrt2 = T{1} / std::numbers::sqrt2_v<T>;
+    T const cos_pan_pos = std::cos(pan_pos * pi_div_4);
+    T const sin_pan_pos = std::sin(pan_pos * pi_div_4);
     return {one_div_sqrt2 * (cos_pan_pos - sin_pan_pos),
             one_div_sqrt2 * (cos_pan_pos + sin_pan_pos)};
 }
@@ -38,47 +37,49 @@ sinusoidal_constant_power_pan_exact(float pan_pos) -> stereo_gain
 //           (π^2 x^2)/(32 sqrt(2)) -
 //           (π^3 x^3)/(384 sqrt(2)) +
 //           (π^4 x^4)/(6144 sqrt(2))
+template <std::floating_point T>
 constexpr auto
-sinusoidal_constant_power_pan(float pan_pos) -> stereo_gain
+sinusoidal_constant_power_pan(T pan_pos) -> pair<T>
 {
-    constexpr float pi_f = std::numbers::pi_v<float>;
-    constexpr float pi_sqr_f = pi_f * pi_f;
-    constexpr float pi_cubed_f = pi_sqr_f * pi_f;
-    constexpr float sqrt2_f = std::numbers::sqrt2_v<float>;
-    constexpr float pi_div_4root2 = pi_f / (4.f * sqrt2_f);
-    constexpr float pi_sqr_div_32root2 = pi_sqr_f / (32.f * sqrt2_f);
-    constexpr float pi_cubed_div_384root2 = pi_cubed_f / (384.f * sqrt2_f);
-    constexpr float pi_quad = pi_cubed_f * pi_f;
-    constexpr float pi_quad_div_6144root2 = pi_quad / (6144.f * sqrt2_f);
-    constexpr float inv_sqrt2_f = 1.f / sqrt2_f;
-    float const x_sqr = pan_pos * pan_pos;
-    float const x_cubed = x_sqr * pan_pos;
-    float const x_quad = x_cubed * pan_pos;
-    float const ax1 = pi_div_4root2 * pan_pos;
-    float const ax2 = pi_sqr_div_32root2 * x_sqr;
-    float const ax3 = pi_cubed_div_384root2 * x_cubed;
-    float const ax4 = pi_quad_div_6144root2 * x_quad;
-    float const axs = inv_sqrt2_f - ax2 + ax4;
-    float const axt = ax1 - ax3;
-    float const left = axs - axt;
-    float const right = axs + axt;
+    constexpr T pi = std::numbers::pi_v<T>;
+    constexpr T sqrt2 = std::numbers::sqrt2_v<T>;
+    constexpr T pi_div_4root2 = pi / (T{4} * sqrt2);
+    constexpr T pi_sqr = pi * pi;
+    constexpr T pi_sqr_div_32root2 = pi_sqr / (T{32} * sqrt2);
+    constexpr T pi_cubed = pi_sqr * pi;
+    constexpr T pi_cubed_div_384root2 = pi_cubed / (T{384} * sqrt2);
+    constexpr T pi_quad = pi_cubed * pi;
+    constexpr T pi_quad_div_6144root2 = pi_quad / (T{6144} * sqrt2);
+    constexpr T inv_sqrt2_f = T{1} / sqrt2;
+    T const x_sqr = pan_pos * pan_pos;
+    T const x_cubed = x_sqr * pan_pos;
+    T const x_quad = x_cubed * pan_pos;
+    T const ax1 = pi_div_4root2 * pan_pos;
+    T const ax2 = pi_sqr_div_32root2 * x_sqr;
+    T const ax3 = pi_cubed_div_384root2 * x_cubed;
+    T const ax4 = pi_quad_div_6144root2 * x_quad;
+    T const axs = inv_sqrt2_f - ax2 + ax4;
+    T const axt = ax1 - ax3;
+    T const left = axs - axt;
+    T const right = axs + axt;
     return {left, right};
 }
 
+template <std::floating_point T>
 constexpr auto
-stereo_balance(float balance_pos) -> stereo_gain
+stereo_balance(T balance_pos) -> pair<T>
 {
-    if (balance_pos < 0.f)
+    if (balance_pos < T{0})
     {
-        return stereo_gain{1.f, numeric::pow_n<3>(1 + balance_pos)};
+        return {T{1}, numeric::pow_n<3>(T{1} + balance_pos)};
     }
 
     if (balance_pos > 0.f)
     {
-        return stereo_gain{numeric::pow_n<3>(1 - balance_pos), 1.f};
+        return {numeric::pow_n<3>(T{1} - balance_pos), T{1}};
     }
 
-    return stereo_gain{1.f};
+    return pair{T{1}};
 }
 
 } // namespace piejam::audio::dsp
