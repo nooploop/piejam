@@ -80,4 +80,11 @@ pos_mod(T x, T y)
 
 inline constexpr auto abs = BOOST_HOF_LIFT(std::abs);
 
+template <std::integral T, std::integral N>
+constexpr auto
+round_down_to_multiple(T x, N n) -> T
+{
+    return (x / n) * n;
+}
+
 } // namespace piejam::math

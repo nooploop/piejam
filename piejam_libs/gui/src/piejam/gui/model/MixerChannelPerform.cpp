@@ -59,12 +59,7 @@ struct MixerChannelPerform::Impl
     template <audio::pair_channel C>
     void calcRmsLevel(std::span<float const> ch)
     {
-        auto [pre, main, post] = audio::dsp::mipp_range_from_unaligned(ch);
-
-        std::ranges::copy(pre, std::back_inserter(get<C>(rms_level_meter)));
-        std::ranges::copy(main, std::back_inserter(get<C>(rms_level_meter)));
-        std::ranges::copy(post, std::back_inserter(get<C>(rms_level_meter)));
-
+        get<C>(rms_level_meter).process(ch);
         rmsLevel.setLevel<C>(get<C>(rms_level_meter).level());
     }
 };

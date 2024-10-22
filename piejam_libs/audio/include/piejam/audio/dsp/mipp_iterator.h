@@ -212,23 +212,23 @@ mipp_range(std::span<T> const in)
 template <mipp_number T>
 [[nodiscard]]
 constexpr auto
-mipp_range_from_unaligned(std::span<T> const in)
+mipp_range_split(std::span<T> const in)
 {
-    auto const data = in.data();
-
     constexpr auto N = mipp::N<T>();
 
-    auto start_offset = std::bit_cast<std::uintptr_t>(data) % N;
-    auto rest_size = in.size() - std::min(in.size(), start_offset);
-    auto post_offset = data + start_offset + (rest_size / N) * N;
-    auto post_size = rest_size % N;
+    auto const pre_data = in.data();
+    auto const pre_size = std::bit_cast<std::uintptr_t>(pre_data) % N;
+    auto const size_without_pre = in.size() - std::min(in.size(), pre_size);
+    auto const main_data = pre_data + pre_size;
+    auto const main_size = (size_without_pre / N) * N;
+    auto const post_data = main_data + main_size;
+    auto const post_size = size_without_pre % N;
 
     return std::tuple{
-            std::span{data, start_offset},
-            std::ranges::subrange{
-                    mipp_iterator{data + start_offset},
-                    mipp_iterator{post_offset}},
-            std::span{post_offset, post_size}};
+            std::span{pre_data, pre_size},
+            std::span{main_data, main_size},
+            std::span{post_data, post_size},
+    };
 }
 
 } // namespace piejam::audio::dsp

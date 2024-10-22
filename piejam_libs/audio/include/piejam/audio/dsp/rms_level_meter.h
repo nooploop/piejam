@@ -4,18 +4,20 @@
 
 #pragma once
 
+#include <piejam/audio/dsp/mipp_iterator.h>
 #include <piejam/audio/sample_rate.h>
 
 #include <piejam/functional/operators.h>
 #include <piejam/math.h>
+#include <piejam/numeric/pow_n.h>
 
 #include <mipp.h>
 
-#include <boost/circular_buffer.hpp>
-
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <concepts>
+#include <numeric>
 
 namespace piejam::audio::dsp
 {
@@ -35,50 +37,222 @@ public:
                     default_rms_measure_time,
             T min_level = default_min_level)
         : m_min_level{min_level}
-        , m_squared_history{
-                  static_cast<std::size_t>(
-                          std::chrono::duration_cast<std::chrono::duration<T>>(
-                                  rms_measure_time)
-                                  .count() *
-                          sr.as_float<T>()),
-                  0.f}
+        , m_squared_history(
+                  math::round_down_to_multiple(
+                          static_cast<std::size_t>(
+                                  std::chrono::duration_cast<
+                                          std::chrono::duration<T>>(
+                                          rms_measure_time)
+                                          .count() *
+                                  sr.as_float<T>()),
+                          mipp::N<T>()),
+                  0.f)
     {
     }
 
-    void push_back(T const x)
+    void process(std::span<T const> samples)
     {
-        T const sq = x * x;
-        m_squared_sum = m_squared_sum - m_squared_history.front() + sq;
-        m_squared_history.push_back(sq);
-    }
+        auto [pre, main, post] = mipp_range_split(samples);
 
-    void push_back(mipp::Reg<T> const x)
-    {
-        auto const sqN = x * x;
-        alignas(mipp::RequiredAlignment) std::array<T, mipp::N<T>()> sqN_buffer;
-        sqN.store(sqN_buffer.data());
-
-        for (auto sq : sqN_buffer)
-        {
-            m_squared_sum = m_squared_sum - m_squared_history.front() + sq;
-            m_squared_history.push_back(sq);
-        }
+        process_span(pre);
+        process_main_span(main);
+        process_span(post);
     }
 
     [[nodiscard]]
     auto level() const noexcept -> T
     {
         return math::flush_to_zero_if(
-                std::sqrt(std::abs(m_squared_sum) / m_squared_history_size),
+                std::sqrt(std::max(m_sqr_sum, T{0}) / m_squared_history_size),
                 less(m_min_level));
     }
 
 private:
-    T m_min_level;
+    template <class V, class SqrSumIterator, class SamplesIterator>
+    static auto process_part(
+            SqrSumIterator sqrsum_first,
+            SqrSumIterator sqrsum_last,
+            SamplesIterator samples_first,
+            SamplesIterator samples_last)
+    {
+        auto sub =
+                std::reduce(sqrsum_first, sqrsum_last, V(T{0}), std::plus<V>{});
 
-    boost::circular_buffer<T> m_squared_history;
+        std::ranges::transform(
+                samples_first,
+                samples_last,
+                sqrsum_first,
+                numeric::pow_n<2>);
+
+        auto add =
+                std::reduce(sqrsum_first, sqrsum_last, V(T{0}), std::plus<V>{});
+
+        return std::tuple{sub, add};
+    }
+
+    void process_span(std::span<T const> samples)
+    {
+        std::size_t const samples_size = samples.size();
+
+        if (samples_size == 0)
+        {
+            return;
+        }
+
+        std::size_t const history_size = m_squared_history.size();
+
+        if (samples_size < history_size)
+        {
+            auto [lo, hi] = ring_buffer_split(samples_size);
+            auto mid_it = std::next(samples.begin(), lo.size());
+
+            {
+                auto [sub, add] = process_part<T>(
+                        lo.begin(),
+                        lo.end(),
+                        samples.begin(),
+                        mid_it);
+
+                adapt_sqr_sum(sub, add);
+            }
+
+            if (hi.size() > 0)
+            {
+                auto [sub, add] = process_part<T>(
+                        hi.begin(),
+                        hi.end(),
+                        mid_it,
+                        samples.end());
+
+                adapt_sqr_sum(sub, add);
+            }
+
+            advance_position(samples_size);
+        }
+        else
+        {
+            std::ranges::transform(
+                    std::next(samples.begin(), samples_size - history_size),
+                    samples.end(),
+                    m_squared_history.begin(),
+                    numeric::pow_n<2>);
+
+            recompute_squared_sum();
+        }
+    }
+
+    void process_main_span(std::span<T const> samples)
+    {
+        std::size_t samples_size = samples.size();
+
+        if (m_position % mipp::N<T>() != 0) [[unlikely]]
+        {
+            process_span(samples);
+            return;
+        }
+
+        auto samples_data = samples.data();
+        std::size_t history_size = m_squared_history.size();
+
+        BOOST_ASSERT(samples_size % mipp::N<T>() == 0);
+        BOOST_ASSERT(mipp::isAligned(samples_data));
+
+        if (samples_size < history_size)
+        {
+            auto [lo, hi] = ring_buffer_split(samples_size);
+
+            auto lo_mipp = mipp_range(lo);
+            auto hi_mipp = mipp_range(hi);
+            auto mid_it = mipp_iterator{samples_data + lo.size()};
+
+            {
+                auto [sub, add] = process_part<mipp::Reg<T>>(
+                        lo_mipp.begin(),
+                        lo_mipp.end(),
+                        mipp_iterator{samples_data},
+                        mid_it);
+
+                adapt_sqr_sum(mipp::sum(sub), mipp::sum(add));
+            }
+
+            if (hi.size() > 0)
+            {
+                auto [sub, add] = process_part<mipp::Reg<T>>(
+                        hi_mipp.begin(),
+                        hi_mipp.end(),
+                        mid_it,
+                        mipp_iterator{samples_data + samples_size});
+
+                adapt_sqr_sum(mipp::sum(sub), mipp::sum(add));
+            }
+
+            advance_position(samples_size);
+        }
+        else
+        {
+            std::ranges::transform(
+                    mipp_iterator{samples_data + samples_size - history_size},
+                    mipp_iterator{samples_data + samples_size},
+                    mipp_iterator{m_squared_history.data()},
+                    numeric::pow_n<2>);
+
+            recompute_squared_sum();
+        }
+    }
+
+    void adapt_sqr_sum(T sub, T add)
+    {
+        m_sqr_sum = m_sqr_sum - sub + add;
+    }
+
+    void advance_position(std::size_t num_samples)
+    {
+        m_position += num_samples;
+
+        std::size_t history_size = m_squared_history.size();
+        if (m_position >= history_size)
+        {
+            m_position -= history_size;
+        }
+    }
+
+    void recompute_squared_sum()
+    {
+        auto mipprng = mipp_range(std::span{std::as_const(m_squared_history)});
+        m_sqr_sum = mipp::sum(std::reduce(
+                mipprng.begin(),
+                mipprng.end(),
+                mipp::Reg<T>(T{0}),
+                std::plus<mipp::Reg<T>>{}));
+    }
+
+    auto ring_buffer_split(std::size_t num_samples)
+            -> std::tuple<std::span<T>, std::span<T>>
+    {
+        auto const history_data = m_squared_history.data();
+        auto const history_size = m_squared_history.size();
+        auto const first = history_data + m_position;
+
+        if (m_position + num_samples < history_size)
+        {
+            auto last = first + num_samples;
+            return std::tuple{std::span{first, last}, std::span{last, last}};
+        }
+        else
+        {
+            auto size = history_size - m_position;
+            return std::tuple{
+                    std::span{first, size},
+                    std::span{history_data, num_samples - size}};
+        }
+    }
+
+    T m_min_level;
+    mipp::vector<T> m_squared_history;
+
+    std::size_t m_position{};
     T m_squared_history_size{static_cast<T>(m_squared_history.size())};
-    T m_squared_sum{};
+    T m_sqr_sum{};
 };
 
 } // namespace piejam::audio::dsp
