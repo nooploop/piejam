@@ -62,6 +62,14 @@ struct MixerChannelPerform::Impl
         get<C>(rms_level_meter).process(ch);
         rmsLevel.setLevel<C>(get<C>(rms_level_meter).level());
     }
+
+    void resetLevelMeter()
+    {
+        peak_level_meter.left.reset();
+        peak_level_meter.right.reset();
+        rms_level_meter.left.reset();
+        rms_level_meter.right.reset();
+    }
 };
 
 MixerChannelPerform::MixerChannelPerform(
@@ -174,6 +182,8 @@ MixerChannelPerform::mute() const noexcept -> BoolParameter*
 void
 MixerChannelPerform::onSubscribe()
 {
+    m_impl->resetLevelMeter();
+
     MixerChannel::onSubscribe();
 
     m_impl->updateSampleRate(

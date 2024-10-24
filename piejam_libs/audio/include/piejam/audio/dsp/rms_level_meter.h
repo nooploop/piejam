@@ -37,7 +37,7 @@ public:
                     default_rms_measure_time,
             T min_level = default_min_level)
         : m_min_level{min_level}
-        , m_squared_history(
+        , m_sqr_history(
                   math::round_down_to_multiple(
                           static_cast<std::size_t>(
                                   std::chrono::duration_cast<
@@ -63,8 +63,14 @@ public:
     auto level() const noexcept -> T
     {
         return math::flush_to_zero_if(
-                std::sqrt(std::max(m_sqr_sum, T{0}) / m_squared_history_size),
+                std::sqrt(std::max(m_sqr_sum, T{0}) / m_sqr_history_size),
                 less(m_min_level));
+    }
+
+    void reset()
+    {
+        std::ranges::fill(m_sqr_history, T{0});
+        m_sqr_sum = 0.f;
     }
 
 private:
@@ -99,7 +105,7 @@ private:
             return;
         }
 
-        std::size_t const history_size = m_squared_history.size();
+        std::size_t const history_size = m_sqr_history.size();
 
         if (samples_size < history_size)
         {
@@ -134,7 +140,7 @@ private:
             std::ranges::transform(
                     std::next(samples.begin(), samples_size - history_size),
                     samples.end(),
-                    m_squared_history.begin(),
+                    m_sqr_history.begin(),
                     numeric::pow_n<2>);
 
             recompute_squared_sum();
@@ -152,7 +158,7 @@ private:
         }
 
         auto samples_data = samples.data();
-        std::size_t history_size = m_squared_history.size();
+        std::size_t history_size = m_sqr_history.size();
 
         BOOST_ASSERT(samples_size % mipp::N<T>() == 0);
         BOOST_ASSERT(mipp::isAligned(samples_data));
@@ -193,7 +199,7 @@ private:
             std::ranges::transform(
                     mipp_iterator{samples_data + samples_size - history_size},
                     mipp_iterator{samples_data + samples_size},
-                    mipp_iterator{m_squared_history.data()},
+                    mipp_iterator{m_sqr_history.data()},
                     numeric::pow_n<2>);
 
             recompute_squared_sum();
@@ -209,7 +215,7 @@ private:
     {
         m_position += num_samples;
 
-        std::size_t history_size = m_squared_history.size();
+        std::size_t history_size = m_sqr_history.size();
         if (m_position >= history_size)
         {
             m_position -= history_size;
@@ -218,7 +224,7 @@ private:
 
     void recompute_squared_sum()
     {
-        auto mipprng = mipp_range(std::span{std::as_const(m_squared_history)});
+        auto mipprng = mipp_range(std::span{std::as_const(m_sqr_history)});
         m_sqr_sum = mipp::sum(std::reduce(
                 mipprng.begin(),
                 mipprng.end(),
@@ -229,8 +235,8 @@ private:
     auto ring_buffer_split(std::size_t num_samples)
             -> std::tuple<std::span<T>, std::span<T>>
     {
-        auto const history_data = m_squared_history.data();
-        auto const history_size = m_squared_history.size();
+        auto const history_data = m_sqr_history.data();
+        auto const history_size = m_sqr_history.size();
         auto const first = history_data + m_position;
 
         if (m_position + num_samples < history_size)
@@ -248,10 +254,10 @@ private:
     }
 
     T m_min_level;
-    mipp::vector<T> m_squared_history;
+    mipp::vector<T> m_sqr_history;
 
     std::size_t m_position{};
-    T m_squared_history_size{static_cast<T>(m_squared_history.size())};
+    T m_sqr_history_size{static_cast<T>(m_sqr_history.size())};
     T m_sqr_sum{};
 };
 

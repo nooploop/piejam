@@ -53,10 +53,16 @@ public:
         return math::flush_to_zero_if(m_peak_level, less(m_min_level));
     }
 
+    void reset()
+    {
+        m_peak_level = T{0};
+    }
+
 private:
     T m_min_level;
-    T m_peak_level{};
     T m_g_release{};
+
+    T m_peak_level{};
 };
 
 } // namespace piejam::audio::dsp
