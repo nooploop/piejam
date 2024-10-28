@@ -161,7 +161,7 @@ public:
             std::span<thread::worker> const worker_threads)
         : dag_executor_base(tasks, graph)
         , m_worker_threads(worker_threads)
-        , m_initial_tasks(distribute_initial_tasks(m_nodes))
+        , m_initial_tasks(collect_initial_tasks(m_nodes))
         , m_main_worker(
                   event_memory_size,
                   m_nodes_to_process,
@@ -204,7 +204,7 @@ public:
     }
 
 private:
-    static auto distribute_initial_tasks(nodes_t& nodes) -> std::vector<node*>
+    static auto collect_initial_tasks(nodes_t& nodes) -> std::vector<node*>
     {
         std::vector<node*> initial_tasks;
         initial_tasks.reserve(nodes.size());
