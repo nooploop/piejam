@@ -33,13 +33,13 @@ struct limits<int24_t>
     [[nodiscard]]
     static constexpr auto min() noexcept -> int24_t
     {
-        return -8388608;
+        return int24_t{-8388608};
     }
 
     [[nodiscard]]
     static constexpr auto max() noexcept -> int24_t
     {
-        return 8388607;
+        return int24_t{8388607};
     }
 };
 
@@ -49,13 +49,13 @@ struct limits<uint24_t>
     [[nodiscard]]
     static constexpr auto min() noexcept -> uint24_t
     {
-        return 0;
+        return uint24_t{0};
     }
 
     [[nodiscard]]
     static constexpr auto max() noexcept -> uint24_t
     {
-        return 16777215;
+        return uint24_t{16777215};
     }
 };
 

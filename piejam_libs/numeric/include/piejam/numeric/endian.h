@@ -16,8 +16,10 @@ template <class T>
 constexpr auto
 reverse_bytes(intx_t<T, 24> x) noexcept -> intx_t<T, 24>
 {
-    return ((x.value & 0xff0000) >> 16) | (x.value & 0xff00) |
-           ((x.value & 0xff) << 16);
+    return intx_t<T, 24>{
+            ((x.value & 0xff0000) >> 16) | //
+            (x.value & 0xff00) |           //
+            ((x.value & 0xff) << 16)};
 }
 
 template <class T>

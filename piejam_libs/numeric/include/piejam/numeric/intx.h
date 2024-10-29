@@ -26,19 +26,20 @@ struct intx_t
     }
 
     template <std::integral OtherInteger>
-    constexpr intx_t(intx_t<OtherInteger, Bits> const& other) noexcept
+    constexpr explicit intx_t(intx_t<OtherInteger, Bits> const& other) noexcept
         : value{static_cast<Integer>(other.value)}
     {
     }
 
     template <class T>
         requires std::integral<T> || std::floating_point<T>
-    constexpr intx_t(T x)
+    constexpr explicit intx_t(T x)
         : value{static_cast<Integer>(x)}
     {
     }
 
     template <class T>
+        requires std::integral<T> || std::floating_point<T>
     [[nodiscard]]
     constexpr explicit operator T() const noexcept
     {
@@ -53,19 +54,22 @@ struct intx_t
     }
 
     [[nodiscard]]
+    constexpr auto operator==(intx_t const&) const noexcept -> bool = default;
+
+    [[nodiscard]]
     constexpr auto operator<=>(intx_t const&) const noexcept = default;
 
     template <std::integral ShiftInt>
     [[nodiscard]]
     constexpr auto operator<<(ShiftInt shift) const noexcept -> intx_t
     {
-        return value << shift;
+        return intx_t{value << shift};
     }
 
     [[nodiscard]]
     constexpr auto operator^(intx_t other) const noexcept -> intx_t
     {
-        return value ^ other.value;
+        return intx_t{value ^ other.value};
     }
 };
 
