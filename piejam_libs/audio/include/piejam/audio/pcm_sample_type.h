@@ -7,7 +7,6 @@
 #include <piejam/audio/pcm_format.h>
 #include <piejam/numeric/intops.h>
 #include <piejam/numeric/intx.h>
-#include <piejam/numeric/limits.h>
 #include <piejam/numeric/type_traits.h>
 
 #include <cstdint>
@@ -26,8 +25,8 @@ struct pcm_sample_descriptor
     using signed_value_type = numeric::make_signed_t<value_type>;
     static constexpr value_type middle{
             numeric::intops::sign_map<value_type>(signed_value_type{})};
-    static constexpr value_type min{numeric::limits<value_type>::min()};
-    static constexpr value_type max{numeric::limits<value_type>::max()};
+    static constexpr value_type min{std::numeric_limits<value_type>::min()};
+    static constexpr value_type max{std::numeric_limits<value_type>::max()};
     static constexpr auto bitdepth{sizeof(value_type) * 8u};
     static_assert(bitdepth <= 32);
     using float_t = std::conditional_t<(bitdepth > 24), double, float>;

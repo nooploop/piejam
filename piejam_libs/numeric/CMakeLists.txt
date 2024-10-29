@@ -10,7 +10,6 @@ add_library(piejam_numeric STATIC
     include/piejam/numeric/fwd.h
     include/piejam/numeric/intops.h
     include/piejam/numeric/intx.h
-    include/piejam/numeric/limits.h
     include/piejam/numeric/pow_n.h
     include/piejam/numeric/rolling_mean.h
     include/piejam/numeric/type_traits.h

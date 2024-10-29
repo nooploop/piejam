@@ -4,7 +4,7 @@
 
 #include <piejam/numeric/intops.h>
 
-#include <piejam/numeric/limits.h>
+#include <piejam/numeric/intx.h>
 #include <piejam/numeric/type_traits.h>
 
 #include <gtest/gtest.h>
@@ -30,8 +30,8 @@ TYPED_TEST(sign_map_test, signed_to_unsigned_min)
     using unsigned_t = make_unsigned_t<signed_t>;
 
     EXPECT_EQ(
-            limits<unsigned_t>::min(),
-            sign_map<unsigned_t>(limits<signed_t>::min()));
+            std::numeric_limits<unsigned_t>::min(),
+            sign_map<unsigned_t>(std::numeric_limits<signed_t>::min()));
 }
 
 TYPED_TEST(sign_map_test, signed_to_unsigned_max)
@@ -40,8 +40,8 @@ TYPED_TEST(sign_map_test, signed_to_unsigned_max)
     using unsigned_t = make_unsigned_t<signed_t>;
 
     EXPECT_EQ(
-            limits<unsigned_t>::max(),
-            sign_map<unsigned_t>(limits<signed_t>::max()));
+            std::numeric_limits<unsigned_t>::max(),
+            sign_map<unsigned_t>(std::numeric_limits<signed_t>::max()));
 }
 
 TYPED_TEST(sign_map_test, signed_to_unsigned_zero)
@@ -60,8 +60,8 @@ TYPED_TEST(sign_map_test, unsigned_to_signed_min)
     using unsigned_t = make_unsigned_t<signed_t>;
 
     EXPECT_EQ(
-            limits<signed_t>::min(),
-            sign_map<signed_t>(limits<unsigned_t>::min()));
+            std::numeric_limits<signed_t>::min(),
+            sign_map<signed_t>(std::numeric_limits<unsigned_t>::min()));
 }
 
 TYPED_TEST(sign_map_test, unsigned_to_signed_max)
@@ -70,8 +70,8 @@ TYPED_TEST(sign_map_test, unsigned_to_signed_max)
     using unsigned_t = make_unsigned_t<signed_t>;
 
     EXPECT_EQ(
-            limits<signed_t>::max(),
-            sign_map<signed_t>(limits<unsigned_t>::max()));
+            std::numeric_limits<signed_t>::max(),
+            sign_map<signed_t>(std::numeric_limits<unsigned_t>::max()));
 }
 
 TYPED_TEST(sign_map_test, unsigned_to_signed_zero)
