@@ -2,8 +2,9 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/dsp/mipp_iterator.h>
 #include <piejam/audio/dsp/peak_level_meter.h>
+
+#include <mipp.h>
 
 #include <benchmark/benchmark.h>
 

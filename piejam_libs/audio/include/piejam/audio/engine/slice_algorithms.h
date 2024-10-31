@@ -6,9 +6,8 @@
 
 #include <piejam/audio/engine/slice.h>
 
-#include <piejam/audio/dsp/mipp_iterator.h>
-
 #include <piejam/math.h>
+#include <piejam/numeric/mipp_iterator.h>
 #include <piejam/switch_cast.h>
 
 #include <boost/assert.hpp>
@@ -48,9 +47,9 @@ struct slice_add
             BOOST_ASSERT(l_buf.size() == m_out.size());
 
             std::transform(
-                    dsp::mipp_begin(l_buf),
-                    dsp::mipp_end(l_buf),
-                    dsp::mipp_begin(m_out),
+                    numeric::mipp_begin(l_buf),
+                    numeric::mipp_end(l_buf),
+                    numeric::mipp_begin(m_out),
                     bhof::capture(mipp::Reg<T>(r_c))(std::plus<>{}));
 
             return m_out;
@@ -76,10 +75,10 @@ struct slice_add
         BOOST_ASSERT(l_buf.size() == m_out.size());
 
         std::transform(
-                dsp::mipp_begin(l_buf),
-                dsp::mipp_end(l_buf),
-                dsp::mipp_begin(r_buf),
-                dsp::mipp_begin(m_out),
+                numeric::mipp_begin(l_buf),
+                numeric::mipp_end(l_buf),
+                numeric::mipp_begin(r_buf),
+                numeric::mipp_begin(m_out),
                 std::plus<>{});
 
         return m_out;
@@ -120,9 +119,9 @@ struct slice_multiply
                 BOOST_ASSERT(l_buf.size() == m_out.size());
 
                 std::transform(
-                        dsp::mipp_begin(l_buf),
-                        dsp::mipp_end(l_buf),
-                        dsp::mipp_begin(m_out),
+                        numeric::mipp_begin(l_buf),
+                        numeric::mipp_end(l_buf),
+                        numeric::mipp_begin(m_out),
                         bhof::capture(mipp::Reg<T>(T{}))(std::minus<>{}));
                 return m_out;
 
@@ -130,9 +129,9 @@ struct slice_multiply
                 BOOST_ASSERT(l_buf.size() == m_out.size());
 
                 std::transform(
-                        dsp::mipp_begin(l_buf),
-                        dsp::mipp_end(l_buf),
-                        dsp::mipp_begin(m_out),
+                        numeric::mipp_begin(l_buf),
+                        numeric::mipp_end(l_buf),
+                        numeric::mipp_begin(m_out),
                         bhof::capture(mipp::Reg<T>(r_c))(std::multiplies<>{}));
 
                 return m_out;
@@ -154,10 +153,10 @@ struct slice_multiply
         BOOST_ASSERT(l_buf.size() == m_out.size());
 
         std::transform(
-                dsp::mipp_begin(l_buf),
-                dsp::mipp_end(l_buf),
-                dsp::mipp_begin(r_buf),
-                dsp::mipp_begin(m_out),
+                numeric::mipp_begin(l_buf),
+                numeric::mipp_end(l_buf),
+                numeric::mipp_begin(r_buf),
+                numeric::mipp_begin(m_out),
                 std::multiplies<>{});
 
         return m_out;
@@ -193,9 +192,9 @@ struct slice_clamp
     {
         BOOST_ASSERT(mipp::isAligned(buf.data()));
         std::transform(
-                dsp::mipp_begin(buf),
-                dsp::mipp_end(buf),
-                dsp::mipp_begin(m_out),
+                numeric::mipp_begin(buf),
+                numeric::mipp_end(buf),
+                numeric::mipp_begin(m_out),
                 [min = mipp::Reg<T>(m_min),
                  max = mipp::Reg<T>(m_max)](mipp::Reg<T> const x) {
                     return mipp::max(min, mipp::min(max, x));

@@ -2,12 +2,12 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/dsp/mipp_iterator.h>
+#include <piejam/numeric/mipp_iterator.h>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-namespace piejam::audio::dsp::test
+namespace piejam::numeric::test
 {
 
 TEST(mipp_iterator_test, write)
@@ -39,4 +39,4 @@ TEST(mipp_iterator_test, concepts)
     static_assert(std::output_iterator<mipp_iterator<float>, mipp::Reg<float>>);
 }
 
-} // namespace piejam::audio::dsp::test
+} // namespace piejam::numeric::test

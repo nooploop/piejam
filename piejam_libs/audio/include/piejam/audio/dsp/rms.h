@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/dsp/mipp_iterator.h>
-
+#include <piejam/numeric/mipp_iterator.h>
 #include <piejam/numeric/pow_n.h>
 
 #include <mipp.h>
@@ -44,7 +43,7 @@ template <std::floating_point T>
 auto
 rms(std::span<T const> const in) -> T
 {
-    auto const rng = mipp_range(in);
+    auto const rng = numeric::mipp_range(in);
     auto sums = std::transform_reduce(
             rng.begin(),
             rng.end(),

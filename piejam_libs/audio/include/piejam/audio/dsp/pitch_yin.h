@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <piejam/audio/dsp/mipp_iterator.h>
 #include <piejam/audio/sample_rate.h>
 
+#include <piejam/numeric/mipp_iterator.h>
 #include <piejam/numeric/pow_n.h>
 
 #include <mipp.h>
@@ -37,9 +37,9 @@ sqr_difference_sum(
     if (offset == 0)
     {
         return mipp::sum(std::transform_reduce(
-                mipp_iterator{data},
-                mipp_iterator{data + e},
-                mipp_iterator{data + tau},
+                numeric::mipp_iterator{data},
+                numeric::mipp_iterator{data + e},
+                numeric::mipp_iterator{data + tau},
                 mipp::Reg<T>(T{}),
                 std::plus<>{},
                 boost::hof::compose(numeric::pow_n<2>, std::minus<>{})));
@@ -54,17 +54,17 @@ sqr_difference_sum(
             return mipp::Msk<N>{I < (N - offset)...};
         }(std::make_index_sequence<N>{}, offset);
 
-        mipp_iterator it_tau{data + tau - offset};
-        mipp::Reg<T> reg_lo = mipp_lrot_n(*it_tau, offset);
+        numeric::mipp_iterator it_tau{data + tau - offset};
+        mipp::Reg<T> reg_lo = numeric::mipp_lrot_n(*it_tau, offset);
 
         for (auto reg_i : std::ranges::subrange(
-                     mipp_iterator{data},
-                     mipp_iterator{data + e}))
+                     numeric::mipp_iterator{data},
+                     numeric::mipp_iterator{data + e}))
         {
             ++it_tau;
-            mipp::Reg<T> reg_hi = mipp_lrot_n(*it_tau, offset);
+            mipp::Reg<T> reg_hi = numeric::mipp_lrot_n(*it_tau, offset);
 
-            sums = mipp_fsqradd(
+            sums = numeric::mipp_fsqradd(
                     reg_i - mipp::select(mask, reg_lo, reg_hi),
                     sums);
 

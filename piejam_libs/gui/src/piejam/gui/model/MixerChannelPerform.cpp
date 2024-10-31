@@ -9,10 +9,10 @@
 #include <piejam/gui/model/FxStream.h>
 #include <piejam/gui/model/StereoLevel.h>
 
-#include <piejam/audio/dsp/mipp_iterator.h>
 #include <piejam/audio/dsp/peak_level_meter.h>
 #include <piejam/audio/dsp/rms_level_meter.h>
 #include <piejam/audio/pair.h>
+#include <piejam/numeric/mipp_iterator.h>
 #include <piejam/renew.h>
 #include <piejam/runtime/selectors.h>
 

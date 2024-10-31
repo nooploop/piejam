@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/dsp/mipp.h>
+#include <piejam/numeric/mipp.h>
 
 #include <boost/assert.hpp>
 #include <boost/stl_interfaces/iterator_interface.hpp>
@@ -13,7 +13,7 @@
 #include <ranges>
 #include <span>
 
-namespace piejam::audio::dsp
+namespace piejam::numeric
 {
 
 namespace detail
@@ -231,4 +231,4 @@ mipp_range_split(std::span<T> const in)
     };
 }
 
-} // namespace piejam::audio::dsp
+} // namespace piejam::numeric

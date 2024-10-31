@@ -12,8 +12,6 @@ add_library(piejam_audio STATIC
     include/piejam/audio/dsp/biquad_filter.h
     include/piejam/audio/dsp/envelope_follower.h
     include/piejam/audio/dsp/generate_sine.h
-    include/piejam/audio/dsp/mipp.h
-    include/piejam/audio/dsp/mipp_iterator.h
     include/piejam/audio/dsp/pan.h
     include/piejam/audio/dsp/peak_level_meter.h
     include/piejam/audio/dsp/pitch_yin.h
@@ -128,7 +126,6 @@ target_link_libraries(piejam_audio
         piejam_range
         piejam_system
         piejam_thread
-        MIPP
     PRIVATE
         fmt
         spdlog::spdlog)

@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <piejam/audio/dsp/mipp_iterator.h>
 #include <piejam/audio/sample_rate.h>
 
 #include <piejam/functional/operators.h>
 #include <piejam/math.h>
+#include <piejam/numeric/mipp_iterator.h>
 #include <piejam/numeric/pow_n.h>
 
 #include <mipp.h>
@@ -52,7 +52,7 @@ public:
 
     void process(std::span<T const> samples)
     {
-        auto [pre, main, post] = mipp_range_split(samples);
+        auto [pre, main, post] = numeric::mipp_range_split(samples);
 
         process_span(pre);
         process_main_span(main);
@@ -167,15 +167,15 @@ private:
         {
             auto [lo, hi] = ring_buffer_split(samples_size);
 
-            auto lo_mipp = mipp_range(lo);
-            auto hi_mipp = mipp_range(hi);
-            auto mid_it = mipp_iterator{samples_data + lo.size()};
+            auto lo_mipp = numeric::mipp_range(lo);
+            auto hi_mipp = numeric::mipp_range(hi);
+            auto mid_it = numeric::mipp_iterator{samples_data + lo.size()};
 
             {
                 auto [sub, add] = process_part<mipp::Reg<T>>(
                         lo_mipp.begin(),
                         lo_mipp.end(),
-                        mipp_iterator{samples_data},
+                        numeric::mipp_iterator{samples_data},
                         mid_it);
 
                 adapt_sqr_sum(mipp::sum(sub), mipp::sum(add));
@@ -187,7 +187,7 @@ private:
                         hi_mipp.begin(),
                         hi_mipp.end(),
                         mid_it,
-                        mipp_iterator{samples_data + samples_size});
+                        numeric::mipp_iterator{samples_data + samples_size});
 
                 adapt_sqr_sum(mipp::sum(sub), mipp::sum(add));
             }
@@ -197,9 +197,10 @@ private:
         else
         {
             std::ranges::transform(
-                    mipp_iterator{samples_data + samples_size - history_size},
-                    mipp_iterator{samples_data + samples_size},
-                    mipp_iterator{m_sqr_history.data()},
+                    numeric::mipp_iterator{
+                            samples_data + samples_size - history_size},
+                    numeric::mipp_iterator{samples_data + samples_size},
+                    numeric::mipp_iterator{m_sqr_history.data()},
                     numeric::pow_n<2>);
 
             recompute_squared_sum();
@@ -224,7 +225,8 @@ private:
 
     void recompute_squared_sum()
     {
-        auto mipprng = mipp_range(std::span{std::as_const(m_sqr_history)});
+        auto mipprng =
+                numeric::mipp_range(std::span{std::as_const(m_sqr_history)});
         m_sqr_sum = mipp::sum(std::reduce(
                 mipprng.begin(),
                 mipprng.end(),

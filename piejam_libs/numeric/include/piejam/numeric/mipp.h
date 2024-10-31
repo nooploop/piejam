@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace piejam::audio::dsp
+namespace piejam::numeric
 {
 
 namespace detail
@@ -115,4 +115,4 @@ mipp_fsqradd(mipp::Reg<T> reg, mipp::Reg<T> add)
     return mipp::fmadd(reg, reg, add);
 }
 
-} // namespace piejam::audio::dsp
+} // namespace piejam::numeric

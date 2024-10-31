@@ -12,8 +12,8 @@
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/update_state_action.h>
 
-#include <piejam/audio/dsp/mipp_iterator.h>
 #include <piejam/audio/multichannel_buffer.h>
+#include <piejam/numeric/mipp_iterator.h>
 #include <piejam/system/file_utils.h>
 
 #include <sndfile.hh>
@@ -203,9 +203,9 @@ recorder_middleware::process_recorder_action(
                 interleaved.resize(stereo_view.samples().size());
 
                 std::ranges::transform(
-                        audio::dsp::mipp_range(stereo_view.channels()[0]),
-                        audio::dsp::mipp_range(stereo_view.channels()[1]),
-                        audio::dsp::make_mipp_iterator_x2(interleaved.data()),
+                        numeric::mipp_range(stereo_view.channels()[0]),
+                        numeric::mipp_range(stereo_view.channels()[1]),
+                        numeric::make_mipp_iterator_x2(interleaved.data()),
                         [](auto reg_l, auto reg_r) {
                             return mipp::interleave(reg_l, reg_r);
                         });
