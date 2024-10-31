@@ -2,8 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/engine/audio_slice.h>
-#include <piejam/audio/engine/slice_algorithms.h>
+#include <piejam/audio/slice_algorithms.h>
 
 #include <benchmark/benchmark.h>
 
@@ -70,12 +69,12 @@ BM_mix_audio_slice(benchmark::State& state)
     mipp::vector<float> out_buf(state.range(0));
     std::span<float> out{out_buf};
 
-    auto in1 = piejam::audio::engine::audio_slice(in_buf1);
-    auto in2 = piejam::audio::engine::audio_slice(in_buf2);
+    auto in1 = piejam::audio::slice<float>(in_buf1);
+    auto in2 = piejam::audio::slice<float>(in_buf2);
 
     for (auto _ : state)
     {
-        piejam::audio::engine::add(in1, in2, out);
+        piejam::audio::add(in1, in2, out);
         benchmark::ClobberMemory();
     }
 }
@@ -135,12 +134,12 @@ BM_multiply_audio_slice(benchmark::State& state)
     mipp::vector<float> out_buf(state.range(0));
     std::span<float> out{out_buf};
 
-    auto in1 = piejam::audio::engine::audio_slice(in_buf1);
-    auto in2 = piejam::audio::engine::audio_slice(in_buf2);
+    auto in1 = piejam::audio::slice<float>(in_buf1);
+    auto in2 = piejam::audio::slice<float>(in_buf2);
 
     for (auto _ : state)
     {
-        piejam::audio::engine::multiply(in1, in2, out);
+        piejam::audio::multiply(in1, in2, out);
         benchmark::ClobberMemory();
     }
 }
@@ -161,13 +160,12 @@ BM_multiply_audio_slice_by_constant(benchmark::State& state)
     mipp::vector<float> out_buf(state.range(0));
     std::span<float> out{out_buf};
 
-    auto in1 = piejam::audio::engine::audio_slice(0.75f);
-    auto in2 = piejam::audio::engine::audio_slice(in_bufs1);
+    auto in1 = piejam::audio::slice<float>(0.75f);
+    auto in2 = piejam::audio::slice<float>(in_bufs1);
 
     for (auto _ : state)
     {
-        benchmark::DoNotOptimize(
-                piejam::audio::engine::multiply(in1, in2, out));
+        benchmark::DoNotOptimize(piejam::audio::multiply(in1, in2, out));
         benchmark::ClobberMemory();
     }
 }

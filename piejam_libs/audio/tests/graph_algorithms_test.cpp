@@ -13,7 +13,7 @@
 #include <piejam/audio/engine/graph_generic_algorithms.h>
 #include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/mix_processor.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <gtest/gtest.h>
 

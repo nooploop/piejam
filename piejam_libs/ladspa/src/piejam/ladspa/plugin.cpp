@@ -11,10 +11,10 @@
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/audio/slice_algorithms.h>
 #include <piejam/npos.h>
 #include <piejam/range/indices.h>
 #include <piejam/range/iota.h>
@@ -535,7 +535,7 @@ public:
                                 m_constant_audio_inputs[i].begin(),
                                 slice_size,
                                 sub.constant());
-                        sub = audio::engine::audio_slice(std::span(
+                        sub = audio::slice<float>(std::span(
                                 m_constant_audio_inputs[i].data(),
                                 slice_size));
                     }

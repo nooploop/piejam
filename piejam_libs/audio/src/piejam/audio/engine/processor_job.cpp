@@ -5,8 +5,8 @@
 #include <piejam/audio/engine/processor_job.h>
 
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/engine/slice.h>
 #include <piejam/audio/engine/thread_context.h>
+#include <piejam/audio/slice.h>
 
 #include <boost/assert.hpp>
 
@@ -16,9 +16,9 @@ namespace piejam::audio::engine
 {
 
 static auto
-empty_result_ref() -> std::reference_wrapper<audio_slice const>
+empty_result_ref() -> std::reference_wrapper<slice<float> const>
 {
-    static audio_slice res;
+    static slice<float> res;
     return std::cref(res);
 }
 
@@ -47,7 +47,7 @@ processor_job::processor_job(processor& proc)
 }
 
 auto
-processor_job::result_ref(std::size_t const index) const -> audio_slice const&
+processor_job::result_ref(std::size_t const index) const -> slice<float> const&
 {
     return m_results[index];
 }
@@ -60,7 +60,7 @@ processor_job::event_result_ref(std::size_t const index)
 }
 
 void
-processor_job::connect_result(std::size_t const index, audio_slice const& res)
+processor_job::connect_result(std::size_t const index, slice<float> const& res)
 {
     BOOST_ASSERT(index < m_inputs.size());
     m_inputs[index] = std::ref(res);

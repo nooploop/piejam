@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <piejam/math.h>
 #include <piejam/numeric/mipp_iterator.h>
@@ -15,7 +15,7 @@
 
 #include <algorithm>
 
-namespace piejam::audio::engine
+namespace piejam::audio
 {
 
 namespace detail
@@ -310,4 +310,4 @@ subslice(
     return slice<T>::visit(detail::subslice<T>(offset, size), s);
 }
 
-} // namespace piejam::audio::engine
+} // namespace piejam::audio

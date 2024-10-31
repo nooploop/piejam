@@ -10,20 +10,17 @@
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/processor.h>
 #include <piejam/audio/engine/processor_job.h>
-#include <piejam/audio/engine/slice.h>
 #include <piejam/audio/period_size.h>
+#include <piejam/audio/slice.h>
 #include <piejam/functional/address_compare.h>
 
 #include <boost/assert.hpp>
 
-#include <algorithm>
 #include <array>
-#include <initializer_list>
 #include <map>
 #include <memory>
 #include <ranges>
 #include <set>
-#include <span>
 #include <vector>
 
 namespace piejam::audio::engine

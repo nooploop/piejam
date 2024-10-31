@@ -4,12 +4,11 @@
 
 #include <piejam/audio/engine/mix_processor.h>
 
-#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <mipp.h>
 
@@ -25,12 +24,12 @@ namespace piejam::audio::engine::test
 struct mix_processor_2_inputs : public ::testing::Test
 {
     constexpr static auto const buffer_size = 8;
-    audio_slice in1;
-    audio_slice in2;
-    std::array<std::reference_wrapper<audio_slice const>, 2> inputs{in1, in2};
+    slice<float> in1;
+    slice<float> in2;
+    std::array<std::reference_wrapper<slice<float> const>, 2> inputs{in1, in2};
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> out_buf{};
     std::array<std::span<float>, 1> outputs{out_buf};
-    std::array<audio_slice, 1> results{outputs[0]};
+    std::array<slice<float>, 1> results{outputs[0]};
     event_input_buffers ev_ins;
     event_output_buffers ev_outs{};
     process_context ctx{inputs, outputs, results, ev_ins, ev_outs, buffer_size};
@@ -112,12 +111,12 @@ TEST(mix_processor, mix_two_silence_channels)
 {
     auto sut = make_mix_processor(2);
 
-    audio_slice const silence;
+    slice<float> const silence;
 
-    std::vector<std::reference_wrapper<audio_slice const>> in(2, silence);
+    std::vector<std::reference_wrapper<slice<float> const>> in(2, silence);
     alignas(mipp::RequiredAlignment) std::array out_buf{0.f};
     std::vector<std::span<float>> out = {out_buf};
-    std::vector<audio_slice> result{out[0]};
+    std::vector<slice<float>> result{out[0]};
 
     sut->process({in, out, result, {}, {}, 1});
 
@@ -129,16 +128,16 @@ TEST(mix_processor, mix_one_silence_one_non_silence_channel)
 {
     auto sut = make_mix_processor(2);
 
-    audio_slice const silence;
+    slice<float> const silence;
     alignas(mipp::RequiredAlignment) std::array in_buf{0.23f};
-    audio_slice in_buf_span(in_buf);
+    slice<float> in_buf_span(in_buf);
 
-    std::vector<std::reference_wrapper<audio_slice const>> in{
+    std::vector<std::reference_wrapper<slice<float> const>> in{
             silence,
             in_buf_span};
     alignas(mipp::RequiredAlignment) std::array out_buf{0.f};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<audio_slice> result{out[0]};
+    std::vector<slice<float>> result{out[0]};
 
     ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
@@ -156,16 +155,16 @@ TEST(mix_processor, mix_two_non_silence_channels)
 
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf1;
     in_buf1.fill(0.23f);
-    audio_slice in_buf1_span(in_buf1);
+    slice<float> in_buf1_span(in_buf1);
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf2;
     in_buf2.fill(0.58f);
-    audio_slice in_buf2_span(in_buf2);
-    std::vector<std::reference_wrapper<audio_slice const>> in{
+    slice<float> in_buf2_span(in_buf2);
+    std::vector<std::reference_wrapper<slice<float> const>> in{
             in_buf1_span,
             in_buf2_span};
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> out_buf{};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<audio_slice> result{out[0]};
+    std::vector<slice<float>> result{out[0]};
 
     ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
@@ -183,16 +182,16 @@ TEST(mix_processor, mix_two_silence_one_non_silence_channel)
 {
     auto sut = make_mix_processor(3);
 
-    audio_slice const silence;
+    slice<float> const silence;
     alignas(mipp::RequiredAlignment) std::array in_buf{0.23f};
-    audio_slice in_buf_span(in_buf);
-    std::vector<std::reference_wrapper<audio_slice const>> in{
+    slice<float> in_buf_span(in_buf);
+    std::vector<std::reference_wrapper<slice<float> const>> in{
             silence,
             silence,
             in_buf_span};
     alignas(mipp::RequiredAlignment) std::array out_buf{0.f};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<audio_slice> result{out[0]};
+    std::vector<slice<float>> result{out[0]};
 
     ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
@@ -209,20 +208,20 @@ TEST(mix_processor, mix_one_silence_two_non_silence_channels)
 
     constexpr auto buffer_size = 8u;
 
-    audio_slice const silence;
+    slice<float> const silence;
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf1;
     in_buf1.fill(0.23f);
-    audio_slice in_buf1_span(in_buf1);
+    slice<float> in_buf1_span(in_buf1);
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf2;
     in_buf2.fill(0.58f);
-    audio_slice in_buf2_span(in_buf2);
-    std::vector<std::reference_wrapper<audio_slice const>> in{
+    slice<float> in_buf2_span(in_buf2);
+    std::vector<std::reference_wrapper<slice<float> const>> in{
             in_buf1_span,
             silence,
             in_buf2_span};
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> out_buf{};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<audio_slice> result{out[0]};
+    std::vector<slice<float>> result{out[0]};
 
     ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 
@@ -241,12 +240,12 @@ TEST(mix_processor, mix_one_silence_and_eight_buffers)
 
     constexpr auto buffer_size = 8u;
 
-    audio_slice const silence;
+    slice<float> const silence;
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> in_buf;
     in_buf.fill(1.f);
-    audio_slice in_buf_slice(in_buf);
+    slice<float> in_buf_slice(in_buf);
 
-    std::vector<std::reference_wrapper<audio_slice const>> in{
+    std::vector<std::reference_wrapper<slice<float> const>> in{
             in_buf_slice,
             in_buf_slice,
             in_buf_slice,
@@ -258,7 +257,7 @@ TEST(mix_processor, mix_one_silence_and_eight_buffers)
             in_buf_slice};
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> out_buf{};
     std::vector<std::span<float>> out{out_buf};
-    std::vector<audio_slice> result{out[0]};
+    std::vector<slice<float>> result{out[0]};
 
     ASSERT_FLOAT_EQ(0.f, result[0].span()[0]);
 

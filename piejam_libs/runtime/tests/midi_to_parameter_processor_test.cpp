@@ -9,7 +9,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 #include <piejam/midi/event.h>
 #include <piejam/runtime/parameter/bool_descriptor.h>
 #include <piejam/runtime/parameter/float_descriptor.h>

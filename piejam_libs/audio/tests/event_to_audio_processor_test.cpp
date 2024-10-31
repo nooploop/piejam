@@ -10,7 +10,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <piejam/algorithm/all_of_adjacent.h>
 #include <piejam/functional/operators.h>
@@ -39,7 +39,7 @@ struct event_to_audio_smoother_processor_test : testing::Test
     static constexpr std::size_t buffer_size{default_smooth_length * 2};
     std::array<float, buffer_size> out0{};
     std::array<std::span<float>, 1> outputs{out0};
-    std::array<audio_slice, 1> results;
+    std::array<slice<float>, 1> results;
     audio::engine::process_context ctx{
             .outputs = outputs,
             .results = results,

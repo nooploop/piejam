@@ -8,7 +8,7 @@
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <gmock/gmock.h>
 

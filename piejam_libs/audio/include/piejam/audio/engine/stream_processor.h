@@ -58,7 +58,7 @@ public:
 private:
     std::size_t const m_num_channels;
 
-    stream_ring_buffer m_buffer;
+    stream_ring_buffer<float> m_buffer;
 };
 
 auto make_stream_processor(

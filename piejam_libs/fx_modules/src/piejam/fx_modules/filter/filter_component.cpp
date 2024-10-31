@@ -13,10 +13,10 @@
 #include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/single_event_input_processor.h>
-#include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/stream_processor.h>
 #include <piejam/audio/engine/verify_process_context.h>
 #include <piejam/audio/sample_rate.h>
+#include <piejam/audio/slice_algorithms.h>
 #include <piejam/fx_modules/filter/filter_module.h>
 #include <piejam/integral_constant.h>
 #include <piejam/math.h>
@@ -33,7 +33,6 @@
 #include <boost/mp11/map.hpp>
 
 #include <cmath>
-#include <numbers>
 
 namespace piejam::fx_modules::filter
 {
@@ -226,11 +225,9 @@ public:
             std::size_t const offset,
             std::size_t const count)
     {
-        using audio::engine::audio_slice;
-
         auto out_it = std::next(ctx.outputs[0].begin(), offset);
 
-        audio_slice::visit(
+        audio::slice<float>::visit(
                 boost::hof::match(
                         [=, this, &out_it](float const c) {
                             std::ranges::generate_n(
@@ -238,7 +235,8 @@ public:
                                     count,
                                     std::bind_front(m_process_sample, this, c));
                         },
-                        [=, this, &out_it](audio_slice::span_t const& buf) {
+                        [=, this, &out_it](
+                                audio::slice<float>::span_t const& buf) {
                             std::ranges::transform(
                                     buf,
                                     out_it,

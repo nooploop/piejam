@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/fwd.h>
+#include <piejam/audio/fwd.h>
 
 #include <functional>
 #include <span>
@@ -16,9 +16,9 @@ namespace piejam::audio::engine
 struct process_context
 {
     using input_buffers_t =
-            std::span<std::reference_wrapper<audio_slice const> const>;
+            std::span<std::reference_wrapper<slice<float> const> const>;
     using output_buffers_t = std::span<std::span<float> const>;
-    using result_buffers_t = std::span<audio_slice>;
+    using result_buffers_t = std::span<slice<float>>;
 
     input_buffers_t inputs{};
     output_buffers_t outputs{};

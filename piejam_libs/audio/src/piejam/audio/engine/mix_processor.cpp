@@ -4,11 +4,10 @@
 
 #include <piejam/audio/engine/mix_processor.h>
 
-#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/engine/verify_process_context.h>
+#include <piejam/audio/slice_algorithms.h>
 
 #include <piejam/functional/operators.h>
 #include <piejam/npos.h>
@@ -42,11 +41,11 @@ template <>
 auto
 mix<npos>(process_context const& ctx)
 {
-    audio_slice res;
+    slice<float> res;
 
     auto const out = ctx.outputs[0];
 
-    for (audio_slice const& in : ctx.inputs)
+    for (slice<float> const& in : ctx.inputs)
     {
         res = add(in, res, out);
     }

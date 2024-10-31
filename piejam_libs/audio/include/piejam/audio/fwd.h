@@ -36,4 +36,7 @@ class multichannel_view;
 template <class T, class Layout>
 class multichannel_buffer;
 
+template <class T>
+class slice;
+
 } // namespace piejam::audio

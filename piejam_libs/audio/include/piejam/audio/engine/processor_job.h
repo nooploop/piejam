@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
@@ -30,8 +29,8 @@ public:
 
     processor_job(processor& proc);
 
-    auto result_ref(std::size_t index) const -> audio_slice const&;
-    void connect_result(std::size_t index, audio_slice const& res);
+    auto result_ref(std::size_t index) const -> slice<float> const&;
+    void connect_result(std::size_t index, slice<float> const& res);
 
     auto event_result_ref(std::size_t index) -> abstract_event_buffer const&;
     void connect_event_result(
@@ -46,9 +45,9 @@ private:
     processor& m_proc;
     mipp::vector<output_buffer_t> m_output_buffers;
 
-    std::vector<std::reference_wrapper<audio_slice const>> m_inputs;
+    std::vector<std::reference_wrapper<slice<float> const>> m_inputs;
     std::vector<std::span<float>> m_outputs;
-    std::vector<audio_slice> m_results;
+    std::vector<slice<float>> m_results;
 
     event_input_buffers m_event_inputs;
     event_output_buffers m_event_outputs;

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <gtest/gtest.h>
 

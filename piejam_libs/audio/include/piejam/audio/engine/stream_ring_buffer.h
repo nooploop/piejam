@@ -4,16 +4,14 @@
 
 #pragma once
 
-#include <piejam/audio/engine/audio_slice.h>
-#include <piejam/audio/engine/slice_algorithms.h>
 #include <piejam/audio/multichannel_buffer.h>
+#include <piejam/audio/slice_algorithms.h>
 
 #include <piejam/thread/cache_line_size.h>
 
 #include <boost/assert.hpp>
 
 #include <atomic>
-#include <concepts>
 #include <span>
 #include <vector>
 
@@ -22,11 +20,12 @@ namespace piejam::audio::engine
 
 //! single-producer-single-consumer, lock-free, multi-channel ring-buffer.
 //! writes from rt-thread, reads from main.
+template <class T>
 class stream_ring_buffer
 {
 public:
     using multichannel_buffer_t =
-            multichannel_buffer<float, multichannel_layout_non_interleaved>;
+            multichannel_buffer<T, multichannel_layout_non_interleaved>;
 
     stream_ring_buffer(
             std::size_t const num_channels,
@@ -39,7 +38,7 @@ public:
 
     //! returns frames written
     auto
-    write(std::span<std::reference_wrapper<audio_slice const> const> const data,
+    write(std::span<std::reference_wrapper<slice<T> const> const> const data,
           std::size_t size_per_channel) -> std::size_t
     {
         BOOST_ASSERT(data.size() == m_num_channels);
@@ -70,7 +69,7 @@ public:
 
             for (std::size_t ch = 0; ch < m_num_channels; ++ch)
             {
-                audio_slice src_data = data[ch];
+                slice<T> src_data = data[ch];
                 auto dst_data = m_buffer_multi_channel_view[ch];
 
                 copy(subslice(src_data, 0, middle),
@@ -85,7 +84,7 @@ public:
         {
             for (std::size_t ch = 0; ch < m_num_channels; ++ch)
             {
-                audio_slice src_data = data[ch];
+                slice<T> src_data = data[ch];
                 auto dst_data = m_buffer_multi_channel_view[ch];
 
                 copy(subslice(src_data, 0, write_size),

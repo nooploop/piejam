@@ -7,14 +7,12 @@
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
-#include <algorithm>
 #include <array>
-#include <vector>
 
 namespace piejam::audio::engine::test
 {
@@ -42,7 +40,7 @@ TEST_F(stream_processor_1_test, process_buffer_and_consume)
 {
     alignas(mipp::RequiredAlignment)
             std::array in_buf{1.f, 1.f, 1.f, 1.f, 2.f, 2.f, 2.f, 2.f};
-    audio_slice in(in_buf);
+    slice<float> in(in_buf);
     std::array ins{std::cref(in)};
     ctx.inputs = ins;
 
@@ -56,7 +54,7 @@ TEST_F(stream_processor_1_test, process_buffer_and_consume)
 
 TEST_F(stream_processor_1_test, process_constant_and_consume)
 {
-    audio_slice in(3.f);
+    slice<float> in(3.f);
     std::array ins{std::cref(in)};
     ctx.inputs = ins;
 
@@ -73,7 +71,7 @@ TEST_F(stream_processor_1_test, process_constant_and_consume)
 TEST_F(stream_processor_1_test, process_twice_buffer_and_consume)
 {
     alignas(mipp::RequiredAlignment) std::array in_buf{1.f, 1.f, 1.f, 1.f};
-    audio_slice in(in_buf);
+    slice<float> in(in_buf);
     std::array ins{std::cref(in)};
     ctx.buffer_size = 4;
     ctx.inputs = ins;
@@ -114,10 +112,10 @@ TEST_F(stream_processor_2_test, process_buffer_and_consume)
 {
     alignas(mipp::RequiredAlignment)
             std::array in1_buf{1.f, 1.f, 1.f, 1.f, 3.f, 3.f, 3.f, 3.f};
-    audio_slice in1(in1_buf);
+    slice<float> in1(in1_buf);
     alignas(mipp::RequiredAlignment)
             std::array in2_buf{2.f, 2.f, 2.f, 2.f, 4.f, 4.f, 4.f, 4.f};
-    audio_slice in2(in2_buf);
+    slice<float> in2(in2_buf);
     std::array ins{std::cref(in1), std::cref(in2)};
     ctx.inputs = ins;
 
@@ -132,8 +130,8 @@ TEST_F(stream_processor_2_test, process_buffer_and_consume)
 
 TEST_F(stream_processor_2_test, process_constants_and_consume)
 {
-    audio_slice in1(1.f);
-    audio_slice in2(2.f);
+    slice<float> in1(1.f);
+    slice<float> in2(2.f);
     std::array ins{std::cref(in1), std::cref(in2)};
     ctx.inputs = ins;
 
@@ -173,16 +171,16 @@ TEST_F(stream_processor_4_test, process_buffer_and_consume)
 {
     alignas(mipp::RequiredAlignment)
             std::array in1_buf{1.f, 1.f, 1.f, 1.f, 3.f, 3.f, 3.f, 3.f};
-    audio_slice in1(in1_buf);
+    slice<float> in1(in1_buf);
     alignas(mipp::RequiredAlignment)
             std::array in2_buf{2.f, 2.f, 2.f, 2.f, 4.f, 4.f, 4.f, 4.f};
-    audio_slice in2(in2_buf);
+    slice<float> in2(in2_buf);
     alignas(mipp::RequiredAlignment)
             std::array in3_buf{5.f, 5.f, 5.f, 5.f, 7.f, 7.f, 7.f, 7.f};
-    audio_slice in3(in3_buf);
+    slice<float> in3(in3_buf);
     alignas(mipp::RequiredAlignment)
             std::array in4_buf{6.f, 6.f, 6.f, 6.f, 8.f, 8.f, 8.f, 8.f};
-    audio_slice in4(in4_buf);
+    slice<float> in4(in4_buf);
 
     std::array ins{
             std::cref(in1),
@@ -225,14 +223,14 @@ TEST_F(stream_processor_n_test, properties)
 TEST_F(stream_processor_n_test, process_buffer_and_consume)
 {
     alignas(mipp::RequiredAlignment) std::array in1_buf{1.f, 2.f, 3.f, 4.f};
-    audio_slice in1(in1_buf);
+    slice<float> in1(in1_buf);
     alignas(mipp::RequiredAlignment) std::array in2_buf{5.f, 6.f, 7.f, 8.f};
-    audio_slice in2(in2_buf);
+    slice<float> in2(in2_buf);
     alignas(mipp::RequiredAlignment) std::array in3_buf{-1.f, -2.f, -3.f, -4.f};
-    audio_slice in3(in3_buf);
+    slice<float> in3(in3_buf);
     alignas(mipp::RequiredAlignment) std::array in4_buf{9.f, 9.f, -9.f, -9.f};
-    audio_slice in4(in4_buf);
-    audio_slice in5(23.f);
+    slice<float> in4(in4_buf);
+    slice<float> in5(23.f);
 
     std::array ins{
             std::cref(in1),

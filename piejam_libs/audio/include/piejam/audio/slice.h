@@ -10,7 +10,7 @@
 #include <functional>
 #include <span>
 
-namespace piejam::audio::engine
+namespace piejam::audio
 {
 
 template <class T>
@@ -126,4 +126,4 @@ private:
     } m_value{};
 };
 
-} // namespace piejam::audio::engine
+} // namespace piejam::audio

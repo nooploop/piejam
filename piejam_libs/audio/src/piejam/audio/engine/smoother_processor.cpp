@@ -5,7 +5,6 @@
 #include <piejam/audio/engine/smoother_processor.h>
 
 #include <piejam/audio/dsp/smoother.h>
-#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/named_processor.h>
@@ -13,8 +12,6 @@
 #include <piejam/audio/engine/verify_process_context.h>
 
 #include <boost/assert.hpp>
-
-#include <type_traits>
 
 namespace piejam::audio::engine
 {

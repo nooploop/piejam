@@ -16,9 +16,6 @@ class event_buffer_memory;
 class event_input_buffers;
 class event_output_buffers;
 class event_port;
-template <class T>
-class slice;
-using audio_slice = slice<float>;
 
 class component;
 class processor;

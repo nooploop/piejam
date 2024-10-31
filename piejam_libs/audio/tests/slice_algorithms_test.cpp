@@ -2,14 +2,14 @@
 // SPDX-FileCopyrightText: 2020-2024  Dimitrij Kotrev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <piejam/audio/engine/slice_algorithms.h>
+#include <piejam/audio/slice_algorithms.h>
 
 #include <mipp.h>
 
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
-namespace piejam::audio::engine::test
+namespace piejam::audio::test
 {
 
 TEST(slice_algorithms_add, adding_constants_results_in_a_constant)
@@ -221,17 +221,17 @@ TEST(slice_algorithms_subslice, sublice_buffer)
 TEST(slice_clamp, constant)
 {
     slice<float> l(1.5f);
-    auto l_res = engine::clamp(l, -1.f, 1.f, {});
+    auto l_res = clamp(l, -1.f, 1.f, {});
     ASSERT_TRUE(l_res.is_constant());
     EXPECT_EQ(1.f, l_res.constant());
 
     slice<float> r(-1.5f);
-    auto r_res = engine::clamp(r, -1.f, 1.f, {});
+    auto r_res = clamp(r, -1.f, 1.f, {});
     ASSERT_TRUE(r_res.is_constant());
     EXPECT_EQ(-1.f, r_res.constant());
 
     slice<float> m(0.5f);
-    auto m_res = engine::clamp(m, -1.f, 1.f, {});
+    auto m_res = clamp(m, -1.f, 1.f, {});
     ASSERT_TRUE(m_res.is_constant());
     EXPECT_EQ(0.5f, m_res.constant());
 }
@@ -241,7 +241,7 @@ TEST(slice_clamp, buffer)
     alignas(mipp::RequiredAlignment)
             std::array buf{-1.5f, 1.5f, 0.5f, 23.f, -17.f, 0.23f, 0.f, -0.25f};
     slice<float> s(buf);
-    auto res = engine::clamp(s, -1.f, 1.f, {buf});
+    auto res = clamp(s, -1.f, 1.f, {buf});
     ASSERT_TRUE(res.is_span());
     EXPECT_EQ(buf.size(), res.span().size());
     EXPECT_EQ(buf.data(), res.span().data());
@@ -252,4 +252,4 @@ TEST(slice_clamp, buffer)
             ElementsAre(-1.f, 1.f, 0.5f, 1.f, -1.f, 0.23f, 0.f, -0.25f))(buf));
 }
 
-} // namespace piejam::audio::engine::test
+} // namespace piejam::audio::test

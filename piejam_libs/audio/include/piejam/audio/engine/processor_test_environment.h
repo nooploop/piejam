@@ -73,14 +73,14 @@ struct processor_test_environment
 private:
     event_buffer_memory ev_mem{1 << 16};
     std::pmr::memory_resource* ev_mem_res{&ev_mem.memory_resource()};
-    std::vector<std::reference_wrapper<audio_slice const>> audio_in_slices;
+    std::vector<std::reference_wrapper<slice<float> const>> audio_in_slices;
     std::vector<std::vector<float, mipp::allocator<float>>> audio_out_bufs;
     std::vector<std::unique_ptr<abstract_event_buffer>> ev_in_bufs;
 
 public:
-    std::vector<audio_slice> audio_inputs;
+    std::vector<slice<float>> audio_inputs;
     std::vector<std::span<float>> audio_outputs;
-    std::vector<audio_slice> audio_results;
+    std::vector<slice<float>> audio_results;
     event_input_buffers event_inputs;
     event_output_buffers event_outputs;
     process_context ctx;

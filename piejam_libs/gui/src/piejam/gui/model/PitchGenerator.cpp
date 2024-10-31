@@ -35,7 +35,8 @@ PitchGenerator::process() -> float
         }
         else
         {
-            m_last_frequency = audio::dsp::pitch_yin<float>(m_signal, m_sample_rate);
+            m_last_frequency =
+                    audio::dsp::pitch_yin<float>(m_signal, m_sample_rate);
         }
 
         m_captured_samples %= captureSize;

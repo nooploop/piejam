@@ -8,7 +8,7 @@
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <mipp.h>
 
@@ -26,7 +26,7 @@ struct clip_processor_test : testing::Test
     static constexpr std::size_t buffer_size{4};
     alignas(mipp::RequiredAlignment) std::array<float, buffer_size> out0;
     std::array<std::span<float>, 1> outputs{out0};
-    std::array<audio_slice, 1> results;
+    std::array<slice<float>, 1> results;
     audio::engine::process_context ctx{
             .outputs = outputs,
             .results = results,
@@ -47,7 +47,7 @@ TEST_F(clip_processor_test, properties)
 TEST_F(clip_processor_test, input_gets_clipped)
 {
     alignas(mipp::RequiredAlignment) std::array in_buf{-1.5f, 1.3f, .5f, -0.7f};
-    audio_slice in(in_buf);
+    slice<float> in(in_buf);
     std::array ins{std::cref(in)};
     ctx.inputs = ins;
 

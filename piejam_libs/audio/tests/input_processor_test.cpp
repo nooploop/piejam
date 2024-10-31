@@ -4,11 +4,10 @@
 
 #include <piejam/audio/engine/input_processor.h>
 
-#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <mipp.h>
 
@@ -24,7 +23,7 @@ TEST(input_processor, input_is_propagated_to_outputs)
 
     alignas(mipp::RequiredAlignment) std::array<float, 4> out_buf{};
     std::vector<std::span<float>> outputs{out_buf};
-    std::vector<audio_slice> results(1);
+    std::vector<slice<float>> results(1);
     auto converter =
             pcm_input_buffer_converter([&out_buf](std::span<float> const buf) {
                 std::ranges::copy(out_buf, buf.begin());

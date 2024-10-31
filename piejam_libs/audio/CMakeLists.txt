@@ -18,7 +18,6 @@ add_library(piejam_audio STATIC
     include/piejam/audio/dsp/rms.h
     include/piejam/audio/dsp/rms_level_meter.h
     include/piejam/audio/dsp/smoother.h
-    include/piejam/audio/engine/audio_slice.h
     include/piejam/audio/engine/clip_processor.h
     include/piejam/audio/engine/component.h
     include/piejam/audio/engine/dag.h
@@ -51,8 +50,6 @@ add_library(piejam_audio STATIC
     include/piejam/audio/engine/processor_test_environment.h
     include/piejam/audio/engine/processor_util.h
     include/piejam/audio/engine/single_event_input_processor.h
-    include/piejam/audio/engine/slice.h
-    include/piejam/audio/engine/slice_algorithms.h
     include/piejam/audio/engine/smoother_processor.h
     include/piejam/audio/engine/stream_processor.h
     include/piejam/audio/engine/stream_ring_buffer.h
@@ -76,6 +73,8 @@ add_library(piejam_audio STATIC
     include/piejam/audio/process_function.h
     include/piejam/audio/process_thread.h
     include/piejam/audio/sample_rate.h
+    include/piejam/audio/slice.h
+    include/piejam/audio/slice_algorithms.h
     include/piejam/audio/sound_card_descriptor.h
     include/piejam/audio/sound_card_hw_params.h
     include/piejam/audio/sound_card_manager.h

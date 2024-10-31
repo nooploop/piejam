@@ -4,13 +4,12 @@
 
 #pragma once
 
-#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/event_port.h>
 #include <piejam/audio/engine/process_context.h>
 #include <piejam/audio/engine/processor.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <mipp.h>
 
@@ -31,7 +30,7 @@ verify_process_context(
     BOOST_ASSERT(proc.num_outputs() == ctx.results.size());
     BOOST_ASSERT(proc.event_inputs().size() == ctx.event_inputs.size());
     BOOST_ASSERT(proc.event_outputs().size() == ctx.event_outputs.size());
-    BOOST_ASSERT(std::ranges::all_of(ctx.inputs, [&](audio_slice const& b) {
+    BOOST_ASSERT(std::ranges::all_of(ctx.inputs, [&](slice<float> const& b) {
         return b.is_constant() || (b.span().size() == ctx.buffer_size &&
                                    mipp::isAligned(b.span().data()));
     }));

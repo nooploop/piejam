@@ -4,11 +4,10 @@
 
 #include <piejam/audio/engine/output_processor.h>
 
-#include <piejam/audio/engine/audio_slice.h>
 #include <piejam/audio/engine/event_input_buffers.h>
 #include <piejam/audio/engine/event_output_buffers.h>
 #include <piejam/audio/engine/process_context.h>
-#include <piejam/audio/engine/slice.h>
+#include <piejam/audio/slice.h>
 
 #include <mipp.h>
 
@@ -35,8 +34,8 @@ TEST(output_processor, input_is_propagated_to_outputs)
             0.58f,
             0.77f,
             0.91f};
-    std::vector<audio_slice> in_spans{in_buf};
-    std::vector<std::reference_wrapper<audio_slice const>> inputs{
+    std::vector<slice<float>> in_spans{in_buf};
+    std::vector<std::reference_wrapper<slice<float> const>> inputs{
             in_spans.begin(),
             in_spans.end()};
 

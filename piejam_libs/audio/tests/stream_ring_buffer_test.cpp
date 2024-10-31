@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <algorithm>
 #include <array>
 
 namespace piejam::audio::engine::test
@@ -15,10 +14,10 @@ namespace piejam::audio::engine::test
 
 TEST(stream_ring_buffer, write_all_samples_if_enough_space)
 {
-    stream_ring_buffer buf(1, 8);
+    stream_ring_buffer<float> buf(1, 8);
 
     std::array ch0_data{0.f, 1.f, 2.f, 3.f};
-    audio_slice slice0{ch0_data};
+    slice<float> slice0{ch0_data};
 
     std::array inputs{std::cref(slice0)};
 
@@ -27,10 +26,10 @@ TEST(stream_ring_buffer, write_all_samples_if_enough_space)
 
 TEST(stream_ring_buffer, write_only_until_max_capacity)
 {
-    stream_ring_buffer buf(1, 2);
+    stream_ring_buffer<float> buf(1, 2);
 
     std::array ch0_data{0.f, 1.f, 2.f, 3.f};
-    audio_slice slice0{ch0_data};
+    slice<float> slice0{ch0_data};
 
     std::array inputs{std::cref(slice0)};
 
@@ -40,10 +39,10 @@ TEST(stream_ring_buffer, write_only_until_max_capacity)
 TEST(stream_ring_buffer,
      write_only_until_max_capacity_on_consecutive_writes_on_border)
 {
-    stream_ring_buffer buf(1, 4);
+    stream_ring_buffer<float> buf(1, 4);
 
     std::array ch0_data{0.f, 1.f, 2.f, 3.f};
-    audio_slice slice0{ch0_data};
+    slice<float> slice0{ch0_data};
 
     std::array inputs{std::cref(slice0)};
 
@@ -53,10 +52,10 @@ TEST(stream_ring_buffer,
 
 TEST(stream_ring_buffer, write_only_until_max_capacity_on_consecutive_writes)
 {
-    stream_ring_buffer buf(1, 6);
+    stream_ring_buffer<float> buf(1, 6);
 
     std::array ch0_data{0.f, 1.f, 2.f, 3.f};
-    audio_slice slice0{ch0_data};
+    slice<float> slice0{ch0_data};
 
     std::array inputs{std::cref(slice0)};
 
@@ -66,12 +65,12 @@ TEST(stream_ring_buffer, write_only_until_max_capacity_on_consecutive_writes)
 
 TEST(stream_ring_buffer, consume_multi_channel)
 {
-    stream_ring_buffer buf(2, 8);
+    stream_ring_buffer<float> buf(2, 8);
 
     std::array ch0_data{0.f, 1.f, 2.f, 3.f};
 
-    audio_slice slice0{ch0_data};
-    audio_slice slice1{23.f};
+    slice<float> slice0{ch0_data};
+    slice<float> slice1{23.f};
 
     std::array inputs{std::cref(slice0), std::cref(slice1)};
 
@@ -88,13 +87,13 @@ TEST(stream_ring_buffer, consume_multi_channel)
 
 TEST(stream_ring_buffer, consume_on_border_will_call_the_functor_twice)
 {
-    stream_ring_buffer buf(2, 6);
+    stream_ring_buffer<float> buf(2, 6);
 
     std::array<float, 4> ch0_data{};
     std::array<float, 4> ch1_data{};
 
-    audio_slice slice0{ch0_data};
-    audio_slice slice1{ch1_data};
+    slice<float> slice0{ch0_data};
+    slice<float> slice1{ch1_data};
 
     std::array inputs{std::cref(slice0), std::cref(slice1)};
 
@@ -116,13 +115,13 @@ TEST(stream_ring_buffer, consume_on_border_will_call_the_functor_twice)
 TEST(stream_ring_buffer,
      write_to_full_capacity_consume_on_border_will_call_the_functor_twice)
 {
-    stream_ring_buffer buf(2, 6);
+    stream_ring_buffer<float> buf(2, 6);
 
     std::array<float, 7> ch0_data{};
     std::array<float, 7> ch1_data{};
 
-    audio_slice slice0{ch0_data};
-    audio_slice slice1{ch1_data};
+    slice<float> slice0{ch0_data};
+    slice<float> slice1{ch1_data};
 
     std::array inputs{std::cref(slice0), std::cref(slice1)};
 
@@ -148,13 +147,13 @@ TEST(stream_ring_buffer,
 
 TEST(stream_ring_buffer, write_over_full_capacity)
 {
-    stream_ring_buffer buf(2, 6);
+    stream_ring_buffer<float> buf(2, 6);
 
     std::array<float, 7> ch0_data{0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
     std::array<float, 7> ch1_data{6.f, 5.f, 4.f, 3.f, 2.f, 1.f, 0.f};
 
-    audio_slice slice0{ch0_data};
-    audio_slice slice1{ch1_data};
+    slice<float> slice0{ch0_data};
+    slice<float> slice1{ch1_data};
 
     std::array inputs{std::cref(slice0), std::cref(slice1)};
 
