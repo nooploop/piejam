@@ -13,16 +13,16 @@
 namespace piejam::audio
 {
 
+enum class slice_kind : bool
+{
+    constant,
+    span,
+};
+
 template <class T>
 class slice
 {
 public:
-    enum class kind : bool
-    {
-        constant,
-        span,
-    };
-
     using value_type = T;
     using constant_t = T;
     using span_t = std::span<T const>;
@@ -30,22 +30,28 @@ public:
     constexpr slice() noexcept = default;
 
     constexpr slice(constant_t v) noexcept
-        : m_kind{kind::constant}
+        : m_kind{slice_kind::constant}
         , m_value{.constant = v}
     {
     }
 
     template <std::convertible_to<span_t> U>
     constexpr slice(U&& u) noexcept(noexcept(span_t(std::forward<U>(u))))
-        : m_kind{kind::span}
+        : m_kind{slice_kind::span}
         , m_value{.span = span_t(std::forward<U>(u))}
     {
     }
 
     [[nodiscard]]
+    constexpr auto kind() const noexcept -> slice_kind
+    {
+        return m_kind;
+    }
+
+    [[nodiscard]]
     constexpr auto is_constant() const noexcept -> bool
     {
-        return m_kind == kind::constant;
+        return m_kind == slice_kind::constant;
     }
 
     [[nodiscard]]
@@ -58,7 +64,7 @@ public:
     [[nodiscard]]
     constexpr auto is_span() const noexcept -> bool
     {
-        return m_kind == kind::span;
+        return m_kind == slice_kind::span;
     }
 
     [[nodiscard]]
@@ -68,62 +74,67 @@ public:
         return m_value.span;
     }
 
-    template <class Visitor>
-    static auto visit(Visitor&& v, slice const s)
-    {
-        switch (s.m_kind)
-        {
-            case kind::constant:
-                return std::invoke(v, s.m_value.constant);
-
-            case kind::span:
-                return std::invoke(v, s.m_value.span);
-        }
-    }
-
-    template <class Visitor>
-    static auto visit(Visitor&& v, slice const s1, slice const s2)
-    {
-        switch (s1.m_kind)
-        {
-            case kind::constant:
-                switch (s2.m_kind)
-                {
-                    case kind::constant:
-                        return std::invoke(
-                                v,
-                                s1.m_value.constant,
-                                s2.m_value.constant);
-
-                    case kind::span:
-                        return std::invoke(
-                                v,
-                                s1.m_value.constant,
-                                s2.m_value.span);
-                }
-
-            case kind::span:
-                switch (s2.m_kind)
-                {
-                    case kind::constant:
-                        return std::invoke(
-                                v,
-                                s1.m_value.span,
-                                s2.m_value.constant);
-
-                    case kind::span:
-                        return std::invoke(v, s1.m_value.span, s2.m_value.span);
-                }
-        }
-    }
-
 private:
-    kind m_kind{};
+    slice_kind m_kind{};
     union
     {
         constant_t constant{};
         span_t span;
     } m_value{};
 };
+
+template <class Visitor, class T>
+static auto
+visit(Visitor&& v, slice<T> const s)
+{
+    switch (s.kind())
+    {
+        case slice_kind::constant:
+            return std::invoke(std::forward<Visitor>(v), s.constant());
+
+        case slice_kind::span:
+            return std::invoke(std::forward<Visitor>(v), s.span());
+    }
+}
+
+template <class Visitor, class T, class U>
+static auto
+visit(Visitor&& v, slice<T> const s1, slice<U> const s2)
+{
+    switch (s1.kind())
+    {
+        case slice_kind::constant:
+            switch (s2.kind())
+            {
+                case slice_kind::constant:
+                    return std::invoke(
+                            std::forward<Visitor>(v),
+                            s1.constant(),
+                            s2.constant());
+
+                case slice_kind::span:
+                    return std::invoke(
+                            std::forward<Visitor>(v),
+                            s1.constant(),
+                            s2.span());
+            }
+
+        case slice_kind::span:
+            switch (s2.kind())
+            {
+                case slice_kind::constant:
+                    return std::invoke(
+                            std::forward<Visitor>(v),
+                            s1.span(),
+                            s2.constant());
+
+                case slice_kind::span:
+                    return std::invoke(
+                            std::forward<Visitor>(v),
+                            s1.span(),
+                            s2.span());
+            }
+    }
+}
 
 } // namespace piejam::audio

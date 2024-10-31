@@ -272,7 +272,7 @@ add(slice<T> const& l,
     slice<T> const& r,
     std::span<T> const out) noexcept -> slice<T>
 {
-    return slice<T>::visit(detail::slice_add<T>(out), l, r);
+    return visit(detail::slice_add<T>(out), l, r);
 }
 
 template <class T>
@@ -280,7 +280,7 @@ constexpr auto
 multiply(slice<T> const& l, slice<T> const& r, std::span<T> const out) noexcept
         -> slice<T>
 {
-    return slice<T>::visit(detail::slice_multiply<T>(out), l, r);
+    return visit(detail::slice_multiply<T>(out), l, r);
 }
 
 template <class T>
@@ -290,14 +290,14 @@ clamp(slice<T> const& s,
       T const max,
       std::span<T> const out) noexcept -> slice<T>
 {
-    return slice<T>::visit(detail::slice_clamp<T>(min, max, out), s);
+    return visit(detail::slice_clamp<T>(min, max, out), s);
 }
 
 template <class T>
 constexpr void
 copy(slice<T> const& s, std::span<T> const out) noexcept
 {
-    slice<T>::visit(detail::slice_copy(out), s);
+    visit(detail::slice_copy(out), s);
 }
 
 template <class T>
@@ -307,7 +307,7 @@ subslice(
         std::size_t const offset,
         std::size_t const size) noexcept -> slice<T>
 {
-    return slice<T>::visit(detail::subslice<T>(offset, size), s);
+    return visit(detail::subslice<T>(offset, size), s);
 }
 
 } // namespace piejam::audio

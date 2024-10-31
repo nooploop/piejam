@@ -227,22 +227,21 @@ public:
     {
         auto out_it = std::next(ctx.outputs[0].begin(), offset);
 
-        audio::slice<float>::visit(
-                boost::hof::match(
-                        [=, this, &out_it](float const c) {
-                            std::ranges::generate_n(
-                                    out_it,
-                                    count,
-                                    std::bind_front(m_process_sample, this, c));
-                        },
-                        [=, this, &out_it](
-                                audio::slice<float>::span_t const& buf) {
-                            std::ranges::transform(
-                                    buf,
-                                    out_it,
-                                    std::bind_front(m_process_sample, this));
-                        }),
-                subslice(ctx.inputs[0].get(), offset, count));
+        visit(boost::hof::match(
+                      [=, this, &out_it](float const c) {
+                          std::ranges::generate_n(
+                                  out_it,
+                                  count,
+                                  std::bind_front(m_process_sample, this, c));
+                      },
+                      [=, this, &out_it](
+                              audio::slice<float>::span_t const& buf) {
+                          std::ranges::transform(
+                                  buf,
+                                  out_it,
+                                  std::bind_front(m_process_sample, this));
+                      }),
+              subslice(ctx.inputs[0].get(), offset, count));
     }
 
     void process_event(
