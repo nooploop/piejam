@@ -22,10 +22,11 @@ TEST(output_processor, input_is_propagated_to_outputs)
     mipp::vector<float> data({0.f, 0.f, 0.f, 0.f});
     output_processor sut;
     auto converter = pcm_output_buffer_converter(
-            [&data](pcm_output_source_buffer_t const& buf) {
-                std::ranges::copy(
-                        std::get<std::span<float const>>(buf),
-                        data.begin());
+            [&data](float c, std::size_t size) {
+                std::ranges::fill_n(data.begin(), c, size);
+            },
+            [&data](std::span<float const> buf) {
+                std::ranges::copy(buf, data.begin());
             });
     sut.set_output(converter);
 

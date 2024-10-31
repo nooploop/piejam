@@ -190,7 +190,13 @@ public:
             m_run_queue.unsynchronized_push(n);
         }
 
-        m_nodes_to_process.store(m_nodes.size(), std::memory_order_release);
+        // Make sure all worker threads are finished before we start.
+        for (std::size_t const w : range::indices(m_worker_threads))
+        {
+            m_worker_threads[w].wait();
+        }
+
+        m_nodes_to_process.store(m_nodes.size(), std::memory_order_relaxed);
 
         BOOST_ASSERT(m_workers.size() == m_worker_threads.size());
         for (std::size_t const w : range::indices(m_worker_threads))

@@ -7,16 +7,13 @@
 #include <piejam/audio/engine/named_processor.h>
 #include <piejam/audio/pcm_buffer_converter.h>
 
-#include <span>
-#include <vector>
-
 namespace piejam::audio::engine
 {
 
 class output_processor final : public named_processor
 {
 public:
-    output_processor(std::string_view name = {});
+    explicit output_processor(std::string_view name = {});
 
     void set_output(pcm_output_buffer_converter const& engine_output)
     {

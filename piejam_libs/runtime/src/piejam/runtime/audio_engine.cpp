@@ -55,7 +55,6 @@
 #include <fstream>
 #include <optional>
 #include <ranges>
-#include <unordered_map>
 
 namespace piejam::runtime
 {

@@ -37,23 +37,29 @@ struct audio_engine_render_test : public ::testing::Test
     std::vector<audio::pair<float>> output;
 
     std::vector<audio::pcm_input_buffer_converter> in_converter{
-            [this](std::span<float> const buffer) {
-                std::ranges::copy(audio_in_left, buffer.begin());
-            },
-            [this](std::span<float> const buffer) {
-                std::ranges::copy(audio_in_right, buffer.begin());
-            }};
+            audio::pcm_input_buffer_converter{
+                    [this](std::span<float> const buffer) {
+                        std::ranges::copy(audio_in_left, buffer.begin());
+                    }},
+            audio::pcm_input_buffer_converter{
+                    [this](std::span<float> const buffer) {
+                        std::ranges::copy(audio_in_right, buffer.begin());
+                    }}};
     std::vector<audio::pcm_output_buffer_converter> out_converter{
-            [this](audio::pcm_output_source_buffer_t const& buffer) {
-                std::ranges::copy(
-                        std::get<std::span<float const>>(buffer),
-                        audio_out_left.begin());
-            },
-            [this](audio::pcm_output_source_buffer_t const& buffer) {
-                std::ranges::copy(
-                        std::get<std::span<float const>>(buffer),
-                        audio_out_right.begin());
-            }};
+            audio::pcm_output_buffer_converter{
+                    [this](float c, std::size_t size) {
+                        std::ranges::fill_n(audio_out_left.begin(), c, size);
+                    },
+                    [this](std::span<float const> buffer) {
+                        std::ranges::copy(buffer, audio_out_left.begin());
+                    }},
+            audio::pcm_output_buffer_converter{
+                    [this](float c, std::size_t size) {
+                        std::ranges::fill_n(audio_out_right.begin(), c, size);
+                    },
+                    [this](std::span<float const> buffer) {
+                        std::ranges::copy(buffer, audio_out_right.begin());
+                    }}};
 
     void fill_sine()
     {

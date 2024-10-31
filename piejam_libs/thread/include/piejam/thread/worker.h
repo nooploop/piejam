@@ -62,6 +62,12 @@ public:
         m_sem_work.release();
     }
 
+    void wait() noexcept
+    {
+        m_sem_finished.acquire();
+        m_sem_finished.release();
+    }
+
 private:
     std::binary_semaphore m_sem_work{0};
     std::binary_semaphore m_sem_finished{1};

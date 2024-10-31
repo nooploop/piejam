@@ -27,7 +27,7 @@ output_processor::process(process_context const& ctx)
     auto const in = ctx.inputs[0].get();
     if (in.is_constant())
     {
-        m_engine_output(in.constant());
+        m_engine_output(in.constant(), ctx.buffer_size);
     }
     else
     {

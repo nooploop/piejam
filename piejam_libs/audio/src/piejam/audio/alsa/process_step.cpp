@@ -95,6 +95,7 @@ writei(system::device& fd,
 
 struct dummy_reader final : pcm_reader
 {
+    [[nodiscard]]
     auto converter() const noexcept -> std::span<converter_f const> override
     {
         return {};
@@ -150,6 +151,7 @@ struct interleaved_reader final : pcm_reader
                 &pcm_convert::from<F>);
     }
 
+    [[nodiscard]]
     auto converter() const noexcept -> std::span<converter_f const> override
     {
         return m_converter;
@@ -235,6 +237,7 @@ make_reader(
 
 struct dummy_writer final : pcm_writer
 {
+    [[nodiscard]]
     auto converter() const noexcept -> std::span<converter_f const> override
     {
         return {};
@@ -244,6 +247,7 @@ struct dummy_writer final : pcm_writer
     {
         return {};
     }
+
     void clear() noexcept override
     {
     }
@@ -264,30 +268,27 @@ struct interleaved_writer final : pcm_writer
                   range::iota(num_channels),
                   [this](std::size_t const channel) {
                       return pcm_output_buffer_converter(
-                              [this, channel](pcm_output_source_buffer_t const&
-                                                      buffer) {
-                                  convert_source(channel, buffer);
+                              [this,
+                               channel](float constant, std::size_t size) {
+                                  convert(constant, size, channel);
+                              },
+                              [this,
+                               channel](std::span<float const> source_buffer) {
+                                  convert(source_buffer, channel);
                               });
                   }))
     {
         BOOST_ASSERT(m_fd);
     }
 
-    void convert_source(
-            std::size_t const channel,
-            pcm_output_source_buffer_t const& buffer)
-    {
-        std::visit([=, this](auto const& b) { convert(channel, b); }, buffer);
-    }
-
-    void convert(std::size_t const channel, std::span<float const> const buffer)
+    void convert(std::span<float const> buffer, std::size_t channel)
     {
         BOOST_ASSERT(channel < m_num_channels);
         BOOST_ASSERT(m_period_size.value() == buffer.size());
 
         range::strided_span<pcm_sample_t<F>> interleaved{
                 m_write_buffer.data() + channel,
-                m_period_size.value(),
+                buffer.size(),
                 static_cast<std::ptrdiff_t>(m_num_channels)};
 
         std::ranges::transform(
@@ -296,18 +297,22 @@ struct interleaved_writer final : pcm_writer
                 &pcm_convert::to<F>);
     }
 
-    void convert(std::size_t const channel, float const constant)
+    void convert(float constant, std::size_t size, std::size_t channel)
     {
         BOOST_ASSERT(channel < m_num_channels);
 
         range::strided_span<pcm_sample_t<F>> interleaved{
                 m_write_buffer.data() + channel,
-                m_period_size.value(),
+                size,
                 static_cast<std::ptrdiff_t>(m_num_channels)};
 
-        std::ranges::fill(interleaved, pcm_convert::to<F>(constant));
+        std::ranges::fill_n(
+                interleaved.begin(),
+                size,
+                pcm_convert::to<F>(constant));
     }
 
+    [[nodiscard]]
     auto converter() const noexcept -> std::span<converter_f const> override
     {
         return m_converter;
