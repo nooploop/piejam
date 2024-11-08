@@ -32,6 +32,11 @@ public:
         m_conns.erase(id);
     }
 
+    void clear()
+    {
+        m_conns.clear();
+    }
+
 private:
     std::unordered_multimap<Id, subscription> m_conns;
 };

@@ -92,6 +92,7 @@ SubscribableItem {
             AudioRoutingComboBox {
                 Layout.fillWidth: true
 
+                defaultText: root.model ? (root.model.busType === PJModels.Types.BusType.Stereo ? "Mix" : "None") : "-"
                 model: root.model ? root.model.in : null
             }
 
@@ -105,6 +106,7 @@ SubscribableItem {
             AudioRoutingComboBox {
                 Layout.fillWidth: true
 
+                defaultText: "None"
                 model: root.model ? root.model.out : null
             }
 

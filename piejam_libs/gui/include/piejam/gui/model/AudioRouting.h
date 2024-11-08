@@ -21,7 +21,6 @@ class AudioRouting final : public Subscribable<SubscribableModel>
 {
     Q_OBJECT
 
-    M_PIEJAM_GUI_CONSTANT_PROPERTY(QString, defaultName)
     M_PIEJAM_GUI_PROPERTY(bool, defaultIsValid, setDefaultIsValid)
     M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::AudioRoutingSelection*,
@@ -45,8 +44,6 @@ private:
 
     struct Impl;
     pimpl<Impl> m_impl;
-
-    QString m_defaultName;
 };
 
 } // namespace piejam::gui::model

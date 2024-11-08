@@ -38,7 +38,7 @@ SubscribableItem {
 
                 Layout.fillWidth: true
 
-                displayTextToElide: root.model ? root.model.selected.label : "-"
+                displayTextToElide: root.model ? (root.model.selected.isDefault ? "Send" : root.model.selected.label) : "-"
                 elideMode: Qt.ElideMiddle
 
                 function selectedStateToColor(s) {

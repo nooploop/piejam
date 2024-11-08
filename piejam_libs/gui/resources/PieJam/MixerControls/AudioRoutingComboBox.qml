@@ -15,6 +15,8 @@ import "../Controls"
 SubscribableItem {
     id: root
 
+    property string defaultText: "-"
+
     implicitHeight: comboBox.implicitHeight
 
     ComboBoxElided {
@@ -22,7 +24,9 @@ SubscribableItem {
 
         anchors.fill: parent
 
-        displayTextToElide: root.model ? root.model.selected.label : "-"
+        displayTextToElide: root.model
+                            ? (root.model.selected.isDefault ? root.defaultText : root.model.selected.label)
+                            : "-"
         elideMode: Qt.ElideMiddle
 
         function selectedStateToColor(s) {
@@ -44,7 +48,7 @@ SubscribableItem {
             MenuItem {
                 enabled: root.model && root.model.defaultIsValid
 
-                text: root.model ? root.model.defaultName : "-"
+                text: root.defaultText
 
                 onClicked: root.model.changeToDefault()
             }

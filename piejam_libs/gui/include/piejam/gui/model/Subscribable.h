@@ -56,11 +56,25 @@ protected:
     template <class Value, class Handler>
     void observe(runtime::selector<Value> sel, Handler&& h)
     {
+        observe(m_subs_id, std::move(sel), std::forward<Handler>(h));
+    }
+
+    template <class Value, class Handler>
+    void
+    observe(runtime::subscription_id subs_id,
+            runtime::selector<Value> sel,
+            Handler&& h)
+    {
         m_subs.observe(
-                m_subs_id,
+                subs_id,
                 m_state_change_subscriber,
                 std::move(sel),
                 std::forward<Handler>(h));
+    }
+
+    void unobserve(runtime::subscription_id subs_id)
+    {
+        m_subs.erase(subs_id);
     }
 
     template <class F>
@@ -113,7 +127,7 @@ private:
     {
         onUnsubscribe();
 
-        m_subs.erase(m_subs_id);
+        m_subs.clear();
 
         if (m_updateTimerId != 0)
         {
@@ -122,7 +136,7 @@ private:
         }
     }
 
-    void timerEvent(QTimerEvent* const event) override final
+    void timerEvent(QTimerEvent* const event) final
     {
         BOOST_ASSERT(event->timerId() == m_updateTimerId);
         BOOST_ASSERT(m_requestUpdate);

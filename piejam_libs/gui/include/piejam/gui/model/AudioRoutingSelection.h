@@ -32,6 +32,7 @@ public:
     Q_ENUM(State)
 
 private:
+    M_PIEJAM_GUI_PROPERTY(bool, isDefault, setDefault)
     M_PIEJAM_GUI_PROPERTY(State, state, setState)
     M_PIEJAM_GUI_PROPERTY(QString, label, setLabel)
 

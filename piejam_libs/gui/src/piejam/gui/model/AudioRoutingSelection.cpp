@@ -6,6 +6,8 @@
 
 #include <piejam/runtime/selectors.h>
 
+#include <boost/hof/match.hpp>
+
 namespace piejam::gui::model
 {
 
@@ -13,6 +15,12 @@ struct AudioRoutingSelection::Impl
 {
     runtime::mixer::channel_id mixer_channel_id;
     runtime::mixer::io_socket io_socket;
+    audio::bus_type bus_type;
+
+    runtime::subscription_id target_channel_state_sub_id{
+            runtime::subscription_id::generate()};
+    runtime::subscription_id target_name_sub_id{
+            runtime::subscription_id::generate()};
 };
 
 AudioRoutingSelection::AudioRoutingSelection(
@@ -21,32 +29,89 @@ AudioRoutingSelection::AudioRoutingSelection(
         runtime::mixer::channel_id const id,
         runtime::mixer::io_socket const io_socket)
     : Subscribable(store_dispatch, state_change_subscriber)
-    , m_impl{make_pimpl<Impl>(id, io_socket)}
+    , m_impl{make_pimpl<Impl>(
+              id,
+              io_socket,
+              observe_once(
+                      runtime::selectors::make_mixer_channel_bus_type_selector(
+                              id)))}
 {
 }
 
 void
 AudioRoutingSelection::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_channel_selected_route_selector(
+    using namespace runtime::selectors;
+    using namespace runtime::mixer;
+
+    observe(make_mixer_channel_selected_route_selector(
                     m_impl->mixer_channel_id,
                     m_impl->io_socket),
-            [this](box<runtime::selectors::selected_route> const& sel_route) {
-                setLabel(QString::fromStdString(sel_route->name));
-                switch (sel_route->state)
-                {
-                    case runtime::selectors::selected_route::state_t::valid:
-                        setState(State::Valid);
-                        break;
+            [this](io_address_t const& io_address) {
+                unobserve(m_impl->target_channel_state_sub_id);
+                unobserve(m_impl->target_name_sub_id);
 
-                    case runtime::selectors::selected_route::state_t::not_mixed:
-                        setState(State::NotMixed);
-                        break;
+                std::visit(
+                        boost::hof::match(
+                                [this](default_t) {
+                                    setDefault(true);
+                                    setState(State::Valid);
+                                    setLabel(QString());
+                                },
+                                [this](missing_device_address a) {
+                                    setDefault(false);
+                                    setState(State::Invalid);
+                                    setLabel(QString::fromStdString(a.name));
+                                },
+                                [this](runtime::external_audio::device_id
+                                               device_id) {
+                                    setDefault(false);
+                                    setState(State::Valid);
+                                    observe(m_impl->target_name_sub_id,
+                                            make_external_audio_device_name_selector(
+                                                    device_id),
+                                            [this](boxed_string device_name) {
+                                                setLabel(QString::fromStdString(
+                                                        device_name));
+                                            });
+                                },
+                                [this](deleted_channel_address a) {
+                                    setDefault(false);
+                                    setState(State::Invalid);
+                                    setLabel(QString::fromStdString(a.name));
+                                },
+                                [this](channel_id target_channel) {
+                                    setDefault(false);
+                                    if (m_impl->io_socket == io_socket::in)
+                                    {
+                                        setState(State::Valid);
+                                    }
+                                    else
+                                    {
+                                        observe(m_impl->target_channel_state_sub_id,
+                                                make_mixer_channel_selected_route_selector(
+                                                        target_channel,
+                                                        io_socket::in),
+                                                [this](io_address_t const&
+                                                               target_channel_in) {
+                                                    setState(
+                                                            std::holds_alternative<
+                                                                    default_t>(
+                                                                    target_channel_in)
+                                                                    ? State::Valid
+                                                                    : State::NotMixed);
+                                                });
+                                    }
 
-                    default:
-                        setState(State::Invalid);
-                        break;
-                }
+                                    observe(m_impl->target_name_sub_id,
+                                            make_mixer_channel_name_selector(
+                                                    target_channel),
+                                            [this](boxed_string channel_name) {
+                                                setLabel(QString::fromStdString(
+                                                        channel_name));
+                                            });
+                                }),
+                        io_address);
             });
 }
 

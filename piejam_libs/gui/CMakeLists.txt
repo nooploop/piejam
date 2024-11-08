@@ -79,11 +79,11 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/ParameterId.h
     include/piejam/gui/model/PitchGenerator.h
     include/piejam/gui/model/RootView.h
-    include/piejam/gui/model/ScopeSlot.h
     include/piejam/gui/model/ScopeGenerator.h
-    include/piejam/gui/model/SpectrumSlot.h
-    include/piejam/gui/model/SpectrumGenerator.h
+    include/piejam/gui/model/ScopeSlot.h
     include/piejam/gui/model/SpectrumDataPoint.h
+    include/piejam/gui/model/SpectrumGenerator.h
+    include/piejam/gui/model/SpectrumSlot.h
     include/piejam/gui/model/StereoLevel.h
     include/piejam/gui/model/StreamId.h
     include/piejam/gui/model/StreamProcessor.h

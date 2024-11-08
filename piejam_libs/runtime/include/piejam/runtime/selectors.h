@@ -108,32 +108,13 @@ struct mixer_channel_route
     operator==(mixer_channel_route const&) const noexcept -> bool = default;
 };
 
-struct selected_route
-{
-    enum class state_t
-    {
-        invalid,
-        valid,
-        not_mixed
-    };
-
-    state_t state{};
-    boxed_string name;
-
-    auto operator==(selected_route const&) const noexcept -> bool = default;
-};
-
-auto make_mixer_channel_default_route_name_selector(
-        audio::bus_type,
-        mixer::io_socket) -> selector<boxed_string>;
-
 auto make_mixer_channel_default_route_is_valid_selector(
         mixer::channel_id,
         mixer::io_socket) -> selector<bool>;
 
 auto make_mixer_channel_selected_route_selector(
         mixer::channel_id,
-        mixer::io_socket) -> selector<box<selected_route>>;
+        mixer::io_socket) -> selector<mixer::io_address_t>;
 
 auto make_mixer_device_routes_selector(audio::bus_type, mixer::io_socket)
         -> selector<boxed_vector<mixer_device_route>>;

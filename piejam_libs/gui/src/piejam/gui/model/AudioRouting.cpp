@@ -43,19 +43,8 @@ AudioRouting::AudioRouting(
                       state_change_subscriber,
                       id,
                       io_socket))}
-    , m_defaultName{QString::fromStdString(observe_once(
-              runtime::selectors::
-                      make_mixer_channel_default_route_name_selector(
-                              m_impl->bus_type,
-                              io_socket)))}
 {
     connectSubscribableChild(*m_impl->selected);
-}
-
-auto
-AudioRouting::defaultName() const noexcept -> QString const&
-{
-    return m_defaultName;
 }
 
 auto
