@@ -24,6 +24,8 @@ public:
     using state_type = State;
     using function_type = std::function<Value(State const&)>;
 
+    selector() = delete;
+
     template <std::invocable<State const&> F>
         requires(!std::is_same_v<selector, std::decay_t<F>>)
     selector(F&& f)
