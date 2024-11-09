@@ -23,14 +23,23 @@ TEST(selector, make_selector_from_pmd)
 {
     auto sut = selector<int, state>(&state::x);
     state st{5};
-    EXPECT_EQ(5, sut.get(st));
+    EXPECT_EQ(5, sut(st));
 }
 
 TEST(selector, make_selector_from_lambda)
 {
     auto sut = selector<int, state>([](state const& st) { return st.x + 5; });
     state st{5};
-    EXPECT_EQ(10, sut.get(st));
+    EXPECT_EQ(10, sut(st));
+}
+
+TEST(selector, combine)
+{
+    auto sub_sel = selector<int, state>(&state::x);
+    auto combined =
+            combine([](int a, int b) { return a + b; }, sub_sel, sub_sel);
+    state st{5};
+    EXPECT_EQ(combined(st), 10);
 }
 
 } // namespace piejam::redux::test

@@ -32,14 +32,14 @@ public:
     [[nodiscard]]
     auto observe_once(selector<Value, State> const& sel) -> Value
     {
-        return sel.get(m_get_state());
+        return sel(m_get_state());
     }
 
     template <class Value, class Handler>
     [[nodiscard]]
     auto observe(selector<Value, State> sel, Handler&& handler) -> subscription
     {
-        auto last = std::make_shared<Value>(sel.get(m_get_state()));
+        auto last = std::make_shared<Value>(sel(m_get_state()));
         std::invoke(std::forward<Handler>(handler), *last);
         auto token = std::make_shared<subscription::token>();
         return subscription(
@@ -53,7 +53,7 @@ public:
                         return;
                     }
 
-                    auto current = sel.get(st);
+                    auto current = sel(st);
                     if (*last != current)
                     {
                         handler(current);

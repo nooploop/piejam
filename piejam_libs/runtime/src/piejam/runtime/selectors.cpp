@@ -651,7 +651,7 @@ make_muted_by_solo_selector(mixer::channel_id const mixer_channel_id)
         -> selector<bool>
 {
     return [mixer_channel_id](state const& st) {
-        auto muted_by_solo_state = select_muted_by_solo_state.get(st);
+        auto muted_by_solo_state = select_muted_by_solo_state(st);
         return muted_by_solo_state.get()(st.reduce_count, mixer_channel_id);
     };
 }

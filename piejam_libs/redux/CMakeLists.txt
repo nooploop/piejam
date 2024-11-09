@@ -22,6 +22,6 @@ target_sources(piejam_redux INTERFACE
 )
 
 target_include_directories(piejam_redux INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(piejam_redux INTERFACE nod)
+target_link_libraries(piejam_redux INTERFACE piejam_functional nod)
 
 add_subdirectory(tests)
