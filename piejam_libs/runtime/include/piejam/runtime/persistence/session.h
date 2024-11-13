@@ -85,6 +85,7 @@ struct session
     enum class mixer_io_type
     {
         default_,
+        invalid,
         device,
         channel
     };
@@ -93,7 +94,6 @@ struct session
     {
         mixer_io_type type;
         std::size_t index;
-        std::string name;
     };
 
     struct mixer_aux_send

@@ -493,16 +493,9 @@ add_external_audio_device(
     parameter_factory params_factory{st.params};
 
     auto mixer_channels = st.mixer_state.channels.lock();
-    auto const equal_to_device_name = equal_to(
-            mixer::io_address_t(mixer::missing_device_address{boxed_name}));
 
     for (auto& [_, mixer_channel] : mixer_channels)
     {
-        set_if(io_dir == io_direction::input ? mixer_channel.in
-                                             : mixer_channel.out,
-               equal_to_device_name,
-               id);
-
         if (io_dir == io_direction::output)
         {
             auto aux_sends = mixer_channel.aux_sends.lock();
@@ -636,9 +629,11 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
     {
         set_if(channel.in,
                equal_to_mixer_channel,
-               mixer::io_address_t{mixer::deleted_channel_address{name}});
-        set_if(channel.out, equal_to_mixer_channel, mixer::io_address_t{});
-        set_if(channel.aux, equal_to_mixer_channel, mixer::io_address_t{});
+               channel.bus_type == audio::bus_type::stereo
+                       ? mixer::io_address_t{invalid_t{}}
+                       : mixer::io_address_t{default_t{}});
+        set_if(channel.out, equal_to_mixer_channel, default_t{});
+        set_if(channel.aux, equal_to_mixer_channel, default_t{});
     }
 
     st.gui_state.mixer_colors.erase(mixer_channel_id);
@@ -654,13 +649,16 @@ remove_external_audio_device(
     auto mixer_channels = st.mixer_state.channels.lock();
     {
         auto const equal_to_device = equal_to(mixer::io_address_t(device_id));
-        auto const missing_device_name = mixer::missing_device_address(name);
 
         for (auto& [_, mixer_channel] : mixer_channels)
         {
-            set_if(mixer_channel.in, equal_to_device, missing_device_name);
-            set_if(mixer_channel.out, equal_to_device, missing_device_name);
-            set_if(mixer_channel.aux, equal_to_device, missing_device_name);
+            set_if(mixer_channel.in,
+                   equal_to_device,
+                   mixer_channel.bus_type == audio::bus_type::stereo
+                           ? mixer::io_address_t{invalid_t{}}
+                           : mixer::io_address_t{default_t{}});
+            set_if(mixer_channel.out, equal_to_device, default_t{});
+            set_if(mixer_channel.aux, equal_to_device, default_t{});
         }
     }
 

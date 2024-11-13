@@ -150,21 +150,6 @@ void
 set_external_audio_device_name::reduce(state& st) const
 {
     st.external_audio_state.devices.lock()[device_id].name = name;
-
-    auto const io_dir =
-            algorithm::contains(*st.external_audio_state.inputs, device_id)
-                    ? io_direction::input
-                    : io_direction::output;
-
-    auto equal_to_device_name =
-            equal_to(mixer::io_address_t(mixer::missing_device_address(name)));
-    auto const get_io_addr = io_dir == io_direction::input
-                                     ? &mixer::channel::in
-                                     : &mixer::channel::out;
-    for (auto& [_, mixer_channel] : st.mixer_state.channels.lock())
-    {
-        set_if(mixer_channel.*get_io_addr, equal_to_device_name, device_id);
-    }
 }
 
 } // namespace piejam::runtime::actions

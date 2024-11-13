@@ -25,7 +25,9 @@ SubscribableItem {
         anchors.fill: parent
 
         displayTextToElide: root.model
-                            ? (root.model.selected.isDefault ? root.defaultText : root.model.selected.label)
+                            ? (root.model.selected.isDefault
+                                ? (root.model.selected.state === PJModels.AudioRoutingSelection.State.Valid ? root.defaultText : "???")
+                                : root.model.selected.label)
                             : "-"
         elideMode: Qt.ElideMiddle
 

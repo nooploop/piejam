@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <piejam/boxed_string.h>
 #include <piejam/default.h>
 #include <piejam/fwd.h>
+#include <piejam/invalid.h>
 #include <piejam/runtime/external_audio_fwd.h>
 
 #include <variant>
@@ -19,52 +19,8 @@ struct channel;
 using channel_id = entity_id<channel>;
 using channels_t = entity_map<channel>;
 
-struct missing_device_address
-{
-    boxed_string name;
-
-    auto operator<=>(missing_device_address const& other) const
-    {
-        return name.get() <=> other.name.get();
-    }
-
-    auto operator==(missing_device_address const& other) const
-    {
-        return name.get() == other.name.get();
-    }
-
-    auto operator!=(missing_device_address const& other) const
-    {
-        return name.get() == other.name.get();
-    }
-};
-
-struct deleted_channel_address
-{
-    boxed_string name;
-
-    auto operator<=>(deleted_channel_address const& other) const
-    {
-        return name.get() <=> other.name.get();
-    }
-
-    auto operator==(deleted_channel_address const& other) const
-    {
-        return name.get() == other.name.get();
-    }
-
-    auto operator!=(deleted_channel_address const& other) const
-    {
-        return name.get() == other.name.get();
-    }
-};
-
-using io_address_t = std::variant<
-        default_t,
-        missing_device_address,
-        external_audio::device_id,
-        deleted_channel_address,
-        channel_id>;
+using io_address_t = std::
+        variant<default_t, invalid_t, external_audio::device_id, channel_id>;
 
 enum class io_socket
 {

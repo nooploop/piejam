@@ -58,10 +58,10 @@ AudioRoutingSelection::onSubscribe()
                                     setState(State::Valid);
                                     setLabel(QString());
                                 },
-                                [this](missing_device_address a) {
-                                    setDefault(false);
+                                [this](invalid_t) {
+                                    setDefault(true);
                                     setState(State::Invalid);
-                                    setLabel(QString::fromStdString(a.name));
+                                    setLabel(QString());
                                 },
                                 [this](runtime::external_audio::device_id
                                                device_id) {
@@ -74,11 +74,6 @@ AudioRoutingSelection::onSubscribe()
                                                 setLabel(QString::fromStdString(
                                                         device_name));
                                             });
-                                },
-                                [this](deleted_channel_address a) {
-                                    setDefault(false);
-                                    setState(State::Invalid);
-                                    setLabel(QString::fromStdString(a.name));
                                 },
                                 [this](channel_id target_channel) {
                                     setDefault(false);

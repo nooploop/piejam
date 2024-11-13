@@ -268,39 +268,29 @@ export_mixer_io(state const& st, mixer::io_address_t const& addr)
                         return session::mixer_io{
                                 .type = session::mixer_io_type::default_,
                                 .index = npos,
-                                .name = {}};
+                        };
                     },
-                    [&st](mixer::channel_id const& channel_id) {
-                        mixer::channel const& mixer_channel =
-                                st.mixer_state.channels[channel_id];
+                    [](invalid_t) {
+                        return session::mixer_io{
+                                .type = session::mixer_io_type::invalid,
+                                .index = npos,
+                        };
+                    },
+                    [&st](mixer::channel_id channel_id) {
                         return session::mixer_io{
                                 .type = session::mixer_io_type::channel,
                                 .index = channel_index(
                                         st.mixer_state,
                                         channel_id),
-                                .name = mixer_channel.name};
+                        };
                     },
-                    [&st](external_audio::device_id const& device_id) {
-                        external_audio::device const& device =
-                                st.external_audio_state.devices[device_id];
+                    [&st](external_audio::device_id device_id) {
                         return session::mixer_io{
                                 .type = session::mixer_io_type::device,
                                 .index = device_index(
                                         st.external_audio_state,
                                         device_id),
-                                .name = device.name};
-                    },
-                    [](mixer::missing_device_address const& missing) {
-                        return session::mixer_io{
-                                .type = session::mixer_io_type::device,
-                                .index = npos,
-                                .name = missing.name};
-                    },
-                    [](mixer::deleted_channel_address const& deleted) {
-                        return session::mixer_io{
-                                .type = session::mixer_io_type::channel,
-                                .index = npos,
-                                .name = deleted.name};
+                        };
                     }),
             addr);
 }

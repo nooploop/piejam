@@ -212,10 +212,11 @@ from_json(nlohmann::json const& j, session::mixer_midi& midi)
 NLOHMANN_JSON_SERIALIZE_ENUM(
         session::mixer_io_type,
         {{session::mixer_io_type::default_, "default"},
+         {session::mixer_io_type::invalid, "invalid"},
          {session::mixer_io_type::device, "device"},
          {session::mixer_io_type::channel, "channel"}})
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::mixer_io, type, index, name);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(session::mixer_io, type, index);
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         session::mixer_aux_send,

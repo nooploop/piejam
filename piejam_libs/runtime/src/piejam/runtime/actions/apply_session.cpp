@@ -120,8 +120,7 @@ apply_mixer_parameters(
 auto
 find_mixer_channel_route(
         mixer::state const& mixer_state,
-        std::size_t const& index,
-        std::string const& name)
+        std::size_t const& index)
 {
     if (index == 0)
     {
@@ -133,20 +132,17 @@ find_mixer_channel_route(
     }
     else
     {
-        return mixer::io_address_t{mixer::deleted_channel_address{box{name}}};
+        return mixer::io_address_t{invalid_t{}};
     }
 }
 
 auto
 find_external_audio_device_route(
         external_audio::device_ids_t const& devices,
-        std::size_t const index,
-        std::string const& name)
+        std::size_t const index)
 {
-    return index < devices.size()
-                   ? mixer::io_address_t{devices[index]}
-                   : mixer::io_address_t{
-                             mixer::missing_device_address{box(name)}};
+    return index < devices.size() ? mixer::io_address_t{devices[index]}
+                                  : mixer::io_address_t{invalid_t{}};
 }
 
 void
@@ -167,14 +163,13 @@ apply_mixer_io(
                         io_dir == io_direction::input
                                 ? external_audio_state.inputs
                                 : external_audio_state.outputs,
-                        mixer_io.index,
-                        mixer_io.name);
+                        mixer_io.index);
 
             case persistence::session::mixer_io_type::channel:
-                return find_mixer_channel_route(
-                        mixer_state,
-                        mixer_io.index,
-                        mixer_io.name);
+                return find_mixer_channel_route(mixer_state, mixer_io.index);
+
+            case persistence::session::mixer_io_type::invalid:
+                return mixer::io_address_t{invalid_t{}};
 
             default:
                 return mixer::io_address_t();
