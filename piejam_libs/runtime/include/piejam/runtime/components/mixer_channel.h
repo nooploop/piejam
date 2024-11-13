@@ -11,6 +11,7 @@
 #include <piejam/runtime/mixer_fwd.h>
 
 #include <memory>
+#include <string_view>
 
 namespace piejam::runtime::components
 {
@@ -20,12 +21,13 @@ auto make_mixer_channel_input(mixer::channel const&)
 
 auto make_mixer_channel_output(
         mixer::channel const&,
+        std::string_view channel_name,
         parameter_processor_factory&,
         processors::stream_processor_factory&,
         audio::sample_rate) -> std::unique_ptr<audio::engine::component>;
 
 auto make_mixer_channel_aux_send(
-        mixer::channel const&,
+        std::string_view channel_name,
         float_parameter_id aux_volume,
         parameter_processor_factory&)
         -> std::unique_ptr<audio::engine::component>;

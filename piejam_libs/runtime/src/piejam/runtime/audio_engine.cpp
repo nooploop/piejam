@@ -116,6 +116,7 @@ make_mixer_components(
         component_map& comps,
         component_map& prev_comps,
         audio::sample_rate const sample_rate,
+        strings_t const& strings,
         mixer::channels_t const& channels,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs)
@@ -147,6 +148,7 @@ make_mixer_components(
                     out_key,
                     components::make_mixer_channel_output(
                             mixer_channel,
+                            *strings[mixer_channel.name],
                             param_procs,
                             stream_procs,
                             sample_rate));
@@ -172,7 +174,7 @@ make_mixer_components(
                 comps.insert(
                         aux_send_key,
                         components::make_mixer_channel_aux_send(
-                                mixer_channel,
+                                *strings[mixer_channel.name],
                                 aux_send.volume,
                                 param_procs));
             }
@@ -777,6 +779,7 @@ audio_engine::rebuild(
             comps,
             m_impl->comps,
             m_impl->sample_rate,
+            st.strings,
             st.mixer_state.channels,
             m_impl->param_procs,
             m_impl->stream_procs);

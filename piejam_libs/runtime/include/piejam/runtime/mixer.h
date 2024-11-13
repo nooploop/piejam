@@ -9,6 +9,7 @@
 #include <piejam/runtime/fx/fwd.h>
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
+#include <piejam/runtime/string_id.h>
 
 #include <piejam/audio/types.h>
 #include <piejam/boxed_string.h>
@@ -31,7 +32,7 @@ using aux_sends_t = std::map<io_address_t, aux_send>;
 
 struct channel
 {
-    boxed_string name{};
+    string_id name{};
 
     audio::bus_type bus_type{};
 

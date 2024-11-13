@@ -241,7 +241,9 @@ apply_session::reduce(state& st) const
     }
 
     [&](mixer::channel& main_mixer_channel) {
-        main_mixer_channel.name = session->main_mixer_channel.name;
+        st.strings.set(
+                main_mixer_channel.name,
+                box{session->main_mixer_channel.name});
         st.gui_state.mixer_colors.set(
                 st.mixer_state.main,
                 session->main_mixer_channel.color);

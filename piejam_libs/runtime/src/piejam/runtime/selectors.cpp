@@ -546,10 +546,20 @@ make_mixer_channel_routes_selector(
 
 auto
 make_mixer_channel_name_selector(mixer::channel_id const channel_id)
-        -> selector<boxed_string>
+        -> selector<string_id>
 {
     return make_mixer_channel_member_selector<&mixer::channel::name>(
             channel_id);
+}
+
+auto
+make_mixer_channel_name_string_selector(mixer::channel_id const channel_id)
+        -> selector<boxed_string>
+{
+    return make_entity_data_map_selector(
+            &state::strings,
+            make_mixer_channel_name_selector(channel_id),
+            boxed_string{});
 }
 
 auto

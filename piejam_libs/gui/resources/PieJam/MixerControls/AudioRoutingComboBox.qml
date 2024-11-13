@@ -89,9 +89,14 @@ SubscribableItem {
                     model: root.model ? root.model.channels : []
 
                     delegate: MenuItem {
-                        text: modelData
+                        text: model.item.value
 
                         onClicked: root.model.changeToChannel(index)
+
+                        ModelSubscription {
+                            target: model.item
+                            subscribed: parent.visible
+                        }
                     }
                 }
             }

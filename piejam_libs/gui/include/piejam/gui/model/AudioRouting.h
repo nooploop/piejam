@@ -28,7 +28,7 @@ class AudioRouting final : public Subscribable<SubscribableModel>
             piejam::gui::model::AudioRoutingSelection*,
             selected)
     M_PIEJAM_GUI_CONSTANT_PROPERTY(QAbstractListModel*, devices)
-    M_PIEJAM_GUI_PROPERTY(QStringList, channels, setChannels)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(QAbstractListModel*, channels)
 
 public:
     AudioRouting(

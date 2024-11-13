@@ -32,6 +32,7 @@ struct MixerChannelAuxSend::Impl
 
     AudioRoutingSelection selected;
     Strings devicesList{};
+    Strings channelsList{};
 
     boxed_vector<runtime::selectors::mixer_device_route> devices;
     boxed_vector<runtime::selectors::mixer_channel_route> channels;
@@ -60,6 +61,12 @@ auto
 MixerChannelAuxSend::devices() const noexcept -> QAbstractListModel*
 {
     return &m_impl->devicesList;
+}
+
+auto
+MixerChannelAuxSend::channels() const noexcept -> QAbstractListModel*
+{
+    return &m_impl->channelsList;
 }
 
 auto
@@ -97,15 +104,18 @@ MixerChannelAuxSend::onSubscribe()
                     runtime::mixer::io_socket::aux),
             [this](boxed_vector<runtime::selectors::mixer_channel_route> const&
                            channels) {
-                m_impl->channels = channels;
+                algorithm::apply_edit_script(
+                        algorithm::edit_script(*m_impl->channels, *channels),
+                        piejam::gui::generic_list_model_edit_script_executor{
+                                m_impl->channelsList,
+                                [this](auto const& route) {
+                                    return std::make_unique<String>(
+                                            dispatch(),
+                                            state_change_subscriber(),
+                                            route.name);
+                                }});
 
-                QStringList channelNames;
-                std::ranges::transform(
-                        *channels,
-                        std::back_inserter(channelNames),
-                        &QString::fromStdString,
-                        &runtime::selectors::mixer_channel_route::name);
-                setChannels(std::move(channelNames));
+                m_impl->channels = channels;
             });
 
     observe(runtime::selectors::make_mixer_channel_aux_enabled_selector(

@@ -33,7 +33,8 @@ MixerChannel::busType() const noexcept -> BusType
 void
 MixerChannel::onSubscribe()
 {
-    observe(runtime::selectors::make_mixer_channel_name_selector(m_channel_id),
+    observe(runtime::selectors::make_mixer_channel_name_string_selector(
+                    m_channel_id),
             [this](boxed_string const& name) {
                 setName(QString::fromStdString(*name));
             });

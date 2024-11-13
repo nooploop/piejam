@@ -320,7 +320,7 @@ export_mixer_channel(
         mixer::channel const& channel)
 {
     session::mixer_channel result;
-    result.name = channel.name;
+    result.name = st.strings[channel.name];
     result.color = st.gui_state.mixer_colors[channel_id];
     result.bus_type = channel.bus_type;
     result.fx_chain = export_fx_chain(st, *channel.fx_chain);

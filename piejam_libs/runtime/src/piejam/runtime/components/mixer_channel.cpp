@@ -53,32 +53,33 @@ class mixer_channel_output final : public audio::engine::component
 public:
     mixer_channel_output(
             mixer::channel const& mixer_channel,
+            std::string_view channel_name,
             parameter_processor_factory& param_procs,
             processors::stream_processor_factory& stream_procs,
             audio::sample_rate const sample_rate)
         : m_volume_input_proc(param_procs.find_or_make_processor(
                   mixer_channel.volume,
-                  format_name(*mixer_channel.name, "volume")))
+                  format_name(channel_name, "volume")))
         , m_pan_balance_input_proc(param_procs.find_or_make_processor(
                   mixer_channel.pan_balance,
                   mixer_channel.bus_type == audio::bus_type::mono
-                          ? format_name(*mixer_channel.name, "pan")
-                          : format_name(*mixer_channel.name, "balance")))
+                          ? format_name(channel_name, "pan")
+                          : format_name(channel_name, "balance")))
         , m_solo_input_proc(param_procs.find_or_make_processor(
                   mixer_channel.solo,
-                  format_name(*mixer_channel.name, "solo")))
+                  format_name(channel_name, "solo")))
         , m_mute_input_proc(param_procs.find_or_make_processor(
                   mixer_channel.mute,
-                  format_name(*mixer_channel.name, "mute")))
+                  format_name(channel_name, "mute")))
         , m_volume_pan_balance{make_volume_pan_balance_component(
                   mixer_channel.bus_type,
-                  *mixer_channel.name)}
-        , m_mute_solo(components::make_mute_solo(*mixer_channel.name))
+                  channel_name)}
+        , m_mute_solo(components::make_mute_solo(channel_name))
         , m_out_stream{stream_procs.make_processor(
                   mixer_channel.out_stream,
                   2,
                   sample_rate.to_samples(std::chrono::milliseconds{40}),
-                  *mixer_channel.name)}
+                  channel_name)}
     {
     }
 
@@ -160,14 +161,14 @@ class mixer_channel_aux_send final : public audio::engine::component
 {
 public:
     mixer_channel_aux_send(
-            mixer::channel const& mixer_channel,
+            std::string_view channel_name,
             float_parameter_id aux_volume,
             parameter_processor_factory& param_procs)
         : m_volume_param(param_procs.find_or_make_processor(
                   aux_volume,
-                  format_name(*mixer_channel.name, "aux_volume")))
+                  format_name(channel_name, "aux_volume")))
         , m_volume_amp{audio::components::make_stereo_amplifier(
-                  format_name(*mixer_channel.name, "aux_amp"))}
+                  format_name(channel_name, "aux_amp"))}
     {
     }
     auto inputs() const -> endpoints override
@@ -222,6 +223,7 @@ make_mixer_channel_input(mixer::channel const& mixer_channel)
 auto
 make_mixer_channel_output(
         mixer::channel const& mixer_channel,
+        std::string_view channel_name,
         parameter_processor_factory& param_procs,
         processors::stream_processor_factory& stream_procs,
         audio::sample_rate const sample_rate)
@@ -229,6 +231,7 @@ make_mixer_channel_output(
 {
     return std::make_unique<mixer_channel_output>(
             mixer_channel,
+            channel_name,
             param_procs,
             stream_procs,
             sample_rate);
@@ -236,13 +239,13 @@ make_mixer_channel_output(
 
 auto
 make_mixer_channel_aux_send(
-        mixer::channel const& mixer_channel,
+        std::string_view channel_name,
         float_parameter_id aux_volume,
         parameter_processor_factory& param_procs)
         -> std::unique_ptr<audio::engine::component>
 {
     return std::make_unique<mixer_channel_aux_send>(
-            mixer_channel,
+            channel_name,
             aux_volume,
             param_procs);
 }

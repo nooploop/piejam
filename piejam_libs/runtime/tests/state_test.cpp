@@ -30,7 +30,7 @@ TEST_F(state_with_one_mixer_input, after_add_mixer_channel)
 
     auto const& channel = sut.mixer_state.channels[channel_id];
 
-    EXPECT_EQ("foo", *channel.name);
+    EXPECT_EQ("foo", *sut.strings[channel.name]);
 
     auto const& volume_param = sut.params[channel.volume].param;
     EXPECT_EQ(1.f, volume_param.default_value);

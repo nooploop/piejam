@@ -50,7 +50,7 @@ delete_mixer_channel::reduce(state& st) const
 void
 set_mixer_channel_name::reduce(state& st) const
 {
-    st.mixer_state.channels.lock()[channel_id].name = name;
+    st.strings.set(st.mixer_state.channels[channel_id].name, name);
 }
 
 void

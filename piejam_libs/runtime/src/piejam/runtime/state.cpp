@@ -516,10 +516,13 @@ add_mixer_channel(state& st, std::string name, audio::bus_type bus_type)
 {
     using namespace std::string_literals;
 
+    auto name_id = string_id::generate();
+    st.strings.insert(name_id, box{std::move(name)});
+
     parameter_factory params_factory{st.params};
     auto mixer_channels = st.mixer_state.channels.lock();
     auto channel_id = mixer_channels.insert({
-            .name = box(std::move(name)),
+            .name = name_id,
             .bus_type = bus_type,
             .in = {},
             .out = st.mixer_state.main,
@@ -582,7 +585,7 @@ remove_mixer_channel(state& st, mixer::channel_id const mixer_channel_id)
     mixer::channel const& mixer_channel =
             st.mixer_state.channels[mixer_channel_id];
 
-    auto const name = mixer_channel.name;
+    st.strings.erase(mixer_channel.name);
 
     remove_parameter(st, mixer_channel.volume);
     remove_parameter(st, mixer_channel.pan_balance);

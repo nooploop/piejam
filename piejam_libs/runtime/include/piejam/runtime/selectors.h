@@ -119,7 +119,7 @@ struct mixer_device_route
 struct mixer_channel_route
 {
     mixer::channel_id channel_id;
-    std::string name;
+    string_id name;
 
     auto
     operator==(mixer_channel_route const&) const noexcept -> bool = default;
@@ -139,7 +139,9 @@ auto make_mixer_device_routes_selector(audio::bus_type, mixer::io_socket)
 auto make_mixer_channel_routes_selector(mixer::channel_id, mixer::io_socket)
         -> selector<boxed_vector<mixer_channel_route>>;
 
-auto make_mixer_channel_name_selector(mixer::channel_id)
+auto make_mixer_channel_name_selector(mixer::channel_id) -> selector<string_id>;
+
+auto make_mixer_channel_name_string_selector(mixer::channel_id)
         -> selector<boxed_string>;
 
 auto make_mixer_channel_can_move_left_selector(mixer::channel_id)

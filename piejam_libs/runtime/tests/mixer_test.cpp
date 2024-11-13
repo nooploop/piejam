@@ -19,11 +19,9 @@ TEST(mixer_valid_io, test1)
 
     channels_t channels;
     auto channel1 = channels.insert({
-            .name = box("foo"s),
             .bus_type = audio::bus_type::stereo,
     });
     auto channel2 = channels.insert({
-            .name = box("bar"s),
             .bus_type = audio::bus_type::stereo,
     });
 
@@ -50,7 +48,6 @@ TEST(mixer_valid_io, test2)
     channels_t channels;
     auto channel1 = channels.insert({});
     auto channel2 = channels.insert({
-            .name = box("foo"s),
             .bus_type = audio::bus_type::stereo,
             .in = channel1,
     });

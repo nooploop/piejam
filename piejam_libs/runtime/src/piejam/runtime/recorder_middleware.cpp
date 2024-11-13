@@ -107,7 +107,7 @@ recorder_middleware::process_recorder_action(
 
         auto filename = system::make_unique_filename(
                 take_dir,
-                *mixer_channel.name,
+                *st.strings[mixer_channel.name],
                 "wav");
 
         auto const format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;

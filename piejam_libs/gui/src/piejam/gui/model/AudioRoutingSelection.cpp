@@ -99,7 +99,7 @@ AudioRoutingSelection::onSubscribe()
                                     }
 
                                     observe(m_impl->target_name_sub_id,
-                                            make_mixer_channel_name_selector(
+                                            make_mixer_channel_name_string_selector(
                                                     target_channel),
                                             [this](boxed_string channel_name) {
                                                 setLabel(QString::fromStdString(

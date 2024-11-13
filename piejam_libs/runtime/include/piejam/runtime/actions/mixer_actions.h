@@ -13,6 +13,7 @@
 #include <piejam/runtime/ui/cloneable_action.h>
 
 #include <piejam/audio/types.h>
+#include <piejam/boxed_string.h>
 #include <piejam/entity_id.h>
 
 namespace piejam::runtime::actions
@@ -50,7 +51,7 @@ struct set_mixer_channel_name final
     : ui::cloneable_action<set_mixer_channel_name, reducible_action>
 {
     mixer::channel_id channel_id;
-    std::string name;
+    boxed_string name;
 
     void reduce(state&) const override;
 };
