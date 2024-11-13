@@ -477,8 +477,11 @@ add_external_audio_device(
 {
     auto boxed_name = box(name);
 
+    auto name_id = string_id::generate();
+    st.strings.insert(name_id, boxed_name);
+
     auto id = st.external_audio_state.devices.insert({
-            .name = boxed_name,
+            .name = name_id,
             .bus_type = io_dir == io_direction::input ? bus_type
                                                       : audio::bus_type::stereo,
             .channels = channels,
@@ -644,7 +647,10 @@ remove_external_audio_device(
         state& st,
         external_audio::device_id const device_id)
 {
-    auto const name = st.external_audio_state.devices[device_id].name;
+    auto const name_id = st.external_audio_state.devices[device_id].name;
+    auto const name = st.strings[name_id];
+
+    st.strings.erase(name_id);
 
     auto mixer_channels = st.mixer_state.channels.lock();
     {

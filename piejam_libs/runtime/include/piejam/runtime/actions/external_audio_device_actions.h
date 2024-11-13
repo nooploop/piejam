@@ -4,14 +4,15 @@
 
 #pragma once
 
-#include <piejam/audio/types.h>
-#include <piejam/boxed_string.h>
-#include <piejam/entity_id.h>
 #include <piejam/runtime/actions/audio_engine_action.h>
 #include <piejam/runtime/external_audio_fwd.h>
 #include <piejam/runtime/fwd.h>
 #include <piejam/runtime/ui/action.h>
 #include <piejam/runtime/ui/cloneable_action.h>
+
+#include <piejam/audio/types.h>
+#include <piejam/boxed_string.h>
+#include <piejam/entity_id.h>
 
 namespace piejam::runtime::actions
 {
@@ -44,15 +45,6 @@ struct set_external_audio_device_bus_channel final
     external_audio::device_id device_id{};
     audio::bus_channel channel_selector{};
     std::size_t channel_index{};
-
-    void reduce(state&) const override;
-};
-
-struct set_external_audio_device_name final
-    : ui::cloneable_action<set_external_audio_device_name, reducible_action>
-{
-    external_audio::device_id device_id;
-    boxed_string name;
 
     void reduce(state&) const override;
 };

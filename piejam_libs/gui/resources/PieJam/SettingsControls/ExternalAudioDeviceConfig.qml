@@ -7,6 +7,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 import ".."
+import "../Controls"
 
 SubscribableItem {
     id: root
@@ -18,15 +19,10 @@ SubscribableItem {
         anchors.fill: parent
         anchors.margins: 4
 
-        TextField {
+        StringTextField {
             Layout.fillWidth: true
 
-            text: root.model ? root.model.name : ""
-
-            onEditingFinished: {
-                root.model.changeName(text)
-                focus = false
-            }
+            model: root.model ? root.model.name : null
         }
 
         ComboBox {

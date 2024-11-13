@@ -4,19 +4,6 @@
 
 #pragma once
 
-#include <piejam/audio/period_count.h>
-#include <piejam/audio/period_size.h>
-#include <piejam/audio/sample_rate.h>
-#include <piejam/audio/sound_card_descriptor.h>
-#include <piejam/audio/sound_card_hw_params.h>
-#include <piejam/audio/types.h>
-#include <piejam/box.h>
-#include <piejam/boxed_vector.h>
-#include <piejam/entity_data_map.h>
-#include <piejam/entity_id_hash.h>
-#include <piejam/io_direction.h>
-#include <piejam/ladspa/fwd.h>
-#include <piejam/npos.h>
 #include <piejam/runtime/audio_stream.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/external_audio.h>
@@ -37,6 +24,21 @@
 #include <piejam/runtime/parameters_map.h>
 #include <piejam/runtime/root_view_mode.h>
 #include <piejam/runtime/selected_sound_card.h>
+#include <piejam/runtime/string_id.h>
+
+#include <piejam/audio/period_count.h>
+#include <piejam/audio/period_size.h>
+#include <piejam/audio/sample_rate.h>
+#include <piejam/audio/sound_card_descriptor.h>
+#include <piejam/audio/sound_card_hw_params.h>
+#include <piejam/audio/types.h>
+#include <piejam/box.h>
+#include <piejam/boxed_vector.h>
+#include <piejam/entity_data_map.h>
+#include <piejam/entity_id_hash.h>
+#include <piejam/io_direction.h>
+#include <piejam/ladspa/fwd.h>
+#include <piejam/npos.h>
 
 #include <optional>
 #include <span>
@@ -48,6 +50,8 @@ namespace piejam::runtime
 struct state
 {
     std::size_t reduce_count{};
+
+    strings_t strings;
 
     audio::io_sound_cards io_sound_cards;
     io_pair<selected_sound_card> selected_io_sound_card;

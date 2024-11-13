@@ -4,6 +4,15 @@
 
 #pragma once
 
+#include <piejam/runtime/external_audio_fwd.h>
+#include <piejam/runtime/fwd.h>
+#include <piejam/runtime/fx/fwd.h>
+#include <piejam/runtime/material_color.h>
+#include <piejam/runtime/midi_assignment_id.h>
+#include <piejam/runtime/mixer_fwd.h>
+#include <piejam/runtime/parameters.h>
+#include <piejam/runtime/string_id.h>
+
 #include <piejam/audio/period_count.h>
 #include <piejam/audio/period_size.h>
 #include <piejam/audio/sample_rate.h>
@@ -16,13 +25,6 @@
 #include <piejam/io_direction.h>
 #include <piejam/midi/device_id.h>
 #include <piejam/redux/fwd.h>
-#include <piejam/runtime/external_audio_fwd.h>
-#include <piejam/runtime/fwd.h>
-#include <piejam/runtime/fx/fwd.h>
-#include <piejam/runtime/material_color.h>
-#include <piejam/runtime/midi_assignment_id.h>
-#include <piejam/runtime/mixer_fwd.h>
-#include <piejam/runtime/parameters.h>
 
 #include <cstddef>
 #include <optional>
@@ -32,6 +34,8 @@ namespace piejam::runtime::selectors
 
 template <class Value>
 using selector = redux::selector<Value, state>;
+
+auto make_string_selector(string_id) -> selector<boxed_string>;
 
 template <class Available, class Current>
 struct choice_model
@@ -65,6 +69,19 @@ auto make_num_device_channels_selector(io_direction) -> selector<std::size_t>;
 auto make_external_audio_device_ids_selector(io_direction)
         -> selector<box<external_audio::device_ids_t>>;
 
+auto make_external_audio_device_name_selector(external_audio::device_id)
+        -> selector<string_id>;
+
+auto make_external_audio_device_name_string_selector(external_audio::device_id)
+        -> selector<boxed_string>;
+
+auto make_external_audio_device_bus_type_selector(external_audio::device_id)
+        -> selector<audio::bus_type>;
+
+auto make_external_audio_device_bus_channel_selector(
+        external_audio::device_id,
+        audio::bus_channel) -> selector<std::size_t>;
+
 extern selector<box<mixer::channel_ids_t>> const select_mixer_user_channels;
 extern selector<mixer::channel_id> const select_mixer_main_channel;
 
@@ -94,7 +111,7 @@ auto make_mixer_channel_can_toggle_aux_selector(mixer::channel_id)
 struct mixer_device_route
 {
     external_audio::device_id device_id;
-    std::string name;
+    string_id name;
 
     auto operator==(mixer_device_route const&) const noexcept -> bool = default;
 };
@@ -122,9 +139,6 @@ auto make_mixer_device_routes_selector(audio::bus_type, mixer::io_socket)
 auto make_mixer_channel_routes_selector(mixer::channel_id, mixer::io_socket)
         -> selector<boxed_vector<mixer_channel_route>>;
 
-auto make_external_audio_device_name_selector(external_audio::device_id)
-        -> selector<boxed_string>;
-
 auto make_mixer_channel_name_selector(mixer::channel_id)
         -> selector<boxed_string>;
 
@@ -132,13 +146,6 @@ auto make_mixer_channel_can_move_left_selector(mixer::channel_id)
         -> selector<bool>;
 auto make_mixer_channel_can_move_right_selector(mixer::channel_id)
         -> selector<bool>;
-
-auto make_external_audio_device_bus_type_selector(external_audio::device_id)
-        -> selector<audio::bus_type>;
-
-auto make_external_audio_device_bus_channel_selector(
-        external_audio::device_id,
-        audio::bus_channel) -> selector<std::size_t>;
 
 extern selector<box<midi::device_ids_t>> const select_midi_input_devices;
 

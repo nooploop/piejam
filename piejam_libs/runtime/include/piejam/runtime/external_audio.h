@@ -5,18 +5,18 @@
 #pragma once
 
 #include <piejam/audio/types.h>
-#include <piejam/boxed_string.h>
 #include <piejam/entity_map.h>
 #include <piejam/npos.h>
 #include <piejam/runtime/channel_index_pair.h>
 #include <piejam/runtime/external_audio_fwd.h>
+#include <piejam/runtime/string_id.h>
 
 namespace piejam::runtime::external_audio
 {
 
 struct device
 {
-    boxed_string name;
+    string_id name;
 
     audio::bus_type bus_type{};
 

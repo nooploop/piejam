@@ -11,6 +11,8 @@
 #include <piejam/runtime/mixer_fwd.h>
 #include <piejam/runtime/parameters.h>
 
+class QAbstractListModel;
+
 namespace piejam::gui::model
 {
 
@@ -25,7 +27,7 @@ class MixerChannelAuxSend final : public MixerChannel
     M_PIEJAM_GUI_PROPERTY(bool, enabled, setEnabled)
     Q_PROPERTY(piejam::gui::model::FloatParameter* volume READ volume NOTIFY
                        volumeChanged FINAL)
-    M_PIEJAM_GUI_PROPERTY(QStringList, devices, setDevices)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(QAbstractListModel*, devices)
     M_PIEJAM_GUI_PROPERTY(QStringList, channels, setChannels)
 
 public:

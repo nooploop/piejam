@@ -13,6 +13,9 @@ class GenericListModel;
 class EnumListModel;
 class StringList;
 
+class String;
+using Strings = GenericListModel<String>;
+
 using MaterialColor = int;
 
 class AudioDeviceSettings;

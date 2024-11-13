@@ -88,6 +88,7 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/StreamId.h
     include/piejam/gui/model/StreamProcessor.h
     include/piejam/gui/model/StreamSamplesCache.h
+    include/piejam/gui/model/String.h
     include/piejam/gui/model/StringList.h
     include/piejam/gui/model/Subscribable.h
     include/piejam/gui/model/SubscribableModel.h
@@ -142,6 +143,7 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/RootView.cpp
     src/piejam/gui/model/ScopeGenerator.cpp
     src/piejam/gui/model/SpectrumGenerator.cpp
+    src/piejam/gui/model/String.cpp
     src/piejam/gui/qt_log.cpp
 )
 

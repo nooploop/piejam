@@ -63,12 +63,17 @@ SubscribableItem {
                 Repeater {
                     id: devicesRep
 
-                    model: root.model ? root.model.devices : []
+                    model: root.model ? root.model.devices : null
 
                     delegate: MenuItem {
-                        text: modelData
+                        text: model.item.value
 
                         onClicked: root.model.changeToDevice(index)
+
+                        ModelSubscription {
+                            target: model.item
+                            subscribed: parent.visible
+                        }
                     }
                 }
             }

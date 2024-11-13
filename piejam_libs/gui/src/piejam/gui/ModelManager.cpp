@@ -45,6 +45,7 @@
 #include <piejam/gui/model/ScopeSlot.h>
 #include <piejam/gui/model/SpectrumSlot.h>
 #include <piejam/gui/model/StereoLevel.h>
+#include <piejam/gui/model/String.h>
 #include <piejam/gui/model/StringList.h>
 #include <piejam/gui/model/Types.h>
 #include <piejam/gui/model/WaveformSlot.h>
@@ -95,6 +96,7 @@ runRegistration()
     qRegisterMetaType<piejam::gui::model::ScopeSlot*>();
     qRegisterMetaType<piejam::gui::model::SpectrumSlot*>();
     qRegisterMetaType<piejam::gui::model::StereoLevel*>();
+    qRegisterMetaType<piejam::gui::model::String*>();
     qRegisterMetaType<piejam::gui::model::StringList*>();
     qRegisterMetaType<piejam::gui::model::WaveformSlot*>();
 

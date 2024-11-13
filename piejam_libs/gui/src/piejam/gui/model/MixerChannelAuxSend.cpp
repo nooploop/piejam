@@ -4,9 +4,13 @@
 
 #include <piejam/gui/model/MixerChannelAuxSend.h>
 
+#include <piejam/gui/generic_list_model_edit_script_executor.h>
 #include <piejam/gui/model/AudioRoutingSelection.h>
 #include <piejam/gui/model/FloatParameter.h>
+#include <piejam/gui/model/GenericListModel.h>
+#include <piejam/gui/model/String.h>
 
+#include <piejam/algorithm/edit_script.h>
 #include <piejam/runtime/actions/mixer_actions.h>
 #include <piejam/runtime/selectors.h>
 
@@ -27,10 +31,12 @@ struct MixerChannelAuxSend::Impl
     }
 
     AudioRoutingSelection selected;
+    Strings devicesList{};
 
     boxed_vector<runtime::selectors::mixer_device_route> devices;
     boxed_vector<runtime::selectors::mixer_channel_route> channels;
     runtime::float_parameter_id volume_id;
+
     std::unique_ptr<FloatParameter> volume;
 };
 
@@ -51,6 +57,12 @@ MixerChannelAuxSend::selected() const noexcept -> AudioRoutingSelection*
 }
 
 auto
+MixerChannelAuxSend::devices() const noexcept -> QAbstractListModel*
+{
+    return &m_impl->devicesList;
+}
+
+auto
 MixerChannelAuxSend::volume() const noexcept -> FloatParameter*
 {
     return m_impl->volume.get();
@@ -66,15 +78,18 @@ MixerChannelAuxSend::onSubscribe()
                     runtime::mixer::io_socket::aux),
             [this](boxed_vector<runtime::selectors::mixer_device_route> const&
                            devices) {
-                m_impl->devices = devices;
+                algorithm::apply_edit_script(
+                        algorithm::edit_script(*m_impl->devices, *devices),
+                        piejam::gui::generic_list_model_edit_script_executor{
+                                m_impl->devicesList,
+                                [this](auto const& route) {
+                                    return std::make_unique<String>(
+                                            dispatch(),
+                                            state_change_subscriber(),
+                                            route.name);
+                                }});
 
-                QStringList deviceNames;
-                std::ranges::transform(
-                        *devices,
-                        std::back_inserter(deviceNames),
-                        &QString::fromStdString,
-                        &runtime::selectors::mixer_device_route::name);
-                setDevices(std::move(deviceNames));
+                m_impl->devices = devices;
             });
 
     observe(runtime::selectors::make_mixer_channel_routes_selector(

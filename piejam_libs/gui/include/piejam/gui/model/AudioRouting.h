@@ -14,6 +14,8 @@
 
 #include <QStringList>
 
+class QAbstractListModel;
+
 namespace piejam::gui::model
 {
 
@@ -25,7 +27,7 @@ class AudioRouting final : public Subscribable<SubscribableModel>
     M_PIEJAM_GUI_CONSTANT_PROPERTY(
             piejam::gui::model::AudioRoutingSelection*,
             selected)
-    M_PIEJAM_GUI_PROPERTY(QStringList, devices, setDevices)
+    M_PIEJAM_GUI_CONSTANT_PROPERTY(QAbstractListModel*, devices)
     M_PIEJAM_GUI_PROPERTY(QStringList, channels, setChannels)
 
 public:

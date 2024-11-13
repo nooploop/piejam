@@ -24,33 +24,46 @@ namespace piejam::runtime::selectors
 namespace
 {
 
-template <std::invocable<state const&> GetDataMap, class Id, class Data>
+template <
+        std::invocable<state const&> GetDataMap,
+        std::invocable<state const&> GetId,
+        class Data>
     requires(std::is_same_v<
                     std::invoke_result_t<GetDataMap, state const&>,
-                    entity_data_map<Id, Data> const&>)
+                    entity_data_map<
+                            std::invoke_result_t<GetId, state const&>,
+                            Data> const&>)
 auto
 make_entity_data_map_selector(
-        Id id,
         GetDataMap&& get_data_map,
+        GetId&& get_id,
         Data&& default_data) -> selector<Data>
 {
-    return [id,
-            get_data_map,
-            default_data,
-            cached = cached_entity_data_ptr<material_color>{}](
-                   state const& st) mutable {
-        if (cached)
+    return [get_data_map = std::forward<GetDataMap>(get_data_map),
+            get_id = std::forward<GetId>(get_id),
+            default_data = std::forward<Data>(default_data),
+            cached = cached_entity_data_ptr<Data>{}](state const& st) mutable {
+        if (cached) [[likely]]
         {
             return *cached;
         }
 
         auto const& data_map = std::invoke(get_data_map, st);
-        cached = data_map.cached(id);
+        cached = data_map.cached(std::invoke(get_id, st));
         return cached ? *cached : default_data;
     };
 }
 
 } // namespace
+
+auto
+make_string_selector(string_id id) -> selector<boxed_string>
+{
+    return make_entity_data_map_selector(
+            &state::strings,
+            boost::hof::always(id),
+            boxed_string{});
+}
 
 selector<box<sample_rate_choice>> const select_sample_rate([](state const& st) {
     static auto const get_sample_rate =
@@ -200,10 +213,20 @@ make_external_audio_member_selector(
 
 auto
 make_external_audio_device_name_selector(
-        external_audio::device_id const device_id) -> selector<boxed_string>
+        external_audio::device_id const device_id) -> selector<string_id>
 {
     return make_external_audio_member_selector<&external_audio::device::name>(
             device_id);
+}
+
+auto
+make_external_audio_device_name_string_selector(
+        external_audio::device_id const device_id) -> selector<boxed_string>
+{
+    return make_entity_data_map_selector(
+            &state::strings,
+            make_external_audio_device_name_selector(device_id),
+            boxed_string{});
 }
 
 auto
@@ -280,8 +303,8 @@ make_mixer_channel_color_selector(mixer::channel_id const channel_id)
         -> selector<material_color>
 {
     return make_entity_data_map_selector(
-            channel_id,
             [](state const& st) -> auto& { return st.gui_state.mixer_colors; },
+            boost::hof::always(channel_id),
             material_color::pink);
 }
 
@@ -438,7 +461,7 @@ make_mixer_device_routes_selector(
                     {
                         result.emplace_back(mixer_device_route{
                                 .device_id = device_id,
-                                .name = *device->name});
+                                .name = device->name});
                     }
                 }
                 return box(std::move(result));

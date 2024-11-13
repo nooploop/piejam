@@ -146,10 +146,4 @@ set_external_audio_device_bus_channel::reduce(state& st) const
     }(st.external_audio_state.devices.lock()[device_id]);
 }
 
-void
-set_external_audio_device_name::reduce(state& st) const
-{
-    st.external_audio_state.devices.lock()[device_id].name = name;
-}
-
 } // namespace piejam::runtime::actions

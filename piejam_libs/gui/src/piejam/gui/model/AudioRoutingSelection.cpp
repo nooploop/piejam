@@ -68,7 +68,7 @@ AudioRoutingSelection::onSubscribe()
                                     setDefault(false);
                                     setState(State::Valid);
                                     observe(m_impl->target_name_sub_id,
-                                            make_external_audio_device_name_selector(
+                                            make_external_audio_device_name_string_selector(
                                                     device_id),
                                             [this](boxed_string device_name) {
                                                 setLabel(QString::fromStdString(
