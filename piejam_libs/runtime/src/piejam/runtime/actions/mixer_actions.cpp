@@ -48,12 +48,6 @@ delete_mixer_channel::reduce(state& st) const
 }
 
 void
-set_mixer_channel_name::reduce(state& st) const
-{
-    st.strings.set(st.mixer_state.channels[channel_id].name, name);
-}
-
-void
 set_mixer_channel_color::reduce(state& st) const
 {
     st.gui_state.mixer_colors.set(channel_id, color);

@@ -47,17 +47,8 @@ struct delete_mixer_channel final
     void reduce(state&) const override;
 };
 
-struct set_mixer_channel_name final
-    : ui::cloneable_action<set_mixer_channel_name, reducible_action>
-{
-    mixer::channel_id channel_id;
-    boxed_string name;
-
-    void reduce(state&) const override;
-};
-
 struct set_mixer_channel_color final
-    : ui::cloneable_action<set_mixer_channel_name, reducible_action>
+    : ui::cloneable_action<set_mixer_channel_color, reducible_action>
 {
     mixer::channel_id channel_id;
     material_color color{material_color::pink};

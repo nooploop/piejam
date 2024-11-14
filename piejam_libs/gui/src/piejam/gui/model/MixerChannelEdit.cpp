@@ -6,8 +6,8 @@
 
 #include <piejam/gui/model/AudioRouting.h>
 
-#include <piejam/runtime/actions/fwd.h>
 #include <piejam/runtime/actions/mixer_actions.h>
+#include <piejam/runtime/actions/set_string.h>
 #include <piejam/runtime/selectors.h>
 #include <piejam/runtime/ui/thunk_action.h>
 
@@ -72,9 +72,10 @@ MixerChannelEdit::onSubscribe()
 void
 MixerChannelEdit::changeName(QString const& name)
 {
-    runtime::actions::set_mixer_channel_name action;
-    action.channel_id = channel_id();
-    action.name = name.toStdString();
+    runtime::actions::set_string action;
+    action.id = observe_once(
+            runtime::selectors::make_mixer_channel_name_selector(channel_id()));
+    action.str = box{name.toStdString()};
     dispatch(action);
 }
 
