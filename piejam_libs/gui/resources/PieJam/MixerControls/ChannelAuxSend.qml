@@ -33,66 +33,12 @@ SubscribableItem {
                 text: root.model ? root.model.name : ""
             }
 
-            ComboBoxElided {
-                id: comboBox
-
+            AudioRoutingComboBox {
                 Layout.fillWidth: true
 
-                displayTextToElide: root.model ? (root.model.selected.isDefault ? "Send" : root.model.selected.label) : "-"
-                elideMode: Qt.ElideMiddle
-
-                function selectedStateToColor(s) {
-                    switch (s) {
-                        case PJModels.AudioRoutingSelection.State.Invalid:
-                            return Material.Red
-
-                        case PJModels.AudioRoutingSelection.State.NotMixed:
-                            return Material.Yellow
-
-                        default:
-                            return Material.primaryTextColor
-                    }
-                }
-
-                Material.foreground: selectedStateToColor(root.model ? root.model.selected.state : null)
-
-                popup: Menu {
-                    Menu {
-                        title: qsTr("Devices")
-
-                        enabled: devicesRep.count > 0
-
-                        Repeater {
-                            id: devicesRep
-
-                            model: root.model ? root.model.devices : []
-
-                            delegate: MenuItem {
-                                text: modelData
-
-                                onClicked: root.model.changeToDevice(index)
-                            }
-                        }
-                    }
-
-                    Menu {
-                        title: qsTr("Channels")
-
-                        enabled: channelsRep.count > 0
-
-                        Repeater {
-                            id: channelsRep
-
-                            model: root.model ? root.model.channels : []
-
-                            delegate: MenuItem {
-                                text: modelData
-
-                                onClicked: root.model.changeToChannel(index)
-                            }
-                        }
-                    }
-                }
+                allowDefaultSelection: false
+                defaultText: "Send"
+                model: root.model ? root.model.aux : null
             }
 
             Item {

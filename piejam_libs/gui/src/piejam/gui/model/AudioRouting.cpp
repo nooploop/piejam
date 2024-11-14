@@ -121,13 +121,53 @@ AudioRouting::onSubscribe()
             });
 }
 
+template <runtime::mixer::io_socket IOSocket>
+static void
+dispatch_set_mixer_channel_route_action(
+        runtime::store_dispatch dispatch,
+        runtime::mixer::channel_id channel_id,
+        runtime::mixer::io_address_t addr)
+{
+    runtime::actions::set_mixer_channel_route<IOSocket> action;
+    action.channel_id = channel_id;
+    action.route = std::move(addr);
+    dispatch(action);
+}
+
+static void
+dispatch_set_mixer_channel_route_action(
+        runtime::store_dispatch dispatch,
+        runtime::mixer::io_socket io_socket,
+        runtime::mixer::channel_id channel_id,
+        runtime::mixer::io_address_t addr)
+{
+    switch (io_socket)
+    {
+        case runtime::mixer::io_socket::in:
+            dispatch_set_mixer_channel_route_action<
+                    runtime::mixer::io_socket::in>(dispatch, channel_id, addr);
+            return;
+
+        case runtime::mixer::io_socket::out:
+            dispatch_set_mixer_channel_route_action<
+                    runtime::mixer::io_socket::out>(dispatch, channel_id, addr);
+            return;
+
+        case runtime::mixer::io_socket::aux:
+            dispatch_set_mixer_channel_route_action<
+                    runtime::mixer::io_socket::aux>(dispatch, channel_id, addr);
+            return;
+    }
+}
+
 void
 AudioRouting::changeToDefault()
 {
-    runtime::actions::set_mixer_channel_route action;
-    action.channel_id = m_impl->mixer_channel_id;
-    action.io_socket = m_impl->io_socket;
-    dispatch(action);
+    dispatch_set_mixer_channel_route_action(
+            dispatch(),
+            m_impl->io_socket,
+            m_impl->mixer_channel_id,
+            default_t{});
 }
 
 void
@@ -135,11 +175,11 @@ AudioRouting::changeToDevice(unsigned index)
 {
     BOOST_ASSERT(index < m_impl->devices->size());
 
-    runtime::actions::set_mixer_channel_route action;
-    action.channel_id = m_impl->mixer_channel_id;
-    action.io_socket = m_impl->io_socket;
-    action.route = (*m_impl->devices)[index].device_id;
-    dispatch(action);
+    dispatch_set_mixer_channel_route_action(
+            dispatch(),
+            m_impl->io_socket,
+            m_impl->mixer_channel_id,
+            (*m_impl->devices)[index].device_id);
 }
 
 void
@@ -147,11 +187,11 @@ AudioRouting::changeToChannel(unsigned index)
 {
     BOOST_ASSERT(index < m_impl->channels->size());
 
-    runtime::actions::set_mixer_channel_route action;
-    action.channel_id = m_impl->mixer_channel_id;
-    action.io_socket = m_impl->io_socket;
-    action.route = (*m_impl->channels)[index].channel_id;
-    dispatch(action);
+    dispatch_set_mixer_channel_route_action(
+            dispatch(),
+            m_impl->io_socket,
+            m_impl->mixer_channel_id,
+            (*m_impl->channels)[index].channel_id);
 }
 
 } // namespace piejam::gui::model

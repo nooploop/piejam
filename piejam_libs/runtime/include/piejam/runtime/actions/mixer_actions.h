@@ -65,19 +65,25 @@ struct set_mixer_channel_color final
     void reduce(state&) const override;
 };
 
+template <mixer::io_socket IOSocket>
 struct set_mixer_channel_route final
-    : ui::cloneable_action<set_mixer_channel_route, reducible_action>
-    , visitable_audio_engine_action<set_mixer_channel_route>
+    : ui::cloneable_action<set_mixer_channel_route<IOSocket>, reducible_action>
+    , visitable_audio_engine_action<set_mixer_channel_route<IOSocket>>
 {
     mixer::channel_id channel_id;
-    mixer::io_socket io_socket;
     mixer::io_address_t route;
 
     void reduce(state&) const override;
 };
 
-struct select_mixer_channel_aux_route final
-    : ui::cloneable_action<select_mixer_channel_aux_route, reducible_action>
+extern template struct set_mixer_channel_route<mixer::io_socket::in>;
+extern template struct set_mixer_channel_route<mixer::io_socket::out>;
+
+template <>
+struct set_mixer_channel_route<mixer::io_socket::aux> final
+    : ui::cloneable_action<
+              set_mixer_channel_route<mixer::io_socket::aux>,
+              reducible_action>
 {
     mixer::channel_id channel_id;
     mixer::io_address_t route;

@@ -15,6 +15,7 @@ import "../Controls"
 SubscribableItem {
     id: root
 
+    property bool allowDefaultSelection: true
     property string defaultText: "-"
 
     implicitHeight: comboBox.implicitHeight
@@ -48,7 +49,10 @@ SubscribableItem {
 
         popup: Menu {
             MenuItem {
-                enabled: root.model && root.model.defaultIsValid
+                enabled: root.allowDefaultSelection && root.model && root.model.defaultIsValid
+
+                height: root.allowDefaultSelection ? implicitHeight : 0
+                visible: root.allowDefaultSelection
 
                 text: root.defaultText
 
