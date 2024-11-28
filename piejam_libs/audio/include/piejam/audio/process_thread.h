@@ -24,45 +24,38 @@ public:
             is_nothrow_default_constructible_v<std::atomic_bool, std::thread>) =
             default;
 
-    ~process_thread()
-    {
-        stop();
-    }
-
     [[nodiscard]]
     auto is_running() const noexcept -> bool
     {
-        return m_running.load(std::memory_order_relaxed);
+        return m_thread.joinable();
     }
 
     [[nodiscard]]
     auto error() const -> std::error_condition const&
     {
-        BOOST_ASSERT(!m_running);
+        BOOST_ASSERT(!is_running());
         return m_error;
     }
 
     template <class Process>
     void start(thread::configuration const& conf, Process&& process)
     {
-        BOOST_ASSERT(!m_running);
+        BOOST_ASSERT(!is_running());
 
         m_error = {};
-        m_running = true;
-        m_thread = std::thread(
-                [this,
-                 conf,
-                 fprocess = std::forward<Process>(process)]() mutable {
+        m_thread = std::jthread(
+                [this, conf, fprocess = std::forward<Process>(process)](
+                        std::stop_token stop_token) mutable {
                     conf.apply();
 
                     static_assert(!std::is_reference_v<decltype(fprocess)>);
 
-                    while (m_running.load(std::memory_order_relaxed))
+                    while (!stop_token.stop_requested())
                     {
                         if (std::error_condition err = fprocess())
                         {
                             m_error = err;
-                            m_running.store(false, std::memory_order_relaxed);
+                            break;
                         }
                     }
                 });
@@ -70,17 +63,12 @@ public:
 
     void stop()
     {
-        m_running = false;
-        if (m_thread.joinable())
-        {
-            m_thread.join();
-        }
+        m_thread.request_stop();
     }
 
 private:
     std::error_condition m_error;
-    std::atomic_bool m_running{};
-    std::thread m_thread;
+    std::jthread m_thread;
 };
 
 } // namespace piejam::audio
