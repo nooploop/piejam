@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 add_library(piejam_audio STATIC
+    include/piejam/audio/alloc_debug.h
     include/piejam/audio/components/amplifier.h
     include/piejam/audio/components/identity.h
     include/piejam/audio/components/pan_balance.h
@@ -79,6 +80,7 @@ add_library(piejam_audio STATIC
     include/piejam/audio/sound_card_hw_params.h
     include/piejam/audio/sound_card_manager.h
     include/piejam/audio/types.h
+    src/piejam/audio/alloc_debug.cpp
     src/piejam/audio/alsa/get_io_sound_cards.cpp
     src/piejam/audio/alsa/get_io_sound_cards.h
     src/piejam/audio/alsa/get_set_hw_params.cpp

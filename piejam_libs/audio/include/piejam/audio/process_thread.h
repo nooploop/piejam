@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <piejam/audio/alloc_debug.h>
+
 #include <piejam/thread/configuration.h>
 #include <piejam/type_traits.h>
 
@@ -47,6 +49,7 @@ public:
                 [this, conf, fprocess = std::forward<Process>(process)](
                         std::stop_token stop_token) mutable {
                     conf.apply();
+                    prohibit_dynamic_memory_allocation();
 
                     static_assert(!std::is_reference_v<decltype(fprocess)>);
 
