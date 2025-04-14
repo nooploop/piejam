@@ -52,10 +52,8 @@ Item {
                 ToolButton {
                     text: "FX"
 
-                    enabled: root.modelManager.rootView.canShowFxModule
-
                     onClicked: {
-                        if (root.modelManager.rootView.mode !== PJModels.RootView.Mode.FxModule) {
+                        if (root.modelManager.rootView.canShowFxModule && root.modelManager.rootView.mode !== PJModels.RootView.Mode.FxModule) {
                             root.modelManager.rootView.showFxModule()
                         } else {
                             MixerViewSettings.forceMode(MixerViewSettings.fx)

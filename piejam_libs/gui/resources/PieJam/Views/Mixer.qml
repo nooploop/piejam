@@ -143,13 +143,6 @@ ViewPane {
         }
 
         ViewToolBarButton {
-            text: "FX"
-            checked: MixerViewSettings.mode === MixerViewSettings.fx
-
-            onClicked: MixerViewSettings.toggleMode(MixerViewSettings.fx)
-        }
-
-        ViewToolBarButton {
             iconSource: "qrc:///images/icons/aux.svg"
             checked: MixerViewSettings.mode === MixerViewSettings.auxSend
 
