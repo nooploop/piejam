@@ -122,9 +122,6 @@ struct session
     std::vector<mixer_channel> mixer_channels;
 };
 
-void to_json(nlohmann::json&, session const&);
-void from_json(nlohmann::json const&, session&);
-
 auto load_session(std::istream&) -> session;
 void save_session(std::ostream&, session const&);
 

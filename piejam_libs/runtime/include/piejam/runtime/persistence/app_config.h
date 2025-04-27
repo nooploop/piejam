@@ -32,9 +32,6 @@ struct app_config
     std::size_t rec_session{};
 };
 
-void to_json(nlohmann::json&, app_config const&);
-void from_json(nlohmann::json const&, app_config&);
-
 auto load_app_config(std::istream&) -> app_config;
 void save_app_config(std::ostream&, app_config const&);
 
