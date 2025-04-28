@@ -14,7 +14,7 @@ with an attached USB audio interface. But it should be possible to use on any ot
 See accompanying [PieJam OS](https://github.com/nooploop/piejam_os) repository
 on how to create a Linux image for the Raspberry Pi.
 
-More [documentation](https://piejam.readthedocs.io/en/stable/)
+More [documentation](https://piejam.readthedocs.io/en/latest/)
 
 ## Features
 * Dynamic configuration of inputs and outputs
