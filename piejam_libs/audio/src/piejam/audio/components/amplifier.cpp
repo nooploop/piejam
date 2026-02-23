@@ -13,10 +13,10 @@
 
 #include <piejam/algorithm/transform_to_vector.h>
 #include <piejam/numeric/dB_lut.h>
+#include <piejam/range/indirected.h>
 #include <piejam/range/iota.h>
 
 #include <boost/assert.hpp>
-#include <boost/range/adaptor/indirected.hpp>
 
 #include <array>
 #include <format>
@@ -58,7 +58,7 @@ format_name(
     }
 }
 
-auto gain_smoother_lut = numeric::dB_lut<float, -120.f, 24.f, 1024>;
+constexpr auto gain_smoother_lut = numeric::dB_lut<float, -120.f, 24.f, 1024>;
 
 //! amplifies with same gain all channels
 class amplifier final : public engine::component
@@ -76,10 +76,6 @@ public:
                       2,
                       format_name(name, "amp", ch, num_channels));
               })}
-        , m_inputs{algorithm::transform_to_vector(
-              m_amp_procs | boost::adaptors::indirected,
-              engine::make_graph_endpoint<0>)}
-        , m_outputs{m_inputs}
     {
     }
 
@@ -119,8 +115,10 @@ private:
     std::unique_ptr<engine::processor> m_gain_proc;
     std::vector<std::unique_ptr<engine::processor>> m_amp_procs;
 
-    std::vector<engine::graph_endpoint> m_inputs;
-    std::vector<engine::graph_endpoint> m_outputs;
+    std::vector<engine::graph_endpoint> m_inputs{algorithm::transform_to_vector(
+        m_amp_procs | range::indirected,
+        engine::make_graph_endpoint<0>)};
+    std::vector<engine::graph_endpoint> m_outputs{m_inputs};
     std::array<engine::graph_endpoint, 1> m_event_inputs{{{*m_gain_proc, 0}}};
 };
 
@@ -144,13 +142,6 @@ public:
                       2,
                       format_name(name, "amp", ch, num_channels));
               })}
-        , m_inputs{algorithm::transform_to_vector(
-              m_amp_procs | boost::adaptors::indirected,
-              engine::make_graph_endpoint<0>)}
-        , m_outputs{m_inputs}
-        , m_event_inputs{algorithm::transform_to_vector(
-              m_gain_procs | boost::adaptors::indirected,
-              engine::make_graph_endpoint<0>)}
     {
     }
 
@@ -191,9 +182,14 @@ private:
     std::vector<std::unique_ptr<engine::processor>> m_gain_procs;
     std::vector<std::unique_ptr<engine::processor>> m_amp_procs;
 
-    std::vector<engine::graph_endpoint> m_inputs;
-    std::vector<engine::graph_endpoint> m_outputs;
-    std::vector<engine::graph_endpoint> m_event_inputs;
+    std::vector<engine::graph_endpoint> m_inputs{algorithm::transform_to_vector(
+        m_amp_procs | range::indirected,
+        engine::make_graph_endpoint<0>)};
+    std::vector<engine::graph_endpoint> m_outputs{m_inputs};
+    std::vector<engine::graph_endpoint> m_event_inputs{
+        algorithm::transform_to_vector(
+            m_gain_procs | range::indirected,
+            engine::make_graph_endpoint<0>)};
 };
 
 } // namespace

@@ -6,16 +6,11 @@
 
 #include <piejam/runtime/processors/stream_processor_factory.h>
 
-#include <piejam/algorithm/transform_to_vector.h>
+#include <piejam/audio/components/identity.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/graph.h>
 #include <piejam/audio/engine/graph_endpoint.h>
-#include <piejam/audio/engine/identity_processor.h>
 #include <piejam/audio/engine/stream_processor.h>
-#include <piejam/range/indices.h>
-#include <piejam/range/iota.h>
-
-#include <vector>
 
 namespace piejam::runtime::components
 {
@@ -37,12 +32,12 @@ public:
 
     auto inputs() const -> endpoints override
     {
-        return m_inputs;
+        return m_input_identity->inputs();
     }
 
     auto outputs() const -> endpoints override
     {
-        return m_outputs;
+        return m_comp->outputs();
     }
 
     auto event_inputs() const -> endpoints override
@@ -58,23 +53,19 @@ public:
     void connect(audio::engine::graph& g) const override
     {
         m_comp->connect(g);
+        m_input_identity->connect(g);
 
         std::size_t port{};
-        for (auto& proc : m_identity)
+        for (auto src : m_input_identity->outputs())
         {
-            g.audio.insert(
-                {.proc = *proc, .port = 0},
-                {.proc = *m_stream_proc, .port = port});
-
-            g.audio.insert({.proc = *proc, .port = 0}, m_comp->inputs()[port]);
-
+            g.audio.insert(src, {.proc = *m_stream_proc, .port = port});
+            g.audio.insert(src, m_comp->inputs()[port]);
             ++port;
         }
 
-        for (auto out : m_comp->outputs())
+        for (auto src : m_comp->outputs())
         {
-            g.audio.insert(out, {.proc = *m_stream_proc, .port = port});
-
+            g.audio.insert(src, {.proc = *m_stream_proc, .port = port});
             ++port;
         }
     }
@@ -83,23 +74,8 @@ private:
     std::unique_ptr<audio::engine::component> m_comp;
     std::shared_ptr<audio::engine::processor> m_stream_proc;
 
-    std::vector<std::unique_ptr<audio::engine::processor>> m_identity{
-        algorithm::transform_to_vector(
-            range::iota(m_comp->num_inputs()),
-            [](auto) { return audio::engine::make_identity_processor(); })};
-
-    std::vector<audio::engine::graph_endpoint> m_inputs{
-        algorithm::transform_to_vector(
-            range::indices(m_identity),
-            [this](auto port) {
-                return audio::engine::graph_endpoint{
-                    .proc = *m_identity[port],
-                    .port = 0};
-            })};
-    std::vector<audio::engine::graph_endpoint> m_outputs{
-        algorithm::transform_to_vector(
-            range::iota(m_comp->num_outputs()),
-            [this](std::size_t port) { return m_comp->outputs()[port]; })};
+    std::unique_ptr<audio::engine::component> m_input_identity{
+        audio::components::make_identity(m_comp->num_inputs())};
 };
 
 } // namespace

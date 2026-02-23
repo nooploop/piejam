@@ -6,17 +6,12 @@
 
 #include "filter_module.h"
 
+#include <piejam/audio/components/biquad_filter.h>
 #include <piejam/audio/dsp/biquad_filter.h>
 #include <piejam/audio/engine/component.h>
 #include <piejam/audio/engine/event_converter_processor.h>
-#include <piejam/audio/engine/graph.h>
-#include <piejam/audio/engine/graph_endpoint.h>
 #include <piejam/audio/engine/graph_generic_algorithms.h>
-#include <piejam/audio/engine/identity_processor.h>
-#include <piejam/audio/engine/named_processor.h>
-#include <piejam/audio/engine/single_event_input_processor.h>
 #include <piejam/audio/sample_rate.h>
-#include <piejam/audio/slice_algorithms.h>
 #include <piejam/runtime/components/in_out_stream.h>
 #include <piejam/runtime/fx/module.h>
 #include <piejam/runtime/internal_fx_component_factory.h>
@@ -105,117 +100,7 @@ make_coefficent_converter_processor(audio::sample_rate const sample_rate)
         },
         s_input_names,
         s_output_names,
-        "make_coeff");
-}
-
-class processor final
-    : public audio::engine::named_processor
-    , public audio::engine::single_event_input_processor<processor, coeffs_t>
-{
-public:
-    processor(std::string_view const name)
-        : named_processor(name)
-    {
-    }
-
-    auto type_name() const noexcept -> std::string_view override
-    {
-        return "filter";
-    }
-
-    auto num_inputs() const noexcept -> std::size_t override
-    {
-        return 1;
-    }
-
-    auto num_outputs() const noexcept -> std::size_t override
-    {
-        return 1;
-    }
-
-    auto event_inputs() const noexcept -> event_ports override
-    {
-        static std::array s_ports{
-            audio::engine::event_port{std::in_place_type<coeffs_t>, "coeffs"}};
-        return s_ports;
-    }
-
-    auto event_outputs() const noexcept -> event_ports override
-    {
-        return {};
-    }
-
-    void process(audio::engine::process_context const& ctx) override
-    {
-        ctx.results[0] = ctx.outputs[0];
-
-        process_sliced(ctx);
-    }
-
-    void process_buffer(audio::engine::process_context const& ctx)
-    {
-        visit(
-            [this, out = ctx.outputs[0]](auto const in) { process(in, out); },
-            ctx.inputs[0].get());
-    }
-
-    void process_slice(
-        audio::engine::process_context const& ctx,
-        std::size_t const offset,
-        std::size_t const count)
-    {
-        visit(
-            [this, out = ctx.outputs[0].subspan(offset, count)](auto const in) {
-                process(in, out);
-            },
-            subslice(ctx.inputs[0].get(), offset, count));
-    }
-
-    void process_event(
-        audio::engine::process_context const& /*ctx*/,
-        audio::engine::event<coeffs_t> const& ev)
-    {
-        m_biquad.coeffs = ev.value();
-    }
-
-private:
-    void process(float const c, std::span<float> out)
-    {
-        std::ranges::generate(out, [this, c]() { return m_biquad.process(c); });
-    }
-
-    void process(audio::slice<float>::span_t const in, std::span<float> out)
-    {
-        std::ranges::transform(in, out.begin(), [this](float const s) {
-            return m_biquad.process(s);
-        });
-    }
-
-    audio::dsp::biquad<float> m_biquad;
-};
-
-template <std::size_t NumChannels>
-[[nodiscard]]
-constexpr auto
-filter_channel_name(std::size_t ch)
-{
-    using namespace std::string_view_literals;
-    switch (NumChannels)
-    {
-        case 2:
-            switch (ch)
-            {
-                case 0:
-                    return "filter L"sv;
-                case 1:
-                    return "filter R"sv;
-                default:
-                    return "filter"sv;
-            }
-
-        default:
-            return "filter"sv;
-    }
+        "filter_coeffs");
 }
 
 template <std::size_t... Channel>
@@ -240,12 +125,12 @@ public:
 
     auto inputs() const -> endpoints override
     {
-        return m_inputs;
+        return m_filter1->inputs();
     }
 
     auto outputs() const -> endpoints override
     {
-        return m_outputs;
+        return m_filter2->outputs();
     }
 
     auto event_inputs() const -> endpoints override
@@ -261,6 +146,9 @@ public:
     void connect(audio::engine::graph& g) const override
     {
         using namespace audio::engine::endpoint_ports;
+
+        m_filter1->connect(g);
+        m_filter2->connect(g);
 
         audio::engine::connect_event(
             g,
@@ -283,37 +171,21 @@ public:
             *m_coeffs_proc,
             to<2>);
 
-        (audio::engine::connect_event(
-             g,
-             *m_coeffs_proc,
-             from<0>,
-             *m_filter1_procs[Channel],
-             to<0>),
-         ...);
+        audio::engine::connect_event(
+            g,
+            *m_coeffs_proc,
+            from<0>,
+            *m_filter1,
+            to<0>);
 
-        (audio::engine::connect_event(
-             g,
-             *m_coeffs_proc,
-             from<1>,
-             *m_filter2_procs[Channel],
-             to<0>),
-         ...);
+        audio::engine::connect_event(
+            g,
+            *m_coeffs_proc,
+            from<1>,
+            *m_filter2,
+            to<0>);
 
-        (audio::engine::connect(
-             g,
-             *m_input_procs[Channel],
-             from<0>,
-             *m_filter1_procs[Channel],
-             to<0>),
-         ...);
-
-        (audio::engine::connect(
-             g,
-             *m_filter1_procs[Channel],
-             from<0>,
-             *m_filter2_procs[Channel],
-             to<0>),
-         ...);
+        audio::engine::connect(g, *m_filter1, *m_filter2);
     }
 
 private:
@@ -321,27 +193,10 @@ private:
     std::shared_ptr<audio::engine::processor> m_cutoff_input_proc;
     std::shared_ptr<audio::engine::processor> m_resonance_input_proc;
     std::unique_ptr<audio::engine::processor> m_coeffs_proc;
-    std::array<std::unique_ptr<audio::engine::processor>, num_channels>
-        m_input_procs{
-            ((void)Channel, audio::engine::make_identity_processor())...};
-    std::array<std::unique_ptr<audio::engine::processor>, num_channels>
-        m_filter1_procs{
-            ((void)Channel,
-             std::make_unique<processor>(
-                 filter_channel_name<num_channels>(Channel)))...};
-    std::array<std::unique_ptr<audio::engine::processor>, num_channels>
-        m_filter2_procs{
-            ((void)Channel,
-             std::make_unique<processor>(
-                 filter_channel_name<num_channels>(Channel)))...};
-    std::array<audio::engine::graph_endpoint, num_channels> m_inputs{
-        audio::engine::graph_endpoint{
-            .proc = *m_input_procs[Channel],
-            .port = 0}...};
-    std::array<audio::engine::graph_endpoint, num_channels> m_outputs{
-        audio::engine::graph_endpoint{
-            .proc = *m_filter2_procs[Channel],
-            .port = 0}...};
+    std::unique_ptr<audio::engine::component> m_filter1{
+        audio::components::make_biquad_filter(num_channels, "filter1")};
+    std::unique_ptr<audio::engine::component> m_filter2{
+        audio::components::make_biquad_filter(num_channels, "filter2")};
     std::array<audio::engine::graph_endpoint, 3> m_event_inputs{
         audio::engine::graph_endpoint{.proc = *m_type_input_proc, .port = 0},
         audio::engine::graph_endpoint{.proc = *m_cutoff_input_proc, .port = 0},

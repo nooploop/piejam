@@ -4,12 +4,17 @@
 
 #pragma once
 
+#include <boost/assert.hpp>
+
 #include <ranges>
 
 namespace piejam::range
 {
 
-inline constexpr auto indirected = std::views::transform(
-    [](auto&& x) -> decltype(auto) { return *std::forward<decltype(x)>(x); });
+inline constexpr auto indirected =
+    std::views::transform([](auto&& x) -> decltype(auto) {
+        BOOST_ASSERT(!!x);
+        return *std::forward<decltype(x)>(x);
+    });
 
 } // namespace piejam::range

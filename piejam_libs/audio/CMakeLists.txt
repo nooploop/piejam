@@ -4,6 +4,7 @@
 
 add_library(piejam_audio STATIC
     include/piejam/audio/components/amplifier.h
+    include/piejam/audio/components/biquad_filter.h
     include/piejam/audio/components/identity.h
     include/piejam/audio/components/pan_balance.h
     include/piejam/audio/components/remap_channels.h
@@ -67,8 +68,8 @@ add_library(piejam_audio STATIC
     include/piejam/audio/slice_algorithms.h
     include/piejam/audio/sound_card_config.h
     include/piejam/audio/sound_card_descriptor.h
-    include/piejam/audio/sound_card_manager.h
     include/piejam/audio/sound_card_hw_params.h
+    include/piejam/audio/sound_card_manager.h
     include/piejam/audio/types.h
     src/piejam/audio/alsa/get_set_hw_params.cpp
     src/piejam/audio/alsa/get_set_hw_params.h
@@ -82,6 +83,7 @@ add_library(piejam_audio STATIC
     src/piejam/audio/alsa/process_step.cpp
     src/piejam/audio/alsa/process_step.h
     src/piejam/audio/components/amplifier.cpp
+    src/piejam/audio/components/biquad_filter.cpp
     src/piejam/audio/components/identity.cpp
     src/piejam/audio/components/pan_balance.cpp
     src/piejam/audio/dsp/pitch_yin.cpp

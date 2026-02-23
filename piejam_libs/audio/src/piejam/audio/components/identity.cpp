@@ -10,7 +10,7 @@
 #include <piejam/audio/engine/processor.h>
 
 #include <piejam/algorithm/transform_to_vector.h>
-#include <piejam/range/indices.h>
+#include <piejam/range/indirected.h>
 #include <piejam/range/iota.h>
 
 #include <vector>
@@ -62,10 +62,9 @@ public:
 private:
     std::vector<std::unique_ptr<engine::processor>> m_procs;
 
-    std::vector<engine::graph_endpoint> m_inputs{
-        algorithm::transform_to_vector(range::indices(m_procs), [this](auto i) {
-            return engine::graph_endpoint{.proc = *m_procs[i], .port = 0};
-        })};
+    std::vector<engine::graph_endpoint> m_inputs{algorithm::transform_to_vector(
+        m_procs | range::indirected,
+        engine::make_graph_endpoint<0>)};
     std::vector<engine::graph_endpoint> m_outputs{m_inputs};
 };
 
