@@ -238,6 +238,7 @@ extern selector<std::size_t> const select_xruns;
 extern selector<float> const select_cpu_load;
 
 extern selector<std::size_t> const select_display_rotation;
+extern selector<bool> const select_on_screen_keyboard_enabled;
 
 extern selector<root_view_mode> const select_root_view_mode;
 extern selector<mixer::channel_id> const select_fx_browser_fx_chain;

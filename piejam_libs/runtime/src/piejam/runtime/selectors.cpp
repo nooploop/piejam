@@ -1062,6 +1062,10 @@ selector<std::size_t> const select_display_rotation([](state const& st) {
     return st.display_rotation;
 });
 
+selector<bool> const select_on_screen_keyboard_enabled([](state const& st) {
+    return st.on_screen_keyboard_enabled;
+});
+
 selector<root_view_mode> const select_root_view_mode([](state const& st) {
     return st.root_view_mode;
 });

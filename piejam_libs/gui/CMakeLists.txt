@@ -44,7 +44,7 @@ add_library(piejam_gui STATIC
     include/piejam/gui/model/BoolParameter.h
     include/piejam/gui/model/DbScaleData.h
     include/piejam/gui/model/DbScaleTick.h
-    include/piejam/gui/model/DisplaySettings.h
+    include/piejam/gui/model/UISettings.h
     include/piejam/gui/model/EnumListModel.h
     include/piejam/gui/model/EnumParameter.h
     include/piejam/gui/model/ExternalAudioDeviceConfig.h
@@ -119,7 +119,7 @@ add_library(piejam_gui STATIC
     src/piejam/gui/model/AuxSend.cpp
     src/piejam/gui/model/BoolParameter.cpp
     src/piejam/gui/model/DbScaleData.cpp
-    src/piejam/gui/model/DisplaySettings.cpp
+    src/piejam/gui/model/UISettings.cpp
     src/piejam/gui/model/EnumParameter.cpp
     src/piejam/gui/model/ExternalAudioDeviceConfig.cpp
     src/piejam/gui/model/FileDialog.cpp

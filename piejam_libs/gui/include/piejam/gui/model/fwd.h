@@ -77,7 +77,7 @@ class MidiDeviceConfig;
 using MidiDeviceList = ObjectListModel<MidiDeviceConfig>;
 class MidiInputSettings;
 
-class DisplaySettings;
+class UISettings;
 class SessionSettings;
 
 class MidiAssignable;

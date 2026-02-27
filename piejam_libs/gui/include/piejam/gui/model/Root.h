@@ -35,9 +35,7 @@ class Root final : public CompositeSubscribableModel
         piejam::gui::model::MidiInputSettings*,
         midiInputSettings)
 
-    PIEJAM_GUI_CONSTANT_PROPERTY(
-        piejam::gui::model::DisplaySettings*,
-        displaySettings)
+    PIEJAM_GUI_CONSTANT_PROPERTY(piejam::gui::model::UISettings*, uiSettings)
 
     PIEJAM_GUI_CONSTANT_PROPERTY(
         piejam::gui::model::SessionSettings*,
@@ -65,6 +63,10 @@ public:
 private:
     PIEJAM_GUI_PROPERTY(bool, canShowFxModule, setCanShowFxModule)
     PIEJAM_GUI_PROPERTY(Mode, mode, setMode)
+    PIEJAM_GUI_PROPERTY(
+        bool,
+        onScreenKeyboardEnabled,
+        setOnScreenKeyboardEnabled)
 
 public:
     explicit Root(

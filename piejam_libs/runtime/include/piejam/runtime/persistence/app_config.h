@@ -32,6 +32,7 @@ struct app_config
     std::size_t rec_session{};
 
     std::size_t display_rotation{};
+    bool on_screen_keyboard_enabled{};
 
     runtime::startup_session startup_session;
     std::filesystem::path last_session_file;

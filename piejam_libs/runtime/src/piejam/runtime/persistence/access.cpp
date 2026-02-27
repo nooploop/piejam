@@ -52,6 +52,7 @@ save_app_config(
         conf.rec_session = state.rec_session + 1;
 
         conf.display_rotation = state.display_rotation;
+        conf.on_screen_keyboard_enabled = state.on_screen_keyboard_enabled;
         conf.startup_session = state.startup_session;
         conf.last_session_file = state.startup_session == startup_session::last
                                      ? state.current_session

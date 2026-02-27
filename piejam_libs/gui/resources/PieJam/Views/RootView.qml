@@ -145,7 +145,7 @@ SubscribableItem {
                         audioInputModel: root.model.audioInputSettings
                         audioOutputModel: root.model.audioOutputSettings
                         midiInputModel: root.model.midiInputSettings
-                        displayModel: root.model.displaySettings
+                        uiSettingsModel: root.model.uiSettings
                         sessionModel: root.model.sessionSettings
                     }
                     asynchronous: true
@@ -179,7 +179,7 @@ SubscribableItem {
 
         y: parent.height - inputPanel.height
 
-        visible: Qt.inputMethod.visible
+        visible: root.model.onScreenKeyboardEnabled && Qt.inputMethod.visible
 
         anchors.left: parent.left
         anchors.right: parent.right
@@ -206,6 +206,6 @@ SubscribableItem {
     Binding {
         target: VirtualKeyboardSettings
         property: "fullScreenMode"
-        value: Qt.inputMethod.visible
+        value: root.model.onScreenKeyboardEnabled && Qt.inputMethod.visible
     }
 }

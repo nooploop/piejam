@@ -4,6 +4,6 @@
 
 module PieJam.SettingsControls
 AudioSettings 1.0 AudioSettings.qml
-DisplaySettings 1.0 DisplaySettings.qml
 MidiSettings 1.0 MidiSettings.qml
 SessionSettings 1.0 SessionSettings.qml
+UISettings 1.0 UISettings.qml

@@ -14,7 +14,15 @@ namespace piejam::runtime::actions
 struct set_display_rotation final
     : ui::cloneable_action<set_display_rotation, reducible_action>
 {
-    std::size_t display_rotation;
+    std::size_t display_rotation{};
+
+    void reduce(state&) const override;
+};
+
+struct set_on_screen_keyboard_enabled final
+    : ui::cloneable_action<set_display_rotation, reducible_action>
+{
+    bool enabled{};
 
     void reduce(state&) const override;
 };

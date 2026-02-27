@@ -80,6 +80,7 @@ struct state
     float cpu_load{};
 
     std::size_t display_rotation{};
+    bool on_screen_keyboard_enabled{true};
 
     runtime::root_view_mode root_view_mode{};
     mixer::channel_id fx_browser_fx_chain_id;

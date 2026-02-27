@@ -13,7 +13,7 @@ import PieJam.Models 1.0 as PJModels
 SubscribableItem {
     id: root
 
-    property var model: null
+    property PJModels.UISettings model: null
 
     ColumnLayout {
         anchors.fill: parent
@@ -22,11 +22,20 @@ SubscribableItem {
         ComboBoxSetting {
             Layout.fillWidth: true
 
-            name: qsTr("Rotation")
-            model: root.model ? root.model.rotations : null
-            currentIndex: root.model.rotation
+            name: qsTr("Display Rotation")
+            model: root.model ? root.model.displayRotations : null
+            currentIndex: root.model.displayRotation
 
-            onOptionSelected: root.model.selectRotation(index)
+            onOptionSelected: root.model.selectDisplayRotation(index)
+        }
+
+        ToggleSetting {
+            Layout.fillWidth: true
+
+            name: qsTr("On-Screen Keyboard")
+            checked: root.model.onScreenKeyboardEnabled
+
+            onToggled: root.model.toggleOnScreenKeyboardEnabled(value)
         }
 
         Item {

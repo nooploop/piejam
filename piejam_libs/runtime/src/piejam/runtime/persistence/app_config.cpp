@@ -53,6 +53,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
     enabled_midi_input_devices,
     rec_session,
     display_rotation,
+    on_screen_keyboard_enabled,
     startup_session,
     last_session_file);
 

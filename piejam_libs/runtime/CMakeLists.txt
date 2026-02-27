@@ -12,7 +12,6 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/actions/control_midi_assignment.h
     include/piejam/runtime/actions/deactivate_midi_device.h
     include/piejam/runtime/actions/delete_fx_module.h
-    include/piejam/runtime/actions/display_actions.h
     include/piejam/runtime/actions/external_audio_device_actions.h
     include/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.h
     include/piejam/runtime/actions/fwd.h
@@ -41,11 +40,13 @@ add_library(piejam_runtime STATIC
     include/piejam/runtime/actions/set_parameter_value.h
     include/piejam/runtime/actions/set_string.h
     include/piejam/runtime/actions/shutdown.h
+    include/piejam/runtime/actions/ui_settings_actions.h
     include/piejam/runtime/audio_engine.h
     include/piejam/runtime/audio_engine_middleware.h
     include/piejam/runtime/audio_stream.h
     include/piejam/runtime/audio_stream_id.h
     include/piejam/runtime/bool_parameter.h
+    include/piejam/runtime/components/in_out_stream.h
     include/piejam/runtime/components/make_fx.h
     include/piejam/runtime/components/mixer_channel.h
     include/piejam/runtime/components/mute_solo.h
@@ -134,7 +135,6 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/actions/control_midi_assignment.cpp
     src/piejam/runtime/actions/deactivate_midi_device.cpp
     src/piejam/runtime/actions/delete_fx_module.cpp
-    src/piejam/runtime/actions/display_actions.cpp
     src/piejam/runtime/actions/external_audio_device_actions.cpp
     src/piejam/runtime/actions/finalize_ladspa_fx_plugin_scan.cpp
     src/piejam/runtime/actions/fx_chain_actions.cpp
@@ -147,9 +147,11 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/actions/session_actions.cpp
     src/piejam/runtime/actions/set_parameter_value.cpp
     src/piejam/runtime/actions/set_string.cpp
+    src/piejam/runtime/actions/ui_settings_actions.cpp
     src/piejam/runtime/audio_engine.cpp
     src/piejam/runtime/audio_engine_middleware.cpp
     src/piejam/runtime/audio_stream.cpp
+    src/piejam/runtime/components/in_out_stream.cpp
     src/piejam/runtime/components/make_fx.cpp
     src/piejam/runtime/components/mixer_channel.cpp
     src/piejam/runtime/components/mute_solo.cpp
@@ -179,8 +181,6 @@ add_library(piejam_runtime STATIC
     src/piejam/runtime/state.cpp
     src/piejam/runtime/state_access.cpp
     src/piejam/runtime/thunk_action.cpp
-    include/piejam/runtime/components/in_out_stream.h
-    src/piejam/runtime/components/in_out_stream.cpp
 )
 
 find_package(nlohmann_json REQUIRED)

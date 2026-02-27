@@ -6,7 +6,6 @@
 
 #include <piejam/gui/model/AudioDeviceSettings.h>
 #include <piejam/gui/model/AudioInputOutputSettings.h>
-#include <piejam/gui/model/DisplaySettings.h>
 #include <piejam/gui/model/FxBrowser.h>
 #include <piejam/gui/model/FxModuleView.h>
 #include <piejam/gui/model/Info.h>
@@ -14,6 +13,7 @@
 #include <piejam/gui/model/MidiInputSettings.h>
 #include <piejam/gui/model/Mixer.h>
 #include <piejam/gui/model/SessionSettings.h>
+#include <piejam/gui/model/UISettings.h>
 
 #include <piejam/runtime/actions/root_view_actions.h>
 #include <piejam/runtime/selectors.h>
@@ -31,7 +31,7 @@ Root::Root(
     , m_audioOutputSettings{&addModel<AudioInputOutputSettings>(
           io_direction::output)}
     , m_midiInputSettings{&addModel<MidiInputSettings>()}
-    , m_displaySettings{&addModel<DisplaySettings>()}
+    , m_uiSettings{&addModel<UISettings>()}
     , m_sessionSettings{&addModel<SessionSettings>(std::move(sessions_dir))}
     , m_mixer{&addModel<Mixer>()}
     , m_info{&addModel<Info>()}
@@ -91,6 +91,10 @@ Root::onSubscribe()
         [&](std::size_t rotation) {
             setDisplayRotation(static_cast<int>(rotation));
         });
+
+    observe(
+        runtime::selectors::select_on_screen_keyboard_enabled,
+        [&](bool enabled) { setOnScreenKeyboardEnabled(enabled); });
 }
 
 void

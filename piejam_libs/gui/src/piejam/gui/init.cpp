@@ -17,7 +17,6 @@
 #include <piejam/gui/model/AuxSend.h>
 #include <piejam/gui/model/BoolParameter.h>
 #include <piejam/gui/model/DbScaleData.h>
-#include <piejam/gui/model/DisplaySettings.h>
 #include <piejam/gui/model/EnumListModel.h>
 #include <piejam/gui/model/EnumParameter.h>
 #include <piejam/gui/model/ExternalAudioDeviceConfig.h>
@@ -56,6 +55,7 @@
 #include <piejam/gui/model/String.h>
 #include <piejam/gui/model/StringList.h>
 #include <piejam/gui/model/Types.h>
+#include <piejam/gui/model/UISettings.h>
 #include <piejam/gui/model/WaveformSlot.h>
 
 #include <QDir>
@@ -99,7 +99,6 @@ runRegistration()
     PIEJAM_GUI_MODEL(model::AuxSend, "AuxSend");
     PIEJAM_GUI_MODEL(model::BoolParameter, "BoolParameter");
     PIEJAM_GUI_MODEL(model::DbScaleData, "DbScaleData");
-    PIEJAM_GUI_MODEL(model::DisplaySettings, "DisplaySettings");
     PIEJAM_GUI_MODEL(model::EnumListModel, "EnumListModel");
     PIEJAM_GUI_MODEL(model::EnumParameter, "EnumParameter");
     PIEJAM_GUI_MODEL(
@@ -137,6 +136,7 @@ runRegistration()
     PIEJAM_GUI_MODEL(model::StereoLevel, "StereoLevel");
     PIEJAM_GUI_MODEL(model::String, "String");
     PIEJAM_GUI_MODEL(model::StringList, "StringList");
+    PIEJAM_GUI_MODEL(model::UISettings, "UISettings");
     PIEJAM_GUI_MODEL(model::WaveformSlot, "WaveformSlot");
 
     qmlRegisterUncreatableMetaObject(
