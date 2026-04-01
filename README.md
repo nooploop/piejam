@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=nooploop&project=piejam&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 <!--
 SPDX-FileCopyrightText: 2020-2026 Dimitrij Kotrev
 
