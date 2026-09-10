@@ -46,7 +46,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         -Wlogical-op
         -Wmismatched-tags
         -Wmultichar
-        # -Wnoexcept
+        #-Wnoexcept
         -Wnon-virtual-dtor
         -Wpointer-arith
         -Wrange-loop-construct
@@ -55,6 +55,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         -Wsuggest-attribute=format
         -Wsuggest-attribute=malloc
         -Wuninitialized
+        -Wno-maybe-uninitialized # should be fixed in gcc-16.2.0
         -Wvla
         -Wvolatile
         -Wwrite-strings

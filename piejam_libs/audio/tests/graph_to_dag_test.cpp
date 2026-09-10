@@ -35,14 +35,13 @@ TEST(graph_to_dag, audio_is_transferred_to_connected_proc)
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
 
-    EXPECT_CALL(in_proc, process(_))
-        .WillOnce(Invoke([](process_context const& ctx) {
-            ASSERT_EQ(1u, ctx.outputs.size());
-            auto const& buf = ctx.outputs[0];
-            ASSERT_EQ(1u, buf.size());
-            buf[0] = 23.f;
-            ctx.results[0] = buf;
-        }));
+    EXPECT_CALL(in_proc, process(_)).WillOnce([](process_context const& ctx) {
+        ASSERT_EQ(1u, ctx.outputs.size());
+        auto const& buf = ctx.outputs[0];
+        ASSERT_EQ(1u, buf.size());
+        buf[0] = 23.f;
+        ctx.results[0] = buf;
+    });
 
     auto input_has_sample = [](process_context const& ctx) {
         return ctx.inputs.size() == 1 &&
@@ -72,14 +71,13 @@ TEST(graph_to_dag, audio_can_spread_to_multiple_ins)
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
 
-    EXPECT_CALL(in_proc, process(_))
-        .WillOnce(Invoke([](process_context const& ctx) {
-            ASSERT_EQ(1u, ctx.outputs.size());
-            auto const& buf = ctx.outputs[0];
-            ASSERT_EQ(1u, buf.size());
-            buf[0] = 23.f;
-            ctx.results[0] = buf;
-        }));
+    EXPECT_CALL(in_proc, process(_)).WillOnce([](process_context const& ctx) {
+        ASSERT_EQ(1u, ctx.outputs.size());
+        auto const& buf = ctx.outputs[0];
+        ASSERT_EQ(1u, buf.size());
+        buf[0] = 23.f;
+        ctx.results[0] = buf;
+    });
 
     auto input_has_sample = [](process_context const& ctx) {
         return ctx.inputs.size() == 2 &&
@@ -133,12 +131,11 @@ TEST(graph_to_dag, unconnected_input_will_have_silence_buffer)
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
 
-    EXPECT_CALL(in_proc, process(_))
-        .WillOnce(Invoke([](process_context const& ctx) {
-            ASSERT_EQ(1u, ctx.outputs.size());
-            ASSERT_EQ(1u, ctx.results.size());
-            ctx.results[0] = ctx.outputs[0];
-        }));
+    EXPECT_CALL(in_proc, process(_)).WillOnce([](process_context const& ctx) {
+        ASSERT_EQ(1u, ctx.outputs.size());
+        ASSERT_EQ(1u, ctx.results.size());
+        ctx.results[0] = ctx.outputs[0];
+    });
 
     auto valid_ins = [](process_context const& ctx) {
         return ctx.inputs.size() == 2 &&
@@ -172,12 +169,11 @@ TEST(graph_to_dag, event_is_transferred)
     std::size_t buffer_size = 1;
     auto d = graph_to_dag(g).make_runnable();
 
-    EXPECT_CALL(in_proc, process(_))
-        .WillOnce(Invoke([](process_context const& ctx) {
-            auto& ev_buf = ctx.event_outputs.template get<float>(0);
-            ev_buf.insert(5, 23.f);
-            EXPECT_EQ(1u, ev_buf.size());
-        }));
+    EXPECT_CALL(in_proc, process(_)).WillOnce([](process_context const& ctx) {
+        auto& ev_buf = ctx.event_outputs.template get<float>(0);
+        ev_buf.insert(5, 23.f);
+        EXPECT_EQ(1u, ev_buf.size());
+    });
 
     auto event_input_has_event = [](process_context const& ctx) {
         auto const& in_buf = ctx.event_inputs.get<float>(0);
@@ -210,11 +206,11 @@ TEST(graph_to_dag, event_output_buffer_is_cleared_after_dag_run)
 
     event_buffer<float>* ev_buf{};
     EXPECT_CALL(in_proc, process(_))
-        .WillOnce(Invoke([&ev_buf](process_context const& ctx) {
+        .WillOnce([&ev_buf](process_context const& ctx) {
             ev_buf = &ctx.event_outputs.template get<float>(0);
             ev_buf->insert(5, 23.f);
             EXPECT_EQ(1u, ev_buf->size());
-        }));
+        });
 
     (*d)(buffer_size);
 
